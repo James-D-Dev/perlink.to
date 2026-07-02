@@ -6,5 +6,10 @@
     { "path": "./.nuxt/tsconfig.server.json" },
     { "path": "./.nuxt/tsconfig.shared.json" },
     { "path": "./.nuxt/tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "types": ["@cloudflare/workers-types", "@types/node"],
+    "typeRoots": ["./types", "./node_modules/@types"]
+  },
+  "include": ["./types/**/*", "app/types/index.d.ts"]
 }

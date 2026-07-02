@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "skills": {
+    "nuxt-ui": {
+      "source": "ui.nuxt.com",
+      "sourceType": "well-known",
+      "computedHash": "0eabcdce7f64bc3097827afeb07a2d6b3081e1b3c211ea591b37a373ba656665"
+    },
+    "vue-typescript": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "vue-typescript/SKILL.md",
+      "computedHash": "bae0e2f07fdb7f1cbec9eadc036d3bc90f78de2d7e1cf2f07767899d22beb847"
+    }
+  }
+}

@@ -1,0 +1,147 @@
+<template>
+  <div
+    class="min-h-screen"
+    :style="{
+      backgroundColor: bioPageAsBioData?.themeConfig?.colors?.third || '#000000',
+    }"
+  >
+    <Head>
+      <Meta charSet="utf-8" />
+      <Meta name="emotion-insertion-point" content="" />
+      <Meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=contain, user-scalable=no"
+      />
+      <Title>{{ metaTitle }}</Title>
+      <Meta name="description" :content="metaDesc" />
+      <Meta property="og:title" :content="metaTitle" />
+      <Meta property="og:description" :content="metaDesc" />
+      <Meta property="og:url" :content="metaUrl" />
+      <Meta property="og:site_name" content="Perlink" />
+      <Meta property="og:image" :content="metaImg" />
+      <Meta property="og:image:width" content="600" />
+      <Meta property="og:image:height" content="600" />
+      <Meta property="og:type" content="website" />
+
+      <Link rel="canonical" :href="metaUrl" />
+      <Meta name="mobile-web-app-capable" content="yes" />
+      <Meta name="apple-mobile-web-app-title" content="Perlink" />
+      <Meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <Meta name="theme-color" content="#000000" />
+      <Meta name="fb:app_id" content="" />
+
+      <Meta name="twitter:card" content="summary_large_image" />
+      <Meta name="twitter:site" content="@perlinkto" />
+      <Meta name="twitter:creator" :content="`@${bioPage?.username}`" />
+      <Meta name="twitter:title" :content="metaTitle" />
+      <Meta name="twitter:description" :content="metaDesc" />
+      <Meta name="twitter:image" :content="metaImg" />
+      <Meta property="profile:username" :content="bioPage?.username" />
+    </Head>
+
+    <div class="mx-auto">
+      <!-- Loading -->
+      <div v-if="pending" class="flex justify-center py-20">
+        <UIcon
+          name="i-lucide-loader-circle"
+          class="w-12 h-12 text-white animate-spin"
+        />
+      </div>
+
+      <!-- Error -->
+      <div v-else-if="error" class="text-center py-20">
+        <UIcon
+          name="i-lucide-alert-circle"
+          class="w-16 h-16 text-gray-400 mx-auto mb-4"
+        />
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Page Not Found</h1>
+        <p class="text-gray-500">
+          This bio page doesn't exist or isn't published yet.
+        </p>
+        <UButton to="/" class="mt-6" color="primary"> Go Home </UButton>
+      </div>
+
+      <!-- Bio Content -->
+      <BioPageView
+        v-else-if="bioPage && bioPageAsBioData"
+        :bio-data="bioPageAsBioData"
+        :username="bioPage.username"
+        mode="view"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { BioBlock, BioData, ThemeConfig } from "~/types/bio";
+import { DEFAULT_THEME } from "~/types/bio";
+definePageMeta({
+  layout: "blank",
+});
+
+interface ApiBioPage {
+  id: string;
+  username: string;
+  title: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  templateId: string;
+  themeConfig: Partial<ThemeConfig> | null;
+  isPublished: boolean;
+  viewCount: number;
+  blocks?: BioBlock[];
+}
+
+const route = useRoute();
+const username = route.params.username as string;
+
+const { data, pending, error } = await useFetch<{ bioPage: ApiBioPage }>(
+  `/api/bio/${username}`,
+  { key: `bio-${username}`, server: true },
+);
+
+const bioPage = computed(() => data.value?.bioPage);
+
+const metaTitle = computed(() => {
+  return `@${bioPage.value?.username} | ${bioPage.value?.title} | Perlink`;
+});
+const metaDesc = computed(() => {
+  return `@${bioPage.value?.username}: ${bioPage.value?.title}. ${bioPage.value?.bio}`;
+});
+const metaUrl = computed(() => {
+  return `https://perlink.to/${bioPage.value?.username}`;
+});
+const metaImg = computed(() => {
+  return `${bioPage.value?.avatarUrl ?? undefined}`;
+});
+
+const bioPageAsBioData = computed<BioData | undefined>(() => {
+  const p = bioPage.value;
+  if (!p) return undefined;
+  return {
+    title: p.title || p.username,
+    bio: p.bio || "",
+    avatarUrl: p.avatarUrl || "",
+    templateId: p.templateId,
+    themeConfig: {
+      colors: { ...DEFAULT_THEME.colors, ...(p.themeConfig?.colors || {}) },
+      background: {
+        ...DEFAULT_THEME.background,
+        ...(p.themeConfig?.background || {}),
+      },
+      card: { ...DEFAULT_THEME.card, ...(p.themeConfig?.card || {}) },
+      button: { ...DEFAULT_THEME.button, ...(p.themeConfig?.button || {}) },
+      header: { ...DEFAULT_THEME.header, ...(p.themeConfig?.header || {}) },
+      avatar: { ...DEFAULT_THEME.avatar, ...(p.themeConfig?.avatar || {}) },
+      link: { ...DEFAULT_THEME.link, ...(p.themeConfig?.link || {}) },
+      typography: {
+        ...DEFAULT_THEME.typography,
+        ...(p.themeConfig?.typography || {}),
+      },
+    } as ThemeConfig,
+    blocks: p.blocks || [],
+  };
+});
+
+// Bio page view tracking is now handled server-side in /api/bio/[username].get.ts
+</script>

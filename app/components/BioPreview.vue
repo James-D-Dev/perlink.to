@@ -1,0 +1,31 @@
+<template>
+  <BioPageView
+    :bio-data="bioData"
+    :username="username"
+    :style="{
+      width: `${RENDER_WIDTH}px`,
+      height: `${renderHeight}px`,
+      transform: `scale(${scale})`,
+      transformOrigin: 'top left',
+      overflow: 'auto',
+    }"
+    mode="preview"
+  />
+</template>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import type { BioData } from "~/types/bio";
+
+defineProps<{
+  bioData: BioData;
+  username: string;
+}>();
+
+const RENDER_WIDTH = 375;
+const DISPLAY_WIDTH = 296;
+const DISPLAY_HEIGHT = 500;
+
+const scale = computed(() => DISPLAY_WIDTH / RENDER_WIDTH);
+const renderHeight = computed(() => DISPLAY_HEIGHT / scale.value);
+</script>

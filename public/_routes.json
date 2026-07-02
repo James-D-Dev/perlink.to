@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/_nuxt/*",
+    "/favicon.ico",
+    "/favicon.png",
+    "/robots.txt",
+    "/sitemap.xml"
+  ]
+}

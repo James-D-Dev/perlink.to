@@ -10,9 +10,27 @@
 	"observability": {
 		"enabled": true
 	},
-	"upload_source_maps": true,
+	"upload_source_maps": false,
 	"compatibility_flags": [
 		"nodejs_compat"
+	],
+	/**
+	 * D1 Database Binding
+	 * https://developers.cloudflare.com/d1/
+	 */
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "perlink_to_db",
+			"database_id": "b2b46bb2-c690-4564-819e-5fb25ad56970",
+			"migrations_dir": "server/migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"bucket_name": "perlink-avatars",
+			"binding": "AVATARS_BUCKET"
+		}
 	]
 	/**
 	 * Smart Placement
