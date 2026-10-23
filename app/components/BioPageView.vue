@@ -275,6 +275,32 @@
           :data="birthdayCountdownData"
           class="my-4 px-4"
         />
+        <!-- Menu Block -->
+        <BioMenuDisplay
+          v-if="block.name === 'menu' && block.data?.sections?.length"
+          id="menu-block"
+          :data="block.data"
+          :card-style="cardStyle"
+          :heading-color="nameStyle.color"
+          class="my-6 px-4"
+        />
+        <!-- Opening Hours Block -->
+        <BioHoursDisplay
+          v-if="block.name === 'hours' && block.data?.days?.length"
+          id="hours-block"
+          :data="block.data"
+          :card-style="cardStyle"
+          class="mx-4 my-4"
+        />
+        <!-- Contact Block -->
+        <BioContactDisplay
+          v-if="block.name === 'contact' && (block.data?.address || block.data?.phone || block.data?.email || block.data?.bookingUrl)"
+          id="contact-block"
+          :data="block.data"
+          :card-style="cardStyle"
+          :button-style="buttonStyle"
+          class="mx-4 my-4"
+        />
         <!-- more block -->
       </template>
 

@@ -94,7 +94,52 @@
           <template #content="{ item }">
             <!-- Editor Tab -->
             <template v-if="item.value === 'editor'">
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+              <!-- Template picker for empty pages -->
+              <div v-if="showTemplatePicker" class="mt-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
+                <div class="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <h3 class="font-semibold text-gray-900">Start from a template</h3>
+                    <p class="text-sm text-gray-500">Pick a starting point. Every template includes sample content, a theme and a matching 3D room.</p>
+                  </div>
+                  <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" @click="templatePickerDismissed = true" />
+                </div>
+                <BioTemplatePicker @select="applyTemplate" />
+              </div>
+
+              <!-- Page mode -->
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-4">
+                <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1">
+                  <UButton
+                    icon="i-lucide-layout-list"
+                    label="2D page"
+                    :color="pageMode === '2d' ? 'primary' : 'neutral'"
+                    :variant="pageMode === '2d' ? 'solid' : 'ghost'"
+                    @click="setPageMode('2d')"
+                  />
+                  <UButton
+                    icon="i-lucide-box"
+                    label="3D room"
+                    :color="pageMode === '3d' ? 'primary' : 'neutral'"
+                    :variant="pageMode === '3d' ? 'solid' : 'ghost'"
+                    @click="setPageMode('3d')"
+                  />
+                </div>
+                <p class="text-sm text-gray-500">
+                  {{ pageMode === '3d'
+                    ? 'Visitors see your 3D room first and can switch to the 2D page.'
+                    : 'Visitors see your classic page.' }}
+                </p>
+                <div v-if="pageMode === '3d'" class="flex gap-2">
+                  <UButton icon="i-lucide-save" label="Save draft" :loading="saving" @click="saveBio" />
+                  <UButton icon="i-lucide-globe" label="Publish" color="success" variant="outline" :loading="publishing" @click="publishBio" />
+                </div>
+              </div>
+
+              <div v-if="pageMode === '3d'" class="pt-4">
+                <LazyRoomEditor v-model:room="roomModel" />
+              </div>
+
+              <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
                 <div class="lg:col-span-7">
                   <BioEditor
                     :active-block="activeBlock"
@@ -160,6 +205,15 @@
                       existingBio?.username
                     }}</span>
                   </div>
+                </div>
+
+                <!-- Template -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                  <h3 class="font-semibold text-gray-900 mb-1">Template</h3>
+                  <p class="text-sm text-gray-500 mb-3">
+                    Replace the page content, theme and 3D room with a template.
+                  </p>
+                  <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
                 </div>
 
                 <!-- Share Button Toggle -->
@@ -229,6 +283,8 @@ import type {
   BioBlock,
 } from "~/types/bio";
 import { DEFAULT_THEME } from "~/types/bio";
+import { PAGE_TEMPLATES } from "~/data/pageTemplates";
+import { createDefaultRoom, normalizeRoom, type PageMode, type RoomConfig } from "~/types/room";
 import { useBioBlock } from "~/composables/useBioBlock";
 
 definePageMeta({
@@ -238,6 +294,7 @@ definePageMeta({
 });
 
 const toast = useToast();
+const confirm = useConfirm();
 
 // State
 const loading = ref(true);
@@ -607,6 +664,67 @@ const handleUpdateImageAlbum = (data: { images: any[]; layout: any }) => {
   setImageAlbum(data.images, data.layout);
 };
 
+// Templates
+const templatePickerDismissed = ref(false);
+const showTemplatePicker = computed(
+  () => !templatePickerDismissed.value && bioData.blocks.length === 0 && !bioData.bio,
+);
+
+const applyTemplate = async (templateId: string) => {
+  const template = PAGE_TEMPLATES.find((t) => t.id === templateId);
+  if (!template) return;
+  const content = template.build();
+  bioData.title = bioData.title || content.title;
+  bioData.bio = content.bio;
+  bioData.blocks = content.blocks;
+  bioData.themeConfig = {
+    ...content.themeConfig,
+    showShare: bioData.themeConfig.showShare,
+    pageMode: bioData.themeConfig.pageMode || "2d",
+    room: content.room,
+  };
+  for (const block of content.blocks) {
+    if (!enabledBlocks.value.includes(block.name)) enabledBlocks.value.push(block.name);
+  }
+  templatePickerDismissed.value = true;
+  activeBlock.value = content.blocks[0]?.name ?? "header";
+  toast.add({
+    title: `${template.name} applied`,
+    description: "Edit the sample content, then save or publish.",
+    color: "success",
+  });
+};
+
+const confirmApplyTemplate = async (templateId: string) => {
+  const template = PAGE_TEMPLATES.find((t) => t.id === templateId);
+  if (!template) return;
+  const ok = await confirm({
+    title: `Apply "${template.name}"?`,
+    description: "This replaces your current blocks, theme and 3D room. Your changes are not saved until you click Save.",
+    confirmLabel: "Apply template",
+    color: "primary",
+  });
+  if (ok) await applyTemplate(templateId);
+};
+
+// 3D room mode
+const pageMode = computed<PageMode>(() => bioData.themeConfig.pageMode || "2d");
+
+const roomModel = computed<RoomConfig>({
+  get: () => bioData.themeConfig.room || createDefaultRoom(),
+  set: (room) => {
+    bioData.themeConfig = { ...bioData.themeConfig, room };
+  },
+});
+
+const setPageMode = (mode: PageMode) => {
+  bioData.themeConfig = {
+    ...bioData.themeConfig,
+    pageMode: mode,
+    room: mode === "3d" ? bioData.themeConfig.room || createDefaultRoom() : bioData.themeConfig.room,
+  };
+};
+
 // Get username from route param
 const route = useRoute();
 const routeUsername = computed(() => route.params.url as string);
@@ -648,6 +766,16 @@ const loadBio = async () => {
         }
         return acc;
       }, {} as ThemeConfig);
+      // 3D room settings are not part of DEFAULT_THEME, so copy them explicitly
+      bioData.themeConfig.pageMode = (savedTheme as any).pageMode === "3d" ? "3d" : "2d";
+      if ((savedTheme as any).room) {
+        bioData.themeConfig.room = normalizeRoom((savedTheme as any).room);
+      }
+
+      // Mark every block the page already has as added
+      for (const block of bioData.blocks) {
+        if (!enabledBlocks.value.includes(block.name)) enabledBlocks.value.push(block.name);
+      }
 
       // Enable VietQR block if exists
       if (

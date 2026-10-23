@@ -61,12 +61,36 @@
         <UButton to="/" class="mt-6" color="primary"> Go Home </UButton>
       </div>
 
+      <!-- 3D room -->
+      <ClientOnly v-else-if="bioPage && room && !show2d">
+        <LazyRoomViewer
+          :room="room"
+          :title="bioPage.title || bioPage.username"
+          :bio="bioPage.bio || undefined"
+          :avatar-url="bioPage.avatarUrl || undefined"
+          @switch2d="show2d = true"
+        />
+        <template #fallback>
+          <div class="fixed inset-0 flex items-center justify-center bg-slate-900">
+            <UIcon name="i-lucide-loader-circle" class="size-10 animate-spin text-white" />
+          </div>
+        </template>
+      </ClientOnly>
+
       <!-- Bio Content -->
       <BioPageView
         v-else-if="bioPage && bioPageAsBioData"
         :bio-data="bioPageAsBioData"
         :username="bioPage.username"
         mode="view"
+      />
+      <UButton
+        v-if="room && show2d"
+        class="fixed bottom-4 left-4 z-50 shadow-lg"
+        color="neutral"
+        icon="i-lucide-box"
+        label="3D room"
+        @click="show2d = false"
       />
     </div>
   </div>
@@ -75,6 +99,7 @@
 <script setup lang="ts">
 import type { BioBlock, BioData, ThemeConfig } from "~/types/bio";
 import { DEFAULT_THEME } from "~/types/bio";
+import { normalizeRoom, type RoomConfig } from "~/types/room";
 definePageMeta({
   layout: "blank",
 });
@@ -142,6 +167,13 @@ const bioPageAsBioData = computed<BioData | undefined>(() => {
     blocks: p.blocks || [],
   };
 });
+
+// Pages in 3D mode open as a room; visitors can switch to the 2D page
+const room = computed<RoomConfig | null>(() => {
+  const theme = bioPage.value?.themeConfig;
+  return theme?.pageMode === "3d" ? normalizeRoom(theme.room) : null;
+});
+const show2d = ref(false);
 
 // Bio page view tracking is now handled server-side in /api/bio/[username].get.ts
 </script>

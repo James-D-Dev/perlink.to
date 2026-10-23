@@ -1,0 +1,684 @@
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
+import type { RoomConfig, RoomObject, RoomStyle, WallSide } from '~/types/room'
+import { CATALOG_BY_TYPE, type CatalogItem } from './catalog'
+import { getDaylight, type DaylightState } from './daylight'
+
+export type TransformMode = 'translate' | 'rotate'
+
+export interface RoomSceneOptions {
+  editable: boolean
+  onSelect?: (id: string | null) => void
+  onObjectChange?: (id: string, patch: Pick<RoomObject, 'position' | 'rotation'>) => void
+  onHover?: (id: string | null, x: number, y: number) => void
+  onActivate?: (id: string) => void
+}
+
+interface ObjectEntry {
+  data: RoomObject
+  item: CatalogItem
+  root: THREE.Group
+  light?: THREE.PointLight
+  glowMaterials: THREE.MeshStandardMaterial[]
+  skyMaterials: THREE.MeshStandardMaterial[]
+  signature: string
+}
+
+const WALL_THICKNESS = 0.12
+const FLOOR_THICKNESS = 0.14
+const SKY_NIGHT = new THREE.Color('#0b1026')
+const SKY_DUSK = new THREE.Color('#f2a65a')
+const SKY_DAY = new THREE.Color('#8fd0f5')
+const GROUND_DAY = new THREE.Color('#7fb069')
+const GROUND_NIGHT = new THREE.Color('#1f3326')
+const SUN_COLOR = new THREE.Color('#fff1d6')
+const MOON_COLOR = new THREE.Color('#9fb4ff')
+
+export class RoomScene {
+  private container: HTMLElement
+  private options: RoomSceneOptions
+  private renderer: THREE.WebGLRenderer
+  private scene = new THREE.Scene()
+  private camera: THREE.PerspectiveCamera
+  private controls: OrbitControls
+  private transform?: TransformControls
+  private raycaster = new THREE.Raycaster()
+  private pointer = new THREE.Vector2()
+  private resizeObserver: ResizeObserver
+  private frame = 0
+  private disposed = false
+
+  private shell = new THREE.Group()
+  private objectsGroup = new THREE.Group()
+  private outdoor = new THREE.Group()
+  private entries = new Map<string, ObjectEntry>()
+  private style?: RoomStyle
+  private styleSignature = ''
+  private room?: RoomConfig
+
+  private hemi = new THREE.HemisphereLight('#ffffff', '#6b5b4a', 0.6)
+  private ambient = new THREE.AmbientLight('#ffffff', 0.2)
+  private sun = new THREE.DirectionalLight('#ffffff', 2)
+  private sunDisc: THREE.Mesh
+  private moonDisc: THREE.Mesh
+  private stars: THREE.Points
+  private groundMaterial = new THREE.MeshStandardMaterial({ color: GROUND_DAY, roughness: 1 })
+  private walls: THREE.Mesh[] = []
+  private floor?: THREE.Mesh
+
+  private selectedId: string | null = null
+  private selectionBox = new THREE.Box3Helper(new THREE.Box3(), new THREE.Color('#38bdf8'))
+  private hoveredId: string | null = null
+  private daylightOverride: DaylightState | null = null
+  private skyColor = new THREE.Color()
+  private pointerDown = { x: 0, y: 0 }
+
+  constructor(container: HTMLElement, options: RoomSceneOptions) {
+    this.container = container
+    this.options = options
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    this.renderer.shadowMap.enabled = true
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace
+    this.renderer.domElement.style.display = 'block'
+    this.renderer.domElement.style.touchAction = 'none'
+    container.appendChild(this.renderer.domElement)
+
+    this.camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200)
+    this.camera.position.set(9.5, 7.5, 9.5)
+
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+    this.controls.target.set(0, 1, 0)
+    this.controls.enableDamping = true
+    this.controls.dampingFactor = 0.08
+    this.controls.minDistance = 6
+    this.controls.maxDistance = 26
+    this.controls.minPolarAngle = 0.25
+    this.controls.maxPolarAngle = 1.35
+    // Keep the camera on the open side of the room so the walls stay behind
+    this.controls.minAzimuthAngle = 0.05
+    this.controls.maxAzimuthAngle = Math.PI / 2 - 0.05
+    this.controls.enablePan = false
+
+    this.scene.add(this.hemi, this.ambient, this.sun, this.sun.target)
+    this.sun.castShadow = true
+    this.sun.shadow.mapSize.set(2048, 2048)
+    this.sun.shadow.camera.left = -8
+    this.sun.shadow.camera.right = 8
+    this.sun.shadow.camera.top = 8
+    this.sun.shadow.camera.bottom = -8
+    this.sun.shadow.bias = -0.0005
+    this.sun.shadow.normalBias = 0.02
+
+    this.sunDisc = new THREE.Mesh(
+      new THREE.SphereGeometry(1.4, 24, 16),
+      new THREE.MeshBasicMaterial({ color: '#ffe8a3', fog: false }),
+    )
+    this.moonDisc = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 24, 16),
+      new THREE.MeshBasicMaterial({ color: '#e8ecff', fog: false }),
+    )
+    this.stars = this.createStars()
+    this.scene.add(this.sunDisc, this.moonDisc, this.stars, this.shell, this.objectsGroup, this.outdoor)
+
+    this.selectionBox.visible = false
+    this.scene.add(this.selectionBox)
+
+    if (options.editable) {
+      this.transform = new TransformControls(this.camera, this.renderer.domElement)
+      this.transform.setSize(0.8)
+      this.transform.setSpace('world')
+      this.transform.addEventListener('dragging-changed', (e) => {
+        this.controls.enabled = !(e as unknown as { value: boolean }).value
+      })
+      this.transform.addEventListener('objectChange', () => this.constrainSelected())
+      this.transform.addEventListener('mouseUp', () => this.commitSelected())
+      this.scene.add(this.transform.getHelper())
+    }
+
+    this.renderer.domElement.addEventListener('pointerdown', this.handlePointerDown)
+    this.renderer.domElement.addEventListener('pointerup', this.handlePointerUp)
+    this.renderer.domElement.addEventListener('pointermove', this.handlePointerMove)
+    this.renderer.domElement.addEventListener('pointerleave', this.handlePointerLeave)
+
+    this.resizeObserver = new ResizeObserver(() => this.resize())
+    this.resizeObserver.observe(container)
+    this.resize()
+    this.animate()
+  }
+
+  // ---------- Public API ----------
+
+  setRoom(room: RoomConfig) {
+    this.room = room
+    const signature = JSON.stringify(room.style)
+    if (signature !== this.styleSignature) {
+      this.styleSignature = signature
+      this.style = room.style
+      this.buildShell(room.style)
+      this.buildOutdoor(room.style)
+      // Wall objects depend on room size
+      for (const entry of this.entries.values()) this.applyTransform(entry)
+    }
+    this.syncObjects(room.objects)
+  }
+
+  select(id: string | null) {
+    this.selectedId = id && this.entries.has(id) ? id : null
+    this.updateTransformAttachment()
+  }
+
+  setTransformMode(mode: TransformMode) {
+    if (!this.transform) return
+    this.transform.setMode(mode)
+    this.updateTransformAttachment()
+  }
+
+  /** Force a time of day (editor preview); null returns to the configured mode */
+  setDaylightOverride(state: DaylightState | null) {
+    this.daylightOverride = state
+  }
+
+  /**
+   * Where a catalog item dropped at a screen point should land.
+   * Floor items stack on top of furniture; wall items stick to the nearest wall.
+   */
+  getDropTarget(clientX: number, clientY: number, wallMounted: boolean): { position: [number, number, number]; wall?: WallSide } | null {
+    if (!this.style) return null
+    this.setPointer(clientX, clientY)
+    const { width, depth, height } = this.style
+
+    if (wallMounted) {
+      const hit = this.raycaster.intersectObjects(this.walls, false)[0]
+      if (!hit) return null
+      const wall = hit.object.userData.wall as WallSide
+      const y = THREE.MathUtils.clamp(hit.point.y, 0.4, height - 0.3)
+      return wall === 'back'
+        ? { wall, position: [THREE.MathUtils.clamp(hit.point.x, -width / 2 + 0.4, width / 2 - 0.4), y, -depth / 2] }
+        : { wall, position: [-width / 2, y, THREE.MathUtils.clamp(hit.point.z, -depth / 2 + 0.4, depth / 2 - 0.4)] }
+    }
+
+    const targets: THREE.Object3D[] = [...this.objectsGroup.children]
+    if (this.floor) targets.push(this.floor)
+    const hits = this.raycaster.intersectObjects(targets, true)
+    const hit = hits.find(h => (h.face?.normal.y ?? 0) > 0.5 || h.object === this.floor)
+    if (!hit) return null
+    const onFloor = hit.object === this.floor
+    return {
+      position: [
+        THREE.MathUtils.clamp(hit.point.x, -width / 2 + 0.2, width / 2 - 0.2),
+        onFloor ? 0 : Math.max(hit.point.y, 0),
+        THREE.MathUtils.clamp(hit.point.z, -depth / 2 + 0.2, depth / 2 - 0.2),
+      ],
+    }
+  }
+
+  dispose() {
+    this.disposed = true
+    cancelAnimationFrame(this.frame)
+    this.resizeObserver.disconnect()
+    const el = this.renderer.domElement
+    el.removeEventListener('pointerdown', this.handlePointerDown)
+    el.removeEventListener('pointerup', this.handlePointerUp)
+    el.removeEventListener('pointermove', this.handlePointerMove)
+    el.removeEventListener('pointerleave', this.handlePointerLeave)
+    this.transform?.detach()
+    this.transform?.dispose()
+    this.controls.dispose()
+    this.scene.traverse((obj) => {
+      const mesh = obj as THREE.Mesh
+      mesh.geometry?.dispose()
+      const material = mesh.material as THREE.Material | THREE.Material[] | undefined
+      if (Array.isArray(material)) material.forEach(m => this.disposeMaterial(m))
+      else if (material) this.disposeMaterial(material)
+    })
+    this.renderer.dispose()
+    el.remove()
+  }
+
+  // ---------- Room shell & outdoor ----------
+
+  private buildShell(style: RoomStyle) {
+    this.clearGroup(this.shell)
+    this.walls = []
+    const { width, depth, height } = style
+
+    const floorMaterial = new THREE.MeshStandardMaterial({
+      color: style.floorColor,
+      map: createFloorTexture(style.floorMaterial, width, depth),
+      roughness: style.floorMaterial === 'tile' ? 0.35 : 0.85,
+    })
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(width + WALL_THICKNESS, FLOOR_THICKNESS, depth + WALL_THICKNESS), floorMaterial)
+    floor.position.set(-WALL_THICKNESS / 2, -FLOOR_THICKNESS / 2, -WALL_THICKNESS / 2)
+    floor.receiveShadow = true
+    this.floor = floor
+
+    const wallMaterial = new THREE.MeshStandardMaterial({ color: style.wallColor, roughness: 0.95 })
+    const back = new THREE.Mesh(new THREE.BoxGeometry(width + WALL_THICKNESS, height, WALL_THICKNESS), wallMaterial)
+    back.position.set(-WALL_THICKNESS / 2, height / 2, -depth / 2 - WALL_THICKNESS / 2)
+    back.userData.wall = 'back'
+    const left = new THREE.Mesh(new THREE.BoxGeometry(WALL_THICKNESS, height, depth), wallMaterial)
+    left.position.set(-width / 2 - WALL_THICKNESS / 2, height / 2, 0)
+    left.userData.wall = 'left'
+    for (const wall of [back, left]) {
+      wall.receiveShadow = true
+      wall.castShadow = true
+      this.walls.push(wall)
+    }
+
+    const trimMaterial = new THREE.MeshStandardMaterial({ color: style.trimColor, roughness: 0.6 })
+    const backTrim = new THREE.Mesh(new THREE.BoxGeometry(width, 0.1, 0.03), trimMaterial)
+    backTrim.position.set(0, 0.05, -depth / 2 + 0.015)
+    const leftTrim = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.1, depth), trimMaterial)
+    leftTrim.position.set(-width / 2 + 0.015, 0.05, 0)
+
+    this.shell.add(floor, back, left, backTrim, leftTrim)
+  }
+
+  private buildOutdoor(style: RoomStyle) {
+    this.clearGroup(this.outdoor)
+    const radius = Math.max(style.width, style.depth) * 1.1 + 2
+    const ground = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.92, 0.5, 48), this.groundMaterial)
+    ground.position.y = -FLOOR_THICKNESS - 0.25
+    ground.receiveShadow = true
+    this.outdoor.add(ground)
+
+    // A few low-poly trees on the open side of the room
+    const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 1 })
+    const leafMaterial = new THREE.MeshStandardMaterial({ color: '#3f7d3a', roughness: 1, flatShading: true })
+    const spots: [number, number, number][] = [
+      [radius * 0.72, radius * 0.25, 1.1],
+      [radius * 0.3, radius * 0.75, 0.9],
+      [radius * 0.78, -radius * 0.38, 0.8],
+      [-radius * 0.4, radius * 0.74, 1],
+    ]
+    for (const [x, z, s] of spots) {
+      const tree = new THREE.Group()
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 0.8, 6), trunkMaterial)
+      trunk.position.y = 0.4
+      const crown = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.4, 7), leafMaterial)
+      crown.position.y = 1.4
+      trunk.castShadow = crown.castShadow = true
+      tree.add(trunk, crown)
+      tree.position.set(x, -FLOOR_THICKNESS, z)
+      tree.scale.setScalar(s)
+      this.outdoor.add(tree)
+    }
+  }
+
+  private createStars() {
+    const count = 400
+    const positions = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      // Points on a dome behind and above the room
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.random() * Math.PI * 0.45
+      const r = 70
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta)
+      positions[i * 3 + 1] = r * Math.cos(phi) + 5
+      positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta)
+    }
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    const material = new THREE.PointsMaterial({ color: '#ffffff', size: 0.45, transparent: true, opacity: 0, fog: false })
+    return new THREE.Points(geometry, material)
+  }
+
+  // ---------- Objects ----------
+
+  private syncObjects(objects: RoomObject[]) {
+    const seen = new Set<string>()
+    for (const data of objects) {
+      const item = CATALOG_BY_TYPE[data.type]
+      if (!item) continue
+      seen.add(data.id)
+      const signature = `${data.type}|${data.color || ''}`
+      const existing = this.entries.get(data.id)
+      if (existing && existing.signature === signature) {
+        existing.data = data
+        if (!(this.transform?.dragging && this.selectedId === data.id)) this.applyTransform(existing)
+        continue
+      }
+      if (existing) this.removeEntry(data.id)
+      this.addEntry(data, item, signature)
+    }
+    for (const id of [...this.entries.keys()]) {
+      if (!seen.has(id)) this.removeEntry(id)
+    }
+    if (this.selectedId && !this.entries.has(this.selectedId)) this.selectedId = null
+    this.updateTransformAttachment()
+  }
+
+  private addEntry(data: RoomObject, item: CatalogItem, signature: string) {
+    const root = new THREE.Group()
+    const model = item.build(data.color || item.defaultColor)
+    root.add(model)
+    root.userData.objectId = data.id
+
+    const glowMaterials: THREE.MeshStandardMaterial[] = []
+    const skyMaterials: THREE.MeshStandardMaterial[] = []
+    model.traverse((obj) => {
+      const material = (obj as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined
+      if (!material?.userData) return
+      if (material.userData.glow) glowMaterials.push(material)
+      if (material.userData.sky) skyMaterials.push(material)
+    })
+
+    let light: THREE.PointLight | undefined
+    if (item.light) {
+      light = new THREE.PointLight(item.light.color, 0, item.light.distance, 1.6)
+      light.position.set(...item.light.offset)
+      root.add(light)
+    }
+
+    const entry: ObjectEntry = { data, item, root, light, glowMaterials, skyMaterials, signature }
+    this.entries.set(data.id, entry)
+    this.objectsGroup.add(root)
+    this.applyTransform(entry)
+  }
+
+  private removeEntry(id: string) {
+    const entry = this.entries.get(id)
+    if (!entry) return
+    if (this.transform?.object === entry.root) this.transform.detach()
+    this.objectsGroup.remove(entry.root)
+    this.clearGroup(entry.root)
+    this.entries.delete(id)
+  }
+
+  private applyTransform(entry: ObjectEntry) {
+    const { data, root, item } = entry
+    const [x, y, z] = data.position
+    root.position.set(x, y, z)
+    root.scale.setScalar(data.scale || 1)
+    if (item.wallMounted && this.style) {
+      const wall = data.wall || 'back'
+      if (wall === 'back') {
+        root.position.z = -this.style.depth / 2
+        root.rotation.set(0, 0, 0)
+      } else {
+        root.position.x = -this.style.width / 2
+        root.rotation.set(0, Math.PI / 2, 0)
+      }
+    } else {
+      root.rotation.set(0, THREE.MathUtils.degToRad(data.rotation || 0), 0)
+    }
+  }
+
+  private updateTransformAttachment() {
+    const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
+    this.selectionBox.visible = !!entry
+    if (!this.transform) return
+    if (!entry) {
+      this.transform.detach()
+      return
+    }
+    const rotating = this.transform.mode === 'rotate'
+    if (entry.item.wallMounted) {
+      if (rotating) {
+        this.transform.detach()
+        return
+      }
+      const onBack = (entry.data.wall || 'back') === 'back'
+      this.transform.showX = onBack
+      this.transform.showY = true
+      this.transform.showZ = !onBack
+    } else {
+      this.transform.showX = !rotating
+      this.transform.showY = rotating
+      this.transform.showZ = !rotating
+    }
+    this.transform.attach(entry.root)
+  }
+
+  /** Keep the selected object inside the room while it is dragged */
+  private constrainSelected() {
+    const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
+    if (!entry || !this.style) return
+    const { width, depth, height } = this.style
+    const p = entry.root.position
+    if (entry.item.wallMounted) {
+      p.y = THREE.MathUtils.clamp(p.y, 0.3, height - 0.2)
+      if ((entry.data.wall || 'back') === 'back') {
+        p.x = THREE.MathUtils.clamp(p.x, -width / 2 + 0.3, width / 2 - 0.3)
+        p.z = -depth / 2
+      } else {
+        p.z = THREE.MathUtils.clamp(p.z, -depth / 2 + 0.3, depth / 2 - 0.3)
+        p.x = -width / 2
+      }
+    } else {
+      p.x = THREE.MathUtils.clamp(p.x, -width / 2 + 0.15, width / 2 - 0.15)
+      p.z = THREE.MathUtils.clamp(p.z, -depth / 2 + 0.15, depth / 2 - 0.15)
+      // Only spin around the vertical axis
+      entry.root.rotation.x = 0
+      entry.root.rotation.z = 0
+    }
+  }
+
+  private commitSelected() {
+    const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
+    if (!entry) return
+    const p = entry.root.position
+    const round = (n: number) => Math.round(n * 1000) / 1000
+    const rotation = entry.item.wallMounted
+      ? entry.data.rotation
+      : Math.round(((THREE.MathUtils.radToDeg(entry.root.rotation.y) % 360) + 360) % 360)
+    this.options.onObjectChange?.(entry.data.id, {
+      position: [round(p.x), round(p.y), round(p.z)],
+      rotation,
+    })
+  }
+
+  // ---------- Pointer ----------
+
+  private setPointer(clientX: number, clientY: number) {
+    const rect = this.renderer.domElement.getBoundingClientRect()
+    this.pointer.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1)
+    this.raycaster.setFromCamera(this.pointer, this.camera)
+  }
+
+  private pickObject(clientX: number, clientY: number): string | null {
+    this.setPointer(clientX, clientY)
+    const hit = this.raycaster.intersectObjects(this.objectsGroup.children, true)[0]
+    let obj: THREE.Object3D | null = hit?.object ?? null
+    while (obj && !obj.userData.objectId) obj = obj.parent
+    return (obj?.userData.objectId as string) ?? null
+  }
+
+  private handlePointerDown = (e: PointerEvent) => {
+    this.pointerDown = { x: e.clientX, y: e.clientY }
+  }
+
+  private handlePointerUp = (e: PointerEvent) => {
+    // Ignore drags (orbiting or moving an object)
+    if (Math.hypot(e.clientX - this.pointerDown.x, e.clientY - this.pointerDown.y) > 5) return
+    if (this.transform?.dragging) return
+    // Clicks on the move/rotate gizmo belong to the gizmo, not to selection
+    if (this.transform?.axis) return
+    const id = this.pickObject(e.clientX, e.clientY)
+    if (this.options.editable) {
+      this.select(id)
+      this.options.onSelect?.(id)
+    } else if (id) {
+      this.options.onActivate?.(id)
+    }
+  }
+
+  private handlePointerMove = (e: PointerEvent) => {
+    if (this.options.editable) return
+    const id = this.pickObject(e.clientX, e.clientY)
+    const hasLink = id ? !!this.entries.get(id)?.data.link?.url : false
+    this.renderer.domElement.style.cursor = hasLink ? 'pointer' : 'grab'
+    const rect = this.renderer.domElement.getBoundingClientRect()
+    const nextId = hasLink ? id : null
+    if (nextId !== this.hoveredId || nextId) {
+      this.hoveredId = nextId
+      this.options.onHover?.(nextId, e.clientX - rect.left, e.clientY - rect.top)
+    }
+  }
+
+  private handlePointerLeave = () => {
+    if (this.hoveredId) {
+      this.hoveredId = null
+      this.options.onHover?.(null, 0, 0)
+    }
+  }
+
+  // ---------- Render loop ----------
+
+  private resize() {
+    const { clientWidth, clientHeight } = this.container
+    if (!clientWidth || !clientHeight) return
+    this.renderer.setSize(clientWidth, clientHeight, false)
+    this.renderer.domElement.style.width = '100%'
+    this.renderer.domElement.style.height = '100%'
+    this.camera.aspect = clientWidth / clientHeight
+    // Pull back on narrow screens so the whole room fits
+    this.camera.fov = clientWidth / clientHeight < 0.8 ? 46 : clientWidth / clientHeight < 1.3 ? 38 : 32
+    this.camera.updateProjectionMatrix()
+  }
+
+  private animate = () => {
+    if (this.disposed) return
+    this.frame = requestAnimationFrame(this.animate)
+    if (this.room) {
+      this.applyDaylight(this.daylightOverride ?? getDaylight(this.room.environment))
+    }
+    const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
+    if (entry) this.selectionBox.box.setFromObject(entry.root)
+    this.controls.update()
+    this.renderer.render(this.scene, this.camera)
+  }
+
+  private applyDaylight({ daylight: d, isDay, arc }: DaylightState) {
+    // Sky: night -> dusk -> day
+    if (d < 0.5) this.skyColor.copy(SKY_NIGHT).lerp(SKY_DUSK, d * 2)
+    else this.skyColor.copy(SKY_DUSK).lerp(SKY_DAY, (d - 0.5) * 2)
+    this.scene.background = this.skyColor
+    if (!this.scene.fog) this.scene.fog = new THREE.Fog(this.skyColor, 30, 90)
+    ;(this.scene.fog as THREE.Fog).color.copy(this.skyColor)
+
+    this.hemi.intensity = 0.12 + 0.75 * d
+    this.hemi.color.copy(this.skyColor).lerp(new THREE.Color('#ffffff'), 0.5)
+    this.ambient.intensity = 0.06 + 0.2 * d
+    this.groundMaterial.color.copy(GROUND_NIGHT).lerp(GROUND_DAY, d)
+    this.renderer.toneMappingExposure = 0.85 + 0.25 * d
+
+    // Sun or moon travels an arc behind the room, rising on the right
+    const angle = Math.PI * (0.08 + 0.84 * arc)
+    const arcPos = new THREE.Vector3(Math.cos(angle) * 22 - 14, Math.sin(angle) * 16 + 2, -Math.cos(angle) * 22 - 14)
+    this.sunDisc.visible = isDay
+    this.moonDisc.visible = !isDay
+    ;(isDay ? this.sunDisc : this.moonDisc).position.copy(arcPos)
+
+    // The directional light comes in from the open side so the room is lit
+    this.sun.position.set(Math.cos(angle) * 5 + 6, Math.max(Math.sin(angle) * 10, 2) + 3, 7)
+    this.sun.color.copy(isDay ? SUN_COLOR : MOON_COLOR)
+    this.sun.intensity = isDay ? 0.4 + 2.2 * d : 0.25 * (1 - d) + 0.05
+
+    ;(this.stars.material as THREE.PointsMaterial).opacity = Math.max(0, 1 - d * 1.6)
+
+    // Lamps fade in as it gets dark
+    const lamps = THREE.MathUtils.smoothstep(0.6 - d, 0, 0.45)
+    for (const entry of this.entries.values()) {
+      if (entry.light && entry.item.light) {
+        entry.light.intensity = entry.item.light.intensity * lamps * (entry.data.scale || 1)
+      }
+      for (const m of entry.glowMaterials) {
+        m.emissiveIntensity = (m.userData.baseGlow as number) + 2.4 * lamps
+      }
+      for (const m of entry.skyMaterials) {
+        m.color.copy(this.skyColor)
+        m.emissive.copy(this.skyColor)
+        m.emissiveIntensity = 0.25 + 0.55 * d
+      }
+    }
+  }
+
+  // ---------- Cleanup helpers ----------
+
+  private clearGroup(group: THREE.Object3D) {
+    for (const child of [...group.children]) {
+      child.traverse((obj) => {
+        const mesh = obj as THREE.Mesh
+        mesh.geometry?.dispose()
+        const material = mesh.material as THREE.Material | THREE.Material[] | undefined
+        if (Array.isArray(material)) material.forEach(m => this.disposeMaterial(m))
+        else if (material && material !== this.groundMaterial) this.disposeMaterial(material)
+      })
+      group.remove(child)
+    }
+  }
+
+  private disposeMaterial(material: THREE.Material) {
+    const map = (material as THREE.MeshStandardMaterial).map
+    map?.dispose()
+    material.dispose()
+  }
+}
+
+// ---------- Procedural floor textures (grayscale, tinted by material color) ----------
+
+function createFloorTexture(kind: RoomStyle['floorMaterial'], width: number, depth: number): THREE.CanvasTexture {
+  const size = 512
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, size, size)
+
+  // Deterministic noise so the floor looks the same on every load
+  let seed = 7
+  const rand = () => {
+    seed = (seed * 16807) % 2147483647
+    return seed / 2147483647
+  }
+
+  if (kind === 'wood') {
+    const plank = size / 8
+    for (let i = 0; i < 8; i++) {
+      const shade = 225 + Math.floor(rand() * 30)
+      ctx.fillStyle = `rgb(${shade},${shade},${shade})`
+      ctx.fillRect(0, i * plank, size, plank)
+      ctx.fillStyle = 'rgba(0,0,0,0.18)'
+      ctx.fillRect(0, i * plank, size, 2)
+      const joint = Math.floor(rand() * size)
+      ctx.fillRect(joint, i * plank, 2, plank)
+      ctx.strokeStyle = 'rgba(0,0,0,0.05)'
+      for (let g = 0; g < 4; g++) {
+        ctx.beginPath()
+        const y = i * plank + rand() * plank
+        ctx.moveTo(0, y)
+        ctx.bezierCurveTo(size / 3, y + 4, (size * 2) / 3, y - 4, size, y)
+        ctx.stroke()
+      }
+    }
+  } else if (kind === 'tile') {
+    const tile = size / 4
+    ctx.fillStyle = 'rgba(0,0,0,0.22)'
+    for (let i = 0; i <= 4; i++) {
+      ctx.fillRect(i * tile - 2, 0, 4, size)
+      ctx.fillRect(0, i * tile - 2, size, 4)
+    }
+  } else {
+    // Carpet and concrete: fine noise, concrete a bit stronger
+    const strength = kind === 'concrete' ? 40 : 22
+    const image = ctx.getImageData(0, 0, size, size)
+    for (let i = 0; i < image.data.length; i += 4) {
+      const v = 255 - Math.floor(rand() * strength)
+      image.data[i] = image.data[i + 1] = image.data[i + 2] = v
+    }
+    ctx.putImageData(image, 0, 0)
+  }
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+  texture.repeat.set(width / 3, depth / 3)
+  texture.anisotropy = 4
+  return texture
+}

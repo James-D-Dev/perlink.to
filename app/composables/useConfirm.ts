@@ -1,4 +1,4 @@
-import { SuperadminConfirmModal } from '#components'
+import { ConfirmModal } from '#components'
 
 interface ConfirmOptions {
   title: string
@@ -10,7 +10,7 @@ interface ConfirmOptions {
 // Open a confirmation dialog and resolve to true when the user confirms
 export function useConfirm() {
   const overlay = useOverlay()
-  const modal = overlay.create(SuperadminConfirmModal)
+  const modal = overlay.create(ConfirmModal)
 
   return async (options: ConfirmOptions): Promise<boolean> => {
     const result = await modal.open(options).result

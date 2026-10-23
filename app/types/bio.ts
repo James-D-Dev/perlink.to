@@ -1,3 +1,5 @@
+import type { PageMode, RoomConfig } from './room';
+
 export interface BioLink {
   id: string;
   title: string;
@@ -216,6 +218,9 @@ export interface ThemeConfig {
   typography: ThemeTypography;
   link: ThemeLink;
   showShare?: boolean;
+  /** '3d' shows the page as an interactive mini room */
+  pageMode?: PageMode;
+  room?: RoomConfig;
 }
 
 // ==================== Bio Blocks ====================
@@ -225,7 +230,10 @@ export type BlockName =
   | 'image-album'
   | 'vietqr'
   | 'text'
-  | 'birthday-countdown';
+  | 'birthday-countdown'
+  | 'menu'
+  | 'hours'
+  | 'contact';
 
 export interface BaseBlock {
   name: BlockName;
@@ -294,13 +302,81 @@ export interface BirthdayCountdownBlock extends BaseBlock {
   };
 }
 
+// Menu: dishes for a restaurant/café, or rooms for a hotel (cards layout)
+export interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price?: string;
+  imageUrl?: string;
+  tag?: string;
+}
+
+export interface MenuSection {
+  id: string;
+  name: string;
+  items: MenuItem[];
+}
+
+export interface MenuBlock extends BaseBlock {
+  name: 'menu';
+  data: {
+    title: string;
+    currency: string;
+    /** Shown after the price, e.g. "/night" */
+    priceSuffix?: string;
+    layout: 'list' | 'cards';
+    sections: MenuSection[];
+  };
+}
+
+export interface OpeningDay {
+  /** 0 = Sunday ... 6 = Saturday */
+  day: number;
+  open: string; // HH:MM
+  close: string; // HH:MM
+  closed: boolean;
+}
+
+export interface HoursBlock extends BaseBlock {
+  name: 'hours';
+  data: {
+    title: string;
+    days: OpeningDay[];
+    note?: string;
+  };
+}
+
+export interface ContactBlock extends BaseBlock {
+  name: 'contact';
+  data: {
+    title: string;
+    address?: string;
+    mapUrl?: string;
+    phone?: string;
+    email?: string;
+    bookingUrl?: string;
+    bookingLabel?: string;
+  };
+}
+
 export type BioBlock =
   | LinksBlock
   | SocialBlock
   | ImageAlbumBlock
   | VietQRBlock
   | TextBlock
-  | BirthdayCountdownBlock;
+  | BirthdayCountdownBlock
+  | MenuBlock
+  | HoursBlock
+  | ContactBlock;
+
+export const DEFAULT_OPENING_DAYS: OpeningDay[] = [1, 2, 3, 4, 5, 6, 0].map(day => ({
+  day,
+  open: '08:00',
+  close: '22:00',
+  closed: false,
+}));
 
 export const DEFAULT_THEME: ThemeConfig = {
   colors: {

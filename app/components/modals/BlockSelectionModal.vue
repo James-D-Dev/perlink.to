@@ -87,6 +87,24 @@ const availableBlocks: BlockOption[] = [
     icon: 'i-lucide-cake',
     colorClass: 'bg-pink-100 text-pink-600'
   },
+  {
+    id: 'menu',
+    label: 'Menu / Price list',
+    icon: 'i-lucide-utensils',
+    colorClass: 'bg-orange-100 text-orange-600'
+  },
+  {
+    id: 'hours',
+    label: 'Opening Hours',
+    icon: 'i-lucide-clock',
+    colorClass: 'bg-emerald-100 text-emerald-600'
+  },
+  {
+    id: 'contact',
+    label: 'Contact & Booking',
+    icon: 'i-lucide-map-pin',
+    colorClass: 'bg-sky-100 text-sky-600'
+  },
   // more block
 ]
 

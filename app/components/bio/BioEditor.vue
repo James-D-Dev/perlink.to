@@ -3,7 +3,7 @@
     <!-- Block Selection Modal -->
     <ModalsBlockSelectionModal
       :open="showBlockModal"
-      :enabled-blocks="enabledBlocks"
+      :enabled-blocks="bioData.blocks.map((b) => b.name)"
       @update:open="showBlockModal = $event"
       @select="selectBlock"
     />
@@ -82,6 +82,33 @@
               @toggle="$emit('toggleBlock', 'birthday-countdown')"
               @remove="onRemoveBlock('birthday-countdown')"
               @update="onUpdateBirthdayCountdown"
+            />
+            <!-- Menu Block -->
+            <BioBlockMenu
+              v-if="block.name === 'menu'"
+              :is-active="activeBlock === 'menu'"
+              :blocks="blocksRef"
+              @toggle="$emit('toggleBlock', 'menu')"
+              @remove="onRemoveBlock('menu')"
+              @update="onUpdateBlockData('menu', $event)"
+            />
+            <!-- Opening Hours Block -->
+            <BioBlockHours
+              v-if="block.name === 'hours'"
+              :is-active="activeBlock === 'hours'"
+              :blocks="blocksRef"
+              @toggle="$emit('toggleBlock', 'hours')"
+              @remove="onRemoveBlock('hours')"
+              @update="onUpdateBlockData('hours', $event)"
+            />
+            <!-- Contact Block -->
+            <BioBlockContact
+              v-if="block.name === 'contact'"
+              :is-active="activeBlock === 'contact'"
+              :blocks="blocksRef"
+              @toggle="$emit('toggleBlock', 'contact')"
+              @remove="onRemoveBlock('contact')"
+              @update="onUpdateBlockData('contact', $event)"
             />
             <!-- more block -->
           </div>
@@ -273,6 +300,14 @@ function onRemoveBlock(blockName: string) {
   const index = localBlocks.value.findIndex(b => b.name === blockName);
   if (index !== -1) {
     localBlocks.value.splice(index, 1);
+    emitBlockUpdate();
+  }
+}
+
+function onUpdateBlockData(blockName: BioBlock['name'], data: BioBlock['data']) {
+  const index = localBlocks.value.findIndex(b => b.name === blockName);
+  if (index !== -1 && localBlocks.value[index]) {
+    localBlocks.value[index] = { ...localBlocks.value[index]!, data } as BioBlock;
     emitBlockUpdate();
   }
 }
