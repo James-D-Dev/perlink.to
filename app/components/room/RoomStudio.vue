@@ -7,7 +7,6 @@
         :room="room"
         editable
         :selected-id="selectedId"
-        :transform-mode="transformMode"
         :force-mode="previewMode === 'live' ? null : previewMode"
         @select="selectedId = $event"
         @object-change="onObjectChange"
@@ -26,6 +25,18 @@
       </div>
 
       <div class="pointer-events-auto flex items-center gap-1 rounded-2xl bg-default/70 ring-1 ring-white/10 p-1 shadow-lg backdrop-blur-xl">
+        <UTooltip text="All objects in the room">
+          <UButton
+            icon="i-lucide-layers"
+            :color="listOpen ? 'primary' : 'neutral'"
+            :variant="listOpen ? 'soft' : 'ghost'"
+            aria-label="Objects"
+            @click="listOpen = !listOpen"
+          >
+            <span class="hidden sm:inline">Objects</span>
+            <span class="min-w-5 rounded-md bg-elevated px-1.5 text-xs tabular-nums text-default">{{ room.objects.length }}</span>
+          </UButton>
+        </UTooltip>
         <UTooltip text="Undo (Ctrl+Z)">
           <UButton icon="i-lucide-undo-2" color="neutral" variant="ghost" :disabled="!canUndo" @click="undo" />
         </UTooltip>
@@ -34,9 +45,6 @@
         </UTooltip>
         <UTooltip :text="previewLabel">
           <UButton :icon="previewIcon" color="neutral" variant="ghost" @click="cyclePreview" />
-        </UTooltip>
-        <UTooltip text="Reset view">
-          <UButton icon="i-lucide-scan" color="neutral" variant="ghost" class="hidden sm:inline-flex" @click="canvasRef?.resetView()" />
         </UTooltip>
         <UButton icon="i-lucide-save" :loading="saving" color="neutral" variant="soft" @click="emit('save')">
           <span class="hidden sm:inline">Save</span>
@@ -47,53 +55,133 @@
       </div>
     </div>
 
+    <!-- Object list: pick small or overlapping objects -->
+    <div
+      v-if="listOpen"
+      class="absolute left-2 top-16 flex max-h-[min(60vh,34rem)] w-[calc(100%-5rem)] max-w-80 flex-col overflow-hidden rounded-2xl bg-default/80 shadow-xl ring-1 ring-white/10 backdrop-blur-xl sm:left-3"
+    >
+      <div class="flex items-center gap-2 border-b border-white/[0.08] px-3 py-2.5">
+        <UIcon name="i-lucide-layers" class="size-4 text-muted" />
+        <p class="flex-1 text-sm font-semibold text-highlighted">Objects <span class="font-normal text-muted">· {{ room.objects.length }}</span></p>
+        <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close list" @click="listOpen = false" />
+      </div>
+      <div class="border-b border-white/[0.08] p-2">
+        <UInput v-model="listQuery" size="sm" icon="i-lucide-search" placeholder="Search objects" class="w-full" />
+      </div>
+      <ul class="flex-1 overflow-y-auto p-1.5">
+        <li v-for="row in objectRows" :key="row.id">
+          <div
+            class="group flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition"
+            :class="row.id === selectedId ? 'bg-perlink-blue/15 ring-1 ring-perlink-blue/40' : 'hover:bg-elevated'"
+            role="button"
+            tabindex="0"
+            @click="focusFromList(row.id)"
+            @keydown.enter="focusFromList(row.id)"
+          >
+            <div class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated">
+              <img v-if="thumbnails[row.type]" :src="thumbnails[row.type]" :alt="row.name" class="size-8 object-contain">
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium text-highlighted">{{ row.name }}</p>
+              <p class="flex items-center gap-1 truncate text-xs text-muted">
+                {{ row.place }}
+                <UIcon v-if="row.linked" name="i-lucide-link" class="size-3 text-perlink-blue" />
+              </p>
+            </div>
+            <UButton
+              icon="i-lucide-trash-2"
+              size="xs"
+              color="error"
+              variant="ghost"
+              class="opacity-60 group-hover:opacity-100"
+              :aria-label="`Delete ${row.name}`"
+              @click.stop="removeObject(row.id)"
+            />
+          </div>
+        </li>
+        <li v-if="objectRows.length === 0" class="px-3 py-8 text-center text-sm text-muted">
+          {{ room.objects.length ? 'No objects match your search.' : 'No objects yet. Add some from the bar below.' }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Camera controls -->
+    <div class="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl sm:right-3">
+      <UTooltip text="Zoom in" :content="{ side: 'left' }">
+        <UButton icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Zoom in" @click="canvasRef?.zoomBy(0.8)" />
+      </UTooltip>
+      <UTooltip text="Zoom out" :content="{ side: 'left' }">
+        <UButton icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Zoom out" @click="canvasRef?.zoomBy(1.25)" />
+      </UTooltip>
+      <UTooltip text="Reset view" :content="{ side: 'left' }">
+        <UButton icon="i-lucide-scan" color="neutral" variant="ghost" aria-label="Reset view" @click="canvasRef?.resetView()" />
+      </UTooltip>
+    </div>
+
+    <!-- Navigation hint -->
+    <p class="pointer-events-none absolute left-1/2 top-16 hidden -translate-x-1/2 rounded-full bg-black/40 px-3 py-1 text-xs text-white/80 backdrop-blur sm:block">
+      Drag to rotate · Right-drag to pan · Scroll to zoom
+    </p>
+
     <!-- Bottom area: selected object panel + inventory bar -->
     <div ref="barRef" class="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-2 sm:p-3">
       <!-- Selected object -->
-      <div v-if="selectedObject && selectedItem" class="w-full max-w-3xl rounded-2xl bg-default/75 ring-1 ring-white/10 p-3 shadow-xl backdrop-blur-xl">
-        <div class="flex flex-wrap items-center gap-2">
-          <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-9 object-contain">
-          <p class="mr-auto font-semibold text-highlighted">{{ selectedItem.name }}</p>
+      <div
+        v-if="selectedObject && selectedItem"
+        class="w-full max-w-2xl divide-y divide-white/[0.08] rounded-2xl bg-default/75 shadow-xl ring-1 ring-white/10 backdrop-blur-xl"
+      >
+        <!-- Header -->
+        <div class="flex items-center gap-3 px-4 py-3">
+          <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-elevated">
+            <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-9 object-contain">
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-semibold text-highlighted">{{ selectedItem.name }}</p>
+            <p class="truncate text-xs text-muted">
+              {{ selectedItem.wallMounted ? 'Drag along the walls to move' : 'Drag to move · drop on furniture to stack' }}
+            </p>
+          </div>
+          <UTooltip text="Duplicate (Ctrl+D)">
+            <UButton icon="i-lucide-copy" color="neutral" variant="ghost" aria-label="Duplicate" @click="duplicateSelected" />
+          </UTooltip>
+          <UTooltip text="Delete (Del)">
+            <UButton icon="i-lucide-trash-2" color="error" variant="ghost" aria-label="Delete" @click="removeSelected" />
+          </UTooltip>
+        </div>
 
-          <div class="flex items-center rounded-xl bg-elevated p-0.5">
-            <UButton
+        <!-- Controls -->
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
+          <div v-if="!selectedItem.wallMounted" class="flex items-center gap-2">
+            <span class="text-xs font-medium text-muted">Rotate</span>
+            <div class="flex items-center rounded-lg bg-elevated">
+              <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Rotate left" @click="rotateBy(-45)" />
+              <span class="w-10 text-center text-xs tabular-nums text-default">{{ selectedObject.rotation }}°</span>
+              <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="ghost" aria-label="Rotate right" @click="rotateBy(45)" />
+            </div>
+          </div>
+          <div v-else class="flex items-center gap-2">
+            <span class="text-xs font-medium text-muted">Wall</span>
+            <USelect
               size="sm"
-              icon="i-lucide-move"
-              :color="transformMode === 'translate' ? 'primary' : 'neutral'"
-              :variant="transformMode === 'translate' ? 'solid' : 'ghost'"
-              aria-label="Move"
-              @click="transformMode = 'translate'"
-            />
-            <UButton
-              v-if="!selectedItem.wallMounted"
-              size="sm"
-              icon="i-lucide-rotate-3d"
-              :color="transformMode === 'rotate' ? 'primary' : 'neutral'"
-              :variant="transformMode === 'rotate' ? 'solid' : 'ghost'"
-              aria-label="Rotate freely"
-              @click="transformMode = 'rotate'"
+              :model-value="selectedObject.wall || 'back'"
+              :items="wallOptions"
+              class="w-32"
+              @update:model-value="moveToWall($event as WallSide)"
             />
           </div>
-          <template v-if="!selectedItem.wallMounted">
-            <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="soft" aria-label="Rotate left" @click="rotateBy(-45)" />
-            <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="soft" aria-label="Rotate right" @click="rotateBy(45)" />
-          </template>
-          <USelect
-            v-else
-            size="sm"
-            :model-value="selectedObject.wall || 'back'"
-            :items="wallOptions"
-            class="w-32"
-            @update:model-value="moveToWall($event as WallSide)"
-          />
-          <div class="flex items-center rounded-xl bg-elevated">
-            <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Smaller" @click="scaleBy(-0.1)" />
-            <span class="w-11 text-center text-xs tabular-nums text-default">{{ Math.round(selectedObject.scale * 100) }}%</span>
-            <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Bigger" @click="scaleBy(0.1)" />
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-muted">Size</span>
+            <div class="flex items-center rounded-lg bg-elevated">
+              <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Smaller" @click="scaleBy(-0.1)" />
+              <span class="w-11 text-center text-xs tabular-nums text-default">{{ Math.round(selectedObject.scale * 100) }}%</span>
+              <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Bigger" @click="scaleBy(0.1)" />
+            </div>
           </div>
+
           <UPopover>
-            <UButton size="sm" icon="i-lucide-link" :color="selectedObject.link?.url ? 'primary' : 'neutral'" variant="soft" aria-label="Link">
-              <span class="hidden sm:inline">{{ selectedObject.link?.url ? 'Linked' : 'Link' }}</span>
+            <UButton size="sm" icon="i-lucide-link" :color="selectedObject.link?.url ? 'primary' : 'neutral'" variant="soft">
+              {{ selectedObject.link?.url ? (selectedObject.link.label || 'Linked') : 'Add link' }}
             </UButton>
             <template #content>
               <div class="w-72 space-y-2 p-3">
@@ -104,32 +192,27 @@
               </div>
             </template>
           </UPopover>
-          <UButton size="sm" icon="i-lucide-copy" color="neutral" variant="soft" aria-label="Duplicate" @click="duplicateSelected" />
-          <UButton size="sm" icon="i-lucide-trash-2" color="error" variant="soft" aria-label="Delete" @click="removeSelected" />
-          <UButton size="sm" icon="i-lucide-check" aria-label="Done" @click="selectedId = null" />
         </div>
 
-        <div class="mt-2 flex items-center gap-1.5 overflow-x-auto pb-0.5">
+        <!-- Colors -->
+        <div class="flex items-center gap-2 overflow-x-auto px-4 py-3">
+          <span class="mr-1 shrink-0 text-xs font-medium text-muted">Color</span>
           <button
             v-for="color in palette"
             :key="color"
             type="button"
             class="size-7 shrink-0 rounded-full border-2 transition hover:scale-110"
-            :class="(selectedObject.color || selectedItem.defaultColor).toLowerCase() === color ? 'border-perlink-blue ring-2 ring-perlink-blue/30' : 'border-white shadow'"
+            :class="(selectedObject.color || selectedItem.defaultColor).toLowerCase() === color ? 'border-perlink-blue ring-2 ring-perlink-blue/30' : 'border-white/80 shadow'"
             :style="{ background: color }"
             :aria-label="`Color ${color}`"
             @click="updateSelected({ color })"
           />
-          <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" aria-label="Custom color">
+          <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" aria-label="Custom color">
             <input type="color" class="absolute inset-0 cursor-pointer opacity-0" :value="selectedObject.color || selectedItem.defaultColor" @input="updateSelected({ color: ($event.target as HTMLInputElement).value })">
           </label>
-          <button
-            type="button"
-            class="ml-1 shrink-0 rounded-full px-2 py-1 text-xs text-muted hover:bg-elevated"
-            @click="updateSelected({ color: undefined })"
-          >
-            Reset color
-          </button>
+          <UTooltip text="Reset to default color">
+            <UButton size="xs" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" class="shrink-0" aria-label="Reset color" @click="updateSelected({ color: undefined })" />
+          </UTooltip>
         </div>
       </div>
 
@@ -294,7 +377,7 @@
 import { nanoid } from 'nanoid'
 import type { DayNightMode, FloorMaterial, RoomConfig, RoomObject, RoomObjectLink, RoomStyle, WallSide } from '~/types/room'
 import { ROOM_CATALOG, CATALOG_BY_TYPE, CATEGORY_LABELS, type CatalogCategory } from '~/utils/room/catalog'
-import type { TransformMode } from '~/utils/room/RoomScene'
+import type { ObjectPatch } from '~/utils/room/RoomScene'
 import { createFloorTexture } from '~/utils/room/RoomScene'
 import { getDaylight } from '~/utils/room/daylight'
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
@@ -316,13 +399,14 @@ const room = defineModel<RoomConfig>('room', { required: true })
 
 type Tab = CatalogCategory | 'room' | 'time'
 
-const canvasRef = ref<{ resetView: () => void; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
+const canvasRef = ref<{ resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
 const barRef = ref<HTMLElement | null>(null)
 const selectedId = ref<string | null>(null)
-const transformMode = ref<TransformMode>('translate')
 const activeTab = ref<Tab>('furniture')
 const trayOpen = ref(true)
 const previewMode = ref<'live' | 'day' | 'night'>('live')
+const listOpen = ref(false)
+const listQuery = ref('')
 const thumbnails = useRoomThumbnails()
 
 const CATEGORY_ICONS: Record<CatalogCategory, string> = {
@@ -389,6 +473,37 @@ onMounted(() => {
     texture.dispose()
   }
 })
+
+// Numbered names (Chair 1, Chair 2) and where each object sits, for the object list
+const objectRows = computed(() => {
+  const totals: Record<string, number> = {}
+  for (const o of room.value.objects) totals[o.type] = (totals[o.type] || 0) + 1
+  const seen: Record<string, number> = {}
+  const rows = room.value.objects.map((o) => {
+    const item = CATALOG_BY_TYPE[o.type]
+    seen[o.type] = (seen[o.type] || 0) + 1
+    const base = item?.name ?? o.type
+    const name = totals[o.type]! > 1 ? `${base} ${seen[o.type]}` : base
+    const place = item?.wallMounted
+      ? (o.wall === 'left' ? 'Left wall' : 'Back wall')
+      : (o.position[1] > 0.05 ? 'On furniture' : 'Floor')
+    return { id: o.id, type: o.type, name, place, linked: !!o.link?.url }
+  })
+  const query = listQuery.value.trim().toLowerCase()
+  return query ? rows.filter(r => r.name.toLowerCase().includes(query) || r.place.toLowerCase().includes(query)) : rows
+})
+
+function focusFromList(id: string) {
+  selectedId.value = id
+  canvasRef.value?.focusObject(id)
+  // Small screens: close the list so the room and the object panel are visible
+  if (window.innerWidth < 640) listOpen.value = false
+}
+
+function removeObject(id: string) {
+  setObjects(room.value.objects.filter(o => o.id !== id))
+  if (selectedId.value === id) selectedId.value = null
+}
 
 const selectedObject = computed(() => room.value.objects.find(o => o.id === selectedId.value) || null)
 const selectedItem = computed(() => (selectedObject.value ? CATALOG_BY_TYPE[selectedObject.value.type] : undefined))
@@ -476,7 +591,6 @@ function addObject(type: string, position: [number, number, number], wall?: Wall
   const object: RoomObject = { id: nanoid(8), type, position, rotation: 0, scale: 1, ...(wall && { wall }) }
   setObjects([...room.value.objects, object])
   selectedId.value = object.id
-  transformMode.value = 'translate'
 }
 
 function addAtDefault(type: string) {
@@ -489,7 +603,7 @@ function addAtDefault(type: string) {
   else addObject(type, [offset, 0, offset])
 }
 
-function onObjectChange(id: string, patch: Pick<RoomObject, 'position' | 'rotation'>) {
+function onObjectChange(id: string, patch: ObjectPatch) {
   setObjects(room.value.objects.map(o => (o.id === id ? { ...o, ...patch } : o)))
 }
 
@@ -537,9 +651,7 @@ function duplicateSelected() {
 }
 
 function removeSelected() {
-  if (!selectedId.value) return
-  setObjects(room.value.objects.filter(o => o.id !== selectedId.value))
-  selectedId.value = null
+  if (selectedId.value) removeObject(selectedId.value)
 }
 
 function updateStyle(patch: Partial<RoomStyle>) {
@@ -638,11 +750,8 @@ function onKeydown(event: KeyboardEvent) {
     removeSelected()
   } else if (key === 'escape') {
     selectedId.value = null
-  } else if (key === 'g') {
-    transformMode.value = 'translate'
   } else if (key === 'r' && selectedId.value) {
-    if (event.shiftKey) transformMode.value = 'rotate'
-    else rotateBy(45)
+    rotateBy(event.shiftKey ? -45 : 45)
   }
 }
 

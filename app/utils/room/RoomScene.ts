@@ -1,16 +1,15 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
 import type { RoomConfig, RoomObject, RoomStyle, WallSide } from '~/types/room'
 import { CATALOG_BY_TYPE, type CatalogItem } from './catalog'
 import { getDaylight, type DaylightState } from './daylight'
 
-export type TransformMode = 'translate' | 'rotate'
+export type ObjectPatch = Pick<RoomObject, 'position' | 'rotation'> & { wall?: WallSide }
 
 export interface RoomSceneOptions {
   editable: boolean
   onSelect?: (id: string | null) => void
-  onObjectChange?: (id: string, patch: Pick<RoomObject, 'position' | 'rotation'>) => void
+  onObjectChange?: (id: string, patch: ObjectPatch) => void
   onHover?: (id: string | null, x: number, y: number) => void
   onActivate?: (id: string) => void
 }
@@ -42,7 +41,6 @@ export class RoomScene {
   private scene = new THREE.Scene()
   private camera: THREE.PerspectiveCamera
   private controls: OrbitControls
-  private transform?: TransformControls
   private raycaster = new THREE.Raycaster()
   private pointer = new THREE.Vector2()
   private resizeObserver: ResizeObserver
@@ -71,10 +69,21 @@ export class RoomScene {
   private selectionBox = new THREE.Box3Helper(new THREE.Box3(), new THREE.Color('#38bdf8'))
   private hoveredId: string | null = null
   private daylightOverride: DaylightState | null = null
+  /** Camera glide toward a focused object (target point and camera position) */
+  private cameraGlide: { target: THREE.Vector3; position: THREE.Vector3 } | null = null
   /** Daylight actually shown; eases toward the target for smooth day/night switches */
   private shownDaylight: number | null = null
   private skyColor = new THREE.Color()
   private pointerDown = { x: 0, y: 0 }
+  /** Object being dragged directly in the editor */
+  private drag: {
+    id: string
+    startX: number
+    startY: number
+    active: boolean
+    /** Grab point offset so the object doesn't jump to the cursor */
+    offset: THREE.Vector3
+  } | null = null
 
   constructor(container: HTMLElement, options: RoomSceneOptions) {
     this.container = container
@@ -97,14 +106,20 @@ export class RoomScene {
     this.controls.target.set(0, 1, 0)
     this.controls.enableDamping = true
     this.controls.dampingFactor = 0.08
-    this.controls.minDistance = 6
+    this.controls.minDistance = 3
     this.controls.maxDistance = 26
     this.controls.minPolarAngle = 0.25
     this.controls.maxPolarAngle = 1.35
     // Keep the camera on the open side of the room so the walls stay behind
     this.controls.minAzimuthAngle = 0.05
     this.controls.maxAzimuthAngle = Math.PI / 2 - 0.05
-    this.controls.enablePan = false
+    // Left drag orbits, right drag / two fingers pan, wheel / pinch zoom
+    this.controls.enablePan = true
+    this.controls.screenSpacePanning = true
+    this.controls.panSpeed = 0.9
+    this.controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN }
+    this.controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }
+    this.controls.addEventListener('change', this.clampTarget)
 
     this.scene.add(this.hemi, this.ambient, this.sun, this.sun.target)
     this.sun.castShadow = true
@@ -131,21 +146,15 @@ export class RoomScene {
     this.scene.add(this.selectionBox)
 
     if (options.editable) {
-      this.transform = new TransformControls(this.camera, this.renderer.domElement)
-      this.transform.setSize(0.8)
-      this.transform.setSpace('world')
-      this.transform.addEventListener('dragging-changed', (e) => {
-        this.controls.enabled = !(e as unknown as { value: boolean }).value
-      })
-      this.transform.addEventListener('objectChange', () => this.constrainSelected())
-      this.transform.addEventListener('mouseUp', () => this.commitSelected())
-      this.scene.add(this.transform.getHelper())
+      // Capture phase runs before OrbitControls, so grabbing an object doesn't orbit
+      this.renderer.domElement.addEventListener('pointerdown', this.handleEditPointerDown, { capture: true })
     }
 
     this.renderer.domElement.addEventListener('pointerdown', this.handlePointerDown)
     this.renderer.domElement.addEventListener('pointerup', this.handlePointerUp)
     this.renderer.domElement.addEventListener('pointermove', this.handlePointerMove)
     this.renderer.domElement.addEventListener('pointerleave', this.handlePointerLeave)
+    this.renderer.domElement.addEventListener('pointercancel', this.handlePointerCancel)
 
     this.resizeObserver = new ResizeObserver(() => this.resize())
     this.resizeObserver.observe(container)
@@ -171,20 +180,35 @@ export class RoomScene {
 
   select(id: string | null) {
     this.selectedId = id && this.entries.has(id) ? id : null
-    this.updateTransformAttachment()
+    this.selectionBox.visible = !!this.selectedId
+  }
+
+  /** Glide the camera to look at an object, moving in closer if far away */
+  focusObject(id: string) {
+    const entry = this.entries.get(id)
+    if (!entry) return
+    const center = new THREE.Box3().setFromObject(entry.root).getCenter(new THREE.Vector3())
+    const offset = this.camera.position.clone().sub(this.controls.target)
+    offset.setLength(Math.min(offset.length(), 8))
+    // Aim a bit below the object so it sits above the editor's bottom panels
+    const target = center.clone().setY(Math.max(center.y - 1, 0))
+    this.cameraGlide = { target, position: target.clone().add(offset) }
+  }
+
+  /** Zoom toward (factor < 1) or away from (factor > 1) the current focus point */
+  zoomBy(factor: number) {
+    const offset = this.camera.position.clone().sub(this.controls.target)
+    offset.setLength(THREE.MathUtils.clamp(offset.length() * factor, this.controls.minDistance, this.controls.maxDistance))
+    this.camera.position.copy(this.controls.target).add(offset)
+    this.controls.update()
   }
 
   /** Return the camera to the default angle */
   resetView() {
+    this.cameraGlide = null
     this.camera.position.set(9.5, 7.5, 9.5)
     this.controls.target.set(0, 1, 0)
     this.controls.update()
-  }
-
-  setTransformMode(mode: TransformMode) {
-    if (!this.transform) return
-    this.transform.setMode(mode)
-    this.updateTransformAttachment()
   }
 
   /** Force a time of day (editor preview); null returns to the configured mode */
@@ -197,21 +221,29 @@ export class RoomScene {
    * Floor items stack on top of furniture; wall items stick to the nearest wall.
    */
   getDropTarget(clientX: number, clientY: number, wallMounted: boolean): { position: [number, number, number]; wall?: WallSide } | null {
+    return wallMounted ? this.wallTarget(clientX, clientY) : this.surfaceTarget(clientX, clientY)
+  }
+
+  /** Point on whichever wall is under the cursor; moving past a corner lands on the other wall */
+  private wallTarget(clientX: number, clientY: number): { position: [number, number, number]; wall: WallSide } | null {
     if (!this.style) return null
     this.setPointer(clientX, clientY)
     const { width, depth, height } = this.style
+    const hit = this.raycaster.intersectObjects(this.walls, false)[0]
+    if (!hit) return null
+    const wall = hit.object.userData.wall as WallSide
+    const y = THREE.MathUtils.clamp(hit.point.y, 0.4, height - 0.3)
+    return wall === 'back'
+      ? { wall, position: [THREE.MathUtils.clamp(hit.point.x, -width / 2 + 0.4, width / 2 - 0.4), y, -depth / 2] }
+      : { wall, position: [-width / 2, y, THREE.MathUtils.clamp(hit.point.z, -depth / 2 + 0.4, depth / 2 - 0.4)] }
+  }
 
-    if (wallMounted) {
-      const hit = this.raycaster.intersectObjects(this.walls, false)[0]
-      if (!hit) return null
-      const wall = hit.object.userData.wall as WallSide
-      const y = THREE.MathUtils.clamp(hit.point.y, 0.4, height - 0.3)
-      return wall === 'back'
-        ? { wall, position: [THREE.MathUtils.clamp(hit.point.x, -width / 2 + 0.4, width / 2 - 0.4), y, -depth / 2] }
-        : { wall, position: [-width / 2, y, THREE.MathUtils.clamp(hit.point.z, -depth / 2 + 0.4, depth / 2 - 0.4)] }
-    }
-
-    const targets: THREE.Object3D[] = [...this.objectsGroup.children]
+  /** Point on the floor or on top of furniture under the cursor */
+  private surfaceTarget(clientX: number, clientY: number, exclude?: THREE.Object3D): { position: [number, number, number] } | null {
+    if (!this.style) return null
+    this.setPointer(clientX, clientY)
+    const { width, depth } = this.style
+    const targets: THREE.Object3D[] = this.objectsGroup.children.filter(c => c !== exclude)
     if (this.floor) targets.push(this.floor)
     const hits = this.raycaster.intersectObjects(targets, true)
     const hit = hits.find(h => (h.face?.normal.y ?? 0) > 0.5 || h.object === this.floor)
@@ -235,8 +267,9 @@ export class RoomScene {
     el.removeEventListener('pointerup', this.handlePointerUp)
     el.removeEventListener('pointermove', this.handlePointerMove)
     el.removeEventListener('pointerleave', this.handlePointerLeave)
-    this.transform?.detach()
-    this.transform?.dispose()
+    el.removeEventListener('pointercancel', this.handlePointerCancel)
+    el.removeEventListener('pointerdown', this.handleEditPointerDown, { capture: true })
+    this.controls.removeEventListener('change', this.clampTarget)
     this.controls.dispose()
     this.scene.traverse((obj) => {
       const mesh = obj as THREE.Mesh
@@ -349,7 +382,7 @@ export class RoomScene {
       const existing = this.entries.get(data.id)
       if (existing && existing.signature === signature) {
         existing.data = data
-        if (!(this.transform?.dragging && this.selectedId === data.id)) this.applyTransform(existing)
+        if (!(this.drag?.active && this.drag.id === data.id)) this.applyTransform(existing)
         continue
       }
       if (existing) this.removeEntry(data.id)
@@ -359,7 +392,7 @@ export class RoomScene {
       if (!seen.has(id)) this.removeEntry(id)
     }
     if (this.selectedId && !this.entries.has(this.selectedId)) this.selectedId = null
-    this.updateTransformAttachment()
+    this.selectionBox.visible = !!this.selectedId
   }
 
   private addEntry(data: RoomObject, item: CatalogItem, signature: string) {
@@ -393,7 +426,6 @@ export class RoomScene {
   private removeEntry(id: string) {
     const entry = this.entries.get(id)
     if (!entry) return
-    if (this.transform?.object === entry.root) this.transform.detach()
     this.objectsGroup.remove(entry.root)
     this.clearGroup(entry.root)
     this.entries.delete(id)
@@ -418,68 +450,60 @@ export class RoomScene {
     }
   }
 
-  private updateTransformAttachment() {
-    const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
-    this.selectionBox.visible = !!entry
-    if (!this.transform) return
-    if (!entry) {
-      this.transform.detach()
-      return
-    }
-    const rotating = this.transform.mode === 'rotate'
-    if (entry.item.wallMounted) {
-      if (rotating) {
-        this.transform.detach()
-        return
-      }
-      const onBack = (entry.data.wall || 'back') === 'back'
-      this.transform.showX = onBack
-      this.transform.showY = true
-      this.transform.showZ = !onBack
-    } else {
-      this.transform.showX = !rotating
-      this.transform.showY = rotating
-      this.transform.showZ = !rotating
-    }
-    this.transform.attach(entry.root)
-  }
-
-  /** Keep the selected object inside the room while it is dragged */
-  private constrainSelected() {
-    const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
-    if (!entry || !this.style) return
+  /** Keep the camera's focus point inside the room while panning */
+  private clampTarget = () => {
+    if (!this.style) return
+    const t = this.controls.target
     const { width, depth, height } = this.style
-    const p = entry.root.position
+    const clamped = new THREE.Vector3(
+      THREE.MathUtils.clamp(t.x, -width / 2 - 1, width / 2 + 1),
+      THREE.MathUtils.clamp(t.y, 0, height + 0.5),
+      THREE.MathUtils.clamp(t.z, -depth / 2 - 1, depth / 2 + 1),
+    )
+    const delta = clamped.sub(t)
+    if (delta.lengthSq() === 0) return
+    t.add(delta)
+    this.camera.position.add(delta)
+  }
+
+  private moveDragged(clientX: number, clientY: number) {
+    const entry = this.drag ? this.entries.get(this.drag.id) : undefined
+    if (!entry || !this.drag || !this.style) return
     if (entry.item.wallMounted) {
-      p.y = THREE.MathUtils.clamp(p.y, 0.3, height - 0.2)
-      if ((entry.data.wall || 'back') === 'back') {
-        p.x = THREE.MathUtils.clamp(p.x, -width / 2 + 0.3, width / 2 - 0.3)
-        p.z = -depth / 2
-      } else {
-        p.z = THREE.MathUtils.clamp(p.z, -depth / 2 + 0.3, depth / 2 - 0.3)
-        p.x = -width / 2
-      }
+      const target = this.wallTarget(clientX, clientY)
+      if (!target) return
+      entry.root.position.set(...target.position)
+      entry.root.rotation.set(0, target.wall === 'back' ? 0 : Math.PI / 2, 0)
+      entry.root.userData.wall = target.wall
     } else {
-      p.x = THREE.MathUtils.clamp(p.x, -width / 2 + 0.15, width / 2 - 0.15)
-      p.z = THREE.MathUtils.clamp(p.z, -depth / 2 + 0.15, depth / 2 - 0.15)
-      // Only spin around the vertical axis
-      entry.root.rotation.x = 0
-      entry.root.rotation.z = 0
+      const target = this.surfaceTarget(clientX, clientY, entry.root)
+      if (!target) return
+      const { width, depth } = this.style
+      const [x, y, z] = target.position
+      entry.root.position.set(
+        THREE.MathUtils.clamp(x + this.drag.offset.x, -width / 2 + 0.15, width / 2 - 0.15),
+        y,
+        THREE.MathUtils.clamp(z + this.drag.offset.z, -depth / 2 + 0.15, depth / 2 - 0.15),
+      )
     }
   }
 
-  private commitSelected() {
-    const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
+  private commitDrag(id: string) {
+    const entry = this.entries.get(id)
     if (!entry) return
     const p = entry.root.position
     const round = (n: number) => Math.round(n * 1000) / 1000
-    const rotation = entry.item.wallMounted
-      ? entry.data.rotation
-      : Math.round(((THREE.MathUtils.radToDeg(entry.root.rotation.y) % 360) + 360) % 360)
-    this.options.onObjectChange?.(entry.data.id, {
-      position: [round(p.x), round(p.y), round(p.z)],
-      rotation,
-    })
+    const patch: ObjectPatch = { position: [round(p.x), round(p.y), round(p.z)], rotation: entry.data.rotation }
+    if (entry.item.wallMounted) patch.wall = (entry.root.userData.wall as WallSide | undefined) ?? entry.data.wall ?? 'back'
+    this.options.onObjectChange?.(id, patch)
+  }
+
+  private cancelDrag() {
+    if (!this.drag) return
+    const entry = this.entries.get(this.drag.id)
+    if (entry) this.applyTransform(entry)
+    this.drag = null
+    this.controls.enabled = true
   }
 
   // ---------- Pointer ----------
@@ -500,14 +524,47 @@ export class RoomScene {
 
   private handlePointerDown = (e: PointerEvent) => {
     this.pointerDown = { x: e.clientX, y: e.clientY }
+    this.cameraGlide = null
+  }
+
+  /** Editor: pressing on an object selects it and starts dragging it */
+  private handleEditPointerDown = (e: PointerEvent) => {
+    // A second finger turns the gesture into pan/zoom
+    if (this.drag) {
+      this.cancelDrag()
+      return
+    }
+    if (e.button !== 0) return
+    const id = this.pickObject(e.clientX, e.clientY)
+    if (!id) return
+    const entry = this.entries.get(id)
+    if (!entry) return
+    this.controls.enabled = false
+    this.select(id)
+    this.options.onSelect?.(id)
+
+    const offset = new THREE.Vector3()
+    if (!entry.item.wallMounted) {
+      const grab = this.surfaceTarget(e.clientX, e.clientY, entry.root)
+      if (grab) offset.set(entry.root.position.x - grab.position[0], 0, entry.root.position.z - grab.position[2])
+    }
+    entry.root.userData.wall = entry.data.wall
+    this.drag = { id, startX: e.clientX, startY: e.clientY, active: false, offset }
+    this.renderer.domElement.setPointerCapture(e.pointerId)
   }
 
   private handlePointerUp = (e: PointerEvent) => {
-    // Ignore drags (orbiting or moving an object)
+    if (this.drag) {
+      const { id, active } = this.drag
+      this.drag = null
+      this.controls.enabled = true
+      if (this.renderer.domElement.hasPointerCapture(e.pointerId)) this.renderer.domElement.releasePointerCapture(e.pointerId)
+      this.renderer.domElement.style.cursor = 'grab'
+      if (active) this.commitDrag(id)
+      return
+    }
+    // Ignore drags (orbiting or panning)
     if (Math.hypot(e.clientX - this.pointerDown.x, e.clientY - this.pointerDown.y) > 5) return
-    if (this.transform?.dragging) return
-    // Clicks on the move/rotate gizmo belong to the gizmo, not to selection
-    if (this.transform?.axis) return
     const id = this.pickObject(e.clientX, e.clientY)
     if (this.options.editable) {
       this.select(id)
@@ -518,7 +575,21 @@ export class RoomScene {
   }
 
   private handlePointerMove = (e: PointerEvent) => {
-    if (this.options.editable) return
+    if (this.options.editable) {
+      if (this.drag) {
+        if (!this.drag.active && Math.hypot(e.clientX - this.drag.startX, e.clientY - this.drag.startY) > 4) {
+          this.drag.active = true
+        }
+        if (this.drag.active) {
+          this.renderer.domElement.style.cursor = 'grabbing'
+          this.moveDragged(e.clientX, e.clientY)
+        }
+        return
+      }
+      if (e.buttons) return
+      this.renderer.domElement.style.cursor = this.pickObject(e.clientX, e.clientY) ? 'grab' : ''
+      return
+    }
     const id = this.pickObject(e.clientX, e.clientY)
     const hasLink = id ? !!this.entries.get(id)?.data.link?.url : false
     this.renderer.domElement.style.cursor = hasLink ? 'pointer' : 'grab'
@@ -528,6 +599,10 @@ export class RoomScene {
       this.hoveredId = nextId
       this.options.onHover?.(nextId, e.clientX - rect.left, e.clientY - rect.top)
     }
+  }
+
+  private handlePointerCancel = () => {
+    this.cancelDrag()
   }
 
   private handlePointerLeave = () => {
@@ -559,6 +634,11 @@ export class RoomScene {
     }
     const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
     if (entry) this.selectionBox.box.setFromObject(entry.root)
+    if (this.cameraGlide) {
+      this.controls.target.lerp(this.cameraGlide.target, 0.12)
+      this.camera.position.lerp(this.cameraGlide.position, 0.12)
+      if (this.controls.target.distanceTo(this.cameraGlide.target) < 0.01) this.cameraGlide = null
+    }
     this.controls.update()
     this.renderer.render(this.scene, this.camera)
   }
