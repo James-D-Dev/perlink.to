@@ -17,7 +17,12 @@ export type WallSide = 'back' | 'left';
 /** The scenery outside the room */
 export type LandId = 'island' | 'mars' | 'sakura' | 'winter';
 
+/** Visual style of the room shell */
+export type RoomTheme = 'classic' | 'dungeon';
+
 export interface RoomStyle {
+  /** 'dungeon' builds stone walls and floor from the Modular Dungeon models */
+  theme?: RoomTheme;
   floorColor: string;
   floorMaterial: FloorMaterial;
   wallColor: string;

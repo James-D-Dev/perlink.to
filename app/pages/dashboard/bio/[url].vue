@@ -134,7 +134,7 @@
               <!-- 3D room launcher -->
               <div v-if="pageMode === '3d'" class="mt-4 overflow-hidden rounded-xl border border-default bg-default/60 backdrop-blur-xl sm:flex">
                 <div class="relative h-56 sm:h-auto sm:w-1/2">
-                  <LazyRoomCanvas :room="roomModel" class="pointer-events-none" />
+                  <LazyRoomCanvas :room="roomModel" preview class="pointer-events-none" />
                 </div>
                 <div class="flex flex-col justify-center gap-3 p-5 sm:w-1/2">
                   <div>

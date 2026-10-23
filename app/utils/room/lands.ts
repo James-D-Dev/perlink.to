@@ -143,34 +143,13 @@ function jitter(geometry: THREE.BufferGeometry, rand: () => number, amount: numb
 }
 
 /** Grass/snow top, soil band and a rocky point underneath, so every land floats */
-function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, soil: string, rock: string, seed: number) {
+function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, _soil?: string, _rock?: string, _seed?: number) {
+  // Just the top layer: the land floats without a soil band or rock underneath
   const group = new THREE.Group()
   const topMesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.98, 0.4, 56), top)
   topMesh.position.y = ctx.groundY - 0.2
   topMesh.receiveShadow = true
-
-  const soilMesh = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.98, radius * 0.9, 0.7, 40), std(soil, { flatShading: true }))
-  soilMesh.position.y = ctx.groundY - 0.75
-
-  // Jagged rock underside
-  const height = radius * 1.15
-  const rockGeometry = new THREE.ConeGeometry(radius * 0.9, height, 14, 4)
-  const rand = seeded(seed)
-  const pos = rockGeometry.attributes.position as THREE.BufferAttribute
-  for (let i = 0; i < pos.count; i++) {
-    const y = pos.getY(i)
-    if (y < height / 2 - 0.01) {
-      pos.setX(i, pos.getX(i) * (0.85 + rand() * 0.3))
-      pos.setZ(i, pos.getZ(i) * (0.85 + rand() * 0.3))
-      pos.setY(i, y + (rand() - 0.5) * 0.6)
-    }
-  }
-  rockGeometry.computeVertexNormals()
-  const rockMesh = new THREE.Mesh(rockGeometry, std(rock, { flatShading: true }))
-  rockMesh.rotation.x = Math.PI
-  rockMesh.position.y = ctx.groundY - 1.1 - height / 2
-
-  group.add(topMesh, soilMesh, rockMesh)
+  group.add(topMesh)
   return { group, top: topMesh }
 }
 

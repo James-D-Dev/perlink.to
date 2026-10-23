@@ -1,12 +1,15 @@
 import * as THREE from 'three'
 import { ROOM_CATALOG, type CatalogItem } from './catalog'
+import { buildRoomShell } from './shell'
+import type { RoomStyle } from '~/types/room'
+import { DEFAULT_ROOM_STYLE } from '~/types/room'
 
 // Renders each catalog model once into a small PNG so the editor can show
 // real previews. Results are cached in memory and in localStorage.
 
 const SIZE = 192
 // Bump when catalog models change so cached thumbnails are regenerated
-const CACHE_KEY = 'perlink-room-thumbs-v1'
+const CACHE_KEY = 'perlink-room-thumbs-v4'
 
 let memoryCache: Record<string, string> | null = null
 
@@ -28,7 +31,7 @@ function writeCache(cache: Record<string, string>) {
   }
 }
 
-function renderItem(renderer: THREE.WebGLRenderer, item: CatalogItem): string {
+async function renderItem(renderer: THREE.WebGLRenderer, item: CatalogItem): Promise<string> {
   const scene = new THREE.Scene()
   scene.add(new THREE.HemisphereLight('#ffffff', '#b8a99a', 1.6))
   const key = new THREE.DirectionalLight('#ffffff', 2.2)
@@ -36,6 +39,8 @@ function renderItem(renderer: THREE.WebGLRenderer, item: CatalogItem): string {
   scene.add(key)
 
   const model = item.build(item.defaultColor)
+  // Model-based items load asynchronously
+  await (model.userData.ready as Promise<void> | undefined)
   // Show lamps and screens a little lit so they read as lights
   model.traverse((obj) => {
     const m = (obj as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined
@@ -60,6 +65,7 @@ function renderItem(renderer: THREE.WebGLRenderer, item: CatalogItem): string {
   const url = renderer.domElement.toDataURL('image/webp', 0.9)
 
   model.traverse((obj) => {
+    if (obj.userData.shared) return
     const mesh = obj as THREE.Mesh
     mesh.geometry?.dispose()
     const material = mesh.material as THREE.Material | THREE.Material[] | undefined
@@ -93,11 +99,77 @@ export async function loadRoomThumbnails(onUpdate: (type: string, url: string) =
     for (const item of missing) {
       // Yield between renders so the page stays responsive
       await new Promise(resolve => setTimeout(resolve, 0))
-      const url = renderItem(renderer, item)
+      const url = await renderItem(renderer, item)
       cache[item.type] = url
       onUpdate(item.type, url)
     }
     writeCache(cache)
+  } finally {
+    renderer.dispose()
+    renderer.forceContextLoss()
+  }
+}
+
+// ---------- Room style previews ----------
+
+const styleCache = new Map<string, string>()
+const STYLE_CACHE_KEY = 'perlink-room-style-thumbs-v2'
+
+/** Render each room style as a small isometric room (cached per session and in localStorage) */
+export async function loadRoomStyleThumbnails(presets: { name: string; style: Partial<RoomStyle> }[], onUpdate: (name: string, url: string) => void) {
+  let stored: Record<string, string> = {}
+  try {
+    stored = JSON.parse(localStorage.getItem(STYLE_CACHE_KEY) || '{}')
+  } catch {
+    stored = {}
+  }
+  const missing = presets.filter((p) => {
+    const url = styleCache.get(p.name) || stored[p.name]
+    if (url) onUpdate(p.name, url)
+    return !url
+  })
+  if (!missing.length) return
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
+  renderer.setPixelRatio(1)
+  renderer.setSize(256, 192, false)
+  renderer.setClearColor(0x000000, 0)
+  renderer.toneMapping = THREE.NeutralToneMapping
+  renderer.outputColorSpace = THREE.SRGBColorSpace
+  renderer.shadowMap.enabled = true
+
+  try {
+    for (const preset of missing) {
+      const style: RoomStyle = { ...DEFAULT_ROOM_STYLE, ...preset.style }
+      const scene = new THREE.Scene()
+      scene.add(new THREE.HemisphereLight('#ffffff', '#8a8a8a', 1.3))
+      const sun = new THREE.DirectionalLight('#fff2dd', 2.2)
+      sun.position.set(8, 12, 9)
+      sun.castShadow = true
+      scene.add(sun)
+      const shell = buildRoomShell(style)
+      await shell.ready
+      scene.add(shell.group)
+      const camera = new THREE.PerspectiveCamera(30, 256 / 192, 0.1, 100)
+      camera.position.set(11, 9, 11)
+      camera.lookAt(0, 0.9, 0)
+      renderer.render(scene, camera)
+      const url = renderer.domElement.toDataURL('image/webp', 0.85)
+      styleCache.set(preset.name, url)
+      stored[preset.name] = url
+      onUpdate(preset.name, url)
+      shell.group.traverse((obj) => {
+        if (obj.userData.shared) return
+        const mesh = obj as THREE.Mesh
+        mesh.geometry?.dispose()
+      })
+      await new Promise(resolve => setTimeout(resolve, 0))
+    }
+    try {
+      localStorage.setItem(STYLE_CACHE_KEY, JSON.stringify(stored))
+    } catch {
+      // Storage full: previews are re-rendered next time
+    }
   } finally {
     renderer.dispose()
     renderer.forceContextLoss()

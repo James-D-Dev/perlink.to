@@ -28,6 +28,6 @@ export const ROOM_MUSIC: RoomMusicTrack[] = [
 ]
 
 /** Turn on once the mp3 files are in /public/music */
-export const ROOM_MUSIC_ENABLED = false
+export const ROOM_MUSIC_ENABLED = true
 
 export const MUSIC_BY_ID: Record<string, RoomMusicTrack> = Object.fromEntries(ROOM_MUSIC.map(t => [t.id, t]))

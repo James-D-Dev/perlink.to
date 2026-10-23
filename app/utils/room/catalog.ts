@@ -1,11 +1,12 @@
 import * as THREE from 'three'
+import { attachDungeonModel } from './dungeonModels'
 
 // Procedural model catalog for the 3D mini room.
 // Every model is assembled from primitives at runtime, so a room is fully
 // described by JSON (type + transform + color). Local origin is the center of
 // the object's base, facing +z. Wall-mounted models have their back on z = 0.
 
-export type CatalogCategory = 'furniture' | 'lighting' | 'decor' | 'wall' | 'tech'
+export type CatalogCategory = 'furniture' | 'lighting' | 'decor' | 'wall' | 'tech' | 'dungeon'
 
 export interface CatalogLight {
   color: string
@@ -24,6 +25,8 @@ export interface CatalogItem {
   defaultColor: string
   /** Mounted on a wall instead of standing on the floor */
   wallMounted?: boolean
+  /** Built from a 3D model file; colour changes don't apply */
+  fromModel?: boolean
   light?: CatalogLight
   build: (color: string) => THREE.Group
 }
@@ -34,6 +37,7 @@ export const CATEGORY_LABELS: Record<CatalogCategory, string> = {
   decor: 'Decor',
   wall: 'Wall',
   tech: 'Tech',
+  dungeon: 'Dungeon',
 }
 
 // ---------- Primitive helpers ----------
@@ -92,6 +96,66 @@ const WOOD = '#8b5e3c'
 const DARK = '#2f2f36'
 const WHITE = '#f5f5f2'
 const WARM_LIGHT = '#ffd59a'
+
+/** Catalog entry backed by a Modular Dungeon model; the model loads asynchronously */
+function dungeonItem(
+  type: string,
+  name: string,
+  icon: string,
+  model: string,
+  scale: number,
+  extra: Partial<CatalogItem> = {},
+): CatalogItem {
+  return {
+    type,
+    name,
+    icon,
+    category: 'dungeon',
+    defaultColor: '#ffffff',
+    fromModel: true,
+    ...extra,
+    build: () => {
+      const g = new THREE.Group()
+      // Renderers wait on this before reading the model (thumbnails, glow materials)
+      g.userData.ready = attachDungeonModel(g, model, scale, !!extra.wallMounted)
+      return g
+    },
+  }
+}
+
+const TORCH_LIGHT = '#ffad5c'
+
+const DUNGEON_ITEMS: CatalogItem[] = [
+  dungeonItem('dungeon-chest', 'Chest', 'i-lucide-package', 'Chest', 0.75),
+  dungeonItem('dungeon-chest-gold', 'Treasure chest', 'i-lucide-gem', 'Chest_gold', 0.75, { light: { color: '#ffb84d', intensity: 0.5, distance: 2.5, offset: [0, 1, 0] } }),
+  dungeonItem('dungeon-barrel', 'Barrel', 'i-lucide-cylinder', 'Barrel', 0.75),
+  dungeonItem('dungeon-candelabrum', 'Candelabrum', 'i-lucide-flame', 'Candelabrum', 0.75, { light: { color: TORCH_LIGHT, intensity: 2.5, distance: 4, offset: [0, 0.85, 0] } }),
+  dungeonItem('dungeon-candelabrum-tall', 'Tall candelabrum', 'i-lucide-flame-kindling', 'Candelabrum_tall', 0.75, { light: { color: TORCH_LIGHT, intensity: 3.5, distance: 5, offset: [0, 1.4, 0] } }),
+  dungeonItem('dungeon-candle', 'Candlestick', 'i-lucide-flame', 'Candle', 0.6, { light: { color: TORCH_LIGHT, intensity: 1.2, distance: 2.5, offset: [0, 0.5, 0] } }),
+  dungeonItem('dungeon-torch', 'Standing torch', 'i-lucide-flame', 'Torch', 0.75, { light: { color: TORCH_LIGHT, intensity: 4, distance: 6, offset: [0, 1.55, 0] } }),
+  dungeonItem('dungeon-wall-torch', 'Wall torch', 'i-lucide-flame', 'Torch_wall', 0.5, { wallMounted: true, light: { color: TORCH_LIGHT, intensity: 4, distance: 6, offset: [0, 0.45, 0.5] } }),
+  dungeonItem('dungeon-book-open', 'Open book', 'i-lucide-book-open', 'Book_Open', 0.35),
+  dungeonItem('dungeon-book', 'Book', 'i-lucide-book', 'Book2', 0.35),
+  dungeonItem('dungeon-books', 'Spell book', 'i-lucide-book-marked', 'Book3', 0.35),
+  dungeonItem('dungeon-potion-blue', 'Blue potion', 'i-lucide-flask-round', 'Potion', 0.3),
+  dungeonItem('dungeon-potion-green', 'Green potion', 'i-lucide-flask-conical', 'Potion2', 0.3),
+  dungeonItem('dungeon-potion-ice', 'Ice potion', 'i-lucide-snowflake', 'Potion3', 0.3),
+  dungeonItem('dungeon-potion-vial', 'Vial', 'i-lucide-test-tube', 'Potion4', 0.35),
+  dungeonItem('dungeon-potion-dark', 'Dark potion', 'i-lucide-flask-round', 'Potion5', 0.3),
+  dungeonItem('dungeon-potion-gold', 'Gold potion', 'i-lucide-flask-conical', 'Potion6', 0.3),
+  dungeonItem('dungeon-bones', 'Skeleton', 'i-lucide-skull', 'Bones', 0.6),
+  dungeonItem('dungeon-bones-pile', 'Bones', 'i-lucide-bone', 'Bones2', 0.6),
+  dungeonItem('dungeon-rock', 'Rock', 'i-lucide-mountain', 'Rock1', 0.6),
+  dungeonItem('dungeon-rock-flat', 'Flat rock', 'i-lucide-mountain', 'Rock2', 0.6),
+  dungeonItem('dungeon-carpet', 'Royal carpet', 'i-lucide-rectangle-vertical', 'Carpet', 0.6),
+  dungeonItem('dungeon-column', 'Column', 'i-lucide-columns-3', 'Column', 0.62),
+  dungeonItem('dungeon-column-broken', 'Broken column', 'i-lucide-columns-2', 'Column_Broken2', 0.62),
+  dungeonItem('dungeon-column-ruin', 'Fallen column', 'i-lucide-columns-2', 'Column_Broken', 0.62),
+  dungeonItem('dungeon-stairs', 'Stairs', 'i-lucide-chevrons-up', 'Stairs', 0.75),
+  dungeonItem('dungeon-window', 'Barred window', 'i-lucide-grid-2x2', 'Window', 0.75, { wallMounted: true }),
+  dungeonItem('dungeon-bars', 'Iron bars', 'i-lucide-grip', 'Bars', 0.75, { wallMounted: true }),
+  dungeonItem('dungeon-arch', 'Stone arch', 'i-lucide-door-open', 'Entrance', 0.75, { wallMounted: true }),
+]
 
 // ---------- Catalog ----------
 
@@ -453,6 +517,8 @@ export const ROOM_CATALOG: CatalogItem[] = [
     },
   },
 ]
+
+ROOM_CATALOG.push(...DUNGEON_ITEMS)
 
 export const CATALOG_BY_TYPE: Record<string, CatalogItem> = Object.fromEntries(
   ROOM_CATALOG.map(item => [item.type, item]),

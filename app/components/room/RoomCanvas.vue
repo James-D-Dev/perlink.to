@@ -15,8 +15,11 @@ const props = withDefaults(defineProps<{
   previewHour?: number | null
   /** Force day or night regardless of the configured mode */
   forceMode?: 'day' | 'night' | null
+  /** Small thumbnail-style preview: renders at a low frame rate and quality */
+  preview?: boolean
 }>(), {
   editable: false,
+  preview: false,
   selectedId: null,
   previewHour: null,
   forceMode: null,
@@ -36,6 +39,7 @@ onMounted(() => {
   if (!containerRef.value) return
   scene = new RoomScene(containerRef.value, {
     editable: props.editable,
+    preview: props.preview,
     onSelect: id => emit('select', id),
     onObjectChange: (id, patch) => emit('objectChange', id, patch),
     onHover: (id, x, y) => emit('hover', id, x, y),

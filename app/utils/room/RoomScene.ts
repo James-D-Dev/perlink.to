@@ -5,11 +5,16 @@ import type { LandId, RoomConfig, RoomObject, RoomStyle, WallSide } from '~/type
 import { CATALOG_BY_TYPE, type CatalogItem } from './catalog'
 import { getDaylight, type DaylightState } from './daylight'
 import { buildLand, createStarSphere, type LandInstance } from './lands'
+import { buildRoomShell, FLOOR_THICKNESS } from './shell'
+
+export { createFloorTexture } from './shell'
 
 export type ObjectPatch = Pick<RoomObject, 'position' | 'rotation'> & { wall?: WallSide }
 
 export interface RoomSceneOptions {
   editable: boolean
+  /** Small, non-interactive preview: low frame rate and quality */
+  preview?: boolean
   onSelect?: (id: string | null) => void
   onObjectChange?: (id: string, patch: ObjectPatch) => void
   onHover?: (id: string | null, x: number, y: number) => void
@@ -26,8 +31,17 @@ interface ObjectEntry {
   signature: string
 }
 
-const WALL_THICKNESS = 0.12
-const FLOOR_THICKNESS = 0.14
+/** Quality steps used by the adaptive renderer, best first */
+const QUALITY_LEVELS = [
+  { pixelRatio: 2, shadowSize: 2048, shadows: true },
+  { pixelRatio: 1.5, shadowSize: 2048, shadows: true },
+  { pixelRatio: 1.25, shadowSize: 1024, shadows: true },
+  { pixelRatio: 1, shadowSize: 1024, shadows: true },
+  { pixelRatio: 0.85, shadowSize: 512, shadows: false },
+]
+/** Only this many lamps cast real light; the rest just glow (each light costs shading on every surface) */
+const MAX_POINT_LIGHTS = 8
+
 const SUN_COLOR = new THREE.Color('#ffeccb')
 const MOON_COLOR = new THREE.Color('#9fb4ff')
 
@@ -82,6 +96,16 @@ export class RoomScene {
   /** Daylight actually shown; eases toward the target for smooth day/night switches */
   private shownDaylight: number | null = null
   private skyColor = new THREE.Color()
+
+  // Performance: render on demand at a frame rate that matches what's happening
+  private visibilityObserver: IntersectionObserver
+  private onScreen = true
+  private lastRender = 0
+  private activeUntil = 0
+  private shadowDirty = true
+  private lastShadowUpdate = 0
+  private quality = 0
+  private frameRatios: number[] = []
   private pointerDown = { x: 0, y: 0 }
   /** Object being dragged directly in the editor */
   private drag: {
@@ -97,10 +121,12 @@ export class RoomScene {
     this.container = container
     this.options = options
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    // High-density screens are already smooth, so skip the extra cost of MSAA there
+    this.renderer = new THREE.WebGLRenderer({ antialias: window.devicePixelRatio < 2, alpha: false, powerPreference: 'high-performance' })
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    // Shadows are re-rendered only when something changes (see renderFrame)
+    this.renderer.shadowMap.autoUpdate = false
     // Neutral keeps colours saturated (ACES and AgX wash out this pastel scenery)
     this.renderer.toneMapping = THREE.NeutralToneMapping
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -129,6 +155,7 @@ export class RoomScene {
     this.controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN }
     this.controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }
     this.controls.addEventListener('change', this.clampTarget)
+    this.controls.addEventListener('change', this.markActive)
 
     this.scene.add(this.hemi, this.ambient, this.sun, this.sun.target)
     this.pmrem = new THREE.PMREMGenerator(this.renderer)
@@ -169,6 +196,19 @@ export class RoomScene {
     this.renderer.domElement.addEventListener('pointerleave', this.handlePointerLeave)
     this.renderer.domElement.addEventListener('pointercancel', this.handlePointerCancel)
 
+    // Phones, low-memory devices and previews start at a lighter quality level
+    const coarse = window.matchMedia?.('(pointer: coarse)').matches
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
+    this.quality = options.preview ? 3 : coarse || memory < 4 ? 2 : 0
+    this.applyQuality()
+
+    // Stop rendering while the canvas is scrolled out of view
+    this.visibilityObserver = new IntersectionObserver(([entry]) => {
+      this.onScreen = !!entry?.isIntersecting
+      if (this.onScreen) this.markActive()
+    })
+    this.visibilityObserver.observe(container)
+
     this.resizeObserver = new ResizeObserver(() => this.resize())
     this.resizeObserver.observe(container)
     this.resize()
@@ -179,6 +219,8 @@ export class RoomScene {
 
   setRoom(room: RoomConfig) {
     this.room = room
+    this.markActive()
+    this.shadowDirty = true
     const signature = JSON.stringify(room.style)
     if (signature !== this.styleSignature) {
       this.styleSignature = signature
@@ -211,6 +253,7 @@ export class RoomScene {
     // Aim a bit below the object so it sits above the editor's bottom panels
     const target = center.clone().setY(Math.max(center.y - 1, 0))
     this.cameraGlide = { target, position: target.clone().add(offset) }
+    this.markActive()
   }
 
   /** Zoom toward (factor < 1) or away from (factor > 1) the current focus point */
@@ -232,6 +275,7 @@ export class RoomScene {
   /** Force a time of day (editor preview); null returns to the configured mode */
   setDaylightOverride(state: DaylightState | null) {
     this.daylightOverride = state
+    this.markActive()
   }
 
   /**
@@ -280,6 +324,7 @@ export class RoomScene {
     this.disposed = true
     cancelAnimationFrame(this.frame)
     this.resizeObserver.disconnect()
+    this.visibilityObserver.disconnect()
     const el = this.renderer.domElement
     el.removeEventListener('pointerdown', this.handlePointerDown)
     el.removeEventListener('pointerup', this.handlePointerUp)
@@ -306,39 +351,10 @@ export class RoomScene {
 
   private buildShell(style: RoomStyle) {
     this.clearGroup(this.shell)
-    this.walls = []
-    const { width, depth, height } = style
-
-    const floorMaterial = new THREE.MeshStandardMaterial({
-      color: style.floorColor,
-      map: createFloorTexture(style.floorMaterial, width, depth),
-      roughness: style.floorMaterial === 'tile' ? 0.35 : 0.85,
-    })
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(width + WALL_THICKNESS, FLOOR_THICKNESS, depth + WALL_THICKNESS), floorMaterial)
-    floor.position.set(-WALL_THICKNESS / 2, -FLOOR_THICKNESS / 2, -WALL_THICKNESS / 2)
-    floor.receiveShadow = true
-    this.floor = floor
-
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: style.wallColor, roughness: 0.95 })
-    const back = new THREE.Mesh(new THREE.BoxGeometry(width + WALL_THICKNESS, height, WALL_THICKNESS), wallMaterial)
-    back.position.set(-WALL_THICKNESS / 2, height / 2, -depth / 2 - WALL_THICKNESS / 2)
-    back.userData.wall = 'back'
-    const left = new THREE.Mesh(new THREE.BoxGeometry(WALL_THICKNESS, height, depth), wallMaterial)
-    left.position.set(-width / 2 - WALL_THICKNESS / 2, height / 2, 0)
-    left.userData.wall = 'left'
-    for (const wall of [back, left]) {
-      wall.receiveShadow = true
-      wall.castShadow = true
-      this.walls.push(wall)
-    }
-
-    const trimMaterial = new THREE.MeshStandardMaterial({ color: style.trimColor, roughness: 0.6 })
-    const backTrim = new THREE.Mesh(new THREE.BoxGeometry(width, 0.1, 0.03), trimMaterial)
-    backTrim.position.set(0, 0.05, -depth / 2 + 0.015)
-    const leftTrim = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.1, depth), trimMaterial)
-    leftTrim.position.set(-width / 2 + 0.015, 0.05, 0)
-
-    this.shell.add(floor, back, left, backTrim, leftTrim)
+    const shell = buildRoomShell(style)
+    this.floor = shell.floor
+    this.walls = shell.walls
+    this.shell.add(shell.group)
   }
 
   private buildOutdoor(landId: LandId, style: RoomStyle) {
@@ -380,15 +396,21 @@ export class RoomScene {
 
     const glowMaterials: THREE.MeshStandardMaterial[] = []
     const skyMaterials: THREE.MeshStandardMaterial[] = []
-    model.traverse((obj) => {
-      const material = (obj as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined
-      if (!material?.userData) return
-      if (material.userData.glow) glowMaterials.push(material)
-      if (material.userData.sky) skyMaterials.push(material)
-    })
+    const collectMaterials = () => {
+      model.traverse((obj) => {
+        const material = (obj as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined
+        if (!material?.userData) return
+        if (material.userData.glow && !glowMaterials.includes(material)) glowMaterials.push(material)
+        if (material.userData.sky && !skyMaterials.includes(material)) skyMaterials.push(material)
+      })
+    }
+    collectMaterials()
+    // Model-based items load asynchronously; pick up their glowing parts when ready
+    ;(model.userData.ready as Promise<void> | undefined)?.then(collectMaterials).catch(() => {})
 
     let light: THREE.PointLight | undefined
-    if (item.light) {
+    const lightCount = [...this.entries.values()].filter(e => e.light).length
+    if (item.light && lightCount < MAX_POINT_LIGHTS) {
       light = new THREE.PointLight(item.light.color, 0, item.light.distance, 1.6)
       light.position.set(...item.light.offset)
       root.add(light)
@@ -446,6 +468,8 @@ export class RoomScene {
   private moveDragged(clientX: number, clientY: number) {
     const entry = this.drag ? this.entries.get(this.drag.id) : undefined
     if (!entry || !this.drag || !this.style) return
+    this.markActive()
+    this.shadowDirty = true
     if (entry.item.wallMounted) {
       const target = this.wallTarget(clientX, clientY)
       if (!target) return
@@ -601,11 +625,60 @@ export class RoomScene {
     // Pull back on narrow screens so the whole room fits
     this.camera.fov = clientWidth / clientHeight < 0.8 ? 46 : clientWidth / clientHeight < 1.3 ? 38 : 32
     this.camera.updateProjectionMatrix()
+    this.markActive()
   }
 
-  private animate = () => {
+  /** Something changed: render at full frame rate for a moment */
+  private markActive = () => {
+    this.activeUntil = performance.now() + 1500
+  }
+
+  private applyQuality() {
+    const level = QUALITY_LEVELS[this.quality]!
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, level.pixelRatio))
+    this.renderer.shadowMap.enabled = level.shadows
+    if (this.sun.shadow.mapSize.x !== level.shadowSize) {
+      this.sun.shadow.mapSize.set(level.shadowSize, level.shadowSize)
+      this.sun.shadow.map?.dispose()
+      this.sun.shadow.map = null
+    }
+    this.shadowDirty = true
+    this.resize()
+  }
+
+  /**
+   * Watch how long frames actually take compared to the target. If the device
+   * keeps falling behind, step down resolution and shadow quality.
+   */
+  private trackPerformance(interval: number, target: number) {
+    if (this.quality >= QUALITY_LEVELS.length - 1) return
+    this.frameRatios.push(interval / target)
+    if (this.frameRatios.length < 45) return
+    const sorted = [...this.frameRatios].sort((a, b) => a - b)
+    const median = sorted[Math.floor(sorted.length / 2)]!
+    this.frameRatios = []
+    if (median > 1.5) {
+      this.quality++
+      this.applyQuality()
+    }
+  }
+
+  private animate = (now: number = performance.now()) => {
     if (this.disposed) return
     this.frame = requestAnimationFrame(this.animate)
+    if (!this.onScreen) return
+    // 60 fps while interacting, 30 fps for ambient motion, 15 fps for previews
+    const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active
+    const fps = this.options.preview ? 15 : active ? 60 : 30
+    const target = 1000 / fps
+    const interval = now - this.lastRender
+    if (interval < target - 2) return
+    if (this.lastRender && interval < 250) this.trackPerformance(interval, target)
+    this.lastRender = now
+    this.renderFrame(now)
+  }
+
+  private renderFrame(now: number) {
     const dt = Math.min(this.clock.getDelta(), 0.1)
     const time = this.clock.elapsedTime
     if (this.room) {
@@ -621,6 +694,12 @@ export class RoomScene {
       if (this.controls.target.distanceTo(this.cameraGlide.target) < 0.01) this.cameraGlide = null
     }
     this.controls.update()
+    // Shadows only when the scene changed, plus a slow refresh for the moving sun and late-loading models
+    if (this.renderer.shadowMap.enabled && (this.shadowDirty || now - this.lastShadowUpdate > 1500)) {
+      this.renderer.shadowMap.needsUpdate = true
+      this.shadowDirty = false
+      this.lastShadowUpdate = now
+    }
     this.renderer.render(this.scene, this.camera)
   }
 
@@ -693,7 +772,7 @@ export class RoomScene {
         entry.light.intensity = entry.item.light.intensity * lamps * (entry.data.scale || 1)
       }
       for (const m of entry.glowMaterials) {
-        m.emissiveIntensity = (m.userData.baseGlow as number) + 2.4 * lamps
+        m.emissiveIntensity = (m.userData.baseGlow as number) + ((m.userData.nightGlow as number | undefined) ?? 2.4) * lamps
       }
       for (const m of entry.skyMaterials) {
         m.color.copy(this.skyColor)
@@ -737,67 +816,6 @@ export class RoomScene {
   }
 }
 
-// ---------- Procedural floor textures (grayscale, tinted by material color) ----------
-
-export function createFloorTexture(kind: RoomStyle['floorMaterial'], width: number, depth: number): THREE.CanvasTexture {
-  const size = 512
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = size
-  const ctx = canvas.getContext('2d')!
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, size, size)
-
-  // Deterministic noise so the floor looks the same on every load
-  let seed = 7
-  const rand = () => {
-    seed = (seed * 16807) % 2147483647
-    return seed / 2147483647
-  }
-
-  if (kind === 'wood') {
-    const plank = size / 8
-    for (let i = 0; i < 8; i++) {
-      const shade = 225 + Math.floor(rand() * 30)
-      ctx.fillStyle = `rgb(${shade},${shade},${shade})`
-      ctx.fillRect(0, i * plank, size, plank)
-      ctx.fillStyle = 'rgba(0,0,0,0.18)'
-      ctx.fillRect(0, i * plank, size, 2)
-      const joint = Math.floor(rand() * size)
-      ctx.fillRect(joint, i * plank, 2, plank)
-      ctx.strokeStyle = 'rgba(0,0,0,0.05)'
-      for (let g = 0; g < 4; g++) {
-        ctx.beginPath()
-        const y = i * plank + rand() * plank
-        ctx.moveTo(0, y)
-        ctx.bezierCurveTo(size / 3, y + 4, (size * 2) / 3, y - 4, size, y)
-        ctx.stroke()
-      }
-    }
-  } else if (kind === 'tile') {
-    const tile = size / 4
-    ctx.fillStyle = 'rgba(0,0,0,0.22)'
-    for (let i = 0; i <= 4; i++) {
-      ctx.fillRect(i * tile - 2, 0, 4, size)
-      ctx.fillRect(0, i * tile - 2, size, 4)
-    }
-  } else {
-    // Carpet and concrete: fine noise, concrete a bit stronger
-    const strength = kind === 'concrete' ? 40 : 22
-    const image = ctx.getImageData(0, 0, size, size)
-    for (let i = 0; i < image.data.length; i += 4) {
-      const v = 255 - Math.floor(rand() * strength)
-      image.data[i] = image.data[i + 1] = image.data[i + 2] = v
-    }
-    ctx.putImageData(image, 0, 0)
-  }
-
-  const texture = new THREE.CanvasTexture(canvas)
-  texture.colorSpace = THREE.SRGBColorSpace
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-  texture.repeat.set(width / 3, depth / 3)
-  texture.anisotropy = 4
-  return texture
-}
 
 /** Gradient sky dome: deeper blue overhead, light at the horizon, rich below it */
 function createSkyDome() {

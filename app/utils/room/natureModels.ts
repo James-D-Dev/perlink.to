@@ -120,6 +120,9 @@ export function cherryLeaves(material: THREE.Material): THREE.Material {
  * Add instanced copies of a model to `group` once it has loaded.
  * Resources are shared between lands, so meshes are marked to skip disposal.
  */
+/** Side length of the culling cells scattered instances are grouped into (meters) */
+const CHUNK_SIZE = 6
+
 export async function scatterModel(
   group: THREE.Group,
   name: string,
@@ -131,23 +134,36 @@ export async function scatterModel(
   const place = new THREE.Matrix4()
   const quat = new THREE.Quaternion()
   const yAxis = new THREE.Vector3(0, 1, 0)
+  // Group instances into ~6 m cells so each batch has a tight bounding sphere
+  // and the camera skips the ones that are out of view
+  const cells = new Map<string, ScatterItem[]>()
+  for (const item of items) {
+    const key = `${Math.floor(item.x / CHUNK_SIZE)},${Math.floor(item.z / CHUNK_SIZE)}`
+    const cell = cells.get(key)
+    if (cell) cell.push(item)
+    else cells.set(key, [item])
+  }
   for (const part of model.parts) {
     const material = options.material ? options.material(part.material) : part.material
-    const mesh = new THREE.InstancedMesh(part.geometry, material, items.length)
-    items.forEach((item, i) => {
-      const s = item.height / model.height
-      quat.setFromAxisAngle(yAxis, item.rotation ?? 0)
-      place.compose(new THREE.Vector3(item.x, item.y, item.z), quat, new THREE.Vector3(s, s, s)).multiply(part.matrix)
-      mesh.setMatrixAt(i, place)
-    })
-    mesh.castShadow = options.castShadow ?? true
-    mesh.receiveShadow = true
     const std = material as THREE.MeshStandardMaterial
-    if (std.alphaTest > 0 && std.map) {
-      // Shadows follow the leaf cut-outs instead of solid cards
-      mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: std.map, alphaTest: std.alphaTest })
+    // Shadows follow the leaf cut-outs instead of solid cards
+    const depthMaterial = std.alphaTest > 0 && std.map
+      ? new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: std.map, alphaTest: std.alphaTest })
+      : undefined
+    for (const cell of cells.values()) {
+      const mesh = new THREE.InstancedMesh(part.geometry, material, cell.length)
+      cell.forEach((item, i) => {
+        const s = item.height / model.height
+        quat.setFromAxisAngle(yAxis, item.rotation ?? 0)
+        place.compose(new THREE.Vector3(item.x, item.y, item.z), quat, new THREE.Vector3(s, s, s)).multiply(part.matrix)
+        mesh.setMatrixAt(i, place)
+      })
+      mesh.computeBoundingSphere()
+      mesh.castShadow = options.castShadow ?? true
+      mesh.receiveShadow = true
+      if (depthMaterial) mesh.customDepthMaterial = depthMaterial
+      mesh.userData.shared = true
+      group.add(mesh)
     }
-    mesh.userData.shared = true
-    group.add(mesh)
   }
 }

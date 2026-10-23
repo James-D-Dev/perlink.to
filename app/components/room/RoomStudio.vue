@@ -195,8 +195,8 @@
           </UPopover>
         </div>
 
-        <!-- Colors -->
-        <div class="flex items-center gap-2 overflow-x-auto px-4 py-3">
+        <!-- Colors (not for model-based items) -->
+        <div v-if="!selectedItem.fromModel" class="flex items-center gap-2 overflow-x-auto px-4 py-3">
           <span class="mr-1 shrink-0 text-xs font-medium text-muted">Color</span>
           <button
             v-for="color in palette"
@@ -249,13 +249,15 @@
                   v-for="preset in ROOM_STYLE_PRESETS"
                   :key="preset.name"
                   type="button"
-                  class="w-20 overflow-hidden rounded-xl border border-default text-left transition hover:border-perlink-blue"
+                  class="w-28 overflow-hidden rounded-xl border-2 text-left transition"
+                  :class="isActivePreset(preset.style) ? 'border-perlink-blue' : 'border-default hover:border-accented'"
                   @click="updateStyle(preset.style)"
                 >
-                  <div class="relative h-12" :style="{ background: preset.style.wallColor }">
-                    <div class="absolute inset-x-0 bottom-0 h-4" :style="{ background: preset.style.floorColor }" />
+                  <div class="flex h-20 items-center justify-center bg-elevated/60">
+                    <img v-if="styleThumbnails[preset.name]" :src="styleThumbnails[preset.name]" :alt="preset.name" class="size-full object-contain">
+                    <USkeleton v-else class="size-3/4 rounded-lg" />
                   </div>
-                  <p class="truncate px-1.5 py-1 text-[11px] text-default">{{ preset.name }}</p>
+                  <p class="truncate px-2 py-1 text-[11px] font-medium text-default">{{ preset.name }}</p>
                 </button>
               </div>
             </div>
@@ -483,6 +485,12 @@ const previewMode = ref<'live' | 'day' | 'night'>('live')
 const listOpen = ref(false)
 const listQuery = ref('')
 const thumbnails = useRoomThumbnails()
+const styleThumbnails = useRoomStyleThumbnails()
+
+function isActivePreset(style: Partial<RoomStyle>) {
+  const current = room.value.style
+  return (current.theme ?? 'classic') === (style.theme ?? 'classic') && current.wallColor === style.wallColor && current.floorColor === style.floorColor
+}
 
 const CATEGORY_ICONS: Record<CatalogCategory, string> = {
   furniture: 'i-lucide-sofa',
@@ -490,6 +498,7 @@ const CATEGORY_ICONS: Record<CatalogCategory, string> = {
   decor: 'i-lucide-sprout',
   wall: 'i-lucide-frame',
   tech: 'i-lucide-monitor',
+  dungeon: 'i-lucide-castle',
 }
 
 const tabs = computed<{ value: Tab; label: string; icon: string }[]>(() => [
