@@ -45,7 +45,7 @@
 
     <!-- Object list: pick small or overlapping objects -->
     <div
-      v-if="listOpen"
+      v-if="listOpen && !detailOpen"
       class="absolute left-2 top-16 flex max-h-[min(60vh,34rem)] w-[calc(100%-5rem)] max-w-80 flex-col overflow-hidden rounded-2xl bg-default/80 shadow-xl ring-1 ring-white/10 backdrop-blur-xl sm:left-3"
     >
       <div class="flex items-center gap-2 border-b border-white/[0.08] px-3 py-2.5">
@@ -93,29 +93,141 @@
       </ul>
     </div>
 
+    <!-- Selected object details: opened from the chip under the right dock -->
+    <div
+      v-if="detailOpen && selectedObject && selectedItem"
+      class="absolute left-2 top-16 flex max-h-[min(60vh,34rem)] w-[calc(100%-5rem)] max-w-80 flex-col overflow-hidden rounded-2xl bg-default/80 shadow-xl ring-1 ring-white/10 backdrop-blur-xl sm:left-3"
+    >
+      <div class="flex items-center gap-2.5 border-b border-white/[0.08] px-3 py-2.5">
+        <div class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated">
+          <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-8 object-contain">
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold text-highlighted">{{ selectedItem.name }}</p>
+          <p class="truncate text-xs text-muted">
+            {{ selectedItem.wallMounted ? 'Drag along the walls to move' : 'Drag to move · drop on furniture to stack' }}
+          </p>
+        </div>
+        <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close details" @click="detailOpen = false" />
+      </div>
+
+      <div class="flex-1 space-y-4 overflow-y-auto p-3">
+        <div v-if="!selectedItem.wallMounted" class="flex items-center justify-between gap-2">
+          <span class="text-xs font-medium text-muted">Rotate</span>
+          <div class="flex items-center rounded-lg bg-elevated">
+            <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Rotate left" @click="rotateBy(-45)" />
+            <span class="w-10 text-center text-xs tabular-nums text-default">{{ selectedObject.rotation }}°</span>
+            <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="ghost" aria-label="Rotate right" @click="rotateBy(45)" />
+          </div>
+        </div>
+        <div v-else class="flex items-center justify-between gap-2">
+          <span class="text-xs font-medium text-muted">Wall</span>
+          <USelect
+            size="sm"
+            :model-value="selectedObject.wall || 'back'"
+            :items="wallOptions"
+            class="w-32"
+            @update:model-value="moveToWall($event as WallSide)"
+          />
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-medium text-muted">Size</span>
+          <div class="flex items-center rounded-lg bg-elevated">
+            <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Smaller" @click="scaleBy(-0.1)" />
+            <span class="w-11 text-center text-xs tabular-nums text-default">{{ Math.round(selectedObject.scale * 100) }}%</span>
+            <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Bigger" @click="scaleBy(0.1)" />
+          </div>
+        </div>
+
+        <div v-if="!selectedItem.fromModel" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-muted">Color</span>
+            <UTooltip text="Reset to default color">
+              <UButton size="xs" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Reset color" @click="updateSelected({ color: undefined })" />
+            </UTooltip>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="color in palette"
+              :key="color"
+              type="button"
+              class="size-7 shrink-0 rounded-full border-2 transition hover:scale-110"
+              :class="(selectedObject.color || selectedItem.defaultColor).toLowerCase() === color ? 'border-perlink-blue ring-2 ring-perlink-blue/30' : 'border-white/80 shadow'"
+              :style="{ background: color }"
+              :aria-label="`Color ${color}`"
+              @click="updateSelected({ color })"
+            />
+            <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" aria-label="Custom color">
+              <input type="color" class="absolute inset-0 cursor-pointer opacity-0" :value="selectedObject.color || selectedItem.defaultColor" @input="updateSelected({ color: ($event.target as HTMLInputElement).value })">
+            </label>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
+            <UIcon name="i-lucide-link" class="size-3.5" />
+            Link
+          </span>
+          <p class="text-xs text-muted">Visitors click this object to open the link.</p>
+          <UInput :model-value="selectedObject.link?.label || ''" size="sm" placeholder="Label, e.g. My Instagram" class="w-full" @update:model-value="updateLink({ label: String($event) })" />
+          <UInput :model-value="selectedObject.link?.url || ''" size="sm" placeholder="https://..." icon="i-lucide-link" class="w-full" @update:model-value="updateLink({ url: String($event) })" />
+        </div>
+      </div>
+
+      <div class="flex gap-2 border-t border-white/[0.08] p-2">
+        <UButton icon="i-lucide-copy" color="neutral" variant="soft" size="sm" class="flex-1 justify-center" @click="duplicateSelected">
+          Duplicate
+        </UButton>
+        <UButton icon="i-lucide-trash-2" color="error" variant="soft" size="sm" class="flex-1 justify-center" @click="removeSelected">
+          Delete
+        </UButton>
+      </div>
+    </div>
+
     <!-- Camera controls -->
-    <div class="absolute right-2 top-16 flex flex-col items-center gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl sm:right-3">
-      <UTooltip text="All objects in the room" :content="{ side: 'left' }">
+    <div class="absolute right-2 top-16 flex flex-col items-center gap-2 sm:right-3">
+      <div class="flex flex-col items-center gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
+        <UTooltip text="All objects in the room" :content="{ side: 'left' }">
+          <button
+            type="button"
+            class="flex w-10 flex-col items-center gap-0.5 rounded-xl py-1.5 transition"
+            :class="listOpen && !detailOpen ? 'bg-perlink-blue/15 text-perlink-blue' : 'text-default hover:bg-elevated'"
+            aria-label="Objects"
+            @click="toggleList"
+          >
+            <UIcon name="i-lucide-layers" class="size-5" />
+            <span class="text-[11px] font-semibold tabular-nums leading-none">{{ room.objects.length }}</span>
+          </button>
+        </UTooltip>
+        <div class="my-0.5 h-px w-6 bg-white/10" />
+        <UTooltip text="Zoom in" :content="{ side: 'left' }">
+          <UButton icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Zoom in" @click="canvasRef?.zoomBy(0.8)" />
+        </UTooltip>
+        <UTooltip text="Zoom out" :content="{ side: 'left' }">
+          <UButton icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Zoom out" @click="canvasRef?.zoomBy(1.25)" />
+        </UTooltip>
+        <UTooltip text="Reset view" :content="{ side: 'left' }">
+          <UButton icon="i-lucide-scan" color="neutral" variant="ghost" aria-label="Reset view" @click="canvasRef?.resetView()" />
+        </UTooltip>
+      </div>
+
+      <!-- Selected object: tap to open its details -->
+      <UTooltip v-if="selectedObject && selectedItem" :text="detailOpen ? 'Hide details' : `Edit ${selectedItem.name}`" :content="{ side: 'left' }">
         <button
           type="button"
-          class="flex w-10 flex-col items-center gap-0.5 rounded-xl py-1.5 transition"
-          :class="listOpen ? 'bg-perlink-blue/15 text-perlink-blue' : 'text-default hover:bg-elevated'"
-          aria-label="Objects"
-          @click="listOpen = !listOpen"
+          class="relative flex size-12 items-center justify-center rounded-2xl bg-default/70 shadow-lg ring-1 backdrop-blur-xl transition"
+          :class="detailOpen ? 'ring-perlink-blue/60 bg-perlink-blue/15' : 'ring-white/10 hover:bg-elevated'"
+          :aria-label="`Edit ${selectedItem.name}`"
+          @click="detailOpen = !detailOpen"
         >
-          <UIcon name="i-lucide-layers" class="size-5" />
-          <span class="text-[11px] font-semibold tabular-nums leading-none">{{ room.objects.length }}</span>
+          <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-9 object-contain">
+          <UIcon v-else name="i-lucide-box" class="size-5" />
+          <span v-if="!detailOpen" class="absolute -right-0.5 -top-0.5 flex size-3">
+            <span class="absolute inline-flex size-full animate-ping rounded-full bg-perlink-blue opacity-75" />
+            <span class="relative inline-flex size-3 rounded-full bg-perlink-blue shadow-[0_0_8px_2px] shadow-perlink-blue/70 ring-2 ring-default" />
+          </span>
         </button>
-      </UTooltip>
-      <div class="my-0.5 h-px w-6 bg-white/10" />
-      <UTooltip text="Zoom in" :content="{ side: 'left' }">
-        <UButton icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Zoom in" @click="canvasRef?.zoomBy(0.8)" />
-      </UTooltip>
-      <UTooltip text="Zoom out" :content="{ side: 'left' }">
-        <UButton icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Zoom out" @click="canvasRef?.zoomBy(1.25)" />
-      </UTooltip>
-      <UTooltip text="Reset view" :content="{ side: 'left' }">
-        <UButton icon="i-lucide-scan" color="neutral" variant="ghost" aria-label="Reset view" @click="canvasRef?.resetView()" />
       </UTooltip>
     </div>
 
@@ -124,99 +236,8 @@
       Drag to rotate · Right-drag to pan · Scroll to zoom
     </p>
 
-    <!-- Bottom area: selected object panel + inventory bar -->
+    <!-- Bottom area: inventory bar -->
     <div ref="barRef" class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-2 sm:p-3">
-      <!-- Selected object -->
-      <div
-        v-if="selectedObject && selectedItem"
-        class="pointer-events-auto w-full max-w-2xl divide-y divide-white/[0.08] rounded-2xl bg-default/75 shadow-xl ring-1 ring-white/10 backdrop-blur-xl"
-      >
-        <!-- Header -->
-        <div class="flex items-center gap-3 px-4 py-3">
-          <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-elevated">
-            <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-9 object-contain">
-          </div>
-          <div class="min-w-0 flex-1">
-            <p class="truncate font-semibold text-highlighted">{{ selectedItem.name }}</p>
-            <p class="truncate text-xs text-muted">
-              {{ selectedItem.wallMounted ? 'Drag along the walls to move' : 'Drag to move · drop on furniture to stack' }}
-            </p>
-          </div>
-          <UTooltip text="Duplicate (Ctrl+D)">
-            <UButton icon="i-lucide-copy" color="neutral" variant="ghost" aria-label="Duplicate" @click="duplicateSelected" />
-          </UTooltip>
-          <UTooltip text="Delete (Del)">
-            <UButton icon="i-lucide-trash-2" color="error" variant="ghost" aria-label="Delete" @click="removeSelected" />
-          </UTooltip>
-        </div>
-
-        <!-- Controls -->
-        <div class="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-          <div v-if="!selectedItem.wallMounted" class="flex items-center gap-2">
-            <span class="text-xs font-medium text-muted">Rotate</span>
-            <div class="flex items-center rounded-lg bg-elevated">
-              <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Rotate left" @click="rotateBy(-45)" />
-              <span class="w-10 text-center text-xs tabular-nums text-default">{{ selectedObject.rotation }}°</span>
-              <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="ghost" aria-label="Rotate right" @click="rotateBy(45)" />
-            </div>
-          </div>
-          <div v-else class="flex items-center gap-2">
-            <span class="text-xs font-medium text-muted">Wall</span>
-            <USelect
-              size="sm"
-              :model-value="selectedObject.wall || 'back'"
-              :items="wallOptions"
-              class="w-32"
-              @update:model-value="moveToWall($event as WallSide)"
-            />
-          </div>
-
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-medium text-muted">Size</span>
-            <div class="flex items-center rounded-lg bg-elevated">
-              <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Smaller" @click="scaleBy(-0.1)" />
-              <span class="w-11 text-center text-xs tabular-nums text-default">{{ Math.round(selectedObject.scale * 100) }}%</span>
-              <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Bigger" @click="scaleBy(0.1)" />
-            </div>
-          </div>
-
-          <UPopover>
-            <UButton size="sm" icon="i-lucide-link" :color="selectedObject.link?.url ? 'primary' : 'neutral'" variant="soft">
-              {{ selectedObject.link?.url ? (selectedObject.link.label || 'Linked') : 'Add link' }}
-            </UButton>
-            <template #content>
-              <div class="w-72 space-y-2 p-3">
-                <p class="text-sm font-medium text-highlighted">Link</p>
-                <p class="text-xs text-muted">Visitors click this object to open the link.</p>
-                <UInput :model-value="selectedObject.link?.label || ''" placeholder="Label, e.g. My Instagram" class="w-full" @update:model-value="updateLink({ label: String($event) })" />
-                <UInput :model-value="selectedObject.link?.url || ''" placeholder="https://..." icon="i-lucide-link" class="w-full" @update:model-value="updateLink({ url: String($event) })" />
-              </div>
-            </template>
-          </UPopover>
-        </div>
-
-        <!-- Colors (not for model-based items) -->
-        <div v-if="!selectedItem.fromModel" class="flex items-center gap-2 overflow-x-auto px-4 py-3">
-          <span class="mr-1 shrink-0 text-xs font-medium text-muted">Color</span>
-          <button
-            v-for="color in palette"
-            :key="color"
-            type="button"
-            class="size-7 shrink-0 rounded-full border-2 transition hover:scale-110"
-            :class="(selectedObject.color || selectedItem.defaultColor).toLowerCase() === color ? 'border-perlink-blue ring-2 ring-perlink-blue/30' : 'border-white/80 shadow'"
-            :style="{ background: color }"
-            :aria-label="`Color ${color}`"
-            @click="updateSelected({ color })"
-          />
-          <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" aria-label="Custom color">
-            <input type="color" class="absolute inset-0 cursor-pointer opacity-0" :value="selectedObject.color || selectedItem.defaultColor" @input="updateSelected({ color: ($event.target as HTMLInputElement).value })">
-          </label>
-          <UTooltip text="Reset to default color">
-            <UButton size="xs" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" class="shrink-0" aria-label="Reset color" @click="updateSelected({ color: undefined })" />
-          </UTooltip>
-        </div>
-      </div>
-
       <!-- Inventory bar -->
       <div class="pointer-events-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-default/75 ring-1 ring-white/10 shadow-xl backdrop-blur-xl">
         <!-- Tray -->
@@ -483,6 +504,8 @@ const activeTab = ref<Tab>('furniture')
 const trayOpen = ref(true)
 const previewMode = ref<'live' | 'day' | 'night'>('live')
 const listOpen = ref(false)
+/** Left panel with the selected object's settings */
+const detailOpen = ref(false)
 const listQuery = ref('')
 const thumbnails = useRoomThumbnails()
 const styleThumbnails = useRoomStyleThumbnails()
@@ -579,6 +602,16 @@ const objectRows = computed(() => {
   return query ? rows.filter(r => r.name.toLowerCase().includes(query) || r.place.toLowerCase().includes(query)) : rows
 })
 
+function toggleList() {
+  // Both panels share the left side; the list takes over from the details
+  if (detailOpen.value) {
+    detailOpen.value = false
+    listOpen.value = true
+  } else {
+    listOpen.value = !listOpen.value
+  }
+}
+
 function focusFromList(id: string) {
   selectedId.value = id
   canvasRef.value?.focusObject(id)
@@ -593,6 +626,9 @@ function removeObject(id: string) {
 
 const selectedObject = computed(() => room.value.objects.find(o => o.id === selectedId.value) || null)
 const selectedItem = computed(() => (selectedObject.value ? CATALOG_BY_TYPE[selectedObject.value.type] : undefined))
+watch(selectedObject, (object) => {
+  if (!object) detailOpen.value = false
+})
 
 // ---------- Day/night preview ----------
 
