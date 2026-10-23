@@ -37,7 +37,6 @@ const QUALITY_LEVELS = [
   { pixelRatio: 1.5, shadowSize: 2048, shadows: true },
   { pixelRatio: 1.25, shadowSize: 1024, shadows: true },
   { pixelRatio: 1, shadowSize: 1024, shadows: true },
-  { pixelRatio: 0.85, shadowSize: 512, shadows: false },
 ]
 /** Only this many lamps cast real light; the rest just glow (each light costs shading on every surface) */
 const MAX_POINT_LIGHTS = 8
@@ -102,10 +101,9 @@ export class RoomScene {
   private onScreen = true
   private lastRender = 0
   private activeUntil = 0
-  private shadowDirty = true
-  private lastShadowUpdate = 0
   private quality = 0
   private frameRatios: number[] = []
+  private startedAt = performance.now()
   private pointerDown = { x: 0, y: 0 }
   /** Object being dragged directly in the editor */
   private drag: {
@@ -121,12 +119,10 @@ export class RoomScene {
     this.container = container
     this.options = options
 
-    // High-density screens are already smooth, so skip the extra cost of MSAA there
-    this.renderer = new THREE.WebGLRenderer({ antialias: window.devicePixelRatio < 2, alpha: false, powerPreference: 'high-performance' })
+    // MSAA stays on everywhere: without it the cut-out grass and leaves shimmer as they sway
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
-    // Shadows are re-rendered only when something changes (see renderFrame)
-    this.renderer.shadowMap.autoUpdate = false
     // Neutral keeps colours saturated (ACES and AgX wash out this pastel scenery)
     this.renderer.toneMapping = THREE.NeutralToneMapping
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -220,7 +216,6 @@ export class RoomScene {
   setRoom(room: RoomConfig) {
     this.room = room
     this.markActive()
-    this.shadowDirty = true
     const signature = JSON.stringify(room.style)
     if (signature !== this.styleSignature) {
       this.styleSignature = signature
@@ -469,7 +464,6 @@ export class RoomScene {
     const entry = this.drag ? this.entries.get(this.drag.id) : undefined
     if (!entry || !this.drag || !this.style) return
     this.markActive()
-    this.shadowDirty = true
     if (entry.item.wallMounted) {
       const target = this.wallTarget(clientX, clientY)
       if (!target) return
@@ -642,7 +636,6 @@ export class RoomScene {
       this.sun.shadow.map?.dispose()
       this.sun.shadow.map = null
     }
-    this.shadowDirty = true
     this.resize()
   }
 
@@ -651,13 +644,14 @@ export class RoomScene {
    * keeps falling behind, step down resolution and shadow quality.
    */
   private trackPerformance(interval: number, target: number) {
-    if (this.quality >= QUALITY_LEVELS.length - 1) return
+    // Skip the first seconds: models and shaders loading cause hitches that aren't representative
+    if (this.quality >= QUALITY_LEVELS.length - 1 || performance.now() - this.startedAt < 5000) return
     this.frameRatios.push(interval / target)
-    if (this.frameRatios.length < 45) return
+    if (this.frameRatios.length < 120) return
     const sorted = [...this.frameRatios].sort((a, b) => a - b)
     const median = sorted[Math.floor(sorted.length / 2)]!
     this.frameRatios = []
-    if (median > 1.5) {
+    if (median > 1.8) {
       this.quality++
       this.applyQuality()
     }
@@ -694,12 +688,6 @@ export class RoomScene {
       if (this.controls.target.distanceTo(this.cameraGlide.target) < 0.01) this.cameraGlide = null
     }
     this.controls.update()
-    // Shadows only when the scene changed, plus a slow refresh for the moving sun and late-loading models
-    if (this.renderer.shadowMap.enabled && (this.shadowDirty || now - this.lastShadowUpdate > 1500)) {
-      this.renderer.shadowMap.needsUpdate = true
-      this.shadowDirty = false
-      this.lastShadowUpdate = now
-    }
     this.renderer.render(this.scene, this.camera)
   }
 

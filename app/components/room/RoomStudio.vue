@@ -125,11 +125,11 @@
     </p>
 
     <!-- Bottom area: selected object panel + inventory bar -->
-    <div ref="barRef" class="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-2 sm:p-3">
+    <div ref="barRef" class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-2 sm:p-3">
       <!-- Selected object -->
       <div
         v-if="selectedObject && selectedItem"
-        class="w-full max-w-2xl divide-y divide-white/[0.08] rounded-2xl bg-default/75 shadow-xl ring-1 ring-white/10 backdrop-blur-xl"
+        class="pointer-events-auto w-full max-w-2xl divide-y divide-white/[0.08] rounded-2xl bg-default/75 shadow-xl ring-1 ring-white/10 backdrop-blur-xl"
       >
         <!-- Header -->
         <div class="flex items-center gap-3 px-4 py-3">
@@ -218,7 +218,7 @@
       </div>
 
       <!-- Inventory bar -->
-      <div class="w-full max-w-5xl overflow-hidden rounded-2xl bg-default/75 ring-1 ring-white/10 shadow-xl backdrop-blur-xl">
+      <div class="pointer-events-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-default/75 ring-1 ring-white/10 shadow-xl backdrop-blur-xl">
         <!-- Tray -->
         <div v-show="trayOpen" class="border-b border-default">
           <!-- Catalog items -->

@@ -71,6 +71,8 @@ function loadModel(name: string): Promise<LoadedModel> {
         if (material.alphaTest > 0 || material.transparent) {
           material.alphaTest = 0.5
           material.transparent = false
+          // Uses MSAA samples to smooth the cut-out edges, so leaves don't flicker as they sway
+          material.alphaToCoverage = true
           addWindSway(material)
         }
         material.side = THREE.DoubleSide
