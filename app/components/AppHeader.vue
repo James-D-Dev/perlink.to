@@ -64,7 +64,7 @@ type User = {
     <template #right>
       <div class="flex items-center space-x-4">
         <template v-if="loggedIn">
-          <NuxtLink to="/admin" class="flex items-center space-x-3">
+          <NuxtLink to="/dashboard" class="flex items-center space-x-3">
             <UAvatar
               :src="user?.avatar || ''"
               :text="

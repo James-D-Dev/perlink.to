@@ -66,7 +66,7 @@
           <div v-if="loggedIn" class="text-center space-y-4">
             <p class="text-green-600">✓ You are already signed in</p>
             <div class="flex gap-3">
-              <UButton to="/admin" color="primary" size="xl" block>
+              <UButton to="/dashboard" color="primary" size="xl" block>
                 Go to Dashboard
               </UButton>
               <UButton @click="logout" color="neutral" size="xl" variant="outline" block>

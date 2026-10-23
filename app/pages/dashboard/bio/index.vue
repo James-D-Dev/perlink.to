@@ -8,7 +8,7 @@
 
         <template #right>
           <UButton
-            to="/admin/create?domain=perlink.to"
+            to="/dashboard/create?domain=perlink.to"
             color="primary"
             icon="i-lucide-plus"
             label="Create Bio Page"
@@ -77,7 +77,7 @@
             v-for="bio in filteredBioPages"
             :key="bio.id"
             class="bg-white border border-gray-100 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
-            @click="navigateTo(`/admin/bio/${bio.username}`)"
+            @click="navigateTo(`/dashboard/bio/${bio.username}`)"
             :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
             <div class="flex items-start gap-4">
@@ -200,7 +200,7 @@
           <h3 class="text-lg font-medium text-gray-900">No bio pages yet</h3>
           <p class="text-gray-500 mt-1 mb-4">Create your first bio link page</p>
           <UButton
-            to="/admin/create?domain=perlink.to"
+            to="/dashboard/create?domain=perlink.to"
             color="primary"
             icon="i-lucide-plus"
             size="xl"

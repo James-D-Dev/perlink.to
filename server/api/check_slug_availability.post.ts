@@ -3,7 +3,7 @@ import { LinkRepository } from '../repositories/linkRepository'
 
 const whiteListedRoutes = [
   'about', 'contact', 'login', 'confirm', 'cookie-notice',
-  'privacy', 'terms', 'admin', 'api', 'tasks', '404'
+  'privacy', 'terms', 'admin', 'dashboard', 'superadmin', 'api', 'tasks', '404'
 ]
 
 export default defineEventHandler(async (event) => {

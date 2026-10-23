@@ -18,7 +18,7 @@
       <ModalsLinkReadyModal
         v-model:open="showSuccessModal"
         :short-code="createdShortCode"
-        @view-details="navigateTo(`/admin/links/${createdShortCode}`)"
+        @view-details="navigateTo(`/dashboard/links/${createdShortCode}`)"
       />
     </template>
   </UDashboardPanel>
@@ -137,7 +137,7 @@ async function addLink() {
       shortCodeAvailable.value = false;
 
       // Navigate to link details with new=true query
-      navigateTo(`/admin/links/${res.data.short_code}?new=true`);
+      navigateTo(`/dashboard/links/${res.data.short_code}?new=true`);
     }
   } catch (error: any) {
     console.error("Error creating link:", error);
@@ -196,7 +196,7 @@ async function createBioLink() {
     });
 
     if (res.success && res.bioPage) {
-      navigateTo(`/admin/bio/${res.bioPage.username}`);
+      navigateTo(`/dashboard/bio/${res.bioPage.username}`);
     }
   } catch (error: any) {
     console.error("Error creating bio:", error);

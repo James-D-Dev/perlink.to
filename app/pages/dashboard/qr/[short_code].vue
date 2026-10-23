@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-8">
       <div class="flex items-center gap-4">
         <UButton
-          to="/admin/qr-codes"
+          to="/dashboard/qr-codes"
           variant="ghost"
           color="neutral"
           icon="i-lucide-arrow-left"
@@ -520,7 +520,7 @@
           <UButton
             color="primary"
             class="flex-1"
-            to="/admin/upgrade"
+            to="/dashboard/upgrade"
             @click="showUpgradeModal = false"
           >
             Upgrade Now

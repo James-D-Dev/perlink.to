@@ -300,7 +300,7 @@ const loadUserBioPages = async () => {
 // Handle bio page selection change
 const onBioPageChange = (username: string) => {
   if (username && username !== routeUsername.value) {
-    navigateTo(`/admin/bio/${username}`);
+    navigateTo(`/dashboard/bio/${username}`);
   }
 };
 

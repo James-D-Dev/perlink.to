@@ -88,7 +88,7 @@ const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [
 ];
 
 const supportLinks: NavigationMenuItem[] = [
-  { label: "User Dashboard", icon: "i-lucide-layout-grid", to: "/admin" },
+  { label: "User Dashboard", icon: "i-lucide-layout-grid", to: "/dashboard" },
   { label: "Back to Site", icon: "i-lucide-arrow-left", to: "/" },
 ];
 

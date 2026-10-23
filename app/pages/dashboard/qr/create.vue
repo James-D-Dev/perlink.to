@@ -28,7 +28,7 @@
                         You can create {{ remainingCodes }} more codes this
                         month.
                         <NuxtLink
-                          to="/admin/upgrade"
+                          to="/dashboard/upgrade"
                           class="text-primary underline"
                           >Upgrade for more</NuxtLink
                         >
@@ -366,7 +366,7 @@ async function createQRCode() {
     });
 
     if (data) {
-      navigateTo(`/admin/qr/${data.shortCode}`);
+      navigateTo(`/dashboard/qr/${data.shortCode}`);
     }
   } catch (error: any) {
     console.error("Failed to create QR code:", error);

@@ -55,7 +55,10 @@ export default defineNuxtConfig({
 
   routeRules: {
     "/": { prerender: true },
-    "/admin/bio/**": { ssr: false },
+    "/dashboard/bio/**": { ssr: false },
+    // Old user dashboard URLs
+    "/admin": { redirect: { to: "/dashboard", statusCode: 301 } },
+    "/admin/**": { redirect: { to: "/dashboard/**", statusCode: 301 } },
     "/**": {
       ...(isProd
         ? {

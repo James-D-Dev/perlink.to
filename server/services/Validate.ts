@@ -9,6 +9,8 @@ const whiteListedRoutes = [
     'privacy',
     'terms',
     'admin',
+    'dashboard',
+    'superadmin',
     'api',
     'tasks',
     '404'

@@ -111,7 +111,7 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 7 // 7 days
     })
 
-    return { success: true, redirect: '/admin' }
+    return { success: true, redirect: '/dashboard' }
     
   } catch (error: any) {
     console.error('[One Tap] Error:', error.message)

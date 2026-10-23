@@ -63,7 +63,7 @@ const handleDelete = async () => {
 
     // Close modal and redirect to links list
     emit("update:open", false);
-    router.push("/admin/create");
+    router.push("/dashboard/create");
   } catch (error) {
     toast.add({
       title: "Error",

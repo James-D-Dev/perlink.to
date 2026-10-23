@@ -49,15 +49,15 @@ const items = computed<DropdownMenuItem[][]>(() => [
   [{
     label: 'My Account',
     icon: 'i-lucide-user',
-    onSelect: () => navigateTo('/admin/settings')
+    onSelect: () => navigateTo('/dashboard/settings')
   }, {
     label: 'Billing',
     icon: 'i-lucide-credit-card',
-    onSelect: () => navigateTo('/admin/billing')
+    onSelect: () => navigateTo('/dashboard/billing')
   }, {
     label: 'Settings',
     icon: 'i-lucide-settings',
-    to: '/admin/settings'
+    to: '/dashboard/settings'
   }],
   [{
     label: 'Sign out',

@@ -8,7 +8,7 @@
 
         <template #right>
           <UButton
-            to="/admin/create?domain=s.perlink.to"
+            to="/dashboard/create?domain=s.perlink.to"
             color="primary"
             icon="i-lucide-plus"
             label="Create Short Link"
@@ -267,7 +267,7 @@
                   </div>
                   <div>
                     <NuxtLink
-                      :to="`/admin/links/${link.short_code}`"
+                      :to="`/dashboard/links/${link.short_code}`"
                       class="font-bold text-lg hover:underline"
                     >
                       s.perlink.to/{{ link.short_code }}

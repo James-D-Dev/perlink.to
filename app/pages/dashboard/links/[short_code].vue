@@ -8,7 +8,7 @@
 
         <template #right>
           <UButton
-            to="/admin/create"
+            to="/dashboard/create"
             color="primary"
             icon="i-lucide-plus"
             label="Create Short Link"

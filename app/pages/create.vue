@@ -20,7 +20,7 @@
   <ModalsLinkReadyModal
     v-model:open="showSuccessModal"
     :short-code="createdShortCode"
-    @view-details="navigateTo(`/admin/links/${createdShortCode}`)"
+    @view-details="navigateTo(`/dashboard/links/${createdShortCode}`)"
   />
 
   <!-- Login Modal -->
@@ -170,7 +170,7 @@ async function selectType(type: "bio" | "short") {
 
 // Redirect to login
 function redirectToLogin() {
-  const redirectUrl = `/admin/create?input=${encodeURIComponent(slug.value)}`;
+  const redirectUrl = `/dashboard/create?input=${encodeURIComponent(slug.value)}`;
   navigateTo(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
 }
 
@@ -197,7 +197,7 @@ async function createBioLink() {
     });
 
     if (res.success && res.bioPage) {
-      navigateTo(`/admin/bio/${res.bioPage.username}`);
+      navigateTo(`/dashboard/bio/${res.bioPage.username}`);
     }
   } catch (error: any) {
     console.error("Error creating bio:", error);
@@ -258,7 +258,7 @@ async function createShortLink() {
     });
 
     if (res.success && "data" in res && res.data) {
-      navigateTo(`/admin/links/${res.data.short_code}`);
+      navigateTo(`/dashboard/links/${res.data.short_code}`);
     }
   } catch (error: any) {
     console.error("Error creating short link:", error);

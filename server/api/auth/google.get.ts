@@ -96,12 +96,12 @@ export default defineOAuthGoogleEventHandler({
         maxAge: 60 * 60 * 24 * 7
       })
 
-      // Get redirect path from query or default to admin
-      const redirectPath = getQuery(event).redirect || '/admin'
+      // Get redirect path from query or default to dashboard
+      const redirectPath = getQuery(event).redirect || '/dashboard'
       
       console.log('[OAuth] Redirecting to:', redirectPath)
       
-      // Redirect to admin/dashboard
+      // Redirect to dashboard
       await sendRedirect(event, redirectPath as string, 302)
       
     } catch (error: any) {

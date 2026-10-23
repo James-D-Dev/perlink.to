@@ -8,7 +8,7 @@
 
         <template #right>
           <UButton
-            to="/admin/qr/create"
+            to="/dashboard/qr/create"
             color="primary"
             icon="i-lucide-plus"
             label="Create QR Code"
@@ -69,7 +69,7 @@
             v-for="qr in filteredQRCodes"
             :key="qr.id"
             class="bg-white border border-gray-100 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
-            @click="navigateTo(`/admin/qr/${qr.shortCode}`)"
+            @click="navigateTo(`/dashboard/qr/${qr.shortCode}`)"
             :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
             <div class="flex items-start gap-4">
@@ -172,7 +172,7 @@
           <h3 class="text-lg font-medium text-gray-900">No QR codes yet</h3>
           <p class="text-gray-500 mt-1 mb-4">Create your first QR code to get started</p>
           <UButton
-            to="/admin/qr/create"
+            to="/dashboard/qr/create"
             color="primary"
             icon="i-lucide-plus"
             size="xl"

@@ -24,7 +24,7 @@
 
       <template #default="{ collapsed }">
         <UButton
-          to="/admin/create"
+          to="/dashboard/create"
           :label="collapsed ? undefined : 'Create new'"
           icon="i-heroicons-plus"
           block
@@ -226,38 +226,38 @@ const navigationLinks: NavigationMenuItem[] = [
   {
     label: "Dashboard",
     icon: "i-mingcute-dashboard-4-line",
-    to: "/admin",
+    to: "/dashboard",
   },
   {
     label: "Bio Pages",
     icon: "i-mingcute-profile-line",
-    to: "/admin/bio",
+    to: "/dashboard/bio",
   },
   {
     label: "Short Links",
     icon: "i-mingcute-link-2-line",
-    to: "/admin/links",
+    to: "/dashboard/links",
   },
 
   {
     label: "QR Codes",
     icon: "i-mingcute-qrcode-2-line",
-    to: "/admin/qr",
+    to: "/dashboard/qr",
   },
   // {
   //   label: "Analytics",
   //   icon: "i-mingcute-chart-bar-line",
-  //   to: "/admin/analytics",
+  //   to: "/dashboard/analytics",
   // },
   // {
   //   label: "Domains",
   //   icon: "i-mingcute-earth-2-line",
-  //   to: "/admin/domains",
+  //   to: "/dashboard/domains",
   // },
   {
     label: "Settings",
     icon: "i-mingcute-settings-6-line",
-    to: "/admin/settings",
+    to: "/dashboard/settings",
   },
 ];
 
@@ -265,12 +265,12 @@ const supportLinks: NavigationMenuItem[] = [
   {
     label: "Help & Support",
     icon: "i-mingcute-lifebuoy-line",
-    to: "/admin/help",
+    to: "/dashboard/help",
   },
   {
     label: "Feedback",
     icon: "i-mingcute-chat-4-line",
-    to: "/admin/feedback",
+    to: "/dashboard/feedback",
   },
 ];
 
@@ -297,12 +297,12 @@ const accountMenuItems = [
     {
       label: "My Account",
       icon: "i-heroicons-user",
-      onSelect: () => navigateTo("/admin/settings"),
+      onSelect: () => navigateTo("/dashboard/settings"),
     },
     {
       label: "Billing",
       icon: "i-heroicons-credit-card",
-      onSelect: () => navigateTo("/admin/billing"),
+      onSelect: () => navigateTo("/dashboard/billing"),
     },
   ],
   [
