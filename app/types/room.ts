@@ -60,6 +60,8 @@ export interface RoomObject {
   /** Set for wall-mounted objects */
   wall?: WallSide;
   link?: RoomObjectLink;
+  /** Uploaded photo shown in a picture frame; visitors click it to view it large */
+  image?: string;
 }
 
 export interface RoomMusic {

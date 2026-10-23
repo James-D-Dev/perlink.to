@@ -140,7 +140,30 @@
           </div>
         </div>
 
-        <div v-if="!selectedItem.fromModel" class="space-y-2">
+        <div v-if="selectedItem.photo" class="space-y-2">
+          <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
+            <UIcon name="i-lucide-image" class="size-3.5" />
+            Photo
+          </span>
+          <div class="flex items-center gap-3">
+            <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-elevated ring-1 ring-white/10">
+              <img v-if="selectedObject.image" :src="selectedObject.image" alt="Photo" class="size-full object-cover">
+              <UIcon v-else name="i-lucide-image-plus" class="size-6 text-dimmed" />
+            </div>
+            <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+              <UButton size="sm" color="neutral" variant="soft" icon="i-lucide-upload" :loading="photoUploading" class="justify-center" @click="photoInput?.click()">
+                {{ selectedObject.image ? 'Replace photo' : 'Upload photo' }}
+              </UButton>
+              <UButton v-if="selectedObject.image" size="sm" color="neutral" variant="ghost" icon="i-lucide-x" class="justify-center" @click="updateSelected({ image: undefined })">
+                Remove
+              </UButton>
+            </div>
+          </div>
+          <p class="text-xs text-muted">Visitors click the frame to see the photo full size.</p>
+          <input ref="photoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onPhotoPicked">
+        </div>
+
+        <div v-if="!selectedItem.fromModel && !(selectedItem.photo && selectedObject.image)" class="space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-medium text-muted">Color</span>
             <UTooltip text="Reset to default color">
@@ -808,6 +831,56 @@ function onObjectChange(id: string, patch: ObjectPatch) {
 function updateSelected(patch: Partial<RoomObject>) {
   if (!selectedId.value) return
   setObjects(room.value.objects.map(o => (o.id === selectedId.value ? { ...o, ...patch } : o)))
+}
+
+// ---------- Picture frame photos ----------
+
+const toast = useToast()
+const photoInput = ref<HTMLInputElement | null>(null)
+const photoUploading = ref(false)
+
+/** Downscale to at most 1600px on the long side and re-encode as JPEG */
+function resizePhoto(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const src = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(src)
+      const scale = Math.min(1, 1600 / Math.max(img.width, img.height))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(blob => (blob ? resolve(blob) : reject(new Error('Could not process image'))), 'image/jpeg', 0.88)
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(src)
+      reject(new Error('Could not read image'))
+    }
+    img.src = src
+  })
+}
+
+async function onPhotoPicked(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  const targetId = selectedId.value
+  if (!file || !targetId) return
+  photoUploading.value = true
+  try {
+    const blob = await resizePhoto(file)
+    const body = new FormData()
+    body.append('file', new File([blob], 'photo.jpg', { type: 'image/jpeg' }))
+    const { url } = await $fetch<{ url: string }>('/api/upload/room-image', { method: 'POST', body })
+    // Apply to the frame that was selected when the upload started
+    setObjects(room.value.objects.map(o => (o.id === targetId ? { ...o, image: url } : o)))
+  } catch (error) {
+    const message = (error as { data?: { statusMessage?: string } })?.data?.statusMessage || (error as Error).message
+    toast.add({ title: 'Photo upload failed', description: message, color: 'error' })
+  } finally {
+    photoUploading.value = false
+  }
 }
 
 function updateLink(patch: Partial<RoomObjectLink>) {

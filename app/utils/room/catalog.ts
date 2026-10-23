@@ -28,6 +28,8 @@ export interface CatalogItem {
   /** Built from a 3D model file; colour changes don't apply */
   fromModel?: boolean
   light?: CatalogLight
+  /** Area that shows an uploaded photo (local coordinates, meters); parts tagged `placeholder` hide when a photo is set */
+  photo?: { width: number; height: number; center: [number, number, number] }
   build: (color: string) => THREE.Group
 }
 
@@ -440,12 +442,17 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'wall',
     defaultColor: '#264653',
     wallMounted: true,
+    photo: { width: 0.5, height: 0.7, center: [0, 0, 0.031] },
     build: (color) => {
       const art = new THREE.Group()
       art.add(box(0.7, 0.9, 0.04, mat('#3a2a1e'), 0, -0.45))
       art.add(box(0.58, 0.78, 0.01, mat(WHITE), 0, -0.39, 0.025))
-      art.add(box(0.44, 0.3, 0.01, mat(color), 0, -0.25, 0.032))
-      art.add(sphere(0.07, mat('#e9c46a'), 0.12, 0.18, 0.035))
+      // Abstract artwork, replaced by the photo once one is uploaded
+      const painting = box(0.44, 0.3, 0.01, mat(color), 0, -0.25, 0.032)
+      const sun = sphere(0.07, mat('#e9c46a'), 0.12, 0.18, 0.035)
+      painting.userData.placeholder = true
+      sun.userData.placeholder = true
+      art.add(painting, sun)
       return art
     },
   },

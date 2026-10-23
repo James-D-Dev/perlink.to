@@ -58,6 +58,49 @@
       </div>
     </div>
 
+    <!-- Photo popup for picture frames -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="photo"
+        class="absolute inset-0 z-20 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Photo"
+        @click.self="photo = null"
+      >
+        <div class="relative flex max-h-full max-w-full flex-col items-center gap-3">
+          <img
+            :src="photo.image"
+            alt="Photo"
+            class="max-h-[78vh] max-w-[min(92vw,64rem)] rounded-2xl object-contain shadow-2xl ring-1 ring-white/15"
+          >
+          <a
+            v-if="photo.link?.url"
+            :href="safeUrl(photo.link.url)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-1.5 rounded-full bg-black/30 px-4 py-2 text-sm font-medium text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/40"
+          >
+            {{ photo.link.label || hostOf(photo.link.url) }}
+            <UIcon name="i-lucide-arrow-up-right" class="size-4" />
+          </a>
+          <button
+            type="button"
+            class="absolute -right-2 -top-2 flex size-9 items-center justify-center rounded-full bg-black/40 text-white shadow-lg ring-1 ring-white/20 backdrop-blur-xl transition hover:bg-black/60"
+            aria-label="Close photo"
+            @click="photo = null"
+          >
+            <UIcon name="i-lucide-x" class="size-5" />
+          </button>
+        </div>
+      </div>
+    </Transition>
+
     <!-- Hover tooltip -->
     <div
       v-if="hovered"
@@ -95,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import type { RoomConfig } from '~/types/room'
+import type { RoomConfig, RoomObject } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import { getDaylight } from '~/utils/room/daylight'
 import { MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
@@ -196,11 +239,26 @@ function safeUrl(url: string) {
 
 function onHover(id: string | null, x: number, y: number) {
   const obj = id ? props.room.objects.find(o => o.id === id) : undefined
-  hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y } : null
+  if (obj?.image) hovered.value = { label: 'View photo', x, y }
+  else hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y } : null
 }
 
+// Picture frames with a photo open it in a popup; other linked objects open their link
+const photo = ref<RoomObject | null>(null)
+
 function onActivate(id: string) {
-  const url = props.room.objects.find(o => o.id === id)?.link?.url
-  if (url) window.open(safeUrl(url), '_blank', 'noopener,noreferrer')
+  const obj = props.room.objects.find(o => o.id === id)
+  if (obj?.image) {
+    photo.value = obj
+    hovered.value = null
+    return
+  }
+  if (obj?.link?.url) window.open(safeUrl(obj.link.url), '_blank', 'noopener,noreferrer')
 }
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') photo.value = null
+}
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>

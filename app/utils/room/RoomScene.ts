@@ -383,7 +383,7 @@ export class RoomScene {
       const item = CATALOG_BY_TYPE[data.type]
       if (!item) continue
       seen.add(data.id)
-      const signature = `${data.type}|${data.color || ''}`
+      const signature = `${data.type}|${data.color || ''}|${data.image || ''}`
       const existing = this.entries.get(data.id)
       if (existing && existing.signature === signature) {
         existing.data = data
@@ -417,6 +417,7 @@ export class RoomScene {
       })
     }
     collectMaterials()
+    if (item.photo && data.image) this.addPhoto(model, item.photo, data.image)
     // Model-based items load asynchronously; pick up their glowing parts when ready
     ;(model.userData.ready as Promise<void> | undefined)?.then(collectMaterials).catch(() => {})
 
@@ -432,6 +433,53 @@ export class RoomScene {
     this.entries.set(data.id, entry)
     this.objectsGroup.add(root)
     this.applyTransform(entry)
+  }
+
+  /** Show an uploaded photo in the item's photo area, cropped to fill it */
+  private addPhoto(model: THREE.Group, slot: NonNullable<CatalogItem['photo']>, url: string) {
+    model.traverse((obj) => {
+      if (obj.userData.placeholder) obj.visible = false
+    })
+    const material = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.55 })
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(slot.width, slot.height), material)
+    plane.position.set(...slot.center)
+    plane.receiveShadow = true
+    model.add(plane)
+    new THREE.TextureLoader().load(url, (texture) => {
+      if (this.disposed) return texture.dispose()
+      texture.colorSpace = THREE.SRGBColorSpace
+      texture.anisotropy = this.renderer.capabilities.getMaxAnisotropy()
+      const image = texture.image as { width: number; height: number }
+      const imageAspect = image.width / image.height
+      // Turn the frame sideways for photos whose orientation doesn't match it
+      const turn = (imageAspect > 1) !== (slot.width > slot.height)
+      const width = turn ? slot.height : slot.width
+      const height = turn ? slot.width : slot.height
+      if (turn) {
+        model.rotation.z = Math.PI / 2
+        plane.rotation.z = -Math.PI / 2
+        plane.geometry.dispose()
+        plane.geometry = new THREE.PlaneGeometry(width, height)
+      }
+      // Cover: crop the longer side so the photo isn't stretched
+      const slotAspect = width / height
+      if (imageAspect > slotAspect) {
+        texture.repeat.set(slotAspect / imageAspect, 1)
+        texture.offset.set((1 - texture.repeat.x) / 2, 0)
+      } else {
+        texture.repeat.set(1, imageAspect / slotAspect)
+        texture.offset.set(0, (1 - texture.repeat.y) / 2)
+      }
+      material.map = texture
+      material.needsUpdate = true
+      this.markActive()
+    }, undefined, () => {
+      // Missing photo: fall back to the artwork
+      plane.visible = false
+      model.traverse((obj) => {
+        if (obj.userData.placeholder) obj.visible = true
+      })
+    })
   }
 
   private removeEntry(id: string) {
@@ -603,10 +651,11 @@ export class RoomScene {
       return
     }
     const id = this.pickObject(e.clientX, e.clientY)
-    const hasLink = id ? !!this.entries.get(id)?.data.link?.url : false
-    this.renderer.domElement.style.cursor = hasLink ? 'pointer' : 'grab'
+    const data = id ? this.entries.get(id)?.data : undefined
+    const clickable = !!(data?.link?.url || data?.image)
+    this.renderer.domElement.style.cursor = clickable ? 'pointer' : 'grab'
     const rect = this.renderer.domElement.getBoundingClientRect()
-    const nextId = hasLink ? id : null
+    const nextId = clickable ? id : null
     if (nextId !== this.hoveredId || nextId) {
       this.hoveredId = nextId
       this.options.onHover?.(nextId, e.clientX - rect.left, e.clientY - rect.top)
