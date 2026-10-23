@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-full relative" :style="pageStyle">
+  <!-- Default text color matches the light site, so previews inside the dark dashboard read the same -->
+  <div class="min-h-full relative" :style="[{ color: '#334155' }, pageStyle]">
     <!-- Share Button (Fixed Top Right) -->
     <UButton
       v-if="theme.showShare"

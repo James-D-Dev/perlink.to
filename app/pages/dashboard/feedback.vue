@@ -9,25 +9,25 @@
     </template>
     <template #body>
       <div class="max-w-xl w-full mx-auto py-8 px-4">
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">Feedback</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Feedback</h1>
 
         <!-- Feedback Form -->
         <UCard class="mb-6">
           <template #header>
             <div class="flex items-center gap-3">
               <div
-                class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center"
+                class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-500/15 flex items-center justify-center"
               >
                 <UIcon
                   name="i-lucide-message-square"
-                  class="w-5 h-5 text-purple-600"
+                  class="w-5 h-5 text-purple-600 dark:text-purple-400"
                 />
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                   Send Feedback
                 </h2>
-                <p class="text-sm text-gray-500">Help us improve Perlink</p>
+                <p class="text-sm text-gray-500 dark:text-neutral-400">Help us improve Perlink</p>
               </div>
             </div>
           </template>
@@ -78,7 +78,7 @@
                 >
                   <UIcon name="i-lucide-star" class="w-6 h-6" />
                 </UButton>
-                <span v-if="form.rating" class="ml-2 text-sm text-gray-600">
+                <span v-if="form.rating" class="ml-2 text-sm text-gray-600 dark:text-neutral-300">
                   {{ form.rating }} out of 5
                 </span>
               </div>
@@ -112,18 +112,18 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div
-                  class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center"
+                  class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center"
                 >
                   <UIcon
                     name="i-lucide-history"
-                    class="w-5 h-5 text-gray-600"
+                    class="w-5 h-5 text-gray-600 dark:text-neutral-300"
                   />
                 </div>
                 <div>
-                  <h2 class="text-lg font-semibold text-gray-900">
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                     My Feedback History
                   </h2>
-                  <p class="text-sm text-gray-500">
+                  <p class="text-sm text-gray-500 dark:text-neutral-400">
                     Track your previous submissions
                   </p>
                 </div>
@@ -138,7 +138,7 @@
             <div
               v-for="item in feedbackHistory"
               :key="item.id"
-              class="border border-gray-100 rounded-lg p-4 hover:border-primary/50 transition-colors"
+              class="border border-gray-100 dark:border-white/5 rounded-lg p-4 hover:border-primary/50 transition-colors"
             >
               <div class="flex items-start justify-between mb-2">
                 <div>
@@ -150,7 +150,7 @@
                   >
                     {{ formatType(item.type) }}
                   </UBadge>
-                  <h3 class="font-medium text-gray-900">{{ item.subject }}</h3>
+                  <h3 class="font-medium text-gray-900 dark:text-white">{{ item.subject }}</h3>
                 </div>
                 <UBadge
                   :color="getStatusColor(item.status)"
@@ -161,12 +161,12 @@
                 </UBadge>
               </div>
 
-              <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+              <p class="text-sm text-gray-600 dark:text-neutral-300 mb-3 line-clamp-2">
                 {{ item.message }}
               </p>
 
               <div
-                class="flex items-center justify-between text-xs text-gray-500"
+                class="flex items-center justify-between text-xs text-gray-500 dark:text-neutral-400"
               >
                 <div class="flex items-center gap-3">
                   <span
@@ -189,6 +189,7 @@
 
 <script setup lang="ts">
 definePageMeta({
+  colorMode: "dark",
   layout: "admin",
   middleware: "auth",
 });

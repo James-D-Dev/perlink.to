@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
       :hidden="contactBlock?.hidden"
@@ -13,7 +13,7 @@
       </template>
     </BioBlockItemHeader>
 
-    <div v-if="isActive" class="p-4 border-t border-gray-100 bg-gray-50/50 space-y-4">
+    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <UFormField label="Title">
         <UInput :model-value="data.title" placeholder="Contact & booking" class="w-full" @update:model-value="update({ title: String($event) })" />
       </UFormField>

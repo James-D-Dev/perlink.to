@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <!-- Header -->
     <BioBlockItemHeader
       :is-active="isActive"
@@ -29,7 +29,7 @@
           <!-- QR Display -->
           <div
             v-if="qrString"
-            class="flex flex-col items-center gap-4 pt-4 border-t border-gray-100"
+            class="flex flex-col items-center gap-4 pt-4 border-t border-gray-100 dark:border-white/5"
           >
             <!-- Themed QR -->
             <!-- prev -->
@@ -61,10 +61,10 @@
           <!-- Placeholder when no QR generated -->
           <div
             v-else
-            class="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-300 bg-gray-50/50 relative w-full aspect-[800/1157] overflow-hidden rounded-xl"
+            class="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-300 dark:border-white/15 bg-gray-50/50 dark:bg-white/[0.03] relative w-full aspect-[800/1157] overflow-hidden rounded-xl"
           >
             <UIcon name="i-lucide-qr-code" class="w-12 h-12 text-gray-300" />
-            <p class="text-sm text-gray-500 text-center">
+            <p class="text-sm text-gray-500 dark:text-neutral-400 text-center">
               Please complete the form beside and press the Generate button
             </p>
           </div>
@@ -80,7 +80,7 @@
             size="xl"
           >
             <template #leading>
-              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-gray-400" />
+              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-gray-400 dark:text-neutral-500" />
             </template>
           </UInputMenu>
 
@@ -95,7 +95,7 @@
             <template #leading>
               <UIcon
                 name="i-lucide-credit-card"
-                class="w-4 h-4 text-gray-400"
+                class="w-4 h-4 text-gray-400 dark:text-neutral-500"
               />
             </template>
           </UInput>
@@ -108,7 +108,7 @@
             @input="formatAccountName"
           >
             <template #leading>
-              <UIcon name="i-lucide-user" class="w-4 h-4 text-gray-400" />
+              <UIcon name="i-lucide-user" class="w-4 h-4 text-gray-400 dark:text-neutral-500" />
             </template>
           </UInput>
           <!-- Amount -->
@@ -121,7 +121,7 @@
             class="w-full"
           >
             <template #leading>
-              <span class="text-gray-400 text-sm">₫</span>
+              <span class="text-gray-400 dark:text-neutral-500 text-sm">₫</span>
             </template>
           </UInput>
 
@@ -144,7 +144,7 @@
               icon="i-lucide-chevron-left"
               @click="prevTheme"
             />
-            <span class="text-sm font-medium text-gray-700">
+            <span class="text-sm font-medium text-gray-700 dark:text-neutral-200">
               Theme: {{ currentThemeName }}
             </span>
             <UButton

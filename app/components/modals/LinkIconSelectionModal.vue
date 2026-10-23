@@ -14,11 +14,11 @@
             class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all"
             :class="selectedIcon === icon.id
               ? 'border-primary bg-primary/10'
-              : 'border-gray-200 hover:border-primary hover:bg-primary/5'"
+              : 'border-gray-200 dark:border-white/10 hover:border-primary hover:bg-primary/5'"
             @click="selectIcon(icon.id)"
           >
             <UIcon :name="icon.icon" class="w-8 h-8" :class="icon.colorClass" />
-            <span class="text-xs text-gray-600">{{ icon.label }}</span>
+            <span class="text-xs text-gray-600 dark:text-neutral-300">{{ icon.label }}</span>
           </button>
         </div>
       </div>
@@ -45,14 +45,14 @@ const emit = defineEmits<{
 }>()
 
 const availableIcons: IconOption[] = [
-  { id: 'facebook', label: 'Facebook', icon: 'i-fa-facebook', colorClass: 'text-blue-600' },
+  { id: 'facebook', label: 'Facebook', icon: 'i-fa-facebook', colorClass: 'text-blue-600 dark:text-blue-400' },
   { id: 'twitter', label: 'Twitter', icon: 'i-prime-twitter', colorClass: 'text-sky-500' },
-  { id: 'instagram', label: 'Instagram', icon: 'i-fa-instagram', colorClass: 'text-pink-600' },
-  { id: 'linkedin', label: 'LinkedIn', icon: 'i-fa-linkedin', colorClass: 'text-blue-700' },
-  { id: 'youtube', label: 'YouTube', icon: 'i-fa-youtube-play', colorClass: 'text-red-600' },
+  { id: 'instagram', label: 'Instagram', icon: 'i-fa-instagram', colorClass: 'text-pink-600 dark:text-pink-400' },
+  { id: 'linkedin', label: 'LinkedIn', icon: 'i-fa-linkedin', colorClass: 'text-blue-700 dark:text-blue-400' },
+  { id: 'youtube', label: 'YouTube', icon: 'i-fa-youtube-play', colorClass: 'text-red-600 dark:text-red-400' },
   { id: 'tiktok', label: 'TikTok', icon: 'i-prime-tiktok', colorClass: 'text-black' },
-  { id: 'globe', label: 'Website', icon: 'i-prime-globe', colorClass: 'text-gray-600' },
-  { id: 'link', label: 'Link', icon: 'i-lucide-link', colorClass: 'text-gray-500' },
+  { id: 'globe', label: 'Website', icon: 'i-prime-globe', colorClass: 'text-gray-600 dark:text-neutral-300' },
+  { id: 'link', label: 'Link', icon: 'i-lucide-link', colorClass: 'text-gray-500 dark:text-neutral-400' },
 ]
 
 function selectIcon(iconId: string) {

@@ -10,17 +10,17 @@
 
     <template #body>
       <div class="max-w-3xl mx-auto py-8 px-4">
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">Help & Support</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Help & Support</h1>
 
         <UCard class="mb-6">
           <template #header>
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <UIcon name="i-lucide-mail" class="w-5 h-5 text-blue-600" />
+              <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-500/15 flex items-center justify-center">
+                <UIcon name="i-lucide-mail" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900">Contact Support</h2>
-                <p class="text-sm text-gray-500">Get in touch with our team</p>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Contact Support</h2>
+                <p class="text-sm text-gray-500 dark:text-neutral-400">Get in touch with our team</p>
               </div>
             </div>
           </template>
@@ -90,20 +90,20 @@
         <UCard>
           <template #header>
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <UIcon name="i-lucide-help-circle" class="w-5 h-5 text-green-600" />
+              <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-500/15 flex items-center justify-center">
+                <UIcon name="i-lucide-help-circle" class="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900">Frequently Asked Questions</h2>
-                <p class="text-sm text-gray-500">Quick answers to common questions</p>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Frequently Asked Questions</h2>
+                <p class="text-sm text-gray-500 dark:text-neutral-400">Quick answers to common questions</p>
               </div>
             </div>
           </template>
 
           <div class="space-y-4">
-            <div v-for="(faq, index) in faqs" :key="index" class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-              <h3 class="font-medium text-gray-900 mb-2">{{ faq.question }}</h3>
-              <p class="text-sm text-gray-600">{{ faq.answer }}</p>
+            <div v-for="(faq, index) in faqs" :key="index" class="border-b border-gray-100 dark:border-white/5 last:border-0 pb-4 last:pb-0">
+              <h3 class="font-medium text-gray-900 dark:text-white mb-2">{{ faq.question }}</h3>
+              <p class="text-sm text-gray-600 dark:text-neutral-300">{{ faq.answer }}</p>
             </div>
           </div>
         </UCard>
@@ -114,6 +114,7 @@
 
 <script setup lang="ts">
 definePageMeta({
+  colorMode: "dark",
   layout: "admin",
   middleware: "auth",
 });

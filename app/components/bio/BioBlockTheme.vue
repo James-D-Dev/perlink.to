@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       container
       :is-active="isActive"
@@ -19,7 +19,7 @@
 
     <div
       v-if="isActive"
-      class="p-4 border-t border-gray-100 bg-gray-50/50 space-y-5"
+      class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-5"
     >
       <!-- Mode toggle -->
       <UTabs
@@ -42,7 +42,7 @@
               @select="onPresetSelect"
             />
             <div>
-              <label class="text-sm font-medium text-gray-700 mb-2 block"
+              <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block"
                 >Header Layout</label
               >
               <BioHeaderLayoutPicker
@@ -100,7 +100,7 @@
                     :key="colorKey"
                   >
                     <label
-                      class="text-xs text-gray-500 mb-1 block capitalize"
+                      class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block capitalize"
                       >{{ colorKey }}</label
                     >
                     <div class="flex items-center gap-1.5">
@@ -112,7 +112,7 @@
                           class="p-0 rounded-full overflow-hidden shrink-0"
                         >
                           <span
-                            class="size-6 rounded-full border-2 border-gray-300"
+                            class="size-6 rounded-full border-2 border-gray-300 dark:border-white/15"
                             :style="{
                               backgroundColor:
                                 themeConfig.colors[colorKey] || '#000000',
@@ -195,7 +195,7 @@
                           class="p-0 rounded-full overflow-hidden"
                         >
                           <span
-                            class="size-8 rounded-full border-2 border-gray-300"
+                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
                             :style="{
                               backgroundColor:
                                 themeConfig.header.textColor ||
@@ -220,7 +220,7 @@
                       </UPopover>
                       <button
                         v-if="themeConfig.header.textColor"
-                        class="text-xs text-gray-400 hover:text-gray-600"
+                        class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
                         @click="emitHeader('textColor', undefined)"
                       >
                         reset
@@ -274,7 +274,7 @@
                           class="p-0 rounded-full overflow-hidden"
                         >
                           <span
-                            class="size-8 rounded-full border-2 border-gray-300"
+                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
                             :style="{
                               backgroundColor:
                                 themeConfig.typography.bioTextColor ||
@@ -299,7 +299,7 @@
                       </UPopover>
                       <button
                         v-if="themeConfig.typography.bioTextColor"
-                        class="text-xs text-gray-400 hover:text-gray-600"
+                        class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
                         @click="emitTypography('bioTextColor', undefined)"
                       >
                         reset
@@ -341,7 +341,7 @@
                           class="p-0 rounded-full overflow-hidden"
                         >
                           <span
-                            class="size-8 rounded-full border-2 border-gray-300"
+                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
                             :style="{
                               backgroundColor:
                                 themeConfig.card.textColor || '#000000',
@@ -360,7 +360,7 @@
                       </UPopover>
                       <button
                         v-if="themeConfig.card.textColor"
-                        class="text-xs text-gray-400 hover:text-gray-600"
+                        class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
                         @click="emitCard('textColor', undefined)"
                       >
                         reset
@@ -438,16 +438,16 @@
               <!-- <div>
             `  <label class="text-lg font-bold text-perlink-blue/60 mb-2 block">Button Style</label>
               <div class="flex items-center gap-2 mb-3">
-                <label class="text-xs text-gray-500">Text Color</label>
+                <label class="text-xs text-gray-500 dark:text-neutral-400">Text Color</label>
                 <input
                   type="color"
                   :value="themeConfig.button.textColor || '#ffffff'"
-                  class="w-8 h-8 rounded cursor-pointer border border-gray-200"
+                  class="w-8 h-8 rounded cursor-pointer border border-gray-200 dark:border-white/10"
                   @input="emitButton('textColor', ($event.target as HTMLInputElement).value)"
                 />
                 <button
                   v-if="themeConfig.button.textColor"
-                  class="text-xs text-gray-400 hover:text-gray-600"
+                  class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
                   @click="emitButton('textColor', undefined)"
                 >reset</button>
               </div>
@@ -465,7 +465,7 @@
               </div>
               <div class="grid grid-cols-2 gap-3 mt-3">
                 <div>
-                  <label class="text-xs text-gray-500 mb-1 block">Appear animation</label>
+                  <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Appear animation</label>
                   <USelect
                     :model-value="themeConfig.button.animationAppear || 'none'"
                     :items="appearOptions"
@@ -474,7 +474,7 @@
                   />
                 </div>
                 <div>
-                  <label class="text-xs text-gray-500 mb-1 block">Hover animation</label>
+                  <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Hover animation</label>
                   <USelect
                     :model-value="themeConfig.button.animationHover || 'none'"
                     :items="hoverOptions"
@@ -484,7 +484,7 @@
                 </div>
               </div>
               <div class="mt-3">
-                <label class="text-xs text-gray-500 mb-1 block">Duration</label>
+                <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Duration</label>
                 <USelect
                   :model-value="themeConfig.button.animationDuration || 'normal'"
                   :items="durationOptions"
@@ -547,7 +547,7 @@
                       :class="
                         themeConfig.avatar.shape === shape
                           ? 'text-primary-600'
-                          : 'text-gray-500'
+                          : 'text-gray-500 dark:text-neutral-400'
                       "
                       >{{ shape }}</span
                     >

@@ -1,15 +1,15 @@
 <template>
-  <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
     <!-- Header with toggle -->
     <div class="flex items-center justify-between mb-4">
       <h4 class="text-sm font-medium">Countries</h4>
-      <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+      <div class="flex items-center gap-1 bg-gray-100 dark:bg-white/[0.06] rounded-lg p-0.5">
         <button
           class="flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-colors"
           :class="
             view === 'map'
-              ? 'bg-white shadow-sm font-medium text-gray-900'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl shadow-sm font-medium text-gray-900 dark:text-white'
+              : 'text-gray-500 dark:text-neutral-400 hover:text-gray-700'
           "
           @click="view = 'map'"
         >
@@ -20,8 +20,8 @@
           class="flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-colors"
           :class="
             view === 'list'
-              ? 'bg-white shadow-sm font-medium text-gray-900'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl shadow-sm font-medium text-gray-900 dark:text-white'
+              : 'text-gray-500 dark:text-neutral-400 hover:text-gray-700'
           "
           @click="view = 'list'"
         >
@@ -42,8 +42,8 @@
         <div
           v-for="item in countries.slice(0, 5)"
           :key="item.name"
-          class="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer select-none rounded px-1 py-0.5 transition-colors"
-          :class="hoveredLegend === item.name ? 'bg-gray-100' : 'hover:bg-gray-50'"
+          class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-neutral-300 cursor-pointer select-none rounded px-1 py-0.5 transition-colors"
+          :class="hoveredLegend === item.name ? 'bg-gray-100 dark:bg-white/[0.06]' : 'hover:bg-gray-50 dark:hover:bg-white/5'"
           @mouseenter="highlightCountry(item.name)"
           @mouseleave="clearHighlight"
           @click="highlightCountry(item.name)"
@@ -53,7 +53,7 @@
             :style="{ backgroundColor: rankColor(countries.indexOf(item)) }"
           />
           {{ resolveCountryName(item.name) }}
-          <span class="text-gray-400">{{ item.clicks }}</span>
+          <span class="text-gray-400 dark:text-neutral-500">{{ item.clicks }}</span>
         </div>
       </div>
     </div>
@@ -62,7 +62,7 @@
     <div v-else class="space-y-3">
       <div
         v-if="countries.length === 0"
-        class="text-center py-8 text-gray-400 text-sm"
+        class="text-center py-8 text-gray-400 dark:text-neutral-500 text-sm"
       >
         No data
       </div>
@@ -75,11 +75,11 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between mb-1">
               <span class="text-sm font-medium truncate">{{ resolveCountryName(item.name) }}</span>
-              <span class="text-xs text-gray-500 ml-2"
+              <span class="text-xs text-gray-500 dark:text-neutral-400 ml-2"
                 >{{ item.clicks }} ({{ item.percentage }}%)</span
               >
             </div>
-            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
               <div
                 class="h-full rounded-full transition-all"
                 :style="{

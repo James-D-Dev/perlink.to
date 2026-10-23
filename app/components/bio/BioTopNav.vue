@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-white border-b border-gray-200 sticky top-0 z-50">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border-b border-gray-200 dark:border-white/10 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <!-- Left: Title & Tabs -->
         <div class="flex items-center gap-6">
-          <h1 class="text-xl font-bold text-gray-900">Link in Bio</h1>
-          <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white">Link in Bio</h1>
+          <div class="flex items-center gap-1 bg-gray-100 dark:bg-white/[0.06] rounded-lg p-1">
             <UButton
               variant="solid"
               color="neutral"
@@ -28,12 +28,12 @@
         <!-- Right: Domain & Share -->
         <div class="flex items-center gap-3">
           <div
-            class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200"
+            class="flex items-center gap-2 bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2 border border-gray-200 dark:border-white/10"
           >
-            <UIcon name="i-lucide-link" class="w-4 h-4 text-gray-400" />
-            <span class="text-sm text-gray-500">perlink.to/</span>
-            <span class="text-sm font-medium text-gray-900">{{ username || "yourname" }}</span>
-            <UIcon name="i-lucide-chevron-down" class="w-4 h-4 text-gray-400" />
+            <UIcon name="i-lucide-link" class="w-4 h-4 text-gray-400 dark:text-neutral-500" />
+            <span class="text-sm text-gray-500 dark:text-neutral-400">perlink.to/</span>
+            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ username || "yourname" }}</span>
+            <UIcon name="i-lucide-chevron-down" class="w-4 h-4 text-gray-400 dark:text-neutral-500" />
           </div>
           <UButton
             color="neutral"

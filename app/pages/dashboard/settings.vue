@@ -18,6 +18,7 @@
 </template>
 <script setup lang="ts">
 definePageMeta({
+    colorMode: "dark",
     layout: "admin",
     middleware: "auth",
     ssr: false,

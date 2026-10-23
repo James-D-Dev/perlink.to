@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
       :hidden="countdownBlock?.hidden"
@@ -9,7 +9,7 @@
       @toggle-hidden="toggleBlockHidden('birthday-countdown')"
     >
       <template #preview>
-        <div v-if="data.birthDate" class="text-xs text-gray-500 mr-2">
+        <div v-if="data.birthDate" class="text-xs text-gray-500 dark:text-neutral-400 mr-2">
           {{ formatDate(data.birthDate) }}
         </div>
       </template>
@@ -25,7 +25,7 @@
     </BioBlockItemHeader>
 
     <!-- Birthday Countdown Edit Form -->
-    <div v-if="isActive" class="p-4 border-t border-gray-100 bg-gray-50/50 space-y-4">
+    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <!-- Birth Date -->
       <UFormField label="Birth Date" required>
         <UInput
@@ -57,7 +57,7 @@
             :class="[
               data.theme === theme.id
                 ? 'border-primary bg-primary/5'
-                : 'border-gray-200 hover:border-gray-300'
+                : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
             ]"
             @click="updateField('theme', theme.id)"
           >
@@ -102,11 +102,11 @@ const emit = defineEmits<{
 
 // Theme options
 const countdownThemes = [
-  { id: 'classic', name: 'Classic', icon: 'i-lucide-cake', colorClass: 'bg-pink-100 text-pink-600' },
-  { id: 'modern', name: 'Modern', icon: 'i-lucide-sparkles', colorClass: 'bg-blue-100 text-blue-600' },
-  { id: 'minimal', name: 'Minimal', icon: 'i-lucide-minus', colorClass: 'bg-gray-100 text-gray-600' },
-  { id: 'party', name: 'Party', icon: 'i-lucide-party-popper', colorClass: 'bg-purple-100 text-purple-600' },
-  { id: 'elegant', name: 'Elegant', icon: 'i-lucide-gem', colorClass: 'bg-amber-100 text-amber-600' },
+  { id: 'classic', name: 'Classic', icon: 'i-lucide-cake', colorClass: 'bg-pink-100 dark:bg-pink-500/15 text-pink-600 dark:text-pink-400' },
+  { id: 'modern', name: 'Modern', icon: 'i-lucide-sparkles', colorClass: 'bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400' },
+  { id: 'minimal', name: 'Minimal', icon: 'i-lucide-minus', colorClass: 'bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-neutral-300' },
+  { id: 'party', name: 'Party', icon: 'i-lucide-party-popper', colorClass: 'bg-purple-100 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400' },
+  { id: 'elegant', name: 'Elegant', icon: 'i-lucide-gem', colorClass: 'bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400' },
 ] as const;
 
 // Use composable

@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <!-- Block Header -->
     <div
-      class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+      class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
       @click="$emit('toggle')"
     >
       <div class="flex items-center gap-3">
@@ -15,21 +15,21 @@
           />
         </div>
         <div>
-          <h3 class="font-medium text-gray-900">Analytics</h3>
-          <p class="text-sm text-gray-500">Track your bio page performance</p>
+          <h3 class="font-medium text-gray-900 dark:text-white">Analytics</h3>
+          <p class="text-sm text-gray-500 dark:text-neutral-400">Track your bio page performance</p>
         </div>
       </div>
       <UIcon
         :name="isActive ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-        class="w-5 h-5 text-gray-400 transition-transform"
+        class="w-5 h-5 text-gray-400 dark:text-neutral-500 transition-transform"
       />
     </div>
 
     <!-- Block Content -->
-    <div v-if="isActive" class="border-t border-gray-200">
+    <div v-if="isActive" class="border-t border-gray-200 dark:border-white/10">
       <div class="p-4">
         <!-- No Data State -->
-        <div v-if="!bioPageId" class="text-center py-8 text-gray-500">
+        <div v-if="!bioPageId" class="text-center py-8 text-gray-500 dark:text-neutral-400">
           <UIcon
             name="i-lucide-bar-chart-2"
             class="w-12 h-12 mx-auto mb-3 opacity-50"
@@ -51,7 +51,7 @@
 
               <template v-else-if="item.value === 'links'">
                 <div class="space-y-4">
-                  <div class="text-sm text-gray-600 mb-4">
+                  <div class="text-sm text-gray-600 dark:text-neutral-300 mb-4">
                     Analytics for individual links and social media clicks
                   </div>
 
@@ -61,28 +61,28 @@
                     <div
                       v-for="link in bioLinks"
                       :key="link.id"
-                      class="border border-gray-200 rounded-lg p-4"
+                      class="border border-gray-200 dark:border-white/10 rounded-lg p-4"
                     >
                       <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                           <UIcon
                             :name="getIconForLink(link)"
-                            class="w-5 h-5 text-gray-600"
+                            class="w-5 h-5 text-gray-600 dark:text-neutral-300"
                           />
                           <div>
-                            <h4 class="font-medium text-gray-900">
+                            <h4 class="font-medium text-gray-900 dark:text-white">
                               {{ link.title }}
                             </h4>
-                            <p class="text-sm text-gray-500 truncate max-w-xs">
+                            <p class="text-sm text-gray-500 dark:text-neutral-400 truncate max-w-xs">
                               {{ link.url }}
                             </p>
                           </div>
                         </div>
                         <div class="text-right">
-                          <div class="text-2xl font-bold text-gray-900">
+                          <div class="text-2xl font-bold text-gray-900 dark:text-white">
                             {{ getLinkClickCount(link.id) }}
                           </div>
-                          <div class="text-sm text-gray-600">clicks</div>
+                          <div class="text-sm text-gray-600 dark:text-neutral-300">clicks</div>
                         </div>
                       </div>
                     </div>
@@ -91,28 +91,28 @@
                     <div
                       v-for="social in socialLinks"
                       :key="social.id"
-                      class="border border-gray-200 rounded-lg p-4"
+                      class="border border-gray-200 dark:border-white/10 rounded-lg p-4"
                     >
                       <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                           <UIcon
                             :name="getSocialIcon(social.provider)"
-                            class="w-5 h-5 text-gray-600"
+                            class="w-5 h-5 text-gray-600 dark:text-neutral-300"
                           />
                           <div>
-                            <h4 class="font-medium text-gray-900 capitalize">
+                            <h4 class="font-medium text-gray-900 dark:text-white capitalize">
                               {{ social.provider }}
                             </h4>
-                            <p class="text-sm text-gray-500 truncate max-w-xs">
+                            <p class="text-sm text-gray-500 dark:text-neutral-400 truncate max-w-xs">
                               {{ social.url }}
                             </p>
                           </div>
                         </div>
                         <div class="text-right">
-                          <div class="text-2xl font-bold text-gray-900">
+                          <div class="text-2xl font-bold text-gray-900 dark:text-white">
                             {{ getSocialClickCount(social.id) }}
                           </div>
-                          <div class="text-sm text-gray-600">clicks</div>
+                          <div class="text-sm text-gray-600 dark:text-neutral-300">clicks</div>
                         </div>
                       </div>
                     </div>

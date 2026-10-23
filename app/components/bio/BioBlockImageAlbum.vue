@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <!-- Header -->
     <BioBlockItemHeader
       :is-active="isActive"
@@ -10,7 +10,7 @@
       @toggle-hidden="toggleBlockHidden('image-album')"
     >
       <template #badge>
-        <span v-if="imageCount > 0" class="text-xs text-gray-500">
+        <span v-if="imageCount > 0" class="text-xs text-gray-500 dark:text-neutral-400">
           {{ imageCount }} image{{ imageCount > 1 ? 's' : '' }}
         </span>
       </template>
@@ -25,10 +25,10 @@
     </BioBlockItemHeader>
 
     <!-- Edit Form -->
-    <div v-if="isActive" class="p-4 border-t border-gray-100 bg-gray-50/50 space-y-4">
+    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <!-- Layout Selector -->
       <div>
-        <label class="text-sm font-medium text-gray-700 mb-2 block">Layout</label>
+        <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block">Layout</label>
         <div class="flex gap-2">
           <UButton
             v-for="layout in layouts"
@@ -48,7 +48,7 @@
       <!-- Upload Area -->
       <div
         v-if="canUpload"
-        class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
+        class="border-2 border-dashed border-gray-300 dark:border-white/15 rounded-xl p-6 text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
         @click="triggerFileInput"
         @dragover.prevent
         @drop.prevent="handleDrop"
@@ -61,25 +61,25 @@
           class="hidden"
           @change="handleFileSelect"
         />
-        <UIcon name="i-lucide-upload-cloud" class="w-10 h-10 text-gray-400 mx-auto mb-2" />
-        <p class="text-sm text-gray-600 mb-1">Click or drag images here</p>
-        <p class="text-xs text-gray-400">Max 6 images, up to 5MB each</p>
+        <UIcon name="i-lucide-upload-cloud" class="w-10 h-10 text-gray-400 dark:text-neutral-500 mx-auto mb-2" />
+        <p class="text-sm text-gray-600 dark:text-neutral-300 mb-1">Click or drag images here</p>
+        <p class="text-xs text-gray-400 dark:text-neutral-500">Max 6 images, up to 5MB each</p>
       </div>
 
       <!-- Max Images Reached -->
       <div
         v-else
-        class="border border-gray-200 rounded-xl p-4 text-center bg-gray-100"
+        class="border border-gray-200 dark:border-white/10 rounded-xl p-4 text-center bg-gray-100 dark:bg-white/[0.06]"
       >
         <UIcon name="i-lucide-check-circle" class="w-8 h-8 text-green-500 mx-auto mb-2" />
-        <p class="text-sm text-gray-600">Maximum 6 images reached</p>
+        <p class="text-sm text-gray-600 dark:text-neutral-300">Maximum 6 images reached</p>
       </div>
 
       <!-- Upload Progress -->
       <div v-if="uploading" class="space-y-2">
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-600">Uploading...</span>
-          <span class="text-gray-500">{{ progress }}%</span>
+          <span class="text-gray-600 dark:text-neutral-300">Uploading...</span>
+          <span class="text-gray-500 dark:text-neutral-400">{{ progress }}%</span>
         </div>
         <UProgress :value="progress" />
       </div>
@@ -87,8 +87,8 @@
       <!-- Image Preview -->
       <div v-if="albumImages.length > 0" class="space-y-3">
         <div class="flex items-center justify-between">
-          <label class="text-sm font-medium text-gray-700">Images</label>
-          <span class="text-xs text-gray-500">{{ albumImages.length }}/5</span>
+          <label class="text-sm font-medium text-gray-700 dark:text-neutral-200">Images</label>
+          <span class="text-xs text-gray-500 dark:text-neutral-400">{{ albumImages.length }}/5</span>
         </div>
 
         <!-- Grid with Drag & Drop -->
@@ -96,7 +96,7 @@
           <div
             v-for="(image, index) in sortedImages"
             :key="image.url"
-            class="relative group/item aspect-square rounded-lg overflow-hidden border border-gray-200 cursor-move"
+            class="relative group/item aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-white/10 cursor-move"
             draggable="true"
             @dragstart="handleDragStart(index)"
             @dragover.prevent
@@ -157,7 +157,7 @@
       @update:open="closeDeleteModal"
     >
       <template #body>
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-gray-600 dark:text-neutral-300">
           Are you sure you want to delete this image? This action cannot be undone.
         </p>
       </template>

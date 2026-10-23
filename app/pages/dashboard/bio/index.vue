@@ -34,7 +34,7 @@
           <UCard
             v-for="i in 3"
             :key="i"
-            class="bg-white border border-gray-100"
+            class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border border-gray-100 dark:border-white/5"
             :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
             <div class="flex items-start gap-4">
@@ -62,7 +62,7 @@
             </div>
 
             <!-- Footer Skeleton -->
-            <div class="mt-3 pt-3 border-t border-gray-100">
+            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-white/5">
               <div class="flex items-center justify-between">
                 <USkeleton class="h-5 w-20" />
                 <USkeleton class="h-6 w-16" />
@@ -76,7 +76,7 @@
           <UCard
             v-for="bio in filteredBioPages"
             :key="bio.id"
-            class="bg-white border border-gray-100 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
+            class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border border-gray-100 dark:border-white/5 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
             @click="navigateTo(`/dashboard/bio/${bio.username}`)"
             :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
@@ -103,12 +103,12 @@
                   />
                 </div>
 
-                <div class="flex items-center gap-1 text-sm text-gray-500 mt-1">
+                <div class="flex items-center gap-1 text-sm text-gray-500 dark:text-neutral-400 mt-1">
                   <UIcon name="i-lucide-link" class="w-3.5 h-3.5" />
                   <span>perlink.to/{{ bio.username }}</span>
                 </div>
 
-                <div class="flex items-center gap-4 text-xs text-gray-400 mt-2">
+                <div class="flex items-center gap-4 text-xs text-gray-400 dark:text-neutral-500 mt-2">
                   <span class="flex items-center gap-1">
                     <UIcon name="i-lucide-eye" class="w-3.5 h-3.5" />
                     {{ bio.viewCount || 0 }} views
@@ -121,7 +121,7 @@
                   <!-- Links count -->
                   <span
                     v-if="bio.links"
-                    class="flex items-center gap-1 text-xs text-gray-400"
+                    class="flex items-center gap-1 text-xs text-gray-400 dark:text-neutral-500"
                   >
                     <UIcon name="i-lucide-list" class="w-3.5 h-3.5" />
                     {{ getLinksCount(bio.links) }} links
@@ -158,7 +158,7 @@
             </div>
 
             <!-- Template badge -->
-            <div class="mt-3 pt-3 border-t border-gray-100">
+            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-white/5">
               <div class="flex items-center justify-between">
                 <UBadge
                   color="neutral"
@@ -193,12 +193,12 @@
         <!-- Empty State -->
         <div v-else class="text-center py-12">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4"
+            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-white/[0.06] mb-4"
           >
-            <UIcon name="i-lucide-user-circle" class="w-8 h-8 text-gray-400" />
+            <UIcon name="i-lucide-user-circle" class="w-8 h-8 text-gray-400 dark:text-neutral-500" />
           </div>
-          <h3 class="text-lg font-medium text-gray-900">No bio pages yet</h3>
-          <p class="text-gray-500 mt-1 mb-4">Create your first bio link page</p>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">No bio pages yet</h3>
+          <p class="text-gray-500 dark:text-neutral-400 mt-1 mb-4">Create your first bio link page</p>
           <UButton
             to="/dashboard/create?domain=perlink.to"
             color="primary"
@@ -216,6 +216,7 @@
 import { format } from "date-fns";
 
 definePageMeta({
+  colorMode: "dark",
   layout: "admin",
   middleware: "auth",
   ssr: false,

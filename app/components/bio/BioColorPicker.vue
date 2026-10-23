@@ -14,9 +14,7 @@
             v-for="palette in getCategoryPalettes(item.value as string)"
             :key="palette.name"
             class="flex flex-col items-center gap-2 p-3 rounded-xl border transition-all hover:border-primary-400"
-            :class="isSelected(palette)
-              ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-400'
-              : 'border-gray-200 bg-gray-50 hover:bg-gray-100'"
+            :class="isSelected(palette) ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-400' : 'border-gray-200 bg-gray-50 dark:bg-white/[0.03] hover:bg-gray-100'"
             @click="emit('select', palette)"
           >
             <div class="flex items-center justify-center">
@@ -33,7 +31,7 @@
                 :style="{ backgroundColor: palette.third }"
               />
             </div>
-            <span class="text-xs text-center text-gray-600 leading-tight">{{ palette.name }}</span>
+            <span class="text-xs text-center text-gray-600 dark:text-neutral-300 leading-tight">{{ palette.name }}</span>
           </button>
         </div>
       </template>

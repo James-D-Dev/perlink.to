@@ -1,5 +1,10 @@
 <template>
   <UDashboardGroup unit="rem">
+    <!-- Subtle top light behind the glass panels (dark mode) -->
+    <div class="pointer-events-none absolute inset-0 hidden dark:block" aria-hidden="true">
+      <div class="absolute inset-x-0 top-0 h-[480px] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgb(255_255_255/0.07),transparent)]" />
+    </div>
+
     <UDashboardSidebar
       id="default"
       v-model:open="open"
@@ -9,13 +14,15 @@
       :max-size="17"
       :default-size="17"
       :ui="{
-        root: 'bg-white',
+        root: 'bg-white dark:bg-[#0a0a0a]/80 dark:backdrop-blur-2xl',
         footer: 'border-t border-default',
+        content: 'max-w-72',
       }"
     >
       <template #header="{ collapsed }">
-        <NuxtLink v-if="!collapsed" to="/" class="flex items-center gap-2">
-          <img src="/logo-full.png" class="h-10" alt="Perlink" />
+        <NuxtLink v-if="!collapsed" to="/" class="flex items-center gap-2.5">
+          <img src="/logo-perlink.png" class="size-8" alt="" />
+          <span class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Perlink.to</span>
         </NuxtLink>
         <NuxtLink v-else to="/" class="flex items-center justify-center">
           <img src="/logo-perlink.png" class="h-10" alt="Perlink" />
@@ -172,7 +179,7 @@
           <p class="text-xs text-muted-foreground mb-3">
             Your plan will expire in 12 days
           </p>
-          <div class="w-full bg-gray-200 rounded-full h-1.5 mb-3">
+          <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-1.5 mb-3">
             <div
               class="bg-perlink-cyan h-1.5 rounded-full"
               style="width: 10%"

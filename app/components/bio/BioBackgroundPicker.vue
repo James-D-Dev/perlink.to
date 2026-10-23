@@ -13,12 +13,12 @@
           <!-- Solid -->
           <template v-if="item.value === 'solid'">
           
-            <div class="flex items-center gap-2 pt-1 border-t border-gray-100">
-              <label class="text-xs text-gray-500 shrink-0">Custom</label>
+            <div class="flex items-center gap-2 pt-1 border-t border-gray-100 dark:border-white/5">
+              <label class="text-xs text-gray-500 dark:text-neutral-400 shrink-0">Custom</label>
               <UPopover>
                 <UButton size="md" color="neutral" variant="outline" class="p-0 rounded-full overflow-hidden shrink-0">
                   <span
-                    class="size-6 rounded-full border-2 border-gray-300"
+                    class="size-6 rounded-full border-2 border-gray-300 dark:border-white/15"
                     :style="{ backgroundColor: background.color || '#ffffff' }"
                   />
                 </UButton>
@@ -50,38 +50,38 @@
               >
                 <span
                   class="w-full aspect-9/16 rounded-lg border-2 transition-all block"
-                  :class="isSelected(preset) ? 'border-primary-500 scale-105 shadow-md' : 'border-gray-200 hover:border-gray-400'"
+                  :class="isSelected(preset) ? 'border-primary-500 scale-105 shadow-md' : 'border-gray-200 dark:border-white/10 hover:border-gray-400'"
                   :style="{ background: preset.preview }"
                 />
               </button>
             </div>
-            <div class="border-t border-gray-100 pt-2 space-y-2">
-              <label class="text-xs text-gray-500 block">Custom gradient</label>
+            <div class="border-t border-gray-100 dark:border-white/5 pt-2 space-y-2">
+              <label class="text-xs text-gray-500 dark:text-neutral-400 block">Custom gradient</label>
               <div class="grid grid-cols-3 gap-2">
                 <div>
-                  <label class="text-[10px] text-gray-400 mb-1 block">From</label>
+                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">From</label>
                   <input
                     :value="background.gradient?.from"
                     type="color"
-                    class="w-full h-8 rounded cursor-pointer border border-gray-200"
+                    class="w-full h-8 rounded cursor-pointer border border-gray-200 dark:border-white/10"
                     @input="emitGradient('from', ($event.target as HTMLInputElement).value)"
                   />
                 </div>
                 <div>
-                  <label class="text-[10px] text-gray-400 mb-1 block">Via</label>
+                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">Via</label>
                   <input
                     :value="background.gradient?.via || '#FFFFFF'"
                     type="color"
-                    class="w-full h-8 rounded cursor-pointer border border-gray-200"
+                    class="w-full h-8 rounded cursor-pointer border border-gray-200 dark:border-white/10"
                     @input="emitGradient('via', ($event.target as HTMLInputElement).value)"
                   />
                 </div>
                 <div>
-                  <label class="text-[10px] text-gray-400 mb-1 block">To</label>
+                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">To</label>
                   <input
                     :value="background.gradient?.to"
                     type="color"
-                    class="w-full h-8 rounded cursor-pointer border border-gray-200"
+                    class="w-full h-8 rounded cursor-pointer border border-gray-200 dark:border-white/10"
                     @input="emitGradient('to', ($event.target as HTMLInputElement).value)"
                   />
                 </div>
@@ -100,14 +100,14 @@
               >
                 <span
                   class="w-full aspect-9/16 rounded-lg border-2 overflow-hidden transition-all block"
-                  :class="isSelected(preset) ? 'border-primary-500 scale-105 shadow-md' : 'border-gray-200 hover:border-gray-400'"
+                  :class="isSelected(preset) ? 'border-primary-500 scale-105 shadow-md' : 'border-gray-200 dark:border-white/10 hover:border-gray-400'"
                 >
                   <img :src="preset.preview" :alt="preset.name" class="w-full h-full object-cover" />
                 </span>
               </button>
             </div>
-            <div class="border-t border-gray-100 pt-2">
-              <label class="text-xs text-gray-500 mb-1 block">Custom image URL</label>
+            <div class="border-t border-gray-100 dark:border-white/5 pt-2">
+              <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Custom image URL</label>
               <UInput
                 :model-value="background.imageUrl"
                 size="sm"
@@ -120,7 +120,7 @@
           <!-- Video -->
           <template v-else-if="item.value === 'video'">
             <div>
-              <label class="text-xs text-gray-500 mb-1 block">Video URL (mp4, webm)</label>
+              <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Video URL (mp4, webm)</label>
               <UInput
                 :model-value="background.videoUrl"
                 size="sm"
@@ -142,7 +142,7 @@
                 <span
                   class="w-full aspect-9/16 rounded-lg border-2 overflow-hidden transition-all relative block"
                   :class="[
-                    isSelected(preset) ? 'border-primary-500 scale-105 shadow-md' : 'border-gray-200 hover:border-gray-400',
+                    isSelected(preset) ? 'border-primary-500 scale-105 shadow-md' : 'border-gray-200 dark:border-white/10 hover:border-gray-400',
                     effectBgClass(preset.value.effectId)
                   ]"
                 >

@@ -20,8 +20,8 @@
               icon="i-lucide-arrow-left"
             />
             <div>
-              <h1 class="text-2xl font-bold text-gray-900">Customize QR Code</h1>
-              <p class="text-sm text-gray-500">
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Customize QR Code</h1>
+              <p class="text-sm text-gray-500 dark:text-neutral-400">
                 {{ linkData?.destinationUrl || "Loading..." }}
               </p>
             </div>
@@ -45,13 +45,13 @@
             <UCard>
               <template #header>
                 <div class="flex items-center justify-between">
-                  <h3 class="font-semibold text-gray-900">Select styles</h3>
-                  <span class="text-xs text-gray-500">Patterns</span>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Select styles</h3>
+                  <span class="text-xs text-gray-500 dark:text-neutral-400">Patterns</span>
                 </div>
               </template>
 
               <div class="space-y-4">
-                <p class="text-sm text-gray-500">Patterns</p>
+                <p class="text-sm text-gray-500 dark:text-neutral-400">Patterns</p>
                 <div class="flex flex-wrap gap-3">
                   <button
                     v-for="pattern in dotPatterns"
@@ -60,7 +60,7 @@
                     :class="[
                       config.dotsType === pattern.value
                         ? 'border-primary bg-primary/5'
-                        : 'border-gray-200 hover:border-gray-300',
+                        : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20',
                       pattern.locked
                         ? 'opacity-60 cursor-not-allowed'
                         : 'cursor-pointer',
@@ -81,7 +81,7 @@
                   </button>
                   <button
                     v-if="hasMorePatterns"
-                    class="size-16 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-primary hover:border-primary transition-colors"
+                    class="size-16 rounded-lg border-2 border-dashed border-gray-300 dark:border-white/15 flex items-center justify-center text-primary hover:border-primary transition-colors"
                     @click="showUpgradeModal = true"
                   >
                     <span class="text-xs">+ More</span>
@@ -90,8 +90,8 @@
               </div>
 
               <!-- Corners -->
-              <div class="space-y-4 mt-6 pt-6 border-t border-gray-100">
-                <p class="text-sm text-gray-500">Corners</p>
+              <div class="space-y-4 mt-6 pt-6 border-t border-gray-100 dark:border-white/5">
+                <p class="text-sm text-gray-500 dark:text-neutral-400">Corners</p>
                 <div class="flex flex-wrap gap-3">
                   <button
                     v-for="corner in cornerStyles"
@@ -100,7 +100,7 @@
                     :class="[
                       config.cornersSquareType === corner.value
                         ? 'border-primary bg-primary/5'
-                        : 'border-gray-200 hover:border-gray-300',
+                        : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20',
                       corner.locked
                         ? 'opacity-60 cursor-not-allowed'
                         : 'cursor-pointer',
@@ -125,7 +125,7 @@
                   </button>
                   <button
                     v-if="hasMoreCorners"
-                    class="size-10 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-primary hover:border-primary transition-colors"
+                    class="size-10 rounded-lg border-2 border-dashed border-gray-300 dark:border-white/15 flex items-center justify-center text-primary hover:border-primary transition-colors"
                     @click="showUpgradeModal = true"
                   >
                     <span class="text-xs">+ More</span>
@@ -137,12 +137,12 @@
             <!-- Colors -->
             <UCard>
               <template #header>
-                <h3 class="font-semibold text-gray-900">Choose your colors</h3>
+                <h3 class="font-semibold text-gray-900 dark:text-white">Choose your colors</h3>
               </template>
 
               <!-- Preset Colors -->
               <div class="space-y-3">
-                <p class="text-sm text-gray-500">Preset</p>
+                <p class="text-sm text-gray-500 dark:text-neutral-400">Preset</p>
                 <div class="flex flex-wrap gap-2">
                   <button
                     v-for="color in presetColors"
@@ -162,7 +162,7 @@
               <!-- Custom Hex -->
               <div class="grid grid-cols-2 gap-4 mt-6">
                 <div>
-                  <label class="block text-sm text-gray-500 mb-2">Code</label>
+                  <label class="block text-sm text-gray-500 dark:text-neutral-400 mb-2">Code</label>
                   <USelect
                     v-model="colorType"
                     :items="[
@@ -176,7 +176,7 @@
                   />
                 </div>
                 <div class="relative">
-                  <label class="block text-sm text-gray-500 mb-2">Hex value</label>
+                  <label class="block text-sm text-gray-500 dark:text-neutral-400 mb-2">Hex value</label>
                   <div class="flex items-center gap-2">
                     <UInput
                       v-model="config.foreground"
@@ -197,7 +197,7 @@
                             class="p-0 rounded-lg overflow-hidden shrink-0"
                           >
                             <span
-                              class="size-10 rounded-lg border-2 border-gray-300"
+                              class="size-10 rounded-lg border-2 border-gray-300 dark:border-white/15"
                               :style="{ backgroundColor: config.foreground }"
                             />
                           </UButton>
@@ -214,7 +214,7 @@
               <!-- Background -->
               <div class="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <label class="block text-sm text-gray-500 mb-2">Background</label>
+                  <label class="block text-sm text-gray-500 dark:text-neutral-400 mb-2">Background</label>
                   <USelect
                     v-model="bgType"
                     :items="[
@@ -228,7 +228,7 @@
                   />
                 </div>
                 <div class="relative">
-                  <label class="block text-sm text-gray-500 mb-2">Hex value</label>
+                  <label class="block text-sm text-gray-500 dark:text-neutral-400 mb-2">Hex value</label>
                   <div class="flex items-center gap-2">
                     <UInput
                       v-model="config.background"
@@ -251,7 +251,7 @@
                             :disabled="bgType === 'transparent'"
                           >
                             <span
-                              class="size-10 rounded-lg border-2 border-gray-300"
+                              class="size-10 rounded-lg border-2 border-gray-300 dark:border-white/15"
                               :style="{ backgroundColor: config.background }"
                             />
                           </UButton>
@@ -270,7 +270,7 @@
             <UCard>
               <template #header>
                 <div class="flex items-center justify-between">
-                  <h3 class="font-semibold text-gray-900">
+                  <h3 class="font-semibold text-gray-900 dark:text-white">
                     Add a logo or center text
                   </h3>
                   <UBadge
@@ -294,11 +294,11 @@
                 <!-- Logo Options -->
                 <div class="flex flex-wrap gap-3">
                   <button
-                    class="w-14 h-14 rounded-lg border-2 border-gray-200 flex items-center justify-center hover:border-primary transition-colors"
+                    class="w-14 h-14 rounded-lg border-2 border-gray-200 dark:border-white/10 flex items-center justify-center hover:border-primary transition-colors"
                     :class="{ 'border-primary bg-primary/5': !config.logo }"
                     @click="config.logo = ''"
                   >
-                    <UIcon name="i-lucide-x" class="w-5 h-5 text-gray-400" />
+                    <UIcon name="i-lucide-x" class="w-5 h-5 text-gray-400 dark:text-neutral-500" />
                   </button>
                   <button
                     v-for="logo in presetLogos"
@@ -307,14 +307,14 @@
                     :class="
                       config.logo === logo.value
                         ? 'border-primary bg-primary/5'
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
                     "
                     @click="config.logo = logo.value"
                   >
                     <UIcon :name="logo.icon" class="w-6 h-6" />
                   </button>
                   <button
-                    class="w-14 h-14 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-xs text-gray-500 hover:border-primary hover:text-primary transition-colors"
+                    class="w-14 h-14 rounded-lg border-2 border-dashed border-gray-300 dark:border-white/15 flex flex-col items-center justify-center text-xs text-gray-500 dark:text-neutral-400 hover:border-primary hover:text-primary transition-colors"
                     @click="showUploadModal = true"
                   >
                     <UIcon name="i-lucide-upload" class="w-4 h-4 mb-1" />
@@ -334,7 +334,7 @@
                   </UButton>
                 </div>
 
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-gray-500 dark:text-neutral-400">
                   File type: PNG, 1:1 aspect ratio. Max size: 5MB, 2500x2500px
                 </p>
               </div>
@@ -344,7 +344,7 @@
             <UCard>
               <template #header>
                 <div class="flex items-center justify-between">
-                  <h3 class="font-semibold text-gray-900">Select a frame</h3>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Select a frame</h3>
                   <UBadge
                     v-if="!canUseFrames"
                     color="neutral"
@@ -370,7 +370,7 @@
                   :class="
                     config.frame === frame.value
                       ? 'border-primary bg-primary/5'
-                      : 'border-gray-200 hover:border-gray-300'
+                      : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
                   "
                   @click="config.frame = frame.value"
                 >
@@ -378,7 +378,7 @@
                     class="w-12 h-12 border-2 rounded"
                     :class="frame.borderClass"
                   ></div>
-                  <span class="text-xs text-gray-500">{{ frame.label }}</span>
+                  <span class="text-xs text-gray-500 dark:text-neutral-400">{{ frame.label }}</span>
                   <div
                     v-if="frame.locked"
                     class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-400 rounded-full flex items-center justify-center"
@@ -388,7 +388,7 @@
                 </button>
                 <button
                   v-if="hasMoreFrames"
-                  class="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-primary hover:border-primary transition-colors"
+                  class="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 dark:border-white/15 flex items-center justify-center text-primary hover:border-primary transition-colors"
                   @click="showUpgradeModal = true"
                 >
                   <span class="text-xs">+ More</span>
@@ -400,7 +400,7 @@
             <UCard>
               <template #header>
                 <div class="flex items-center justify-between">
-                  <h3 class="font-semibold text-gray-900">Advanced options</h3>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Advanced options</h3>
                 </div>
               </template>
 
@@ -408,8 +408,8 @@
                 <!-- Branding -->
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="font-medium text-gray-900">Branding</p>
-                    <p class="text-sm text-gray-500">Perlink logo</p>
+                    <p class="font-medium text-gray-900 dark:text-white">Branding</p>
+                    <p class="text-sm text-gray-500 dark:text-neutral-400">Perlink logo</p>
                   </div>
                   <div class="flex items-center gap-2">
                     <UBadge
@@ -433,11 +433,11 @@
 
                 <!-- Use QR Color for Corners -->
                 <div
-                  class="flex items-center justify-between pt-4 border-t border-gray-100"
+                  class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/5"
                 >
                   <div>
-                    <p class="font-medium text-gray-900">Corners</p>
-                    <p class="text-sm text-gray-500">Use QR Code color</p>
+                    <p class="font-medium text-gray-900 dark:text-white">Corners</p>
+                    <p class="text-sm text-gray-500 dark:text-neutral-400">Use QR Code color</p>
                   </div>
                   <USwitch v-model="config.useQrColorForCorners" size="xl" />
                 </div>
@@ -448,14 +448,14 @@
           <!-- Right Panel - Preview -->
           <div class="lg:col-span-1">
             <div class="sticky top-6">
-              <UCard class="bg-gray-50">
+              <UCard class="bg-gray-50 dark:bg-white/[0.03]">
                 <template #header>
-                  <h3 class="font-semibold text-gray-900 text-center">Preview</h3>
+                  <h3 class="font-semibold text-gray-900 dark:text-white text-center">Preview</h3>
                 </template>
 
                 <div class="flex flex-col items-center">
                   <!-- QR Preview -->
-                  <div class="bg-white p-6 rounded-xl shadow-sm">
+                  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl p-6 rounded-xl shadow-sm">
                     <ClientOnly>
                       <QRCodeRender
                         v-if="linkData"
@@ -489,7 +489,7 @@
               <!-- Download Options -->
               <UCard class="mt-4">
                 <template #header>
-                  <h3 class="font-semibold text-gray-900">Download</h3>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Download</h3>
                 </template>
 
                 <div class="space-y-3">
@@ -511,10 +511,10 @@
             >
               <UIcon name="i-lucide-crown" class="w-8 h-8 text-primary" />
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Unlock Premium Features
             </h3>
-            <p class="text-gray-600 mb-6">
+            <p class="text-gray-600 dark:text-neutral-300 mb-6">
               Upgrade to Starter ($5) or higher to access all QR code customization
               options including custom logos, frames, and transparent backgrounds.
             </p>
@@ -550,6 +550,7 @@ import type { User } from "#auth-utils";
 
 // Page meta
 definePageMeta({
+  colorMode: "dark",
   layout: "admin",
   middleware: "auth",
 });

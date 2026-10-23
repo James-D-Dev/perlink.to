@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <!-- No Data State -->
-    <div v-if="!bioPageId" class="text-center py-16 text-gray-500">
+    <div v-if="!bioPageId" class="text-center py-16 text-gray-500 dark:text-neutral-400">
       <UIcon
         name="i-lucide-bar-chart-2"
         class="w-12 h-12 mx-auto mb-3 opacity-50"
@@ -29,13 +29,13 @@
 
         <template v-else-if="item.value === 'links'">
           <div class="space-y-4 pt-2">
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-gray-600 dark:text-neutral-300">
               Analytics for individual links and social media clicks
             </p>
 
             <div
               v-if="!bioLinks?.length && !socialLinks?.length"
-              class="text-center py-8 text-gray-400 text-sm"
+              class="text-center py-8 text-gray-400 dark:text-neutral-500 text-sm"
             >
               No links to display
             </div>
@@ -45,28 +45,28 @@
               <div
                 v-for="link in bioLinks"
                 :key="link.id"
-                class="border border-gray-200 rounded-lg p-4"
+                class="border border-gray-200 dark:border-white/10 rounded-lg p-4"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3 min-w-0">
                     <UIcon
                       :name="getIconForLink(link)"
-                      class="w-5 h-5 text-gray-600 shrink-0"
+                      class="w-5 h-5 text-gray-600 dark:text-neutral-300 shrink-0"
                     />
                     <div class="min-w-0">
-                      <h4 class="font-medium text-gray-900 truncate">
+                      <h4 class="font-medium text-gray-900 dark:text-white truncate">
                         {{ link.title }}
                       </h4>
-                      <p class="text-sm text-gray-500 truncate max-w-xs">
+                      <p class="text-sm text-gray-500 dark:text-neutral-400 truncate max-w-xs">
                         {{ link.url }}
                       </p>
                     </div>
                   </div>
                   <div class="text-right shrink-0 ml-4">
-                    <div class="text-2xl font-bold text-gray-900">
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">
                       {{ getLinkClickCount(link.id) }}
                     </div>
-                    <div class="text-xs text-gray-500">clicks</div>
+                    <div class="text-xs text-gray-500 dark:text-neutral-400">clicks</div>
                   </div>
                 </div>
               </div>
@@ -75,28 +75,28 @@
               <div
                 v-for="social in socialLinks"
                 :key="social.id"
-                class="border border-gray-200 rounded-lg p-4"
+                class="border border-gray-200 dark:border-white/10 rounded-lg p-4"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3 min-w-0">
                     <UIcon
                       :name="getSocialIcon(social.provider)"
-                      class="w-5 h-5 text-gray-600 shrink-0"
+                      class="w-5 h-5 text-gray-600 dark:text-neutral-300 shrink-0"
                     />
                     <div class="min-w-0">
-                      <h4 class="font-medium text-gray-900 capitalize">
+                      <h4 class="font-medium text-gray-900 dark:text-white capitalize">
                         {{ social.provider }}
                       </h4>
-                      <p class="text-sm text-gray-500 truncate max-w-xs">
+                      <p class="text-sm text-gray-500 dark:text-neutral-400 truncate max-w-xs">
                         {{ getSocialUrl(social) }}
                       </p>
                     </div>
                   </div>
                   <div class="text-right shrink-0 ml-4">
-                    <div class="text-2xl font-bold text-gray-900">
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">
                       {{ getSocialClickCount(social.id) }}
                     </div>
-                    <div class="text-xs text-gray-500">clicks</div>
+                    <div class="text-xs text-gray-500 dark:text-neutral-400">clicks</div>
                   </div>
                 </div>
               </div>

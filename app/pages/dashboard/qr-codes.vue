@@ -14,16 +14,16 @@
           <div class="flex flex-col items-center gap-6">
             <!-- Icon -->
             <div
-              class="w-[68px] h-[68px] rounded-2xl bg-blue-100 flex items-center justify-center"
+              class="w-[68px] h-[68px] rounded-2xl bg-blue-100 dark:bg-blue-500/15 flex items-center justify-center"
             >
-              <UIcon name="i-lucide-qr-code" class="w-10 h-10 text-blue-600" />
+              <UIcon name="i-lucide-qr-code" class="w-10 h-10 text-blue-600 dark:text-blue-400" />
             </div>
 
             <!-- Title -->
-            <h1 class="text-2xl font-bold text-gray-900">QR Codes Management</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">QR Codes Management</h1>
 
             <!-- Coming Soon Message -->
-            <p class="text-gray-600 max-w-md">
+            <p class="text-gray-600 dark:text-neutral-300 max-w-md">
               This feature is currently under development. Soon you'll be able to
               create, customize, and manage all your QR codes in one place.
             </p>
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 definePageMeta({
+  colorMode: "dark",
   layout: "admin",
   middleware: "auth",
 });

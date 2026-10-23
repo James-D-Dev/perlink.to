@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
       title="Social Links"
@@ -15,7 +15,7 @@
             :key="social.provider"
           >
             <div
-              class="size-6 rounded-full bg-white ring-1 ring-white flex items-center justify-center"
+              class="size-6 rounded-full bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl ring-1 ring-white flex items-center justify-center"
             >
               <UIcon :name="getProviderIcon(social.provider)" class="size-5" />
             </div>
@@ -33,7 +33,7 @@
     </BioBlockItemHeader>
 
     <!-- Social Edit Form -->
-    <div v-if="isActive" class="p-4 border-t border-gray-100 bg-gray-50/50">
+    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
       <!-- Draggable Social Links List -->
       <div class="space-y-3 mb-4">
         <draggable
@@ -44,11 +44,11 @@
         >
           <template #item="{ element: social, index }">
             <div
-              class="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-3 mb-2 last:mb-0"
+              class="flex items-center gap-3 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-lg border border-gray-200 dark:border-white/10 p-3 mb-2 last:mb-0"
             >
               <!-- Drag Handle -->
               <div
-                class="drag-handle cursor-move text-gray-400 hover:text-gray-600 flex-shrink-0"
+                class="drag-handle cursor-move text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300 flex-shrink-0"
               >
                 <UIcon name="i-lucide-grip-vertical" class="w-5 h-5" />
               </div>
@@ -87,7 +87,7 @@
                     {{ getProviderLabel(social.provider) }}
 
                     <span
-                      class="inline-flex items-center text-xs text-gray-500 ml-1"
+                      class="inline-flex items-center text-xs text-gray-500 dark:text-neutral-400 ml-1"
                       >- Clicks: {{ social.clicks || 0 }}</span
                     >
                   </span>
@@ -103,7 +103,7 @@
                 color="neutral"
                 size="xs"
                 icon="i-lucide-trash-2"
-                class="flex-shrink-0 text-gray-400 hover:text-red-500"
+                class="flex-shrink-0 text-gray-400 dark:text-neutral-500 hover:text-red-500"
                 @click="deleteSocial(social.id)"
               />
             </div>
@@ -113,7 +113,7 @@
         <!-- Empty State -->
         <div
           v-if="localSocials.length === 0"
-          class="text-center py-8 text-gray-400"
+          class="text-center py-8 text-gray-400 dark:text-neutral-500"
         >
           <UIcon
             name="i-lucide-share-2"
@@ -150,7 +150,7 @@
             <button
               v-for="provider in availableProviders"
               :key="provider.key"
-              class="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-perlink-cyan hover:bg-perlink-cyan/5 transition-all"
+              class="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-perlink-cyan hover:bg-perlink-cyan/5 transition-all"
               @click="addSocial(provider.key)"
             >
               <div
@@ -163,7 +163,7 @@
                   :style="{ color: provider.color }"
                 />
               </div>
-              <span class="text-xs font-medium text-gray-700">{{
+              <span class="text-xs font-medium text-gray-700 dark:text-neutral-200">{{
                 provider.label
               }}</span>
             </button>

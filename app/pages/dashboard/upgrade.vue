@@ -11,37 +11,37 @@
     <template #body>
       <div class="max-w-5xl mx-auto w-full px-4 py-8 space-y-8">
         <!-- Current Plan -->
-        <UCard class="bg-white">
+        <UCard class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">Current Plan</h2>
-              <p class="text-gray-500 mt-1">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Current Plan</h2>
+              <p class="text-gray-500 dark:text-neutral-400 mt-1">
                 You are currently on the <UBadge :color="currentPlanColor" size="sm">{{ currentPlanLabel }}</UBadge> plan
               </p>
             </div>
             <div class="text-right">
-              <div class="text-2xl font-bold text-gray-900">{{ currentPlanPrice }}</div>
-              <div class="text-sm text-gray-500">/month</div>
+              <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ currentPlanPrice }}</div>
+              <div class="text-sm text-gray-500 dark:text-neutral-400">/month</div>
             </div>
           </div>
         </UCard>
 
         <!-- Usage Stats -->
-        <UCard class="bg-white" title="Your Usage">
+        <UCard class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl" title="Your Usage">
           <div class="grid md:grid-cols-3 gap-6">
-            <div class="text-center p-4 bg-gray-50 rounded-lg">
-              <div class="text-2xl font-bold text-gray-900">{{ usage.profiles }}/{{ limits.maxProfiles }}</div>
-              <div class="text-sm text-gray-500 mt-1">Bio Profiles</div>
+            <div class="text-center p-4 bg-gray-50 dark:bg-white/[0.03] rounded-lg">
+              <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ usage.profiles }}/{{ limits.maxProfiles }}</div>
+              <div class="text-sm text-gray-500 dark:text-neutral-400 mt-1">Bio Profiles</div>
               <UProgress :value="(usage.profiles / limits.maxProfiles) * 100" class="mt-2" />
             </div>
-            <div class="text-center p-4 bg-gray-50 rounded-lg">
-              <div class="text-2xl font-bold text-gray-900">{{ usage.shortLinks }}/{{ limits.maxShortLinks }}</div>
-              <div class="text-sm text-gray-500 mt-1">Short Links</div>
+            <div class="text-center p-4 bg-gray-50 dark:bg-white/[0.03] rounded-lg">
+              <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ usage.shortLinks }}/{{ limits.maxShortLinks }}</div>
+              <div class="text-sm text-gray-500 dark:text-neutral-400 mt-1">Short Links</div>
               <UProgress :value="(usage.shortLinks / limits.maxShortLinks) * 100" class="mt-2" />
             </div>
-            <div class="text-center p-4 bg-gray-50 rounded-lg">
-              <div class="text-2xl font-bold text-gray-900">{{ usage.themes }}/{{ limits.maxThemes }}</div>
-              <div class="text-sm text-gray-500 mt-1">Custom Themes</div>
+            <div class="text-center p-4 bg-gray-50 dark:bg-white/[0.03] rounded-lg">
+              <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ usage.themes }}/{{ limits.maxThemes }}</div>
+              <div class="text-sm text-gray-500 dark:text-neutral-400 mt-1">Custom Themes</div>
               <UProgress :value="(usage.themes / limits.maxThemes) * 100" class="mt-2" />
             </div>
           </div>
@@ -49,19 +49,19 @@
 
         <!-- Upgrade Options -->
         <div>
-          <h2 class="text-xl font-bold text-gray-900 mb-6">Available Plans</h2>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Available Plans</h2>
           <div class="grid md:grid-cols-3 gap-6">
             <!-- Free -->
             <UCard 
-              class="bg-white border-gray-200" 
+              class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border-gray-200 dark:border-white/10" 
               :class="{ 'ring-2 ring-green-500': currentPlan === 'free' }"
               :ui="{ body: 'p-6' }"
             >
               <div class="text-center">
-                <h3 class="text-xl font-bold text-gray-900">Free</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Free</h3>
                 <div class="mt-4">
-                  <span class="text-3xl font-bold text-gray-900">$0</span>
-                  <span class="text-gray-500">/month</span>
+                  <span class="text-3xl font-bold text-gray-900 dark:text-white">$0</span>
+                  <span class="text-gray-500 dark:text-neutral-400">/month</span>
                 </div>
               </div>
 
@@ -108,7 +108,7 @@
 
             <!-- Pro -->
             <UCard 
-              class="bg-white" 
+              class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl" 
               :class="{ 
                 'border-primary-500 ring-2 ring-primary-500': currentPlan === 'pro',
                 'border-primary-300': currentPlan !== 'pro'
@@ -120,10 +120,10 @@
               </div>
 
               <div class="text-center">
-                <h3 class="text-xl font-bold text-gray-900">Pro</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Pro</h3>
                 <div class="mt-4">
-                  <span class="text-3xl font-bold text-gray-900">$9</span>
-                  <span class="text-gray-500">/month</span>
+                  <span class="text-3xl font-bold text-gray-900 dark:text-white">$9</span>
+                  <span class="text-gray-500 dark:text-neutral-400">/month</span>
                 </div>
               </div>
 
@@ -177,15 +177,15 @@
 
             <!-- Business -->
             <UCard 
-              class="bg-white border-gray-200" 
+              class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border-gray-200 dark:border-white/10" 
               :class="{ 'ring-2 ring-purple-500': currentPlan === 'business' }"
               :ui="{ body: 'p-6' }"
             >
               <div class="text-center">
-                <h3 class="text-xl font-bold text-gray-900">Business</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Business</h3>
                 <div class="mt-4">
-                  <span class="text-3xl font-bold text-gray-900">$29</span>
-                  <span class="text-gray-500">/month</span>
+                  <span class="text-3xl font-bold text-gray-900 dark:text-white">$29</span>
+                  <span class="text-gray-500 dark:text-neutral-400">/month</span>
                 </div>
               </div>
 
@@ -237,18 +237,18 @@
         </div>
 
         <!-- Billing History -->
-        <UCard class="bg-white" title="Billing History" v-if="billingHistory.length > 0">
+        <UCard class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl" title="Billing History" v-if="billingHistory.length > 0">
           <table class="w-full text-sm">
             <thead>
-              <tr class="border-b border-gray-200">
-                <th class="text-left py-2 px-3 font-medium text-gray-700">Date</th>
-                <th class="text-left py-2 px-3 font-medium text-gray-700">Description</th>
-                <th class="text-left py-2 px-3 font-medium text-gray-700">Amount</th>
-                <th class="text-left py-2 px-3 font-medium text-gray-700">Status</th>
+              <tr class="border-b border-gray-200 dark:border-white/10">
+                <th class="text-left py-2 px-3 font-medium text-gray-700 dark:text-neutral-200">Date</th>
+                <th class="text-left py-2 px-3 font-medium text-gray-700 dark:text-neutral-200">Description</th>
+                <th class="text-left py-2 px-3 font-medium text-gray-700 dark:text-neutral-200">Amount</th>
+                <th class="text-left py-2 px-3 font-medium text-gray-700 dark:text-neutral-200">Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="row in billingHistory" :key="row.date" class="border-b border-gray-100">
+              <tr v-for="row in billingHistory" :key="row.date" class="border-b border-gray-100 dark:border-white/5">
                 <td class="py-2 px-3">{{ row.date }}</td>
                 <td class="py-2 px-3">{{ row.description }}</td>
                 <td class="py-2 px-3">{{ row.amount }}</td>
@@ -268,6 +268,7 @@
 import { ref, computed } from 'vue';
 
 definePageMeta({
+  colorMode: 'dark',
   layout: 'admin'
 });
 

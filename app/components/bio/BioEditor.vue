@@ -32,7 +32,7 @@
           <div class="relative group mb-2">
             <!-- Drag Handle -->
             <!-- <div class="drag-handle absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-move opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <UIcon name="i-lucide-grip-vertical" class="w-5 h-5 text-gray-400" />
+              <UIcon name="i-lucide-grip-vertical" class="w-5 h-5 text-gray-400 dark:text-neutral-500" />
             </div> -->
 
             <!-- Social Block -->
@@ -119,7 +119,7 @@
       <!-- Add Block Button -->
       <UButton
         color="neutral"
-        class="w-full py-3 rounded-xl border-2 border-dashed bg-white border-gray-300 text-gray-500 hover:text-white hover:bg-perlink-blue hover:border-perlink-blue"
+        class="w-full py-3 rounded-xl border-2 border-dashed bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border-gray-300 dark:border-white/15 text-gray-500 dark:text-neutral-400 hover:text-white hover:bg-perlink-blue hover:border-perlink-blue"
         @click="showBlockModal = true"
       >
         <UIcon name="i-lucide-plus" class="w-5 h-5" />

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
       :hidden="menuBlock?.hidden"
@@ -9,14 +9,14 @@
       @toggle-hidden="toggleBlockHidden('menu')"
     >
       <template #preview>
-        <span class="text-xs text-gray-500 mr-2">{{ itemCount }} items</span>
+        <span class="text-xs text-gray-500 dark:text-neutral-400 mr-2">{{ itemCount }} items</span>
       </template>
       <template #actions>
         <UButton variant="ghost" color="neutral" size="xs" icon="i-lucide-trash-2" @click.stop="$emit('remove')" />
       </template>
     </BioBlockItemHeader>
 
-    <div v-if="isActive" class="p-4 border-t border-gray-100 bg-gray-50/50 space-y-4">
+    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Title" class="col-span-2">
           <UInput :model-value="data.title" placeholder="Menu, Rooms, Services..." class="w-full" @update:model-value="update({ title: String($event) })" />
@@ -34,7 +34,7 @@
               :key="option.value"
               type="button"
               class="flex items-center gap-2 p-2 rounded-lg border text-sm transition-all"
-              :class="data.layout === option.value ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'"
+              :class="data.layout === option.value ? 'border-primary bg-primary/5' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'"
               @click="update({ layout: option.value })"
             >
               <UIcon :name="option.icon" class="w-4 h-4" />
@@ -44,7 +44,7 @@
         </UFormField>
       </div>
 
-      <div v-for="(section, sIndex) in data.sections" :key="section.id" class="rounded-lg border border-gray-200 bg-white p-3 space-y-3">
+      <div v-for="(section, sIndex) in data.sections" :key="section.id" class="rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl p-3 space-y-3">
         <div class="flex items-center gap-2">
           <UInput
             :model-value="section.name"
@@ -55,7 +55,7 @@
           <UButton variant="ghost" color="neutral" size="xs" icon="i-lucide-trash-2" @click="removeSection(sIndex)" />
         </div>
 
-        <div v-for="(item, iIndex) in section.items" :key="item.id" class="rounded-lg bg-gray-50 p-3 space-y-2">
+        <div v-for="(item, iIndex) in section.items" :key="item.id" class="rounded-lg bg-gray-50 dark:bg-white/[0.03] p-3 space-y-2">
           <div class="flex items-center gap-2">
             <UInput :model-value="item.name" placeholder="Name" class="flex-1" @update:model-value="updateItem(sIndex, iIndex, { name: String($event) })" />
             <UInput :model-value="item.price" placeholder="Price" class="w-28" @update:model-value="updateItem(sIndex, iIndex, { price: String($event) })" />

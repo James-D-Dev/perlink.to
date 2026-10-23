@@ -13,6 +13,7 @@
         header: 'h-(--ui-header-height) border-b border-default',
         body: 'py-4',
         footer: 'border-t border-default',
+        content: 'max-w-72',
       }"
     >
       <template #header="{ collapsed }">

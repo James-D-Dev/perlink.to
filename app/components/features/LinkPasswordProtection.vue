@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200 space-y-6">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10 space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">

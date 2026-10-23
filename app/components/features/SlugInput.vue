@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative w-full flex gap-0.5 md:gap-1 border border-perlink-cyan/30 rounded-full p-1 md:p-2 bg-white/80 focus:ring-2 focus:ring-perlink-cyan focus:outline-none hover:ring-2 hover:ring-perlink-cyan hover:outline-none shadow-lg md:shadow-xl shadow-perlink-cyan/20"
+    class="relative w-full flex gap-0.5 md:gap-1 border border-perlink-cyan/30 rounded-full p-1 md:p-2 bg-white/80 dark:bg-white/[0.04] dark:backdrop-blur-xl focus:ring-2 focus:ring-perlink-cyan focus:outline-none hover:ring-2 hover:ring-perlink-cyan hover:outline-none shadow-lg md:shadow-xl shadow-perlink-cyan/20"
   >
     <!-- Fixed domain label (no switcher) -->
     <div

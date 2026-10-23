@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
       :hidden="hoursBlock?.hidden"
@@ -13,16 +13,16 @@
       </template>
     </BioBlockItemHeader>
 
-    <div v-if="isActive" class="p-4 border-t border-gray-100 bg-gray-50/50 space-y-4">
+    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <UFormField label="Title">
         <UInput :model-value="data.title" placeholder="Opening hours" class="w-full" @update:model-value="update({ title: String($event) })" />
       </UFormField>
 
       <div class="space-y-2">
         <div v-for="(day, index) in data.days" :key="day.day" class="flex items-center gap-2">
-          <span class="w-12 text-sm font-medium text-gray-700">{{ DAY_NAMES[day.day] }}</span>
+          <span class="w-12 text-sm font-medium text-gray-700 dark:text-neutral-200">{{ DAY_NAMES[day.day] }}</span>
           <UInput type="time" :model-value="day.open" :disabled="day.closed" class="flex-1" @update:model-value="updateDay(index, { open: String($event) })" />
-          <span class="text-gray-400">–</span>
+          <span class="text-gray-400 dark:text-neutral-500">–</span>
           <UInput type="time" :model-value="day.close" :disabled="day.closed" class="flex-1" @update:model-value="updateDay(index, { close: String($event) })" />
           <UCheckbox :model-value="day.closed" label="Closed" @update:model-value="updateDay(index, { closed: Boolean($event) })" />
         </div>

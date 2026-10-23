@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
       title="Links"
@@ -19,7 +19,7 @@
     </BioBlockItemHeader>
 
     <!-- Links Edit Form -->
-    <div v-if="isActive" class="p-4 border-t border-gray-100 bg-gray-50/50">
+    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
       <div class="space-y-4">
         <draggable
           v-model="localLinks"
@@ -29,12 +29,12 @@
         >
           <template #item="{ element: link, index }">
             <div
-              class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-4 last:mb-0"
+              class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden mb-4 last:mb-0"
             >
               <!-- Main Content -->
               <div class="flex gap-3 p-4">
                 <!-- Left: Drag handle -->
-                <div class="drag-handle cursor-move text-gray-400 pt-1">
+                <div class="drag-handle cursor-move text-gray-400 dark:text-neutral-500 pt-1">
                   <UIcon name="i-lucide-grip-vertical" class="w-5 h-5" />
                 </div>
 
@@ -76,7 +76,7 @@
 
                 <!-- Right: Icon picker -->
                 <button
-                  class="w-16 h-16 rounded-xl bg-gray-100 border-0 hover:bg-gray-200 flex items-center justify-center transition-colors flex-shrink-0"
+                  class="w-16 h-16 rounded-xl bg-gray-100 dark:bg-white/[0.06] border-0 hover:bg-gray-200 flex items-center justify-center transition-colors flex-shrink-0"
                   @click="openIconModal(index)"
                 >
                   <UIcon
@@ -89,7 +89,7 @@
 
               <!-- Bottom Action Bar -->
               <div
-                class="flex items-center justify-between px-4 py-2 border-t border-gray-100 bg-gray-50/50"
+                class="flex items-center justify-between px-4 py-2 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]"
               >
                 <!-- Left: Action Icons -->
                 <div class="flex items-center gap-1">

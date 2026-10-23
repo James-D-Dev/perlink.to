@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <!-- Header Edit Form -->
-    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+    <div class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
       <div class="space-y-4">
         <div class="flex items-center gap-4">
           <div class="flex-1 min-w-0">

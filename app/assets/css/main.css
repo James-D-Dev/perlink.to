@@ -45,15 +45,42 @@ Make sure disabled buttons don't get the pointer cursor.
   cursor: default;
 }
 /*
-Dark theme (used by the superadmin console via per-page colorMode).
+Dark theme (dashboard, superadmin and 3D editor via per-page colorMode).
+Neutral black/gray instead of the blue-tinted slate palette.
 Must come after :root so it overrides the light --ui-bg above.
 */
 .dark {
-  --ui-primary: var(--color-perlink-cyan);
-  --ui-secondary: var(--color-perlink-blue);
-  --ui-bg: var(--ui-color-neutral-950);
-  --ui-bg-muted: var(--ui-color-neutral-900);
-  --ui-bg-elevated: var(--ui-color-neutral-900);
-  --ui-bg-accented: var(--ui-color-neutral-800);
-  --ui-border: color-mix(in oklab, var(--ui-color-neutral-800) 80%, transparent);
+  --ui-primary: var(--color-perlink-blue);
+  --ui-secondary: var(--color-perlink-cyan);
+
+  --ui-bg: #0a0a0a;
+  --ui-bg-muted: #111111;
+  --ui-bg-elevated: #161616;
+  --ui-bg-accented: #222222;
+  --ui-bg-inverted: #fafafa;
+
+  --ui-text-dimmed: #6b6b6b;
+  --ui-text-muted: #a1a1a1;
+  --ui-text-toned: #c8c8c8;
+  --ui-text: #e5e5e5;
+  --ui-text-highlighted: #fafafa;
+  --ui-text-inverted: #0a0a0a;
+
+  --ui-border: rgb(255 255 255 / 0.08);
+  --ui-border-muted: rgb(255 255 255 / 0.05);
+  --ui-border-accented: rgb(255 255 255 / 0.14);
+  --ui-border-inverted: #fafafa;
+
+  /* Neutral gray scale for component colors (badges, chips, tooltips) */
+  --ui-color-neutral-50: #fafafa;
+  --ui-color-neutral-100: #f5f5f5;
+  --ui-color-neutral-200: #e5e5e5;
+  --ui-color-neutral-300: #d4d4d4;
+  --ui-color-neutral-400: #a3a3a3;
+  --ui-color-neutral-500: #737373;
+  --ui-color-neutral-600: #525252;
+  --ui-color-neutral-700: #404040;
+  --ui-color-neutral-800: #262626;
+  --ui-color-neutral-900: #171717;
+  --ui-color-neutral-950: #0a0a0a;
 }

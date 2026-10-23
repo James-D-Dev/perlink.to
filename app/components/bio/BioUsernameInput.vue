@@ -1,9 +1,9 @@
 <template>
   <UCard class="mt-8">
     <div class="space-y-4">
-      <h3 class="font-semibold text-gray-900">Choose Your Username</h3>
+      <h3 class="font-semibold text-gray-900 dark:text-white">Choose Your Username</h3>
       <div class="flex items-center gap-2">
-        <span class="text-gray-500">perlink.to/</span>
+        <span class="text-gray-500 dark:text-neutral-400">perlink.to/</span>
         <UInput
           :model-value="username"
           placeholder="yourname"

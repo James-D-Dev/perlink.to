@@ -176,14 +176,14 @@
                     <div
                       v-for="tag in tagsWithSearch"
                       :key="tag.id"
-                      class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded"
+                      class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 p-2 rounded"
                       @click="tag.selected = !tag.selected"
                     >
                       <UCheckbox :model-value="tag.selected" />
                       <span>{{ tag.id }}</span>
                     </div>
                   </div>
-                  <div v-else class="text-sm text-gray-500">
+                  <div v-else class="text-sm text-gray-500 dark:text-neutral-400">
                     Press Enter to create new tag
                   </div>
                 </div>
@@ -205,7 +205,7 @@
           <UCard
             v-for="i in 5"
             :key="i"
-            class="bg-white"
+            class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl"
             :ui="{ body: 'p-4 sm:p-4' }"
           >
             <div class="flex md:flex-row flex-col gap-3 items-start justify-between">
@@ -340,14 +340,14 @@
                                 <div
                                   v-for="tag in tagsWithSearch"
                                   :key="tag.id"
-                                  class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded"
+                                  class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 p-2 rounded"
                                   @click="tag.selected = !tag.selected"
                                 >
                                   <UCheckbox :model-value="tag.selected" />
                                   <span>{{ tag.id }}</span>
                                 </div>
                               </div>
-                              <div v-else class="text-sm text-gray-500">
+                              <div v-else class="text-sm text-gray-500 dark:text-neutral-400">
                                 Press Enter to create new tag
                               </div>
                             </div>
@@ -443,6 +443,7 @@ import type {
 } from "../../../../types/response";
 
 definePageMeta({
+  colorMode: "dark",
   layout: "admin",
   middleware: "auth",
   ssr: false,

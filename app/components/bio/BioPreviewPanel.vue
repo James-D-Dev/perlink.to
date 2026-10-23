@@ -2,9 +2,9 @@
   <div class="space-y-4">
     <!-- Preview Header -->
     <div class="flex items-center justify-between">
-      <h3 class="font-semibold text-gray-900">Preview</h3>
+      <h3 class="font-semibold text-gray-900 dark:text-white">Preview</h3>
       <div class="flex items-center gap-2">
-        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Mobile</span>
+        <span class="text-xs text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-white/[0.06] px-2 py-1 rounded">Mobile</span>
       </div>
     </div>
 
@@ -22,7 +22,7 @@
       <div class="flex items-center gap-3">
         <UIcon name="i-lucide-globe" class="w-5 h-5 text-green-500" />
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 truncate">
+          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
             perlink.to/{{ username }}
           </p>
         </div>

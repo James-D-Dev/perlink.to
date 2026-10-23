@@ -3,15 +3,15 @@
     <!-- Period Selector -->
     <div class="flex items-center justify-between">
       <!-- <h3 class="text-lg font-semibold">Analytics</h3> -->
-      <div class="flex gap-1 bg-gray-100 rounded-lg p-1">
+      <div class="flex gap-1 bg-gray-100 dark:bg-white/[0.06] rounded-lg p-1">
         <button
           v-for="p in periods"
           :key="p.value"
           class="px-3 py-1 text-sm rounded-md transition-colors"
           :class="
             period === p.value
-              ? 'bg-white shadow-sm font-medium text-gray-900'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl shadow-sm font-medium text-gray-900 dark:text-white'
+              : 'text-gray-500 dark:text-neutral-400 hover:text-gray-700'
           "
           @click="period = p.value"
         >
@@ -25,7 +25,7 @@
       <div
         v-for="card in overviewCards"
         :key="card.label"
-        class="bg-white rounded-xl p-4 border border-gray-200"
+        class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 border border-gray-200 dark:border-white/10"
       >
         <div class="flex items-center gap-2 mb-2">
           <div
@@ -43,7 +43,7 @@
     </div>
 
     <!-- Timeseries Chart -->
-    <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+    <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
       <h4 class="text-sm font-medium mb-4">Clicks over time</h4>
       <div v-if="timeseries.length === 0" class="text-center py-8 text-muted-foreground text-sm">
         No data for this period
@@ -57,7 +57,7 @@
           <span class="text-xs text-muted-foreground w-16 shrink-0">
             {{ formatChartDate(point.date) }}
           </span>
-          <div class="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
+          <div class="flex-1 h-6 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
             <div
               class="h-full bg-perlink-blue rounded-full transition-all"
               :style="{ width: getBarWidth(point.clicks) + '%' }"
@@ -73,7 +73,7 @@
     <!-- Breakdown Panels -->
     <div class="grid md:grid-cols-2 gap-4">
       <!-- Referrers -->
-      <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+      <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
         <h4 class="text-sm font-medium mb-4">Top Referrers</h4>
         <div v-if="referrers.length === 0" class="text-center py-6 text-muted-foreground text-sm">
           No data
@@ -93,7 +93,7 @@
                   >{{ item.clicks }} ({{ item.percentage }}%)</span
                 >
               </div>
-              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
                 <div
                   class="h-full bg-perlink-cyan rounded-full"
                   :style="{ width: item.percentage + '%' }"
@@ -105,7 +105,7 @@
       </div>
 
       <!-- Devices -->
-      <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+      <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
         <h4 class="text-sm font-medium mb-4">Devices</h4>
         <div v-if="devices.length === 0" class="text-center py-6 text-muted-foreground text-sm">
           No data
@@ -125,7 +125,7 @@
                   >{{ item.clicks }} ({{ item.percentage }}%)</span
                 >
               </div>
-              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
                 <div
                   class="h-full bg-green-400 rounded-full"
                   :style="{ width: item.percentage + '%' }"
@@ -140,7 +140,7 @@
       <FeaturesCountryMap :countries="countries" />
 
       <!-- Browsers -->
-      <div class="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+      <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
         <h4 class="text-sm font-medium mb-4">Browsers</h4>
         <div v-if="browsers.length === 0" class="text-center py-6 text-muted-foreground text-sm">
           No data
@@ -160,7 +160,7 @@
                   >{{ item.clicks }} ({{ item.percentage }}%)</span
                 >
               </div>
-              <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
                 <div
                   class="h-full bg-purple-400 rounded-full"
                   :style="{ width: item.percentage + '%' }"

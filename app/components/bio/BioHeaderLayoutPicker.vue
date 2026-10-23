@@ -19,11 +19,11 @@
         class="flex flex-col items-center gap-1.5 p-1 rounded-xl border-2 transition-all"
         :class="(modelValue ?? 'centered') === opt.value
           ? 'border-primary-500 bg-primary-50'
-          : 'border-gray-200 hover:border-gray-400 bg-white'"
+          : 'border-gray-200 dark:border-white/10 hover:border-gray-400 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl'"
         @click="emit('update:modelValue', opt.value)"
       >
         <!-- Preview -->
-        <div class="w-full rounded-lg overflow-hidden border border-gray-300 bg-gray-50" style="aspect-ratio: 3/3">
+        <div class="w-full rounded-lg overflow-hidden border border-gray-300 dark:border-white/15 bg-gray-50 dark:bg-white/[0.03]" style="aspect-ratio: 3/3">
 
           <!-- centered -->
           <template v-if="opt.value === 'centered'">
@@ -56,7 +56,7 @@
               <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 40%, transparent 100%)" />
               <div class="absolute bottom-0 left-0 right-0 flex flex-col items-center pb-[8%] gap-[5%]">
                 <span v-if="title" class="font-semibold text-white/90 truncate max-w-[85%]" style="font-size: 58%">{{ title }}</span>
-                <div v-else class="w-[50%] rounded-full bg-white/70" style="height: 4px" />
+                <div v-else class="w-[50%] rounded-full bg-white/70 dark:bg-white/[0.04] dark:backdrop-blur-xl" style="height: 4px" />
                 <span v-if="bio" class="text-white/70 truncate max-w-[85%]" style="font-size: 56%">{{ bio }}</span>
               </div>
             </div>
@@ -68,7 +68,7 @@
               <img :src="avatarSrc" class="absolute inset-0 w-full h-full object-cover" @error="onAvatarError" />
               <div class="absolute inset-0 flex flex-col items-center justify-center gap-[5%]" style="background: rgba(0,0,0,0.42)">
                 <span v-if="title" class="font-semibold text-white/90 truncate max-w-[85%]" style="font-size: 58%">{{ title }}</span>
-                <div v-else class="w-[50%] rounded-full bg-white/70" style="height: 4px" />
+                <div v-else class="w-[50%] rounded-full bg-white/70 dark:bg-white/[0.04] dark:backdrop-blur-xl" style="height: 4px" />
                 <span v-if="bio" class="text-white/70 truncate max-w-[85%]" style="font-size: 56%">{{ bio }}</span>
               </div>
             </div>
@@ -105,7 +105,7 @@
           </template>
 
         </div>
-        <span class="text-[10px] font-medium text-gray-600 leading-tight text-center">{{ opt.label }}</span>
+        <span class="text-[10px] font-medium text-gray-600 dark:text-neutral-300 leading-tight text-center">{{ opt.label }}</span>
       </button>
     </div>
 
@@ -113,7 +113,7 @@
     <template v-if="activeTab === 'banner'">
       <input ref="bannerInputRef" type="file" accept="image/*" class="hidden" @change="onBannerFileChange" />
       <div
-        class="w-full rounded-xl border border-dashed border-gray-300 bg-white flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-gray-400 transition-colors overflow-hidden"
+        class="w-full rounded-xl border border-dashed border-gray-300 dark:border-white/15 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-gray-400 transition-colors overflow-hidden"
         style="min-height: 120px"
         @click="bannerInputRef?.click()"
       >
@@ -129,7 +129,7 @@
           </div>
         </template>
         <template v-else>
-          <p class="text-sm text-gray-400">Add banner image</p>
+          <p class="text-sm text-gray-400 dark:text-neutral-500">Add banner image</p>
           <UButton color="neutral" size="sm" icon="i-lucide-upload" :loading="bannerUploading" @click.stop="bannerInputRef?.click()">
             Upload your image
           </UButton>

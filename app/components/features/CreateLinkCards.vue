@@ -28,7 +28,7 @@
         {{ selectedDomain === 's.perlink.to' ? 'Shorten your URL at' : 'Your bio page will be at' }}
         <strong class="text-primary">{{ selectedDomain }}/{{ activeSlug }}</strong>
         <button
-          class="ml-2 text-xs text-gray-400 hover:text-gray-600 underline"
+          class="ml-2 text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300 underline"
           @click="activeSlug = ''"
         >
           change
@@ -42,7 +42,7 @@
       <UCard
         v-if="selectedDomain === 'perlink.to'"
         variant="solid"
-        class="bg-white border border-gray-200 rounded-xl hover:border-secondary/50 transition-colors"
+        class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-xl hover:border-secondary/50 transition-colors"
       >
         <div class="flex items-start gap-4">
           <div class="flex-1">
@@ -72,7 +72,7 @@
       <UCard
         v-if="selectedDomain === 's.perlink.to'"
         variant="solid"
-        class="bg-white border border-gray-200 rounded-xl hover:border-secondary/50 transition-colors"
+        class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-xl hover:border-secondary/50 transition-colors"
       >
         <div class="flex items-start gap-4">
           <div class="flex-1">

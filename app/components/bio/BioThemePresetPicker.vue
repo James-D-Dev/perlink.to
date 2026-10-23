@@ -42,9 +42,9 @@
             </div>
 
             <!-- Label -->
-            <div class="px-2 py-1.5 bg-white">
-              <p class="text-xs font-semibold text-gray-900 truncate">{{ preset.name }}</p>
-              <p class="text-[10px] text-gray-400 truncate">{{ preset.description }}</p>
+            <div class="px-2 py-1.5 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl">
+              <p class="text-xs font-semibold text-gray-900 dark:text-white truncate">{{ preset.name }}</p>
+              <p class="text-[10px] text-gray-400 dark:text-neutral-500 truncate">{{ preset.description }}</p>
             </div>
 
             <!-- Selected check -->
