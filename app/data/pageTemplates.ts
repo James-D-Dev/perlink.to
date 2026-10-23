@@ -16,9 +16,21 @@ export interface PageTemplateContent {
   room: RoomConfig
 }
 
+export type TemplateCategory = 'personal' | 'food' | 'hospitality' | 'business' | 'creative' | 'events'
+
+export const TEMPLATE_CATEGORIES: { id: TemplateCategory; label: string; icon: string }[] = [
+  { id: 'personal', label: 'Personal', icon: 'i-lucide-user-round' },
+  { id: 'food', label: 'Food & drink', icon: 'i-lucide-utensils' },
+  { id: 'hospitality', label: 'Hotel & travel', icon: 'i-lucide-bed-double' },
+  { id: 'business', label: 'Business', icon: 'i-lucide-briefcase' },
+  { id: 'creative', label: 'Creative', icon: 'i-lucide-palette' },
+  { id: 'events', label: 'Events', icon: 'i-lucide-party-popper' },
+]
+
 export interface PageTemplate {
   id: string
   name: string
+  category: TemplateCategory
   description: string
   icon: string
   /** Swatch colors for the picker card */
@@ -67,6 +79,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
   {
     id: 'personal',
     name: 'Personal portfolio',
+    category: 'personal',
     description: 'Introduce yourself, your work and where to find you.',
     icon: 'i-lucide-user-round',
     preview: { bg: '#FFFFFF', accent: '#7C3AED' },
@@ -98,6 +111,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
   {
     id: 'restaurant',
     name: 'Restaurant menu',
+    category: 'food',
     description: 'Menu with prices, opening hours and table booking.',
     icon: 'i-lucide-utensils',
     preview: { bg: '#FDFAF6', accent: '#D97706' },
@@ -144,6 +158,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
   {
     id: 'hotel',
     name: 'Hotel & homestay',
+    category: 'hospitality',
     description: 'Rooms with nightly prices, contact and booking.',
     icon: 'i-lucide-bed-double',
     preview: { bg: '#F5F0E8', accent: '#78716C' },
@@ -187,6 +202,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
   {
     id: 'cafe',
     name: 'Café & shop',
+    category: 'food',
     description: 'Drinks or products, opening hours and where to find you.',
     icon: 'i-lucide-coffee',
     preview: { bg: '#FFF1F2', accent: '#F43F5E' },
@@ -231,6 +247,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
   {
     id: 'creator',
     name: 'Creator & artist',
+    category: 'creative',
     description: 'Show your work as a gallery with links to shop or commission.',
     icon: 'i-lucide-palette',
     preview: { bg: '#1E1B4B', accent: '#A855F7' },
@@ -257,6 +274,118 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         { type: 'floor-lamp', position: [2.4, 0, -2.3], rotation: 0 },
         { type: 'plant', position: [-2.5, 0, 2.4], rotation: 0 },
         { type: 'rug', position: [0.4, 0, 0.6], rotation: 0, color: '#6d597a' },
+      ]),
+    }),
+  },
+  {
+    id: 'link-in-bio',
+    name: 'Link in bio',
+    category: 'personal',
+    description: 'A clean, dark page with your socials and top links.',
+    icon: 'i-lucide-link',
+    preview: { bg: '#0B0B0F', accent: '#8B5CF6' },
+    build: () => ({
+      title: 'Your Name',
+      bio: 'Creator · sharing what I make and love.',
+      themeConfig: theme('dark-obsidian'),
+      blocks: withIndex([
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'threads') } },
+        { name: 'links', data: { items: links(['Latest video', ''], ['My newsletter', ''], ['Shop my picks', ''], ['Work with me', '']) } },
+      ] as Omit<BioBlock, 'index' | 'hidden'>[]),
+      room: room({ wallColor: '#1f1f24', floorColor: '#3a3a42', floorMaterial: 'concrete', trimColor: '#55555f' }, [
+        { type: 'neon-sign', position: [0.6, 1.9, -3], rotation: 0, wall: 'back', color: '#8b5cf6', link: { label: 'Latest video', url: '' } },
+        { type: 'string-lights', position: [-3, 2.5, 0], rotation: 0, wall: 'left', color: '#c4b5fd' },
+        { type: 'desk', position: [1.4, 0, -2.6], rotation: 0, color: '#2f2f36' },
+        { type: 'chair', position: [1.4, 0, -1.8], rotation: 180 },
+        { type: 'laptop', position: [1.25, DESK_TOP, -2.6], rotation: 0 },
+        { type: 'desk-lamp', position: [1.9, DESK_TOP, -2.7], rotation: 0, color: '#8b5cf6' },
+        { type: 'sofa', position: [-1.6, 0, 0.6], rotation: 90, color: '#3d3d46' },
+        { type: 'plant', position: [2.5, 0, 0.8], rotation: 0 },
+        { type: 'rug', position: [0, 0, 0.4], rotation: 0, color: '#4c4c58' },
+      ]),
+    }),
+  },
+  {
+    id: 'services',
+    name: 'Freelancer & services',
+    category: 'business',
+    description: 'Services with prices, booking and opening hours.',
+    icon: 'i-lucide-briefcase',
+    preview: { bg: '#F8FAFC', accent: '#0F172A' },
+    build: () => ({
+      title: 'Your Studio',
+      bio: 'Photography, design and video for small businesses.',
+      themeConfig: theme('classic-slate'),
+      blocks: withIndex([
+        {
+          name: 'menu',
+          data: {
+            title: 'Services',
+            currency: '$',
+            layout: 'cards',
+            sections: menu([
+              { name: '', items: [['Brand photo shoot', '250', 'Half day, 30 edited photos', 'Popular'], ['Logo & identity', '600', 'Logo, colors, typography'], ['Short promo video', '450', '30-60 second edit']] },
+            ]),
+          },
+        },
+        { name: 'contact', data: { title: 'Book a call', email: '', phone: '', bookingLabel: 'Book a free call', bookingUrl: '' } },
+        { name: 'hours', data: { title: 'Availability', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '09:00', close: '18:00', closed: d.day === 0 })), note: 'Replies within one business day.' } },
+        { name: 'social', data: { links: social('linkedin', 'instagram', 'website') } },
+      ] as Omit<BioBlock, 'index' | 'hidden'>[]),
+      room: room({ wallColor: '#e7e5e4', floorColor: '#a8a29e', floorMaterial: 'tile', trimColor: '#f5f5f4' }, [
+        { type: 'window', position: [0.8, 1.6, -3], rotation: 0, wall: 'back' },
+        { type: 'desk', position: [0.8, 0, -2.6], rotation: 0 },
+        { type: 'chair', position: [0.8, 0, -1.8], rotation: 180 },
+        { type: 'laptop', position: [0.65, DESK_TOP, -2.6], rotation: 0, link: { label: 'Book a free call', url: '' } },
+        { type: 'bookshelf', position: [-1.8, 0, -2.8], rotation: 0 },
+        { type: 'picture-frame', position: [-3, 1.7, -0.4], rotation: 0, wall: 'left', color: '#0f172a' },
+        { type: 'wall-clock', position: [2.2, 2.2, -3], rotation: 0, wall: 'back' },
+        { type: 'sofa', position: [1.6, 0, 1.6], rotation: 270, color: '#64748b' },
+        { type: 'coffee-table', position: [0.4, 0, 1.6], rotation: 0 },
+        { type: 'mug', position: [0.4, COFFEE_TABLE_TOP, 1.6], rotation: 0 },
+        { type: 'plant', position: [-2.5, 0, 2.4], rotation: 0 },
+        { type: 'floor-lamp', position: [-2.5, 0, 0.8], rotation: 0 },
+      ]),
+    }),
+  },
+  {
+    id: 'event',
+    name: 'Wedding & event',
+    category: 'events',
+    description: 'Schedule, venue, RSVP and photo gallery for your big day.',
+    icon: 'i-lucide-heart',
+    preview: { bg: '#FFF7ED', accent: '#F97316' },
+    build: () => ({
+      title: 'Anna & Minh',
+      bio: 'We’re getting married! Saturday, 14 June 2025.',
+      themeConfig: theme('gradient-sunset'),
+      blocks: withIndex([
+        {
+          name: 'menu',
+          data: {
+            title: 'Schedule',
+            currency: '',
+            layout: 'list',
+            sections: menu([
+              { name: 'The day', items: [['Ceremony', '15:00', 'Garden terrace'], ['Cocktails', '16:30'], ['Dinner & party', '18:00', 'Grand ballroom']] },
+            ]),
+          },
+        },
+        { name: 'contact', data: { title: 'Venue', address: '', bookingLabel: 'RSVP', bookingUrl: '' } },
+        { name: 'image-album', data: { images: [], layout: 'grid' } },
+      ] as Omit<BioBlock, 'index' | 'hidden'>[]),
+      room: room({ wallColor: '#fde2e4', floorColor: '#e8c4a0', floorMaterial: 'wood', trimColor: '#ffffff' }, [
+        { type: 'string-lights', position: [0, 2.6, -3], rotation: 0, wall: 'back', color: '#ffe8a3' },
+        { type: 'string-lights', position: [-3, 2.6, 0], rotation: 0, wall: 'left', color: '#ffe8a3' },
+        { type: 'picture-frame', position: [0, 1.6, -3], rotation: 0, wall: 'back', color: '#f97316', link: { label: 'RSVP', url: '' } },
+        { type: 'coffee-table', position: [0, 0, -0.6], rotation: 0, color: '#fff7ed' },
+        { type: 'candle', position: [-0.15, COFFEE_TABLE_TOP, -0.6], rotation: 0 },
+        { type: 'candle', position: [0.15, COFFEE_TABLE_TOP, -0.55], rotation: 0 },
+        { type: 'chair', position: [-0.8, 0, -0.6], rotation: 90, color: '#f5f5f2' },
+        { type: 'chair', position: [0.8, 0, -0.6], rotation: 270, color: '#f5f5f2' },
+        { type: 'plant', position: [-2.5, 0, -2.5], rotation: 0, color: '#6a994e' },
+        { type: 'plant', position: [2.5, 0, -2.5], rotation: 0, color: '#6a994e' },
+        { type: 'rug', position: [0, 0, 0.6], rotation: 0, color: '#f4acb7' },
       ]),
     }),
   },
