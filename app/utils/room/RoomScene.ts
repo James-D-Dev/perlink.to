@@ -15,6 +15,8 @@ export interface RoomSceneOptions {
   editable: boolean
   /** Small, non-interactive preview: low frame rate and quality */
   preview?: boolean
+  /** Opening shot: start far away with the land tiny, then fly in to the widest zoom */
+  intro?: boolean
   onSelect?: (id: string | null) => void
   onObjectChange?: (id: string, patch: ObjectPatch) => void
   onHover?: (id: string | null, x: number, y: number) => void
@@ -38,6 +40,13 @@ const QUALITY_LEVELS = [
   { pixelRatio: 1.25, shadowSize: 1024, shadows: true },
   { pixelRatio: 1, shadowSize: 1024, shadows: true },
 ]
+/** Widest zoom (camera distance from the room) */
+const MAX_ZOOM_DISTANCE = 30
+/** Intro: start distance, pause before flying, and flight time (ms) */
+const INTRO_DISTANCE = 1400
+const INTRO_HOLD = 700
+const INTRO_DURATION = 3200
+
 /** Only this many lamps cast real light; the rest just glow (each light costs shading on every surface) */
 const MAX_POINT_LIGHTS = 8
 
@@ -92,6 +101,8 @@ export class RoomScene {
   private daylightOverride: DaylightState | null = null
   /** Camera glide toward a focused object (target point and camera position) */
   private cameraGlide: { target: THREE.Vector3; position: THREE.Vector3 } | null = null
+  /** Fly-in opening shot (live page); start is set on the first frame */
+  private intro: { start: number | null } | null = null
   /** Daylight actually shown; eases toward the target for smooth day/night switches */
   private shownDaylight: number | null = null
   private skyColor = new THREE.Color()
@@ -138,12 +149,18 @@ export class RoomScene {
     this.controls.enableDamping = true
     this.controls.dampingFactor = 0.08
     this.controls.minDistance = 3
-    this.controls.maxDistance = 30
+    this.controls.maxDistance = MAX_ZOOM_DISTANCE
     this.controls.minPolarAngle = 0.25
     this.controls.maxPolarAngle = 1.45
     // Keep the camera on the open side of the room so the walls stay behind
     this.controls.minAzimuthAngle = 0.05
     this.controls.maxAzimuthAngle = Math.PI / 2 - 0.05
+    if (options.intro && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      this.intro = { start: null }
+      this.controls.enabled = false
+      this.controls.maxDistance = Infinity
+      this.placeIntroCamera(0)
+    }
     // Left drag orbits, right drag / two fingers pan, wheel / pinch zoom
     this.controls.enablePan = true
     this.controls.screenSpacePanning = true
@@ -622,6 +639,35 @@ export class RoomScene {
     this.markActive()
   }
 
+  /**
+   * Opening shot progress 0..1: the camera starts so far away that the land is
+   * a speck, then flies in along the default view direction (swinging around a
+   * little) until it reaches the widest zoom, where it stops.
+   */
+  private placeIntroCamera(progress: number) {
+    const ease = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2
+    // Interpolate distance in log space so the approach feels like a steady flight
+    const distance = Math.exp(THREE.MathUtils.lerp(Math.log(INTRO_DISTANCE), Math.log(MAX_ZOOM_DISTANCE), ease))
+    const azimuth = Math.PI / 4 + 0.5 * (1 - ease)
+    const polar = 1.0 - 0.25 * (1 - ease)
+    this.controls.target.set(0, 1, 0)
+    this.camera.position.setFromSphericalCoords(distance, polar, azimuth).add(this.controls.target)
+    this.camera.lookAt(this.controls.target)
+  }
+
+  private updateIntro(now: number) {
+    if (!this.intro) return
+    // Hold on the distant view for a moment so the land's models can load
+    this.intro.start ??= now + INTRO_HOLD
+    const progress = THREE.MathUtils.clamp((now - this.intro.start) / INTRO_DURATION, 0, 1)
+    this.placeIntroCamera(progress)
+    if (progress >= 1) {
+      this.intro = null
+      this.controls.maxDistance = MAX_ZOOM_DISTANCE
+      this.controls.enabled = true
+    }
+  }
+
   /** Something changed: render at full frame rate for a moment */
   private markActive = () => {
     this.activeUntil = performance.now() + 1500
@@ -662,7 +708,7 @@ export class RoomScene {
     this.frame = requestAnimationFrame(this.animate)
     if (!this.onScreen) return
     // 60 fps while interacting, 30 fps for ambient motion, 15 fps for previews
-    const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active
+    const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active || !!this.intro
     const fps = this.options.preview ? 15 : active ? 60 : 30
     const target = 1000 / fps
     const interval = now - this.lastRender
@@ -687,8 +733,30 @@ export class RoomScene {
       this.camera.position.lerp(this.cameraGlide.position, 0.12)
       if (this.controls.target.distanceTo(this.cameraGlide.target) < 0.01) this.cameraGlide = null
     }
-    this.controls.update()
+    if (this.intro) this.updateIntro(now)
+    else this.controls.update()
+    this.keepSkyAroundCamera()
     this.renderer.render(this.scene, this.camera)
+  }
+
+  /**
+   * The sky dome and stars travel with the camera like a skybox, and fog and
+   * the far plane stretch when the camera is far out (the intro's start).
+   */
+  private keepSkyAroundCamera() {
+    this.skyDome.mesh.position.copy(this.camera.position)
+    this.stars.points.position.copy(this.camera.position)
+    const extra = Math.max(0, this.camera.position.distanceTo(this.controls.target) - MAX_ZOOM_DISTANCE)
+    const fog = this.scene.fog as THREE.Fog | null
+    if (fog) {
+      fog.near = 30 + extra
+      fog.far = 90 + extra
+    }
+    const far = 200 + extra
+    if (this.camera.far !== far) {
+      this.camera.far = far
+      this.camera.updateProjectionMatrix()
+    }
   }
 
   private applyDaylight({ daylight: target, isDay, arc }: DaylightState) {

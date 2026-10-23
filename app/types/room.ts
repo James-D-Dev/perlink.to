@@ -67,6 +67,8 @@ export interface RoomMusic {
   trackId: string | null;
   /** 0-1 */
   volume: number;
+  /** Start playing when the room opens (or on the visitor's first interaction if the browser blocks it) */
+  autoplay?: boolean;
 }
 
 export interface RoomConfig {
@@ -119,7 +121,7 @@ export function normalizeRoom(room: Partial<RoomConfig> | null | undefined): Roo
     version: 1,
     style: { ...DEFAULT_ROOM_STYLE, ...(room.style || {}) },
     environment: { ...DEFAULT_ROOM_ENVIRONMENT, ...(room.environment || {}) },
-    music: { trackId: room.music?.trackId ?? null, volume: room.music?.volume ?? 0.5 },
+    music: { trackId: room.music?.trackId ?? null, volume: room.music?.volume ?? 0.5, autoplay: room.music?.autoplay ?? false },
     land: room.land ?? 'island',
     objects: room.objects
       .filter(o => o && typeof o.type === 'string' && Array.isArray(o.position))

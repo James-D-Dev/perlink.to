@@ -1,56 +1,60 @@
 <template>
-  <div class="fixed inset-0 bg-slate-900">
+  <div class="fixed inset-0 bg-slate-900 [touch-action:pan-x_pan-y] max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base">
     <RoomCanvas
       :room="room"
+      intro
       :force-mode="forceMode"
       @hover="onHover"
       @activate="onActivate"
     />
 
-    <!-- Profile -->
-    <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4">
-      <div class="pointer-events-auto flex max-w-sm items-center gap-3 rounded-2xl bg-white/80 p-3 pr-4 shadow-lg backdrop-blur-md">
-        <img
-          v-if="avatarUrl"
-          :src="avatarUrl"
-          :alt="title"
-          class="size-12 shrink-0 rounded-full object-cover"
+    <!-- Profile (tap to switch to the 2D page) + controls -->
+    <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-4">
+      <UTooltip text="Switch to 2D page" :content="{ side: 'bottom', align: 'start' }">
+        <button
+          type="button"
+          class="group pointer-events-auto flex min-w-0 max-w-[16rem] items-center gap-2.5 rounded-2xl bg-black/30 p-1.5 pr-3 text-left text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/40"
+          :class="{ 'py-2 pl-3': !avatarUrl }"
+          aria-label="Switch to 2D page"
+          @click="emit('switch2d')"
         >
-        <div class="min-w-0">
-          <h1 class="truncate font-semibold text-gray-900">{{ title }}</h1>
-          <p v-if="bio" class="line-clamp-2 text-xs text-gray-600">{{ bio }}</p>
-        </div>
-      </div>
+          <img
+            v-if="avatarUrl"
+            :src="avatarUrl"
+            :alt="title"
+            class="size-9 shrink-0 rounded-full object-cover ring-1 ring-white/20"
+          >
+          <div class="min-w-0 flex-1">
+            <h1 class="truncate text-sm font-semibold">{{ title }}</h1>
+            <p v-if="bio" class="truncate text-[11px] text-white/70">{{ bio }}</p>
+          </div>
+          <UIcon name="i-lucide-layout-list" class="size-4 shrink-0 text-white/60 transition group-hover:text-white" />
+        </button>
+      </UTooltip>
 
       <div class="pointer-events-auto flex items-center gap-2">
         <UTooltip v-if="track" :text="musicOn ? 'Mute music' : `Play music: ${track.title}`">
-          <UButton
-            class="shadow-lg"
-            :color="musicOn ? 'primary' : 'neutral'"
-            variant="solid"
-            :icon="musicOn ? 'i-lucide-volume-2' : 'i-lucide-volume-x'"
+          <button
+            type="button"
+            class="flex size-10 items-center justify-center rounded-full shadow-lg ring-1 backdrop-blur-xl transition"
+            :class="musicOn ? 'bg-white/25 text-white ring-white/30' : 'bg-black/30 text-white/80 ring-white/15 hover:bg-black/40'"
             :aria-label="musicOn ? 'Mute music' : 'Play music'"
+            data-music-toggle
             @click="toggleMusic"
-          />
+          >
+            <UIcon :name="musicOn ? 'i-lucide-volume-2' : 'i-lucide-volume-x'" class="size-5" />
+          </button>
         </UTooltip>
         <UTooltip :text="isDayShown ? 'Switch to night' : 'Switch to day'">
-          <UButton
-            class="shadow-lg"
-            color="neutral"
-            variant="solid"
-            :icon="isDayShown ? 'i-lucide-moon' : 'i-lucide-sun'"
+          <button
+            type="button"
+            class="flex size-10 items-center justify-center rounded-full bg-black/30 text-white/80 shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/40"
             :aria-label="isDayShown ? 'Switch to night' : 'Switch to day'"
             @click="toggleDayNight"
-          />
+          >
+            <UIcon :name="isDayShown ? 'i-lucide-moon' : 'i-lucide-sun'" class="size-5" />
+          </button>
         </UTooltip>
-        <UButton
-          class="shadow-lg"
-          color="neutral"
-          variant="solid"
-          icon="i-lucide-layout-list"
-          label="2D page"
-          @click="emit('switch2d')"
-        />
       </div>
     </div>
 
@@ -96,6 +100,9 @@ import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import { getDaylight } from '~/utils/room/daylight'
 import { MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 
+// Pinch zooms the camera, never the page
+usePreventPageZoom()
+
 const props = defineProps<{
   room: RoomConfig
   title: string
@@ -122,7 +129,7 @@ function toggleDayNight() {
   forceMode.value = isDayShown.value ? 'night' : 'day'
 }
 
-// Background music: browsers block autoplay with sound, so visitors turn it on
+// Background music: off until the visitor turns it on, unless the owner enabled autoplay
 const track = computed(() => (ROOM_MUSIC_ENABLED && props.room.music?.trackId ? MUSIC_BY_ID[props.room.music.trackId] : undefined))
 const musicOn = ref(false)
 let audio: HTMLAudioElement | null = null
@@ -143,7 +150,30 @@ function toggleMusic() {
   audio.play().then(() => (musicOn.value = true)).catch(() => (musicOn.value = false))
 }
 
-onBeforeUnmount(() => audio?.pause())
+// Browsers block sound before the first interaction, so autoplay waits for it if needed
+const unlockEvents = ['pointerdown', 'keydown', 'touchstart'] as const
+function startOnInteraction(event: Event) {
+  removeUnlock()
+  // The music button handles its own click
+  if ((event.target as Element | null)?.closest?.('[data-music-toggle]')) return
+  if (!musicOn.value) toggleMusic()
+}
+function removeUnlock() {
+  for (const event of unlockEvents) window.removeEventListener(event, startOnInteraction, true)
+}
+
+onMounted(() => {
+  if (!track.value || !props.room.music?.autoplay) return
+  toggleMusic()
+  // If play() was blocked, start on the first tap, click or key press instead
+  for (const event of unlockEvents) window.addEventListener(event, startOnInteraction, true)
+  audio?.addEventListener('playing', removeUnlock, { once: true })
+})
+
+onBeforeUnmount(() => {
+  removeUnlock()
+  audio?.pause()
+})
 
 const linkedObjects = computed(() => props.room.objects.filter(o => o.link?.url))
 

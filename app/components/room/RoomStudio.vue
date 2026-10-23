@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 select-none overflow-hidden bg-slate-900">
+  <div class="fixed inset-0 select-none overflow-hidden bg-slate-900 [touch-action:pan-x_pan-y] max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base">
     <!-- Scene -->
     <div class="absolute inset-0">
       <RoomCanvas
@@ -391,8 +391,15 @@
                 <UIcon name="i-lucide-volume-2" class="size-4 text-muted" />
                 <USlider :model-value="Math.round(musicVolume * 100)" :min="0" :max="100" :step="5" class="flex-1" @update:model-value="setVolume(Number($event) / 100)" />
               </div>
+              <USwitch
+                :model-value="musicAutoplay"
+                :disabled="!musicTrackId"
+                size="sm"
+                label="Autoplay"
+                @update:model-value="setMusic({ autoplay: $event })"
+              />
               <p class="text-[11px] leading-snug text-dimmed">
-                Visitors start muted and can turn the music on. Music from
+                {{ musicAutoplay ? 'Starts when visitors open the room, or on their first tap if the browser blocks sound.' : 'Visitors start muted and can turn the music on.' }} Music from
                 <a href="https://pixabay.com/music/" target="_blank" rel="noopener noreferrer" class="underline hover:text-default">Pixabay</a>.
               </p>
             </div>
@@ -480,6 +487,9 @@ import { getDaylight } from '~/utils/room/daylight'
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
 import { ROOM_MUSIC, MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 import { LANDS } from '~/utils/room/lands'
+
+// Pinch zooms the camera, never the page
+usePreventPageZoom()
 
 defineProps<{
   saving?: boolean
@@ -668,13 +678,14 @@ function selectTab(tab: Tab) {
 
 const musicTrackId = computed(() => room.value.music?.trackId ?? null)
 const musicVolume = computed(() => room.value.music?.volume ?? 0.5)
+const musicAutoplay = computed(() => room.value.music?.autoplay ?? false)
 const previewingId = ref<string | null>(null)
 const previewPlaying = ref(false)
 const missingTracks = reactive(new Set<string>())
 let previewAudio: HTMLAudioElement | null = null
 
 function setMusic(patch: Partial<NonNullable<RoomConfig['music']>>) {
-  room.value = { ...room.value, music: { trackId: musicTrackId.value, volume: musicVolume.value, ...patch } }
+  room.value = { ...room.value, music: { trackId: musicTrackId.value, volume: musicVolume.value, autoplay: musicAutoplay.value, ...patch } }
 }
 
 function selectTrack(trackId: string | null) {
