@@ -70,10 +70,6 @@
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span class="text-slate-600">1 custom theme</span>
                 </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">10 short links</span>
-                </li>
               </ul>
             </div>
 
@@ -131,10 +127,6 @@
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
                   <span class="text-slate-600">5 custom themes</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span class="text-slate-600">100 short links</span>
                 </li>
               </ul>
             </div>
@@ -209,10 +201,6 @@
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                     <span class="text-slate-600">Custom domain</span>
                   </li>
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600">500 short links</span>
-                  </li>
                 </ul>
               </div>
 
@@ -279,10 +267,6 @@
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span class="text-slate-600">Priority support</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">Unlimited short links</span>
                 </li>
               </ul>
             </div>

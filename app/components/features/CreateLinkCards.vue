@@ -11,6 +11,7 @@
     <FeaturesSlugInput
       v-model="slugInput"
       v-model:domain="selectedDomain"
+      :hide-domain-switch="!allowShortLinks"
       placeholder="your-name"
       confirm-text="Continue"
       @confirm="onSlugConfirmed"
@@ -123,6 +124,8 @@ const props = defineProps<{
   urlError?: string;
   bioLoading?: boolean;
   shortLoading?: boolean;
+  /** Short links are hidden from the product for now; set true to offer them again */
+  allowShortLinks?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -136,7 +139,7 @@ const router = useRouter();
 const route = useRoute();
 const slugInput = ref("");
 const selectedDomain = ref(
-  (route.query.domain as string) || "perlink.to"
+  (props.allowShortLinks && (route.query.domain as string)) || "perlink.to"
 );
 const activeSlug = ref(props.slug);
 

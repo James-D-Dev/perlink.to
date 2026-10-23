@@ -1,5 +1,12 @@
 <template>
   <UDashboardPanel id="admin-create">
+    <template #header>
+      <UDashboardNavbar title="Create new">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+      </UDashboardNavbar>
+    </template>
     <template #body>
       <div
         class="relative z-10 container max-w-3xl mx-auto px-2 md:px-4 py-4 md:py-8 flex flex-col space-y-6"

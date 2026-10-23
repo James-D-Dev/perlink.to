@@ -106,16 +106,16 @@
                   <span class="truncate">{{ qr.destinationUrl }}</span>
                 </div>
 
-                <div class="flex items-center gap-4 text-xs text-gray-400 mt-2">
-                  <span class="flex items-center gap-1">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 mt-2">
+                  <span class="flex items-center gap-1 whitespace-nowrap">
                     <UIcon name="i-lucide-qr-code" class="w-3.5 h-3.5" />
                     perlink.to/qr/{{ qr.shortCode }}
                   </span>
-                  <span class="flex items-center gap-1">
+                  <span class="flex items-center gap-1 whitespace-nowrap">
                     <UIcon name="i-lucide-scan-line" class="w-3.5 h-3.5" />
                     {{ qr.scanCount || 0 }} scans
                   </span>
-                  <span class="flex items-center gap-1">
+                  <span class="flex items-center gap-1 whitespace-nowrap">
                     <UIcon name="i-lucide-calendar" class="w-3.5 h-3.5" />
                     {{ formatDate(qr.createdAt) }}
                   </span>

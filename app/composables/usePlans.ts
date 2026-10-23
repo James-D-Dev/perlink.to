@@ -23,7 +23,6 @@ export const PLANS = {
       '1 custom theme',
       'QR code sharing',
       '30-day analytics',
-      '10 short links',
     ],
   },
   starter: {
@@ -37,7 +36,6 @@ export const PLANS = {
       '5 custom themes',
       'Custom QR codes',
       '90-day analytics',
-      '100 short links',
     ],
   },
   plus: {
@@ -53,7 +51,6 @@ export const PLANS = {
       'Remove branding',
       'Customizable QR codes',
       'Full analytics history',
-      '500 short links',
     ],
     popular: true,
   },
@@ -70,7 +67,6 @@ export const PLANS = {
       'Advanced analytics',
       'Advanced QR & API access',
       'Priority support',
-      'Unlimited short links',
     ],
   },
 } as const

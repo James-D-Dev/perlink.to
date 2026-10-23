@@ -1,103 +1,115 @@
 <template>
-  <div class="max-w-3xl mx-auto py-8 px-4">
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Help & Support</h1>
+  <UDashboardPanel id="help">
+    <template #header>
+      <UDashboardNavbar title="Help & Support">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+      </UDashboardNavbar>
+    </template>
 
-    <UCard class="mb-6">
-      <template #header>
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-            <UIcon name="i-lucide-mail" class="w-5 h-5 text-blue-600" />
+    <template #body>
+      <div class="max-w-3xl mx-auto py-8 px-4">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Help & Support</h1>
+
+        <UCard class="mb-6">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <UIcon name="i-lucide-mail" class="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">Contact Support</h2>
+                <p class="text-sm text-gray-500">Get in touch with our team</p>
+              </div>
+            </div>
+          </template>
+
+          <form class="space-y-4" @submit.prevent="sendEmail">
+            <UFormField label="Your Name" required>
+              <UInput
+                v-model="form.name"
+                placeholder="Enter your name"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <UFormField label="Your Email" required>
+              <UInput
+                v-model="form.email"
+                type="email"
+                placeholder="Enter your email"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <UFormField label="Subject" required>
+              <UInput
+                v-model="form.subject"
+                placeholder="What is this about?"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <UFormField label="Message" required>
+              <UTextarea
+                v-model="form.message"
+                placeholder="Describe your issue or question..."
+                class="w-full"
+                rows="5"
+                required
+              />
+            </UFormField>
+
+            <div class="flex items-center justify-end gap-3 pt-4">
+              <UButton
+                type="button"
+                variant="ghost"
+                color="neutral"
+                @click="resetForm"
+              >
+                Clear
+              </UButton>
+              <UButton
+                type="submit"
+                color="primary"
+                :loading="sending"
+                :disabled="!isFormValid"
+              >
+                <UIcon name="i-lucide-send" class="w-4 h-4 mr-2" />
+                Send Message
+              </UButton>
+            </div>
+          </form>
+        </UCard>
+
+        <!-- FAQ Section -->
+        <UCard>
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <UIcon name="i-lucide-help-circle" class="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">Frequently Asked Questions</h2>
+                <p class="text-sm text-gray-500">Quick answers to common questions</p>
+              </div>
+            </div>
+          </template>
+
+          <div class="space-y-4">
+            <div v-for="(faq, index) in faqs" :key="index" class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+              <h3 class="font-medium text-gray-900 mb-2">{{ faq.question }}</h3>
+              <p class="text-sm text-gray-600">{{ faq.answer }}</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900">Contact Support</h2>
-            <p class="text-sm text-gray-500">Get in touch with our team</p>
-          </div>
-        </div>
-      </template>
-
-      <form class="space-y-4" @submit.prevent="sendEmail">
-        <UFormField label="Your Name" required>
-          <UInput
-            v-model="form.name"
-            placeholder="Enter your name"
-            class="w-full"
-            required
-          />
-        </UFormField>
-
-        <UFormField label="Your Email" required>
-          <UInput
-            v-model="form.email"
-            type="email"
-            placeholder="Enter your email"
-            class="w-full"
-            required
-          />
-        </UFormField>
-
-        <UFormField label="Subject" required>
-          <UInput
-            v-model="form.subject"
-            placeholder="What is this about?"
-            class="w-full"
-            required
-          />
-        </UFormField>
-
-        <UFormField label="Message" required>
-          <UTextarea
-            v-model="form.message"
-            placeholder="Describe your issue or question..."
-            class="w-full"
-            rows="5"
-            required
-          />
-        </UFormField>
-
-        <div class="flex items-center justify-end gap-3 pt-4">
-          <UButton
-            type="button"
-            variant="ghost"
-            color="neutral"
-            @click="resetForm"
-          >
-            Clear
-          </UButton>
-          <UButton
-            type="submit"
-            color="primary"
-            :loading="sending"
-            :disabled="!isFormValid"
-          >
-            <UIcon name="i-lucide-send" class="w-4 h-4 mr-2" />
-            Send Message
-          </UButton>
-        </div>
-      </form>
-    </UCard>
-
-    <!-- FAQ Section -->
-    <UCard>
-      <template #header>
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-            <UIcon name="i-lucide-help-circle" class="w-5 h-5 text-green-600" />
-          </div>
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900">Frequently Asked Questions</h2>
-            <p class="text-sm text-gray-500">Quick answers to common questions</p>
-          </div>
-        </div>
-      </template>
-
-      <div class="space-y-4">
-        <div v-for="(faq, index) in faqs" :key="index" class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-          <h3 class="font-medium text-gray-900 mb-2">{{ faq.question }}</h3>
-          <p class="text-sm text-gray-600">{{ faq.answer }}</p>
-        </div>
+        </UCard>
       </div>
-    </UCard>
-  </div>
+    </template>
+  </UDashboardPanel>
 </template>
 
 <script setup lang="ts">

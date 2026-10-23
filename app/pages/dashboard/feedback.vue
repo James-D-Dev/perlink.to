@@ -1,5 +1,12 @@
 <template>
   <UDashboardPanel id="admin-feedback">
+    <template #header>
+      <UDashboardNavbar title="Feedback">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+      </UDashboardNavbar>
+    </template>
     <template #body>
       <div class="max-w-xl w-full mx-auto py-8 px-4">
         <h1 class="text-2xl font-bold text-gray-900 mb-6">Feedback</h1>

@@ -234,12 +234,6 @@ const navigationLinks: NavigationMenuItem[] = [
     to: "/dashboard/bio",
   },
   {
-    label: "Short Links",
-    icon: "i-mingcute-link-2-line",
-    to: "/dashboard/links",
-  },
-
-  {
     label: "QR Codes",
     icon: "i-mingcute-qrcode-2-line",
     to: "/dashboard/qr",
