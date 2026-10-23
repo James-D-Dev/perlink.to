@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import type { RoomConfig, RoomObject, WallSide } from '~/types/room'
 import { RoomScene, type TransformMode } from '~/utils/room/RoomScene'
-import { daylightAtHour } from '~/utils/room/daylight'
+import { daylightAtHour, getDaylight } from '~/utils/room/daylight'
 
 const props = withDefaults(defineProps<{
   room: RoomConfig
@@ -14,11 +14,14 @@ const props = withDefaults(defineProps<{
   transformMode?: TransformMode
   /** Preview a fixed hour (0-24) instead of the configured day/night mode */
   previewHour?: number | null
+  /** Force day or night regardless of the configured mode */
+  forceMode?: 'day' | 'night' | null
 }>(), {
   editable: false,
   selectedId: null,
   transformMode: 'translate',
   previewHour: null,
+  forceMode: null,
 })
 
 const emit = defineEmits<{
@@ -54,13 +57,20 @@ onBeforeUnmount(() => {
 watch(() => props.room, room => scene?.setRoom(room), { deep: true })
 watch(() => props.selectedId, id => scene?.select(id))
 watch(() => props.transformMode, mode => scene?.setTransformMode(mode))
-watch(() => props.previewHour, applyPreview)
+watch(() => [props.previewHour, props.forceMode], applyPreview)
 
 function applyPreview() {
-  scene?.setDaylightOverride(props.previewHour === null ? null : daylightAtHour(props.previewHour))
+  if (props.forceMode) {
+    scene?.setDaylightOverride(getDaylight({ ...props.room.environment, mode: props.forceMode }))
+  } else {
+    scene?.setDaylightOverride(props.previewHour === null ? null : daylightAtHour(props.previewHour))
+  }
 }
 
 defineExpose({
+  resetView() {
+    scene?.resetView()
+  },
   getDropTarget(clientX: number, clientY: number, wallMounted: boolean): { position: [number, number, number]; wall?: WallSide } | null {
     return scene?.getDropTarget(clientX, clientY, wallMounted) ?? null
   },

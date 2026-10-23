@@ -71,6 +71,8 @@ export class RoomScene {
   private selectionBox = new THREE.Box3Helper(new THREE.Box3(), new THREE.Color('#38bdf8'))
   private hoveredId: string | null = null
   private daylightOverride: DaylightState | null = null
+  /** Daylight actually shown; eases toward the target for smooth day/night switches */
+  private shownDaylight: number | null = null
   private skyColor = new THREE.Color()
   private pointerDown = { x: 0, y: 0 }
 
@@ -170,6 +172,13 @@ export class RoomScene {
   select(id: string | null) {
     this.selectedId = id && this.entries.has(id) ? id : null
     this.updateTransformAttachment()
+  }
+
+  /** Return the camera to the default angle */
+  resetView() {
+    this.camera.position.set(9.5, 7.5, 9.5)
+    this.controls.target.set(0, 1, 0)
+    this.controls.update()
   }
 
   setTransformMode(mode: TransformMode) {
@@ -554,7 +563,11 @@ export class RoomScene {
     this.renderer.render(this.scene, this.camera)
   }
 
-  private applyDaylight({ daylight: d, isDay, arc }: DaylightState) {
+  private applyDaylight({ daylight: target, isDay, arc }: DaylightState) {
+    this.shownDaylight = this.shownDaylight === null
+      ? target
+      : this.shownDaylight + (target - this.shownDaylight) * 0.06
+    const d = this.shownDaylight
     // Sky: night -> dusk -> day
     if (d < 0.5) this.skyColor.copy(SKY_NIGHT).lerp(SKY_DUSK, d * 2)
     else this.skyColor.copy(SKY_DUSK).lerp(SKY_DAY, (d - 0.5) * 2)
@@ -623,7 +636,7 @@ export class RoomScene {
 
 // ---------- Procedural floor textures (grayscale, tinted by material color) ----------
 
-function createFloorTexture(kind: RoomStyle['floorMaterial'], width: number, depth: number): THREE.CanvasTexture {
+export function createFloorTexture(kind: RoomStyle['floorMaterial'], width: number, depth: number): THREE.CanvasTexture {
   const size = 512
   const canvas = document.createElement('canvas')
   canvas.width = canvas.height = size

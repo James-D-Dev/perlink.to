@@ -53,7 +53,7 @@
       <div v-if="loading" class="flex justify-center py-20">
         <UIcon
           name="i-lucide-loader-2"
-          class="w-10 h-10 animate-spin text-gray-400"
+          class="w-10 h-10 animate-spin text-gray-400 dark:text-neutral-500"
         />
       </div>
 
@@ -98,8 +98,8 @@
               <div v-if="showTemplatePicker" class="mt-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                 <div class="mb-3 flex items-start justify-between gap-3">
                   <div>
-                    <h3 class="font-semibold text-gray-900">Start from a template</h3>
-                    <p class="text-sm text-gray-500">Pick a starting point. Every template includes sample content, a theme and a matching 3D room.</p>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Start from a template</h3>
+                    <p class="text-sm text-gray-500 dark:text-neutral-400">Pick a starting point. Every template includes sample content, a theme and a matching 3D room.</p>
                   </div>
                   <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" @click="templatePickerDismissed = true" />
                 </div>
@@ -108,7 +108,7 @@
 
               <!-- Page mode -->
               <div class="flex flex-wrap items-center justify-between gap-3 pt-4">
-                <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1">
+                <div class="inline-flex rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl p-1">
                   <UButton
                     icon="i-lucide-layout-list"
                     label="2D page"
@@ -124,22 +124,33 @@
                     @click="setPageMode('3d')"
                   />
                 </div>
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-gray-500 dark:text-neutral-400">
                   {{ pageMode === '3d'
                     ? 'Visitors see your 3D room first and can switch to the 2D page.'
                     : 'Visitors see your classic page.' }}
                 </p>
-                <div v-if="pageMode === '3d'" class="flex gap-2">
-                  <UButton icon="i-lucide-save" label="Save draft" :loading="saving" @click="saveBio" />
-                  <UButton icon="i-lucide-globe" label="Publish" color="success" variant="outline" :loading="publishing" @click="publishBio" />
+              </div>
+
+              <!-- 3D room launcher -->
+              <div v-if="pageMode === '3d'" class="mt-4 overflow-hidden rounded-xl border border-default bg-default/60 backdrop-blur-xl sm:flex">
+                <div class="relative h-56 sm:h-auto sm:w-1/2">
+                  <LazyRoomCanvas :room="roomModel" class="pointer-events-none" />
+                </div>
+                <div class="flex flex-col justify-center gap-3 p-5 sm:w-1/2">
+                  <div>
+                    <h3 class="font-semibold text-highlighted">Your 3D room</h3>
+                    <p class="mt-1 text-sm text-muted">
+                      {{ roomModel.objects.length }} objects · decorate it in the full-screen editor, then publish.
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <UButton icon="i-lucide-box" label="Open 3D editor" :loading="openingRoom" @click="openRoomEditor" />
+                    <UButton icon="i-lucide-globe" label="Publish" color="neutral" variant="outline" :loading="publishing" @click="publishBio" />
+                  </div>
                 </div>
               </div>
 
-              <div v-if="pageMode === '3d'" class="pt-4">
-                <LazyRoomEditor v-model:room="roomModel" />
-              </div>
-
-              <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
                 <div class="lg:col-span-7">
                   <BioEditor
                     :active-block="activeBlock"
@@ -192,38 +203,38 @@
             <!-- Settings Tab -->
             <template v-else-if="item.value === 'settings'">
               <div class="pt-4 max-w-lg mx-auto space-y-6">
-                <div class="bg-white rounded-xl border border-gray-200 p-6">
-                  <h3 class="font-semibold text-gray-900 mb-1">Bio Page URL</h3>
-                  <p class="text-sm text-gray-500 mb-3">
+                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Bio Page URL</h3>
+                  <p class="text-sm text-gray-500 dark:text-neutral-400 mb-3">
                     Your public bio page address
                   </p>
                   <div
-                    class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                    class="flex items-center gap-2 bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2"
                   >
-                    <span class="text-gray-500 text-sm">perlink.to/</span>
-                    <span class="font-medium text-gray-900 text-sm">{{
+                    <span class="text-gray-500 dark:text-neutral-400 text-sm">perlink.to/</span>
+                    <span class="font-medium text-gray-900 dark:text-white text-sm">{{
                       existingBio?.username
                     }}</span>
                   </div>
                 </div>
 
                 <!-- Template -->
-                <div class="bg-white rounded-xl border border-gray-200 p-6">
-                  <h3 class="font-semibold text-gray-900 mb-1">Template</h3>
-                  <p class="text-sm text-gray-500 mb-3">
+                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Template</h3>
+                  <p class="text-sm text-gray-500 dark:text-neutral-400 mb-3">
                     Replace the page content, theme and 3D room with a template.
                   </p>
                   <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
                 </div>
 
                 <!-- Share Button Toggle -->
-                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
                   <div class="flex items-center justify-between">
                     <div>
-                      <h3 class="font-semibold text-gray-900 mb-1">
+                      <h3 class="font-semibold text-gray-900 dark:text-white mb-1">
                         Share Button
                       </h3>
-                      <p class="text-sm text-gray-500">
+                      <p class="text-sm text-gray-500 dark:text-neutral-400">
                         Show a floating share button on your bio page
                       </p>
                     </div>
@@ -237,17 +248,17 @@
                   </div>
                 </div>
 
-                <div class="bg-white rounded-xl border border-gray-200 p-6">
-                  <h3 class="font-semibold text-gray-900 mb-1">Visibility</h3>
-                  <p class="text-sm text-gray-500 mb-3">
+                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Visibility</h3>
+                  <p class="text-sm text-gray-500 dark:text-neutral-400 mb-3">
                     Control who can see your bio page
                   </p>
                   <div class="flex items-center justify-between">
                     <div>
-                      <p class="text-sm font-medium text-gray-900">
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">
                         {{ existingBio?.isPublished ? "Published" : "Draft" }}
                       </p>
-                      <p class="text-xs text-gray-500">
+                      <p class="text-xs text-gray-500 dark:text-neutral-400">
                         {{
                           existingBio?.isPublished
                             ? "Your page is publicly visible"
@@ -288,6 +299,7 @@ import { createDefaultRoom, normalizeRoom, type PageMode, type RoomConfig } from
 import { useBioBlock } from "~/composables/useBioBlock";
 
 definePageMeta({
+  colorMode: "dark",
   layout: "admin",
   middleware: "auth",
   ssr: false,
@@ -716,6 +728,17 @@ const roomModel = computed<RoomConfig>({
     bioData.themeConfig = { ...bioData.themeConfig, room };
   },
 });
+
+const openingRoom = ref(false);
+
+// Save the page first so the full-screen editor starts from the latest data
+const openRoomEditor = async () => {
+  if (!existingBio.value?.username) return;
+  openingRoom.value = true;
+  await saveBio();
+  openingRoom.value = false;
+  navigateTo(`/dashboard/room/${existingBio.value.username}`);
+};
 
 const setPageMode = (mode: PageMode) => {
   bioData.themeConfig = {

@@ -2,6 +2,7 @@
   <div class="fixed inset-0 bg-slate-900">
     <RoomCanvas
       :room="room"
+      :force-mode="forceMode"
       @hover="onHover"
       @activate="onActivate"
     />
@@ -21,14 +22,26 @@
         </div>
       </div>
 
-      <UButton
-        class="pointer-events-auto shadow-lg"
-        color="neutral"
-        variant="solid"
-        icon="i-lucide-layout-list"
-        label="2D page"
-        @click="emit('switch2d')"
-      />
+      <div class="pointer-events-auto flex items-center gap-2">
+        <UTooltip :text="isDayShown ? 'Switch to night' : 'Switch to day'">
+          <UButton
+            class="shadow-lg"
+            color="neutral"
+            variant="solid"
+            :icon="isDayShown ? 'i-lucide-moon' : 'i-lucide-sun'"
+            :aria-label="isDayShown ? 'Switch to night' : 'Switch to day'"
+            @click="toggleDayNight"
+          />
+        </UTooltip>
+        <UButton
+          class="shadow-lg"
+          color="neutral"
+          variant="solid"
+          icon="i-lucide-layout-list"
+          label="2D page"
+          @click="emit('switch2d')"
+        />
+      </div>
     </div>
 
     <!-- Hover tooltip -->
@@ -66,6 +79,7 @@
 <script setup lang="ts">
 import type { RoomConfig } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
+import { getDaylight } from '~/utils/room/daylight'
 
 const props = defineProps<{
   room: RoomConfig
@@ -77,6 +91,21 @@ const props = defineProps<{
 const emit = defineEmits<{ switch2d: [] }>()
 
 const hovered = ref<{ label: string; x: number; y: number } | null>(null)
+
+// Visitors can flip between day and night; until they do, the room follows its own setting
+const forceMode = ref<'day' | 'night' | null>(null)
+const now = ref(new Date())
+let clock: ReturnType<typeof setInterval> | undefined
+onMounted(() => (clock = setInterval(() => (now.value = new Date()), 2000)))
+onBeforeUnmount(() => clearInterval(clock))
+
+const isDayShown = computed(() =>
+  forceMode.value ? forceMode.value === 'day' : getDaylight(props.room.environment, now.value).daylight >= 0.5,
+)
+
+function toggleDayNight() {
+  forceMode.value = isDayShown.value ? 'night' : 'day'
+}
 
 const linkedObjects = computed(() => props.room.objects.filter(o => o.link?.url))
 
