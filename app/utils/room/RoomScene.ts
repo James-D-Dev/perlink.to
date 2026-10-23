@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import type { RoomConfig, RoomObject, RoomStyle, WallSide } from '~/types/room'
+import type { LandId, RoomConfig, RoomObject, RoomStyle, WallSide } from '~/types/room'
 import { CATALOG_BY_TYPE, type CatalogItem } from './catalog'
 import { getDaylight, type DaylightState } from './daylight'
+import { buildLand, createStarSphere, type LandInstance } from './lands'
 
 export type ObjectPatch = Pick<RoomObject, 'position' | 'rotation'> & { wall?: WallSide }
 
@@ -26,11 +27,6 @@ interface ObjectEntry {
 
 const WALL_THICKNESS = 0.12
 const FLOOR_THICKNESS = 0.14
-const SKY_NIGHT = new THREE.Color('#0b1026')
-const SKY_DUSK = new THREE.Color('#f2a65a')
-const SKY_DAY = new THREE.Color('#8fd0f5')
-const GROUND_DAY = new THREE.Color('#7fb069')
-const GROUND_NIGHT = new THREE.Color('#1f3326')
 const SUN_COLOR = new THREE.Color('#fff1d6')
 const MOON_COLOR = new THREE.Color('#9fb4ff')
 
@@ -60,8 +56,11 @@ export class RoomScene {
   private sun = new THREE.DirectionalLight('#ffffff', 2)
   private sunDisc: THREE.Mesh
   private moonDisc: THREE.Mesh
-  private stars: THREE.Points
-  private groundMaterial = new THREE.MeshStandardMaterial({ color: GROUND_DAY, roughness: 1 })
+  private stars = createStarSphere()
+  private land?: LandInstance
+  private landKey = ''
+  private clock = new THREE.Clock()
+  private lamps = 0
   private walls: THREE.Mesh[] = []
   private floor?: THREE.Mesh
 
@@ -107,9 +106,9 @@ export class RoomScene {
     this.controls.enableDamping = true
     this.controls.dampingFactor = 0.08
     this.controls.minDistance = 3
-    this.controls.maxDistance = 26
+    this.controls.maxDistance = 30
     this.controls.minPolarAngle = 0.25
-    this.controls.maxPolarAngle = 1.35
+    this.controls.maxPolarAngle = 1.45
     // Keep the camera on the open side of the room so the walls stay behind
     this.controls.minAzimuthAngle = 0.05
     this.controls.maxAzimuthAngle = Math.PI / 2 - 0.05
@@ -139,8 +138,7 @@ export class RoomScene {
       new THREE.SphereGeometry(1, 24, 16),
       new THREE.MeshBasicMaterial({ color: '#e8ecff', fog: false }),
     )
-    this.stars = this.createStars()
-    this.scene.add(this.sunDisc, this.moonDisc, this.stars, this.shell, this.objectsGroup, this.outdoor)
+    this.scene.add(this.sunDisc, this.moonDisc, this.stars.points, this.shell, this.objectsGroup, this.outdoor)
 
     this.selectionBox.visible = false
     this.scene.add(this.selectionBox)
@@ -171,9 +169,14 @@ export class RoomScene {
       this.styleSignature = signature
       this.style = room.style
       this.buildShell(room.style)
-      this.buildOutdoor(room.style)
       // Wall objects depend on room size
       for (const entry of this.entries.values()) this.applyTransform(entry)
+    }
+    const landId: LandId = room.land ?? 'island'
+    const landKey = `${landId}|${signature}`
+    if (landKey !== this.landKey) {
+      this.landKey = landKey
+      this.buildOutdoor(landId, room.style)
     }
     this.syncObjects(room.objects)
   }
@@ -321,53 +324,10 @@ export class RoomScene {
     this.shell.add(floor, back, left, backTrim, leftTrim)
   }
 
-  private buildOutdoor(style: RoomStyle) {
+  private buildOutdoor(landId: LandId, style: RoomStyle) {
     this.clearGroup(this.outdoor)
-    const radius = Math.max(style.width, style.depth) * 1.1 + 2
-    const ground = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.92, 0.5, 48), this.groundMaterial)
-    ground.position.y = -FLOOR_THICKNESS - 0.25
-    ground.receiveShadow = true
-    this.outdoor.add(ground)
-
-    // A few low-poly trees on the open side of the room
-    const trunkMaterial = new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 1 })
-    const leafMaterial = new THREE.MeshStandardMaterial({ color: '#3f7d3a', roughness: 1, flatShading: true })
-    const spots: [number, number, number][] = [
-      [radius * 0.72, radius * 0.25, 1.1],
-      [radius * 0.3, radius * 0.75, 0.9],
-      [radius * 0.78, -radius * 0.38, 0.8],
-      [-radius * 0.4, radius * 0.74, 1],
-    ]
-    for (const [x, z, s] of spots) {
-      const tree = new THREE.Group()
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 0.8, 6), trunkMaterial)
-      trunk.position.y = 0.4
-      const crown = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.4, 7), leafMaterial)
-      crown.position.y = 1.4
-      trunk.castShadow = crown.castShadow = true
-      tree.add(trunk, crown)
-      tree.position.set(x, -FLOOR_THICKNESS, z)
-      tree.scale.setScalar(s)
-      this.outdoor.add(tree)
-    }
-  }
-
-  private createStars() {
-    const count = 400
-    const positions = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      // Points on a dome behind and above the room
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.random() * Math.PI * 0.45
-      const r = 70
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta)
-      positions[i * 3 + 1] = r * Math.cos(phi) + 5
-      positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta)
-    }
-    const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    const material = new THREE.PointsMaterial({ color: '#ffffff', size: 0.45, transparent: true, opacity: 0, fog: false })
-    return new THREE.Points(geometry, material)
+    this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS })
+    this.outdoor.add(this.land.group)
   }
 
   // ---------- Objects ----------
@@ -629,9 +589,13 @@ export class RoomScene {
   private animate = () => {
     if (this.disposed) return
     this.frame = requestAnimationFrame(this.animate)
+    const dt = Math.min(this.clock.getDelta(), 0.1)
+    const time = this.clock.elapsedTime
     if (this.room) {
       this.applyDaylight(this.daylightOverride ?? getDaylight(this.room.environment))
     }
+    this.stars.material.uniforms.time!.value = time
+    this.land?.update(time, dt, this.shownDaylight ?? 1, this.lamps)
     const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
     if (entry) this.selectionBox.box.setFromObject(entry.root)
     if (this.cameraGlide) {
@@ -649,8 +613,11 @@ export class RoomScene {
       : this.shownDaylight + (target - this.shownDaylight) * 0.06
     const d = this.shownDaylight
     // Sky: night -> dusk -> day
-    if (d < 0.5) this.skyColor.copy(SKY_NIGHT).lerp(SKY_DUSK, d * 2)
-    else this.skyColor.copy(SKY_DUSK).lerp(SKY_DAY, (d - 0.5) * 2)
+    const sky = this.land?.sky
+    if (sky) {
+      if (d < 0.5) this.skyColor.copy(sky.night).lerp(sky.dusk, d * 2)
+      else this.skyColor.copy(sky.dusk).lerp(sky.day, (d - 0.5) * 2)
+    }
     this.scene.background = this.skyColor
     if (!this.scene.fog) this.scene.fog = new THREE.Fog(this.skyColor, 30, 90)
     ;(this.scene.fog as THREE.Fog).color.copy(this.skyColor)
@@ -658,7 +625,6 @@ export class RoomScene {
     this.hemi.intensity = 0.12 + 0.75 * d
     this.hemi.color.copy(this.skyColor).lerp(new THREE.Color('#ffffff'), 0.5)
     this.ambient.intensity = 0.06 + 0.2 * d
-    this.groundMaterial.color.copy(GROUND_NIGHT).lerp(GROUND_DAY, d)
     this.renderer.toneMappingExposure = 0.85 + 0.25 * d
 
     // Sun or moon travels an arc behind the room, rising on the right
@@ -673,10 +639,11 @@ export class RoomScene {
     this.sun.color.copy(isDay ? SUN_COLOR : MOON_COLOR)
     this.sun.intensity = isDay ? 0.4 + 2.2 * d : 0.25 * (1 - d) + 0.05
 
-    ;(this.stars.material as THREE.PointsMaterial).opacity = Math.max(0, 1 - d * 1.6)
+    this.stars.material.uniforms.opacity!.value = this.land?.starsAlways ? 1 : Math.max(0, 1 - d * 1.6)
 
     // Lamps fade in as it gets dark
     const lamps = THREE.MathUtils.smoothstep(0.6 - d, 0, 0.45)
+    this.lamps = lamps
     for (const entry of this.entries.values()) {
       if (entry.light && entry.item.light) {
         entry.light.intensity = entry.item.light.intensity * lamps * (entry.data.scale || 1)
@@ -697,11 +664,13 @@ export class RoomScene {
   private clearGroup(group: THREE.Object3D) {
     for (const child of [...group.children]) {
       child.traverse((obj) => {
+        // Model geometry/materials are cached and shared between lands
+        if (obj.userData.shared) return
         const mesh = obj as THREE.Mesh
         mesh.geometry?.dispose()
         const material = mesh.material as THREE.Material | THREE.Material[] | undefined
         if (Array.isArray(material)) material.forEach(m => this.disposeMaterial(m))
-        else if (material && material !== this.groundMaterial) this.disposeMaterial(material)
+        else if (material) this.disposeMaterial(material)
       })
       group.remove(child)
     }

@@ -14,6 +14,9 @@ export type DayNightMode =
 
 export type WallSide = 'back' | 'left';
 
+/** The scenery outside the room */
+export type LandId = 'island' | 'mars' | 'sakura' | 'winter';
+
 export interface RoomStyle {
   floorColor: string;
   floorMaterial: FloorMaterial;
@@ -54,11 +57,20 @@ export interface RoomObject {
   link?: RoomObjectLink;
 }
 
+export interface RoomMusic {
+  /** Track id from the music library; null = no music */
+  trackId: string | null;
+  /** 0-1 */
+  volume: number;
+}
+
 export interface RoomConfig {
   version: 1;
   style: RoomStyle;
   environment: RoomEnvironment;
   objects: RoomObject[];
+  music?: RoomMusic;
+  land?: LandId;
 }
 
 export const DEFAULT_ROOM_STYLE: RoomStyle = {
@@ -102,6 +114,8 @@ export function normalizeRoom(room: Partial<RoomConfig> | null | undefined): Roo
     version: 1,
     style: { ...DEFAULT_ROOM_STYLE, ...(room.style || {}) },
     environment: { ...DEFAULT_ROOM_ENVIRONMENT, ...(room.environment || {}) },
+    music: { trackId: room.music?.trackId ?? null, volume: room.music?.volume ?? 0.5 },
+    land: room.land ?? 'island',
     objects: room.objects
       .filter(o => o && typeof o.type === 'string' && Array.isArray(o.position))
       .map(o => ({ ...o, rotation: o.rotation ?? 0, scale: o.scale ?? 1 })),

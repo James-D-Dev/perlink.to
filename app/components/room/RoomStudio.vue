@@ -15,28 +15,13 @@
 
     <!-- Top bar -->
     <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2 sm:p-3">
-      <div class="pointer-events-auto flex min-w-0 items-center gap-1 rounded-2xl bg-default/70 ring-1 ring-white/10 p-1 pr-3 shadow-lg backdrop-blur-xl">
-        <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" aria-label="Back to page editor" @click="emit('back')" />
-        <div class="min-w-0">
-          <p class="truncate text-sm font-semibold text-highlighted">3D Room</p>
-          <p class="truncate text-xs text-muted">perlink.to/{{ username }}</p>
-        </div>
-        <span v-if="dirty" class="ml-1 size-2 shrink-0 rounded-full bg-amber-500" title="Unsaved changes" />
+      <div class="pointer-events-auto rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
+        <UTooltip text="Back to page editor" :content="{ side: 'right' }">
+          <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" aria-label="Back to page editor" @click="emit('back')" />
+        </UTooltip>
       </div>
 
       <div class="pointer-events-auto flex items-center gap-1 rounded-2xl bg-default/70 ring-1 ring-white/10 p-1 shadow-lg backdrop-blur-xl">
-        <UTooltip text="All objects in the room">
-          <UButton
-            icon="i-lucide-layers"
-            :color="listOpen ? 'primary' : 'neutral'"
-            :variant="listOpen ? 'soft' : 'ghost'"
-            aria-label="Objects"
-            @click="listOpen = !listOpen"
-          >
-            <span class="hidden sm:inline">Objects</span>
-            <span class="min-w-5 rounded-md bg-elevated px-1.5 text-xs tabular-nums text-default">{{ room.objects.length }}</span>
-          </UButton>
-        </UTooltip>
         <UTooltip text="Undo (Ctrl+Z)">
           <UButton icon="i-lucide-undo-2" color="neutral" variant="ghost" :disabled="!canUndo" @click="undo" />
         </UTooltip>
@@ -46,9 +31,12 @@
         <UTooltip :text="previewLabel">
           <UButton :icon="previewIcon" color="neutral" variant="ghost" @click="cyclePreview" />
         </UTooltip>
-        <UButton icon="i-lucide-save" :loading="saving" color="neutral" variant="soft" @click="emit('save')">
-          <span class="hidden sm:inline">Save</span>
-        </UButton>
+        <UTooltip :text="dirty ? 'Unsaved changes (Ctrl+S)' : 'All changes saved'">
+          <UButton icon="i-lucide-save" :loading="saving" color="neutral" variant="soft" class="relative" @click="emit('save')">
+            <span class="hidden sm:inline">Save</span>
+            <span v-if="dirty" class="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-amber-500 ring-2 ring-default" />
+          </UButton>
+        </UTooltip>
         <UButton icon="i-lucide-globe" :loading="publishing" @click="emit('publish')">
           <span class="hidden sm:inline">Publish</span>
         </UButton>
@@ -106,7 +94,20 @@
     </div>
 
     <!-- Camera controls -->
-    <div class="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl sm:right-3">
+    <div class="absolute right-2 top-16 flex flex-col items-center gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl sm:right-3">
+      <UTooltip text="All objects in the room" :content="{ side: 'left' }">
+        <button
+          type="button"
+          class="flex w-10 flex-col items-center gap-0.5 rounded-xl py-1.5 transition"
+          :class="listOpen ? 'bg-perlink-blue/15 text-perlink-blue' : 'text-default hover:bg-elevated'"
+          aria-label="Objects"
+          @click="listOpen = !listOpen"
+        >
+          <UIcon name="i-lucide-layers" class="size-5" />
+          <span class="text-[11px] font-semibold tabular-nums leading-none">{{ room.objects.length }}</span>
+        </button>
+      </UTooltip>
+      <div class="my-0.5 h-px w-6 bg-white/10" />
       <UTooltip text="Zoom in" :content="{ side: 'left' }">
         <UButton icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Zoom in" @click="canvasRef?.zoomBy(0.8)" />
       </UTooltip>
@@ -301,6 +302,79 @@
             </div>
           </div>
 
+          <!-- Land (scenery outside the room) -->
+          <div v-else-if="activeTab === 'land'" class="flex items-stretch gap-3 overflow-x-auto p-3">
+            <button
+              v-for="land in LANDS"
+              :key="land.id"
+              type="button"
+              class="w-40 shrink-0 overflow-hidden rounded-xl border-2 text-left transition"
+              :class="(room.land ?? 'island') === land.id ? 'border-perlink-blue' : 'border-default hover:border-accented'"
+              @click="room = { ...room, land: land.id }"
+            >
+              <div class="relative flex h-16 items-center justify-center" :style="{ background: land.preview }">
+                <UIcon :name="land.icon" class="size-7 text-white drop-shadow" />
+                <UIcon v-if="(room.land ?? 'island') === land.id" name="i-lucide-circle-check" class="absolute right-1.5 top-1.5 size-4 text-white drop-shadow" />
+              </div>
+              <div class="p-2">
+                <p class="text-sm font-semibold text-highlighted">{{ land.name }}</p>
+                <p class="line-clamp-2 text-[11px] leading-snug text-muted">{{ land.description }}</p>
+              </div>
+            </button>
+          </div>
+
+          <!-- Music -->
+          <div v-else-if="activeTab === 'music'" class="flex items-stretch gap-2 overflow-x-auto p-3">
+            <button
+              type="button"
+              class="flex w-28 shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-2 text-center transition"
+              :class="!musicTrackId ? 'border-perlink-blue bg-perlink-blue/5' : 'border-default hover:border-accented'"
+              @click="selectTrack(null)"
+            >
+              <UIcon name="i-lucide-volume-x" class="size-6 text-muted" />
+              <span class="text-sm font-semibold text-highlighted">No music</span>
+            </button>
+
+            <div
+              v-for="track in ROOM_MUSIC"
+              :key="track.id"
+              class="flex w-52 shrink-0 cursor-pointer items-center gap-3 rounded-xl border-2 p-2.5 transition"
+              :class="musicTrackId === track.id ? 'border-perlink-blue bg-perlink-blue/5' : 'border-default hover:border-accented'"
+              role="button"
+              tabindex="0"
+              @click="selectTrack(track.id)"
+              @keydown.enter="selectTrack(track.id)"
+            >
+              <UButton
+                :icon="previewingId === track.id && previewPlaying ? 'i-lucide-pause' : 'i-lucide-play'"
+                :color="musicTrackId === track.id ? 'primary' : 'neutral'"
+                :variant="musicTrackId === track.id ? 'solid' : 'soft'"
+                class="shrink-0 rounded-full"
+                :aria-label="`Preview ${track.title}`"
+                :disabled="missingTracks.has(track.id)"
+                @click.stop="togglePreview(track.id)"
+              />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-semibold text-highlighted">{{ track.title }}</p>
+                <p class="truncate text-xs text-muted">
+                  {{ missingTracks.has(track.id) ? 'File missing' : `${track.mood} · ${track.duration}` }}
+                </p>
+                <p class="truncate text-[11px] text-dimmed">{{ track.artist }}</p>
+              </div>
+            </div>
+
+            <div class="flex w-44 shrink-0 flex-col justify-center gap-2 rounded-xl bg-elevated/60 px-3">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-lucide-volume-2" class="size-4 text-muted" />
+                <USlider :model-value="Math.round(musicVolume * 100)" :min="0" :max="100" :step="5" class="flex-1" @update:model-value="setVolume(Number($event) / 100)" />
+              </div>
+              <p class="text-[11px] leading-snug text-dimmed">
+                Visitors start muted and can turn the music on. Music from
+                <a href="https://pixabay.com/music/" target="_blank" rel="noopener noreferrer" class="underline hover:text-default">Pixabay</a>.
+              </p>
+            </div>
+          </div>
+
           <!-- Day & night -->
           <div v-else-if="activeTab === 'time'" class="flex items-stretch gap-3 overflow-x-auto p-3">
             <button
@@ -381,9 +455,10 @@ import type { ObjectPatch } from '~/utils/room/RoomScene'
 import { createFloorTexture } from '~/utils/room/RoomScene'
 import { getDaylight } from '~/utils/room/daylight'
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
+import { ROOM_MUSIC, MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
+import { LANDS } from '~/utils/room/lands'
 
 defineProps<{
-  username: string
   saving?: boolean
   publishing?: boolean
   dirty?: boolean
@@ -397,7 +472,7 @@ const emit = defineEmits<{
 
 const room = defineModel<RoomConfig>('room', { required: true })
 
-type Tab = CatalogCategory | 'room' | 'time'
+type Tab = CatalogCategory | 'room' | 'land' | 'time' | 'music'
 
 const canvasRef = ref<{ resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
 const barRef = ref<HTMLElement | null>(null)
@@ -420,7 +495,9 @@ const CATEGORY_ICONS: Record<CatalogCategory, string> = {
 const tabs = computed<{ value: Tab; label: string; icon: string }[]>(() => [
   ...(Object.keys(CATEGORY_LABELS) as CatalogCategory[]).map(c => ({ value: c, label: CATEGORY_LABELS[c], icon: CATEGORY_ICONS[c] })),
   { value: 'room', label: 'Room', icon: 'i-lucide-paint-roller' },
+  { value: 'land', label: 'Land', icon: 'i-lucide-mountain-snow' },
   { value: 'time', label: 'Day & night', icon: 'i-lucide-sun-moon' },
+  ...(ROOM_MUSIC_ENABLED ? [{ value: 'music' as const, label: 'Music', icon: 'i-lucide-music' }] : []),
 ])
 
 const activeCategory = computed(() => (activeTab.value in CATEGORY_LABELS ? (activeTab.value as CatalogCategory) : null))
@@ -541,6 +618,71 @@ function selectTab(tab: Tab) {
     trayOpen.value = true
   }
 }
+
+// ---------- Background music ----------
+
+const musicTrackId = computed(() => room.value.music?.trackId ?? null)
+const musicVolume = computed(() => room.value.music?.volume ?? 0.5)
+const previewingId = ref<string | null>(null)
+const previewPlaying = ref(false)
+const missingTracks = reactive(new Set<string>())
+let previewAudio: HTMLAudioElement | null = null
+
+function setMusic(patch: Partial<NonNullable<RoomConfig['music']>>) {
+  room.value = { ...room.value, music: { trackId: musicTrackId.value, volume: musicVolume.value, ...patch } }
+}
+
+function selectTrack(trackId: string | null) {
+  setMusic({ trackId })
+  if (trackId) playPreview(trackId)
+  else stopPreview()
+}
+
+function setVolume(volume: number) {
+  setMusic({ volume })
+  if (previewAudio) previewAudio.volume = volume
+}
+
+function playPreview(trackId: string) {
+  const track = MUSIC_BY_ID[trackId]
+  if (!track || missingTracks.has(trackId)) return
+  stopPreview()
+  previewAudio = new Audio(track.src)
+  previewAudio.volume = musicVolume.value
+  previewAudio.loop = true
+  previewAudio.addEventListener('error', () => {
+    missingTracks.add(trackId)
+    if (previewingId.value === trackId) stopPreview()
+  })
+  previewAudio.play().then(() => (previewPlaying.value = true)).catch(() => (previewPlaying.value = false))
+  previewingId.value = trackId
+}
+
+function stopPreview() {
+  previewAudio?.pause()
+  previewAudio = null
+  previewingId.value = null
+  previewPlaying.value = false
+}
+
+function togglePreview(trackId: string) {
+  if (previewingId.value === trackId && previewPlaying.value) stopPreview()
+  else playPreview(trackId)
+}
+
+let checkedTracks = false
+
+// Stop previews when leaving the Music tab; flag tracks whose file is missing
+watch(activeTab, (tab) => {
+  if (tab !== 'music') return stopPreview()
+  if (checkedTracks) return
+  checkedTracks = true
+  for (const track of ROOM_MUSIC) {
+    fetch(track.src, { method: 'HEAD' })
+      .then((res) => { if (!res.ok) missingTracks.add(track.id) })
+      .catch(() => missingTracks.add(track.id))
+  }
+})
 
 // ---------- History (undo / redo) ----------
 
@@ -764,5 +906,6 @@ onBeforeUnmount(() => {
   clearInterval(clock)
   window.removeEventListener('keydown', onKeydown)
   cancelDrag()
+  stopPreview()
 })
 </script>

@@ -23,6 +23,16 @@
       </div>
 
       <div class="pointer-events-auto flex items-center gap-2">
+        <UTooltip v-if="track" :text="musicOn ? 'Mute music' : `Play music: ${track.title}`">
+          <UButton
+            class="shadow-lg"
+            :color="musicOn ? 'primary' : 'neutral'"
+            variant="solid"
+            :icon="musicOn ? 'i-lucide-volume-2' : 'i-lucide-volume-x'"
+            :aria-label="musicOn ? 'Mute music' : 'Play music'"
+            @click="toggleMusic"
+          />
+        </UTooltip>
         <UTooltip :text="isDayShown ? 'Switch to night' : 'Switch to day'">
           <UButton
             class="shadow-lg"
@@ -72,6 +82,10 @@
       <p class="rounded-full bg-black/30 px-3 py-1 text-xs text-white/90 backdrop-blur">
         Drag to look around · click objects to open
       </p>
+      <p v-if="track && musicOn" class="text-[10px] text-white/60">
+        Music: {{ track.title }} by {{ track.artist }} ·
+        <a :href="track.sourceUrl" target="_blank" rel="noopener noreferrer" class="underline">Pixabay</a>
+      </p>
     </div>
   </div>
 </template>
@@ -80,6 +94,7 @@
 import type { RoomConfig } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import { getDaylight } from '~/utils/room/daylight'
+import { MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 
 const props = defineProps<{
   room: RoomConfig
@@ -106,6 +121,29 @@ const isDayShown = computed(() =>
 function toggleDayNight() {
   forceMode.value = isDayShown.value ? 'night' : 'day'
 }
+
+// Background music: browsers block autoplay with sound, so visitors turn it on
+const track = computed(() => (ROOM_MUSIC_ENABLED && props.room.music?.trackId ? MUSIC_BY_ID[props.room.music.trackId] : undefined))
+const musicOn = ref(false)
+let audio: HTMLAudioElement | null = null
+
+function toggleMusic() {
+  if (!track.value) return
+  if (musicOn.value) {
+    audio?.pause()
+    musicOn.value = false
+    return
+  }
+  if (!audio) {
+    audio = new Audio(track.value.src)
+    audio.loop = true
+    audio.addEventListener('error', () => (musicOn.value = false))
+  }
+  audio.volume = props.room.music?.volume ?? 0.5
+  audio.play().then(() => (musicOn.value = true)).catch(() => (musicOn.value = false))
+}
+
+onBeforeUnmount(() => audio?.pause())
 
 const linkedObjects = computed(() => props.room.objects.filter(o => o.link?.url))
 

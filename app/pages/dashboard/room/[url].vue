@@ -16,12 +16,11 @@
     <LazyRoomStudio
       v-else
       v-model:room="room"
-      :username="username"
       :saving="saving"
       :publishing="publishing"
       :dirty="dirty"
       @back="goBack"
-      @save="save"
+      @save="save()"
       @publish="publish"
     />
   </div>
@@ -69,7 +68,7 @@ async function load() {
   }
 }
 
-async function save(): Promise<boolean> {
+async function save(options: { silent?: boolean } = {}): Promise<boolean> {
   if (!bioPage.value) return false
   saving.value = true
   try {
@@ -78,7 +77,7 @@ async function save(): Promise<boolean> {
     await $fetch(`/api/admin/bio/${username.value}`, { method: 'PUT' as const, body: { themeConfig } })
     bioPage.value = { ...bioPage.value, themeConfig }
     savedSnapshot.value = JSON.stringify(room.value)
-    toast.add({ title: 'Room saved', color: 'success' })
+    if (!options.silent) toast.add({ title: 'Room saved', color: 'success' })
     return true
   } catch (error: any) {
     toast.add({ title: 'Failed to save', description: error?.data?.statusMessage, color: 'error' })
@@ -91,7 +90,8 @@ async function save(): Promise<boolean> {
 async function publish() {
   publishing.value = true
   try {
-    if (!(await save())) return
+    // Publishing saves first; only the publish result gets a toast
+    if (!(await save({ silent: true }))) return
     await $fetch(`/api/admin/bio/${username.value}/publish`, { method: 'POST' as const })
     toast.add({
       title: 'Published',
