@@ -27,7 +27,7 @@ interface ObjectEntry {
 
 const WALL_THICKNESS = 0.12
 const FLOOR_THICKNESS = 0.14
-const SUN_COLOR = new THREE.Color('#fff1d6')
+const SUN_COLOR = new THREE.Color('#ffeccb')
 const MOON_COLOR = new THREE.Color('#9fb4ff')
 
 export class RoomScene {
@@ -51,7 +51,7 @@ export class RoomScene {
   private styleSignature = ''
   private room?: RoomConfig
 
-  private hemi = new THREE.HemisphereLight('#ffffff', '#6b5b4a', 0.6)
+  private hemi = new THREE.HemisphereLight('#ffffff', '#7a8f52', 0.6)
   private ambient = new THREE.AmbientLight('#ffffff', 0.2)
   private sun = new THREE.DirectionalLight('#ffffff', 2)
   private sunDisc: THREE.Mesh
@@ -622,10 +622,10 @@ export class RoomScene {
     if (!this.scene.fog) this.scene.fog = new THREE.Fog(this.skyColor, 30, 90)
     ;(this.scene.fog as THREE.Fog).color.copy(this.skyColor)
 
-    this.hemi.intensity = 0.12 + 0.75 * d
+    this.hemi.intensity = 0.15 + 0.9 * d
     this.hemi.color.copy(this.skyColor).lerp(new THREE.Color('#ffffff'), 0.5)
     this.ambient.intensity = 0.06 + 0.2 * d
-    this.renderer.toneMappingExposure = 0.85 + 0.25 * d
+    this.renderer.toneMappingExposure = 0.9 + 0.25 * d
 
     // Sun or moon travels an arc behind the room, rising on the right
     const angle = Math.PI * (0.08 + 0.84 * arc)

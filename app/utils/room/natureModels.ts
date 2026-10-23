@@ -29,6 +29,29 @@ export interface ScatterItem {
   rotation?: number
 }
 
+/** Shared wind clock for swaying grass, leaves and flowers (seconds) */
+export const natureWind = { value: 0 }
+
+/** Make cut-out foliage sway: the higher a vertex, the more it moves */
+function addWindSway(material: THREE.Material) {
+  if (material.userData.wind) return
+  material.userData.wind = true
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uWindTime = natureWind
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nuniform float uWindTime;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        float swayH = max(position.y, 0.0);
+        float seed = 0.0;
+        #ifdef USE_INSTANCING
+          seed = instanceMatrix[3].x * 0.7 + instanceMatrix[3].z * 0.9;
+        #endif
+        transformed.x += sin(uWindTime * 1.7 + seed) * swayH * 0.035;
+        transformed.z += cos(uWindTime * 1.3 + seed * 1.3) * swayH * 0.025;`)
+  }
+  material.needsUpdate = true
+}
+
 const loader = new GLTFLoader()
 const cache = new Map<string, Promise<LoadedModel>>()
 const textureCache = new Map<string, THREE.Texture>()
@@ -48,6 +71,7 @@ function loadModel(name: string): Promise<LoadedModel> {
         if (material.alphaTest > 0 || material.transparent) {
           material.alphaTest = 0.5
           material.transparent = false
+          addWindSway(material)
         }
         material.side = THREE.DoubleSide
         parts.push({ geometry: mesh.geometry, material, matrix: mesh.matrixWorld.clone() })
@@ -82,8 +106,10 @@ export function cherryLeaves(material: THREE.Material): THREE.Material {
     m.map = loadTexture('Leaves_Cherry.png')
     m.emissive = new THREE.Color('#ffc2dc')
     m.emissiveMap = m.map
-    m.emissiveIntensity = 0.18
+    m.emissiveIntensity = 0.07
     m.userData.shared = true
+    m.userData.wind = false
+    addWindSway(m)
     cherryMaterials.set(material, m)
     pink = m
   }
