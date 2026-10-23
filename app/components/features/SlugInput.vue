@@ -2,7 +2,15 @@
   <div
     class="relative w-full flex gap-0.5 md:gap-1 border border-perlink-cyan/30 rounded-full p-1 md:p-2 bg-white/80 focus:ring-2 focus:ring-perlink-cyan focus:outline-none hover:ring-2 hover:ring-perlink-cyan hover:outline-none shadow-lg md:shadow-xl shadow-perlink-cyan/20"
   >
+    <!-- Fixed domain label (no switcher) -->
+    <div
+      v-if="hideDomainSwitch"
+      class="flex items-center pl-3 md:pl-4 text-sm md:text-xl font-medium text-perlink-blue whitespace-nowrap select-none"
+    >
+      <span class="hidden sm:inline">perlink.to</span><span class="sm:hidden">perlink</span>/
+    </div>
     <UDropdownMenu
+      v-else
       :items="domainItems"
       :modal="false"
       :content="{ align: 'start', side: 'bottom', sideOffset: 8 }"
@@ -59,10 +67,13 @@ const props = withDefaults(
     domain?: string;
     placeholder?: string;
     confirmText?: string;
+    /** Hide the perlink.to / s.perlink.to switcher and lock the domain to perlink.to (page only). */
+    hideDomainSwitch?: boolean;
   }>(),
   {
     placeholder: "your-name",
     confirmText: "Claim your link",
+    hideDomainSwitch: false,
   },
 );
 
@@ -75,10 +86,12 @@ const emit = defineEmits<{
 const inputValue = ref(props.modelValue ?? "");
 const error = ref("");
 const checking = ref(false);
-const selectedDomain = ref(props.domain ?? "perlink.to");
+const selectedDomain = ref(
+  props.hideDomainSwitch ? "perlink.to" : (props.domain ?? "perlink.to"),
+);
 
 watch(() => props.domain, (val) => {
-  if (val) selectedDomain.value = val;
+  if (val && !props.hideDomainSwitch) selectedDomain.value = val;
 });
 
 const domainItems = [

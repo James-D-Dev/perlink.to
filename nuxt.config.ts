@@ -25,12 +25,12 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css", "animate.css/animate.min.css"],
   app: {
     head: {
-      title: "Perlink.to - Bio Link Pages, Short URLs & QR Codes",
+      title: "Perlink.to - Portfolio Templates & 3D Pages for Anything",
       meta: [
         {
           name: "description",
           content:
-            "All-in-one platform to create bio link pages, shorten URLs, and generate QR codes including VietQR. Built on Cloudflare for lightning-fast performance.",
+            "Build a beautiful page for you, your restaurant, your hotel or your shop with portfolio templates, drag-and-drop editing and interactive 3D mode.",
         },
         { name: "apple-mobile-web-app-title", content: "Perlink" },
       ],

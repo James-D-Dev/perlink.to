@@ -28,10 +28,16 @@ type User = {
     <template #default>
       <nav class="hidden md:flex items-center space-x-8">
         <ULink
-          to="#"
+          to="/#templates"
           class="text-perlink-blue/80 hover:text-perlink-blue transition-colors"
         >
           Templates
+        </ULink>
+        <ULink
+          to="/#3d-mode"
+          class="text-perlink-blue/80 hover:text-perlink-blue transition-colors"
+        >
+          3D Mode
         </ULink>
         <ULink
           to="#"
@@ -46,7 +52,7 @@ type User = {
           Discover
         </ULink>
         <ULink
-          to="pricing"
+          to="/pricing"
           class="text-perlink-blue/80 hover:text-perlink-blue transition-colors"
         >
           Pricing
@@ -97,10 +103,16 @@ type User = {
     <template #body>
       <nav class="flex flex-col space-y-4 p-4">
         <ULink
-          to="#"
+          to="/#templates"
           class="text-perlink-blue/80 hover:text-perlink-blue transition-colors"
         >
           Templates
+        </ULink>
+        <ULink
+          to="/#3d-mode"
+          class="text-perlink-blue/80 hover:text-perlink-blue transition-colors"
+        >
+          3D Mode
         </ULink>
         <ULink
           to="#"

@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     <Head>
       <Title>Pricing - Perlink.to</Title>
-      <Meta name="description" content="Choose the perfect plan for your bio link pages and short URLs. Free, Pro, and Business tiers available." />
+      <Meta name="description" content="Choose the perfect plan for your portfolio pages and templates. Free, Starter, Plus and Pro plans available." />
     </Head>
     <div class="py-8 md:py-12"></div>
 
@@ -56,11 +56,7 @@
               <ul class="space-y-3 text-sm">
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">1 bio profile</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">10 short links</span>
+                  <span class="text-slate-600">1 page</span>
                 </li>
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -74,12 +70,16 @@
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span class="text-slate-600">1 custom theme</span>
                 </li>
+                <li class="flex items-start gap-3">
+                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span class="text-slate-600">10 short links</span>
+                </li>
               </ul>
             </div>
 
             <!-- Bottom note -->
             <p class="mt-6 pt-4 border-t border-gray-100 text-xs text-slate-500">
-              1 link, 1 bio page & basic analytics
+              1 page, templates & basic analytics
             </p>
           </div>
         </UCard>
@@ -118,11 +118,7 @@
               <ul class="space-y-3 text-sm">
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span class="text-slate-600"><strong>2 bio profiles</strong></span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span class="text-slate-600"><strong>100 short links</strong></span>
+                  <span class="text-slate-600"><strong>2 pages</strong></span>
                 </li>
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
@@ -136,12 +132,16 @@
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
                   <span class="text-slate-600">5 custom themes</span>
                 </li>
+                <li class="flex items-start gap-3">
+                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                  <span class="text-slate-600">100 short links</span>
+                </li>
               </ul>
             </div>
 
             <!-- Bottom note -->
             <p class="mt-6 pt-4 border-t border-gray-100 text-xs text-slate-500">
-              100 links, 2 bio pages & 90-day analytics
+              2 pages, 5 themes & 90-day analytics
             </p>
           </div>
         </UCard>
@@ -187,11 +187,7 @@
                 <ul class="space-y-3 text-sm">
                   <li class="flex items-start gap-3">
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600"><strong>10 bio profiles</strong></span>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600"><strong>500 short links</strong></span>
+                    <span class="text-slate-600"><strong>10 pages</strong></span>
                   </li>
                   <li class="flex items-start gap-3">
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -213,12 +209,16 @@
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                     <span class="text-slate-600">Custom domain</span>
                   </li>
+                  <li class="flex items-start gap-3">
+                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span class="text-slate-600">500 short links</span>
+                  </li>
                 </ul>
               </div>
 
               <!-- Bottom note -->
               <p class="mt-6 pt-4 border-t border-gray-100 text-xs text-slate-500">
-                500 links, 10 profiles & full analytics
+                10 pages, custom domain & full analytics
               </p>
             </div>
           </UCard>
@@ -258,11 +258,7 @@
               <ul class="space-y-3 text-sm">
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600"><strong>Unlimited profiles</strong></span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600"><strong>Unlimited short links</strong></span>
+                  <span class="text-slate-600"><strong>Unlimited pages</strong></span>
                 </li>
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -283,6 +279,10 @@
                 <li class="flex items-start gap-3">
                   <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span class="text-slate-600">Priority support</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span class="text-slate-600">Unlimited short links</span>
                 </li>
               </ul>
             </div>

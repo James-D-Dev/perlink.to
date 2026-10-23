@@ -17,16 +17,16 @@ useHead({
   },
 });
 
-const title = "Nuxt Starter Template";
+const title = "Perlink.to - Portfolio Templates & 3D Pages for Anything";
 const description =
-  "A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours.";
+  "Build a beautiful page for you, your restaurant, your hotel or your shop with portfolio templates, drag-and-drop editing and interactive 3D mode.";
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-  ogImage: "https://ui.nuxt.com/assets/templates/nuxt/starter-light.png",
+  ogImage: "https://perlink.to/logo-full.png",
   twitterCard: "summary_large_image",
 });
 

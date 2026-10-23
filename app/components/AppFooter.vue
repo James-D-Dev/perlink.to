@@ -16,7 +16,7 @@
             Perlink.to
           </div>
           <p class="text-sm text-white/60 max-w-sm">
-            All-in-one platform for bio link pages, URL shortening, and QR codes. Built on Cloudflare for speed and reliability.
+            Beautiful pages for people and places: portfolios, menus, hotels, shops and interactive 3D rooms. Built on Cloudflare for speed and reliability.
           </p>
           <!-- Social Links -->
           <div class="flex space-x-3 pt-2">
@@ -54,17 +54,17 @@
         <div>
           <h3 class="text-sm font-semibold mb-4 text-white uppercase tracking-wider">Product</h3>
           <nav class="flex flex-col space-y-2">
-            <ULink to="/" class="text-sm text-white/60 hover:text-white transition-colors">
-              Bio Link Pages
+            <ULink to="/#templates" class="text-sm text-white/60 hover:text-white transition-colors">
+              Portfolio Templates
             </ULink>
-            <ULink to="/" class="text-sm text-white/60 hover:text-white transition-colors">
-              URL Shortener
+            <ULink to="/#3d-mode" class="text-sm text-white/60 hover:text-white transition-colors">
+              3D Mode
             </ULink>
-            <ULink to="/" class="text-sm text-white/60 hover:text-white transition-colors">
-              QR Codes
+            <ULink to="/#features" class="text-sm text-white/60 hover:text-white transition-colors">
+              QR Sharing
             </ULink>
-            <ULink to="/" class="text-sm text-white/60 hover:text-white transition-colors">
-              VietQR Payments
+            <ULink to="/pricing" class="text-sm text-white/60 hover:text-white transition-colors">
+              Pricing
             </ULink>
           </nav>
         </div>
@@ -79,8 +79,8 @@
             <ULink to="#" class="text-sm text-white/60 hover:text-white transition-colors">
               Blog
             </ULink>
-            <ULink to="#" class="text-sm text-white/60 hover:text-white transition-colors">
-              Pricing
+            <ULink to="/#faq" class="text-sm text-white/60 hover:text-white transition-colors">
+              FAQ
             </ULink>
             <ULink to="#" class="text-sm text-white/60 hover:text-white transition-colors">
               Contact
