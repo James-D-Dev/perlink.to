@@ -9,8 +9,8 @@
     </template>
 
     <template #body>
-      <div class="max-w-7xl mx-auto w-full px-2 md:px-4 py-4 space-y-6">
-        <p class="text-gray-500">Coming soon...</p>
+      <div class="mx-auto w-full max-w-7xl">
+        <UEmpty icon="i-lucide-settings" title="Settings" description="Coming soon." class="py-16" />
       </div>
     </template>
   </UDashboardPanel>
@@ -20,5 +20,6 @@
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
+  colorMode: 'dark',
 });
 </script>

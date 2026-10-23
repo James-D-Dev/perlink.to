@@ -5,49 +5,43 @@
       v-model:open="open"
       collapsible
       resizable
-      :min-size="17"
-      :max-size="17"
-      :default-size="17"
+      :min-size="15"
+      :max-size="20"
+      :default-size="16"
       :ui="{
-        root: 'bg-white',
+        root: 'bg-default border-r border-default',
+        header: 'h-(--ui-header-height) border-b border-default',
+        body: 'py-4',
         footer: 'border-t border-default',
       }"
     >
       <template #header="{ collapsed }">
-        <NuxtLink v-if="!collapsed" to="/" class="flex items-center gap-2">
-          <img src="/logo-full.png" class="h-10" alt="Perlink" />
-          <UKbd color="error" class="ml-2">SUPERADMIN</UKbd>
-        </NuxtLink>
-        <NuxtLink v-else to="/" class="flex items-center justify-center">
-          <img src="/logo-perlink.png" class="h-10" alt="Perlink" />
+        <NuxtLink to="/superadmin" class="flex items-center gap-2.5 min-w-0" :class="collapsed && 'mx-auto'">
+          <img src="/logo-perlink.png" class="size-8 shrink-0" alt="Perlink" />
+          <template v-if="!collapsed">
+            <span class="font-semibold text-highlighted truncate">Perlink</span>
+            <UBadge label="Admin" color="error" variant="subtle" size="sm" />
+          </template>
         </NuxtLink>
       </template>
 
       <template #default="{ collapsed }">
-        <UButton
-          to="/superadmin/users/create"
-          :label="collapsed ? undefined : 'Create User'"
-          icon="i-heroicons-plus"
-          block
-          :square="collapsed"
-          size="xl"
-          color="error"
-          class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600"
-        />
+        <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
 
         <UNavigationMenu
+          v-for="group in navigationGroups"
+          :key="group.label"
           :collapsed="collapsed"
-          :items="navigationLinks"
+          :items="[{ label: group.label, type: 'label' }, ...group.items]"
           orientation="vertical"
-          :ui="{
-            link: 'py-3',
-          }"
+          tooltip
         />
 
         <UNavigationMenu
           :collapsed="collapsed"
           :items="supportLinks"
           orientation="vertical"
+          tooltip
           class="mt-auto"
         />
       </template>
@@ -56,6 +50,7 @@
         <UserMenu :collapsed="collapsed" />
       </template>
     </UDashboardSidebar>
+
     <UDashboardSearch :groups="groups" />
 
     <slot />
@@ -64,91 +59,51 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from "#auth-utils";
 import type { NavigationMenuItem } from "@nuxt/ui";
 
-const { user: sessionUser, loggedIn } = useUserSession();
-const user = sessionUser as Ref<User | null>;
 const open = ref(false);
 
-const navigationLinks: NavigationMenuItem[] = [
+const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [
   {
-    label: "Dashboard",
-    icon: "i-mingcute-dashboard-4-line",
-    to: "/superadmin",
+    label: "Overview",
+    items: [
+      { label: "Dashboard", icon: "i-lucide-layout-dashboard", to: "/superadmin", exact: true },
+    ],
   },
   {
-    label: "Users",
-    icon: "i-mingcute-user-2-line",
-    to: "/superadmin/users",
+    label: "Manage",
+    items: [
+      { label: "Users", icon: "i-lucide-users", to: "/superadmin/users" },
+      { label: "Bio Pages", icon: "i-lucide-id-card", to: "/superadmin/bio" },
+      { label: "Short Links", icon: "i-lucide-link", to: "/superadmin/links" },
+      { label: "QR Codes", icon: "i-lucide-qr-code", to: "/superadmin/qr-codes" },
+    ],
   },
   {
-    label: "Bio Pages",
-    icon: "i-mingcute-profile-line",
-    to: "/superadmin/bio",
-  },
-  {
-    label: "Short Links",
-    icon: "i-mingcute-link-2-line",
-    to: "/superadmin/links",
-  },
-  {
-    label: "QR Codes",
-    icon: "i-mingcute-qrcode-2-line",
-    to: "/superadmin/qr-codes",
-  },
-  {
-    label: "Settings",
-    icon: "i-mingcute-settings-6-line",
-    to: "/superadmin/settings",
+    label: "System",
+    items: [
+      { label: "Settings", icon: "i-lucide-settings", to: "/superadmin/settings" },
+    ],
   },
 ];
 
 const supportLinks: NavigationMenuItem[] = [
-  {
-    label: "Back to Site",
-    icon: "i-mingcute-arrow-left-line",
-    to: "/",
-  },
-  {
-    label: "Admin Panel",
-    icon: "i-mingcute-dashboard-3-line",
-    to: "/admin",
-  },
+  { label: "User Dashboard", icon: "i-lucide-layout-grid", to: "/admin" },
+  { label: "Back to Site", icon: "i-lucide-arrow-left", to: "/" },
 ];
 
 const groups = computed(() => [
   {
     id: "links",
     label: "Go to",
-    items: navigationLinks as any,
+    items: navigationGroups.flatMap(g => g.items) as any,
+  },
+  {
+    id: "actions",
+    label: "Actions",
+    items: [
+      { label: "Create user", icon: "i-lucide-user-plus", to: "/superadmin/users/create" },
+    ],
   },
 ]);
-
-const handleSignOut = async () => {
-  try {
-    await $fetch("/api/auth/logout", { method: "POST" });
-    await useUserSession().clear();
-    await navigateTo("/login");
-  } catch (error) {
-    console.error("Error signing out:", error);
-  }
-};
-
-const accountMenuItems = [
-  [
-    {
-      label: "My Account",
-      icon: "i-heroicons-user",
-      onSelect: () => navigateTo("/superadmin/settings"),
-    },
-  ],
-  [
-    {
-      label: "Sign out",
-      icon: "i-heroicons-arrow-right-on-rectangle",
-      onSelect: handleSignOut,
-    },
-  ],
-];
 </script>

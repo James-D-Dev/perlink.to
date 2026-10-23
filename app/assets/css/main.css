@@ -44,3 +44,16 @@ Make sure disabled buttons don't get the pointer cursor.
 :disabled {
   cursor: default;
 }
+/*
+Dark theme (used by the superadmin console via per-page colorMode).
+Must come after :root so it overrides the light --ui-bg above.
+*/
+.dark {
+  --ui-primary: var(--color-perlink-cyan);
+  --ui-secondary: var(--color-perlink-blue);
+  --ui-bg: var(--ui-color-neutral-950);
+  --ui-bg-muted: var(--ui-color-neutral-900);
+  --ui-bg-elevated: var(--ui-color-neutral-900);
+  --ui-bg-accented: var(--ui-color-neutral-800);
+  --ui-border: color-mix(in oklab, var(--ui-color-neutral-800) 80%, transparent);
+}

@@ -1,130 +1,80 @@
 <template>
   <UDashboardPanel id="users-list">
     <template #header>
-      <UDashboardNavbar title="Users Management">
+      <UDashboardNavbar title="Users">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
         <template #right>
           <UButton
             to="/superadmin/users/create"
-            color="primary"
-            icon="i-lucide-plus"
-            label="Add User"
+            icon="i-lucide-user-plus"
+            label="Create User"
           />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <div class="max-w-7xl mx-auto w-full px-2 md:px-4 py-4 space-y-6">
+      <div class="mx-auto w-full max-w-7xl space-y-6">
 
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <UCard class="bg-white">
-          <div class="flex items-center gap-4">
-            <div class="p-3 bg-blue-50 rounded-lg">
-              <UIcon name="i-lucide-users" class="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Total Users</p>
-              <p class="text-2xl font-semibold">{{ stats.total }}</p>
-            </div>
-          </div>
-        </UCard>
-        <UCard class="bg-white">
-          <div class="flex items-center gap-4">
-            <div class="p-3 bg-green-50 rounded-lg">
-              <UIcon name="i-lucide-check-circle" class="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Active</p>
-              <p class="text-2xl font-semibold">{{ stats.active }}</p>
-            </div>
-          </div>
-        </UCard>
-        <UCard class="bg-white">
-          <div class="flex items-center gap-4">
-            <div class="p-3 bg-amber-50 rounded-lg">
-              <UIcon name="i-lucide-clock" class="w-6 h-6 text-amber-600" />
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Pending</p>
-              <p class="text-2xl font-semibold">{{ stats.pending }}</p>
-            </div>
-          </div>
-        </UCard>
-        <UCard class="bg-white">
-          <div class="flex items-center gap-4">
-            <div class="p-3 bg-red-50 rounded-lg">
-              <UIcon name="i-lucide-ban" class="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Banned</p>
-              <p class="text-2xl font-semibold">{{ stats.banned }}</p>
-            </div>
-          </div>
-        </UCard>
-      </div>
-
-      <!-- Filters -->
-      <div class="flex flex-wrap items-center gap-4 mb-6">
-        <UInput
-          v-model="searchQuery"
-          placeholder="Search users..."
-          icon="i-lucide-search"
-          class="w-72"
-        />
-        <USelect
-          v-model="statusFilter"
-          :items="statusOptions"
-          placeholder="Filter by status"
-          class="w-40"
-        />
-        <USelect
-          v-model="planFilter"
-          :items="planOptions"
-          placeholder="Filter by plan"
-          class="w-40"
-        />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-refresh-cw"
-          @click="refreshUsers"
-        />
-      </div>
-
-      <!-- Debug -->
-      <div v-if="users.length === 0 && !isLoading" class="p-4 bg-yellow-50 text-yellow-700 rounded-lg mb-4">
-        No users loaded. Check API response.
-      </div>
-      <div v-else class="p-2 bg-green-50 text-green-700 rounded-lg mb-4 text-sm">
-        Loaded {{ users.length }} users, filtered: {{ filteredUsers.length }}
+      <!-- Stats -->
+      <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <SuperadminStatCard label="Total Users" :value="stats.total" icon="i-lucide-users" :hint="`+${stats.newThisWeek} in the last 7 days`" :loading="isLoading && !loaded" />
+        <SuperadminStatCard label="Active" :value="stats.active" icon="i-lucide-user-check" :loading="isLoading && !loaded" />
+        <SuperadminStatCard label="Paid Plans" :value="stats.paid" icon="i-lucide-crown" :hint="paidPercent" :loading="isLoading && !loaded" />
+        <SuperadminStatCard label="Banned" :value="stats.banned" icon="i-lucide-ban" :loading="isLoading && !loaded" />
       </div>
 
       <!-- Users Table -->
-      <UCard class="bg-white overflow-hidden">
+      <UCard :ui="superadminCardUi">
+        <template #header>
+          <div class="flex flex-wrap items-center gap-2">
+            <UInput
+              v-model="searchQuery"
+              placeholder="Search name, email, username..."
+              icon="i-lucide-search"
+              class="w-full sm:w-72"
+            />
+            <USelect v-model="statusFilter" :items="statusOptions" placeholder="Status" class="w-36" />
+            <USelect v-model="planFilter" :items="planOptions" placeholder="Plan" class="w-36" />
+            <USelect v-model="sortBy" :items="sortOptions" class="w-44" />
+            <UButton
+              variant="ghost"
+              color="neutral"
+              icon="i-lucide-refresh-cw"
+              :loading="isLoading"
+              class="ml-auto"
+              @click="refreshUsers"
+            />
+          </div>
+        </template>
+
         <UTable
-          :data="users"
+          :data="paginatedUsers"
           :columns="columns"
           :loading="isLoading"
-          sort-mode="manual"
-          @sort="handleSort"
-        />
+          :ui="superadminTableUi"
+        >
+          <template #empty>
+            {{ users.length === 0 ? 'No users yet.' : 'No users match your filters.' }}
+          </template>
+        </UTable>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-between px-4 py-4 border-t border-gray-200">
-          <p class="text-sm text-gray-500">
-            Showing {{ pagination.start }} to {{ pagination.end }} of {{ pagination.total }} users
-          </p>
-          <UPagination
-            v-model:page="currentPage"
-            :total="pagination.total"
-            :items-per-page="itemsPerPage"
-            :sibling-count="1"
-          />
-        </div>
+        <template #footer>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-sm text-muted">
+              Showing {{ pageStart }}–{{ pageEnd }} of {{ filteredUsers.length }}
+            </p>
+            <UPagination
+              v-model:page="currentPage"
+              :total="filteredUsers.length"
+              :items-per-page="itemsPerPage"
+              :sibling-count="1"
+              size="sm"
+            />
+          </div>
+        </template>
       </UCard>
       </div>
     </template>
@@ -133,139 +83,155 @@
 
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
-import type { TableColumn, SelectItem } from '@nuxt/ui'
-import type { DropdownMenuItem } from '@nuxt/ui'
-import { PLAN_OPTIONS_WITH_ALL, type PlanId, usePlans } from '~/composables/usePlans'
+import type { TableColumn, SelectItem, DropdownMenuItem } from '@nuxt/ui'
+import { PLAN_OPTIONS, PLAN_OPTIONS_WITH_ALL, usePlans } from '~/composables/usePlans'
 
 const UBadge = resolveComponent('UBadge')
 const UAvatar = resolveComponent('UAvatar')
 const UButton = resolveComponent('UButton')
+const UIcon = resolveComponent('UIcon')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
+const NuxtLink = resolveComponent('NuxtLink')
 
 interface User {
   id: string
   name: string | null
+  username: string | null
   email: string
   avatar: string | null
   status: 'active' | 'pending' | 'banned' | 'inactive'
-  plan: 'free' | 'starter' | 'plus' | 'pro' | null
+  plan: string
   createdAt: string
+  bioCount: number
+  linkCount: number
+  qrCount: number
 }
 
 interface Stats {
   total: number
   active: number
-  pending: number
   banned: number
-}
-
-interface Pagination {
-  start: number
-  end: number
-  total: number
+  paid: number
+  newThisWeek: number
 }
 
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
+  colorMode: 'dark',
 });
+
+const toast = useToast();
+const confirm = useConfirm();
+const { getPlanColor } = usePlans();
 
 // State
 const isLoading = ref(false);
+const loaded = ref(false);
 const searchQuery = ref('');
 const statusFilter = ref<string | null>(null);
 const planFilter = ref<string | null>(null);
+const sortBy = ref('created');
 const currentPage = ref(1);
-const itemsPerPage = ref(10);
-
-const stats = ref<Stats>({
-  total: 0,
-  active: 0,
-  pending: 0,
-  banned: 0,
-});
+const itemsPerPage = ref(15);
 
 const users = ref<User[]>([]);
-const pagination = ref<Pagination>({
-  start: 1,
-  end: 10,
-  total: 0,
-});
+const stats = ref<Stats>({ total: 0, active: 0, banned: 0, paid: 0, newThisWeek: 0 });
 
 // Options
 const statusOptions = ref<SelectItem[]>([
-  { label: 'All', value: null as unknown as string },
+  { label: 'All statuses', value: null as unknown as string },
   { label: 'Active', value: 'active' },
   { label: 'Pending', value: 'pending' },
   { label: 'Banned', value: 'banned' },
 ]);
 
-const planOptions = PLAN_OPTIONS_WITH_ALL;
+const planOptions = PLAN_OPTIONS_WITH_ALL.map(o =>
+  (o as { value: unknown }).value === null ? { ...(o as object), label: 'All plans' } : o
+) as SelectItem[];
+
+const sortOptions = ref<SelectItem[]>([
+  { label: 'Newest', value: 'created' },
+  { label: 'Oldest', value: 'oldest' },
+  { label: 'Most content', value: 'content' },
+  { label: 'Name (A-Z)', value: 'name' },
+]);
+
+const statusColors: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
+  active: 'success',
+  pending: 'warning',
+  banned: 'error',
+  inactive: 'neutral',
+};
+
+const countChip = (icon: string, count: number, title: string) =>
+  h('span', { class: ['inline-flex items-center gap-1 tabular-nums', count ? 'text-default' : 'text-dimmed'], title }, [
+    h(UIcon, { name: icon, class: 'size-3.5 text-dimmed' }),
+    String(count)
+  ])
 
 const columns: TableColumn<User>[] = [
   {
     accessorKey: 'email',
     header: 'User',
     cell: ({ row }) => {
-      const user = row.original as User
-      return h('div', { class: 'flex items-center gap-3' }, [
+      const user = row.original
+      return h(NuxtLink, { to: `/superadmin/users/${user.id}`, class: 'flex items-center gap-3 min-w-0 group' }, () => [
         h(UAvatar, {
           src: user.avatar || undefined,
           alt: user.name || '',
           text: (user.name?.charAt(0) || user.email?.charAt(0) || '?').toUpperCase(),
           size: 'sm'
         }),
-        h('div', {}, [
-          h('p', { class: 'font-medium text-gray-900' }, user.name || 'No name'),
-          h('p', { class: 'text-sm text-gray-500' }, user.email)
+        h('div', { class: 'min-w-0' }, [
+          h('p', { class: 'truncate font-medium text-highlighted group-hover:text-primary' }, user.name || 'No name'),
+          h('p', { class: 'truncate text-xs text-muted' }, user.email)
         ])
       ])
     }
   },
   {
+    accessorKey: 'plan',
+    header: 'Plan',
+    cell: ({ row }) => h(UBadge, { variant: 'subtle', color: getPlanColor(row.original.plan), size: 'sm', class: 'capitalize' }, () => row.original.plan)
+  },
+  {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const user = row.original as User
-      const color = {
-        active: 'success',
-        pending: 'warning',
-        banned: 'error',
-        inactive: 'neutral'
-      }[user.status] || 'neutral'
-      return h(UBadge, { variant: 'soft', color, size: 'sm' }, () => user.status)
+      const status = row.original.status
+      return h('span', { class: 'inline-flex items-center gap-1.5 capitalize' }, [
+        h('span', { class: ['size-1.5 rounded-full', {
+          success: 'bg-success', warning: 'bg-warning', error: 'bg-error', neutral: 'bg-dimmed'
+        }[statusColors[status] || 'neutral']] }),
+        status
+      ])
     }
   },
   {
-    accessorKey: 'plan',
-    header: 'Plan',
+    id: 'content',
+    header: 'Content',
     cell: ({ row }) => {
-      const user = row.original as User
-      const color = {
-        free: 'neutral',
-        starter: 'primary',
-        plus: 'secondary',
-        pro: 'warning'
-      }[user.plan || 'free'] || 'neutral'
-      return h(UBadge, { variant: 'soft', color, size: 'sm' }, () => user.plan || 'Free')
+      const user = row.original
+      return h('div', { class: 'flex items-center gap-3' }, [
+        countChip('i-lucide-id-card', user.bioCount, 'Bio pages'),
+        countChip('i-lucide-link', user.linkCount, 'Short links'),
+        countChip('i-lucide-qr-code', user.qrCount, 'QR codes'),
+      ])
     }
   },
   {
     accessorKey: 'createdAt',
     header: 'Joined',
-    cell: ({ row }) => {
-      const user = row.original as User
-      return formatDate(user.createdAt)
-    }
+    cell: ({ row }) => h('span', { class: 'text-muted' }, formatAdminDate(row.original.createdAt))
   },
   {
-    accessorKey: 'id',
-    header: '',
+    id: 'actions',
     meta: { class: { td: 'text-right' } },
     cell: ({ row }) => {
-      const user = row.original as User
-      return h(UDropdownMenu, { items: getActionItems(user) }, () =>
-        h(UButton, { variant: 'ghost', color: 'neutral', icon: 'i-lucide-more-vertical', size: 'sm' })
+      const user = row.original
+      return h(UDropdownMenu, { items: getActionItems(user), content: { align: 'end' } }, () =>
+        h(UButton, { variant: 'ghost', color: 'neutral', icon: 'i-lucide-ellipsis-vertical', size: 'sm' })
       )
     }
   }
@@ -274,68 +240,92 @@ const columns: TableColumn<User>[] = [
 // Computed
 const filteredUsers = computed(() => {
   let result = users.value;
-  
+
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    result = result.filter((u: User) => 
+    result = result.filter((u) =>
       u.name?.toLowerCase().includes(query) ||
+      u.username?.toLowerCase().includes(query) ||
       u.email?.toLowerCase().includes(query)
     );
   }
-  
+
   if (statusFilter.value) {
-    result = result.filter((u: User) => u.status === statusFilter.value);
+    result = result.filter((u) => u.status === statusFilter.value);
   }
 
   if (planFilter.value) {
-    result = result.filter((u: User) => u.plan === planFilter.value);
+    result = result.filter((u) => u.plan === planFilter.value);
   }
-  
-  return result;
+
+  const content = (u: User) => u.bioCount + u.linkCount + u.qrCount;
+  const sorters: Record<string, (a: User, b: User) => number> = {
+    created: (a, b) => toTime(b.createdAt) - toTime(a.createdAt),
+    oldest: (a, b) => toTime(a.createdAt) - toTime(b.createdAt),
+    content: (a, b) => content(b) - content(a),
+    name: (a, b) => (a.name || a.email).localeCompare(b.name || b.email),
+  };
+
+  return [...result].sort(sorters[sortBy.value] ?? sorters.created);
+});
+
+const paginatedUsers = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  return filteredUsers.value.slice(start, start + itemsPerPage.value);
+});
+
+const pageStart = computed(() =>
+  filteredUsers.value.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage.value + 1
+);
+const pageEnd = computed(() =>
+  Math.min(currentPage.value * itemsPerPage.value, filteredUsers.value.length)
+);
+
+const paidPercent = computed(() =>
+  stats.value.total ? `${Math.round((stats.value.paid / stats.value.total) * 100)}% of users` : undefined
+);
+
+// Reset to first page when filters change
+watch([searchQuery, statusFilter, planFilter, sortBy], () => {
+  currentPage.value = 1;
 });
 
 // Methods
-const getStatusColor = (status: string): 'success' | 'warning' | 'error' | 'neutral' => {
-  const colors: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
-    active: 'success',
-    pending: 'warning',
-    banned: 'error',
-    inactive: 'neutral',
-  };
-  return colors[status] || 'neutral';
-};
-
-const formatDate = (date: string | Date): string => {
-  if (!date) return '-';
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-};
-
 const getActionItems = (user: User): DropdownMenuItem[][] => [
   [
     {
-      label: 'View Details',
+      label: 'View details',
       icon: 'i-lucide-eye',
       onSelect: () => navigateTo(`/superadmin/users/${user.id}`),
     },
     {
-      label: 'Edit User',
-      icon: 'i-lucide-pencil',
-      onSelect: () => navigateTo(`/superadmin/users/${user.id}/edit`),
+      label: 'Change plan',
+      icon: 'i-lucide-crown',
+      children: PLAN_OPTIONS.map((o) => {
+        const option = o as { label: string; value: string };
+        return {
+          label: option.label,
+          type: 'checkbox' as const,
+          checked: user.plan === option.value,
+          onSelect: () => updatePlan(user, option.value),
+        };
+      }),
+    },
+    {
+      label: 'Copy email',
+      icon: 'i-lucide-copy',
+      onSelect: () => copyEmail(user),
     },
   ],
   [
     {
-      label: user.status === 'banned' ? 'Unban User' : 'Ban User',
-      icon: user.status === 'banned' ? 'i-lucide-check-circle' : 'i-lucide-ban',
-      color: user.status === 'banned' ? 'success' : 'error',
+      label: user.status === 'banned' ? 'Unban user' : 'Ban user',
+      icon: user.status === 'banned' ? 'i-lucide-user-check' : 'i-lucide-ban',
+      color: user.status === 'banned' ? 'success' : 'warning',
       onSelect: () => toggleBanUser(user),
     },
     {
-      label: 'Delete User',
+      label: 'Delete user',
       icon: 'i-lucide-trash',
       color: 'error',
       onSelect: () => deleteUser(user),
@@ -343,33 +333,68 @@ const getActionItems = (user: User): DropdownMenuItem[][] => [
   ],
 ];
 
+const copyEmail = async (user: User) => {
+  try {
+    await navigator.clipboard.writeText(user.email);
+    toast.add({ title: 'Email copied', color: 'success' });
+  } catch {
+    toast.add({ title: 'Failed to copy email', color: 'error' });
+  }
+};
+
+const updatePlan = async (user: User, plan: string) => {
+  if (user.plan === plan) return;
+  try {
+    await $fetch(`/api/superadmin/users/${user.id}/plan`, {
+      method: 'POST' as any,
+      body: { plan },
+    });
+    toast.add({ title: `${user.name || user.email} moved to ${plan}`, color: 'success' });
+    await refreshUsers();
+  } catch (error) {
+    console.error('Failed to update plan:', error);
+    toast.add({ title: 'Failed to update plan', color: 'error' });
+  }
+};
+
 const toggleBanUser = async (user: User) => {
+  const banning = user.status !== 'banned';
+  if (banning && !await confirm({
+    title: `Ban ${user.name || user.email}?`,
+    description: 'The user will be marked as banned.',
+    confirmLabel: 'Ban user',
+    color: 'warning',
+  })) return;
+
   try {
     await $fetch(`/api/superadmin/users/${user.id}/ban`, {
       method: 'POST' as any,
     });
+    toast.add({ title: banning ? 'User banned' : 'User unbanned', color: 'success' });
     await refreshUsers();
   } catch (error) {
     console.error('Failed to toggle ban:', error);
+    toast.add({ title: 'Failed to update user', color: 'error' });
   }
 };
 
 const deleteUser = async (user: User) => {
-  if (!confirm(`Are you sure you want to delete ${user.name || user.email}?`)) return;
-  
+  if (!await confirm({
+    title: `Delete ${user.name || user.email}?`,
+    description: `This permanently deletes the account and all of its content (${user.bioCount} bio pages, ${user.linkCount} short links, ${user.qrCount} QR codes). This cannot be undone.`,
+    confirmLabel: 'Delete user',
+  })) return;
+
   try {
     await $fetch(`/api/superadmin/users/${user.id}`, {
       method: 'DELETE' as any,
     });
+    toast.add({ title: 'User deleted', color: 'success' });
     await refreshUsers();
   } catch (error) {
     console.error('Failed to delete user:', error);
+    toast.add({ title: 'Failed to delete user', color: 'error' });
   }
-};
-
-const handleSort = (sort: { id: string; desc: boolean }) => {
-  console.log('Sort:', sort);
-  // TODO: Implement server-side sorting
 };
 
 const refreshUsers = async () => {
@@ -378,19 +403,13 @@ const refreshUsers = async () => {
     const response = await $fetch('/api/superadmin/users') as {
       users: User[]
       stats: Stats
-      pagination: Pagination
     };
-    console.log('API Response:', response);
-    console.log('Users:', response.users);
     users.value = response.users || [];
-    stats.value = response.stats || { total: 0, active: 0, pending: 0, banned: 0 };
-    pagination.value = response.pagination || { start: 1, end: 0, total: 0 };
-    console.log('users.value set to:', users.value);
+    stats.value = response.stats || { total: 0, active: 0, banned: 0, paid: 0, newThisWeek: 0 };
+    loaded.value = true;
   } catch (error) {
     console.error('Failed to fetch users:', error);
-    users.value = [];
-    stats.value = { total: 0, active: 0, pending: 0, banned: 0 };
-    pagination.value = { start: 1, end: 0, total: 0 };
+    toast.add({ title: 'Failed to load users', color: 'error' });
   } finally {
     isLoading.value = false;
   }
