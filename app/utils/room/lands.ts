@@ -27,9 +27,17 @@ export interface SkyPalette {
   day: THREE.Color
 }
 
+/** Physical sky settings (three.js Sky shader); omitted for space */
+export interface Atmosphere {
+  turbidity: number
+  rayleigh: number
+  mie: number
+}
+
 export interface LandInstance {
   group: THREE.Group
   sky: SkyPalette
+  atmosphere?: Atmosphere
   /** Stars stay visible during the day (space) */
   starsAlways: boolean
   /** Called every frame; daylight 0..1, lamps 0..1 (night lights) */
@@ -718,6 +726,7 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
     group,
     starsAlways: false,
     sky: { night: new THREE.Color('#070b1f'), dusk: new THREE.Color('#f2a65a'), day: new THREE.Color('#8fd0f5') },
+    atmosphere: { turbidity: 2.5, rayleigh: 2.2, mie: 0.003 },
     update(time, dt, daylight, lamps) {
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
@@ -889,6 +898,7 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
     group,
     starsAlways: false,
     sky: { night: new THREE.Color('#140c2a'), dusk: new THREE.Color('#ffb3c7'), day: new THREE.Color('#bfe3ff') },
+    atmosphere: { turbidity: 2, rayleigh: 1.8, mie: 0.0025 },
     update(time, dt, daylight, lamps) {
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
@@ -1020,6 +1030,7 @@ function buildWinter(ctx: LandContext, radius: number): LandInstance {
     group,
     starsAlways: false,
     sky: { night: new THREE.Color('#0b1424'), dusk: new THREE.Color('#e7b8a6'), day: new THREE.Color('#bcd3e8') },
+    atmosphere: { turbidity: 6, rayleigh: 1.2, mie: 0.005 },
     update(time, dt, daylight, lamps) {
       snowTop.color.copy(snowNight).lerp(snowDay, daylight)
       snowfall.update(time, dt, daylight)

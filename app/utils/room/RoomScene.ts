@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { Sky } from 'three/examples/jsm/objects/Sky.js'
 import type { LandId, RoomConfig, RoomObject, RoomStyle, WallSide } from '~/types/room'
 import { CATALOG_BY_TYPE, type CatalogItem } from './catalog'
 import { getDaylight, type DaylightState } from './daylight'
@@ -61,6 +62,14 @@ export class RoomScene {
   private landKey = ''
   private clock = new THREE.Clock()
   private lamps = 0
+  /** Visible sky: gradient dome (the camera mostly sees below the horizon) */
+  private skyDome = createSkyDome()
+  /** Physical sky, used only to light the scene through the environment map */
+  private envScene = new THREE.Scene()
+  private envSky = new Sky()
+  private pmrem: THREE.PMREMGenerator
+  private envTarget?: THREE.WebGLRenderTarget
+  private envKey = ''
   private walls: THREE.Mesh[] = []
   private floor?: THREE.Mesh
 
@@ -92,7 +101,8 @@ export class RoomScene {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+    // Neutral keeps colours saturated (ACES and AgX wash out this pastel scenery)
+    this.renderer.toneMapping = THREE.NeutralToneMapping
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.domElement.style.display = 'block'
     this.renderer.domElement.style.touchAction = 'none'
@@ -121,12 +131,17 @@ export class RoomScene {
     this.controls.addEventListener('change', this.clampTarget)
 
     this.scene.add(this.hemi, this.ambient, this.sun, this.sun.target)
+    this.pmrem = new THREE.PMREMGenerator(this.renderer)
+    this.scene.add(this.skyDome.mesh)
+    this.envSky.scale.setScalar(50)
+    this.envScene.add(this.envSky)
     this.sun.castShadow = true
     this.sun.shadow.mapSize.set(2048, 2048)
-    this.sun.shadow.camera.left = -8
-    this.sun.shadow.camera.right = 8
-    this.sun.shadow.camera.top = 8
-    this.sun.shadow.camera.bottom = -8
+    this.sun.shadow.camera.left = -14
+    this.sun.shadow.camera.right = 14
+    this.sun.shadow.camera.top = 14
+    this.sun.shadow.camera.bottom = -14
+    this.sun.shadow.camera.far = 80
     this.sun.shadow.bias = -0.0005
     this.sun.shadow.normalBias = 0.02
 
@@ -281,6 +296,8 @@ export class RoomScene {
       if (Array.isArray(material)) material.forEach(m => this.disposeMaterial(m))
       else if (material) this.disposeMaterial(material)
     })
+    this.envTarget?.dispose()
+    this.pmrem.dispose()
     this.renderer.dispose()
     el.remove()
   }
@@ -619,25 +636,52 @@ export class RoomScene {
       else this.skyColor.copy(sky.dusk).lerp(sky.day, (d - 0.5) * 2)
     }
     this.scene.background = this.skyColor
+    this.skyDome.setColor(this.skyColor)
     if (!this.scene.fog) this.scene.fog = new THREE.Fog(this.skyColor, 30, 90)
     ;(this.scene.fog as THREE.Fog).color.copy(this.skyColor)
-
-    this.hemi.intensity = 0.15 + 0.9 * d
-    this.hemi.color.copy(this.skyColor).lerp(new THREE.Color('#ffffff'), 0.5)
-    this.ambient.intensity = 0.06 + 0.2 * d
-    this.renderer.toneMappingExposure = 0.9 + 0.25 * d
 
     // Sun or moon travels an arc behind the room, rising on the right
     const angle = Math.PI * (0.08 + 0.84 * arc)
     const arcPos = new THREE.Vector3(Math.cos(angle) * 22 - 14, Math.sin(angle) * 16 + 2, -Math.cos(angle) * 22 - 14)
-    this.sunDisc.visible = isDay
+    // The directional light comes in from the open side so the room is lit
+    this.sun.position.set(Math.cos(angle) * 8 + 10, Math.max(Math.sin(angle) * 16, 3) + 5, 12)
+    this.sun.color.copy(isDay ? SUN_COLOR : MOON_COLOR)
+
+    const atmosphere = this.land?.atmosphere
+    if (atmosphere) {
+      // Physical sky: sun height follows daylight so dusk turns orange naturally
+      const sunDir = this.sun.position.clone().normalize()
+      const skyDir = new THREE.Vector3(sunDir.x, THREE.MathUtils.lerp(-0.15, sunDir.y, d), sunDir.z).normalize()
+      {
+        const u = this.envSky.material.uniforms
+        u.turbidity!.value = atmosphere.turbidity
+        u.rayleigh!.value = atmosphere.rayleigh
+        u.mieCoefficient!.value = atmosphere.mie
+        u.mieDirectionalG!.value = 0.8
+        u.sunPosition!.value.copy(skyDir)
+      }
+      this.updateEnvironment(`${Math.round(skyDir.y * 40)}|${Math.round(skyDir.x * 8)}|${atmosphere.turbidity}`)
+      // The physical sky is very bright (HDR), so its light is scaled down
+      this.scene.environmentIntensity = 0.08 + 0.32 * d
+      // Image-based light does the fill; keep flat ambient low so colours stay rich
+      this.hemi.intensity = 0.08 + 0.3 * d
+      this.ambient.intensity = 0.03 + 0.05 * d
+      this.sun.intensity = isDay ? 0.6 + 3.2 * d : 0.3 * (1 - d) + 0.05
+      this.sunDisc.visible = false
+    } else {
+      if (this.scene.environment) {
+        this.scene.environment = null
+        this.envKey = ''
+      }
+      this.hemi.intensity = 0.15 + 0.9 * d
+      this.ambient.intensity = 0.06 + 0.2 * d
+      this.sun.intensity = isDay ? 0.4 + 2.2 * d : 0.25 * (1 - d) + 0.05
+      this.sunDisc.visible = isDay
+    }
+    this.hemi.color.copy(this.skyColor).lerp(new THREE.Color('#ffffff'), 0.5)
+    this.renderer.toneMappingExposure = atmosphere ? 0.75 + 0.1 * d : 1 + 0.1 * d
     this.moonDisc.visible = !isDay
     ;(isDay ? this.sunDisc : this.moonDisc).position.copy(arcPos)
-
-    // The directional light comes in from the open side so the room is lit
-    this.sun.position.set(Math.cos(angle) * 5 + 6, Math.max(Math.sin(angle) * 10, 2) + 3, 7)
-    this.sun.color.copy(isDay ? SUN_COLOR : MOON_COLOR)
-    this.sun.intensity = isDay ? 0.4 + 2.2 * d : 0.25 * (1 - d) + 0.05
 
     this.stars.material.uniforms.opacity!.value = this.land?.starsAlways ? 1 : Math.max(0, 1 - d * 1.6)
 
@@ -657,6 +701,16 @@ export class RoomScene {
         m.emissiveIntensity = 0.25 + 0.55 * d
       }
     }
+  }
+
+  /** Re-render the sky into the environment map when the sun has moved */
+  private updateEnvironment(key: string) {
+    if (key === this.envKey) return
+    this.envKey = key
+    const target = this.pmrem.fromScene(this.envScene, 0.04)
+    this.envTarget?.dispose()
+    this.envTarget = target
+    this.scene.environment = target.texture
   }
 
   // ---------- Cleanup helpers ----------
@@ -743,4 +797,52 @@ export function createFloorTexture(kind: RoomStyle['floorMaterial'], width: numb
   texture.repeat.set(width / 3, depth / 3)
   texture.anisotropy = 4
   return texture
+}
+
+/** Gradient sky dome: deeper blue overhead, light at the horizon, rich below it */
+function createSkyDome() {
+  const uniforms = {
+    zenith: { value: new THREE.Color() },
+    horizon: { value: new THREE.Color() },
+    below: { value: new THREE.Color() },
+  }
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    side: THREE.BackSide,
+    depthWrite: false,
+    fog: false,
+    vertexShader: `
+      varying vec3 vDir;
+      void main() {
+        vDir = normalize(position);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 zenith;
+      uniform vec3 horizon;
+      uniform vec3 below;
+      varying vec3 vDir;
+      void main() {
+        float y = vDir.y;
+        vec3 color = y > 0.0
+          ? mix(horizon, zenith, smoothstep(0.0, 0.55, y))
+          : mix(horizon, below, smoothstep(0.0, 0.5, -y));
+        gl_FragColor = vec4(color, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `,
+  })
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(95, 32, 16), material)
+  mesh.renderOrder = -1
+  const white = new THREE.Color('#ffffff')
+  return {
+    mesh,
+    setColor(base: THREE.Color) {
+      uniforms.zenith.value.copy(base).offsetHSL(0, 0.08, -0.14)
+      uniforms.horizon.value.copy(base).lerp(white, 0.35)
+      uniforms.below.value.copy(base).offsetHSL(0, 0.12, -0.04)
+    },
+  }
 }
