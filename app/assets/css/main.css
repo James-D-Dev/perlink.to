@@ -47,7 +47,7 @@ comes from imagery and the gradient orbs, not from the UI chrome.
   /* Light theme (public site and dashboard): ink primary, warm neutrals */
   --ui-primary: var(--color-ink);
   --ui-secondary: var(--color-ink-soft);
-  --ui-radius: 0.625rem;
+  --ui-radius: 0.25rem;
 
   --ui-bg: var(--color-paper);
   --ui-bg-muted: #f9f7f5;

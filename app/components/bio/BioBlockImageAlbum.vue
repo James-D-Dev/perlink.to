@@ -26,10 +26,19 @@
 
     <!-- Edit Form -->
     <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
+      <UFormField label="Title" help="Optional heading above the images.">
+        <UInput
+          :model-value="imageAlbumBlock?.data.title"
+          placeholder="e.g. Gallery"
+          class="w-full"
+          @update:model-value="$emit('updateTitle', String($event))"
+        />
+      </UFormField>
+
       <!-- Layout Selector -->
       <div>
         <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block">Layout</label>
-        <div class="flex gap-2">
+        <div class="grid grid-cols-4 gap-2">
           <UButton
             v-for="layout in layouts"
             :key="layout.value"
@@ -201,6 +210,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   toggle: [];
   update: [data: { images: any[], layout: ImageAlbumLayout }];
+  updateTitle: [title: string];
 }>();
 
 // Use composable
@@ -211,7 +221,9 @@ const { albumImages, albumLayout, imageAlbumBlock, setImageAlbum, addImage, remo
 const MAX_IMAGES = 6;
 
 const layouts = [
-  { value: 'vertical' as ImageAlbumLayout, label: 'Vertical', icon: 'i-lucide-layout-grid' },
+  { value: 'grid' as ImageAlbumLayout, label: 'Grid', icon: 'i-lucide-layout-grid' },
+  { value: 'masonry' as ImageAlbumLayout, label: 'Masonry', icon: 'i-lucide-layout-dashboard' },
+  { value: 'vertical' as ImageAlbumLayout, label: 'Stack', icon: 'i-lucide-rows-3' },
   { value: 'carousel' as ImageAlbumLayout, label: 'Carousel', icon: 'i-lucide-images' },
 ];
 

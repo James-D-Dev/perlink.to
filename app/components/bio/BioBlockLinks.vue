@@ -21,6 +21,14 @@
     <!-- Links Edit Form -->
     <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
       <div class="space-y-4">
+        <UFormField label="Title" help="Optional heading above the links.">
+          <UInput
+            :model-value="linksBlock?.data.title"
+            placeholder="e.g. Featured"
+            class="w-full"
+            @update:model-value="$emit('updateTitle', String($event))"
+          />
+        </UFormField>
         <draggable
           v-model="localLinks"
           item-key="id"
@@ -201,6 +209,7 @@ const emit = defineEmits<{
   ];
   selectImage: [index: number];
   update: [links: BioLink[]];
+  updateTitle: [title: string];
 }>();
 
 // Use composable

@@ -1,5 +1,5 @@
 <template>
-  <div id="social-block" :class="cardAppearClasses" class="flex justify-center gap-3 mb-6">
+  <div id="social-block" :class="[...cardAppearClasses, align === 'left' ? 'justify-start' : 'justify-center']" class="flex flex-wrap gap-2.5">
     <a
       v-for="social in socials"
       :key="social.id"
@@ -12,7 +12,7 @@
       @mouseleave="onMouseLeave"
       @click="trackSocialClick(social.id, getSocialUrl(social))"
     >
-      <UIcon :name="getSocialIcon(social.provider)" class="w-5 h-5" />
+      <UIcon :name="getSocialIcon(social.provider)" class="size-[18px]" />
     </a>
   </div>
 </template>
@@ -29,9 +29,20 @@ const props = defineProps<{
   cardHoverClasses: string[]
   username?: string
   mode: string
+  /** Single-colour icons that take the theme colour instead of brand logos */
+  monochrome?: boolean
+  align?: 'left' | 'center'
 }>()
 
+const MONO_ICONS: Record<string, string> = {
+  twitter: 'i-simple-icons-x',
+  website: 'i-lucide-globe',
+  email: 'i-lucide-mail',
+  phone: 'i-lucide-phone',
+}
+
 function getSocialIcon(provider: string): string {
+  if (props.monochrome) return MONO_ICONS[provider] ?? `i-simple-icons-${provider}`
   const found = SOCIAL_PROVIDERS.find(p => p.key === provider)
   return found?.icon || 'i-lucide-link'
 }

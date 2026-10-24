@@ -144,6 +144,8 @@ export interface ThemeCard {
   shadow: ThemeShadow;
   backdropBlur?: ThemeBackdropBlur;
   outlineColor?: string;
+  /** Surface colour. When set, cards use it instead of a tint of the primary colour */
+  backgroundColor?: string;
   textColor?: string;
   animationAppear?: AnimateAppear;
   animationHover?: AnimateHover;
@@ -175,6 +177,10 @@ export interface ThemeHeader {
   bannerUrl?: string;
   fontFamily?: string;
   fontSize?: string;
+  /** CSS font-weight for the name, e.g. "400" */
+  fontWeight?: string;
+  /** CSS letter-spacing for the name, e.g. "-0.02em" */
+  letterSpacing?: string;
   textColor?: string;
 }
 
@@ -191,7 +197,8 @@ export interface ThemeAvatar {
 export type LinkCardLayout =
   | "vertical"
   | "horizontal-left"
-  | "horizontal-right";
+  | "horizontal-right"
+  | "centered";
 
 export interface ThemeLink {
   layout: LinkCardLayout;
@@ -206,6 +213,19 @@ export interface ThemeTypography {
   bioFontFamily?: string;
   bioFontSize?: string;
   bioTextColor?: string;
+  /** Default colour for text outside cards */
+  textColor?: string;
+}
+
+export interface ThemeSocial {
+  style: "soft" | "filled" | "outline" | "plain";
+}
+
+export interface ThemePage {
+  /** Space between blocks */
+  blockGap: "compact" | "normal" | "relaxed";
+  /** Alignment of block titles */
+  titleAlign: "left" | "center";
 }
 
 export interface ThemeConfig {
@@ -217,6 +237,8 @@ export interface ThemeConfig {
   avatar: ThemeAvatar;
   typography: ThemeTypography;
   link: ThemeLink;
+  social?: ThemeSocial;
+  page?: ThemePage;
   showShare?: boolean;
   /** '3d' shows the page as an interactive mini room */
   pageMode?: PageMode;
@@ -244,6 +266,7 @@ export interface BaseBlock {
 export interface LinksBlock extends BaseBlock {
   name: 'links';
   data: {
+    title?: string;
     items: BioLink[];
   };
 }
@@ -258,6 +281,7 @@ export interface SocialBlock extends BaseBlock {
 export interface ImageAlbumBlock extends BaseBlock {
   name: 'image-album';
   data: {
+    title?: string;
     images: { id: string; url: string; alt?: string }[];
     layout: 'grid' | 'masonry' | 'carousel';
   };
@@ -287,8 +311,11 @@ export interface AnalyticsConfig {
 export interface TextBlock extends BaseBlock {
   name: 'text';
   data: {
+    title?: string;
     content: string;
     align: 'left' | 'center' | 'right';
+    /** 'card' puts the text on a card surface */
+    style?: 'plain' | 'card';
   };
 }
 
@@ -418,6 +445,8 @@ export const DEFAULT_THEME: ThemeConfig = {
     nameSize: "lg",
     paragraphSize: "sm",
   },
+  social: { style: "soft" },
+  page: { blockGap: "normal", titleAlign: "center" },
   showShare: true,
 };
 
@@ -442,6 +471,7 @@ export interface ImageAlbumImage {
 export type ImageAlbumLayout = "vertical" | "carousel" | "grid" | "masonry";
 
 export interface ImageAlbumBlock {
+  title?: string;
   images: ImageAlbumImage[];
   layout: ImageAlbumLayout;
   maxImages?: number;

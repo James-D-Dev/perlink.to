@@ -25,9 +25,11 @@ export function useBioBlock({ blocks }: UseBioBlockOptions) {
     
     if (existingIndex >= 0) {
       // Update existing block
+      // Merge so fields an editor doesn't know about (e.g. the block title) survive
+      const existing = blocks.value[existingIndex]!;
       blocks.value[existingIndex] = {
-        ...blocks.value[existingIndex],
-        data,
+        ...existing,
+        data: { ...(existing.data as object), ...(data as object) },
       } as T;
     } else {
       // Create new block

@@ -1,6 +1,6 @@
 <template>
-  <section class="space-y-3 p-4" :style="cardStyle">
-    <h2 class="font-semibold">{{ data.title || 'Contact' }}</h2>
+  <section class="space-y-3 p-5" :style="cardStyle">
+    <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || 'Contact' }}</h2>
 
     <a v-if="data.address" :href="mapHref" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 text-sm hover:underline">
       <UIcon name="i-lucide-map-pin" class="mt-0.5 size-4 shrink-0" />
@@ -48,6 +48,7 @@ const props = defineProps<{
   data: ContactBlock['data']
   cardStyle: Record<string, string | undefined>
   buttonStyle: Record<string, string | undefined>
+  headingStyle?: Record<string, string | undefined>
 }>()
 
 // Only allow web links (blocks javascript: and similar)

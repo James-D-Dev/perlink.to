@@ -14,7 +14,7 @@
     <template #body>
       <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-6">
         <!-- Hero -->
-        <section class="relative overflow-hidden rounded-3xl bg-elevated p-6 dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl sm:p-10">
+        <section class="relative overflow-hidden rounded-2xl bg-elevated p-6 dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl sm:p-10">
           <div class="pointer-events-none absolute inset-0 dark:bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgb(255_255_255/0.06),transparent)]" />
           <!-- Gradient orbs, echoing the 3D lands -->
           <div class="pointer-events-none absolute right-12 top-1/2 hidden -translate-y-1/2 lg:block" aria-hidden="true">

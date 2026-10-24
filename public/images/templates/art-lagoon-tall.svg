@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+<defs><radialGradient id="g0"><stop offset="0" stop-color="#9fe3f5" stop-opacity="0.95"/><stop offset="1" stop-color="#9fe3f5" stop-opacity="0"/></radialGradient><radialGradient id="g1"><stop offset="0" stop-color="#3d8ccc" stop-opacity="0.95"/><stop offset="1" stop-color="#3d8ccc" stop-opacity="0"/></radialGradient><radialGradient id="g2"><stop offset="0" stop-color="#173f73" stop-opacity="0.95"/><stop offset="1" stop-color="#173f73" stop-opacity="0"/></radialGradient><radialGradient id="g3"><stop offset="0" stop-color="#d9f6ff" stop-opacity="0.95"/><stop offset="1" stop-color="#d9f6ff" stop-opacity="0"/></radialGradient>
+<radialGradient id="orb" cx="0.32" cy="0.28" r="0.85"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="0.35" stop-color="#9fe3f5"/><stop offset="1" stop-color="#d9f6ff"/></radialGradient>
+<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.09 0"/></filter>
+</defs>
+<rect width="800" height="1000" fill="#0d1d2e"/><circle cx="120" cy="167" r="308" fill="url(#g0)"/><circle cx="667" cy="499" r="387" fill="url(#g1)"/><circle cx="607" cy="438" r="411" fill="url(#g2)"/><circle cx="129" cy="426" r="485" fill="url(#g3)"/>
+<circle cx="460" cy="383" r="145" fill="url(#orb)"/>
+<rect width="800" height="1000" filter="url(#n)"/>
+</svg>

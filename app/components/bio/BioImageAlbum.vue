@@ -1,11 +1,40 @@
 <template>
   <div v-if="hasImages" class="w-full">
+    <!-- Grid: square tiles, two per row -->
+    <div v-if="layout === 'grid'" class="grid grid-cols-2 gap-2">
+      <button
+        v-for="(image, index) in sortedImages"
+        :key="image.url"
+        type="button"
+        class="relative aspect-square overflow-hidden"
+        :style="{ borderRadius: radius }"
+        @click="openLightbox(index)"
+      >
+        <img :src="image.url" :alt="image.alt || ''" class="size-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy">
+      </button>
+    </div>
+
+    <!-- Masonry: two columns, natural heights -->
+    <div v-else-if="layout === 'masonry'" class="columns-2 gap-2">
+      <button
+        v-for="(image, index) in sortedImages"
+        :key="image.url"
+        type="button"
+        class="mb-2 block w-full overflow-hidden break-inside-avoid"
+        :style="{ borderRadius: radius }"
+        @click="openLightbox(index)"
+      >
+        <img :src="image.url" :alt="image.alt || ''" class="w-full transition-transform duration-300 hover:scale-105" loading="lazy">
+      </button>
+    </div>
+
     <!-- Vertical Layout -->
-    <div v-if="layout === 'vertical'" class="flex flex-col gap-3">
+    <div v-else-if="layout === 'vertical'" class="flex flex-col gap-3">
       <div
         v-for="(image, index) in sortedImages"
         :key="image.url"
-        class="relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer"
+        class="relative aspect-[3/4] overflow-hidden cursor-pointer"
+        :style="{ borderRadius: radius }"
         @click="openLightbox(index)"
       >
         <img
@@ -25,10 +54,11 @@
       :prev-icon="prevIcon"
       :next-icon="nextIcon"
       :items="sortedImages"
-      class="w-full"
+      class="w-full mb-10"
     >
       <div
-        class="relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer mx-1"
+        class="relative aspect-[4/3] overflow-hidden cursor-pointer mx-1"
+        :style="{ borderRadius: radius }"
         @click="openLightbox(sortedImages.findIndex(i => i.url === item.url))"
       >
         <img
@@ -87,15 +117,18 @@
 <script setup lang="ts">
 import type { ImageAlbumBlock, ImageAlbumImage, ImageAlbumLayout } from '~/types/bio';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   data?: ImageAlbumBlock;
-}>();
+  radius?: string;
+}>(), {
+  radius: '8px',
+});
 
 const prevIcon = 'i-lucide-chevron-left';
 const nextIcon = 'i-lucide-chevron-right';
 
 const images = computed(() => props.data?.images || []);
-const sortedImages = computed(() => [...images.value].sort((a, b) => a.index - b.index));
+const sortedImages = computed(() => [...images.value].sort((a, b) => (a.index ?? 0) - (b.index ?? 0)));
 const layout = computed<ImageAlbumLayout>(() => props.data?.layout || 'vertical');
 const hasImages = computed(() => images.value.length > 0);
 

@@ -199,128 +199,136 @@
         v-if="bioData.bio"
         :style="{
           ...paragraphStyle,
-          textAlign: 'center',
+          textAlign: bioAlign,
           opacity: '0.8',
         }"
-        class="leading-relaxed max-w-sm text-sm px-4 mx-auto mb-4"
+        class="leading-relaxed text-sm px-4 mb-6"
+        :class="bioAlign === 'center' ? 'mx-auto max-w-sm' : 'max-w-md'"
       >
         {{ bioData.bio }}
       </p>
       </div>
 
-      <!-- Render blocks dynamically -->
-      <template v-for="block in sortedBlocks" :key="block.name">
-        <!-- Social Links Block -->
-        <BioSocialLinks
-          v-if="block.name === 'social' && activeSocials.length > 0"
-          :socials="activeSocials"
-          :social-button-style="socialButtonStyle"
-          :card-appear-classes="cardAppearClasses"
-          :card-hover-classes="cardHoverClasses"
-          :username="username"
-          :mode="mode"
-        />
+      <!-- Blocks, evenly spaced -->
+      <div class="flex flex-col px-4" :style="{ gap: blockGap }">
+        <template v-for="block in sortedBlocks" :key="block.name">
+          <!-- Social Links Block -->
+          <BioSocialLinks
+            v-if="block.name === 'social' && activeSocials.length > 0"
+            :socials="activeSocials"
+            :social-button-style="socialButtonStyle"
+            :monochrome="theme.social?.style !== 'soft'"
+            :align="bioAlign === 'left' ? 'left' : 'center'"
+            :card-appear-classes="cardAppearClasses"
+            :card-hover-classes="cardHoverClasses"
+            :username="username"
+            :mode="mode"
+          />
 
-        <!-- Links Block -->
-        <div v-if="block.name === 'links'" id="links-block" class="px-4">
-          <div class="space-y-3">
-            <BioLinkCard
-              v-for="(link, index) in activeLinks"
-              :key="link.id"
-              :link="link"
-              :animation-delay="`${index * 80}ms`"
-              :layout="linkLayout"
-              :card-style="cardStyle"
-              :transparency="cardTransparency"
-              :button-style="buttonStyle"
-              :card-appear-classes="cardAppearClasses"
-              :card-hover-classes="cardHoverClasses"
-              :button-appear-classes="buttonAppearClasses"
-              :button-hover-classes="buttonHoverClasses"
-              :username="username"
-              :mode="mode"
+          <!-- Links Block -->
+          <section v-if="block.name === 'links' && activeLinks.length" id="links-block">
+            <h2 v-if="block.data?.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
+            <div class="space-y-2.5">
+              <BioLinkCard
+                v-for="(link, index) in activeLinks"
+                :key="link.id"
+                :link="link"
+                :animation-delay="`${index * 80}ms`"
+                :layout="linkLayout"
+                :card-style="cardStyle"
+                :transparency="cardTransparency"
+                :button-style="buttonStyle"
+                :card-appear-classes="cardAppearClasses"
+                :card-hover-classes="cardHoverClasses"
+                :button-appear-classes="buttonAppearClasses"
+                :button-hover-classes="buttonHoverClasses"
+                :username="username"
+                :mode="mode"
+              />
+            </div>
+          </section>
+
+          <!-- Text Block -->
+          <section
+            v-if="block.name === 'text' && (block.data?.content || block.data?.title)"
+            id="text-block"
+            :class="block.data.style === 'card' && 'p-5'"
+            :style="[{ textAlign: block.data.align || 'left' }, block.data.style === 'card' ? cardStyle : {}]"
+          >
+            <h2 v-if="block.data.title" class="mb-2 text-[17px]" :style="{ ...headingStyle, textAlign: block.data.align || 'left' }">{{ block.data.title }}</h2>
+            <p v-if="block.data.content" class="whitespace-pre-line text-[15px] leading-relaxed opacity-85">{{ block.data.content }}</p>
+          </section>
+
+          <!-- Image Album Block -->
+          <section v-if="block.name === 'image-album' && albumImages.length > 0" id="image-album-block">
+            <h2 v-if="block.data?.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
+            <BioImageAlbum
+              :data="{ images: albumImages, layout: albumLayout } as any"
+              :radius="cardStyle.borderRadius"
             />
+          </section>
+
+          <!-- VietQR Block -->
+          <div
+            v-if="block.name === 'vietqr' && vietQRData?.qrString"
+            id="vietqr-block"
+            class="flex flex-col items-center gap-4"
+          >
+            <ClientOnly>
+              <QRCodeWithTheme
+                :qr-string="vietQRData.qrString"
+                :bank-name="vietQRData.bankName"
+                :account-number="vietQRData.accountNumber"
+                :account-name="vietQRData.accountName"
+                :amount="parseFloat(vietQRData.amount || '0')"
+                :theme-id="vietQRData.theme || 'vietnam'"
+                class="w-full"
+              />
+            </ClientOnly>
           </div>
-        </div>
-
-        <!-- Image Album Block -->
-        <BioImageAlbum
-          v-if="block.name === 'image-album' && albumImages.length > 0"
-          id="image-album-block"
-          :data="{ images: albumImages, layout: albumLayout } as any"
-          class="my-4 px-4"
-        />
-
-        <!-- VietQR Block -->
-        <div
-          v-if="block.name === 'vietqr' && vietQRData?.qrString"
-          id="vietqr-block"
-          class="flex flex-col items-center gap-4 my-4 px-4"
-        >
-          <ClientOnly>
-            <QRCodeWithTheme
-              :qr-string="vietQRData.qrString"
-              :bank-name="vietQRData.bankName"
-              :account-number="vietQRData.accountNumber"
-              :account-name="vietQRData.accountName"
-              :amount="parseFloat(vietQRData.amount || '0')"
-              :theme-id="vietQRData.theme || 'vietnam'"
-              class="w-full"
-            />
-          </ClientOnly>
-        </div>
-        <!-- Birthday Countdown Block -->
-        <BioBlockBirthdayCountdownDisplay
-          v-if="block.name === 'birthday-countdown' && birthdayCountdownData?.birthDate"
-          id="birthday-countdown-block"
-          :data="birthdayCountdownData"
-          class="my-4 px-4"
-        />
-        <!-- Menu Block -->
-        <BioMenuDisplay
-          v-if="block.name === 'menu' && block.data?.sections?.length"
-          id="menu-block"
-          :data="block.data"
-          :card-style="cardStyle"
-          :heading-color="nameStyle.color"
-          class="my-6 px-4"
-        />
-        <!-- Opening Hours Block -->
-        <BioHoursDisplay
-          v-if="block.name === 'hours' && block.data?.days?.length"
-          id="hours-block"
-          :data="block.data"
-          :card-style="cardStyle"
-          class="mx-4 my-4"
-        />
-        <!-- Contact Block -->
-        <BioContactDisplay
-          v-if="block.name === 'contact' && (block.data?.address || block.data?.phone || block.data?.email || block.data?.bookingUrl)"
-          id="contact-block"
-          :data="block.data"
-          :card-style="cardStyle"
-          :button-style="buttonStyle"
-          class="mx-4 my-4"
-        />
-        <!-- more block -->
-      </template>
+          <!-- Birthday Countdown Block -->
+          <BioBlockBirthdayCountdownDisplay
+            v-if="block.name === 'birthday-countdown' && birthdayCountdownData?.birthDate"
+            id="birthday-countdown-block"
+            :data="birthdayCountdownData"
+          />
+          <!-- Menu Block -->
+          <BioMenuDisplay
+            v-if="block.name === 'menu' && block.data?.sections?.length"
+            id="menu-block"
+            :data="block.data"
+            :card-style="cardStyle"
+            :heading-style="headingStyle"
+          />
+          <!-- Opening Hours Block -->
+          <BioHoursDisplay
+            v-if="block.name === 'hours' && block.data?.days?.length"
+            id="hours-block"
+            :data="block.data"
+            :card-style="cardStyle"
+            :heading-style="headingStyle"
+          />
+          <!-- Contact Block -->
+          <BioContactDisplay
+            v-if="block.name === 'contact' && (block.data?.address || block.data?.phone || block.data?.email || block.data?.bookingUrl)"
+            id="contact-block"
+            :data="block.data"
+            :card-style="cardStyle"
+            :button-style="buttonStyle"
+            :heading-style="headingStyle"
+          />
+          <!-- more block -->
+        </template>
+      </div>
 
       <!-- Footer -->
-      <div v-if="mode !== 'preview'" class="text-center mt-12 px-3">
-        <NuxtLink to="/" class="">
-         <UCard variant="solid" color="neutral" class="bg-white"
-         :ui="{
-          body: '!p-3'
-         }"
-         >
-         <div class="flex items-center">
-           <img src="/logo-full.png" class="h-6" alt="Perlink.to" />
-           <div class="flex-1"></div>
-           <span class="text-xs text-black font-medium">Create your Perlink</span>
-
-           <UIcon name="lucide:arrow-right" class="ml-2 text-black" />
-         </div>
-         </UCard>
+      <div v-if="mode !== 'preview'" class="mt-14 flex justify-center px-4">
+        <NuxtLink
+          to="/"
+          class="inline-flex items-center gap-2 rounded-full bg-white/90 py-2 pl-3 pr-4 text-xs font-medium text-[#0c0b0a] shadow-sm ring-1 ring-black/5 backdrop-blur transition hover:bg-white"
+        >
+          <AppLogo variant="mark" :size="16" />
+          Made with Perlink
         </NuxtLink>
       </div>
     </div>
@@ -329,7 +337,6 @@
 
 <script setup lang="ts">
 import { computed, defineAsyncComponent, ref, watch, onMounted, toRef } from "vue";
-import avatarDefault from "~/assets/images/avatar-default-1.jpg";
 import type { BioData, BioLink, SocialLink, ThemeConfig, BioBlock } from "~/types/bio";
 import { useBioTheme } from "~/composables/useBioTheme";
 import { getEffectBgClass } from "~/utils/effectUtils";
@@ -396,6 +403,8 @@ const {
   headerLayout,
   avatarStyle,
   nameStyle,
+  headingStyle,
+  blockGap,
   paragraphStyle,
   socialButtonStyle,
   cardAppearClasses,
@@ -405,6 +414,11 @@ const {
   avatarAppearClasses,
   avatarHoverClasses,
 } = useBioTheme(themeSource);
+
+// The bio follows the header: left-aligned next to a left avatar
+const bioAlign = computed(() =>
+  headerLayout.value === 'left' ? 'left' : headerLayout.value === 'centered' ? headerAlignment.value : 'center',
+);
 
 const bgEffectComponent = computed(() => {
   if (theme.value.background.type !== "effect") return null;
@@ -428,17 +442,34 @@ function onAvatarMouseLeave(e: MouseEvent) {
   el.classList.remove(...avatarHoverClasses.value);
 }
 
-const avatarSrc = ref(props.bioData.avatarUrl || avatarDefault);
+// Without a photo, show the first letter of the name in the theme's colours
+// (the stock avatar clashes with most themes)
+const placeholderAvatar = computed(() => {
+  const t = theme.value;
+  const bg = t.card.backgroundColor || t.colors.secondary || "#f3f4f6";
+  const fg = t.header.textColor || t.colors.primary || "#111827";
+  // Images can't use the page's web fonts, so pick a matching system family
+  const family = t.header.fontFamily || t.typography.nameFont || "";
+  const font = /serif/.test(family) && !/sans-serif/.test(family) ? "Georgia, serif" : "Helvetica, Arial, sans-serif";
+  const initial = Array.from((props.bioData.title || props.username || "?").trim())[0]?.toUpperCase() || "?";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><rect width="200" height="200" fill="${bg}"/><text x="100" y="100" dy="0.35em" text-anchor="middle" font-family="${font}" font-size="88" font-weight="${t.header.fontWeight || 500}" fill="${fg}">${initial.replace(/[<>&"']/g, "")}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+});
+
+const avatarFailed = ref(false);
+const avatarSrc = computed(() =>
+  props.bioData.avatarUrl && !avatarFailed.value ? props.bioData.avatarUrl : placeholderAvatar.value,
+);
 
 watch(
   () => props.bioData.avatarUrl,
-  (val) => {
-    avatarSrc.value = val || avatarDefault;
+  () => {
+    avatarFailed.value = false;
   },
 );
 
 function onAvatarError() {
-  avatarSrc.value = avatarDefault;
+  avatarFailed.value = true;
 }
 
 const avatarFallbackStyle = computed(() => ({
@@ -450,16 +481,21 @@ const avatarFallbackStyle = computed(() => ({
 const blocksRef = toRef(props.bioData, 'blocks');
 const { links, socialLinks, albumImages, albumLayout, vietQRData, birthdayCountdownData } = useBioBlock({ blocks: blocksRef });
 
+// Previews (editor, template thumbnails) also show items that still need a
+// URL, so a fresh template looks complete; the public page hides them
+const isPreview = computed(() => props.mode === "preview");
+
 const activeLinks = computed<BioLink[]>(
   () =>
     links.value
-      ?.filter((l) => l.isActive && l.title && l.url)
+      ?.filter((l) => l.isActive && l.title && (l.url || isPreview.value))
+      .map((l) => (l.url ? l : { ...l, url: "#" }))
       .sort((a, b) => (a.order || 0) - (b.order || 0)) ?? [],
 );
 
 const activeSocials = computed(() => {
   return socialLinks.value
-    .filter((s) => s.url && s.url.trim())
+    .filter((s) => s.url?.trim() || isPreview.value)
     .sort((a, b) => (a.index || 0) - (b.index || 0));
 });
 

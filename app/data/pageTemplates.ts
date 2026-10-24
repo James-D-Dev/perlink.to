@@ -1,9 +1,8 @@
 import { nanoid } from 'nanoid'
-import type { BioBlock, MenuSection, ThemeConfig } from '~/types/bio'
+import type { BioBlock, LinkCardLayout, MenuSection, ThemeConfig, ThemeHeaderLayout, ThemePage, ThemeSocial } from '~/types/bio'
 import { DEFAULT_OPENING_DAYS } from '~/types/bio'
 import type { RoomConfig, RoomObject, RoomStyle } from '~/types/room'
 import { DEFAULT_ROOM_ENVIRONMENT, DEFAULT_ROOM_STYLE } from '~/types/room'
-import { THEME_PRESETS } from './themePresets'
 
 // Starter pages by industry. Applying a template fills the page with sample
 // content, a matching theme and a matching 3D room (used if 3D mode is on).
@@ -38,9 +37,85 @@ export interface PageTemplate {
   build: () => PageTemplateContent
 }
 
-function theme(presetId: string): ThemeConfig {
-  const preset = THEME_PRESETS.find(p => p.id === presetId) ?? THEME_PRESETS[0]!
-  return structuredClone(preset.theme)
+interface Look {
+  bg: string
+  /** Text on the page and on cards */
+  text: string
+  accent: string
+  /** Text on accent-coloured buttons */
+  onAccent: string
+  surface: string
+  /** Hairline around cards; omit for borderless cards */
+  border?: string
+  radius: number
+  shadow?: ThemeConfig['card']['shadow']
+  nameFont: string
+  nameWeight: string
+  nameSize: string
+  tracking?: string
+  headingFont?: string
+  bodyFont?: string
+  header: ThemeHeaderLayout
+  banner?: string
+  avatar?: ThemeConfig['avatar']['shape']
+  link: LinkCardLayout
+  social: ThemeSocial['style']
+  gap?: ThemePage['blockGap']
+  titleAlign?: ThemePage['titleAlign']
+}
+
+// Every value here maps to a control in the theme editor, so users can
+// rebuild or tweak any template by hand
+function look(l: Look): ThemeConfig {
+  const body = l.bodyFont ?? 'Inter, sans-serif'
+  return {
+    colors: { primary: l.accent, secondary: l.border ?? l.surface, third: l.bg },
+    background: { type: 'solid', color: l.bg },
+    card: {
+      style: l.border ? 'outline' : 'filled',
+      backgroundColor: l.surface,
+      outlineColor: l.border,
+      textColor: l.text,
+      cornerRadius: l.radius,
+      transparency: 1,
+      shadow: l.shadow ?? 'none',
+      animationAppear: 'fadeIn',
+      animationHover: 'none',
+    },
+    button: { style: 'filled', cornerRadius: l.radius, shadow: 'none', textColor: l.onAccent },
+    header: {
+      alignment: 'center',
+      spacing: 'spacious',
+      layout: l.header,
+      bannerUrl: l.banner,
+      fontFamily: l.nameFont,
+      fontSize: l.nameSize,
+      fontWeight: l.nameWeight,
+      letterSpacing: l.tracking,
+      textColor: l.text,
+    },
+    avatar: { shape: l.avatar ?? 'circle', size: 'lg', border: false, animationAppear: 'fadeIn', animationHover: 'none' },
+    link: { layout: l.link },
+    typography: {
+      nameFont: l.nameFont,
+      headingFont: l.headingFont ?? l.nameFont,
+      paragraphFont: body,
+      nameSize: 'lg',
+      paragraphSize: 'sm',
+      bioFontFamily: body,
+      bioFontSize: '1rem',
+      bioTextColor: l.text,
+      textColor: l.text,
+    },
+    social: { style: l.social },
+    page: { blockGap: l.gap ?? 'normal', titleAlign: l.titleAlign ?? 'center' },
+  }
+}
+
+const art = (name: string) => `/images/templates/${name}.svg`
+
+function album(...names: string[]) {
+  return names.map((name, index) => ({ id: nanoid(6), url: art(name), index }))
 }
 
 function room(style: Partial<RoomStyle>, objects: Omit<RoomObject, 'id' | 'scale'>[]): RoomConfig {
@@ -72,6 +147,9 @@ function links(...items: [string, string][]) {
   return items.map(([title, url], order) => ({ id: nanoid(6), title, url, icon: 'link', order, isActive: true }))
 }
 
+const SAMPLE_ADDRESS = '12 Riverside Street, District 1'
+const SAMPLE_PHONE = '+84 90 123 4567'
+
 const COFFEE_TABLE_TOP = 0.43
 const DESK_TOP = 0.76
 
@@ -82,15 +160,21 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'personal',
     description: 'Introduce yourself, your work and where to find you.',
     icon: 'i-lucide-user-round',
-    preview: { bg: '#FFFFFF', accent: '#7C3AED' },
+    preview: { bg: '#F7F5F2', accent: '#1C1A17' },
     build: () => ({
       title: 'Your Name',
       bio: 'Designer & developer. I build friendly products for the web.',
-      themeConfig: theme('classic-white'),
+      themeConfig: look({
+        bg: '#F7F5F2', text: '#1C1A17', accent: '#1C1A17', onAccent: '#FFFFFF',
+        surface: '#FFFFFF', border: '#E8E4DF', radius: 10,
+        nameFont: 'Inter Tight, sans-serif', nameWeight: '500', nameSize: '1.875rem', tracking: '-0.03em',
+        header: 'centered', link: 'centered', social: 'outline', titleAlign: 'left',
+      }),
       blocks: withIndex([
         { name: 'social', data: { links: social('instagram', 'linkedin', 'github', 'email') } },
-        { name: 'links', data: { items: links(['My portfolio', ''], ['Latest project', ''], ['Book a call', '']) } },
-        { name: 'image-album', data: { images: [], layout: 'grid' } },
+        { name: 'links', data: { items: links(['Portfolio', ''], ['Latest project', ''], ['Book a call', '']) } },
+        { name: 'text', data: { title: 'About', content: 'I design and build calm, useful software. Eight years across startups and studios, now independent and open to new projects.', align: 'left', style: 'plain' } },
+        { name: 'image-album', data: { title: 'Selected work', images: album('tile-sand', 'tile-lagoon', 'tile-sage', 'tile-blush'), layout: 'grid' } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#f3ede4', floorColor: '#c8a27a', floorMaterial: 'wood' }, [
         { type: 'window', position: [0.6, 1.6, -3], rotation: 0, wall: 'back' },
@@ -114,12 +198,18 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'food',
     description: 'Menu with prices, opening hours and table booking.',
     icon: 'i-lucide-utensils',
-    preview: { bg: '#FDFAF6', accent: '#D97706' },
+    preview: { bg: '#F4EEE6', accent: '#9A3B1C' },
     build: () => ({
       title: 'Your Restaurant',
       bio: 'Fresh, seasonal cooking in the heart of the city.',
-      themeConfig: theme('classic-ivory'),
+      themeConfig: look({
+        bg: '#F4EEE6', text: '#2B1D14', accent: '#9A3B1C', onAccent: '#FFF7EF',
+        surface: '#FFFBF6', border: '#E6D9C8', radius: 8,
+        nameFont: 'Playfair Display, serif', nameWeight: '500', nameSize: '2.25rem',
+        header: 'banner-circle', banner: art('banner-ember'), link: 'centered', social: 'soft',
+      }),
       blocks: withIndex([
+        { name: 'text', data: { title: 'Our story', content: 'Family recipes, market produce and a charcoal grill. We cook what is in season and change the menu every month.', align: 'center', style: 'plain' } },
         {
           name: 'menu',
           data: {
@@ -134,7 +224,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
           },
         },
         { name: 'hours', data: { title: 'Opening hours', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '10:00', close: '22:00' })), note: 'Last orders 30 minutes before closing.' } },
-        { name: 'contact', data: { title: 'Find us', address: '', phone: '', bookingLabel: 'Book a table', bookingUrl: '' } },
+        { name: 'contact', data: { title: 'Find us', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, bookingLabel: 'Book a table', bookingUrl: '' } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'zalo') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#7a4b3a', floorColor: '#9c6b46', floorMaterial: 'wood', trimColor: '#3b2a22' }, [
@@ -161,13 +251,19 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'hospitality',
     description: 'Rooms with nightly prices, contact and booking.',
     icon: 'i-lucide-bed-double',
-    preview: { bg: '#F5F0E8', accent: '#78716C' },
+    preview: { bg: '#F3F1EC', accent: '#1F4E5F' },
     build: () => ({
       title: 'Your Homestay',
       bio: 'A quiet place to stay, five minutes from the beach.',
-      themeConfig: theme('minimal-sand'),
+      themeConfig: look({
+        bg: '#F3F1EC', text: '#1F2A2E', accent: '#1F4E5F', onAccent: '#FFFFFF',
+        surface: '#FFFFFF', radius: 10, shadow: 'sm',
+        nameFont: 'Cormorant Garamond, serif', nameWeight: '500', nameSize: '2.25rem',
+        header: 'banner-square', banner: art('banner-lagoon'), avatar: 'rounded', link: 'centered', social: 'outline',
+      }),
       blocks: withIndex([
-        { name: 'image-album', data: { images: [], layout: 'carousel' } },
+        { name: 'image-album', data: { images: album('photo-lagoon', 'photo-sand', 'photo-ember'), layout: 'carousel' } },
+        { name: 'text', data: { title: 'The house', content: 'Six rooms around a garden courtyard, with breakfast on the terrace and bikes to borrow.', align: 'center', style: 'plain' } },
         {
           name: 'menu',
           data: {
@@ -180,8 +276,8 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
             ]),
           },
         },
-        { name: 'contact', data: { title: 'Contact & booking', address: '', phone: '', email: '', bookingLabel: 'Book your stay', bookingUrl: '' } },
-        { name: 'hours', data: { title: 'Check-in & reception', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '07:00', close: '23:00' })), note: 'Check-in from 14:00, check-out before 12:00.' } },
+        { name: 'contact', data: { title: 'Contact & booking', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, email: '', bookingLabel: 'Book your stay', bookingUrl: '' } },
+        { name: 'hours', data: { title: 'Reception', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '07:00', close: '23:00' })), note: 'Check-in from 14:00, check-out before 12:00.' } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'whatsapp') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#ece4d8', floorColor: '#b89b7a', floorMaterial: 'wood' }, [
@@ -205,12 +301,18 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'food',
     description: 'Drinks or products, opening hours and where to find you.',
     icon: 'i-lucide-coffee',
-    preview: { bg: '#FFF1F2', accent: '#F43F5E' },
+    preview: { bg: '#EDF0E8', accent: '#3F6B4B' },
     build: () => ({
       title: 'Your Café',
       bio: 'Specialty coffee, homemade cakes and good music.',
-      themeConfig: theme('vibrant-coral'),
+      themeConfig: look({
+        bg: '#EDF0E8', text: '#223326', accent: '#3F6B4B', onAccent: '#FFFFFF',
+        surface: '#F9FAF6', border: '#D9E0D1', radius: 12,
+        nameFont: 'Poppins, sans-serif', nameWeight: '600', nameSize: '1.875rem', tracking: '-0.03em',
+        header: 'left', link: 'centered', social: 'filled', titleAlign: 'left',
+      }),
       blocks: withIndex([
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook') } },
         {
           name: 'menu',
           data: {
@@ -223,9 +325,9 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
             ]),
           },
         },
+        { name: 'image-album', data: { title: 'Inside the café', images: album('tile-sage', 'tile-ember', 'tile-sand', 'tile-blush'), layout: 'grid' } },
         { name: 'hours', data: { title: 'Opening hours', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '07:00', close: '21:30' })), note: '' } },
-        { name: 'contact', data: { title: 'Visit us', address: '', phone: '' } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook') } },
+        { name: 'contact', data: { title: 'Visit us', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#dfe7d6', floorColor: '#b08968', floorMaterial: 'wood', trimColor: '#f8f4ec' }, [
         { type: 'string-lights', position: [0, 2.5, -3], rotation: 0, wall: 'back' },
@@ -250,14 +352,19 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'creative',
     description: 'Show your work as a gallery with links to shop or commission.',
     icon: 'i-lucide-palette',
-    preview: { bg: '#1E1B4B', accent: '#A855F7' },
+    preview: { bg: '#111015', accent: '#CDB4FF' },
     build: () => ({
       title: 'Your Studio',
       bio: 'Illustration, prints and commissions.',
-      themeConfig: theme('gradient-aurora'),
+      themeConfig: look({
+        bg: '#111015', text: '#F3EFE8', accent: '#CDB4FF', onAccent: '#17122B',
+        surface: '#1B1A21', border: '#2C2A33', radius: 10,
+        nameFont: 'Inter Tight, sans-serif', nameWeight: '400', nameSize: '2.25rem', tracking: '-0.03em',
+        header: 'banner-circle', banner: art('banner-dusk'), link: 'centered', social: 'plain',
+      }),
       blocks: withIndex([
-        { name: 'image-album', data: { images: [], layout: 'masonry' } },
-        { name: 'links', data: { items: links(['Shop prints', ''], ['Commission me', ''], ['Behance', '']) } },
+        { name: 'image-album', data: { title: 'Recent work', images: album('art-dusk-tall', 'art-ember', 'art-blush', 'art-lagoon-tall'), layout: 'masonry' } },
+        { name: 'links', data: { title: 'Shop & commissions', items: links(['Shop prints', ''], ['Commission me', ''], ['Behance', '']) } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'pinterest') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#2b2d42', floorColor: '#4a4e69', floorMaterial: 'concrete', trimColor: '#8d99ae' }, [
@@ -283,11 +390,16 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'personal',
     description: 'A clean, dark page with your socials and top links.',
     icon: 'i-lucide-link',
-    preview: { bg: '#0B0B0F', accent: '#8B5CF6' },
+    preview: { bg: '#0C0B0A', accent: '#F5F3F1' },
     build: () => ({
       title: 'Your Name',
       bio: 'Creator · sharing what I make and love.',
-      themeConfig: theme('dark-obsidian'),
+      themeConfig: look({
+        bg: '#0C0B0A', text: '#F5F3F1', accent: '#F5F3F1', onAccent: '#0C0B0A',
+        surface: '#1A1917', radius: 12,
+        nameFont: 'Inter Tight, sans-serif', nameWeight: '500', nameSize: '1.5rem', tracking: '-0.02em',
+        header: 'centered', link: 'centered', social: 'plain', gap: 'compact',
+      }),
       blocks: withIndex([
         { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'threads') } },
         { name: 'links', data: { items: links(['Latest video', ''], ['My newsletter', ''], ['Shop my picks', ''], ['Work with me', '']) } },
@@ -311,12 +423,18 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'business',
     description: 'Services with prices, booking and opening hours.',
     icon: 'i-lucide-briefcase',
-    preview: { bg: '#F8FAFC', accent: '#0F172A' },
+    preview: { bg: '#FFFFFF', accent: '#18181B' },
     build: () => ({
       title: 'Your Studio',
       bio: 'Photography, design and video for small businesses.',
-      themeConfig: theme('classic-slate'),
+      themeConfig: look({
+        bg: '#FFFFFF', text: '#18181B', accent: '#18181B', onAccent: '#FFFFFF',
+        surface: '#F4F4F5', radius: 10,
+        nameFont: 'Inter Tight, sans-serif', nameWeight: '600', nameSize: '1.875rem', tracking: '-0.03em',
+        header: 'left', avatar: 'rounded', link: 'centered', social: 'outline', titleAlign: 'left',
+      }),
       blocks: withIndex([
+        { name: 'text', data: { title: 'What I do', content: 'I help small businesses look their best online: brand photos, simple identities and short videos for social media.', align: 'left', style: 'plain' } },
         {
           name: 'menu',
           data: {
@@ -324,12 +442,12 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
             currency: '$',
             layout: 'cards',
             sections: menu([
-              { name: '', items: [['Brand photo shoot', '250', 'Half day, 30 edited photos', 'Popular'], ['Logo & identity', '600', 'Logo, colors, typography'], ['Short promo video', '450', '30-60 second edit']] },
+              { name: '', items: [['Brand photo shoot', '250', 'Half day, 30 edited photos', 'Popular'], ['Logo & identity', '600', 'Logo, colors, typography'], ['Short promo video', '450', '30–60 second edit']] },
             ]),
           },
         },
-        { name: 'contact', data: { title: 'Book a call', email: '', phone: '', bookingLabel: 'Book a free call', bookingUrl: '' } },
-        { name: 'hours', data: { title: 'Availability', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '09:00', close: '18:00', closed: d.day === 0 })), note: 'Replies within one business day.' } },
+        { name: 'contact', data: { title: 'Book a call', email: 'hello@yourstudio.com', phone: SAMPLE_PHONE, bookingLabel: 'Book a free call', bookingUrl: '' } },
+        { name: 'hours', data: { title: 'Availability', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '09:00', close: '18:00', closed: d.day === 0 || d.day === 6 })), note: 'Replies within one business day.' } },
         { name: 'social', data: { links: social('linkedin', 'instagram', 'website') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#e7e5e4', floorColor: '#a8a29e', floorMaterial: 'tile', trimColor: '#f5f5f4' }, [
@@ -354,12 +472,18 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     category: 'events',
     description: 'Schedule, venue, RSVP and photo gallery for your big day.',
     icon: 'i-lucide-heart',
-    preview: { bg: '#FFF7ED', accent: '#F97316' },
+    preview: { bg: '#FBF4F0', accent: '#8C4A62' },
     build: () => ({
       title: 'Anna & Minh',
-      bio: 'We’re getting married! Saturday, 14 June 2025.',
-      themeConfig: theme('gradient-sunset'),
+      bio: 'We’re getting married! Saturday, 12 June 2027.',
+      themeConfig: look({
+        bg: '#FBF4F0', text: '#3A2530', accent: '#8C4A62', onAccent: '#FFFFFF',
+        surface: '#FFFFFF', border: '#F0DCD6', radius: 10,
+        nameFont: 'Cormorant Garamond, serif', nameWeight: '500', nameSize: '2.25rem',
+        header: 'banner-circle', banner: art('banner-blush'), link: 'centered', social: 'soft', gap: 'relaxed',
+      }),
       blocks: withIndex([
+        { name: 'text', data: { title: 'Join us', content: 'We would love to celebrate with you. Dinner, dancing and a garden full of flowers. Please let us know if you can come by 1 May.', align: 'center', style: 'plain' } },
         {
           name: 'menu',
           data: {
@@ -371,8 +495,8 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
             ]),
           },
         },
-        { name: 'contact', data: { title: 'Venue', address: '', bookingLabel: 'RSVP', bookingUrl: '' } },
-        { name: 'image-album', data: { images: [], layout: 'grid' } },
+        { name: 'contact', data: { title: 'Venue', address: 'Rose Garden Hotel, 8 Lake Road', bookingLabel: 'RSVP', bookingUrl: '' } },
+        { name: 'image-album', data: { title: 'Us', images: album('tile-blush', 'tile-sand', 'tile-ember', 'tile-lagoon'), layout: 'grid' } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#fde2e4', floorColor: '#e8c4a0', floorMaterial: 'wood', trimColor: '#ffffff' }, [
         { type: 'string-lights', position: [0, 2.6, -3], rotation: 0, wall: 'back', color: '#ffe8a3' },

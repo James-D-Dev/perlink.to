@@ -11,7 +11,6 @@
       boxShadow: cardStyle.boxShadow,
       border: cardStyle.border,
       color: cardStyle.color,
-      borderColor: cardStyle.color,
     }"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
@@ -47,6 +46,15 @@
               </p>
             </div>
           </div>
+        </div>
+
+        <!-- Content layer: CENTERED (text only) -->
+        <div v-else-if="layout === 'centered'" class="relative flex min-h-14 items-center justify-center px-12 py-3.5 text-center">
+          <div class="min-w-0">
+            <p class="font-medium truncate">{{ link.title }}</p>
+            <p v-if="link.subtitle" class="text-sm opacity-70 truncate mt-0.5">{{ link.subtitle }}</p>
+          </div>
+          <UIcon name="i-lucide-arrow-up-right" class="absolute right-4 size-4 opacity-40" />
         </div>
 
         <!-- Content layer: HORIZONTAL (icon left or right) -->

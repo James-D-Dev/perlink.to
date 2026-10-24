@@ -1,7 +1,7 @@
 <template>
-  <section class="p-4" :style="cardStyle">
+  <section class="p-5" :style="cardStyle">
     <div class="mb-3 flex items-center justify-between gap-2">
-      <h2 class="font-semibold">{{ data.title || 'Opening hours' }}</h2>
+      <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || 'Opening hours' }}</h2>
       <span
         v-if="status"
         class="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
@@ -32,6 +32,7 @@ import type { HoursBlock } from '~/types/bio'
 const props = defineProps<{
   data: HoursBlock['data']
   cardStyle: Record<string, string | undefined>
+  headingStyle?: Record<string, string | undefined>
 }>()
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']

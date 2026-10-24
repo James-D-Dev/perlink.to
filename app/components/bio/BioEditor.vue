@@ -54,6 +54,7 @@
               @remove="$emit('removeLink', $event)"
               @update-link="onUpdateLink"
               @select-image="onSelectImage"
+              @update-title="onUpdateBlockTitle('links', $event)"
             />
 
             <!-- VietQR Block -->
@@ -73,6 +74,16 @@
               :bio-page-id="bioPageId"
               @toggle="$emit('toggleBlock', 'image-album')"
               @update="$emit('updateImageAlbum', $event)"
+              @update-title="onUpdateBlockTitle('image-album', $event)"
+            />
+            <!-- Text Block -->
+            <BioBlockText
+              v-if="block.name === 'text'"
+              :is-active="activeBlock === 'text'"
+              :blocks="blocksRef"
+              @toggle="$emit('toggleBlock', 'text')"
+              @remove="onRemoveBlock('text')"
+              @update="onUpdateBlockData('text', $event)"
             />
             <!-- Birthday Countdown Block -->
             <BioBlockBirthdayCountdown
@@ -310,6 +321,11 @@ function onUpdateBlockData(blockName: BioBlock['name'], data: BioBlock['data']) 
     localBlocks.value[index] = { ...localBlocks.value[index]!, data } as BioBlock;
     emitBlockUpdate();
   }
+}
+
+function onUpdateBlockTitle(blockName: 'links' | 'image-album', title: string) {
+  const block = localBlocks.value.find(b => b.name === blockName);
+  if (block) onUpdateBlockData(blockName, { ...block.data, title } as BioBlock['data']);
 }
 
 function onUpdateBirthdayCountdown(data: BirthdayCountdownBlock['data']) {

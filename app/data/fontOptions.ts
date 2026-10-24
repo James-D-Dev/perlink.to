@@ -9,7 +9,9 @@ export interface FontOption {
 // Google Fonts configuration
 // Format: family:weights (e.g., "Inter:400;600;700")
 export const GOOGLE_FONTS = [
-  'Inter:wght@400;500;600;700',
+  'Inter:wght@300;400;500;600;700',
+  'Inter+Tight:wght@300;400;500;600;700',
+  'Cormorant+Garamond:wght@400;500;600;700',
   'Roboto:wght@400;500;700',
   'Poppins:wght@400;500;600;700',
   'Playfair+Display:wght@400;500;600;700',
@@ -38,6 +40,7 @@ export const GOOGLE_FONTS = [
 export const nameFontOptions: FontOption[] = [
   { label: 'System UI', value: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif', family: 'system-ui' },
   { label: 'Inter', value: 'Inter, sans-serif', family: 'Inter', weights: [400, 500, 600, 700] },
+  { label: 'Inter Tight', value: 'Inter Tight, sans-serif', family: 'Inter Tight', weights: [300, 400, 500, 600, 700] },
   { label: 'Roboto', value: 'Roboto, sans-serif', family: 'Roboto', weights: [400, 500, 700] },
   { label: 'Poppins', value: 'Poppins, sans-serif', family: 'Poppins', weights: [400, 500, 600, 700] },
   { label: 'Montserrat', value: 'Montserrat, sans-serif', family: 'Montserrat', weights: [400, 500, 600, 700] },
@@ -45,6 +48,7 @@ export const nameFontOptions: FontOption[] = [
   { label: 'Lato', value: 'Lato, sans-serif', family: 'Lato', weights: [400, 700] },
   { label: 'Merriweather', value: 'Merriweather, serif', family: 'Merriweather', weights: [400, 700], category: 'serif' },
   { label: 'Playfair Display', value: 'Playfair Display, serif', family: 'Playfair Display', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Cormorant Garamond', value: 'Cormorant Garamond, serif', family: 'Cormorant Garamond', weights: [400, 500, 600, 700], category: 'serif' },
   { label: 'Times New Roman', value: '"Times New Roman", Times, serif', family: 'Times New Roman', category: 'serif' },
   // Script/Display fonts
   { label: 'Story Script', value: 'Story Script, cursive', family: 'Story Script', weights: [400], category: 'handwriting' },
@@ -68,6 +72,7 @@ export const nameFontOptions: FontOption[] = [
 export const headingFontOptions: FontOption[] = [
   { label: 'System UI', value: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif', family: 'system-ui' },
   { label: 'Inter', value: 'Inter, sans-serif', family: 'Inter', weights: [400, 500, 600, 700] },
+  { label: 'Inter Tight', value: 'Inter Tight, sans-serif', family: 'Inter Tight', weights: [300, 400, 500, 600, 700] },
   { label: 'Roboto', value: 'Roboto, sans-serif', family: 'Roboto', weights: [400, 500, 700] },
   { label: 'Poppins', value: 'Poppins, sans-serif', family: 'Poppins', weights: [400, 500, 600, 700] },
   { label: 'Montserrat', value: 'Montserrat, sans-serif', family: 'Montserrat', weights: [400, 500, 600, 700] },
@@ -75,6 +80,7 @@ export const headingFontOptions: FontOption[] = [
   { label: 'Lato', value: 'Lato, sans-serif', family: 'Lato', weights: [400, 700] },
   { label: 'Merriweather', value: 'Merriweather, serif', family: 'Merriweather', weights: [400, 700], category: 'serif' },
   { label: 'Playfair Display', value: 'Playfair Display, serif', family: 'Playfair Display', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Cormorant Garamond', value: 'Cormorant Garamond, serif', family: 'Cormorant Garamond', weights: [400, 500, 600, 700], category: 'serif' },
   { label: 'Times New Roman', value: '"Times New Roman", Times, serif', family: 'Times New Roman', category: 'serif' },
   // Script/Display fonts
   { label: 'Story Script', value: 'Story Script, cursive', family: 'Story Script', weights: [400], category: 'handwriting' },
@@ -98,6 +104,7 @@ export const headingFontOptions: FontOption[] = [
 export const paragraphFontOptions: FontOption[] = [
   { label: 'System UI', value: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif', family: 'system-ui' },
   { label: 'Inter', value: 'Inter, sans-serif', family: 'Inter', weights: [400, 500, 600, 700] },
+  { label: 'Inter Tight', value: 'Inter Tight, sans-serif', family: 'Inter Tight', weights: [300, 400, 500, 600, 700] },
   { label: 'Roboto', value: 'Roboto, sans-serif', family: 'Roboto', weights: [400, 500, 700] },
   { label: 'Poppins', value: 'Poppins, sans-serif', family: 'Poppins', weights: [400, 500, 600, 700] },
   { label: 'Montserrat', value: 'Montserrat, sans-serif', family: 'Montserrat', weights: [400, 500, 600, 700] },
@@ -105,6 +112,7 @@ export const paragraphFontOptions: FontOption[] = [
   { label: 'Lato', value: 'Lato, sans-serif', family: 'Lato', weights: [400, 700] },
   { label: 'Merriweather', value: 'Merriweather, serif', family: 'Merriweather', weights: [400, 700], category: 'serif' },
   { label: 'Playfair Display', value: 'Playfair Display, serif', family: 'Playfair Display', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Cormorant Garamond', value: 'Cormorant Garamond, serif', family: 'Cormorant Garamond', weights: [400, 500, 600, 700], category: 'serif' },
   { label: 'Times New Roman', value: '"Times New Roman", Times, serif', family: 'Times New Roman', category: 'serif' },
 ];
 

@@ -227,6 +227,34 @@
                       </button>
                     </div>
                   </UFormField>
+                  <!-- Weight -->
+                  <UFormField label="Weight">
+                    <USelect
+                      :model-value="themeConfig.header.fontWeight || '700'"
+                      :items="fontWeightOptions"
+                      size="md"
+                      class="w-full"
+                      @update:model-value="emitHeader('fontWeight', $event)"
+                    />
+                  </UFormField>
+                  <!-- Letter spacing -->
+                  <UFormField label="Letter Spacing">
+                    <USelect
+                      :model-value="themeConfig.header.letterSpacing || 'normal'"
+                      :items="letterSpacingOptions"
+                      size="md"
+                      class="w-full"
+                      @update:model-value="emitHeader('letterSpacing', $event === 'normal' ? undefined : $event)"
+                    />
+                  </UFormField>
+                  <!-- Block titles -->
+                  <UFormField label="Block Title Font">
+                    <FontSelect
+                      :model-value="themeConfig.typography.headingFont || 'system-ui'"
+                      :font-options="headingFontOptions"
+                      @update:model-value="onHeadingFontChange($event)"
+                    />
+                  </UFormField>
                 </div>
               </div>
 
@@ -328,6 +356,26 @@
                       size="md"
                       class="w-full"
                       @update:model-value="emitCard('style', $event)"
+                    />
+                  </UFormField>
+                  <!-- Surface colour -->
+                  <UFormField label="Card Color" help="Empty uses the primary colour.">
+                    <BioColorField
+                      :model-value="themeConfig.card.backgroundColor"
+                      :fallback="themeConfig.colors.primary"
+                      label="Card color"
+                      placeholder="Auto"
+                      @update:model-value="emitCard('backgroundColor', $event)"
+                    />
+                  </UFormField>
+                  <!-- Border colour -->
+                  <UFormField label="Border Color">
+                    <BioColorField
+                      :model-value="themeConfig.card.outlineColor"
+                      :fallback="themeConfig.colors.primary"
+                      label="Card border color"
+                      placeholder="Auto"
+                      @update:model-value="emitCard('outlineColor', $event)"
                     />
                   </UFormField>
                   <!-- Text Color -->
@@ -494,6 +542,51 @@
               </div>
             </div> -->`
 
+              <!-- Page -->
+              <div>
+                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                  >Page</label
+                >
+                <div class="grid grid-cols-3 gap-4">
+                  <UFormField label="Text Color">
+                    <BioColorField
+                      :model-value="themeConfig.typography.textColor"
+                      fallback="#334155"
+                      label="Page text color"
+                      placeholder="Auto"
+                      @update:model-value="emitTypography('textColor', $event)"
+                    />
+                  </UFormField>
+                  <UFormField label="Block Spacing">
+                    <USelect
+                      :model-value="themeConfig.page?.blockGap || 'normal'"
+                      :items="blockGapOptions"
+                      size="md"
+                      class="w-full"
+                      @update:model-value="emitPage('blockGap', $event)"
+                    />
+                  </UFormField>
+                  <UFormField label="Block Titles">
+                    <USelect
+                      :model-value="themeConfig.page?.titleAlign || 'center'"
+                      :items="[{ label: 'Centered', value: 'center' }, { label: 'Left', value: 'left' }]"
+                      size="md"
+                      class="w-full"
+                      @update:model-value="emitPage('titleAlign', $event)"
+                    />
+                  </UFormField>
+                  <UFormField label="Social Icons">
+                    <USelect
+                      :model-value="themeConfig.social?.style || 'soft'"
+                      :items="socialStyleOptions"
+                      size="md"
+                      class="w-full"
+                      @update:model-value="emit('updateTheme', { social: { style: $event as any } })"
+                    />
+                  </UFormField>
+                </div>
+              </div>
+
               <!-- Typography -->
               <div>
                 <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
@@ -619,7 +712,17 @@ const selectedPresetId = ref<string | undefined>(undefined);
 
 function onPresetSelect(preset: ThemePreset) {
   selectedPresetId.value = preset.id;
-  emit("updateTheme", preset.theme);
+  // Theme patches merge into the current theme, so clear the extras a
+  // template may have set that the preset doesn't define
+  const theme = preset.theme;
+  emit("updateTheme", {
+    ...theme,
+    card: { backgroundColor: undefined, outlineColor: undefined, ...theme.card },
+    header: { fontWeight: undefined, letterSpacing: undefined, fontFamily: undefined, fontSize: undefined, textColor: undefined, ...theme.header },
+    typography: { textColor: undefined, bioTextColor: undefined, bioFontFamily: undefined, ...theme.typography },
+    social: theme.social ?? { style: "soft" },
+    page: theme.page ?? { blockGap: "normal", titleAlign: "center" },
+  });
 }
 
 // Google Fonts loader
@@ -645,6 +748,49 @@ function onParagraphFontChange(value: string) {
     loadFont(selectedFont);
   }
   emitTypography('bioFontFamily', value);
+}
+
+function onHeadingFontChange(value: string) {
+  const selectedFont = headingFontOptions.find(f => f.value === value);
+  if (selectedFont) {
+    loadFont(selectedFont);
+  }
+  emitTypography('headingFont', value);
+}
+
+const fontWeightOptions = [
+  { label: 'Light', value: '300' },
+  { label: 'Regular', value: '400' },
+  { label: 'Medium', value: '500' },
+  { label: 'Semibold', value: '600' },
+  { label: 'Bold', value: '700' },
+];
+
+const letterSpacingOptions = [
+  { label: 'Tight', value: '-0.03em' },
+  { label: 'Snug', value: '-0.015em' },
+  { label: 'Normal', value: 'normal' },
+  { label: 'Wide', value: '0.04em' },
+  { label: 'Extra wide', value: '0.12em' },
+];
+
+const blockGapOptions = [
+  { label: 'Compact', value: 'compact' },
+  { label: 'Normal', value: 'normal' },
+  { label: 'Relaxed', value: 'relaxed' },
+];
+
+const socialStyleOptions = [
+  { label: 'Soft', value: 'soft' },
+  { label: 'Filled', value: 'filled' },
+  { label: 'Outline', value: 'outline' },
+  { label: 'Icon only', value: 'plain' },
+];
+
+function emitPage(key: string, value: any) {
+  emit("updateTheme", {
+    page: { blockGap: "normal", titleAlign: "center", ...props.themeConfig.page, [key]: value },
+  });
 }
 
 function onGenericParagraphFontChange(value: string) {
@@ -759,6 +905,7 @@ const linkLayoutOptions = [
   { label: "Vertical (image top)", value: "vertical" },
   { label: "Horizontal (image left)", value: "horizontal-left" },
   { label: "Horizontal (image right)", value: "horizontal-right" },
+  { label: "Centered (text only)", value: "centered" },
 ];
 
 function emitLink(key: string, value: any) {

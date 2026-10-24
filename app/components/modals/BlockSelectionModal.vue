@@ -70,6 +70,12 @@ const availableBlocks: BlockOption[] = [
     colorClass: 'bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400'
   },
   {
+    id: 'text',
+    label: 'Text',
+    icon: 'i-lucide-text',
+    colorClass: 'bg-stone-100 dark:bg-stone-500/15 text-stone-700 dark:text-stone-300'
+  },
+  {
     id: 'vietqr',
     label: 'VietQR',
     icon: 'i-lucide-qr-code',

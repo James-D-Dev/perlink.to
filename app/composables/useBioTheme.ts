@@ -13,6 +13,8 @@ function mergeWithDefault(theme: Partial<ThemeConfig> | undefined | null): Theme
     avatar: { ...DEFAULT_THEME.avatar, ...theme.avatar },
     link: { ...DEFAULT_THEME.link, ...theme.link },
     typography: { ...DEFAULT_THEME.typography, ...theme.typography },
+    social: { ...DEFAULT_THEME.social!, ...theme.social },
+    page: { ...DEFAULT_THEME.page!, ...theme.page },
     showShare: theme.showShare ?? DEFAULT_THEME.showShare,
   }
 }
@@ -78,6 +80,20 @@ export function getHoverClasses(animationHover?: string, duration?: AnimateDurat
   ].filter(Boolean)
 }
 
+function blockGapToCss(gap: string): string {
+  switch (gap) {
+    case 'compact':  return '12px'
+    case 'relaxed':  return '36px'
+    default:         return '24px'
+  }
+}
+
+/** Colour with opacity, for any CSS colour (not just #rrggbb) */
+function withAlpha(color: string, alpha: number): string {
+  if (alpha >= 1) return color
+  return `color-mix(in srgb, ${color} ${Math.round(alpha * 100)}%, transparent)`
+}
+
 function spacingToGap(spacing: string): string {
   switch (spacing) {
     case 'compact':   return '12px'
@@ -112,13 +128,15 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
         backgroundAttachment: 'fixed',
       }
     }
-    return { backgroundColor: theme.value.colors.third || '#FFFFFF' }
+    // Older pages only stored the colour in colors.third
+    return { backgroundColor: bg.color || theme.value.colors.third || '#FFFFFF' }
   })
 
   const bgLayerStyle = computed(() => backgroundStyle.value)
 
   const pageStyle = computed(() => ({
     fontFamily: theme.value.typography.paragraphFont,
+    color: theme.value.typography.textColor,
     ...bgLayerStyle.value
   }))
 
@@ -137,6 +155,18 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
       backdropFilter,
     }
     const cardText = card.textColor || undefined
+    // An explicit surface colour: the style only decides the border
+    if (card.backgroundColor) {
+      const surface = withAlpha(card.backgroundColor, card.transparency ?? 1)
+      switch (card.style) {
+        case 'outline':
+          return { ...base, backgroundColor: surface, border: `1px solid ${card.outlineColor || color}`, color: cardText }
+        case 'ghost':
+          return { ...base, backgroundColor: 'transparent', border: `1px solid ${card.outlineColor || card.backgroundColor}`, color: cardText }
+        default:
+          return { ...base, backgroundColor: surface, border: 'none', color: cardText }
+      }
+    }
     switch (card.style) {
       case 'outline':
         return { ...base, backgroundColor: `${color}20`, border: `1px solid ${card.outlineColor || color}`, color: cardText }
@@ -216,9 +246,22 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
   const nameStyle = computed(() => ({
     fontFamily: theme.value.header.fontFamily || theme.value.typography.nameFont,
     fontSize: theme.value.header.fontSize || nameSizeToCss(theme.value.typography.nameSize),
-    fontWeight: '700',
+    fontWeight: theme.value.header.fontWeight || '700',
+    letterSpacing: theme.value.header.letterSpacing,
+    lineHeight: '1.15',
     color: theme.value.header.textColor,
   }))
+
+  // Block titles ("Menu", "Gallery"...) share the name's colour and weight
+  const headingStyle = computed(() => ({
+    fontFamily: theme.value.typography.headingFont,
+    fontWeight: theme.value.header.fontWeight && Number(theme.value.header.fontWeight) < 600 ? '500' : '600',
+    letterSpacing: theme.value.header.letterSpacing,
+    color: theme.value.header.textColor,
+    textAlign: theme.value.page?.titleAlign ?? 'center',
+  }))
+
+  const blockGap = computed(() => blockGapToCss(theme.value.page?.blockGap ?? 'normal'))
 
   const paragraphStyle = computed(() => ({
     fontFamily: theme.value.typography.bioFontFamily || theme.value.typography.paragraphFont,
@@ -226,16 +269,27 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
     color: theme.value.typography.bioTextColor,
   }))
 
-  const socialButtonStyle = computed(() => ({
-    backgroundColor: `${theme.value.colors.primary}15`,
-    color: theme.value.colors.primary,
-    borderRadius: '9999px',
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }))
+  const socialButtonStyle = computed(() => {
+    const color = theme.value.colors.primary
+    const base = {
+      borderRadius: '9999px',
+      width: '40px',
+      height: '40px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }
+    switch (theme.value.social?.style) {
+      case 'filled':
+        return { ...base, backgroundColor: color, color: theme.value.button.textColor || '#ffffff' }
+      case 'outline':
+        return { ...base, backgroundColor: 'transparent', color, border: `1px solid ${withAlpha(color, 0.35)}` }
+      case 'plain':
+        return { ...base, backgroundColor: 'transparent', color, width: '32px' }
+      default:
+        return { ...base, backgroundColor: withAlpha(color, 0.08), color }
+    }
+  })
 
   const linkLayout = computed(() => theme.value.link.layout)
 
@@ -253,6 +307,8 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
     headerLayout,
     avatarStyle,
     nameStyle,
+    headingStyle,
+    blockGap,
     paragraphStyle,
     socialButtonStyle,
     cardAppearClasses,

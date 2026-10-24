@@ -26,7 +26,7 @@
 
       <!-- Showcase: switch between worlds -->
       <div class="px-5 pb-16 sm:px-8 md:pb-24">
-        <div class="rounded-[20px] bg-sand p-1.5">
+        <div class="rounded-2xl bg-sand p-1.5">
           <div class="grid grid-cols-2 gap-1 sm:grid-cols-4" role="tablist" aria-label="3D worlds">
             <button
               v-for="(world, i) in showcase"
