@@ -1,7 +1,9 @@
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import { cherryLeaves, natureWind, scatterModel, type ScatterItem } from './natureModels'
+import { cherryLeaves, greenLeaves, natureWind, scatterModel, type ScatterItem } from './natureModels'
 import type { LandId, RoomStyle } from '~/types/room'
+import { attachCityModel, beamMaterial, carMaterials, cityMaterials, createCar } from './cityModels'
+import { CATALOG_BY_TYPE } from './catalog'
 
 // Scenery outside the room. Each land is built from primitives and returns its
 // sky colors plus an update() hook for animation (butterflies, snow, petals...).
@@ -19,6 +21,7 @@ export const LANDS: LandMeta[] = [
   { id: 'island', name: 'Sky island', description: 'Floating island above the clouds, flowers and butterflies', icon: 'i-lucide-cloud-sun', preview: 'linear-gradient(180deg,#8fd0f5 0%,#cfeaff 55%,#6fbf5a 56%,#4f8a3a 100%)' },
   { id: 'mars', name: 'Mars', description: 'Red planet surface floating in space, planets all around', icon: 'i-lucide-orbit', preview: 'linear-gradient(180deg,#0b0614 0%,#2a1440 55%,#c4572d 56%,#7a2f18 100%)' },
   { id: 'sakura', name: 'Sakura', description: 'Cherry blossoms, falling petals, butterflies and a pond', icon: 'i-lucide-flower-2', preview: 'linear-gradient(180deg,#bfe3ff 0%,#ffd6e8 55%,#9fd88a 56%,#6fb35a 100%)' },
+  { id: 'city', name: 'City', description: 'Downtown block: streets, traffic, street lamps and lit windows at night', icon: 'i-lucide-building-2', preview: 'linear-gradient(180deg,#9fcdf0 0%,#d9e6f2 55%,#8d8f95 56%,#55585e 100%)' },
   { id: 'winter', name: 'Winter', description: 'Snowfall, snowy pines and a snowman with a Santa hat', icon: 'i-lucide-snowflake', preview: 'linear-gradient(180deg,#9fb8d1 0%,#dce8f3 55%,#f4f8ff 56%,#d6e2ef 100%)' },
 ]
 
@@ -1219,6 +1222,522 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
   }
 }
 
+// ---------- City ----------
+
+/** Building footprints in pack units (x, z), for laying out the blocks */
+const CITY_FOOTPRINTS: Record<string, [number, number]> = {
+  Building1_Large: [8, 2.74],
+  Building1_Small: [3.74, 2.74],
+  Building2_Large: [5.72, 2.22],
+  Building2_Small: [3.58, 2.48],
+  Building3_Big: [4.7, 4.4],
+  Building3_Small: [3.06, 4.4],
+  Building4: [4.64, 3.86],
+  House1: [2.56, 3.87],
+  House2: [3.64, 3.09],
+}
+
+/** Street lamp with its arm along +x; the bulb and glow are shared so they light up together */
+function streetLamp(bulb: THREE.Material, glow: THREE.SpriteMaterial) {
+  const lamp = new THREE.Group()
+  const metal = std('#2f3338', { roughness: 0.6, metalness: 0.4 })
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.07, 3, 8), metal)
+  pole.position.y = 1.5
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.05, 0.05), metal)
+  arm.position.set(0.3, 2.96, 0)
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.08, 0.18), metal)
+  head.position.set(0.58, 2.92, 0)
+  const light = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.03, 0.13), bulb)
+  light.position.set(0.58, 2.865, 0)
+  const halo = new THREE.Sprite(glow)
+  halo.position.set(0.58, 2.8, 0)
+  halo.scale.setScalar(1)
+  lamp.add(pole, arm, head, light, halo)
+  lamp.traverse((o) => {
+    if ((o as THREE.Mesh).isMesh) o.castShadow = true
+  })
+  return lamp
+}
+
+function buildCity(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(61)
+  const { width, depth } = ctx.style
+  const g0 = ctx.groundY
+  // Plaza around the room, a road loop, then a sidewalk and the buildings
+  const hx = width / 2 + 1.4
+  const hz = depth / 2 + 1.4
+  const road = 2.1
+  const walk = 1.1
+  const ox = hx + road + walk
+  const oz = hz + road + walk
+
+  // Lawns between the streets; roads and sidewalks are laid on top
+  const lawnColor = new THREE.Color('#7ba65a')
+  const lawn = std('#7ba65a', { roughness: 1 })
+  const { group } = floatingGround(ctx, radius, lawn)
+  // Ground the buildings, houses, park and trees must not overlap
+  const blocked: { x0: number; z0: number; x1: number; z1: number }[] = []
+  const block = (x: number, z: number, w: number, d: number, pad = 0) =>
+    blocked.push({ x0: x - w / 2 - pad, z0: z - d / 2 - pad, x1: x + w / 2 + pad, z1: z + d / 2 + pad })
+  const isFree = (x: number, z: number, w: number, d: number) =>
+    !blocked.some(b => x + w / 2 > b.x0 && x - w / 2 < b.x1 && z + d / 2 > b.z0 && z - d / 2 < b.z1)
+
+  // Flat ground layers; a shape's (x, y) maps to world (x, -z) once laid flat
+  const rect = (x0: number, z0: number, x1: number, z1: number) => {
+    const path = new THREE.Path()
+    path.moveTo(x0, -z0)
+    path.lineTo(x1, -z0)
+    path.lineTo(x1, -z1)
+    path.lineTo(x0, -z1)
+    path.closePath()
+    return path
+  }
+  const layer = (outerX: number, outerZ: number, innerX: number, innerZ: number, material: THREE.Material, y: number) => {
+    const shape = new THREE.Shape(rect(-outerX, -outerZ, outerX, outerZ).getPoints())
+    if (innerX > 0) shape.holes.push(rect(-innerX, -innerZ, innerX, innerZ))
+    const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), material)
+    mesh.rotation.x = -Math.PI / 2
+    mesh.position.y = g0 + y
+    mesh.receiveShadow = true
+    group.add(mesh)
+  }
+  const pavement = std('#aaa69e', { roughness: 0.95 })
+  const asphalt = std('#3a3c42', { roughness: 0.9 })
+  layer(hx, hz, 0, 0, pavement, 0.03)
+  layer(hx + road, hz + road, hx, hz, asphalt, 0.012)
+  layer(ox, oz, hx + road, hz + road, pavement, 0.03)
+
+  // Avenues leading off the loop to the island edge, one on each side
+  type Avenue = { axis: 'x' | 'z'; dir: 1 | -1; at: number }
+  const avenues: Avenue[] = [
+    { axis: 'x', dir: 1, at: 0.3 + road / 2 },
+    { axis: 'z', dir: 1, at: 0.3 + road / 2 },
+    { axis: 'z', dir: -1, at: 0.05 },
+    { axis: 'x', dir: -1, at: 0.05 },
+  ]
+  const strip = (x0: number, z0: number, x1: number, z1: number, material: THREE.Material, y: number) => {
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(x1 - x0), Math.abs(z1 - z0)), material)
+    mesh.rotation.x = -Math.PI / 2
+    mesh.position.set((x0 + x1) / 2, g0 + y, (z0 + z1) / 2)
+    mesh.receiveShadow = true
+    group.add(mesh)
+  }
+  for (const a of avenues) {
+    const start = (a.axis === 'x' ? hx : hz) + road - 0.01
+    const end = radius * 1.02
+    const along = (from: number, to: number) => [a.dir * from, a.dir * to] as const
+    const [s0, s1] = along(start, end)
+    // Sidewalks either side, then the asphalt over the sidewalk ring it crosses
+    for (const side of [-1, 1]) {
+      const c = a.at + side * (road / 2 + 0.35)
+      if (a.axis === 'x') strip(s0, c - 0.35, s1, c + 0.35, pavement, 0.031)
+      else strip(c - 0.35, s0, c + 0.35, s1, pavement, 0.031)
+    }
+    if (a.axis === 'x') strip(s0, a.at - road / 2, s1, a.at + road / 2, asphalt, 0.033)
+    else strip(a.at - road / 2, s0, a.at + road / 2, s1, asphalt, 0.033)
+    const mid = a.dir * (start + end) / 2
+    if (a.axis === 'x') block(mid, a.at, end - start, road + 1.4, 0.2)
+    else block(a.at, mid, road + 1.4, end - start, 0.2)
+  }
+  block(0, 0, ox * 2, oz * 2, 0.2)
+
+  // Lane markings and crosswalks
+  const paint = std('#eeeeea', { roughness: 0.6 })
+  const markings = new THREE.Group()
+  const mark = (x: number, z: number, w: number, d: number) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), paint)
+    m.rotation.x = -Math.PI / 2
+    m.position.set(x, g0 + 0.036, z)
+    markings.add(m)
+  }
+  const cx = hx + road / 2
+  const cz = hz + road / 2
+  for (let x = -cx + 0.6; x < cx - 0.6; x += 1) {
+    mark(x, cz, 0.5, 0.07)
+    mark(x, -cz, 0.5, 0.07)
+  }
+  for (let z = -cz + 0.6; z < cz - 0.6; z += 1) {
+    mark(cx, z, 0.07, 0.5)
+    mark(-cx, z, 0.07, 0.5)
+  }
+  // Crosswalks at the back-right corner, off to the side of the view
+  for (let i = 0; i < 6; i++) {
+    mark(width / 2 - 0.4 + i * 0.32, -cz, 0.18, road * 0.85)
+    mark(cx, -(depth / 2 - 0.4 + i * 0.32), road * 0.85, 0.18)
+  }
+  for (const a of avenues) {
+    const start = (a.axis === 'x' ? hx : hz) + road + 0.6
+    for (let d = start; d < radius - 0.4; d += 1) {
+      if (a.axis === 'x') mark(a.dir * d, a.at, 0.5, 0.07)
+      else mark(a.at, a.dir * d, 0.07, 0.5)
+    }
+  }
+  group.add(markings)
+  const markGeometries = markings.children.map(m => (m as THREE.Mesh).geometry.clone().applyMatrix4(m.matrix.compose(m.position, m.quaternion, m.scale)))
+  markings.clear()
+  group.remove(markings)
+  const markMesh = new THREE.Mesh(mergeGeometries(markGeometries), paint)
+  markMesh.receiveShadow = true
+  group.add(markMesh)
+
+  // Buildings: tall rows behind the walls, lower houses to the sides, the front corner kept open
+  const fits = (x: number, z: number, w: number, d: number) =>
+    [[1, 1], [1, -1], [-1, 1], [-1, -1]].every(([sx, sz]) => Math.hypot(x + sx! * w / 2, z + sz! * d / 2) < radius - 0.3)
+  /** Houses, so each can get flower pots by its door */
+  const houses: { x: number; z: number; rotation: number; depth: number }[] = []
+  const row = (names: string[], scale: number, axis: 'x' | 'z', from: number, to: number, edge: number, rotation: number) => {
+    // Leave a gap where an avenue crosses this row
+    const gaps = avenues
+      .filter(a => a.axis !== axis && Math.sign(edge) === a.dir)
+      .map(a => [a.at - road / 2 - 1.1, a.at + road / 2 + 1.1] as const)
+    let cursor = from
+    let i = 0
+    let misses = 0
+    while (cursor < to) {
+      const name = names[i % names.length]!
+      i++
+      const [fx, fz] = CITY_FOOTPRINTS[name]!
+      const along = fx * scale
+      const across = fz * scale
+      const offset = edge + Math.sign(edge) * (across / 2 + 0.25)
+      const x = axis === 'x' ? cursor + along / 2 : offset
+      const z = axis === 'x' ? offset : cursor + along / 2
+      const [w, d] = axis === 'x' ? [along, across] : [across, along]
+      const gap = gaps.find(([g0_, g1]) => cursor < g1 && cursor + along > g0_)
+      if (!gap && fits(x, z, w, d) && isFree(x, z, w, d)) {
+        attachCityModel(group, name, x, g0, z, rotation, scale).catch(() => {})
+        block(x, z, w, d, 0.2)
+        if (name.startsWith('House')) houses.push({ x, z, rotation, depth: across })
+        cursor += along + 0.35
+        misses = 0
+      } else if (++misses >= names.length) {
+        // Nothing fits here: skip past the avenue, or along the curving island edge
+        const blocking = gaps.find(([g0_, g1]) => cursor < g1 && cursor + 2 > g0_)
+        cursor = blocking && cursor >= blocking[0] - 2 ? blocking[1] : cursor + 0.5
+        misses = 0
+      }
+    }
+  }
+  row(['Building2_Large', 'Building1_Small', 'Building4', 'Building2_Small'], 1.15, 'x', -ox, radius, -oz, 0)
+  // Side rows stop at the street corners so they don't overlap the back row
+  row(['Building3_Big', 'Building1_Large', 'Building2_Small'], 1.15, 'z', -oz, oz, -ox, Math.PI / 2)
+  row(['House2', 'House1'], 0.95, 'z', -oz, -0.5, ox, -Math.PI / 2)
+  row(['House1', 'House2'], 0.95, 'x', -ox, -0.5, oz, Math.PI)
+  // Corner tower behind the room
+  const corner = -Math.max(ox, oz) - 2.6
+  if (fits(corner, corner, 4.7 * 1.3, 4.4 * 1.3) && isFree(corner, corner, 6, 6)) {
+    attachCityModel(group, 'Building3_Big', corner, g0, corner, Math.PI / 4, 1.3).catch(() => {})
+    block(corner, corner, 6.2, 6.2)
+  }
+
+  let pondWater: ReturnType<typeof createWater> | null = null
+  // Park with a pond on the open corner between the two front avenues; kept
+  // low (no trees) because it sits in front of the camera
+  const pondR = 1.3
+  const pondX = (0.3 + road + 0.7 + Math.min(ox + 3, radius * 0.55)) / 2 + 0.6
+  const pondZ = Math.min(oz + pondR + 1.6, Math.sqrt(Math.max((radius - pondR - 0.8) ** 2 - pondX ** 2, 0)))
+  const parkFits = Math.hypot(pondX, pondZ) + pondR < radius - 0.5 && pondZ - pondR > oz + 0.2
+  const parkSpots: [number, number][] = []
+  if (parkFits) {
+    const water = createWater(pondR)
+    water.mesh.position.set(pondX, g0 + 0.035, pondZ)
+    group.add(water.mesh)
+    pondWater = water
+    block(pondX, pondZ, pondR * 2 + 2.2, pondR * 2 + 2.2)
+    const shore: ScatterItem[] = []
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2 + rand() * 0.15
+      const r = pondR + 0.05 + rand() * 0.12
+      shore.push({ x: pondX + Math.cos(a) * r, y: g0, z: pondZ + Math.sin(a) * r, height: 0.12 + rand() * 0.12, rotation: rand() * Math.PI * 2 })
+    }
+    for (const [name, items] of byVariant(['Pebble_Round_1', 'Pebble_Round_2', 'Pebble_Round_3', 'Pebble_Round_4'], shore, rand)) scatterModel(group, name, items)
+    const reeds: ScatterItem[] = Array.from({ length: 10 }, (_, i) => {
+      const a = Math.PI * (0.9 + (i / 10) * 0.9)
+      return { x: pondX + Math.cos(a) * (pondR + 0.25), y: g0, z: pondZ + Math.sin(a) * (pondR + 0.25), height: 0.5 + rand() * 0.3, rotation: rand() * Math.PI * 2 }
+    })
+    scatterModel(group, 'Grass_Wispy_Tall', reeds, { castShadow: false })
+    for (let i = 0; i < 4; i++) {
+      const pad = new THREE.Mesh(new THREE.CircleGeometry(0.16, 14, 0.3, Math.PI * 1.8), std('#4f9d3a', { side: THREE.DoubleSide }))
+      pad.rotation.x = -Math.PI / 2
+      const a = rand() * Math.PI * 2
+      const r = rand() * 0.8
+      pad.position.set(pondX + Math.cos(a) * r, g0 + 0.045, pondZ + Math.sin(a) * r)
+      group.add(pad)
+    }
+    // Flowers and bushes around the pond
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 + 0.3
+      parkSpots.push([pondX + Math.cos(a) * (pondR + 0.9), pondZ + Math.sin(a) * (pondR + 0.9)])
+    }
+    const flowers = parkSpots.map(([x, z]) => ({ x, y: g0, z, height: 0.3 + rand() * 0.12, rotation: rand() * Math.PI * 2 }))
+    for (const [name, items] of byVariant(['Flower_3_Group', 'Flower_4_Group', 'Bush_Common_Flowers'], flowers, rand)) scatterModel(group, name, items, { castShadow: false })
+  }
+
+  // Street lamps along the outer sidewalk, facing the road
+  const bulb = new THREE.MeshStandardMaterial({ color: '#fff4d8', emissive: '#ffd58a', emissiveIntensity: 0 })
+  const glow = new THREE.SpriteMaterial({ map: softDotTexture(), color: '#ffcf7a', blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0 })
+  const lampSpots: [number, number, number][] = [
+    [hx + road + 0.4, -hz + 0.6, Math.PI], [hx + road + 0.4, hz - 0.6, Math.PI],
+    [-hx + 0.6, hz + road + 0.4, Math.PI / 2], [hx - 0.6, hz + road + 0.4, Math.PI / 2],
+    [-hx - road - 0.4, hz - 0.6, 0], [hx - 0.6, -hz - road - 0.4, -Math.PI / 2],
+  ]
+  for (const a of avenues) {
+    // One lamp partway down each avenue, arm reaching over the road
+    const d = ((a.axis === 'x' ? hx : hz) + road + radius) / 2
+    const side = a.at + road / 2 + 0.4
+    if (a.axis === 'x') lampSpots.push([a.dir * d, side, -Math.PI / 2])
+    else lampSpots.push([side, a.dir * d, Math.PI])
+  }
+  // Pools of light on the ground under each lamp at night
+  const poolMaterial = new THREE.MeshBasicMaterial({ map: softDotTexture(), color: '#ffcf86', blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0, fog: false })
+  const poolGeometry = new THREE.PlaneGeometry(3.2, 3.2)
+  for (const [x, z, angle] of lampSpots) {
+    const lamp = streetLamp(bulb, glow)
+    lamp.position.set(x, g0 + 0.03, z)
+    lamp.rotation.y = angle
+    group.add(lamp)
+    // The bulb hangs 0.58 m along the arm
+    const pool = new THREE.Mesh(poolGeometry, poolMaterial)
+    pool.rotation.x = -Math.PI / 2
+    pool.position.set(x + Math.cos(angle) * 0.58, g0 + 0.04, z - Math.sin(angle) * 0.58)
+    pool.renderOrder = 1
+    group.add(pool)
+  }
+
+  // Traffic light on the back-right corner, cycling green, amber, red
+  const signal = new THREE.Group()
+  const signalMetal = std('#2b2e33', { roughness: 0.6, metalness: 0.4 })
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 2.4, 8), signalMetal)
+  post.position.y = 1.2
+  const housing = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.62, 0.2), signalMetal)
+  housing.position.y = 2.35
+  signal.add(post, housing)
+  const signalColors = ['#ff3b30', '#ffcc00', '#34c759']
+  const signalLights = signalColors.map((color, i) => {
+    const material = new THREE.MeshStandardMaterial({ color: '#222222', emissive: color, emissiveIntensity: 0 })
+    const bulbMesh = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 8), material)
+    bulbMesh.position.set(0, 2.55 - i * 0.2, 0.11)
+    signal.add(bulbMesh)
+    return material
+  })
+  signal.position.set(hx + road + 0.35, g0 + 0.03, -hz - road - 0.35)
+  // Lights turned toward the default camera
+  signal.rotation.y = 0.4
+  group.add(signal)
+
+  // Trees in planters along the outer sidewalk, and a small park on the open corner
+  const planter = std('#8e8a83', { roughness: 0.9 })
+  const trees: ScatterItem[] = []
+  const treeAt = (x: number, z: number, height: number) => {
+    if (Math.hypot(x, z) > radius - 0.6) return
+    const box = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.36, 0.3, 12), planter)
+    box.position.set(x, g0 + 0.15, z)
+    box.castShadow = true
+    box.receiveShadow = true
+    group.add(box)
+    trees.push({ x, y: g0 + 0.28, z, height, rotation: rand() * Math.PI * 2 })
+    block(x, z, 1, 1)
+  }
+  // Only on the far halves of the front streets, so they don't hide the room
+  for (let z = -hz; z < 0; z += 3) treeAt(ox - 0.45, z + 1.2, 2.6 + rand() * 0.8)
+  for (let x = -hx; x < 0; x += 3) treeAt(x + 1.2, oz - 0.45, 2.6 + rand() * 0.8)
+  // Fill the leftover ground: small houses facing the nearest street, then trees
+  const candidates: [number, number][] = []
+  for (let x = -radius; x <= radius; x += 0.9) {
+    for (let z = -radius; z <= radius; z += 0.9) candidates.push([x, z])
+  }
+  candidates.sort(() => rand() - 0.5)
+  let fillerHouses = 0
+  // The quadrant between the camera and the room stays open (park, low plants only)
+  const cameraSide = (x: number, z: number) => x > 0 && z > 0
+  for (const [x, z] of candidates) {
+    if (fillerHouses >= 8) break
+    if (cameraSide(x, z)) continue
+    const name = rand() < 0.5 ? 'House1' : 'House2'
+    const [fx, fz] = CITY_FOOTPRINTS[name]!
+    const scale = 0.8
+    // Face the centre along whichever axis is further out
+    const alongX = Math.abs(x) > Math.abs(z)
+    const rotation = alongX ? -Math.sign(x) * Math.PI / 2 : (z > 0 ? Math.PI : 0)
+    const [w, d] = alongX ? [fz * scale, fx * scale] : [fx * scale, fz * scale]
+    if (!fits(x, z, w, d) || !isFree(x, z, w + 0.8, d + 0.8)) continue
+    attachCityModel(group, name, x, g0, z, rotation, scale).catch(() => {})
+    block(x, z, w, d, 0.5)
+    houses.push({ x, z, rotation, depth: fz * scale })
+    fillerHouses++
+  }
+  for (const [x, z] of candidates) {
+    if (trees.length >= 40) break
+    if (cameraSide(x, z) || Math.hypot(x, z) > radius - 0.7 || !isFree(x, z, 1.3, 1.3)) continue
+    trees.push({ x, y: g0, z, height: 2.2 + rand() * 1.4, rotation: rand() * Math.PI * 2 })
+    block(x, z, 1.3, 1.3)
+  }
+  for (const [name, list] of byVariant(['CommonTree_2', 'CommonTree_3', 'CommonTree_4', 'CommonTree_1'], trees, rand)) scatterModel(group, name, list)
+
+  // The open lawn on the camera side gets low planting only: flower beds and bushes
+  const low: ScatterItem[] = []
+  for (const [x, z] of candidates) {
+    if (low.length >= 18) break
+    if (!cameraSide(x, z) || Math.hypot(x, z) > radius - 0.6 || !isFree(x, z, 0.9, 0.9)) continue
+    low.push({ x, y: g0, z, height: 0.35 + rand() * 0.35, rotation: rand() * Math.PI * 2 })
+    block(x, z, 0.9, 0.9)
+  }
+  for (const [name, list] of byVariant(['Bush_Common_Flowers', 'Flower_3_Group', 'Flower_4_Group', 'Bush_Common'], low, rand)) {
+    scatterModel(group, name, list, { castShadow: name.startsWith('Bush'), material: name === 'Bush_Common' ? greenLeaves : undefined })
+  }
+
+  // Pots by each house's door (house fronts face +z before rotation)
+  const potTypes = ['garden-flower-pot', 'garden-fern-pot', 'garden-ceramic-flowers', 'garden-flower-pot']
+  houses.forEach((h, i) => {
+    const front = new THREE.Vector3(Math.sin(h.rotation), 0, Math.cos(h.rotation))
+    const side = new THREE.Vector3(front.z, 0, -front.x)
+    for (const [k, offset] of [[0, -0.75], [1, 0.75]] as const) {
+      const item = CATALOG_BY_TYPE[potTypes[(i * 2 + k) % potTypes.length]!]
+      if (!item) continue
+      const pot = item.build(item.defaultColor)
+      pot.scale.setScalar(0.85)
+      pot.position.set(h.x + front.x * (h.depth / 2 + 0.3) + side.x * offset, g0 + 0.03, h.z + front.z * (h.depth / 2 + 0.3) + side.z * offset)
+      pot.traverse(o => ((o as THREE.Mesh).isMesh && (o.castShadow = true)))
+      group.add(pot)
+    }
+  })
+
+  // Benches on the plaza in front of the room
+  const wood = std('#8a5a3a', { roughness: 0.8 })
+  const bench = (x: number, z: number, angle: number) => {
+    const b = new THREE.Group()
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.06, 0.36), wood)
+    seat.position.y = 0.42
+    const back = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.32, 0.05), wood)
+    back.position.set(0, 0.62, -0.16)
+    b.add(seat, back)
+    for (const sx of [-0.52, 0.52]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.34), signalMetal)
+      leg.position.set(sx, 0.21, 0)
+      b.add(leg)
+    }
+    b.traverse(o => ((o as THREE.Mesh).isMesh && (o.castShadow = true)))
+    b.position.set(x, g0 + 0.03, z)
+    b.rotation.y = angle
+    group.add(b)
+  }
+  bench(hx - 0.55, -0.6, -Math.PI / 2)
+  bench(0.6, hz - 0.55, Math.PI)
+  if (parkFits) bench(pondX - pondR - 0.9, pondZ, Math.PI / 2)
+
+  // Cars driving round the loop, one lane each way
+  const loop = (half: number) => {
+    // Rounded rectangle through the lane centre
+    const ax = hx + half
+    const az = hz + half
+    const r = 0.8
+    const points: THREE.Vector3[] = []
+    const corners: [number, number, number][] = [[ax - r, az - r, 0], [-ax + r, az - r, Math.PI / 2], [-ax + r, -az + r, Math.PI], [ax - r, -az + r, Math.PI * 1.5]]
+    for (const [x, z, start] of corners) {
+      for (let k = 0; k <= 4; k++) {
+        const a = start + (k / 4) * (Math.PI / 2)
+        points.push(new THREE.Vector3(x + Math.cos(a) * r, 0, z + Math.sin(a) * r))
+      }
+    }
+    return new THREE.CatmullRomCurve3(points, true, 'centripetal')
+  }
+  const outerLane = loop(road * 0.73)
+  const innerLane = loop(road * 0.27)
+  const CAR_SCALE = 0.42
+  const cars = [
+    { model: 'Taxi', lane: outerLane, speed: 1.6, t: 0.05, reverse: false },
+    { model: 'NormalCar1', lane: outerLane, speed: 1.6, t: 0.55, reverse: false },
+    { model: 'Cop', lane: innerLane, speed: 1.5, t: 0.3, reverse: true },
+  ].map((c) => {
+    const mesh = createCar(c.model, CAR_SCALE, true)
+    group.add(mesh)
+    return { ...c, mesh, length: c.lane.getLength(), velocity: c.speed }
+  })
+  // Crosswalks at the traffic light: cars wait before them on amber and red
+  const crossings = [
+    { x0: width / 2 - 0.65, x1: width / 2 - 0.4 + 5 * 0.32 + 0.25, z0: -hz - road, z1: -hz },
+    { x0: hx, x1: hx + road, z0: -(depth / 2 - 0.4 + 5 * 0.32 + 0.25), z1: -(depth / 2 - 0.65) },
+  ]
+  const onCrossing = (p: THREE.Vector3) => crossings.some(c => p.x > c.x0 && p.x < c.x1 && p.z > c.z0 && p.z < c.z1)
+  const ahead = new THREE.Vector3()
+  // Parked along the avenues, against the kerb
+  const parked: [string, Avenue, number][] = [['SUV', avenues[0]!, 0.75], ['SportsCar', avenues[1]!, 0.7], ['NormalCar2', avenues[0]!, 0.9]]
+  for (const [model, a, f] of parked) {
+    const d = ((a.axis === 'x' ? hx : hz) + road) * (1 - f) + radius * f * 0.92
+    const lane = a.at - road * 0.3
+    const car = createCar(model, CAR_SCALE)
+    if (a.axis === 'x') {
+      car.position.set(a.dir * d, g0 + 0.033, lane)
+      car.rotation.y = a.dir > 0 ? Math.PI : 0
+    } else {
+      car.position.set(lane, g0 + 0.033, a.dir * d)
+      car.rotation.y = a.dir > 0 ? Math.PI / 2 : -Math.PI / 2
+    }
+    if (Math.hypot(car.position.x, car.position.z) < radius - 1) group.add(car)
+  }
+  const tangent = new THREE.Vector3()
+
+  const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#dfe8f2', emissiveIntensity: 0.12 })
+  const clouds = skyClouds(group, rand, cloudMaterial)
+
+  const nightTint = new THREE.Color('#3b4258')
+  const white = new THREE.Color('#ffffff')
+  const cloudNight = new THREE.Color('#4a5470')
+
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#0b1026'), dusk: new THREE.Color('#f09a6b'), day: new THREE.Color('#9fcdf0') },
+    atmosphere: { turbidity: 4, rayleigh: 1.6, mie: 0.005 },
+    update(time, dt, daylight, lamps) {
+      natureWind.value = time
+      lawn.color.copy(nightTint).lerp(white, daylight).multiply(lawnColor)
+      if (pondWater) {
+        pondWater.uniforms.time.value = time
+        pondWater.uniforms.daylight.value = daylight
+      }
+      cityMaterials.body.color.copy(nightTint).lerp(white, daylight)
+      cityMaterials.windows.emissiveIntensity = lamps * 0.9
+      bulb.emissiveIntensity = lamps * 2.2
+      glow.opacity = lamps * 0.5
+      poolMaterial.opacity = lamps * 0.45
+      beamMaterial.opacity = lamps * 0.55
+      carMaterials.head.emissiveIntensity = 0.3 + lamps * 2
+      carMaterials.tail.emissiveIntensity = 0.3 + lamps * 1.2
+      // Police lights flash in short double pulses
+      carMaterials.siren.emissiveIntensity = (time * 4) % 2 < 0.25 || ((time * 4) % 2 > 0.5 && (time * 4) % 2 < 0.75) ? 3 : 0.2
+      cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
+      clouds.rotation.y = time * 0.004
+      // 9 s cycle: green 5 s, amber 1 s, red 3 s
+      const phase = time % 9
+      const active = phase < 5 ? 2 : phase < 6 ? 1 : 0
+      signalLights.forEach((m, i) => (m.emissiveIntensity = i === active ? 2.2 : 0.05))
+      const stopping = active !== 2
+      for (const car of cars) {
+        const p = car.lane.getPointAt(car.t)
+        car.lane.getTangentAt(car.t, tangent)
+        if (car.reverse) tangent.negate()
+        let target = car.speed
+        // Wait at the crossing: the front bumper would roll onto it, the car isn't on it yet
+        ahead.copy(p).addScaledVector(tangent, 1.05)
+        if (stopping && onCrossing(ahead) && !onCrossing(p)) target = 0
+        // Keep a safe gap behind the car ahead in the same lane
+        for (const other of cars) {
+          if (other === car || other.lane !== car.lane || other.reverse !== car.reverse) continue
+          const gap = ((((other.t - car.t) * (car.reverse ? -1 : 1)) % 1) + 1) % 1 * car.length
+          if (gap < 3.4) target = Math.min(target, Math.max(0, (gap - 2.3) * 1.4))
+        }
+        // Brake firmly, pull away gently
+        const change = target - car.velocity
+        car.velocity += THREE.MathUtils.clamp(change, -3.5 * dt, 1.1 * dt)
+        car.t = (car.t + (car.reverse ? -1 : 1) * (car.velocity * dt) / car.length + 1) % 1
+        car.mesh.position.set(p.x, g0 + 0.012, p.z)
+        car.mesh.rotation.y = Math.atan2(-tangent.z, tangent.x)
+      }
+    },
+  }
+}
+
 function snowyPine(scale: number, rand: () => number = seeded(5)) {
   return pineTree(rand, scale, true)
 }
@@ -1358,6 +1877,9 @@ export function buildLand(id: LandId, ctx: LandContext): LandInstance {
       return buildSakura(ctx, radius)
     case 'winter':
       return buildWinter(ctx, radius)
+    case 'city':
+      // A city needs more room for streets and buildings
+      return buildCity(ctx, radius * 1.65)
     default:
       return buildIsland(ctx, radius)
   }
