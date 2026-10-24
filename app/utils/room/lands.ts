@@ -43,6 +43,12 @@ export interface LandInstance {
   starsAlways: boolean
   /** Called every frame; daylight 0..1, lamps 0..1 (night lights) */
   update: (time: number, dt: number, daylight: number, lamps: number) => void
+  /** Ground surface, for finding the point under the cursor */
+  ground?: THREE.Object3D
+  /** Point on the ground under the cursor (null when it leaves); butterflies come to flowers near it */
+  setAttractor?: (point: THREE.Vector3 | null) => void
+  /** Tops of flower decor inside the room, extra places for butterflies to land */
+  setRoomFlowers?: (spots: THREE.Vector3[]) => void
 }
 
 export interface LandContext {
@@ -239,52 +245,191 @@ function butterflyModel(color: string) {
   return { group: g, left, right }
 }
 
+/**
+ * Butterflies hop between flowers: rest with slow wing beats, then arc over
+ * to another flower. Now and then two of them chase each other through the
+ * air. Flowers near the cursor draw a couple of them over, and flower decor
+ * inside the room counts as somewhere to land too.
+ */
 function createButterflies(count: number, spots: THREE.Vector3[], rand: () => number, colors: string[]) {
+  type Mode = 'rest' | 'fly' | 'lead' | 'follow'
   const group = new THREE.Group()
+  const lowest = Math.min(...spots.map(s => s.y))
+  let roomSpots: THREE.Vector3[] = []
+  /** Flower the cursor is near, and the butterflies sent to it */
+  let attraction: { spot: THREE.Vector3; flies: Set<number> } | null = null
+  let chaseTimer = 6 + rand() * 6
+
   const flies = Array.from({ length: count }, (_, i) => {
     const model = butterflyModel(colors[i % colors.length]!)
     const from = spots[Math.floor(rand() * spots.length)]!.clone()
     group.add(model.group)
     model.group.position.copy(from)
-    return { ...model, from, to: from.clone(), ctrl: from.clone(), t: 1, duration: 1, rest: rand() * 2, phase: rand() * 10 }
+    return {
+      ...model,
+      index: i,
+      mode: 'rest' as Mode,
+      from,
+      to: from.clone(),
+      ctrl: from.clone(),
+      t: 1,
+      duration: 1,
+      rest: rand() * 2,
+      phase: rand() * 10,
+      velocity: new THREE.Vector3(),
+      chaseUntil: 0,
+      partner: -1,
+      wander: new THREE.Vector3(),
+      wanderAt: 0,
+      center: new THREE.Vector3(),
+    }
   })
+  type Fly = (typeof flies)[number]
   const tmp = new THREE.Vector3()
+  const desired = new THREE.Vector3()
+
+  /** A spot a little off a flower's center, so several butterflies don't stack exactly */
+  const near = (spot: THREE.Vector3, spread = 0.1) =>
+    spot.clone().add(new THREE.Vector3((rand() - 0.5) * spread, 0.02, (rand() - 0.5) * spread))
+
+  function destination(f: Fly) {
+    if (attraction?.flies.has(f.index)) return near(attraction.spot, 0.16)
+    // Room flowers are few, so favour them when there are any
+    if (roomSpots.length && rand() < 0.4) return near(roomSpots[Math.floor(rand() * roomSpots.length)]!)
+    return spots[Math.floor(rand() * spots.length)]!.clone()
+  }
+
+  function takeOff(f: Fly, to: THREE.Vector3) {
+    f.mode = 'fly'
+    f.from.copy(f.group.position)
+    f.to.copy(to)
+    const distance = f.from.distanceTo(f.to)
+    f.ctrl.copy(f.from).lerp(f.to, 0.5)
+    // Short hops stay low; longer flights arc higher
+    f.ctrl.y += 0.25 + Math.min(distance * 0.35, 1.2) + rand() * 0.6
+    f.t = 0
+    f.duration = 1 + distance * 0.35
+    f.partner = -1
+  }
+
+  function startChase(time: number) {
+    const free = flies.filter(f => f.mode === 'rest' || f.mode === 'fly')
+      .filter(f => !attraction?.flies.has(f.index))
+    if (free.length < 2) return
+    const lead = free[Math.floor(rand() * free.length)]!
+    // The partner is the nearest other butterfly, if it's close enough to notice
+    const follow = free.filter(f => f !== lead)
+      .sort((a, b) => a.group.position.distanceTo(lead.group.position) - b.group.position.distanceTo(lead.group.position))[0]!
+    if (follow.group.position.distanceTo(lead.group.position) > 7) return
+    const until = time + 3 + rand() * 2.5
+    lead.center.copy(lead.group.position).lerp(follow.group.position, 0.5)
+    lead.center.y = Math.max(lead.center.y, lowest) + 0.7
+    for (const [f, mode, partner] of [[lead, 'lead', follow.index], [follow, 'follow', lead.index]] as const) {
+      f.mode = mode
+      f.partner = partner
+      f.chaseUntil = until
+      f.velocity.set(rand() - 0.5, 0.6, rand() - 0.5).normalize().multiplyScalar(0.8)
+    }
+    lead.wanderAt = 0
+  }
+
+  function face(f: Fly, direction: THREE.Vector3) {
+    tmp.copy(f.group.position).add(direction)
+    f.group.lookAt(tmp.x, f.group.position.y, tmp.z)
+  }
+
+  function flap(f: Fly, time: number, speed: number, amount: number) {
+    const a = Math.sin(time * speed + f.phase) * amount
+    f.right.rotation.z = a
+    f.left.rotation.z = -a
+  }
 
   function update(time: number, dt: number) {
+    chaseTimer -= dt
+    if (chaseTimer <= 0) {
+      chaseTimer = 8 + rand() * 10
+      startChase(time)
+    }
     for (const f of flies) {
-      if (f.rest > 0) {
+      if (f.mode === 'rest') {
         f.rest -= dt
-        // Resting: slow wing beat
-        const a = 0.3 + Math.sin(time * 3 + f.phase) * 0.3
-        f.right.rotation.z = a
-        f.left.rotation.z = -a
-        if (f.rest <= 0) {
-          f.from.copy(f.group.position)
-          f.to.copy(spots[Math.floor(rand() * spots.length)]!)
-          f.ctrl.copy(f.from).lerp(f.to, 0.5)
-          f.ctrl.y += 0.8 + rand() * 1.4
-          f.t = 0
-          f.duration = 2 + f.from.distanceTo(f.to) * 0.35
-        }
+        // Resting: slow, gentle wing beat
+        f.right.rotation.z = 0.3 + Math.sin(time * 3 + f.phase) * 0.3
+        f.left.rotation.z = -f.right.rotation.z
+        if (f.rest <= 0) takeOff(f, destination(f))
         continue
       }
+
+      if (f.mode === 'lead' || f.mode === 'follow') {
+        if (time > f.chaseUntil) {
+          takeOff(f, destination(f))
+          continue
+        }
+        if (f.mode === 'lead') {
+          // Zig-zag between random points in a small patch of air
+          if (time > f.wanderAt) {
+            f.wanderAt = time + 0.5 + rand() * 0.4
+            f.wander.copy(f.center).add(new THREE.Vector3((rand() - 0.5) * 3, (rand() - 0.3) * 1, (rand() - 0.5) * 3))
+            f.wander.y = Math.max(f.wander.y, lowest + 0.3)
+          }
+          desired.copy(f.wander).sub(f.group.position).setLength(1.5)
+          f.velocity.lerp(desired, 1 - Math.exp(-dt * 3))
+        } else {
+          // Chase the leader, weaving a little behind it
+          const leader = flies[f.partner]!
+          desired.copy(leader.group.position)
+            .add(tmp.set(Math.sin(time * 5 + f.phase) * 0.18, Math.cos(time * 4 + f.phase) * 0.12, Math.cos(time * 5 + f.phase) * 0.18))
+            .sub(f.group.position)
+          desired.setLength(Math.min(2, desired.length() * 2.2))
+          f.velocity.lerp(desired, 1 - Math.exp(-dt * 4))
+        }
+        f.group.position.addScaledVector(f.velocity, dt)
+        face(f, f.velocity)
+        flap(f, time, 32, 1)
+        continue
+      }
+
+      // Flying to a flower: quadratic bezier arc with a little flutter
       f.t = Math.min(1, f.t + dt / f.duration)
       const t = f.t
-      // Quadratic bezier arc between flowers, with a little flutter
       tmp.set(0, 0, 0)
         .addScaledVector(f.from, (1 - t) * (1 - t))
         .addScaledVector(f.ctrl, 2 * (1 - t) * t)
         .addScaledVector(f.to, t * t)
-      tmp.y += Math.sin(time * 6 + f.phase) * 0.04
-      f.group.lookAt(tmp.x, f.group.position.y, tmp.z)
+      tmp.y += Math.sin(time * 6 + f.phase) * 0.04 * (1 - t)
+      desired.copy(tmp).sub(f.group.position)
+      if (desired.lengthSq() > 1e-8) face(f, desired)
       f.group.position.copy(tmp)
-      const flap = Math.sin(time * 28 + f.phase) * 0.9
-      f.right.rotation.z = flap
-      f.left.rotation.z = -flap
-      if (f.t >= 1) f.rest = 1 + rand() * 2.5
+      flap(f, time, 28, 0.9)
+      if (f.t >= 1) {
+        f.mode = 'rest'
+        // Butterflies called by the cursor linger on the flower
+        f.rest = attraction?.flies.has(f.index) ? 2 + rand() * 2 : 1 + rand() * 2.5
+      }
     }
   }
-  return { group, update }
+
+  /** Send the two nearest free butterflies to the flower closest to the cursor */
+  function setAttractor(point: THREE.Vector3 | null) {
+    const candidates = [...roomSpots, ...spots]
+    const spot = point ? candidates.find(s => s.distanceTo(point) < 0.9) : undefined
+    if (!spot) {
+      attraction = null
+      return
+    }
+    if (attraction?.spot === spot) return
+    const chosen = flies.filter(f => f.mode !== 'lead' && f.mode !== 'follow')
+      .sort((a, b) => a.group.position.distanceTo(spot) - b.group.position.distanceTo(spot))
+      .slice(0, 2)
+    attraction = { spot, flies: new Set(chosen.map(f => f.index)) }
+    for (const f of chosen) takeOff(f, near(spot, 0.16))
+  }
+
+  function setRoomFlowers(next: THREE.Vector3[]) {
+    roomSpots = next
+  }
+
+  return { group, update, setAttractor, setRoomFlowers }
 }
 
 // ---------- Particles ----------
@@ -766,6 +911,9 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
       if (butterflies.group.visible) butterflies.update(time, dt)
       fireflies.update(time, lamps)
     },
+    ground: terrain.mesh,
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
   }
 }
 
@@ -1043,6 +1191,9 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
       if (butterflies.group.visible) butterflies.update(time, dt)
       fireflies.update(time, lamps)
     },
+    ground: terrain.mesh,
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
   }
 }
 

@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   select: [id: string | null]
-  objectChange: [id: string, patch: ObjectPatch]
+  objectChange: [changes: { id: string; patch: ObjectPatch }[]]
   hover: [id: string | null, x: number, y: number]
   activate: [id: string]
   stats: [stats: RoomSceneStats]
@@ -46,7 +46,7 @@ onMounted(() => {
     preview: props.preview,
     intro: props.intro,
     onSelect: id => emit('select', id),
-    onObjectChange: (id, patch) => emit('objectChange', id, patch),
+    onObjectChange: changes => emit('objectChange', changes),
     onHover: (id, x, y) => emit('hover', id, x, y),
     onActivate: id => emit('activate', id),
     onStats: stats => emit('stats', stats),
@@ -79,6 +79,9 @@ defineExpose({
   },
   zoomBy(factor: number) {
     scene?.zoomBy(factor)
+  },
+  ridersOf(id: string) {
+    return scene?.ridersOf(id) ?? []
   },
   focusObject(id: string) {
     scene?.focusObject(id)

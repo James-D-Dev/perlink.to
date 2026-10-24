@@ -558,7 +558,7 @@ const room = defineModel<RoomConfig>('room', { required: true })
 
 type Tab = CatalogCategory | 'room' | 'land' | 'time' | 'music'
 
-const canvasRef = ref<{ resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
+const canvasRef = ref<{ resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; ridersOf: (id: string) => string[]; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
 const barRef = ref<HTMLElement | null>(null)
 const selectedId = ref<string | null>(null)
 const activeTab = ref<Tab>('furniture')
@@ -882,8 +882,10 @@ function addAtDefault(type: string) {
   else addObject(type, [offset, 0, offset])
 }
 
-function onObjectChange(id: string, patch: ObjectPatch) {
-  setObjects(room.value.objects.map(o => (o.id === id ? { ...o, ...patch } : o)))
+/** A drag finished: the dragged object plus anything that was resting on it, as one change */
+function onObjectChange(changes: { id: string; patch: ObjectPatch }[]) {
+  const byId = new Map(changes.map(c => [c.id, c.patch]))
+  setObjects(room.value.objects.map(o => (byId.has(o.id) ? { ...o, ...byId.get(o.id) } : o)))
 }
 
 function updateSelected(patch: Partial<RoomObject>) {
@@ -947,10 +949,27 @@ function updateLink(patch: Partial<RoomObjectLink>) {
   updateSelected({ link: link.label || link.url ? link : undefined })
 }
 
+const wrapDegrees = (deg: number) => ((deg % 360) + 360) % 360
+
+/** Rotate the selected object; things resting on it turn around its center with it */
 function rotateBy(degrees: number) {
   const obj = selectedObject.value
   if (!obj) return
-  updateSelected({ rotation: (((obj.rotation + degrees) % 360) + 360) % 360 })
+  const riders = new Set(canvasRef.value?.ridersOf(obj.id) ?? [])
+  const angle = (degrees * Math.PI) / 180
+  const cos = Math.cos(angle)
+  const sin = Math.sin(angle)
+  const [cx, , cz] = obj.position
+  setObjects(room.value.objects.map((o) => {
+    if (o.id === obj.id) return { ...o, rotation: wrapDegrees(o.rotation + degrees) }
+    if (!riders.has(o.id)) return o
+    // Same turn as the object's rotation around the vertical axis
+    const dx = o.position[0] - cx
+    const dz = o.position[2] - cz
+    const x = Math.round((cx + dx * cos + dz * sin) * 1000) / 1000
+    const z = Math.round((cz - dx * sin + dz * cos) * 1000) / 1000
+    return { ...o, position: [x, o.position[1], z], rotation: wrapDegrees(o.rotation + degrees) }
+  }))
 }
 
 function scaleBy(delta: number) {

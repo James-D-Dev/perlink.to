@@ -18,7 +18,8 @@ export interface RoomSceneOptions {
   /** Opening shot: start far away with the land tiny, then fly in to the widest zoom */
   intro?: boolean
   onSelect?: (id: string | null) => void
-  onObjectChange?: (id: string, patch: ObjectPatch) => void
+  /** Objects moved by a drag: the dragged one plus anything resting on it */
+  onObjectChange?: (changes: { id: string; patch: ObjectPatch }[]) => void
   onHover?: (id: string | null, x: number, y: number) => void
   onActivate?: (id: string) => void
   /** Called about once a second with rendering stats (editor FPS readout) */
@@ -152,6 +153,8 @@ export class RoomScene {
     active: boolean
     /** Grab point offset so the object doesn't jump to the cursor */
     offset: THREE.Vector3
+    /** Objects resting on the dragged one, carried along at a fixed offset */
+    riders: { entry: ObjectEntry; offset: THREE.Vector3 }[]
   } | null = null
 
   constructor(container: HTMLElement, options: RoomSceneOptions) {
@@ -409,6 +412,35 @@ export class RoomScene {
     // Lighter scenery on devices that start at a reduced quality level (phones, low memory)
     this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS, detail: this.quality >= 2 ? 0.55 : 1 })
     this.outdoor.add(this.land.group)
+    this.updateRoomFlowers()
+  }
+
+  private lastAttractorCheck = 0
+
+  /** Tell the land where the cursor is on the ground or room floor, so butterflies can come over */
+  private updateAttractor(clientX: number, clientY: number) {
+    if (!this.land?.setAttractor) return
+    const now = performance.now()
+    if (now - this.lastAttractorCheck < 80) return
+    this.lastAttractorCheck = now
+    this.setPointer(clientX, clientY)
+    const surfaces = [this.land.ground, this.floor, ...this.objectsGroup.children].filter((o): o is THREE.Object3D => !!o)
+    const hit = this.raycaster.intersectObjects(surfaces, true)[0]
+    this.land.setAttractor(hit ? hit.point : null)
+  }
+
+  /** Tops of flower decor in the room, where butterflies may also land */
+  private updateRoomFlowers() {
+    if (!this.land?.setRoomFlowers) return
+    const box = new THREE.Box3()
+    const spots: THREE.Vector3[] = []
+    for (const entry of this.entries.values()) {
+      if (!entry.item.attractsButterflies || entry.revealedAt === null) continue
+      box.setFromObject(entry.root)
+      const center = box.getCenter(new THREE.Vector3())
+      spots.push(new THREE.Vector3(center.x, box.max.y - 0.04, center.z))
+    }
+    this.land.setRoomFlowers(spots)
   }
 
   // ---------- Objects ----------
@@ -435,6 +467,7 @@ export class RoomScene {
     }
     if (this.selectedId && !this.entries.has(this.selectedId)) this.selectedId = null
     this.selectionBox.visible = !!this.selectedId
+    this.updateRoomFlowers()
   }
 
   private addEntry(data: RoomObject, item: CatalogItem, signature: string, animate: boolean) {
@@ -489,6 +522,7 @@ export class RoomScene {
         entry.root.visible = true
         entry.revealedAt = performance.now()
         entry.popping = animate
+        this.updateRoomFlowers()
         this.markActive()
       })
   }
@@ -655,23 +689,59 @@ export class RoomScene {
         y,
         THREE.MathUtils.clamp(z + this.drag.offset.z, -depth / 2 + 0.15, depth / 2 - 0.15),
       )
+      for (const rider of this.drag.riders) rider.entry.root.position.copy(entry.root.position).add(rider.offset)
     }
   }
 
-  private commitDrag(id: string) {
+  /** Ids of the objects resting on top of an object, including ones stacked on those */
+  ridersOf(id: string): string[] {
+    const entry = this.entries.get(id)
+    return entry ? this.findRiders(entry).map(r => r.data.id) : []
+  }
+
+  /**
+   * Objects whose base sits on top of `entry`: above its own base, no higher
+   * than its top, and inside its footprint. Followed recursively, so a candle
+   * on a tray on a table counts too.
+   */
+  private findRiders(entry: ObjectEntry): ObjectEntry[] {
+    if (entry.item.wallMounted) return []
+    const riders: ObjectEntry[] = []
+    const queue = [entry]
+    const box = new THREE.Box3()
+    while (queue.length) {
+      const base = queue.shift()!
+      box.setFromObject(base.root)
+      for (const other of this.entries.values()) {
+        if (other === entry || other.item.wallMounted || riders.includes(other)) continue
+        const [x, y, z] = other.data.position
+        if (y < base.data.position[1] + 0.05 || y > box.max.y + 0.05) continue
+        if (x < box.min.x - 0.02 || x > box.max.x + 0.02 || z < box.min.z - 0.02 || z > box.max.z + 0.02) continue
+        riders.push(other)
+        queue.push(other)
+      }
+    }
+    return riders
+  }
+
+  private commitDrag(id: string, riders: ObjectEntry[]) {
     const entry = this.entries.get(id)
     if (!entry) return
-    const p = entry.root.position
     const round = (n: number) => Math.round(n * 1000) / 1000
-    const patch: ObjectPatch = { position: [round(p.x), round(p.y), round(p.z)], rotation: entry.data.rotation }
+    const positionOf = (e: ObjectEntry): [number, number, number] => [round(e.root.position.x), round(e.root.position.y), round(e.root.position.z)]
+    const patch: ObjectPatch = { position: positionOf(entry), rotation: entry.data.rotation }
     if (entry.item.wallMounted) patch.wall = (entry.root.userData.wall as WallSide | undefined) ?? entry.data.wall ?? 'back'
-    this.options.onObjectChange?.(id, patch)
+    this.options.onObjectChange?.([
+      { id, patch },
+      ...riders.map(r => ({ id: r.data.id, patch: { position: positionOf(r), rotation: r.data.rotation } })),
+    ])
   }
 
   private cancelDrag() {
     if (!this.drag) return
     const entry = this.entries.get(this.drag.id)
     if (entry) this.applyTransform(entry)
+    for (const rider of this.drag.riders) this.applyTransform(rider.entry)
     this.drag = null
     this.controls.enabled = true
   }
@@ -719,18 +789,19 @@ export class RoomScene {
       if (grab) offset.set(entry.root.position.x - grab.position[0], 0, entry.root.position.z - grab.position[2])
     }
     entry.root.userData.wall = entry.data.wall
-    this.drag = { id, startX: e.clientX, startY: e.clientY, active: false, offset }
+    const riders = this.findRiders(entry).map(r => ({ entry: r, offset: r.root.position.clone().sub(entry.root.position) }))
+    this.drag = { id, startX: e.clientX, startY: e.clientY, active: false, offset, riders }
     this.renderer.domElement.setPointerCapture(e.pointerId)
   }
 
   private handlePointerUp = (e: PointerEvent) => {
     if (this.drag) {
-      const { id, active } = this.drag
+      const { id, active, riders } = this.drag
       this.drag = null
       this.controls.enabled = true
       if (this.renderer.domElement.hasPointerCapture(e.pointerId)) this.renderer.domElement.releasePointerCapture(e.pointerId)
       this.renderer.domElement.style.cursor = 'grab'
-      if (active) this.commitDrag(id)
+      if (active) this.commitDrag(id, riders.map(r => r.entry))
       return
     }
     // Ignore drags (orbiting or panning)
@@ -745,6 +816,7 @@ export class RoomScene {
   }
 
   private handlePointerMove = (e: PointerEvent) => {
+    this.updateAttractor(e.clientX, e.clientY)
     if (this.options.editable) {
       if (this.drag) {
         if (!this.drag.active && Math.hypot(e.clientX - this.drag.startX, e.clientY - this.drag.startY) > 4) {
@@ -777,6 +849,7 @@ export class RoomScene {
   }
 
   private handlePointerLeave = () => {
+    this.land?.setAttractor?.(null)
     if (this.hoveredId) {
       this.hoveredId = null
       this.options.onHover?.(null, 0, 0)

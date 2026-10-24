@@ -28,6 +28,8 @@ export interface CatalogItem {
   wallMounted?: boolean
   /** Built from a 3D model file; colour changes don't apply */
   fromModel?: boolean
+  /** Has flowers: butterflies from the land come to land on it */
+  attractsButterflies?: boolean
   light?: CatalogLight
   /** Area that shows an uploaded photo (local coordinates, meters); parts tagged `placeholder` hide when a photo is set */
   photo?: { width: number; height: number; center: [number, number, number] }
@@ -634,6 +636,7 @@ function natureItem(
     defaultColor: container?.defaultColor ?? '#ffffff',
     // Without a container there's nothing to recolour
     fromModel: !container,
+    attractsButterflies: pieces.some(p => p.model.includes('Flower')),
     build: (color) => {
       const g = new THREE.Group()
       let base = 0
