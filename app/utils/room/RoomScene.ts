@@ -6,6 +6,7 @@ import { CATALOG_BY_TYPE, type CatalogItem } from './catalog'
 import { getDaylight, type DaylightState } from './daylight'
 import { buildLand, createStarSphere, type LandInstance } from './lands'
 import { buildRoomShell, FLOOR_THICKNESS } from './shell'
+import { flameFlicker, flameTime } from './flame'
 
 export { createFloorTexture } from './shell'
 
@@ -958,6 +959,7 @@ export class RoomScene {
       this.applyDaylight(this.daylightOverride ?? getDaylight(this.room.environment))
     }
     this.stars.material.uniforms.time!.value = time
+    flameTime.value = time
     this.land?.update(time, dt, this.shownDaylight ?? 1, this.lamps)
     const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
     if (entry) this.selectionBox.box.setFromObject(entry.root)
@@ -1076,7 +1078,8 @@ export class RoomScene {
     this.lamps = lamps
     for (const entry of this.entries.values()) {
       if (entry.light && entry.item.light && entry.revealedAt !== null) {
-        entry.light.intensity = entry.item.light.intensity * lamps * (entry.data.scale || 1)
+        const flicker = entry.item.light.flicker ? flameFlicker(flameTime.value, entry.root.position.x * 7 + entry.root.position.z * 3) : 1
+        entry.light.intensity = entry.item.light.intensity * lamps * (entry.data.scale || 1) * flicker
       }
       for (const m of entry.glowMaterials) {
         m.emissiveIntensity = (m.userData.baseGlow as number) + ((m.userData.nightGlow as number | undefined) ?? 2.4) * lamps

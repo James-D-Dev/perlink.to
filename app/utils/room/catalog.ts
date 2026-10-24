@@ -16,6 +16,8 @@ export interface CatalogLight {
   distance: number
   /** Light position relative to the object's origin (before scale) */
   offset: [number, number, number]
+  /** Flickers like a flame (candles, torches) */
+  flicker?: boolean
 }
 
 export interface CatalogItem {
@@ -142,11 +144,11 @@ const DUNGEON_ITEMS: CatalogItem[] = [
   dungeonItem('dungeon-chest', 'Chest', 'i-lucide-package', 'Chest', 0.75),
   dungeonItem('dungeon-chest-gold', 'Treasure chest', 'i-lucide-gem', 'Chest_gold', 0.75, { light: { color: '#ffb84d', intensity: 0.5, distance: 2.5, offset: [0, 1, 0] } }),
   dungeonItem('dungeon-barrel', 'Barrel', 'i-lucide-cylinder', 'Barrel', 0.75),
-  dungeonItem('dungeon-candelabrum', 'Candelabrum', 'i-lucide-flame', 'Candelabrum', 0.75, { light: { color: TORCH_LIGHT, intensity: 2.5, distance: 4, offset: [0, 0.85, 0] } }),
-  dungeonItem('dungeon-candelabrum-tall', 'Tall candelabrum', 'i-lucide-flame-kindling', 'Candelabrum_tall', 0.75, { light: { color: TORCH_LIGHT, intensity: 3.5, distance: 5, offset: [0, 1.4, 0] } }),
-  dungeonItem('dungeon-candle', 'Candlestick', 'i-lucide-flame', 'Candle', 0.6, { light: { color: TORCH_LIGHT, intensity: 1.2, distance: 2.5, offset: [0, 0.5, 0] } }),
-  dungeonItem('dungeon-torch', 'Standing torch', 'i-lucide-flame', 'Torch', 0.75, { light: { color: TORCH_LIGHT, intensity: 4, distance: 6, offset: [0, 1.55, 0] } }),
-  dungeonItem('dungeon-wall-torch', 'Wall torch', 'i-lucide-flame', 'Torch_wall', 0.5, { wallMounted: true, light: { color: TORCH_LIGHT, intensity: 4, distance: 6, offset: [0, 0.45, 0.5] } }),
+  dungeonItem('dungeon-candelabrum', 'Candelabrum', 'i-lucide-flame', 'Candelabrum', 0.75, { light: { color: TORCH_LIGHT, flicker: true, intensity: 2.5, distance: 4, offset: [0, 0.85, 0] } }),
+  dungeonItem('dungeon-candelabrum-tall', 'Tall candelabrum', 'i-lucide-flame-kindling', 'Candelabrum_tall', 0.75, { light: { color: TORCH_LIGHT, flicker: true, intensity: 3.5, distance: 5, offset: [0, 1.4, 0] } }),
+  dungeonItem('dungeon-candle', 'Candlestick', 'i-lucide-flame', 'Candle', 0.6, { light: { color: TORCH_LIGHT, flicker: true, intensity: 1.2, distance: 2.5, offset: [0, 0.5, 0] } }),
+  dungeonItem('dungeon-torch', 'Standing torch', 'i-lucide-flame', 'Torch', 0.75, { light: { color: TORCH_LIGHT, flicker: true, intensity: 4, distance: 6, offset: [0, 1.55, 0] } }),
+  dungeonItem('dungeon-wall-torch', 'Wall torch', 'i-lucide-flame', 'Torch_wall', 0.5, { wallMounted: true, light: { color: TORCH_LIGHT, flicker: true, intensity: 4, distance: 6, offset: [0, 0.45, 0.5] } }),
   dungeonItem('dungeon-book-open', 'Open book', 'i-lucide-book-open', 'Book_Open', 0.35),
   dungeonItem('dungeon-book', 'Book', 'i-lucide-book', 'Book2', 0.35),
   dungeonItem('dungeon-books', 'Spell book', 'i-lucide-book-marked', 'Book3', 0.35),

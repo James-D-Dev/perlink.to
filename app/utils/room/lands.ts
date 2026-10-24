@@ -256,6 +256,8 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
   const group = new THREE.Group()
   const lowest = Math.min(...spots.map(s => s.y))
   let roomSpots: THREE.Vector3[] = []
+  /** At most this many butterflies go into the room at once */
+  const ROOM_LIMIT = 3
   /** Flower the cursor is near, and the butterflies sent to it */
   let attraction: { spot: THREE.Vector3; flies: Set<number> } | null = null
   let chaseTimer = 6 + rand() * 6
@@ -282,6 +284,8 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
       wander: new THREE.Vector3(),
       wanderAt: 0,
       center: new THREE.Vector3(),
+      /** Heading to or resting on a flower inside the room */
+      inRoom: false,
     }
   })
   type Fly = (typeof flies)[number]
@@ -292,10 +296,21 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
   const near = (spot: THREE.Vector3, spread = 0.1) =>
     spot.clone().add(new THREE.Vector3((rand() - 0.5) * spread, 0.02, (rand() - 0.5) * spread))
 
+  const isRoomSpot = (spot: THREE.Vector3) => roomSpots.some(r => r.distanceTo(spot) < 0.05)
+  /** Butterflies other than `except` that are in (or on their way into) the room */
+  const inRoomCount = (except?: Fly) => flies.filter(o => o.inRoom && o !== except).length
+
   function destination(f: Fly) {
-    if (attraction?.flies.has(f.index)) return near(attraction.spot, 0.16)
-    // Room flowers are few, so favour them when there are any
-    if (roomSpots.length && rand() < 0.4) return near(roomSpots[Math.floor(rand() * roomSpots.length)]!)
+    if (attraction?.flies.has(f.index)) {
+      f.inRoom = isRoomSpot(attraction.spot)
+      return near(attraction.spot, 0.16)
+    }
+    // Now and then visit a flower in the room, while there's space for one more
+    if (roomSpots.length && inRoomCount(f) < ROOM_LIMIT && rand() < 0.15) {
+      f.inRoom = true
+      return near(roomSpots[Math.floor(rand() * roomSpots.length)]!)
+    }
+    f.inRoom = false
     return spots[Math.floor(rand() * spots.length)]!.clone()
   }
 
@@ -418,9 +433,16 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
       return
     }
     if (attraction?.spot === spot) return
-    const chosen = flies.filter(f => f.mode !== 'lead' && f.mode !== 'follow')
+    const nearest = flies.filter(f => f.mode !== 'lead' && f.mode !== 'follow')
       .sort((a, b) => a.group.position.distanceTo(spot) - b.group.position.distanceTo(spot))
-      .slice(0, 2)
+    const chosen: Fly[] = []
+    for (const f of nearest) {
+      if (chosen.length === 2) break
+      // A room flower only takes butterflies while the room has space
+      if (isRoomSpot(spot) && !f.inRoom && inRoomCount() >= ROOM_LIMIT) continue
+      chosen.push(f)
+      f.inRoom = isRoomSpot(spot)
+    }
     attraction = { spot, flies: new Set(chosen.map(f => f.index)) }
     for (const f of chosen) takeOff(f, near(spot, 0.16))
   }
