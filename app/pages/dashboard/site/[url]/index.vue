@@ -41,6 +41,11 @@
             />
           </UTooltip>
 
+          <!-- Printable QR card -->
+          <UTooltip v-if="existingBio?.username" :text="t('dashboard.qr.open')">
+            <UButton color="neutral" variant="ghost" icon="i-lucide-qr-code" :aria-label="t('dashboard.qr.open')" @click="qrOpen = true" />
+          </UTooltip>
+
           <!-- Inbox -->
           <UTooltip v-if="existingBio?.username" :text="t('dashboard.inbox.open')">
             <UButton
@@ -160,6 +165,14 @@
                   />
                 </div>
               </div>
+
+              <SiteQrModal
+                v-if="existingBio?.username"
+                v-model:open="qrOpen"
+                :username="existingBio.username"
+                :title="bioData.title"
+                :theme-config="bioData.themeConfig"
+              />
 
               <!-- Phone preview (mobile and tablet; desktop shows it beside the editor) -->
               <!-- The phone frame is the card, so no modal chrome around it -->
@@ -416,6 +429,7 @@ const onBioPageChange = (username: string) => {
 
 // Editor tabs
 const previewOpen = ref(false);
+const qrOpen = ref(false);
 
 const editorTabs = computed(() => [
   { value: "site", label: t("dashboard.editor.tabs.site"), icon: "i-lucide-layout-list" },

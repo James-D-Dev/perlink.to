@@ -60,6 +60,9 @@ const en = {
   formError: 'Couldn’t send. Please try again.',
   formPreview: 'Forms work on your published site.',
   formBook: 'Request a booking',
+  qrScan: 'Scan to visit',
+  qrMenu: 'Scan for our menu',
+  qrBook: 'Scan to book',
 }
 
 export type SiteMessageKey = keyof typeof en
@@ -108,6 +111,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: 'Chưa gửi được. Vui lòng thử lại.',
     formPreview: 'Form hoạt động trên trang đã xuất bản.',
     formBook: 'Gửi yêu cầu đặt chỗ',
+
+    qrScan: 'Quét để ghé trang',
+    qrMenu: 'Quét để xem thực đơn',
+    qrBook: 'Quét để đặt chỗ',
   },
   es: {
     openingHours: 'Horario',
@@ -151,6 +158,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: 'No se pudo enviar. Inténtalo de nuevo.',
     formPreview: 'El formulario funciona en tu sitio publicado.',
     formBook: 'Solicitar reserva',
+
+    qrScan: 'Escanea para visitar',
+    qrMenu: 'Escanea para ver la carta',
+    qrBook: 'Escanea para reservar',
   },
   fr: {
     openingHours: 'Horaires',
@@ -194,6 +205,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: 'Échec de l’envoi. Veuillez réessayer.',
     formPreview: 'Le formulaire fonctionne sur votre site publié.',
     formBook: 'Demander une réservation',
+
+    qrScan: 'Scannez pour visiter',
+    qrMenu: 'Scannez pour voir la carte',
+    qrBook: 'Scannez pour réserver',
   },
   de: {
     openingHours: 'Öffnungszeiten',
@@ -237,6 +252,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: 'Senden fehlgeschlagen. Bitte erneut versuchen.',
     formPreview: 'Das Formular funktioniert auf deiner veröffentlichten Seite.',
     formBook: 'Reservierung anfragen',
+
+    qrScan: 'Scannen und besuchen',
+    qrMenu: 'Scannen für die Speisekarte',
+    qrBook: 'Scannen zum Reservieren',
   },
   pt: {
     openingHours: 'Horário de funcionamento',
@@ -280,6 +299,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: 'Não foi possível enviar. Tente novamente.',
     formPreview: 'O formulário funciona no seu site publicado.',
     formBook: 'Solicitar reserva',
+
+    qrScan: 'Escaneie para visitar',
+    qrMenu: 'Escaneie para ver o cardápio',
+    qrBook: 'Escaneie para reservar',
   },
   id: {
     openingHours: 'Jam buka',
@@ -323,6 +346,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: 'Gagal mengirim. Silakan coba lagi.',
     formPreview: 'Formulir berfungsi di situs yang sudah diterbitkan.',
     formBook: 'Minta reservasi',
+
+    qrScan: 'Pindai untuk berkunjung',
+    qrMenu: 'Pindai untuk lihat menu',
+    qrBook: 'Pindai untuk reservasi',
   },
   th: {
     openingHours: 'เวลาทำการ',
@@ -366,6 +393,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: 'ส่งไม่สำเร็จ โปรดลองอีกครั้ง',
     formPreview: 'แบบฟอร์มใช้งานได้บนเว็บไซต์ที่เผยแพร่แล้ว',
     formBook: 'ขอจอง',
+
+    qrScan: 'สแกนเพื่อเข้าชม',
+    qrMenu: 'สแกนเพื่อดูเมนู',
+    qrBook: 'สแกนเพื่อจอง',
   },
   ja: {
     openingHours: '営業時間',
@@ -409,6 +440,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: '送信できませんでした。もう一度お試しください。',
     formPreview: 'フォームは公開中のサイトで使えます。',
     formBook: '予約をリクエスト',
+
+    qrScan: 'スキャンしてアクセス',
+    qrMenu: 'スキャンしてメニューを見る',
+    qrBook: 'スキャンして予約',
   },
   ko: {
     openingHours: '영업시간',
@@ -452,6 +487,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: '보내지 못했습니다. 다시 시도해 주세요.',
     formPreview: '양식은 게시된 사이트에서 작동합니다.',
     formBook: '예약 요청',
+
+    qrScan: '스캔해서 방문하기',
+    qrMenu: '스캔해서 메뉴 보기',
+    qrBook: '스캔해서 예약하기',
   },
   zh: {
     openingHours: '营业时间',
@@ -495,6 +534,10 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formError: '发送失败，请重试。',
     formPreview: '表单在已发布的网站上可用。',
     formBook: '申请预订',
+
+    qrScan: '扫码访问',
+    qrMenu: '扫码查看菜单',
+    qrBook: '扫码预订',
   },
 }
 

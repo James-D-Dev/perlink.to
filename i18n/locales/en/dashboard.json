@@ -295,6 +295,22 @@
       "deleteText": "It will be removed from your inbox.",
       "loadFailed": "Couldn’t load your inbox",
       "open": "Inbox"
+    },
+    "qr": {
+      "open": "QR code",
+      "title": "QR code for your tables",
+      "description": "Print it for tables, the counter, menus or flyers. It opens your site when scanned.",
+      "ctaLabel": "Text on the card",
+      "styleLabel": "Style",
+      "styles": {
+        "light": "Light",
+        "dark": "Dark",
+        "brand": "Your colour"
+      },
+      "trackingNote": "Scans show up as “QR” in your analytics.",
+      "print": "Print 4 per page",
+      "downloadPng": "Download PNG",
+      "downloadSvg": "SVG"
     }
   }
 }

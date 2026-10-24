@@ -295,6 +295,22 @@
       "deleteText": "Yêu cầu sẽ bị xóa khỏi Hộp thư.",
       "loadFailed": "Không tải được Hộp thư",
       "open": "Hộp thư"
+    },
+    "qr": {
+      "open": "Mã QR",
+      "title": "Mã QR để bàn",
+      "description": "In để đặt trên bàn, quầy, thực đơn hoặc tờ rơi. Khách quét là mở trang của bạn.",
+      "ctaLabel": "Chữ trên thẻ",
+      "styleLabel": "Kiểu",
+      "styles": {
+        "light": "Sáng",
+        "dark": "Tối",
+        "brand": "Màu của trang"
+      },
+      "trackingNote": "Lượt quét sẽ hiện là “QR” trong thống kê.",
+      "print": "In 4 thẻ mỗi trang",
+      "downloadPng": "Tải PNG",
+      "downloadSvg": "SVG"
     }
   }
 }
