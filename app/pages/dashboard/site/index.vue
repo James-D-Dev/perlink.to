@@ -1,7 +1,7 @@
 <template>
   <UDashboardPanel id="bio-list">
     <template #header>
-      <UDashboardNavbar title="My sites">
+      <UDashboardNavbar :title="t('dashboard.sites.title')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -11,7 +11,7 @@
             to="/dashboard"
             color="primary"
             icon="i-lucide-plus"
-            label="Create a site"
+            :label="t('dashboard.sites.createSite')"
           />
         </template>
       </UDashboardNavbar>
@@ -21,15 +21,15 @@
       <div class="mx-auto w-full max-w-4xl space-y-6 py-2 sm:py-4">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 class="mk-display text-3xl text-ink sm:text-4xl">Your sites</h1>
+            <h1 class="mk-display text-3xl text-ink sm:text-4xl">{{ t('dashboard.sites.heading') }}</h1>
             <p v-if="!loading" class="mt-1 text-sm text-ink-muted">
-              {{ bioPages.length }} {{ bioPages.length === 1 ? 'site' : 'sites' }} · {{ liveCount }} live
+              {{ t('dashboard.sites.count', bioPages.length) }} · {{ t('dashboard.sites.liveCount', { n: liveCount }) }}
             </p>
           </div>
           <UInput
             v-if="bioPages.length > 1"
             v-model="searchQuery"
-            placeholder="Search sites"
+            :placeholder="t('dashboard.sites.search')"
             icon="i-lucide-search"
             class="w-full sm:w-64"
           />
@@ -75,27 +75,27 @@
                     :class="bio.isPublished ? 'bg-emerald-50 text-emerald-700' : 'bg-sand text-ink-muted'"
                   >
                     <span class="size-1.5 rounded-full" :class="bio.isPublished ? 'bg-emerald-500' : 'bg-ink-faint'" />
-                    {{ bio.isPublished ? 'Live' : 'Draft' }}
+                    {{ bio.isPublished ? t('dashboard.sites.live') : t('dashboard.sites.draft') }}
                   </span>
                 </div>
                 <p class="truncate text-sm text-ink-muted">perlink.to/{{ bio.username }}</p>
                 <p class="mt-0.5 text-xs text-ink-faint">
-                  {{ (bio.viewCount || 0).toLocaleString() }} views
-                  <template v-if="bio.updatedAt || bio.createdAt"> · Updated {{ formatDate(bio.updatedAt || bio.createdAt) }}</template>
+                  {{ t('dashboard.sites.views', { n: (bio.viewCount || 0).toLocaleString() }) }}
+                  <template v-if="bio.updatedAt || bio.createdAt"> · {{ t('dashboard.sites.updated', { date: formatDate(bio.updatedAt || bio.createdAt) }) }}</template>
                 </p>
               </div>
             </div>
 
             <!-- Actions, in a row -->
             <div class="flex items-center gap-1 pl-15 sm:pl-0" @click.stop>
-              <UTooltip text="Open site">
-                <UButton :to="`/${bio.username}`" target="_blank" color="neutral" variant="ghost" icon="i-lucide-external-link" aria-label="Open site" />
+              <UTooltip :text="t('common.openSite')">
+                <UButton :to="`/${bio.username}`" target="_blank" color="neutral" variant="ghost" icon="i-lucide-external-link" :aria-label="t('common.openSite')" />
               </UTooltip>
-              <UTooltip text="Analytics">
-                <UButton :to="`/dashboard/site/${bio.username}/analytics`" color="neutral" variant="ghost" icon="i-lucide-chart-column" aria-label="Analytics" />
+              <UTooltip :text="t('common.analytics')">
+                <UButton :to="`/dashboard/site/${bio.username}/analytics`" color="neutral" variant="ghost" icon="i-lucide-chart-column" :aria-label="t('common.analytics')" />
               </UTooltip>
-              <UTooltip text="Copy link">
-                <UButton color="neutral" variant="ghost" icon="i-lucide-copy" aria-label="Copy link" @click="copyUrl(bio.username)" />
+              <UTooltip :text="t('common.copyLink')">
+                <UButton color="neutral" variant="ghost" icon="i-lucide-copy" :aria-label="t('common.copyLink')" @click="copyUrl(bio.username)" />
               </UTooltip>
               <UButton
                 v-if="!bio.isPublished"
@@ -103,7 +103,7 @@
                 variant="outline"
                 size="sm"
                 class="ml-1"
-                label="Publish"
+                :label="t('common.publish')"
                 @click="publishBio(bio.username)"
               />
               <UButton
@@ -112,7 +112,7 @@
                 variant="ghost"
                 size="sm"
                 class="ml-1 text-ink-muted"
-                label="Unpublish"
+                :label="t('common.unpublish')"
                 @click="unpublishBio(bio.username)"
               />
               <UButton
@@ -120,7 +120,7 @@
                 size="sm"
                 class="ml-1"
                 icon="i-lucide-pencil"
-                label="Edit"
+                :label="t('common.edit')"
               />
             </div>
           </li>
@@ -128,15 +128,15 @@
 
         <!-- No search results -->
         <div v-else-if="bioPages.length > 0" class="rounded-xl bg-paper py-12 text-center text-sm text-ink-muted ring-1 ring-line">
-          No sites match “{{ searchQuery }}”.
+          {{ t('dashboard.sites.noMatch', { query: searchQuery }) }}
         </div>
 
         <!-- Empty State -->
         <div v-else class="flex flex-col items-center rounded-xl bg-sand px-6 py-14 text-center">
           <MarketingMkOrb palette="sunset" :size="72" />
-          <h3 class="mt-6 text-lg font-medium text-ink">No sites yet</h3>
-          <p class="mt-1 max-w-sm text-sm text-ink-muted">Claim your perlink.to address and start from a template. It takes about a minute.</p>
-          <UButton to="/dashboard" class="mt-6" icon="i-lucide-plus" label="Create a site" />
+          <h3 class="mt-6 text-lg font-medium text-ink">{{ t('dashboard.sites.emptyTitle') }}</h3>
+          <p class="mt-1 max-w-sm text-sm text-ink-muted">{{ t('dashboard.sites.emptyText') }}</p>
+          <UButton to="/dashboard" class="mt-6" icon="i-lucide-plus" :label="t('dashboard.sites.createSite')" />
         </div>
       </div>
     </template>
@@ -144,8 +144,6 @@
 </template>
 
 <script setup lang="ts">
-import { format } from "date-fns";
-
 definePageMeta({
   colorMode: 'light',
   layout: "admin",
@@ -154,6 +152,7 @@ definePageMeta({
 });
 
 const toast = useToast();
+const { t, locale } = useI18n();
 
 // State
 const loading = ref(true);
@@ -171,8 +170,8 @@ const fetchBioPages = async () => {
   } catch (error) {
     console.error("Failed to fetch bio pages:", error);
     toast.add({
-      title: "Error",
-      description: "Failed to load sites",
+      title: t("dashboard.toast.error"),
+      description: t("dashboard.sites.loadFailed"),
       color: "error",
     });
   } finally {
@@ -210,7 +209,11 @@ const getLinksCount = (links: string | any[]) => {
 // Format date
 const formatDate = (date: string) => {
   if (!date) return "N/A";
-  return format(new Date(date), "MMM d, yyyy");
+  return new Date(date).toLocaleDateString(locale.value === "vi" ? "vi-VN" : "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 };
 
 // Copy URL
@@ -219,12 +222,12 @@ const copyUrl = async (username: string) => {
     const url = `https://perlink.to/${username}`;
     await navigator.clipboard.writeText(url);
     toast.add({
-      title: "Copied!",
+      title: t("dashboard.toast.copied"),
       description: url,
     });
   } catch {
     toast.add({
-      title: "Failed to copy",
+      title: t("dashboard.toast.copyFailed"),
       color: "error",
     });
   }
@@ -237,14 +240,14 @@ const publishBio = async (username: string) => {
       method: "POST" as const,
     });
     toast.add({
-      title: "Published!",
-      description: "Your site is now live",
+      title: t("dashboard.toast.published"),
+      description: t("dashboard.sites.publishedText"),
     });
     await fetchBioPages();
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to publish site",
+      title: t("dashboard.toast.error"),
+      description: t("dashboard.sites.publishFailed"),
       color: "error",
     });
   }
@@ -257,14 +260,14 @@ const unpublishBio = async (username: string) => {
       method: "POST" as const,
     });
     toast.add({
-      title: "Unpublished",
-      description: "Your site is now hidden",
+      title: t("dashboard.toast.unpublished"),
+      description: t("dashboard.sites.unpublishedText"),
     });
     await fetchBioPages();
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to unpublish site",
+      title: t("dashboard.toast.error"),
+      description: t("dashboard.sites.unpublishFailed"),
       color: "error",
     });
   }

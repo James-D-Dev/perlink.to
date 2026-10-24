@@ -3,7 +3,7 @@
     <!-- No Data State -->
     <div v-if="!bioPageId" class="rounded-xl bg-paper py-16 text-center ring-1 ring-line">
       <UIcon name="i-lucide-chart-column" class="mx-auto mb-3 size-8 text-ink-faint" />
-      <p class="text-sm text-ink-muted">Publish your site to start seeing analytics.</p>
+      <p class="text-sm text-ink-muted">{{ t('analytics.unpublished') }}</p>
     </div>
 
     <UTabs
@@ -26,12 +26,12 @@
             v-if="!bioLinks?.length && !socialLinks?.length"
             class="rounded-xl bg-paper py-12 text-center text-sm text-ink-muted ring-1 ring-line"
           >
-            This site has no links or social icons yet.
+            {{ t('analytics.links.empty') }}
           </div>
 
           <div v-else class="space-y-4">
             <section v-if="bioLinks?.length" class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
-              <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">Links</h4>
+              <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">{{ t('analytics.links.linksTitle') }}</h4>
               <ul class="divide-y divide-line">
                 <li v-for="link in bioLinks" :key="link.id" class="flex items-center gap-3 px-4 py-3">
                   <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-sand">
@@ -43,14 +43,14 @@
                   </div>
                   <div class="shrink-0 text-right">
                     <p class="text-lg font-semibold tabular-nums text-ink">{{ getLinkClickCount(link.id) }}</p>
-                    <p class="text-[11px] text-ink-muted">clicks</p>
+                    <p class="text-[11px] text-ink-muted">{{ t('analytics.links.clicks', getLinkClickCount(link.id)) }}</p>
                   </div>
                 </li>
               </ul>
             </section>
 
             <section v-if="socialLinks?.length" class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
-              <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">Social icons</h4>
+              <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">{{ t('analytics.links.socialTitle') }}</h4>
               <ul class="divide-y divide-line">
                 <li v-for="social in socialLinks" :key="social.id" class="flex items-center gap-3 px-4 py-3">
                   <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-sand">
@@ -58,11 +58,11 @@
                   </span>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-medium capitalize text-ink">{{ social.provider }}</p>
-                    <p class="truncate text-xs text-ink-muted">{{ getSocialUrl(social) || 'No link yet' }}</p>
+                    <p class="truncate text-xs text-ink-muted">{{ getSocialUrl(social) || t('analytics.links.noLink') }}</p>
                   </div>
                   <div class="shrink-0 text-right">
                     <p class="text-lg font-semibold tabular-nums text-ink">{{ getSocialClickCount(social.id) }}</p>
-                    <p class="text-[11px] text-ink-muted">clicks</p>
+                    <p class="text-[11px] text-ink-muted">{{ t('analytics.links.clicks', getSocialClickCount(social.id)) }}</p>
                   </div>
                 </li>
               </ul>
@@ -85,10 +85,12 @@ const props = defineProps<{
   socialLinks?: SocialLink[];
 }>();
 
-const tabs = [
-  { value: "page", label: "Overview" },
-  { value: "links", label: "Links" },
-];
+const { t } = useI18n();
+
+const tabs = computed(() => [
+  { value: "page", label: t("analytics.tabs.overview") },
+  { value: "links", label: t("analytics.tabs.links") },
+]);
 
 const getIconForLink = (link: BioLink) => {
   if (link.icon) return link.icon;

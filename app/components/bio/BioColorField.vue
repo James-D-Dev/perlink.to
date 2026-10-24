@@ -18,13 +18,15 @@
       class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
       @click="$emit('update:modelValue', undefined)"
     >
-      reset
+      {{ t('common.reset') }}
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
 // Swatch + colour picker with a reset back to "not set"
+const { t } = useI18n()
+
 withDefaults(defineProps<{
   modelValue?: string
   fallback?: string

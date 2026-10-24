@@ -7,7 +7,7 @@
           <button
             type="button"
             class="group relative size-14 shrink-0 overflow-hidden rounded-full bg-elevated ring-1 ring-default"
-            aria-label="Change photo"
+            :aria-label="t('blocks.header.changePhoto')"
             @click="triggerFileInput"
           >
             <img v-if="avatarUrl" :src="avatarUrl" :alt="title" class="size-full object-cover">
@@ -22,13 +22,13 @@
           <div class="min-w-0 flex-1">
             <UInput
               :model-value="title"
-              placeholder="Your name or title"
+              :placeholder="t('blocks.header.titlePlaceholder')"
               class="w-full"
               :ui="{ base: 'font-semibold' }"
               @update:model-value="$emit('update:title', $event)"
             />
             <button type="button" class="mt-1 text-xs text-muted hover:text-highlighted" @click="triggerFileInput">
-              {{ avatarUrl ? 'Change photo' : 'Add a photo' }}
+              {{ avatarUrl ? t('blocks.header.changePhoto') : t('blocks.header.addPhoto') }}
             </button>
             <p v-if="uploadError" class="text-xs text-red-500 mt-1">
               {{ uploadError }}
@@ -46,7 +46,7 @@
         <div>
           <UTextarea
             :model-value="bio"
-            placeholder="Tell us about yourself"
+            :placeholder="t('blocks.header.bioPlaceholder')"
             class="w-full"
             :rows="2"
             autoresize
@@ -75,6 +75,8 @@ const emit = defineEmits<{
   "update:bio": [value: string];
   "update:avatarUrl": [value: string];
 }>();
+
+const { t } = useI18n();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const { upload, uploading, error: uploadError } = useAvatarUpload();

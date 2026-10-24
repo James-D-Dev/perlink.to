@@ -26,10 +26,10 @@
           to="/dashboard/create"
           class="flex h-10 items-center justify-center gap-2 rounded-full bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
           :class="collapsed ? 'mx-auto w-10' : 'w-full'"
-          :aria-label="collapsed ? 'Create a site' : undefined"
+          :aria-label="collapsed ? t('nav.createSite') : undefined"
         >
           <UIcon name="i-lucide-plus" class="size-4" />
-          <span v-if="!collapsed">Create a site</span>
+          <span v-if="!collapsed">{{ t('nav.createSite') }}</span>
         </NuxtLink>
 
         <UNavigationMenu
@@ -51,11 +51,11 @@
         >
           <div class="flex items-center gap-2">
             <MarketingMkOrb palette="sunset" :size="18" still />
-            <p class="text-sm font-medium text-ink">Perlink Pro</p>
+            <p class="text-sm font-medium text-ink">{{ t('nav.proTitle') }}</p>
           </div>
-          <p class="mt-1.5 text-xs leading-relaxed text-ink-muted">More sites, more 3D worlds and premium extras.</p>
+          <p class="mt-1.5 text-xs leading-relaxed text-ink-muted">{{ t('nav.proText') }}</p>
           <p class="mt-3 inline-flex items-center gap-1 text-xs font-medium text-ink">
-            See plans
+            {{ t('nav.seePlans') }}
             <UIcon name="i-lucide-arrow-right" class="size-3.5 transition-transform group-hover:translate-x-0.5" />
           </p>
         </NuxtLink>
@@ -94,54 +94,25 @@ const open = ref(false);
 
 const helpOpen = useHelpCenter();
 
-const navigationLinks: NavigationMenuItem[] = [
-  { label: "Home", icon: "i-lucide-house", to: "/dashboard", exact: true },
-  { label: "Sites", icon: "i-lucide-layout-template", to: "/dashboard/site" },
-  { label: "Settings", icon: "i-lucide-settings", to: "/dashboard/settings" },
-];
+const { t } = useI18n();
 
-const supportLinks: NavigationMenuItem[] = [
-  { label: "Help", icon: "i-lucide-circle-help", onSelect: () => (helpOpen.value = true) },
-  { label: "Feedback", icon: "i-lucide-message-square-heart", to: "/dashboard/feedback" },
-];
+const navigationLinks = computed<NavigationMenuItem[]>(() => [
+  { label: t("nav.home"), icon: "i-lucide-house", to: "/dashboard", exact: true },
+  { label: t("nav.sites"), icon: "i-lucide-layout-template", to: "/dashboard/site" },
+  { label: t("nav.settings"), icon: "i-lucide-settings", to: "/dashboard/settings" },
+]);
+
+const supportLinks = computed<NavigationMenuItem[]>(() => [
+  { label: t("nav.help"), icon: "i-lucide-circle-help", onSelect: () => (helpOpen.value = true) },
+  { label: t("nav.feedback"), icon: "i-lucide-message-square-heart", to: "/dashboard/feedback" },
+]);
 
 const groups = computed(() => [
   {
     id: "links",
-    label: "Go to",
-    items: navigationLinks as any,
+    label: t("nav.home"),
+    items: navigationLinks.value as any,
   },
 ]);
 
-const handleSignOut = async () => {
-  try {
-    await $fetch("/api/auth/logout", { method: "POST" });
-    await useUserSession().clear(); // Clear client session first
-    await navigateTo("/login");
-  } catch (error) {
-    console.error("Error signing out:", error);
-  }
-};
-
-const accountMenuItems = [
-  [
-    {
-      label: "My Account",
-      icon: "i-heroicons-user",
-      onSelect: () => navigateTo("/dashboard/settings"),
-    },
-    {
-      label: "Billing",
-      icon: "i-heroicons-credit-card",
-      onSelect: () => navigateTo("/dashboard/billing"),
-    },
-  ],
-  [
-    {
-      label: "Sign out",
-      icon: "i-heroicons-arrow-right-on-rectangle",
-      onSelect: handleSignOut,
-    },
-  ],
-];
 </script>

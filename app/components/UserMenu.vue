@@ -37,6 +37,8 @@ const handleSignOut = async () => {
   }
 }
 
+const { t, locale, locales, setLocale } = useI18n()
+
 const items = computed<DropdownMenuItem[][]>(() => [
   [{
     label: user.value?.name || 'User',
@@ -47,20 +49,28 @@ const items = computed<DropdownMenuItem[][]>(() => [
     type: 'label'
   }],
   [{
-    label: 'My Account',
+    label: t('menu.account'),
     icon: 'i-lucide-user',
-    onSelect: () => navigateTo('/dashboard/settings')
-  }, {
-    label: 'Billing',
-    icon: 'i-lucide-credit-card',
-    onSelect: () => navigateTo('/dashboard/billing')
-  }, {
-    label: 'Settings',
-    icon: 'i-lucide-settings',
     to: '/dashboard/settings'
+  }, {
+    label: t('menu.plans'),
+    icon: 'i-lucide-credit-card',
+    to: '/dashboard/upgrade'
+  }, {
+    label: t('menu.language'),
+    icon: 'i-lucide-languages',
+    children: locales.value.map(l => ({
+      label: l.name,
+      type: 'checkbox' as const,
+      checked: locale.value === l.code,
+      onSelect: (e: Event) => {
+        e.preventDefault()
+        setLocale(l.code)
+      }
+    }))
   }],
   [{
-    label: 'Sign out',
+    label: t('menu.signOut'),
     icon: 'i-lucide-log-out',
     onSelect: handleSignOut
   }]

@@ -44,6 +44,8 @@ import { computed } from 'vue'
 import { colorPaletteCategories } from '~/data/colorPalettes'
 import type { ColorPalette } from '~/data/colorPalettes'
 
+const { t } = useI18n()
+
 const props = defineProps<{
   primary: string
   secondary: string
@@ -55,7 +57,7 @@ const emit = defineEmits<{
 }>()
 
 const tabItems = computed(() =>
-  colorPaletteCategories.map(cat => ({ label: cat.label, value: cat.value }))
+  colorPaletteCategories.map(cat => ({ label: t(`theme.colors.categories.${cat.value}`), value: cat.value }))
 )
 
 function getCategoryPalettes(value: string) {

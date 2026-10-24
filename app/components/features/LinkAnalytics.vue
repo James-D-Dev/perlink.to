@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <!-- Period -->
-    <div class="inline-flex rounded-full bg-sand p-0.5" role="tablist" aria-label="Period">
+    <div class="inline-flex rounded-full bg-sand p-0.5" role="tablist" :aria-label="t('analytics.overview.periodAria')">
       <button
         v-for="p in periods"
         :key="p.value"
@@ -27,11 +27,11 @@
     <!-- Views over time: column chart -->
     <section class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
       <div class="flex items-baseline justify-between gap-3">
-        <h4 class="text-sm font-medium text-ink">Views over time</h4>
-        <p v-if="timeseries.length" class="text-xs text-ink-muted">Peak {{ compact(maxClicks) }}</p>
+        <h4 class="text-sm font-medium text-ink">{{ t('analytics.overview.viewsOverTime') }}</h4>
+        <p v-if="timeseries.length" class="text-xs text-ink-muted">{{ t('analytics.overview.peak', { value: compact(maxClicks) }) }}</p>
       </div>
       <div v-if="timeseries.length === 0" class="py-10 text-center text-sm text-ink-muted">
-        No views in this period yet
+        {{ t('analytics.overview.noViews') }}
       </div>
       <div v-else class="mt-4">
         <div class="flex h-40 items-end gap-0.5 border-b border-line">
@@ -39,7 +39,7 @@
             v-for="point in timeseries"
             :key="point.date"
             class="group relative flex h-full flex-1 items-end justify-center"
-            :aria-label="`${formatChartDate(point.date)}: ${point.clicks} views`"
+            :aria-label="`${formatChartDate(point.date)}: ${t('analytics.overview.viewsCount', point.clicks)}`"
           >
             <div
               class="w-full max-w-6 rounded-t-[4px] bg-ink/85 transition-colors group-hover:bg-ink"
@@ -47,7 +47,7 @@
             />
             <!-- Tooltip -->
             <div class="pointer-events-none absolute bottom-full z-10 mb-1 hidden whitespace-nowrap rounded-md bg-ink px-2 py-1 text-xs text-paper group-hover:block">
-              {{ formatChartDate(point.date) }} · {{ point.clicks }} views
+              {{ formatChartDate(point.date) }} · {{ t('analytics.overview.viewsCount', point.clicks) }}
             </div>
           </div>
         </div>
@@ -62,7 +62,7 @@
     <div class="grid gap-4 md:grid-cols-2">
       <section v-for="panel in breakdowns" :key="panel.title" class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
         <h4 class="text-sm font-medium text-ink">{{ panel.title }}</h4>
-        <div v-if="panel.items.length === 0" class="py-8 text-center text-sm text-ink-muted">No data yet</div>
+        <div v-if="panel.items.length === 0" class="py-8 text-center text-sm text-ink-muted">{{ t('analytics.overview.noData') }}</div>
         <ul v-else class="mt-4 space-y-3">
           <li v-for="item in panel.items.slice(0, 8)" :key="item.name">
             <div class="mb-1 flex items-baseline justify-between gap-2 text-sm">
@@ -98,12 +98,17 @@ const props = defineProps<{
   linkId: string;
 }>();
 
-const periods = [
-  { label: "24h", value: "24h" },
-  { label: "7d", value: "7d" },
-  { label: "30d", value: "30d" },
-  { label: "90d", value: "90d" },
-];
+const { t, locale } = useI18n();
+
+const periods = computed(() => [
+  { label: t("analytics.overview.periods.h24"), value: "24h" },
+  { label: t("analytics.overview.periods.d7"), value: "7d" },
+  { label: t("analytics.overview.periods.d30"), value: "30d" },
+  { label: t("analytics.overview.periods.d90"), value: "90d" },
+]);
+
+// Dashboard locale → Intl locale ("23 Oct" / "23 thg 10")
+const intlLocale = computed(() => (locale.value === "vi" ? "vi-VN" : "en-GB"));
 
 const period = ref("7d");
 
@@ -116,23 +121,23 @@ const countries = ref<BreakdownItem[]>([]);
 const browsers = ref<BreakdownItem[]>([]);
 
 const overviewCards = computed(() => [
-  { label: "Views", value: overview.value.total_clicks },
-  { label: "Unique visitors", value: overview.value.unique_clicks },
-  { label: "Today", value: overview.value.today_clicks },
-  { label: "Bots filtered", value: overview.value.bot_clicks },
+  { label: t("analytics.overview.cards.views"), value: overview.value.total_clicks },
+  { label: t("analytics.overview.cards.unique"), value: overview.value.unique_clicks },
+  { label: t("analytics.overview.cards.today"), value: overview.value.today_clicks },
+  { label: t("analytics.overview.cards.bots"), value: overview.value.bot_clicks },
 ]);
 
 const breakdowns = computed(() => [
-  { title: "Top referrers", items: referrers.value },
-  { title: "Devices", items: devices.value },
-  { title: "Browsers", items: browsers.value },
+  { title: t("analytics.overview.topReferrers"), items: referrers.value },
+  { title: t("analytics.overview.devices"), items: devices.value },
+  { title: t("analytics.overview.browsers"), items: browsers.value },
 ]);
 
 const maxClicks = computed(() => Math.max(...timeseries.value.map((p) => p.clicks), 0));
 
 // 1,284 / 12.9K / 4.2M
 const compact = (value: number) =>
-  new Intl.NumberFormat("en", { notation: value >= 10000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
+  new Intl.NumberFormat(intlLocale.value, { notation: value >= 10000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
 
 const fetchAnalytics = async () => {
   if (!props.linkId) return;
@@ -168,7 +173,7 @@ const getBarWidth = (clicks: number): number => {
 
 const formatChartDate = (date: string): string => {
   const d = new Date(date);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  return d.toLocaleDateString(intlLocale.value, { day: "numeric", month: "short" });
 };
 
 // Fetch on mount and period change

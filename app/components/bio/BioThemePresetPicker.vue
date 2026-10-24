@@ -44,7 +44,7 @@
             <!-- Label -->
             <div class="px-2 py-1.5 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl">
               <p class="text-xs font-semibold text-gray-900 dark:text-white truncate">{{ preset.name }}</p>
-              <p class="text-[10px] text-gray-400 dark:text-neutral-500 truncate">{{ preset.description }}</p>
+              <p class="text-[10px] text-gray-400 dark:text-neutral-500 truncate">{{ presetDescription(preset) }}</p>
             </div>
 
             <!-- Selected check -->
@@ -70,6 +70,8 @@ import {
   type ThemePresetCategory,
 } from '~/data/themePresets'
 
+const { t, te } = useI18n()
+
 const props = defineProps<{
   selectedId?: string
 }>()
@@ -81,11 +83,17 @@ const emit = defineEmits<{
 const activeCategory = ref<ThemePresetCategory>('classic')
 
 const tabItems = computed(() =>
-  THEME_PRESET_CATEGORIES.map(cat => ({ label: cat.label, value: cat.id }))
+  THEME_PRESET_CATEGORIES.map(cat => ({ label: t(`theme.presetCategories.${cat.id}`), value: cat.id }))
 )
 
 function getPresets(category: ThemePresetCategory) {
   return THEME_PRESETS_BY_CATEGORY.find(c => c.id === category)?.presets ?? []
+}
+
+// Preset names stay as-is; descriptions are translated when a key exists
+function presetDescription(preset: ThemePreset) {
+  const key = `theme.presets.${preset.id}.description`
+  return te(key) ? t(key) : preset.description
 }
 
 function previewBgStyle(preset: ThemePreset) {

@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { en as uiEn, vi as uiVi } from "@nuxt/ui/locale";
+
+// Built-in Nuxt UI texts (empty states, close buttons...) follow the dashboard language
+const { locale: i18nLocale } = useI18n();
+const uiLocale = computed(() => (i18nLocale.value === "vi" ? uiVi : uiEn));
+
 const colorMode = useColorMode();
 
 const color = computed(() =>
@@ -41,7 +47,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="uiLocale">
     <NuxtLoadingIndicator />
     <NuxtLayout>
       <NuxtPage />

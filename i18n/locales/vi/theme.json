@@ -1,0 +1,274 @@
+{
+  "theme": {
+    "panelTitle": "Mẫu & Giao diện",
+    "tabs": {
+      "presets": "Mẫu có sẵn",
+      "custom": "Tùy chỉnh"
+    },
+    "options": {
+      "none": "Không",
+      "xs": "Rất nhỏ",
+      "small": "Nhỏ",
+      "medium": "Vừa",
+      "large": "Lớn",
+      "xl": "Rất lớn"
+    },
+    "fields": {
+      "fontFamily": "Phông chữ",
+      "fontSize": "Cỡ chữ",
+      "textColor": "Màu chữ",
+      "weight": "Độ đậm",
+      "letterSpacing": "Giãn chữ"
+    },
+    "headerLayout": {
+      "label": "Bố cục đầu trang",
+      "tabs": {
+        "noBanner": "Không ảnh bìa",
+        "banner": "Có ảnh bìa"
+      },
+      "options": {
+        "centered": "Căn giữa",
+        "left": "Căn trái",
+        "cover": "Ảnh phủ",
+        "imageOverlay": "Ảnh lớp phủ",
+        "bannerCircle": "Ảnh bìa ○",
+        "bannerSquare": "Ảnh bìa □"
+      },
+      "addBanner": "Thêm ảnh bìa",
+      "upload": "Tải ảnh lên"
+    },
+    "colors": {
+      "title": "Màu sắc",
+      "primary": "Màu chính",
+      "secondary": "Màu phụ",
+      "third": "Màu thứ ba",
+      "categories": {
+        "neutral": "Trung tính",
+        "bold": "Nổi bật",
+        "playful": "Vui tươi",
+        "dark": "Tối",
+        "gradient": "Chuyển sắc"
+      }
+    },
+    "background": {
+      "title": "Nền",
+      "tabs": {
+        "solid": "Màu trơn",
+        "gradient": "Chuyển sắc",
+        "image": "Ảnh",
+        "video": "Video",
+        "effect": "Hiệu ứng"
+      },
+      "custom": "Tự chọn",
+      "customGradient": "Chuyển sắc tự chọn",
+      "from": "Từ",
+      "via": "Giữa",
+      "to": "Đến",
+      "customImageUrl": "Link ảnh của bạn",
+      "videoUrl": "Link video (mp4, webm)"
+    },
+    "header": {
+      "title": "Tên trang",
+      "blockTitleFont": "Phông tiêu đề khối"
+    },
+    "bio": {
+      "title": "Đoạn giới thiệu"
+    },
+    "card": {
+      "title": "Kiểu thẻ",
+      "style": "Kiểu",
+      "color": "Màu thẻ",
+      "colorHelp": "Để trống sẽ dùng màu chính.",
+      "colorAria": "Màu thẻ",
+      "borderColor": "Màu viền",
+      "borderColorAria": "Màu viền thẻ",
+      "cornerRadius": "Bo góc",
+      "shadow": "Đổ bóng",
+      "backdropBlur": "Làm mờ nền",
+      "appearAnimation": "Hiệu ứng xuất hiện",
+      "hoverAnimation": "Hiệu ứng khi rê chuột",
+      "styles": {
+        "filled": "Tô đặc",
+        "outline": "Viền",
+        "ghost": "Trong suốt",
+        "soft": "Nhạt"
+      }
+    },
+    "fontWeights": {
+      "light": "Mảnh",
+      "regular": "Thường",
+      "medium": "Vừa",
+      "semibold": "Hơi đậm",
+      "bold": "Đậm"
+    },
+    "letterSpacings": {
+      "tight": "Hẹp",
+      "snug": "Hơi hẹp",
+      "normal": "Bình thường",
+      "wide": "Rộng",
+      "extraWide": "Rất rộng"
+    },
+    "page": {
+      "title": "Trang",
+      "textColorAria": "Màu chữ của trang",
+      "blockSpacing": "Khoảng cách khối",
+      "blockTitles": "Tiêu đề khối",
+      "titleAlign": {
+        "center": "Căn giữa",
+        "left": "Căn trái"
+      },
+      "socialIcons": "Biểu tượng mạng xã hội"
+    },
+    "blockGaps": {
+      "compact": "Gọn",
+      "normal": "Bình thường",
+      "relaxed": "Thoáng"
+    },
+    "socialStyles": {
+      "soft": "Nhạt",
+      "filled": "Tô đặc",
+      "outline": "Viền",
+      "plain": "Chỉ biểu tượng"
+    },
+    "font": {
+      "title": "Phông chữ",
+      "selectPlaceholder": "Chọn phông chữ..."
+    },
+    "avatar": {
+      "title": "Hình ảnh đại diện",
+      "shapes": {
+        "circle": "Tròn",
+        "rounded": "Bo góc",
+        "square": "Vuông"
+      }
+    },
+    "linkLayout": {
+      "title": "Bố cục thẻ liên kết",
+      "vertical": "Dọc (ảnh ở trên)",
+      "horizontalLeft": "Ngang (ảnh bên trái)",
+      "horizontalRight": "Ngang (ảnh bên phải)",
+      "centered": "Căn giữa (chỉ chữ)"
+    },
+    "animations": {
+      "appear": {
+        "fadeIn": "Hiện dần",
+        "fadeInDown": "Hiện dần từ trên",
+        "fadeInUp": "Hiện dần từ dưới",
+        "fadeInLeft": "Hiện dần từ trái",
+        "fadeInRight": "Hiện dần từ phải",
+        "zoomIn": "Phóng to",
+        "zoomInDown": "Phóng to từ trên",
+        "zoomInUp": "Phóng to từ dưới",
+        "bounceIn": "Nảy vào",
+        "bounceInDown": "Nảy vào từ trên",
+        "bounceInUp": "Nảy vào từ dưới",
+        "slideInDown": "Trượt vào từ trên",
+        "slideInUp": "Trượt vào từ dưới",
+        "slideInLeft": "Trượt vào từ trái",
+        "slideInRight": "Trượt vào từ phải",
+        "backInDown": "Lùi vào từ trên",
+        "backInUp": "Lùi vào từ dưới",
+        "flipInX": "Lật vào theo trục X",
+        "flipInY": "Lật vào theo trục Y",
+        "lightSpeedInRight": "Lướt nhanh từ phải",
+        "rotateIn": "Xoay vào"
+      },
+      "hover": {
+        "pulse": "Nhịp đập",
+        "bounce": "Nảy",
+        "rubberBand": "Co giãn",
+        "shakeX": "Rung ngang",
+        "shakeY": "Rung dọc",
+        "headShake": "Lắc nhẹ",
+        "swing": "Đung đưa",
+        "tada": "Tada",
+        "wobble": "Lắc lư",
+        "jello": "Rung rinh",
+        "heartBeat": "Nhịp tim",
+        "flash": "Nhấp nháy",
+        "flip": "Lật"
+      },
+      "durations": {
+        "faster": "Rất nhanh (0.5s)",
+        "fast": "Nhanh (0.8s)",
+        "normal": "Bình thường (1s)",
+        "slow": "Chậm (2s)",
+        "slower": "Rất chậm (3s)"
+      }
+    },
+    "presetCategories": {
+      "classic": "Cổ điển",
+      "vibrant": "Rực rỡ",
+      "dark": "Tối",
+      "minimal": "Tối giản",
+      "gradient": "Chuyển sắc",
+      "neon": "Neon"
+    },
+    "presets": {
+      "classic-white": { "description": "Trắng thanh lịch, điểm tím" },
+      "classic-ivory": { "description": "Ngà dịu nhẹ với nâu ấm" },
+      "classic-slate": { "description": "Xám đá chuyên nghiệp, điểm xanh" },
+      "vibrant-coral": { "description": "San hô và cam đầy năng lượng" },
+      "vibrant-emerald": { "description": "Xanh lá nhiệt đới tươi mới" },
+      "vibrant-rose": { "description": "Bảng màu hồng nổi bật" },
+      "dark-obsidian": { "description": "Tối sâu, điểm tím" },
+      "dark-midnight": { "description": "Chế độ tối xanh navy và xanh điện" },
+      "dark-charcoal": { "description": "Tối sang trọng, điểm vàng" },
+      "minimal-pure": { "description": "Siêu gọn gàng, không xao nhãng" },
+      "minimal-sand": { "description": "Tông trung tính dịu, không xao nhãng" },
+      "minimal-frost": { "description": "Tối giản xám nhạt mát lạnh" },
+      "gradient-aurora": { "description": "Cực quang — từ xanh ngọc sang tím" },
+      "gradient-sunset": { "description": "Hoàng hôn ấm từ cam sang hồng" },
+      "gradient-ocean": { "description": "Xanh đại dương sâu đến navy" },
+      "gradient-candy": { "description": "Hồng pastel đến oải hương vui mắt" },
+      "neon-cyber": { "description": "Vàng điện trên nền gần đen" },
+      "neon-matrix": { "description": "Xanh hacker trên nền đen" },
+      "neon-electric": { "description": "Xanh điện phát sáng trên nền đen sâu" },
+      "neon-purple": { "description": "Tím vaporwave trên nền tối" }
+    }
+  },
+  "analytics": {
+    "unpublished": "Xuất bản trang để bắt đầu xem thống kê.",
+    "tabs": {
+      "overview": "Tổng quan",
+      "links": "Liên kết"
+    },
+    "links": {
+      "empty": "Trang này chưa có liên kết hay biểu tượng mạng xã hội nào.",
+      "linksTitle": "Liên kết",
+      "socialTitle": "Biểu tượng mạng xã hội",
+      "clicks": "lượt bấm | lượt bấm",
+      "noLink": "Chưa có liên kết"
+    },
+    "overview": {
+      "periodAria": "Khoảng thời gian",
+      "periods": {
+        "h24": "24 giờ",
+        "d7": "7 ngày",
+        "d30": "30 ngày",
+        "d90": "90 ngày"
+      },
+      "cards": {
+        "views": "Lượt xem",
+        "unique": "Khách truy cập",
+        "today": "Hôm nay",
+        "bots": "Bot đã lọc"
+      },
+      "viewsOverTime": "Lượt xem theo thời gian",
+      "peak": "Cao nhất {value}",
+      "noViews": "Chưa có lượt xem nào trong khoảng này",
+      "viewsCount": "{n} lượt xem | {n} lượt xem",
+      "topReferrers": "Nguồn truy cập hàng đầu",
+      "devices": "Thiết bị",
+      "browsers": "Trình duyệt",
+      "noData": "Chưa có dữ liệu"
+    },
+    "countryMap": {
+      "title": "Quốc gia",
+      "map": "Bản đồ",
+      "list": "Danh sách",
+      "noData": "Chưa có dữ liệu",
+      "viewsCount": "{n} lượt xem | {n} lượt xem"
+    }
+  }
+}

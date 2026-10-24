@@ -1,8 +1,8 @@
 <template>
   <UModal
     :open="open"
-    title="Add a block"
-    description="Blocks are the sections of your page. You can reorder them later."
+    :title="t('blocks.picker.title')"
+    :description="t('blocks.picker.description')"
     :ui="{ content: 'sm:max-w-2xl', body: 'p-0 sm:p-0' }"
     @update:open="$emit('update:open', $event)"
   >
@@ -27,7 +27,7 @@
                   <span class="text-sm font-medium text-highlighted dark:text-white">{{ block.label }}</span>
                   <span v-if="isAdded(block.id)" class="inline-flex items-center gap-0.5 text-[11px] font-medium text-muted">
                     <UIcon name="i-lucide-check" class="size-3" />
-                    Added
+                    {{ t('blocks.picker.added') }}
                   </span>
                 </span>
                 <span class="mt-0.5 block text-xs leading-snug text-muted">{{ block.description }}</span>
@@ -65,33 +65,47 @@ const emit = defineEmits<{
   select: [blockId: string]
 }>()
 
+const { t } = useI18n()
+
 // Each block can appear once per page
-const groups: { label: string; blocks: BlockOption[] }[] = [
+const groupDefs: { key: string; blocks: { id: string; key: string; icon: string }[] }[] = [
   {
-    label: 'Content',
+    key: 'content',
     blocks: [
-      { id: 'links', label: 'Links', description: 'Buttons to your website, shop, videos or anything else.', icon: 'i-lucide-link' },
-      { id: 'social', label: 'Social icons', description: 'A row of icons for Instagram, TikTok, Zalo and more.', icon: 'i-lucide-at-sign' },
-      { id: 'text', label: 'Text', description: 'An about section or any paragraph with a title.', icon: 'i-lucide-text' },
-      { id: 'image-album', label: 'Gallery', description: 'Up to 6 photos as a grid, masonry, stack or carousel.', icon: 'i-lucide-images' },
+      { id: 'links', key: 'links', icon: 'i-lucide-link' },
+      { id: 'social', key: 'social', icon: 'i-lucide-at-sign' },
+      { id: 'text', key: 'text', icon: 'i-lucide-text' },
+      { id: 'image-album', key: 'imageAlbum', icon: 'i-lucide-images' },
     ],
   },
   {
-    label: 'Business',
+    key: 'business',
     blocks: [
-      { id: 'menu', label: 'Menu / price list', description: 'Dishes, rooms or services with prices.', icon: 'i-lucide-utensils' },
-      { id: 'hours', label: 'Opening hours', description: 'Your week, with a live "Open now" badge.', icon: 'i-lucide-clock' },
-      { id: 'contact', label: 'Contact & booking', description: 'Address, phone, email and a booking button.', icon: 'i-lucide-map-pin' },
+      { id: 'menu', key: 'menu', icon: 'i-lucide-utensils' },
+      { id: 'hours', key: 'hours', icon: 'i-lucide-clock' },
+      { id: 'contact', key: 'contact', icon: 'i-lucide-map-pin' },
     ],
   },
   {
-    label: 'Extras',
+    key: 'extras',
     blocks: [
-      { id: 'vietqr', label: 'VietQR', description: 'A bank QR code so people can pay or tip you.', icon: 'i-lucide-qr-code' },
-      { id: 'birthday-countdown', label: 'Birthday countdown', description: 'Days until your next birthday.', icon: 'i-lucide-cake' },
+      { id: 'vietqr', key: 'vietqr', icon: 'i-lucide-qr-code' },
+      { id: 'birthday-countdown', key: 'birthdayCountdown', icon: 'i-lucide-cake' },
     ],
   },
 ]
+
+const groups = computed<{ label: string; blocks: BlockOption[] }[]>(() =>
+  groupDefs.map(group => ({
+    label: t(`blocks.picker.groups.${group.key}`),
+    blocks: group.blocks.map(block => ({
+      id: block.id,
+      icon: block.icon,
+      label: t(`blocks.picker.items.${block.key}.label`),
+      description: t(`blocks.picker.items.${block.key}.description`),
+    })),
+  })),
+)
 
 function isAdded(blockId: string) {
   return props.enabledBlocks.includes(blockId)

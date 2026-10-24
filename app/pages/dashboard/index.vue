@@ -1,12 +1,12 @@
 <template>
   <UDashboardPanel id="create-site">
     <template #header>
-      <UDashboardNavbar title="Create">
+      <UDashboardNavbar :title="t('dashboard.home.title')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
         <template #right>
-          <UButton to="/dashboard/site" color="neutral" variant="ghost" icon="i-lucide-layout-grid" label="My sites" />
+          <UButton to="/dashboard/site" color="neutral" variant="ghost" icon="i-lucide-layout-grid" :label="t('dashboard.home.mySites')" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -25,13 +25,13 @@
           <div class="relative max-w-2xl">
             <p class="mb-3 inline-flex items-center gap-1.5 rounded-full border border-default px-2.5 py-1 text-xs font-medium text-muted dark:border-white/10 dark:text-neutral-300">
               <UIcon name="i-lucide-sparkles" class="size-3.5 text-highlighted" />
-              Templates · Drag-and-drop editor · 3D rooms
+              {{ t('dashboard.home.badge') }}
             </p>
             <h1 class="mk-display text-4xl sm:text-5xl dark:text-white">
-              Create your site
+              {{ t('dashboard.home.heading') }}
             </h1>
             <p class="mt-2 text-muted dark:text-neutral-400">
-              Pick your address, then start from a template or a blank page. You can change everything later.
+              {{ t('dashboard.home.intro') }}
             </p>
             <div class="mt-6">
               <SiteClaimForm size="lg" :initial-slug="initialSlug" autofocus />
@@ -43,9 +43,9 @@
         <section class="space-y-5">
           <div class="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 class="mk-display text-2xl sm:text-3xl dark:text-white">Start from a template</h2>
+              <h2 class="mk-display text-2xl sm:text-3xl dark:text-white">{{ t('dashboard.home.templatesHeading') }}</h2>
               <p class="mt-1 text-sm text-muted dark:text-neutral-400">
-                {{ PAGE_TEMPLATES.length }} templates, each with sample content, a theme and a matching 3D room.
+                {{ t('dashboard.home.templatesIntro', { n: PAGE_TEMPLATES.length }) }}
               </p>
             </div>
           </div>
@@ -83,20 +83,20 @@
                 <SiteTemplateThumbnail :template="template" :scale="0.4" class="transition duration-500 group-hover:scale-[1.03]" />
                 <div class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/0 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
                   <span class="inline-flex items-center gap-1.5 rounded-lg bg-default px-3 py-1.5 text-sm font-semibold text-highlighted shadow">
-                    Use template
+                    {{ t('dashboard.home.useTemplate') }}
                     <UIcon name="i-lucide-arrow-right" class="size-4" />
                   </span>
                 </div>
               </div>
               <div class="space-y-1.5 p-3 sm:space-y-2 sm:p-4">
                 <div class="flex items-center justify-between gap-2">
-                  <h3 class="truncate text-sm font-semibold text-highlighted sm:text-base dark:text-white">{{ template.name }}</h3>
+                  <h3 class="truncate text-sm font-semibold text-highlighted sm:text-base dark:text-white">{{ templateName(template.id) }}</h3>
                   <span class="hidden shrink-0 sm:inline-flex items-center gap-1 rounded-md border border-default px-1.5 py-0.5 text-[11px] font-medium text-muted dark:border-white/10 dark:text-neutral-400">
                     <UIcon name="i-lucide-box" class="size-3" />
                     3D
                   </span>
                 </div>
-                <p class="line-clamp-2 text-xs text-muted sm:text-sm dark:text-neutral-400">{{ template.description }}</p>
+                <p class="line-clamp-2 text-xs text-muted sm:text-sm dark:text-neutral-400">{{ templateDescription(template.id) }}</p>
                 <p class="text-xs text-dimmed dark:text-neutral-500">{{ categoryLabel(template.category) }}</p>
               </div>
             </div>
@@ -108,7 +108,7 @@
       <UModal
         v-model:open="modalOpen"
         :ui="{ content: 'sm:max-w-3xl', body: 'p-0 sm:p-0' }"
-        :title="selectedTemplate?.name"
+        :title="selectedTemplate ? templateName(selectedTemplate.id) : undefined"
       >
         <template #content>
           <div v-if="selectedTemplate" class="grid grid-cols-1 sm:grid-cols-2">
@@ -121,11 +121,11 @@
                   <p class="text-xs font-medium uppercase tracking-wide text-muted dark:text-neutral-500">
                     {{ categoryLabel(selectedTemplate.category) }}
                   </p>
-                  <h3 class="mt-1 text-xl font-semibold text-highlighted dark:text-white">{{ selectedTemplate.name }}</h3>
+                  <h3 class="mt-1 text-xl font-semibold text-highlighted dark:text-white">{{ templateName(selectedTemplate.id) }}</h3>
                 </div>
-                <UButton icon="i-lucide-x" color="neutral" variant="ghost" aria-label="Close" @click="modalOpen = false" />
+                <UButton icon="i-lucide-x" color="neutral" variant="ghost" :aria-label="t('common.close')" @click="modalOpen = false" />
               </div>
-              <p class="mt-2 text-sm text-muted dark:text-neutral-400">{{ selectedTemplate.description }}</p>
+              <p class="mt-2 text-sm text-muted dark:text-neutral-400">{{ templateDescription(selectedTemplate.id) }}</p>
 
               <ul class="mt-4 space-y-2 text-sm text-muted dark:text-neutral-300">
                 <li v-for="feature in templateFeatures" :key="feature" class="flex items-center gap-2">
@@ -135,7 +135,7 @@
               </ul>
 
               <div class="mt-auto pt-6">
-                <p class="mb-2 text-sm font-medium text-highlighted dark:text-white">Claim your site</p>
+                <p class="mb-2 text-sm font-medium text-highlighted dark:text-white">{{ t('dashboard.home.claimHeading') }}</p>
                 <SiteClaimForm :template-id="selectedTemplate.id" :initial-slug="initialSlug" autofocus />
               </div>
             </div>
@@ -157,6 +157,7 @@ definePageMeta({
 })
 
 const route = useRoute()
+const { t } = useI18n()
 
 // Name typed on the landing page (?input=) carries over
 const initialSlug = computed(() => (typeof route.query.input === 'string' ? route.query.input.toLowerCase() : ''))
@@ -166,8 +167,8 @@ const modalOpen = ref(false)
 const selectedTemplateId = ref<string | null>(null)
 
 const chips = computed(() => [
-  { id: 'all' as const, label: 'All', icon: 'i-lucide-layout-grid', count: PAGE_TEMPLATES.length },
-  ...TEMPLATE_CATEGORIES.map(c => ({ ...c, count: PAGE_TEMPLATES.filter(t => t.category === c.id).length })),
+  { id: 'all' as const, label: t('dashboard.home.all'), icon: 'i-lucide-layout-grid', count: PAGE_TEMPLATES.length },
+  ...TEMPLATE_CATEGORIES.map(c => ({ ...c, label: t(`dashboard.categories.${c.id}`), count: PAGE_TEMPLATES.filter(t => t.category === c.id).length })),
 ].filter(chip => chip.count > 0))
 
 const filteredTemplates = computed(() =>
@@ -176,10 +177,23 @@ const filteredTemplates = computed(() =>
 
 const selectedTemplate = computed(() => PAGE_TEMPLATES.find(t => t.id === selectedTemplateId.value) || null)
 
-const templateFeatures = ['Sample content you can edit', 'Matching theme and fonts', 'A decorated 3D room included', 'Change templates anytime']
+const templateFeatures = computed(() => [
+  t('dashboard.home.features.sampleContent'),
+  t('dashboard.home.features.theme'),
+  t('dashboard.home.features.room'),
+  t('dashboard.home.features.changeAnytime'),
+])
 
 function categoryLabel(id: TemplateCategory) {
-  return TEMPLATE_CATEGORIES.find(c => c.id === id)?.label ?? ''
+  return TEMPLATE_CATEGORIES.some(c => c.id === id) ? t(`dashboard.categories.${id}`) : ''
+}
+
+function templateName(id: string) {
+  return t(`dashboard.templates.${id}.name`)
+}
+
+function templateDescription(id: string) {
+  return t(`dashboard.templates.${id}.description`)
 }
 
 function openTemplate(id: string) {

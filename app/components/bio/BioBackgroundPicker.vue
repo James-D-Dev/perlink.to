@@ -14,7 +14,7 @@
           <template v-if="item.value === 'solid'">
           
             <div class="flex items-center gap-2 pt-1 border-t border-gray-100 dark:border-white/5">
-              <label class="text-xs text-gray-500 dark:text-neutral-400 shrink-0">Custom</label>
+              <label class="text-xs text-gray-500 dark:text-neutral-400 shrink-0">{{ t('theme.background.custom') }}</label>
               <UPopover>
                 <UButton size="md" color="neutral" variant="outline" class="p-0 rounded-full overflow-hidden shrink-0">
                   <span
@@ -56,10 +56,10 @@
               </button>
             </div>
             <div class="border-t border-gray-100 dark:border-white/5 pt-2 space-y-2">
-              <label class="text-xs text-gray-500 dark:text-neutral-400 block">Custom gradient</label>
+              <label class="text-xs text-gray-500 dark:text-neutral-400 block">{{ t('theme.background.customGradient') }}</label>
               <div class="grid grid-cols-3 gap-2">
                 <div>
-                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">From</label>
+                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">{{ t('theme.background.from') }}</label>
                   <input
                     :value="background.gradient?.from"
                     type="color"
@@ -68,7 +68,7 @@
                   />
                 </div>
                 <div>
-                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">Via</label>
+                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">{{ t('theme.background.via') }}</label>
                   <input
                     :value="background.gradient?.via || '#FFFFFF'"
                     type="color"
@@ -77,7 +77,7 @@
                   />
                 </div>
                 <div>
-                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">To</label>
+                  <label class="text-[10px] text-gray-400 dark:text-neutral-500 mb-1 block">{{ t('theme.background.to') }}</label>
                   <input
                     :value="background.gradient?.to"
                     type="color"
@@ -107,7 +107,7 @@
               </button>
             </div>
             <div class="border-t border-gray-100 dark:border-white/5 pt-2">
-              <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Custom image URL</label>
+              <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">{{ t('theme.background.customImageUrl') }}</label>
               <UInput
                 :model-value="background.imageUrl"
                 size="sm"
@@ -120,7 +120,7 @@
           <!-- Video -->
           <template v-else-if="item.value === 'video'">
             <div>
-              <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Video URL (mp4, webm)</label>
+              <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">{{ t('theme.background.videoUrl') }}</label>
               <UInput
                 :model-value="background.videoUrl"
                 size="sm"
@@ -182,6 +182,8 @@ const effectComponents: Record<string, ReturnType<typeof defineAsyncComponent>> 
   'thunderstorm': defineAsyncComponent(() => import('~/components/background-effects/ThunderstormBackground.vue')),
 }
 
+const { t } = useI18n()
+
 const props = defineProps<{
   background: ThemeBackground
 }>()
@@ -191,7 +193,7 @@ const emit = defineEmits<{
 }>()
 
 const tabItems = computed(() =>
-  backgroundCategories.map(cat => ({ label: cat.label, value: cat.value }))
+  backgroundCategories.map(cat => ({ label: t(`theme.background.tabs.${cat.value}`), value: cat.value }))
 )
 
 function getPresets(type: string) {

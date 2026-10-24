@@ -1,7 +1,7 @@
 <template>
   <UDashboardPanel id="upgrade">
     <template #header>
-      <UDashboardNavbar title="Plans">
+      <UDashboardNavbar :title="t('dashboard.upgrade.title')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -11,8 +11,8 @@
     <template #body>
       <div class="mx-auto w-full max-w-6xl py-2 sm:py-6">
         <div class="mb-10 max-w-xl">
-          <h1 class="mk-display text-4xl sm:text-5xl">Choose your plan</h1>
-          <p class="mt-3 text-muted">Every plan includes templates, the editor and a 3D world for your page.</p>
+          <h1 class="mk-display text-4xl sm:text-5xl">{{ t('dashboard.upgrade.heading') }}</h1>
+          <p class="mt-3 text-muted">{{ t('dashboard.upgrade.intro') }}</p>
         </div>
         <MarketingMkPricing />
       </div>
@@ -26,5 +26,6 @@ definePageMeta({
   middleware: 'auth',
   colorMode: 'light',
 })
-useSeoMeta({ title: 'Plans — Perlink', robots: 'noindex' })
+const { t } = useI18n()
+useSeoMeta({ title: () => t('dashboard.upgrade.seoTitle'), robots: 'noindex' })
 </script>

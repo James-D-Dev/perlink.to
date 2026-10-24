@@ -24,6 +24,7 @@
 		"@internationalized/date": "^3.7.0",
 		"@nuxt/icon": "2.2.2",
 		"@nuxt/ui": "^4.7.1",
+		"@nuxtjs/i18n": "10.6.0",
 		"@svg-maps/world": "^2.0.0",
 		"@vueuse/components": "^14.3.0",
 		"@vueuse/core": "^14.3.0",

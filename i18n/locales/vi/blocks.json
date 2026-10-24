@@ -1,0 +1,225 @@
+{
+  "blocks": {
+    "editor": {
+      "addBlock": "Thêm khối"
+    },
+    "header": {
+      "changePhoto": "Đổi ảnh",
+      "addPhoto": "Thêm ảnh",
+      "titlePlaceholder": "Tên hoặc tiêu đề của bạn",
+      "bioPlaceholder": "Giới thiệu đôi chút về bạn"
+    },
+    "links": {
+      "title": "Liên kết",
+      "titleLabel": "Tiêu đề",
+      "titleHelp": "Tiêu đề hiện phía trên các liên kết (không bắt buộc).",
+      "titlePlaceholder": "VD: Nổi bật",
+      "linkTitlePlaceholder": "Tiêu đề (bắt buộc)",
+      "linkSubtitlePlaceholder": "Phụ đề (không bắt buộc)",
+      "linkUrlPlaceholder": "URL hoặc email (bắt buộc)",
+      "add": "Thêm"
+    },
+    "social": {
+      "title": "Biểu tượng mạng xã hội",
+      "clicks": "- Lượt nhấn: {n}",
+      "empty": "Chưa có liên kết mạng xã hội nào",
+      "addSocial": "Thêm mạng xã hội",
+      "modalTitle": "Thêm liên kết mạng xã hội",
+      "searchPlaceholder": "Tìm nền tảng mạng xã hội...",
+      "usernamePlaceholder": "tên người dùng",
+      "urlPlaceholder": "Nhập URL"
+    },
+    "album": {
+      "title": "Bộ sưu tập ảnh",
+      "imageCount": "{n} ảnh | {n} ảnh",
+      "titleLabel": "Tiêu đề",
+      "titleHelp": "Tiêu đề hiện phía trên các ảnh (không bắt buộc).",
+      "titlePlaceholder": "VD: Bộ sưu tập",
+      "layout": "Bố cục",
+      "layouts": {
+        "grid": "Lưới",
+        "masonry": "So le",
+        "vertical": "Xếp chồng",
+        "carousel": "Trượt ngang"
+      },
+      "dropHint": "Nhấn hoặc kéo ảnh vào đây",
+      "limits": "Tối đa 6 ảnh, mỗi ảnh không quá 5MB",
+      "maxReached": "Đã đủ tối đa 6 ảnh",
+      "uploading": "Đang tải lên...",
+      "images": "Ảnh",
+      "deleteTitle": "Xoá ảnh",
+      "deleteConfirm": "Bạn có chắc muốn xoá ảnh này? Không thể hoàn tác.",
+      "toast": {
+        "limitTitle": "Đã đạt giới hạn",
+        "limitDescription": "Chỉ được tối đa {max} ảnh",
+        "successTitle": "Thành công",
+        "uploaded": "Đã tải lên {n} ảnh | Đã tải lên {n} ảnh",
+        "uploadFailedTitle": "Tải lên thất bại",
+        "uploadFailedDescription": "Không tải ảnh lên được",
+        "deletedTitle": "Đã xoá",
+        "deletedDescription": "Đã xoá ảnh khỏi bộ sưu tập"
+      }
+    },
+    "text": {
+      "title": "Văn bản",
+      "titleLabel": "Tiêu đề",
+      "titleHelp": "Tiêu đề hiện phía trên đoạn văn (không bắt buộc).",
+      "titlePlaceholder": "Về chúng tôi",
+      "textLabel": "Nội dung",
+      "textPlaceholder": "Cho khách biết bạn là ai, bạn làm gì hay điều gì khiến nơi của bạn đặc biệt.",
+      "alignment": "Căn lề",
+      "alignLeft": "Căn trái",
+      "alignCenter": "Căn giữa",
+      "alignRight": "Căn phải",
+      "style": "Kiểu",
+      "styles": {
+        "plain": "Đơn giản",
+        "card": "Thẻ"
+      }
+    },
+    "menu": {
+      "title": "Thực đơn",
+      "itemCount": "{n} món | {n} món",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Thực đơn, Phòng, Dịch vụ...",
+      "currency": "Tiền tệ",
+      "priceSuffix": "Hậu tố giá",
+      "priceSuffixPlaceholder": "VD: /đêm",
+      "layout": "Bố cục",
+      "layouts": {
+        "list": "Danh sách",
+        "cards": "Thẻ"
+      },
+      "sectionPlaceholder": "Mục, VD: Khai vị",
+      "itemNamePlaceholder": "Tên",
+      "itemPricePlaceholder": "Giá",
+      "itemDescriptionPlaceholder": "Mô tả ngắn (không bắt buộc)",
+      "itemTagPlaceholder": "Nhãn, VD: Bán chạy",
+      "itemImagePlaceholder": "URL ảnh (không bắt buộc)",
+      "addItem": "Thêm món",
+      "addSection": "Thêm mục"
+    },
+    "hours": {
+      "title": "Giờ mở cửa",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Giờ mở cửa",
+      "closed": "Nghỉ",
+      "copyMonday": "Áp dụng giờ thứ Hai cho mọi ngày",
+      "note": "Ghi chú",
+      "notePlaceholder": "VD: Bếp đóng sớm hơn 30 phút"
+    },
+    "contact": {
+      "title": "Liên hệ",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Liên hệ & đặt chỗ",
+      "address": "Địa chỉ",
+      "addressPlaceholder": "123 Nguyễn Huệ, Quận 1",
+      "mapLink": "Liên kết bản đồ",
+      "mapLinkHelp": "Để trống để mở địa chỉ trên Google Maps.",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "bookingButton": "Nút đặt chỗ",
+      "bookingButtonPlaceholder": "Đặt bàn",
+      "bookingLink": "Liên kết đặt chỗ"
+    },
+    "birthday": {
+      "title": "Đếm ngược sinh nhật",
+      "birthDate": "Ngày sinh",
+      "birthDatePlaceholder": "Chọn ngày sinh",
+      "label": "Nhãn",
+      "labelPlaceholder": "VD: Sinh nhật mình, Sinh nhật của An",
+      "theme": "Giao diện",
+      "themes": {
+        "classic": "Cổ điển",
+        "modern": "Hiện đại",
+        "minimal": "Tối giản",
+        "party": "Tiệc tùng",
+        "elegant": "Thanh lịch"
+      },
+      "showAge": "Hiện tuổi (VD: 'Tròn 25 tuổi')"
+    },
+    "vietqr": {
+      "title": "Thanh toán VietQR",
+      "emptyHint": "Điền thông tin bên cạnh rồi bấm nút Tạo mã QR",
+      "selectBank": "Chọn ngân hàng",
+      "accountNumber": "Số tài khoản",
+      "accountName": "Tên chủ tài khoản",
+      "amount": "Số tiền (VND)",
+      "note": "Nội dung chuyển khoản (không bắt buộc)",
+      "theme": "Giao diện: {name}",
+      "themes": {
+        "doreamon": "Doreamon",
+        "hello-kitty": "Hello Kitty",
+        "merry-christmas": "Giáng sinh an lành",
+        "newyear-2026": "Năm mới 2026",
+        "vietnam": "Việt Nam",
+        "rose": "Hoa hồng"
+      },
+      "generate": "Tạo mã QR",
+      "errorTitle": "Lỗi",
+      "generateFailed": "Không tạo được mã QR",
+      "copiedDescription": "Đã sao chép nội dung mã QR"
+    },
+    "picker": {
+      "title": "Thêm khối",
+      "description": "Khối là các phần trên trang của bạn. Bạn có thể sắp xếp lại sau.",
+      "added": "Đã thêm",
+      "groups": {
+        "content": "Nội dung",
+        "business": "Kinh doanh",
+        "extras": "Tiện ích thêm"
+      },
+      "items": {
+        "links": {
+          "label": "Liên kết",
+          "description": "Nút dẫn tới website, cửa hàng, video hay bất cứ đâu."
+        },
+        "social": {
+          "label": "Biểu tượng mạng xã hội",
+          "description": "Một hàng biểu tượng cho Instagram, TikTok, Zalo và nhiều hơn nữa."
+        },
+        "text": {
+          "label": "Văn bản",
+          "description": "Phần giới thiệu hoặc một đoạn văn có tiêu đề."
+        },
+        "imageAlbum": {
+          "label": "Bộ sưu tập ảnh",
+          "description": "Tối đa 6 ảnh, dạng lưới, so le, xếp chồng hoặc trượt ngang."
+        },
+        "menu": {
+          "label": "Thực đơn / bảng giá",
+          "description": "Món ăn, phòng hoặc dịch vụ kèm giá."
+        },
+        "hours": {
+          "label": "Giờ mở cửa",
+          "description": "Lịch cả tuần, kèm nhãn \"Đang mở cửa\" theo thời gian thực."
+        },
+        "contact": {
+          "label": "Liên hệ & đặt chỗ",
+          "description": "Địa chỉ, điện thoại, email và nút đặt chỗ."
+        },
+        "vietqr": {
+          "label": "VietQR",
+          "description": "Mã QR ngân hàng để mọi người chuyển khoản hoặc ủng hộ bạn."
+        },
+        "birthdayCountdown": {
+          "label": "Đếm ngược sinh nhật",
+          "description": "Số ngày tới sinh nhật tiếp theo của bạn."
+        }
+      }
+    },
+    "iconPicker": {
+      "title": "Chọn biểu tượng",
+      "website": "Website",
+      "link": "Liên kết"
+    },
+    "deleteLink": {
+      "title": "Xoá liên kết",
+      "description": "Bạn có chắc muốn xoá liên kết này? Không thể hoàn tác.",
+      "errorTitle": "Lỗi",
+      "deletedTitle": "Đã xoá liên kết",
+      "deletedDescription": "Liên kết đã được xoá",
+      "failed": "Không xoá được liên kết. Vui lòng thử lại."
+    }
+  }
+}

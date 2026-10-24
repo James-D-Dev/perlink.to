@@ -3,7 +3,7 @@
     <BioBlockItemHeader
       :is-active="isActive"
       :hidden="contactBlock?.hidden"
-      :title="data.title || 'Contact'"
+      :title="data.title || t('blocks.contact.title')"
       icon="i-lucide-map-pin"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('contact')"
@@ -14,28 +14,28 @@
     </BioBlockItemHeader>
 
     <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
-      <UFormField label="Title">
-        <UInput :model-value="data.title" placeholder="Contact & booking" class="w-full" @update:model-value="update({ title: String($event) })" />
+      <UFormField :label="t('blocks.contact.titleLabel')">
+        <UInput :model-value="data.title" :placeholder="t('blocks.contact.titlePlaceholder')" class="w-full" @update:model-value="update({ title: String($event) })" />
       </UFormField>
-      <UFormField label="Address">
-        <UInput :model-value="data.address" placeholder="123 Nguyen Hue, District 1" icon="i-lucide-map-pin" class="w-full" @update:model-value="update({ address: String($event) })" />
+      <UFormField :label="t('blocks.contact.address')">
+        <UInput :model-value="data.address" :placeholder="t('blocks.contact.addressPlaceholder')" icon="i-lucide-map-pin" class="w-full" @update:model-value="update({ address: String($event) })" />
       </UFormField>
-      <UFormField label="Map link" help="Leave empty to open the address in Google Maps.">
+      <UFormField :label="t('blocks.contact.mapLink')" :help="t('blocks.contact.mapLinkHelp')">
         <UInput :model-value="data.mapUrl" placeholder="https://maps.app.goo.gl/..." icon="i-lucide-map" class="w-full" @update:model-value="update({ mapUrl: String($event) })" />
       </UFormField>
       <div class="grid grid-cols-2 gap-3">
-        <UFormField label="Phone">
+        <UFormField :label="t('blocks.contact.phone')">
           <UInput :model-value="data.phone" placeholder="+84 90 000 0000" icon="i-lucide-phone" class="w-full" @update:model-value="update({ phone: String($event) })" />
         </UFormField>
-        <UFormField label="Email">
+        <UFormField :label="t('blocks.contact.email')">
           <UInput :model-value="data.email" placeholder="hello@example.com" icon="i-lucide-mail" class="w-full" @update:model-value="update({ email: String($event) })" />
         </UFormField>
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <UFormField label="Booking button">
-          <UInput :model-value="data.bookingLabel" placeholder="Book a table" class="w-full" @update:model-value="update({ bookingLabel: String($event) })" />
+        <UFormField :label="t('blocks.contact.bookingButton')">
+          <UInput :model-value="data.bookingLabel" :placeholder="t('blocks.contact.bookingButtonPlaceholder')" class="w-full" @update:model-value="update({ bookingLabel: String($event) })" />
         </UFormField>
-        <UFormField label="Booking link">
+        <UFormField :label="t('blocks.contact.bookingLink')">
           <UInput :model-value="data.bookingUrl" placeholder="https://..." icon="i-lucide-link" class="w-full" @update:model-value="update({ bookingUrl: String($event) })" />
         </UFormField>
       </div>
@@ -57,6 +57,8 @@ const emit = defineEmits<{
   remove: []
   update: [data: ContactBlock['data']]
 }>()
+
+const { t } = useI18n()
 
 const { getBlock, toggleBlockHidden } = useBioBlock({ blocks: toRef(props, 'blocks') })
 

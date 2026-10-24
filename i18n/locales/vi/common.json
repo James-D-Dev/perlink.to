@@ -1,0 +1,42 @@
+{
+  "common": {
+    "save": "Lưu",
+    "saveDraft": "Lưu nháp",
+    "publish": "Xuất bản",
+    "unpublish": "Ngừng xuất bản",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "preview": "Xem trước",
+    "copied": "Đã sao chép",
+    "copyLink": "Sao chép liên kết",
+    "openSite": "Mở trang",
+    "analytics": "Thống kê",
+    "settings": "Cài đặt",
+    "loading": "Đang tải…",
+    "error": "Đã có lỗi xảy ra",
+    "reset": "đặt lại",
+    "auto": "Tự động",
+    "optional": "Không bắt buộc",
+    "confirm": "Xác nhận"
+  },
+  "menu": {
+    "account": "Tài khoản",
+    "plans": "Gói dịch vụ",
+    "settings": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "signOut": "Đăng xuất"
+  },
+  "nav": {
+    "createSite": "Tạo trang",
+    "home": "Trang chủ",
+    "sites": "Trang của tôi",
+    "settings": "Cài đặt",
+    "help": "Trợ giúp",
+    "feedback": "Góp ý",
+    "proTitle": "Perlink Pro",
+    "proText": "Thêm trang, thêm thế giới 3D và nhiều tiện ích cao cấp.",
+    "seePlans": "Xem các gói"
+  }
+}

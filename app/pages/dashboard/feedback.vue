@@ -1,7 +1,7 @@
 <template>
   <UDashboardPanel id="admin-feedback">
     <template #header>
-      <UDashboardNavbar title="Feedback">
+      <UDashboardNavbar :title="t('dashboard.feedback.title')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -9,7 +9,7 @@
     </template>
     <template #body>
       <div class="max-w-xl w-full mx-auto py-8 px-4">
-        <h1 class="text-2xl font-bold text-highlighted dark:text-white mb-6">Feedback</h1>
+        <h1 class="text-2xl font-bold text-highlighted dark:text-white mb-6">{{ t('dashboard.feedback.title') }}</h1>
 
         <!-- Feedback Form -->
         <UCard class="mb-6">
@@ -25,43 +25,43 @@
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-highlighted dark:text-white">
-                  Send Feedback
+                  {{ t('dashboard.feedback.formHeading') }}
                 </h2>
-                <p class="text-sm text-muted dark:text-neutral-400">Help us improve Perlink</p>
+                <p class="text-sm text-muted dark:text-neutral-400">{{ t('dashboard.feedback.formIntro') }}</p>
               </div>
             </div>
           </template>
 
           <form class="space-y-4" @submit.prevent="submitFeedback">
-            <UFormField label="Feedback Type" required>
+            <UFormField :label="t('dashboard.feedback.type')" required>
               <USelect
                 v-model="form.type"
                 :items="feedbackTypes"
-                placeholder="Select feedback type"
+                :placeholder="t('dashboard.feedback.typePlaceholder')"
                 class="w-full"
               />
             </UFormField>
 
-            <UFormField label="Subject" required>
+            <UFormField :label="t('dashboard.feedback.subject')" required>
               <UInput
                 v-model="form.subject"
-                placeholder="Brief summary of your feedback"
+                :placeholder="t('dashboard.feedback.subjectPlaceholder')"
                 class="w-full"
                 required
               />
             </UFormField>
 
-            <UFormField label="Your Feedback" required>
+            <UFormField :label="t('dashboard.feedback.message')" required>
               <UTextarea
                 v-model="form.message"
-                placeholder="Tell us what you think, report a bug, or suggest a feature..."
+                :placeholder="t('dashboard.feedback.messagePlaceholder')"
                 class="w-full"
                 :rows="5"
                 required
               />
             </UFormField>
 
-            <UFormField label="Rating (Optional)">
+            <UFormField :label="t('dashboard.feedback.rating')">
               <div class="flex items-center gap-2">
                 <UButton
                   v-for="star in [1, 2, 3, 4, 5]"
@@ -79,7 +79,7 @@
                   <UIcon name="i-lucide-star" class="w-6 h-6" />
                 </UButton>
                 <span v-if="form.rating" class="ml-2 text-sm text-muted dark:text-neutral-300">
-                  {{ form.rating }} out of 5
+                  {{ t('dashboard.feedback.ratingValue', { rating: form.rating }) }}
                 </span>
               </div>
             </UFormField>
@@ -91,7 +91,7 @@
                 color="neutral"
                 @click="resetForm"
               >
-                Clear
+                {{ t('dashboard.feedback.clear') }}
               </UButton>
               <UButton
                 type="submit"
@@ -100,7 +100,7 @@
                 :disabled="!isFormValid"
               >
                 <UIcon name="i-lucide-send" class="w-4 h-4 mr-2" />
-                Submit Feedback
+                {{ t('dashboard.feedback.submit') }}
               </UButton>
             </div>
           </form>
@@ -121,15 +121,15 @@
                 </div>
                 <div>
                   <h2 class="text-lg font-semibold text-highlighted dark:text-white">
-                    My Feedback History
+                    {{ t('dashboard.feedback.historyHeading') }}
                   </h2>
                   <p class="text-sm text-muted dark:text-neutral-400">
-                    Track your previous submissions
+                    {{ t('dashboard.feedback.historyIntro') }}
                   </p>
                 </div>
               </div>
               <UBadge color="primary" variant="soft">
-                {{ feedbackHistory.length }} submitted
+                {{ t('dashboard.feedback.submittedCount', { n: feedbackHistory.length }) }}
               </UBadge>
             </div>
           </template>
@@ -157,7 +157,7 @@
                   variant="soft"
                   size="sm"
                 >
-                  {{ item.status }}
+                  {{ formatStatus(item.status) }}
                 </UBadge>
               </div>
 
@@ -195,6 +195,7 @@ definePageMeta({
 });
 
 const toast = useToast();
+const { t, te, locale } = useI18n();
 
 const form = ref({
   type: "general",
@@ -207,13 +208,12 @@ const submitting = ref(false);
 const feedbackHistory = ref<any[]>([]);
 const loading = ref(false);
 
-const feedbackTypes = [
-  { value: "general", label: "General Feedback" },
-  { value: "bug", label: "Bug Report" },
-  { value: "feature", label: "Feature Request" },
-  { value: "improvement", label: "Improvement Suggestion" },
-  { value: "other", label: "Other" },
-];
+const feedbackTypes = computed(() =>
+  ["general", "bug", "feature", "improvement", "other"].map((value) => ({
+    value,
+    label: t(`dashboard.feedback.types.${value}`),
+  })),
+);
 
 const isFormValid = computed(() => {
   return form.value.type && form.value.subject && form.value.message;
@@ -259,14 +259,13 @@ function getTypeColor(
 }
 
 function formatType(type: string) {
-  const labels: Record<string, string> = {
-    general: "General",
-    bug: "Bug Report",
-    feature: "Feature Request",
-    improvement: "Improvement",
-    other: "Other",
-  };
-  return labels[type] || type;
+  const key = `dashboard.feedback.typeBadges.${type}`;
+  return te(key) ? t(key) : type;
+}
+
+function formatStatus(status: string) {
+  const key = `dashboard.feedback.statuses.${status}`;
+  return te(key) ? t(key) : status;
 }
 
 function getStatusColor(
@@ -299,7 +298,7 @@ function getStatusColor(
 }
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
+  return new Date(date).toLocaleDateString(locale.value === "vi" ? "vi-VN" : "en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -327,23 +326,23 @@ async function submitFeedback() {
 
     if (response.success) {
       toast.add({
-        title: "Feedback submitted",
-        description: "Thank you for helping us improve!",
+        title: t("dashboard.feedback.submitted"),
+        description: t("dashboard.feedback.submittedText"),
         color: "success",
       });
       resetForm();
       await loadFeedbackHistory();
     } else {
       toast.add({
-        title: "Failed to submit",
-        description: response.message || "Please try again",
+        title: t("dashboard.feedback.submitFailed"),
+        description: response.message || t("dashboard.feedback.tryAgain"),
         color: "error",
       });
     }
   } catch (error: any) {
     toast.add({
-      title: "Error",
-      description: error.message || "Failed to submit feedback",
+      title: t("dashboard.toast.error"),
+      description: error.message || t("dashboard.feedback.submitError"),
       color: "error",
     });
   } finally {

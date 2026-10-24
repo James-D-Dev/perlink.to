@@ -2,9 +2,9 @@
   <div class="space-y-4">
     <!-- Preview Header -->
     <div class="flex items-center justify-between">
-      <h3 class="font-semibold text-gray-900 dark:text-white">Preview</h3>
+      <h3 class="font-semibold text-gray-900 dark:text-white">{{ t('common.preview') }}</h3>
       <div class="flex items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-white/[0.06] px-2 py-1 rounded">Mobile</span>
+        <span class="text-xs text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-white/[0.06] px-2 py-1 rounded">{{ t('dashboard.previewPanel.mobile') }}</span>
       </div>
     </div>
 
@@ -40,6 +40,8 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 // Method to scroll to a specific block in the preview
 const scrollToBlock = (blockId: string) => {
   // Map blockId to the corresponding DOM element ID in BioPageView

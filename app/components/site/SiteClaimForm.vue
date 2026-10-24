@@ -13,10 +13,10 @@
         autocomplete="off"
         autocapitalize="off"
         spellcheck="false"
-        placeholder="your-site"
+        :placeholder="t('dashboard.claim.placeholder')"
         class="min-w-0 flex-1 bg-transparent font-medium text-highlighted outline-none placeholder:text-dimmed dark:text-white dark:placeholder:text-neutral-600"
         :class="size === 'lg' ? 'sm:text-lg' : 'text-sm'"
-        aria-label="Site address"
+        :aria-label="t('dashboard.claim.ariaLabel')"
       >
       <UButton
         type="submit"
@@ -26,8 +26,8 @@
         trailing-icon="i-lucide-arrow-right"
         class="shrink-0 rounded-full"
       >
-        <span class="hidden sm:inline">Create your site</span>
-        <span class="sm:hidden">Create</span>
+        <span class="hidden sm:inline">{{ t('dashboard.claim.submit') }}</span>
+        <span class="sm:hidden">{{ t('dashboard.claim.submitShort') }}</span>
       </UButton>
     </div>
     <p class="flex min-h-5 items-center gap-1.5 pl-1 text-xs" :class="messageClass">
@@ -59,10 +59,13 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ created: [username: string] }>()
 
 const toast = useToast()
+const { t } = useI18n()
 const inputRef = ref<HTMLInputElement | null>(null)
 const slug = ref(props.initialSlug)
 const status = ref<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle')
-const message = ref('Letters, numbers, hyphens and underscores. You can change the content anytime.')
+// A message key (translated at render time) or raw text from the server
+const messageState = ref<{ key?: string; params?: Record<string, unknown>; text?: string }>({ key: 'hint' })
+const message = computed(() => messageState.value.text ?? t(`dashboard.claim.${messageState.value.key}`, messageState.value.params ?? {}))
 const creating = ref(false)
 
 const messageClass = computed(() => ({
@@ -82,11 +85,13 @@ const check = useDebounceFn(async (value: string) => {
     // Ignore results for an older value
     if (value !== slug.value) return
     status.value = res.success ? 'available' : 'taken'
-    message.value = res.success ? `perlink.to/${value} is available` : (res.message || 'This name is taken')
+    messageState.value = res.success
+      ? { key: 'available', params: { slug: value } }
+      : res.message ? { text: res.message } : { key: 'taken' }
   } catch {
     if (value !== slug.value) return
     status.value = 'invalid'
-    message.value = 'Could not check this name. Try again.'
+    messageState.value = { key: 'checkFailed' }
   }
 }, 400)
 
@@ -99,16 +104,16 @@ watch(slug, (raw) => {
   }
   if (!value) {
     status.value = 'idle'
-    message.value = 'Letters, numbers, hyphens and underscores. You can change the content anytime.'
+    messageState.value = { key: 'hint' }
     return
   }
   if (value.length < 3) {
     status.value = 'invalid'
-    message.value = 'At least 3 characters'
+    messageState.value = { key: 'tooShort' }
     return
   }
   status.value = 'checking'
-  message.value = 'Checking availability...'
+  messageState.value = { key: 'checking' }
   check(value)
 }, { immediate: true })
 
@@ -139,11 +144,11 @@ async function submit() {
     }
 
     emit('created', username)
-    toast.add({ title: 'Your site is ready', description: `perlink.to/${username}`, color: 'success' })
+    toast.add({ title: t('dashboard.claim.ready'), description: `perlink.to/${username}`, color: 'success' })
     await navigateTo(`/dashboard/site/${username}`)
   } catch (error: any) {
     toast.add({
-      title: 'Could not create your site',
+      title: t('dashboard.claim.createFailed'),
       description: error?.data?.statusMessage || error?.message,
       color: 'error',
     })

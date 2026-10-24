@@ -1,0 +1,263 @@
+{
+  "dashboard": {
+    "toast": {
+      "error": "Lỗi",
+      "copied": "Đã sao chép!",
+      "copyFailed": "Không sao chép được",
+      "published": "Đã xuất bản!",
+      "unpublished": "Đã ngừng xuất bản",
+      "saved": "Đã lưu!",
+      "urlCopied": "Đã sao chép liên kết"
+    },
+    "home": {
+      "title": "Tạo trang",
+      "mySites": "Trang của tôi",
+      "badge": "Mẫu có sẵn · Kéo thả dễ dàng · Phòng 3D",
+      "heading": "Tạo trang của bạn",
+      "intro": "Chọn địa chỉ, rồi bắt đầu từ một mẫu hoặc trang trống. Bạn có thể thay đổi mọi thứ sau.",
+      "templatesHeading": "Bắt đầu từ một mẫu",
+      "templatesIntro": "{n} mẫu, mỗi mẫu có sẵn nội dung mẫu, giao diện và Phòng 3D đi kèm.",
+      "all": "Tất cả",
+      "useTemplate": "Dùng mẫu này",
+      "claimHeading": "Chọn địa chỉ cho trang",
+      "features": {
+        "sampleContent": "Nội dung mẫu, sửa tùy ý",
+        "theme": "Giao diện và phông chữ đồng bộ",
+        "room": "Kèm Phòng 3D đã trang trí sẵn",
+        "changeAnytime": "Đổi mẫu bất cứ lúc nào"
+      }
+    },
+    "sites": {
+      "title": "Trang của tôi",
+      "createSite": "Tạo trang",
+      "heading": "Trang của bạn",
+      "count": "{n} trang | {n} trang",
+      "liveCount": "{n} đang hiển thị",
+      "search": "Tìm trang",
+      "live": "Đang hiển thị",
+      "draft": "Bản nháp",
+      "views": "{n} lượt xem",
+      "updated": "Cập nhật {date}",
+      "noMatch": "Không có trang nào khớp với “{query}”.",
+      "emptyTitle": "Chưa có trang nào",
+      "emptyText": "Chọn địa chỉ perlink.to của bạn và bắt đầu từ một mẫu. Chỉ mất khoảng một phút.",
+      "loadFailed": "Không tải được danh sách trang",
+      "publishedText": "Trang của bạn đang hiển thị",
+      "publishFailed": "Không xuất bản được trang",
+      "unpublishedText": "Trang của bạn đã được ẩn",
+      "unpublishFailed": "Không ngừng xuất bản được trang"
+    },
+    "editor": {
+      "titleCreate": "Tạo trang",
+      "titleEdit": "Sửa trang",
+      "selectSite": "Chọn trang",
+      "copyUrl": "Sao chép liên kết",
+      "share": "Chia sẻ",
+      "continueToEditor": "Tiếp tục chỉnh sửa",
+      "templateHeading": "Bắt đầu từ một mẫu",
+      "templateIntro": "Chọn một điểm bắt đầu. Mẫu nào cũng có nội dung mẫu, giao diện và Phòng 3D đi kèm.",
+      "closePreview": "Đóng xem trước",
+      "tabs": {
+        "site": "Trang",
+        "room": "Phòng 3D"
+      },
+      "room": {
+        "heading": "Phòng 3D của bạn",
+        "objects": "{n} đồ vật. Trang trí phòng và chọn vùng đất trong trình chỉnh sửa toàn màn hình.",
+        "openEditor": "Mở trình chỉnh sửa 3D",
+        "showFirst": "Hiện Phòng 3D trước",
+        "modeOn": "Khách sẽ vào Phòng 3D của bạn trước và có thể chuyển sang trang chỉ với một chạm.",
+        "modeOff": "Khách sẽ thấy trang của bạn. Phòng 3D được ẩn cho đến khi bạn bật tùy chọn này."
+      },
+      "settings": {
+        "addressHeading": "Địa chỉ trang",
+        "addressText": "Địa chỉ công khai của trang",
+        "languageHeading": "Ngôn ngữ trang",
+        "languageText": "Ngôn ngữ của các nút và nhãn khách nhìn thấy, như giờ mở cửa và “Đặt ngay”. Nội dung bạn tự viết vẫn giữ nguyên.",
+        "templateHeading": "Mẫu",
+        "templateText": "Thay nội dung trang, giao diện và Phòng 3D bằng một mẫu.",
+        "shareHeading": "Nút chia sẻ",
+        "shareText": "Hiện nút chia sẻ nổi trên trang của bạn",
+        "visibilityHeading": "Chế độ hiển thị",
+        "visibilityText": "Chọn ai có thể xem trang của bạn",
+        "published": "Đã xuất bản",
+        "draft": "Bản nháp",
+        "live": "Đang hiển thị",
+        "publicText": "Mọi người đều xem được trang của bạn",
+        "privateText": "Chỉ bạn xem được trang này"
+      },
+      "shareFallbackTitle": "Tên của bạn",
+      "usernameTooShort": "Tên người dùng cần ít nhất 3 ký tự",
+      "usernameInvalid": "Chỉ dùng chữ cái, số, gạch dưới và gạch ngang",
+      "created": "Đã tạo trang!",
+      "createdText": "Giờ hãy tùy chỉnh trang của bạn",
+      "createFailed": "Không tạo được trang",
+      "noSiteToSave": "Không có trang để lưu",
+      "savedText": "Đã lưu các thay đổi của bạn",
+      "saveFailed": "Không lưu được",
+      "noSiteToPublish": "Không có trang để xuất bản",
+      "publishedText": "Trang của bạn đang hiển thị tại perlink.to/{username}",
+      "publishFailed": "Không xuất bản được",
+      "templateApplied": "Đã áp dụng mẫu {name}",
+      "templateAppliedText": "Sửa nội dung mẫu, rồi lưu hoặc xuất bản.",
+      "applyTitle": "Áp dụng mẫu \"{name}\"?",
+      "applyText": "Thao tác này sẽ thay các khối, giao diện và Phòng 3D hiện tại. Thay đổi chỉ được lưu khi bạn bấm Lưu.",
+      "applyConfirm": "Áp dụng mẫu"
+    },
+    "username": {
+      "heading": "Chọn tên người dùng",
+      "placeholder": "tencuaban",
+      "available": "Tên này còn trống"
+    },
+    "previewPanel": {
+      "mobile": "Điện thoại"
+    },
+    "analyticsPage": {
+      "editSite": "Sửa trang",
+      "notFound": "Không tìm thấy trang.",
+      "seoTitle": "Thống kê · {username} — Perlink"
+    },
+    "settings": {
+      "placeholder": "Cài đặt"
+    },
+    "upgrade": {
+      "title": "Gói dịch vụ",
+      "heading": "Chọn gói của bạn",
+      "intro": "Gói nào cũng có mẫu, trình chỉnh sửa và một thế giới 3D cho trang của bạn.",
+      "seoTitle": "Gói dịch vụ — Perlink"
+    },
+    "feedback": {
+      "title": "Góp ý",
+      "formHeading": "Gửi góp ý",
+      "formIntro": "Giúp chúng tôi làm Perlink tốt hơn",
+      "type": "Loại góp ý",
+      "typePlaceholder": "Chọn loại góp ý",
+      "subject": "Tiêu đề",
+      "subjectPlaceholder": "Tóm tắt ngắn góp ý của bạn",
+      "message": "Nội dung góp ý",
+      "messagePlaceholder": "Chia sẻ suy nghĩ, báo lỗi hoặc đề xuất tính năng...",
+      "rating": "Đánh giá (không bắt buộc)",
+      "ratingValue": "{rating}/5",
+      "clear": "Xóa",
+      "submit": "Gửi góp ý",
+      "historyHeading": "Góp ý của tôi",
+      "historyIntro": "Theo dõi các góp ý bạn đã gửi",
+      "submittedCount": "Đã gửi {n}",
+      "types": {
+        "general": "Góp ý chung",
+        "bug": "Báo lỗi",
+        "feature": "Đề xuất tính năng",
+        "improvement": "Đề xuất cải thiện",
+        "other": "Khác"
+      },
+      "typeBadges": {
+        "general": "Chung",
+        "bug": "Báo lỗi",
+        "feature": "Đề xuất tính năng",
+        "improvement": "Cải thiện",
+        "other": "Khác"
+      },
+      "statuses": {
+        "pending": "chờ xử lý",
+        "reviewing": "đang xem xét",
+        "resolved": "đã giải quyết",
+        "closed": "đã đóng"
+      },
+      "submitted": "Đã gửi góp ý",
+      "submittedText": "Cảm ơn bạn đã giúp chúng tôi tốt hơn!",
+      "submitFailed": "Không gửi được",
+      "tryAgain": "Vui lòng thử lại",
+      "submitError": "Không gửi được góp ý"
+    },
+    "claim": {
+      "placeholder": "trang-cua-ban",
+      "ariaLabel": "Địa chỉ trang",
+      "submit": "Tạo trang của bạn",
+      "submitShort": "Tạo",
+      "hint": "Chữ cái, số, gạch ngang và gạch dưới. Nội dung có thể thay đổi bất cứ lúc nào.",
+      "available": "perlink.to/{slug} còn trống",
+      "taken": "Tên này đã có người dùng",
+      "checkFailed": "Không kiểm tra được tên này. Hãy thử lại.",
+      "tooShort": "Ít nhất 3 ký tự",
+      "checking": "Đang kiểm tra...",
+      "ready": "Trang của bạn đã sẵn sàng",
+      "createFailed": "Không tạo được trang của bạn"
+    },
+    "help": {
+      "ariaLabel": "Trợ giúp",
+      "heading": "Chúng tôi có thể giúp gì?",
+      "intro": "Câu trả lời nhanh, hoặc trò chuyện với chúng tôi.",
+      "close": "Đóng trợ giúp",
+      "contact": "Liên hệ",
+      "feedback": "Góp ý",
+      "answers": {
+        "create": {
+          "q": "Làm sao để tạo trang?",
+          "a": "Vào Bảng điều khiển → Tạo trang, chọn tên perlink.to của bạn và chọn một mẫu. Bạn có thể thay đổi mọi thứ sau."
+        },
+        "room": {
+          "q": "Làm sao để bật thế giới 3D?",
+          "a": "Mở trang trong trình chỉnh sửa và bật “Phòng 3D”. Sau đó mở trình chỉnh sửa 3D để trang trí phòng và chọn vùng đất."
+        },
+        "publish": {
+          "q": "Làm sao để xuất bản?",
+          "a": "Bấm Xuất bản trong trình chỉnh sửa. Trang của bạn sẽ hiển thị ngay tại perlink.to/tencuaban."
+        },
+        "photos": {
+          "q": "Tôi có thể thêm ảnh của mình không?",
+          "a": "Có. Thêm khối album ảnh vào trang, hoặc đặt một khung ảnh trong Phòng 3D rồi tải ảnh lên."
+        },
+        "phones": {
+          "q": "Có dùng được trên điện thoại không?",
+          "a": "Có. Trang được thiết kế ưu tiên điện thoại, còn thế giới 3D chạy ngay trên trình duyệt và tự điều chỉnh chất lượng theo thiết bị."
+        },
+        "visitors": {
+          "q": "Khách vẫn xem được trang thường chứ?",
+          "a": "Luôn luôn. Khách có thể chuyển từ thế giới 3D sang trang 2D của bạn chỉ với một chạm."
+        }
+      }
+    },
+    "templates": {
+      "personal": {
+        "name": "Hồ sơ cá nhân",
+        "description": "Giới thiệu bản thân, công việc và nơi mọi người tìm thấy bạn."
+      },
+      "restaurant": {
+        "name": "Thực đơn nhà hàng",
+        "description": "Thực đơn kèm giá, giờ mở cửa và đặt bàn."
+      },
+      "hotel": {
+        "name": "Khách sạn & homestay",
+        "description": "Phòng kèm giá mỗi đêm, liên hệ và đặt phòng."
+      },
+      "cafe": {
+        "name": "Quán cà phê & cửa hàng",
+        "description": "Đồ uống hoặc sản phẩm, giờ mở cửa và địa chỉ."
+      },
+      "creator": {
+        "name": "Nhà sáng tạo & nghệ sĩ",
+        "description": "Trưng bày tác phẩm dạng thư viện ảnh, kèm liên kết mua hàng hoặc đặt làm."
+      },
+      "link-in-bio": {
+        "name": "Link in bio",
+        "description": "Trang tối, gọn gàng với mạng xã hội và các liên kết nổi bật."
+      },
+      "services": {
+        "name": "Freelancer & dịch vụ",
+        "description": "Dịch vụ kèm giá, đặt lịch và giờ làm việc."
+      },
+      "event": {
+        "name": "Đám cưới & sự kiện",
+        "description": "Lịch trình, địa điểm, xác nhận tham dự và album ảnh cho ngày trọng đại."
+      }
+    },
+    "categories": {
+      "personal": "Cá nhân",
+      "food": "Ăn uống",
+      "hospitality": "Khách sạn & du lịch",
+      "business": "Kinh doanh",
+      "creative": "Sáng tạo",
+      "events": "Sự kiện"
+    }
+  }
+}

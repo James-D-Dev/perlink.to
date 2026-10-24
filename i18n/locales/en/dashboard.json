@@ -1,0 +1,263 @@
+{
+  "dashboard": {
+    "toast": {
+      "error": "Error",
+      "copied": "Copied!",
+      "copyFailed": "Failed to copy",
+      "published": "Published!",
+      "unpublished": "Unpublished",
+      "saved": "Saved!",
+      "urlCopied": "URL copied to clipboard"
+    },
+    "home": {
+      "title": "Create",
+      "mySites": "My sites",
+      "badge": "Templates · Drag-and-drop editor · 3D rooms",
+      "heading": "Create your site",
+      "intro": "Pick your address, then start from a template or a blank page. You can change everything later.",
+      "templatesHeading": "Start from a template",
+      "templatesIntro": "{n} templates, each with sample content, a theme and a matching 3D room.",
+      "all": "All",
+      "useTemplate": "Use template",
+      "claimHeading": "Claim your site",
+      "features": {
+        "sampleContent": "Sample content you can edit",
+        "theme": "Matching theme and fonts",
+        "room": "A decorated 3D room included",
+        "changeAnytime": "Change templates anytime"
+      }
+    },
+    "sites": {
+      "title": "My sites",
+      "createSite": "Create a site",
+      "heading": "Your sites",
+      "count": "{n} site | {n} sites",
+      "liveCount": "{n} live",
+      "search": "Search sites",
+      "live": "Live",
+      "draft": "Draft",
+      "views": "{n} views",
+      "updated": "Updated {date}",
+      "noMatch": "No sites match “{query}”.",
+      "emptyTitle": "No sites yet",
+      "emptyText": "Claim your perlink.to address and start from a template. It takes about a minute.",
+      "loadFailed": "Failed to load sites",
+      "publishedText": "Your site is now live",
+      "publishFailed": "Failed to publish site",
+      "unpublishedText": "Your site is now hidden",
+      "unpublishFailed": "Failed to unpublish site"
+    },
+    "editor": {
+      "titleCreate": "Create a site",
+      "titleEdit": "Edit site",
+      "selectSite": "Select site",
+      "copyUrl": "Copy URL",
+      "share": "Share",
+      "continueToEditor": "Continue to Editor",
+      "templateHeading": "Start from a template",
+      "templateIntro": "Pick a starting point. Every template includes sample content, a theme and a matching 3D room.",
+      "closePreview": "Close preview",
+      "tabs": {
+        "site": "Site",
+        "room": "3D room"
+      },
+      "room": {
+        "heading": "Your 3D room",
+        "objects": "{n} objects. Furnish it and pick a land in the full-screen editor.",
+        "openEditor": "Open 3D editor",
+        "showFirst": "Show the 3D room first",
+        "modeOn": "Visitors land in your 3D room and can switch to the site with one tap.",
+        "modeOff": "Visitors see your site. The 3D room stays hidden until you turn this on."
+      },
+      "settings": {
+        "addressHeading": "Site address",
+        "addressText": "Your public site address",
+        "languageHeading": "Site language",
+        "languageText": "The language of buttons and labels your visitors see, like opening hours and “Book now”. Your own text stays as you write it.",
+        "templateHeading": "Template",
+        "templateText": "Replace the page content, theme and 3D room with a template.",
+        "shareHeading": "Share Button",
+        "shareText": "Show a floating share button on your site",
+        "visibilityHeading": "Visibility",
+        "visibilityText": "Control who can see your site",
+        "published": "Published",
+        "draft": "Draft",
+        "live": "Live",
+        "publicText": "Your page is publicly visible",
+        "privateText": "Only you can see this page"
+      },
+      "shareFallbackTitle": "Your Name",
+      "usernameTooShort": "Username must be at least 3 characters",
+      "usernameInvalid": "Only letters, numbers, underscore and hyphen allowed",
+      "created": "Site created!",
+      "createdText": "Now customize your page",
+      "createFailed": "Failed to create site",
+      "noSiteToSave": "No site to save",
+      "savedText": "Your changes have been saved",
+      "saveFailed": "Failed to save",
+      "noSiteToPublish": "No site to publish",
+      "publishedText": "Your page is now live at perlink.to/{username}",
+      "publishFailed": "Failed to publish",
+      "templateApplied": "{name} applied",
+      "templateAppliedText": "Edit the sample content, then save or publish.",
+      "applyTitle": "Apply \"{name}\"?",
+      "applyText": "This replaces your current blocks, theme and 3D room. Your changes are not saved until you click Save.",
+      "applyConfirm": "Apply template"
+    },
+    "username": {
+      "heading": "Choose Your Username",
+      "placeholder": "yourname",
+      "available": "Username available"
+    },
+    "previewPanel": {
+      "mobile": "Mobile"
+    },
+    "analyticsPage": {
+      "editSite": "Edit site",
+      "notFound": "Site not found.",
+      "seoTitle": "Analytics · {username} — Perlink"
+    },
+    "settings": {
+      "placeholder": "Settings"
+    },
+    "upgrade": {
+      "title": "Plans",
+      "heading": "Choose your plan",
+      "intro": "Every plan includes templates, the editor and a 3D world for your page.",
+      "seoTitle": "Plans — Perlink"
+    },
+    "feedback": {
+      "title": "Feedback",
+      "formHeading": "Send Feedback",
+      "formIntro": "Help us improve Perlink",
+      "type": "Feedback Type",
+      "typePlaceholder": "Select feedback type",
+      "subject": "Subject",
+      "subjectPlaceholder": "Brief summary of your feedback",
+      "message": "Your Feedback",
+      "messagePlaceholder": "Tell us what you think, report a bug, or suggest a feature...",
+      "rating": "Rating (Optional)",
+      "ratingValue": "{rating} out of 5",
+      "clear": "Clear",
+      "submit": "Submit Feedback",
+      "historyHeading": "My Feedback History",
+      "historyIntro": "Track your previous submissions",
+      "submittedCount": "{n} submitted",
+      "types": {
+        "general": "General Feedback",
+        "bug": "Bug Report",
+        "feature": "Feature Request",
+        "improvement": "Improvement Suggestion",
+        "other": "Other"
+      },
+      "typeBadges": {
+        "general": "General",
+        "bug": "Bug Report",
+        "feature": "Feature Request",
+        "improvement": "Improvement",
+        "other": "Other"
+      },
+      "statuses": {
+        "pending": "pending",
+        "reviewing": "reviewing",
+        "resolved": "resolved",
+        "closed": "closed"
+      },
+      "submitted": "Feedback submitted",
+      "submittedText": "Thank you for helping us improve!",
+      "submitFailed": "Failed to submit",
+      "tryAgain": "Please try again",
+      "submitError": "Failed to submit feedback"
+    },
+    "claim": {
+      "placeholder": "your-site",
+      "ariaLabel": "Site address",
+      "submit": "Create your site",
+      "submitShort": "Create",
+      "hint": "Letters, numbers, hyphens and underscores. You can change the content anytime.",
+      "available": "perlink.to/{slug} is available",
+      "taken": "This name is taken",
+      "checkFailed": "Could not check this name. Try again.",
+      "tooShort": "At least 3 characters",
+      "checking": "Checking availability...",
+      "ready": "Your site is ready",
+      "createFailed": "Could not create your site"
+    },
+    "help": {
+      "ariaLabel": "Help",
+      "heading": "How can we help?",
+      "intro": "Quick answers, or talk to us.",
+      "close": "Close help",
+      "contact": "Contact us",
+      "feedback": "Feedback",
+      "answers": {
+        "create": {
+          "q": "How do I create my site?",
+          "a": "Go to Dashboard → Create, claim your perlink.to name and pick a template. You can change everything later."
+        },
+        "room": {
+          "q": "How do I turn on the 3D world?",
+          "a": "Open your site in the editor and switch on “3D room”. Then open the 3D editor to furnish the room and pick a land."
+        },
+        "publish": {
+          "q": "How do I publish?",
+          "a": "Press Publish in the editor. Your site goes live at perlink.to/yourname straight away."
+        },
+        "photos": {
+          "q": "Can I add my own photos?",
+          "a": "Yes. Add an image album block to your site, or place a picture frame in your 3D room and upload a photo."
+        },
+        "phones": {
+          "q": "Does it work on phones?",
+          "a": "Yes. Sites are mobile-first, and the 3D world runs in the browser and adapts its quality to the device."
+        },
+        "visitors": {
+          "q": "Can visitors still see a normal page?",
+          "a": "Always. Visitors can switch from the 3D world to your 2D page with one tap."
+        }
+      }
+    },
+    "templates": {
+      "personal": {
+        "name": "Personal portfolio",
+        "description": "Introduce yourself, your work and where to find you."
+      },
+      "restaurant": {
+        "name": "Restaurant menu",
+        "description": "Menu with prices, opening hours and table booking."
+      },
+      "hotel": {
+        "name": "Hotel & homestay",
+        "description": "Rooms with nightly prices, contact and booking."
+      },
+      "cafe": {
+        "name": "Café & shop",
+        "description": "Drinks or products, opening hours and where to find you."
+      },
+      "creator": {
+        "name": "Creator & artist",
+        "description": "Show your work as a gallery with links to shop or commission."
+      },
+      "link-in-bio": {
+        "name": "Link in bio",
+        "description": "A clean, dark page with your socials and top links."
+      },
+      "services": {
+        "name": "Freelancer & services",
+        "description": "Services with prices, booking and opening hours."
+      },
+      "event": {
+        "name": "Wedding & event",
+        "description": "Schedule, venue, RSVP and photo gallery for your big day."
+      }
+    },
+    "categories": {
+      "personal": "Personal",
+      "food": "Food & drink",
+      "hospitality": "Hotel & travel",
+      "business": "Business",
+      "creative": "Creative",
+      "events": "Events"
+    }
+  }
+}

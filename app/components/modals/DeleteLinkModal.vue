@@ -2,13 +2,13 @@
   <UModal
     :open="open"
     @update:open="$emit('update:open', false)"
-    title="Delete Link"
-    description="Are you sure you want to delete this link? This action cannot be undone."
+    :title="t('blocks.deleteLink.title')"
+    :description="t('blocks.deleteLink.description')"
   >
     <template #body>
       <div class="flex justify-end space-x-2 pt-4">
         <Button variant="outline" @click="$emit('update:open', false)">
-          Cancel
+          {{ t('common.cancel') }}
         </Button>
         <Button
           variant="destructive"
@@ -17,7 +17,7 @@
         >
           <Icon v-if="!isDeleting" name="ph:trash-bold" class="w-4 h-4 mr-2" />
           <UIcon v-else name="ph:spinner-gap" class="w-4 h-4 mr-2" />
-          Delete
+          {{ t('common.delete') }}
         </Button>
       </div>
     </template>
@@ -38,6 +38,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const toast = useToast();
+const { t } = useI18n();
 const isDeleting = ref(false);
 
 const handleDelete = async () => {
@@ -49,7 +50,7 @@ const handleDelete = async () => {
 
     if (!res.success) {
       toast.add({
-        title: "Error",
+        title: t("blocks.deleteLink.errorTitle"),
         description: res.message,
         color: "error",
       });
@@ -57,8 +58,8 @@ const handleDelete = async () => {
     }
 
     toast.add({
-      title: "Link deleted",
-      description: "The link has been successfully deleted",
+      title: t("blocks.deleteLink.deletedTitle"),
+      description: t("blocks.deleteLink.deletedDescription"),
     });
 
     // Close modal and redirect to links list
@@ -66,8 +67,8 @@ const handleDelete = async () => {
     router.push("/dashboard/create");
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to delete link. Please try again.",
+      title: t("blocks.deleteLink.errorTitle"),
+      description: t("blocks.deleteLink.failed"),
       color: "error",
     });
   } finally {

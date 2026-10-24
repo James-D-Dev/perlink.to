@@ -2,7 +2,7 @@
   <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
-      title="Links"
+      :title="t('blocks.links.title')"
       icon="i-lucide-link"
       :hidden="linksBlock?.hidden"
       @toggle="$emit('toggle')"
@@ -21,10 +21,10 @@
     <!-- Links Edit Form -->
     <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
       <div class="space-y-4">
-        <UFormField label="Title" help="Optional heading above the links.">
+        <UFormField :label="t('blocks.links.titleLabel')" :help="t('blocks.links.titleHelp')">
           <UInput
             :model-value="linksBlock?.data.title"
-            placeholder="e.g. Featured"
+            :placeholder="t('blocks.links.titlePlaceholder')"
             class="w-full"
             @update:model-value="$emit('updateTitle', String($event))"
           />
@@ -50,7 +50,7 @@
                 <div class="flex-1 space-y-2">
                   <UInput
                     :model-value="link.title"
-                    placeholder="Title (required)"
+                    :placeholder="t('blocks.links.linkTitlePlaceholder')"
                     variant="soft"
                     size="sm"
                     class="font-medium block"
@@ -61,7 +61,7 @@
 
                   <UInput
                     :model-value="link.subtitle"
-                    placeholder="Subtitle (optional)"
+                    :placeholder="t('blocks.links.linkSubtitlePlaceholder')"
                     variant="soft"
                     size="sm"
                     class="block"
@@ -72,7 +72,7 @@
 
                   <UInput
                     :model-value="link.url"
-                    placeholder="URL or email (required)"
+                    :placeholder="t('blocks.links.linkUrlPlaceholder')"
                     variant="soft"
                     size="sm"
                     class="block"
@@ -170,7 +170,7 @@
             @click="addLinkFromUrl"
           >
             <UIcon name="i-lucide-plus" class="w-4 h-4" />
-            Add
+            {{ t('blocks.links.add') }}
           </UButton>
         </div>
       </div>
@@ -211,6 +211,8 @@ const emit = defineEmits<{
   update: [links: BioLink[]];
   updateTitle: [title: string];
 }>();
+
+const { t } = useI18n();
 
 // Use composable
 const {

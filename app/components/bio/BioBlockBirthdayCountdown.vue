@@ -3,7 +3,7 @@
     <BioBlockItemHeader
       :is-active="isActive"
       :hidden="countdownBlock?.hidden"
-      title="Birthday Countdown"
+      :title="t('blocks.birthday.title')"
       icon="i-lucide-cake"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('birthday-countdown')"
@@ -27,28 +27,28 @@
     <!-- Birthday Countdown Edit Form -->
     <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <!-- Birth Date -->
-      <UFormField label="Birth Date" required>
+      <UFormField :label="t('blocks.birthday.birthDate')" required>
         <UInput
           type="date"
           :model-value="data.birthDate"
-          placeholder="Select birth date"
+          :placeholder="t('blocks.birthday.birthDatePlaceholder')"
           class="w-full"
           @update:model-value="updateField('birthDate', $event)"
         />
       </UFormField>
 
       <!-- Label -->
-      <UFormField label="Label">
+      <UFormField :label="t('blocks.birthday.label')">
         <UInput
           :model-value="data.label"
-          placeholder="e.g., My Birthday, John's Birthday"
+          :placeholder="t('blocks.birthday.labelPlaceholder')"
           class="w-full"
           @update:model-value="updateField('label', $event)"
         />
       </UFormField>
 
       <!-- Theme Selection -->
-      <UFormField label="Theme">
+      <UFormField :label="t('blocks.birthday.theme')">
         <div class="grid grid-cols-2 gap-2">
           <button
             v-for="theme in countdownThemes"
@@ -76,7 +76,7 @@
       <UFormField>
         <UCheckbox
           :model-value="data.showAge"
-          label="Show age (e.g., 'Turning 25')"
+          :label="t('blocks.birthday.showAge')"
           @update:model-value="updateField('showAge', Boolean($event))"
         />
       </UFormField>
@@ -100,14 +100,20 @@ const emit = defineEmits<{
   update: [data: BirthdayCountdownBlock['data']];
 }>();
 
+const { t, locale } = useI18n();
+
 // Theme options
-const countdownThemes = [
+const countdownThemeOptions = [
   { id: 'classic', name: 'Classic', icon: 'i-lucide-cake', colorClass: 'bg-pink-100 dark:bg-pink-500/15 text-pink-600 dark:text-pink-400' },
   { id: 'modern', name: 'Modern', icon: 'i-lucide-sparkles', colorClass: 'bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400' },
   { id: 'minimal', name: 'Minimal', icon: 'i-lucide-minus', colorClass: 'bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-neutral-300' },
   { id: 'party', name: 'Party', icon: 'i-lucide-party-popper', colorClass: 'bg-purple-100 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400' },
   { id: 'elegant', name: 'Elegant', icon: 'i-lucide-gem', colorClass: 'bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400' },
 ] as const;
+
+const countdownThemes = computed(() =>
+  countdownThemeOptions.map(theme => ({ ...theme, name: t(`blocks.birthday.themes.${theme.id}`) })),
+);
 
 // Use composable
 const { 
@@ -145,7 +151,7 @@ function formatDate(dateStr: string): string {
   if (!dateStr) return '';
   const [year, month, day] = dateStr.split('-').map(Number);
   if (!year || !month || !day) return '';
-  return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+  return new Date(year, month - 1, day).toLocaleDateString(locale.value, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

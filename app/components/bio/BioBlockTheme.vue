@@ -3,7 +3,7 @@
     <BioBlockItemHeader
       container
       :is-active="isActive"
-      title="Template & Theme"
+      :title="t('theme.panelTitle')"
       icon="i-lucide-palette"
       @toggle="$emit('toggle')"
     >
@@ -23,10 +23,7 @@
     >
       <!-- Mode toggle -->
       <UTabs
-        :items="[
-          { label: 'Theme Presets', value: 'presets' },
-          { label: 'Customize', value: 'custom' },
-        ]"
+        :items="modeTabs"
         :model-value="editMode"
         color="neutral"
         variant="pill"
@@ -43,7 +40,7 @@
             />
             <div>
               <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block"
-                >Header Layout</label
+                >{{ t('theme.headerLayout.label') }}</label
               >
               <BioHeaderLayoutPicker
                 :model-value="themeConfig.header.layout"
@@ -65,7 +62,7 @@
               <!-- Colors -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Colors</label
+                  >{{ t('theme.colors.title') }}</label
                 >
                 <BioColorPicker
                   :primary="themeConfig.colors.primary"
@@ -100,8 +97,8 @@
                     :key="colorKey"
                   >
                     <label
-                      class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block capitalize"
-                      >{{ colorKey }}</label
+                      class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block"
+                      >{{ t(`theme.colors.${colorKey}`) }}</label
                     >
                     <div class="flex items-center gap-1.5">
                       <UPopover>
@@ -147,7 +144,7 @@
               <!-- Background -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Background</label
+                  >{{ t('theme.background.title') }}</label
                 >
                 <BioBackgroundPicker
                   :background="themeConfig.background"
@@ -158,11 +155,11 @@
               <!-- Header -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Header Title</label
+                  >{{ t('theme.header.title') }}</label
                 >
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <!-- Font Family -->
-                  <UFormField label="Font Family">
+                  <UFormField :label="t('theme.fields.fontFamily')">
                     <FontSelect
                       :model-value="themeConfig.header.fontFamily || 'system-ui'"
                       :font-options="nameFontOptions"
@@ -170,22 +167,17 @@
                     />
                   </UFormField>
                   <!-- Font Size -->
-                  <UFormField label="Font Size">
+                  <UFormField :label="t('theme.fields.fontSize')">
                     <USelect
                       :model-value="themeConfig.header.fontSize || '1.5rem'"
-                      :items="[
-                        { label: 'Small', value: '1.25rem' },
-                        { label: 'Medium', value: '1.5rem' },
-                        { label: 'Large', value: '1.875rem' },
-                        { label: 'XL', value: '2.25rem' },
-                      ]"
+                      :items="headerFontSizeOptions"
                       size="md"
                       class="w-full"
                       @update:model-value="emitHeader('fontSize', $event)"
                     />
                   </UFormField>
                   <!-- Text Color -->
-                  <UFormField label="Text Color">
+                  <UFormField :label="t('theme.fields.textColor')">
                     <div class="flex items-center gap-2">
                       <UPopover>
                         <UButton
@@ -223,12 +215,12 @@
                         class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
                         @click="emitHeader('textColor', undefined)"
                       >
-                        reset
+                        {{ t('common.reset') }}
                       </button>
                     </div>
                   </UFormField>
                   <!-- Weight -->
-                  <UFormField label="Weight">
+                  <UFormField :label="t('theme.fields.weight')">
                     <USelect
                       :model-value="themeConfig.header.fontWeight || '700'"
                       :items="fontWeightOptions"
@@ -238,7 +230,7 @@
                     />
                   </UFormField>
                   <!-- Letter spacing -->
-                  <UFormField label="Letter Spacing">
+                  <UFormField :label="t('theme.fields.letterSpacing')">
                     <USelect
                       :model-value="themeConfig.header.letterSpacing || 'normal'"
                       :items="letterSpacingOptions"
@@ -248,7 +240,7 @@
                     />
                   </UFormField>
                   <!-- Block titles -->
-                  <UFormField label="Block Title Font">
+                  <UFormField :label="t('theme.header.blockTitleFont')">
                     <FontSelect
                       :model-value="themeConfig.typography.headingFont || 'system-ui'"
                       :font-options="headingFontOptions"
@@ -261,11 +253,11 @@
               <!-- Bio Text -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Bio Text</label
+                  >{{ t('theme.bio.title') }}</label
                 >
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <!-- Font Family -->
-                  <UFormField label="Font Family">
+                  <UFormField :label="t('theme.fields.fontFamily')">
                     <FontSelect
                       :model-value="themeConfig.typography.bioFontFamily || 'system-ui'"
                       :font-options="paragraphFontOptions"
@@ -273,17 +265,12 @@
                     />
                   </UFormField>
                   <!-- Font Size -->
-                  <UFormField label="Font Size">
+                  <UFormField :label="t('theme.fields.fontSize')">
                     <USelect
                       :model-value="
                         themeConfig.typography.bioFontSize || '0.875rem'
                       "
-                      :items="[
-                        { label: 'XS', value: '0.75rem' },
-                        { label: 'Small', value: '0.875rem' },
-                        { label: 'Medium', value: '1rem' },
-                        { label: 'Large', value: '1.125rem' },
-                      ]"
+                      :items="bioFontSizeOptions"
                       size="md"
                       class="w-full"
                       @update:model-value="
@@ -292,7 +279,7 @@
                     />
                   </UFormField>
                   <!-- Text Color -->
-                  <UFormField label="Text Color">
+                  <UFormField :label="t('theme.fields.textColor')">
                     <div class="flex items-center gap-2">
                       <UPopover>
                         <UButton
@@ -330,7 +317,7 @@
                         class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
                         @click="emitTypography('bioTextColor', undefined)"
                       >
-                        reset
+                        {{ t('common.reset') }}
                       </button>
                     </div>
                   </UFormField>
@@ -340,46 +327,41 @@
               <!-- Card -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Card Style</label
+                  >{{ t('theme.card.title') }}</label
                 >
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <!-- Style -->
-                  <UFormField label="Style">
+                  <UFormField :label="t('theme.card.style')">
                     <USelect
                       :model-value="themeConfig.card.style || 'filled'"
-                      :items="[
-                        { label: 'Filled', value: 'filled' },
-                        { label: 'Outline', value: 'outline' },
-                        { label: 'Ghost', value: 'ghost' },
-                        { label: 'Soft', value: 'soft' },
-                      ]"
+                      :items="cardStyleOptions"
                       size="md"
                       class="w-full"
                       @update:model-value="emitCard('style', $event)"
                     />
                   </UFormField>
                   <!-- Surface colour -->
-                  <UFormField label="Card Color" help="Empty uses the primary colour.">
+                  <UFormField :label="t('theme.card.color')" :help="t('theme.card.colorHelp')">
                     <BioColorField
                       :model-value="themeConfig.card.backgroundColor"
                       :fallback="themeConfig.colors.primary"
-                      label="Card color"
-                      placeholder="Auto"
+                      :label="t('theme.card.colorAria')"
+                      :placeholder="t('common.auto')"
                       @update:model-value="emitCard('backgroundColor', $event)"
                     />
                   </UFormField>
                   <!-- Border colour -->
-                  <UFormField label="Border Color">
+                  <UFormField :label="t('theme.card.borderColor')">
                     <BioColorField
                       :model-value="themeConfig.card.outlineColor"
                       :fallback="themeConfig.colors.primary"
-                      label="Card border color"
-                      placeholder="Auto"
+                      :label="t('theme.card.borderColorAria')"
+                      :placeholder="t('common.auto')"
                       @update:model-value="emitCard('outlineColor', $event)"
                     />
                   </UFormField>
                   <!-- Text Color -->
-                  <UFormField label="Text Color">
+                  <UFormField :label="t('theme.fields.textColor')">
                     <div class="flex items-center gap-2">
                       <UPopover>
                         <UButton
@@ -411,12 +393,12 @@
                         class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
                         @click="emitCard('textColor', undefined)"
                       >
-                        reset
+                        {{ t('common.reset') }}
                       </button>
                     </div>
                   </UFormField>
                   <!-- Corner Radius -->
-                  <UFormField label="Corner Radius">
+                  <UFormField :label="t('theme.card.cornerRadius')">
                     <UInput
                       :model-value="String(themeConfig.card.cornerRadius)"
                       size="md"
@@ -428,7 +410,7 @@
                     />
                   </UFormField>
                   <!-- Shadow -->
-                  <UFormField label="Shadow">
+                  <UFormField :label="t('theme.card.shadow')">
                     <USelect
                       :model-value="themeConfig.card.shadow || 'none'"
                       :items="shadowOptions"
@@ -438,16 +420,10 @@
                     />
                   </UFormField>
                   <!-- Backdrop Blur -->
-                  <UFormField label="Backdrop Blur">
+                  <UFormField :label="t('theme.card.backdropBlur')">
                     <USelect
                       :model-value="themeConfig.card.backdropBlur || 'none'"
-                      :items="[
-                        { label: 'None', value: 'none' },
-                        { label: 'Small', value: 'sm' },
-                        { label: 'Medium', value: 'md' },
-                        { label: 'Large', value: 'lg' },
-                        { label: 'XL', value: 'xl' },
-                      ]"
+                      :items="backdropBlurOptions"
                       size="md"
                       class="w-full"
                       @update:model-value="
@@ -456,7 +432,7 @@
                     />
                   </UFormField>
                   <!-- Appear Animation -->
-                  <UFormField label="Appear Animation">
+                  <UFormField :label="t('theme.card.appearAnimation')">
                     <USelect
                       :model-value="themeConfig.card.animationAppear || 'none'"
                       :items="appearOptions"
@@ -468,7 +444,7 @@
                     />
                   </UFormField>
                   <!-- Hover Animation -->
-                  <UFormField label="Hover Animation">
+                  <UFormField :label="t('theme.card.hoverAnimation')">
                     <USelect
                       :model-value="themeConfig.card.animationHover || 'none'"
                       :items="hoverOptions"
@@ -540,24 +516,24 @@
                   @update:model-value="emitButton('animationDuration', $event as string)"
                 />
               </div>
-            </div> -->`
+            </div> -->
 
               <!-- Page -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Page</label
+                  >{{ t('theme.page.title') }}</label
                 >
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  <UFormField label="Text Color">
+                  <UFormField :label="t('theme.fields.textColor')">
                     <BioColorField
                       :model-value="themeConfig.typography.textColor"
                       fallback="#334155"
-                      label="Page text color"
-                      placeholder="Auto"
+                      :label="t('theme.page.textColorAria')"
+                      :placeholder="t('common.auto')"
                       @update:model-value="emitTypography('textColor', $event)"
                     />
                   </UFormField>
-                  <UFormField label="Block Spacing">
+                  <UFormField :label="t('theme.page.blockSpacing')">
                     <USelect
                       :model-value="themeConfig.page?.blockGap || 'normal'"
                       :items="blockGapOptions"
@@ -566,16 +542,16 @@
                       @update:model-value="emitPage('blockGap', $event)"
                     />
                   </UFormField>
-                  <UFormField label="Block Titles">
+                  <UFormField :label="t('theme.page.blockTitles')">
                     <USelect
                       :model-value="themeConfig.page?.titleAlign || 'center'"
-                      :items="[{ label: 'Centered', value: 'center' }, { label: 'Left', value: 'left' }]"
+                      :items="titleAlignOptions"
                       size="md"
                       class="w-full"
                       @update:model-value="emitPage('titleAlign', $event)"
                     />
                   </UFormField>
-                  <UFormField label="Social Icons">
+                  <UFormField :label="t('theme.page.socialIcons')">
                     <USelect
                       :model-value="themeConfig.social?.style || 'soft'"
                       :items="socialStyleOptions"
@@ -590,7 +566,7 @@
               <!-- Typography -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Font</label
+                  >{{ t('theme.font.title') }}</label
                 >
                 <FontSelect
                   :model-value="themeConfig.typography.paragraphFont"
@@ -602,7 +578,7 @@
               <!-- Avatar -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Avatar Shape</label
+                  >{{ t('theme.avatar.title') }}</label
                 >
                 <div class="flex gap-3">
                   <UButton
@@ -636,13 +612,13 @@
                       "
                     />
                     <span
-                      class="text-[10px] font-medium capitalize"
+                      class="text-[10px] font-medium"
                       :class="
                         themeConfig.avatar.shape === shape
                           ? 'text-primary-600'
                           : 'text-gray-500 dark:text-neutral-400'
                       "
-                      >{{ shape }}</span
+                      >{{ t(`theme.avatar.shapes.${shape}`) }}</span
                     >
                   </UButton>
                 </div>
@@ -651,7 +627,7 @@
               <!-- Link Card Layout -->
               <div>
                 <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Link Card Layout</label
+                  >{{ t('theme.linkLayout.title') }}</label
                 >
                 <div class="flex flex-col gap-2">
                   <UButton
@@ -689,6 +665,8 @@ import { nameFontOptions, headingFontOptions, paragraphFontOptions, type FontOpt
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
 import avatarDefaultImg from "~/assets/images/avatar-default-1.jpg";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   isActive: boolean;
   templates: Template[];
@@ -708,6 +686,45 @@ const emit = defineEmits<{
 }>();
 
 const editMode = ref<"presets" | "custom">("presets");
+
+const modeTabs = computed(() => [
+  { label: t("theme.tabs.presets"), value: "presets" },
+  { label: t("theme.tabs.custom"), value: "custom" },
+]);
+
+const headerFontSizeOptions = computed(() => [
+  { label: t("theme.options.small"), value: "1.25rem" },
+  { label: t("theme.options.medium"), value: "1.5rem" },
+  { label: t("theme.options.large"), value: "1.875rem" },
+  { label: t("theme.options.xl"), value: "2.25rem" },
+]);
+
+const bioFontSizeOptions = computed(() => [
+  { label: t("theme.options.xs"), value: "0.75rem" },
+  { label: t("theme.options.small"), value: "0.875rem" },
+  { label: t("theme.options.medium"), value: "1rem" },
+  { label: t("theme.options.large"), value: "1.125rem" },
+]);
+
+const cardStyleOptions = computed(() =>
+  (["filled", "outline", "ghost", "soft"] as const).map((value) => ({
+    label: t(`theme.card.styles.${value}`),
+    value,
+  })),
+);
+
+const backdropBlurOptions = computed(() => [
+  { label: t("theme.options.none"), value: "none" },
+  { label: t("theme.options.small"), value: "sm" },
+  { label: t("theme.options.medium"), value: "md" },
+  { label: t("theme.options.large"), value: "lg" },
+  { label: t("theme.options.xl"), value: "xl" },
+]);
+
+const titleAlignOptions = computed(() => [
+  { label: t("theme.page.titleAlign.center"), value: "center" },
+  { label: t("theme.page.titleAlign.left"), value: "left" },
+]);
 const selectedPresetId = ref<string | undefined>(undefined);
 
 function onPresetSelect(preset: ThemePreset) {
@@ -758,34 +775,35 @@ function onHeadingFontChange(value: string) {
   emitTypography('headingFont', value);
 }
 
-const fontWeightOptions = [
-  { label: 'Light', value: '300' },
-  { label: 'Regular', value: '400' },
-  { label: 'Medium', value: '500' },
-  { label: 'Semibold', value: '600' },
-  { label: 'Bold', value: '700' },
-];
+const fontWeightOptions = computed(() => [
+  { label: t('theme.fontWeights.light'), value: '300' },
+  { label: t('theme.fontWeights.regular'), value: '400' },
+  { label: t('theme.fontWeights.medium'), value: '500' },
+  { label: t('theme.fontWeights.semibold'), value: '600' },
+  { label: t('theme.fontWeights.bold'), value: '700' },
+]);
 
-const letterSpacingOptions = [
-  { label: 'Tight', value: '-0.03em' },
-  { label: 'Snug', value: '-0.015em' },
-  { label: 'Normal', value: 'normal' },
-  { label: 'Wide', value: '0.04em' },
-  { label: 'Extra wide', value: '0.12em' },
-];
+const letterSpacingOptions = computed(() => [
+  { label: t('theme.letterSpacings.tight'), value: '-0.03em' },
+  { label: t('theme.letterSpacings.snug'), value: '-0.015em' },
+  { label: t('theme.letterSpacings.normal'), value: 'normal' },
+  { label: t('theme.letterSpacings.wide'), value: '0.04em' },
+  { label: t('theme.letterSpacings.extraWide'), value: '0.12em' },
+]);
 
-const blockGapOptions = [
-  { label: 'Compact', value: 'compact' },
-  { label: 'Normal', value: 'normal' },
-  { label: 'Relaxed', value: 'relaxed' },
-];
+const blockGapOptions = computed(() =>
+  (['compact', 'normal', 'relaxed'] as const).map((value) => ({
+    label: t(`theme.blockGaps.${value}`),
+    value,
+  })),
+);
 
-const socialStyleOptions = [
-  { label: 'Soft', value: 'soft' },
-  { label: 'Filled', value: 'filled' },
-  { label: 'Outline', value: 'outline' },
-  { label: 'Icon only', value: 'plain' },
-];
+const socialStyleOptions = computed(() =>
+  (['soft', 'filled', 'outline', 'plain'] as const).map((value) => ({
+    label: t(`theme.socialStyles.${value}`),
+    value,
+  })),
+);
 
 function emitPage(key: string, value: any) {
   emit("updateTheme", {
@@ -801,62 +819,50 @@ function onGenericParagraphFontChange(value: string) {
   emitTypography('paragraphFont', value);
 }
 
-const shadowOptions = [
-  { label: "None", value: "none" },
-  { label: "Small", value: "sm" },
-  { label: "Medium", value: "md" },
-  { label: "Large", value: "lg" },
-];
+const shadowOptions = computed(() => [
+  { label: t("theme.options.none"), value: "none" },
+  { label: t("theme.options.small"), value: "sm" },
+  { label: t("theme.options.medium"), value: "md" },
+  { label: t("theme.options.large"), value: "lg" },
+]);
 
-const appearOptions = [
-  { label: "None", value: "none" },
-  { label: "Fade In", value: "fadeIn" },
-  { label: "Fade In Down", value: "fadeInDown" },
-  { label: "Fade In Up", value: "fadeInUp" },
-  { label: "Fade In Left", value: "fadeInLeft" },
-  { label: "Fade In Right", value: "fadeInRight" },
-  { label: "Zoom In", value: "zoomIn" },
-  { label: "Zoom In Down", value: "zoomInDown" },
-  { label: "Zoom In Up", value: "zoomInUp" },
-  { label: "Bounce In", value: "bounceIn" },
-  { label: "Bounce In Down", value: "bounceInDown" },
-  { label: "Bounce In Up", value: "bounceInUp" },
-  { label: "Slide In Down", value: "slideInDown" },
-  { label: "Slide In Up", value: "slideInUp" },
-  { label: "Slide In Left", value: "slideInLeft" },
-  { label: "Slide In Right", value: "slideInRight" },
-  { label: "Back In Down", value: "backInDown" },
-  { label: "Back In Up", value: "backInUp" },
-  { label: "Flip In X", value: "flipInX" },
-  { label: "Flip In Y", value: "flipInY" },
-  { label: "Light Speed In Right", value: "lightSpeedInRight" },
-  { label: "Rotate In", value: "rotateIn" },
-];
+const APPEAR_ANIMATIONS = [
+  "fadeIn", "fadeInDown", "fadeInUp", "fadeInLeft", "fadeInRight",
+  "zoomIn", "zoomInDown", "zoomInUp",
+  "bounceIn", "bounceInDown", "bounceInUp",
+  "slideInDown", "slideInUp", "slideInLeft", "slideInRight",
+  "backInDown", "backInUp",
+  "flipInX", "flipInY",
+  "lightSpeedInRight", "rotateIn",
+] as const;
 
-const hoverOptions = [
-  { label: "None", value: "none" },
-  { label: "Pulse", value: "pulse" },
-  { label: "Bounce", value: "bounce" },
-  { label: "Rubber Band", value: "rubberBand" },
-  { label: "Shake X", value: "shakeX" },
-  { label: "Shake Y", value: "shakeY" },
-  { label: "Head Shake", value: "headShake" },
-  { label: "Swing", value: "swing" },
-  { label: "Tada", value: "tada" },
-  { label: "Wobble", value: "wobble" },
-  { label: "Jello", value: "jello" },
-  { label: "Heart Beat", value: "heartBeat" },
-  { label: "Flash", value: "flash" },
-  { label: "Flip", value: "flip" },
-];
+const appearOptions = computed(() => [
+  { label: t("theme.options.none"), value: "none" },
+  ...APPEAR_ANIMATIONS.map((value) => ({
+    label: t(`theme.animations.appear.${value}`),
+    value,
+  })),
+]);
 
-const durationOptions = [
-  { label: "Faster (0.5s)", value: "faster" },
-  { label: "Fast (0.8s)", value: "fast" },
-  { label: "Normal (1s)", value: "normal" },
-  { label: "Slow (2s)", value: "slow" },
-  { label: "Slower (3s)", value: "slower" },
-];
+const HOVER_ANIMATIONS = [
+  "pulse", "bounce", "rubberBand", "shakeX", "shakeY", "headShake",
+  "swing", "tada", "wobble", "jello", "heartBeat", "flash", "flip",
+] as const;
+
+const hoverOptions = computed(() => [
+  { label: t("theme.options.none"), value: "none" },
+  ...HOVER_ANIMATIONS.map((value) => ({
+    label: t(`theme.animations.hover.${value}`),
+    value,
+  })),
+]);
+
+const durationOptions = computed(() =>
+  (["faster", "fast", "normal", "slow", "slower"] as const).map((value) => ({
+    label: t(`theme.animations.durations.${value}`),
+    value,
+  })),
+);
 
 function emitColors(key: "primary" | "secondary" | "third", value: string) {
   emit("updateTheme", {
@@ -901,12 +907,12 @@ function emitAvatar(key: string, value: any) {
   });
 }
 
-const linkLayoutOptions = [
-  { label: "Vertical (image top)", value: "vertical" },
-  { label: "Horizontal (image left)", value: "horizontal-left" },
-  { label: "Horizontal (image right)", value: "horizontal-right" },
-  { label: "Centered (text only)", value: "centered" },
-];
+const linkLayoutOptions = computed(() => [
+  { label: t("theme.linkLayout.vertical"), value: "vertical" },
+  { label: t("theme.linkLayout.horizontalLeft"), value: "horizontal-left" },
+  { label: t("theme.linkLayout.horizontalRight"), value: "horizontal-right" },
+  { label: t("theme.linkLayout.centered"), value: "centered" },
+]);
 
 function emitLink(key: string, value: any) {
   emit("updateTheme", { link: { ...props.themeConfig.link, [key]: value } });

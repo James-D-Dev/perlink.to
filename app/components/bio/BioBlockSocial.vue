@@ -2,7 +2,7 @@
   <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
     <BioBlockItemHeader
       :is-active="isActive"
-      title="Social Links"
+      :title="t('blocks.social.title')"
       icon="i-lucide-share-2"
       :hidden="socialBlock?.hidden"
       @toggle="$emit('toggle')"
@@ -88,7 +88,7 @@
 
                     <span
                       class="inline-flex items-center text-xs text-gray-500 dark:text-neutral-400 ml-1"
-                      >- Clicks: {{ social.clicks || 0 }}</span
+                      >{{ t('blocks.social.clicks', { n: social.clicks || 0 }) }}</span
                     >
                   </span>
                 </label>
@@ -119,7 +119,7 @@
             name="i-lucide-share-2"
             class="w-8 h-8 mx-auto mb-2 opacity-50"
           />
-          <p class="text-sm">No social links added yet</p>
+          <p class="text-sm">{{ t('blocks.social.empty') }}</p>
         </div>
       </div>
 
@@ -129,19 +129,19 @@
         color="neutral"
         variant="solid"
         icon="i-lucide-plus"
-        label="Add social"
+        :label="t('blocks.social.addSocial')"
         class="bg-gray-900 text-white hover:bg-gray-800"
         @click="openAddModal"
       />
     </div>
 
     <!-- Add Social Modal -->
-    <UModal v-model:open="isAddModalOpen" title="Add Social Link">
+    <UModal v-model:open="isAddModalOpen" :title="t('blocks.social.modalTitle')">
       <template #body>
         <div >
           <UInput
             v-model="providerSearchQuery"
-            placeholder="Search social platforms..."
+            :placeholder="t('blocks.social.searchPlaceholder')"
             icon="i-lucide-search"
             class="mb-4 w-full"
             size="lg"
@@ -196,6 +196,8 @@ const emit = defineEmits<{
   toggle: [];
   update: [socials: SocialLink[]];
 }>();
+
+const { t } = useI18n();
 
 // Use composable
 const { socialLinks, socialBlock, setSocialLinks, addSocialLink, removeSocialLink, updateSocialLink, moveSocialLink, toggleBlockHidden } = useBioBlock({
@@ -281,7 +283,9 @@ function getProviderLabel(provider: string): string {
 }
 
 function getProviderPlaceholder(provider: string): string {
-  return getProviderInfo(provider)?.placeholder || "Enter URL";
+  const placeholder = getProviderInfo(provider)?.placeholder;
+  if (placeholder === "username") return t("blocks.social.usernamePlaceholder");
+  return placeholder || t("blocks.social.urlPlaceholder");
 }
 
  

@@ -1,7 +1,7 @@
 <template>
   <UDashboardPanel id="site-analytics">
     <template #header>
-      <UDashboardNavbar title="Analytics">
+      <UDashboardNavbar :title="t('common.analytics')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -11,7 +11,7 @@
             color="neutral"
             variant="outline"
             icon="i-lucide-pencil"
-            label="Edit site"
+            :label="t('dashboard.analyticsPage.editSite')"
             size="sm"
           />
         </template>
@@ -25,7 +25,7 @@
           <UIcon name="i-lucide-loader-2" class="size-8 animate-spin text-dimmed" />
         </div>
         <div v-else-if="!bioPage" class="py-20 text-center text-sm text-muted">
-          Site not found.
+          {{ t('dashboard.analyticsPage.notFound') }}
         </div>
         <BioAnalytics
           v-else
@@ -51,9 +51,10 @@ definePageMeta({
 })
 
 const route = useRoute()
+const { t } = useI18n()
 const username = computed(() => String(route.params.url || ''))
 
-useSeoMeta({ title: () => `Analytics · ${username.value} — Perlink`, robots: 'noindex, nofollow' })
+useSeoMeta({ title: () => t('dashboard.analyticsPage.seoTitle', { username: username.value }), robots: 'noindex, nofollow' })
 
 const loading = ref(true)
 const bioPage = ref<{ id: string; username: string; blocks?: BioBlock[] } | null>(null)

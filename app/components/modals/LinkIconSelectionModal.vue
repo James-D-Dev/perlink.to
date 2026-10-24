@@ -1,7 +1,7 @@
 <template>
   <UModal
     :open="open"
-    title="Select Icon"
+    :title="t('blocks.iconPicker.title')"
     :close="{ color: 'neutral', variant: 'ghost' }"
     @update:open="$emit('update:open', $event)"
   >
@@ -44,16 +44,18 @@ const emit = defineEmits<{
   'select': [iconId: string]
 }>()
 
-const availableIcons: IconOption[] = [
+const { t } = useI18n()
+
+const availableIcons = computed<IconOption[]>(() => [
   { id: 'facebook', label: 'Facebook', icon: 'i-fa-facebook', colorClass: 'text-blue-600 dark:text-blue-400' },
   { id: 'twitter', label: 'Twitter', icon: 'i-prime-twitter', colorClass: 'text-sky-500' },
   { id: 'instagram', label: 'Instagram', icon: 'i-fa-instagram', colorClass: 'text-pink-600 dark:text-pink-400' },
   { id: 'linkedin', label: 'LinkedIn', icon: 'i-fa-linkedin', colorClass: 'text-blue-700 dark:text-blue-400' },
   { id: 'youtube', label: 'YouTube', icon: 'i-fa-youtube-play', colorClass: 'text-red-600 dark:text-red-400' },
   { id: 'tiktok', label: 'TikTok', icon: 'i-prime-tiktok', colorClass: 'text-black' },
-  { id: 'globe', label: 'Website', icon: 'i-prime-globe', colorClass: 'text-gray-600 dark:text-neutral-300' },
-  { id: 'link', label: 'Link', icon: 'i-lucide-link', colorClass: 'text-gray-500 dark:text-neutral-400' },
-]
+  { id: 'globe', label: t('blocks.iconPicker.website'), icon: 'i-prime-globe', colorClass: 'text-gray-600 dark:text-neutral-300' },
+  { id: 'link', label: t('blocks.iconPicker.link'), icon: 'i-lucide-link', colorClass: 'text-gray-500 dark:text-neutral-400' },
+])
 
 function selectIcon(iconId: string) {
   emit('select', iconId)

@@ -1,12 +1,12 @@
 <template>
   <UCard class="mt-8">
     <div class="space-y-4">
-      <h3 class="font-semibold text-gray-900 dark:text-white">Choose Your Username</h3>
+      <h3 class="font-semibold text-gray-900 dark:text-white">{{ t('dashboard.username.heading') }}</h3>
       <div class="flex items-center gap-2">
         <span class="text-gray-500 dark:text-neutral-400">perlink.to/</span>
         <UInput
           :model-value="username"
-          placeholder="yourname"
+          :placeholder="t('dashboard.username.placeholder')"
           class="flex-1"
           :error="usernameError"
           @update:model-value="$emit('update:username', $event)"
@@ -18,13 +18,15 @@
       </p>
       <p v-else-if="usernameAvailable" class="text-green-500 text-sm">
         <UIcon name="i-lucide-check-circle" class="w-4 h-4 inline mr-1" />
-        Username available
+        {{ t('dashboard.username.available') }}
       </p>
     </div>
   </UCard>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 defineProps<{
   username: string;
   usernameError: string;

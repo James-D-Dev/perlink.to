@@ -3,7 +3,7 @@
     <!-- Header -->
     <BioBlockItemHeader
       :is-active="isActive"
-      title="Image Album"
+      :title="t('blocks.album.title')"
       icon="i-lucide-images"
       :hidden="imageAlbumBlock?.hidden"
       @toggle="$emit('toggle')"
@@ -11,7 +11,7 @@
     >
       <template #badge>
         <span v-if="imageCount > 0" class="text-xs text-gray-500 dark:text-neutral-400">
-          {{ imageCount }} image{{ imageCount > 1 ? 's' : '' }}
+          {{ t('blocks.album.imageCount', { n: imageCount }, imageCount) }}
         </span>
       </template>
       <template #actions>
@@ -26,10 +26,10 @@
 
     <!-- Edit Form -->
     <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
-      <UFormField label="Title" help="Optional heading above the images.">
+      <UFormField :label="t('blocks.album.titleLabel')" :help="t('blocks.album.titleHelp')">
         <UInput
           :model-value="imageAlbumBlock?.data.title"
-          placeholder="e.g. Gallery"
+          :placeholder="t('blocks.album.titlePlaceholder')"
           class="w-full"
           @update:model-value="$emit('updateTitle', String($event))"
         />
@@ -37,7 +37,7 @@
 
       <!-- Layout Selector -->
       <div>
-        <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block">Layout</label>
+        <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block">{{ t('blocks.album.layout') }}</label>
         <div class="grid grid-cols-4 gap-2">
           <UButton
             v-for="layout in layouts"
@@ -71,8 +71,8 @@
           @change="handleFileSelect"
         />
         <UIcon name="i-lucide-upload-cloud" class="w-10 h-10 text-gray-400 dark:text-neutral-500 mx-auto mb-2" />
-        <p class="text-sm text-gray-600 dark:text-neutral-300 mb-1">Click or drag images here</p>
-        <p class="text-xs text-gray-400 dark:text-neutral-500">Max 6 images, up to 5MB each</p>
+        <p class="text-sm text-gray-600 dark:text-neutral-300 mb-1">{{ t('blocks.album.dropHint') }}</p>
+        <p class="text-xs text-gray-400 dark:text-neutral-500">{{ t('blocks.album.limits') }}</p>
       </div>
 
       <!-- Max Images Reached -->
@@ -81,13 +81,13 @@
         class="border border-gray-200 dark:border-white/10 rounded-xl p-4 text-center bg-gray-100 dark:bg-white/[0.06]"
       >
         <UIcon name="i-lucide-check-circle" class="w-8 h-8 text-green-500 mx-auto mb-2" />
-        <p class="text-sm text-gray-600 dark:text-neutral-300">Maximum 6 images reached</p>
+        <p class="text-sm text-gray-600 dark:text-neutral-300">{{ t('blocks.album.maxReached') }}</p>
       </div>
 
       <!-- Upload Progress -->
       <div v-if="uploading" class="space-y-2">
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-600 dark:text-neutral-300">Uploading...</span>
+          <span class="text-gray-600 dark:text-neutral-300">{{ t('blocks.album.uploading') }}</span>
           <span class="text-gray-500 dark:text-neutral-400">{{ progress }}%</span>
         </div>
         <UProgress :value="progress" />
@@ -96,8 +96,8 @@
       <!-- Image Preview -->
       <div v-if="albumImages.length > 0" class="space-y-3">
         <div class="flex items-center justify-between">
-          <label class="text-sm font-medium text-gray-700 dark:text-neutral-200">Images</label>
-          <span class="text-xs text-gray-500 dark:text-neutral-400">{{ albumImages.length }}/5</span>
+          <label class="text-sm font-medium text-gray-700 dark:text-neutral-200">{{ t('blocks.album.images') }}</label>
+          <span class="text-xs text-gray-500 dark:text-neutral-400">{{ albumImages.length }}/{{ MAX_IMAGES }}</span>
         </div>
 
         <!-- Grid with Drag & Drop -->
@@ -161,13 +161,13 @@
     <!-- Delete Confirmation Modal -->
     <UModal
       :open="showDeleteModal"
-      title="Delete Image"
+      :title="t('blocks.album.deleteTitle')"
       :close="{ color: 'neutral', variant: 'ghost' }"
       @update:open="closeDeleteModal"
     >
       <template #body>
         <p class="text-sm text-gray-600 dark:text-neutral-300">
-          Are you sure you want to delete this image? This action cannot be undone.
+          {{ t('blocks.album.deleteConfirm') }}
         </p>
       </template>
       <template #footer>
@@ -178,7 +178,7 @@
             class="flex-1"
             @click="closeDeleteModal"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </UButton>
           <UButton
             color="error"
@@ -187,7 +187,7 @@
             @click="confirmDelete"
           >
             <UIcon name="i-lucide-trash-2" class="w-4 h-4 mr-1" />
-            Delete
+            {{ t('common.delete') }}
           </UButton>
         </div>
       </template>
@@ -220,12 +220,14 @@ const { albumImages, albumLayout, imageAlbumBlock, setImageAlbum, addImage, remo
 
 const MAX_IMAGES = 6;
 
-const layouts = [
-  { value: 'grid' as ImageAlbumLayout, label: 'Grid', icon: 'i-lucide-layout-grid' },
-  { value: 'masonry' as ImageAlbumLayout, label: 'Masonry', icon: 'i-lucide-layout-dashboard' },
-  { value: 'vertical' as ImageAlbumLayout, label: 'Stack', icon: 'i-lucide-rows-3' },
-  { value: 'carousel' as ImageAlbumLayout, label: 'Carousel', icon: 'i-lucide-images' },
-];
+const { t } = useI18n();
+
+const layouts = computed(() => [
+  { value: 'grid' as ImageAlbumLayout, label: t('blocks.album.layouts.grid'), icon: 'i-lucide-layout-grid' },
+  { value: 'masonry' as ImageAlbumLayout, label: t('blocks.album.layouts.masonry'), icon: 'i-lucide-layout-dashboard' },
+  { value: 'vertical' as ImageAlbumLayout, label: t('blocks.album.layouts.vertical'), icon: 'i-lucide-rows-3' },
+  { value: 'carousel' as ImageAlbumLayout, label: t('blocks.album.layouts.carousel'), icon: 'i-lucide-images' },
+]);
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const previewingImage = ref<string | null>(null);
@@ -277,8 +279,8 @@ async function uploadFiles(files: File[]) {
   const remainingSlots = MAX_IMAGES - albumImages.value.length;
   if (remainingSlots <= 0) {
     toast.add({
-      title: 'Limit reached',
-      description: `Maximum ${MAX_IMAGES} images allowed`,
+      title: t('blocks.album.toast.limitTitle'),
+      description: t('blocks.album.toast.limitDescription', { max: MAX_IMAGES }),
       color: 'warning',
     });
     return;
@@ -302,14 +304,14 @@ async function uploadFiles(files: File[]) {
     });
 
     toast.add({
-      title: 'Success',
-      description: `${filesToUpload.length} image(s) uploaded`,
+      title: t('blocks.album.toast.successTitle'),
+      description: t('blocks.album.toast.uploaded', { n: filesToUpload.length }, filesToUpload.length),
       color: 'success',
     });
   } catch (e: any) {
     toast.add({
-      title: 'Upload failed',
-      description: error.value || 'Failed to upload images',
+      title: t('blocks.album.toast.uploadFailedTitle'),
+      description: error.value || t('blocks.album.toast.uploadFailedDescription'),
       color: 'error',
     });
   }
@@ -357,8 +359,8 @@ function confirmDelete() {
       layout: selectedLayout.value,
     });
     toast.add({
-      title: 'Deleted',
-      description: 'Image removed from album',
+      title: t('blocks.album.toast.deletedTitle'),
+      description: t('blocks.album.toast.deletedDescription'),
       color: 'success',
     });
   }

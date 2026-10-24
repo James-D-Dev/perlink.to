@@ -1,7 +1,7 @@
 <template>
   <UDashboardPanel id="settings">
     <template #header>
-      <UDashboardNavbar title="Settings">
+      <UDashboardNavbar :title="t('common.settings')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -10,7 +10,7 @@
 
     <template #body>
         <div>
-            Settings
+            {{ t('dashboard.settings.placeholder') }}
         </div>
 
     </template>
@@ -23,4 +23,6 @@ definePageMeta({
     middleware: "auth",
     ssr: false,
 });
+
+const { t } = useI18n();
 </script>

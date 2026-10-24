@@ -1,0 +1,42 @@
+{
+  "common": {
+    "save": "Save",
+    "saveDraft": "Save draft",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "cancel": "Cancel",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "preview": "Preview",
+    "copied": "Copied",
+    "copyLink": "Copy link",
+    "openSite": "Open site",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "reset": "reset",
+    "auto": "Auto",
+    "optional": "Optional",
+    "confirm": "Confirm"
+  },
+  "menu": {
+    "account": "My account",
+    "plans": "Plans",
+    "settings": "Settings",
+    "language": "Language",
+    "signOut": "Sign out"
+  },
+  "nav": {
+    "createSite": "Create a site",
+    "home": "Home",
+    "sites": "Sites",
+    "settings": "Settings",
+    "help": "Help",
+    "feedback": "Feedback",
+    "proTitle": "Perlink Pro",
+    "proText": "More sites, more 3D worlds and premium extras.",
+    "seePlans": "See plans"
+  }
+}

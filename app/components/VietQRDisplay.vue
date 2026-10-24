@@ -3,7 +3,7 @@
     <!-- Header -->
     <BioBlockItemHeader
       :is-active="isActive"
-      title="VietQR Payment"
+      :title="t('blocks.vietqr.title')"
       iconImage="_"
       :hidden="vietQRBlock?.hidden"
       @toggle="$emit('toggle')"
@@ -65,7 +65,7 @@
           >
             <UIcon name="i-lucide-qr-code" class="w-12 h-12 text-gray-300" />
             <p class="text-sm text-gray-500 dark:text-neutral-400 text-center">
-              Please complete the form beside and press the Generate button
+              {{ t('blocks.vietqr.emptyHint') }}
             </p>
           </div>
         </div>
@@ -75,7 +75,7 @@
             v-model="selectedBank"
             value-key="id"
             :items="bankOptions"
-            placeholder="Select bank"
+            :placeholder="t('blocks.vietqr.selectBank')"
             class="w-full"
             size="xl"
           >
@@ -87,7 +87,7 @@
           <!-- Account Number -->
           <UInput
             v-model="accountNumber"
-            placeholder="Account number"
+            :placeholder="t('blocks.vietqr.accountNumber')"
             :maxlength="19"
             size="xl"
             class="w-full"
@@ -102,7 +102,7 @@
           <!-- Account name -->
           <UInput
             v-model="accountName"
-            placeholder="Account name"
+            :placeholder="t('blocks.vietqr.accountName')"
             size="xl"
             class="w-full"
             @input="formatAccountName"
@@ -115,7 +115,7 @@
           <UInput
             v-model="amount"
             type="number"
-            placeholder="Amount (VND)"
+            :placeholder="t('blocks.vietqr.amount')"
             :min="0"
             size="xl"
             class="w-full"
@@ -128,7 +128,7 @@
           <!-- Note -->
           <UTextarea
             v-model="note"
-            placeholder="Transfer note (optional)"
+            :placeholder="t('blocks.vietqr.note')"
             :rows="2"
             class="w-full"
             size="xl"
@@ -145,7 +145,7 @@
               @click="prevTheme"
             />
             <span class="text-sm font-medium text-gray-700 dark:text-neutral-200">
-              Theme: {{ currentThemeName }}
+              {{ t('blocks.vietqr.theme', { name: currentThemeName }) }}
             </span>
             <UButton
               variant="soft"
@@ -167,7 +167,7 @@
           >
             <div class="flex items-center justify-center flex-1">
               <UIcon name="i-lucide-qr-code" class="w-4 h-4 mr-2" />
-              Generate QR Code
+              {{ t('blocks.vietqr.generate') }}
             </div>
           </UButton>
         </div>
@@ -221,6 +221,7 @@ const emit = defineEmits<{
 }>();
 
 const toast = useToast();
+const { t } = useI18n();
 
 // State
 const banks = ref<BankOption[]>([]);
@@ -245,8 +246,8 @@ const selectedThemeIndex = ref(4); // Default to vietnam (index 4)
 const selectedTheme = computed(
   () => qrThemes[selectedThemeIndex.value]?.id ?? "vietnam",
 );
-const currentThemeName = computed(
-  () => qrThemes[selectedThemeIndex.value]?.name ?? "Vietnam",
+const currentThemeName = computed(() =>
+  t(`blocks.vietqr.themes.${qrThemes[selectedThemeIndex.value]?.id ?? "vietnam"}`),
 );
 
 function prevTheme() {
@@ -374,8 +375,8 @@ async function generateQR() {
     }
   } catch (error: any) {
     toast.add({
-      title: "Error",
-      description: error?.message || "Failed to generate QR code",
+      title: t("blocks.vietqr.errorTitle"),
+      description: error?.message || t("blocks.vietqr.generateFailed"),
       color: "error",
     });
   } finally {
@@ -390,8 +391,8 @@ function formatAmount(value: number): string {
 function copyQRString() {
   navigator.clipboard.writeText(qrString.value);
   toast.add({
-    title: "Copied",
-    description: "QR code text copied to clipboard",
+    title: t("common.copied"),
+    description: t("blocks.vietqr.copiedDescription"),
     color: "success",
   });
 }

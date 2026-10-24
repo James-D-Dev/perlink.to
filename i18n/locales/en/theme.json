@@ -1,0 +1,274 @@
+{
+  "theme": {
+    "panelTitle": "Template & Theme",
+    "tabs": {
+      "presets": "Theme Presets",
+      "custom": "Customize"
+    },
+    "options": {
+      "none": "None",
+      "xs": "XS",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "xl": "XL"
+    },
+    "fields": {
+      "fontFamily": "Font Family",
+      "fontSize": "Font Size",
+      "textColor": "Text Color",
+      "weight": "Weight",
+      "letterSpacing": "Letter Spacing"
+    },
+    "headerLayout": {
+      "label": "Header Layout",
+      "tabs": {
+        "noBanner": "No Banner",
+        "banner": "Banner"
+      },
+      "options": {
+        "centered": "Centered",
+        "left": "Left",
+        "cover": "Cover",
+        "imageOverlay": "Img Overlay",
+        "bannerCircle": "Banner ○",
+        "bannerSquare": "Banner □"
+      },
+      "addBanner": "Add banner image",
+      "upload": "Upload your image"
+    },
+    "colors": {
+      "title": "Colors",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "third": "Third",
+      "categories": {
+        "neutral": "Neutral",
+        "bold": "Bold",
+        "playful": "Playful",
+        "dark": "Dark",
+        "gradient": "Gradient"
+      }
+    },
+    "background": {
+      "title": "Background",
+      "tabs": {
+        "solid": "Solid",
+        "gradient": "Gradient",
+        "image": "Image",
+        "video": "Video",
+        "effect": "Effect"
+      },
+      "custom": "Custom",
+      "customGradient": "Custom gradient",
+      "from": "From",
+      "via": "Via",
+      "to": "To",
+      "customImageUrl": "Custom image URL",
+      "videoUrl": "Video URL (mp4, webm)"
+    },
+    "header": {
+      "title": "Header Title",
+      "blockTitleFont": "Block Title Font"
+    },
+    "bio": {
+      "title": "Bio Text"
+    },
+    "card": {
+      "title": "Card Style",
+      "style": "Style",
+      "color": "Card Color",
+      "colorHelp": "Empty uses the primary colour.",
+      "colorAria": "Card color",
+      "borderColor": "Border Color",
+      "borderColorAria": "Card border color",
+      "cornerRadius": "Corner Radius",
+      "shadow": "Shadow",
+      "backdropBlur": "Backdrop Blur",
+      "appearAnimation": "Appear Animation",
+      "hoverAnimation": "Hover Animation",
+      "styles": {
+        "filled": "Filled",
+        "outline": "Outline",
+        "ghost": "Ghost",
+        "soft": "Soft"
+      }
+    },
+    "fontWeights": {
+      "light": "Light",
+      "regular": "Regular",
+      "medium": "Medium",
+      "semibold": "Semibold",
+      "bold": "Bold"
+    },
+    "letterSpacings": {
+      "tight": "Tight",
+      "snug": "Snug",
+      "normal": "Normal",
+      "wide": "Wide",
+      "extraWide": "Extra wide"
+    },
+    "page": {
+      "title": "Page",
+      "textColorAria": "Page text color",
+      "blockSpacing": "Block Spacing",
+      "blockTitles": "Block Titles",
+      "titleAlign": {
+        "center": "Centered",
+        "left": "Left"
+      },
+      "socialIcons": "Social Icons"
+    },
+    "blockGaps": {
+      "compact": "Compact",
+      "normal": "Normal",
+      "relaxed": "Relaxed"
+    },
+    "socialStyles": {
+      "soft": "Soft",
+      "filled": "Filled",
+      "outline": "Outline",
+      "plain": "Icon only"
+    },
+    "font": {
+      "title": "Font",
+      "selectPlaceholder": "Select font..."
+    },
+    "avatar": {
+      "title": "Avatar Shape",
+      "shapes": {
+        "circle": "Circle",
+        "rounded": "Rounded",
+        "square": "Square"
+      }
+    },
+    "linkLayout": {
+      "title": "Link Card Layout",
+      "vertical": "Vertical (image top)",
+      "horizontalLeft": "Horizontal (image left)",
+      "horizontalRight": "Horizontal (image right)",
+      "centered": "Centered (text only)"
+    },
+    "animations": {
+      "appear": {
+        "fadeIn": "Fade In",
+        "fadeInDown": "Fade In Down",
+        "fadeInUp": "Fade In Up",
+        "fadeInLeft": "Fade In Left",
+        "fadeInRight": "Fade In Right",
+        "zoomIn": "Zoom In",
+        "zoomInDown": "Zoom In Down",
+        "zoomInUp": "Zoom In Up",
+        "bounceIn": "Bounce In",
+        "bounceInDown": "Bounce In Down",
+        "bounceInUp": "Bounce In Up",
+        "slideInDown": "Slide In Down",
+        "slideInUp": "Slide In Up",
+        "slideInLeft": "Slide In Left",
+        "slideInRight": "Slide In Right",
+        "backInDown": "Back In Down",
+        "backInUp": "Back In Up",
+        "flipInX": "Flip In X",
+        "flipInY": "Flip In Y",
+        "lightSpeedInRight": "Light Speed In Right",
+        "rotateIn": "Rotate In"
+      },
+      "hover": {
+        "pulse": "Pulse",
+        "bounce": "Bounce",
+        "rubberBand": "Rubber Band",
+        "shakeX": "Shake X",
+        "shakeY": "Shake Y",
+        "headShake": "Head Shake",
+        "swing": "Swing",
+        "tada": "Tada",
+        "wobble": "Wobble",
+        "jello": "Jello",
+        "heartBeat": "Heart Beat",
+        "flash": "Flash",
+        "flip": "Flip"
+      },
+      "durations": {
+        "faster": "Faster (0.5s)",
+        "fast": "Fast (0.8s)",
+        "normal": "Normal (1s)",
+        "slow": "Slow (2s)",
+        "slower": "Slower (3s)"
+      }
+    },
+    "presetCategories": {
+      "classic": "Classic",
+      "vibrant": "Vibrant",
+      "dark": "Dark",
+      "minimal": "Minimal",
+      "gradient": "Gradient",
+      "neon": "Neon"
+    },
+    "presets": {
+      "classic-white": { "description": "Timeless white with purple accents" },
+      "classic-ivory": { "description": "Soft ivory tones with warm brown" },
+      "classic-slate": { "description": "Corporate slate with blue highlights" },
+      "vibrant-coral": { "description": "Bold coral and orange energy" },
+      "vibrant-emerald": { "description": "Fresh tropical greens with energy" },
+      "vibrant-rose": { "description": "Bold rose and pink palette" },
+      "dark-obsidian": { "description": "Deep dark with violet highlights" },
+      "dark-midnight": { "description": "Navy and electric blue dark mode" },
+      "dark-charcoal": { "description": "Sophisticated dark with gold accents" },
+      "minimal-pure": { "description": "Ultra-clean with no distractions" },
+      "minimal-sand": { "description": "Calm neutral tones, distraction-free" },
+      "minimal-frost": { "description": "Ice-cool light grey minimalism" },
+      "gradient-aurora": { "description": "Northern lights — teal to purple" },
+      "gradient-sunset": { "description": "Warm sunset from orange to pink" },
+      "gradient-ocean": { "description": "Deep ocean blues to navy" },
+      "gradient-candy": { "description": "Fun pastel pink to lavender" },
+      "neon-cyber": { "description": "Electric yellow on near-black" },
+      "neon-matrix": { "description": "Hacker green on black" },
+      "neon-electric": { "description": "Glowing electric blue on deep black" },
+      "neon-purple": { "description": "Vaporwave purple on dark" }
+    }
+  },
+  "analytics": {
+    "unpublished": "Publish your site to start seeing analytics.",
+    "tabs": {
+      "overview": "Overview",
+      "links": "Links"
+    },
+    "links": {
+      "empty": "This site has no links or social icons yet.",
+      "linksTitle": "Links",
+      "socialTitle": "Social icons",
+      "clicks": "click | clicks",
+      "noLink": "No link yet"
+    },
+    "overview": {
+      "periodAria": "Period",
+      "periods": {
+        "h24": "24h",
+        "d7": "7d",
+        "d30": "30d",
+        "d90": "90d"
+      },
+      "cards": {
+        "views": "Views",
+        "unique": "Unique visitors",
+        "today": "Today",
+        "bots": "Bots filtered"
+      },
+      "viewsOverTime": "Views over time",
+      "peak": "Peak {value}",
+      "noViews": "No views in this period yet",
+      "viewsCount": "{n} view | {n} views",
+      "topReferrers": "Top referrers",
+      "devices": "Devices",
+      "browsers": "Browsers",
+      "noData": "No data yet"
+    },
+    "countryMap": {
+      "title": "Countries",
+      "map": "Map",
+      "list": "List",
+      "noData": "No data yet",
+      "viewsCount": "{n} view | {n} views"
+    }
+  }
+}

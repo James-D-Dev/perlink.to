@@ -2,7 +2,7 @@
   <div class="space-y-3">
     <!-- Tabs -->
     <UTabs
-      :items="[{ value: 'no-banner', label: 'No Banner' }, { value: 'banner', label: 'Banner' }]"
+      :items="tabItems"
       :model-value="activeTab"
       color="neutral"
       variant="link"
@@ -129,9 +129,9 @@
           </div>
         </template>
         <template v-else>
-          <p class="text-sm text-gray-400 dark:text-neutral-500">Add banner image</p>
+          <p class="text-sm text-gray-400 dark:text-neutral-500">{{ t('theme.headerLayout.addBanner') }}</p>
           <UButton color="neutral" size="sm" icon="i-lucide-upload" :loading="bannerUploading" @click.stop="bannerInputRef?.click()">
-            Upload your image
+            {{ t('theme.headerLayout.upload') }}
           </UButton>
           <p v-if="bannerError" class="text-xs text-red-500 text-center px-4">{{ bannerError }}</p>
         </template>
@@ -159,22 +159,29 @@ const emit = defineEmits<{
   'update:bannerUrl': [v: string | undefined]
 }>()
 
+const { t } = useI18n()
+
+const tabItems = computed(() => [
+  { value: 'no-banner', label: t('theme.headerLayout.tabs.noBanner') },
+  { value: 'banner', label: t('theme.headerLayout.tabs.banner') },
+])
+
 const BANNER_LAYOUTS: ThemeHeaderLayout[] = ['banner-circle', 'banner-square']
-const NO_BANNER_OPTIONS: { value: ThemeHeaderLayout; label: string }[] = [
-  { value: 'centered',      label: 'Centered' },
-  { value: 'left',          label: 'Left' },
-  { value: 'cover',         label: 'Cover' },
-  { value: 'image-overlay', label: 'Img Overlay' },
-]
-const BANNER_OPTIONS: { value: ThemeHeaderLayout; label: string }[] = [
-  { value: 'banner-circle', label: 'Banner ○' },
-  { value: 'banner-square', label: 'Banner □' },
-]
+const NO_BANNER_OPTIONS = computed<{ value: ThemeHeaderLayout; label: string }[]>(() => [
+  { value: 'centered',      label: t('theme.headerLayout.options.centered') },
+  { value: 'left',          label: t('theme.headerLayout.options.left') },
+  { value: 'cover',         label: t('theme.headerLayout.options.cover') },
+  { value: 'image-overlay', label: t('theme.headerLayout.options.imageOverlay') },
+])
+const BANNER_OPTIONS = computed<{ value: ThemeHeaderLayout; label: string }[]>(() => [
+  { value: 'banner-circle', label: t('theme.headerLayout.options.bannerCircle') },
+  { value: 'banner-square', label: t('theme.headerLayout.options.bannerSquare') },
+])
 
 const activeTab = ref<'no-banner' | 'banner'>(
   BANNER_LAYOUTS.includes(props.modelValue ?? 'centered') ? 'banner' : 'no-banner'
 )
-const activeOptions = computed(() => activeTab.value === 'banner' ? BANNER_OPTIONS : NO_BANNER_OPTIONS)
+const activeOptions = computed(() => activeTab.value === 'banner' ? BANNER_OPTIONS.value : NO_BANNER_OPTIONS.value)
 
 
 const avatarSrc = computed(() => props.avatarUrl || avatarDefault)

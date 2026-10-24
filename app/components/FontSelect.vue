@@ -3,7 +3,7 @@
     :model-value="modelValue"
     :items="fontOptions.map(f => ({ label: f.label, value: f.value }))"
     :size="size"
-    :placeholder="placeholder"
+    :placeholder="placeholder ?? t('theme.font.selectPlaceholder')"
     class="w-full"
     @update:model-value="$emit('update:modelValue', $event)"
   >
@@ -23,9 +23,10 @@ interface Props {
   placeholder?: string;
 }
 
+const { t } = useI18n();
+
 withDefaults(defineProps<Props>(), {
   size: 'md',
-  placeholder: 'Select font...',
 });
 
 defineEmits<{

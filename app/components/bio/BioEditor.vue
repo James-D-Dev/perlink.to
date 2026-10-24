@@ -134,7 +134,7 @@
         @click="showBlockModal = true"
       >
         <UIcon name="i-lucide-plus" class="size-4" />
-        Add block
+        {{ t('blocks.editor.addBlock') }}
       </button>
     </div>
 
@@ -161,10 +161,10 @@
           color="neutral"
           variant="outline"
           class="lg:hidden"
-          aria-label="Preview"
+          :aria-label="t('common.preview')"
           @click="$emit('preview')"
         >
-          <span class="hidden sm:inline">Preview</span>
+          <span class="hidden sm:inline">{{ t('common.preview') }}</span>
         </UButton>
         <div class="flex-1" />
         <UButton
@@ -174,14 +174,14 @@
           :loading="saving"
           @click="$emit('save')"
         >
-          Save draft
+          {{ t('common.saveDraft') }}
         </UButton>
         <UButton
           icon="i-lucide-globe"
           :loading="publishing"
           @click="$emit('publish')"
         >
-          Publish
+          {{ t('common.publish') }}
         </UButton>
       </div>
     </div>
@@ -220,6 +220,8 @@ const props = withDefaults(
     enabledBlocks: () => ["links", "social", "image-album", "vietqr"],
   },
 );
+
+const { t } = useI18n();
 
 const showBlockModal = ref(false);
 

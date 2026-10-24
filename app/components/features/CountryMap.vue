@@ -2,7 +2,7 @@
   <section class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
     <!-- Header with toggle -->
     <div class="flex items-center justify-between mb-4">
-      <h4 class="text-sm font-medium text-ink">Countries</h4>
+      <h4 class="text-sm font-medium text-ink">{{ t('analytics.countryMap.title') }}</h4>
       <div class="flex items-center gap-0.5 rounded-full bg-sand p-0.5">
         <button
           class="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs transition-colors"
@@ -14,7 +14,7 @@
           @click="view = 'map'"
         >
           <UIcon name="i-lucide-map" class="w-3.5 h-3.5" />
-          Map
+          {{ t('analytics.countryMap.map') }}
         </button>
         <button
           class="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs transition-colors"
@@ -26,7 +26,7 @@
           @click="view = 'list'"
         >
           <UIcon name="i-lucide-list" class="w-3.5 h-3.5" />
-          List
+          {{ t('analytics.countryMap.list') }}
         </button>
       </div>
     </div>
@@ -64,7 +64,7 @@
         v-if="countries.length === 0"
         class="py-8 text-center text-sm text-ink-muted"
       >
-        No data yet
+        {{ t('analytics.countryMap.noData') }}
       </div>
       <div v-else class="space-y-3">
         <div
@@ -108,6 +108,17 @@ interface BreakdownItem {
 const props = defineProps<{
   countries: BreakdownItem[];
 }>();
+
+const { t, locale } = useI18n();
+
+// Localised country names from the browser, by alpha-2 code
+const regionNames = computed(() => {
+  try {
+    return new Intl.DisplayNames([locale.value], { type: "region" });
+  } catch {
+    return null;
+  }
+});
 
 const view = ref<"map" | "list">("map");
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -260,8 +271,18 @@ const alpha2Map: Record<string, { numeric: number; name: string }> = {
   ZW: { numeric: 716, name: "Zimbabwe" },
 };
 
+function localizedName(alpha2: string, fallback: string): string {
+  try {
+    return regionNames.value?.of(alpha2) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 function resolveCountryName(code: string): string {
-  return alpha2Map[code.toUpperCase()]?.name ?? code;
+  const upper = code.toUpperCase();
+  const entry = alpha2Map[upper];
+  return entry ? localizedName(upper, entry.name) : code;
 }
 
 // Fallback: full name → numeric (in case API returns full names)
@@ -390,8 +411,8 @@ async function buildChart() {
 
   // Build numeric → display name for all countries in alpha2Map
   const numericToName: Record<number, string> = {};
-  for (const entry of Object.values(alpha2Map)) {
-    numericToName[entry.numeric] = entry.name;
+  for (const [alpha2, entry] of Object.entries(alpha2Map)) {
+    numericToName[entry.numeric] = localizedName(alpha2, entry.name);
   }
 
   // Build click lookup by numeric id
@@ -402,7 +423,7 @@ async function buildChart() {
     const upper = item.name.toUpperCase();
     const byAlpha2 = alpha2Map[upper];
     if (byAlpha2) {
-      clicksByNumericId[byAlpha2.numeric] = { clicks: item.clicks, name: byAlpha2.name };
+      clicksByNumericId[byAlpha2.numeric] = { clicks: item.clicks, name: localizedName(upper, byAlpha2.name) };
     } else {
       const num = nameToNumeric[item.name];
       if (num !== undefined)
@@ -460,7 +481,7 @@ async function buildChart() {
             },
             label(ctx: any) {
               const val: number = ctx.raw?.value ?? 0;
-              return `${val} views`;
+              return t("analytics.countryMap.viewsCount", val);
             },
           },
         },
@@ -485,7 +506,7 @@ async function buildChart() {
 }
 
 watch(
-  () => [view.value, props.countries] as const,
+  () => [view.value, props.countries, locale.value] as const,
   ([v]) => {
     if (v === "map") nextTick(() => buildChart());
     else if (chartInstance) {

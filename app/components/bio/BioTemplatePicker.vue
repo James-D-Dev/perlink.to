@@ -15,8 +15,8 @@
         <SiteTemplateThumbnail :template="template" :scale="0.36" />
       </div>
       <div class="space-y-1 p-3">
-        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ template.name }}</p>
-        <p class="text-xs leading-snug text-gray-500 dark:text-neutral-400">{{ template.description }}</p>
+        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ t(`dashboard.templates.${template.id}.name`) }}</p>
+        <p class="text-xs leading-snug text-gray-500 dark:text-neutral-400">{{ t(`dashboard.templates.${template.id}.description`) }}</p>
       </div>
     </div>
   </div>
@@ -26,4 +26,5 @@
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
 
 const emit = defineEmits<{ select: [templateId: string] }>()
+const { t } = useI18n()
 </script>

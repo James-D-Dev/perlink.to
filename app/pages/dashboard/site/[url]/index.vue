@@ -2,7 +2,7 @@
   <UDashboardPanel id="bio">
     <template #header>
       <UDashboardNavbar
-        :title="step === 'template' ? 'Create a site' : 'Edit site'"
+        :title="step === 'template' ? t('dashboard.editor.titleCreate') : t('dashboard.editor.titleEdit')"
       >
         <template #leading>
           <UDashboardSidebarCollapse />
@@ -14,7 +14,7 @@
             v-if="userBioPages.length > 0"
             v-model="selectedBioUsername"
             :items="userBioPages"
-            placeholder="Select site"
+            :placeholder="t('dashboard.editor.selectSite')"
             class="hidden sm:block"
             size="xl"
             color="neutral"
@@ -31,18 +31,18 @@
           </USelect>
 
           <!-- Analytics -->
-          <UTooltip v-if="existingBio?.username" text="Analytics">
+          <UTooltip v-if="existingBio?.username" :text="t('common.analytics')">
             <UButton
               color="neutral"
               variant="ghost"
               icon="i-lucide-chart-column"
-              aria-label="Analytics"
+              :aria-label="t('common.analytics')"
               :to="`/dashboard/site/${existingBio.username}/analytics`"
             />
           </UTooltip>
 
           <!-- Copy URL -->
-          <UTooltip text="Copy URL">
+          <UTooltip :text="t('dashboard.editor.copyUrl')">
             <UButton
               color="neutral"
               variant="ghost"
@@ -52,7 +52,7 @@
           </UTooltip>
 
           <!-- Share -->
-          <UTooltip text="Share">
+          <UTooltip :text="t('dashboard.editor.share')">
             <UButton color="primary" icon="i-lucide-share" @click="sharePage" />
           </UTooltip>
         </template>
@@ -86,7 +86,7 @@
             :loading="creating"
             @click="createBioPage"
           >
-            Continue to Editor
+            {{ t('dashboard.editor.continueToEditor') }}
             <UIcon name="i-lucide-arrow-right" class="w-5 h-5 ml-2" />
           </UButton>
         </div>
@@ -110,8 +110,8 @@
               <div v-if="showTemplatePicker" class="mt-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                 <div class="mb-3 flex items-start justify-between gap-3">
                   <div>
-                    <h3 class="font-semibold text-highlighted dark:text-white">Start from a template</h3>
-                    <p class="text-sm text-muted dark:text-neutral-400">Pick a starting point. Every template includes sample content, a theme and a matching 3D room.</p>
+                    <h3 class="font-semibold text-highlighted dark:text-white">{{ t('dashboard.editor.templateHeading') }}</h3>
+                    <p class="text-sm text-muted dark:text-neutral-400">{{ t('dashboard.editor.templateIntro') }}</p>
                   </div>
                   <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" @click="templatePickerDismissed = true" />
                 </div>
@@ -160,7 +160,7 @@
               <!-- The phone frame is the card, so no modal chrome around it -->
               <UModal
                 v-model:open="previewOpen"
-                title="Preview"
+                :title="t('common.preview')"
                 :ui="{ content: 'w-auto max-w-none bg-transparent shadow-none ring-0 divide-y-0 overflow-visible' }"
               >
                 <template #content>
@@ -173,7 +173,7 @@
                       color="neutral"
                       variant="solid"
                       class="absolute -right-3 -top-3 rounded-full shadow-lg"
-                      aria-label="Close preview"
+                      :aria-label="t('dashboard.editor.closePreview')"
                       @click="previewOpen = false"
                     />
                   </div>
@@ -190,32 +190,32 @@
                   </div>
                   <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
                     <div>
-                      <h3 class="font-semibold text-highlighted">Your 3D room</h3>
+                      <h3 class="font-semibold text-highlighted">{{ t('dashboard.editor.room.heading') }}</h3>
                       <p class="mt-1 text-sm text-muted">
-                        {{ roomModel.objects.length }} objects. Furnish it and pick a land in the full-screen editor.
+                        {{ t('dashboard.editor.room.objects', { n: roomModel.objects.length }) }}
                       </p>
                     </div>
                     <div>
-                      <UButton icon="i-lucide-box" label="Open 3D editor" size="sm" :loading="openingRoom" @click="openRoomEditor" />
+                      <UButton icon="i-lucide-box" :label="t('dashboard.editor.room.openEditor')" size="sm" :loading="openingRoom" @click="openRoomEditor" />
                     </div>
                   </div>
                 </div>
 
                 <div class="flex items-start justify-between gap-4 rounded-xl border border-default bg-default p-4 dark:border-white/10">
                   <div>
-                    <p class="text-sm font-medium text-highlighted">Show the 3D room first</p>
+                    <p class="text-sm font-medium text-highlighted">{{ t('dashboard.editor.room.showFirst') }}</p>
                     <p class="mt-0.5 text-sm text-muted">
                       {{ pageMode === '3d'
-                        ? 'Visitors land in your 3D room and can switch to the site with one tap.'
-                        : 'Visitors see your site. The 3D room stays hidden until you turn this on.' }}
+                        ? t('dashboard.editor.room.modeOn')
+                        : t('dashboard.editor.room.modeOff') }}
                     </p>
                   </div>
                   <USwitch :model-value="pageMode === '3d'" @update:model-value="setPageMode($event ? '3d' : '2d')" />
                 </div>
 
                 <div class="flex justify-end gap-2">
-                  <UButton color="neutral" variant="outline" icon="i-lucide-save" :loading="saving" @click="saveBio">Save draft</UButton>
-                  <UButton icon="i-lucide-globe" :loading="publishing" @click="publishBio">Publish</UButton>
+                  <UButton color="neutral" variant="outline" icon="i-lucide-save" :loading="saving" @click="saveBio">{{ t('common.saveDraft') }}</UButton>
+                  <UButton icon="i-lucide-globe" :loading="publishing" @click="publishBio">{{ t('common.publish') }}</UButton>
                 </div>
               </div>
             </template>
@@ -224,9 +224,9 @@
             <template v-else-if="item.value === 'settings'">
               <div class="pt-4 max-w-lg mx-auto space-y-6">
                 <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Site address</h3>
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.addressHeading') }}</h3>
                   <p class="text-sm text-muted dark:text-neutral-400 mb-3">
-                    Your public site address
+                    {{ t('dashboard.editor.settings.addressText') }}
                   </p>
                   <div
                     class="flex items-center gap-2 bg-muted dark:bg-white/[0.03] border border-default dark:border-white/10 rounded-lg px-3 py-2"
@@ -240,9 +240,9 @@
 
                 <!-- Site language -->
                 <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Site language</h3>
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.languageHeading') }}</h3>
                   <p class="text-sm text-muted dark:text-neutral-400 mb-3">
-                    The language of buttons and labels your visitors see, like opening hours and “Book now”. Your own text stays as you write it.
+                    {{ t('dashboard.editor.settings.languageText') }}
                   </p>
                   <USelect
                     :model-value="normalizeSiteLanguage(bioData.themeConfig.language)"
@@ -254,9 +254,9 @@
 
                 <!-- Template -->
                 <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Template</h3>
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.templateHeading') }}</h3>
                   <p class="text-sm text-muted dark:text-neutral-400 mb-3">
-                    Replace the page content, theme and 3D room with a template.
+                    {{ t('dashboard.editor.settings.templateText') }}
                   </p>
                   <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
                 </div>
@@ -266,10 +266,10 @@
                   <div class="flex items-center justify-between">
                     <div>
                       <h3 class="font-semibold text-highlighted dark:text-white mb-1">
-                        Share Button
+                        {{ t('dashboard.editor.settings.shareHeading') }}
                       </h3>
                       <p class="text-sm text-muted dark:text-neutral-400">
-                        Show a floating share button on your site
+                        {{ t('dashboard.editor.settings.shareText') }}
                       </p>
                     </div>
                     <USwitch
@@ -283,20 +283,20 @@
                 </div>
 
                 <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Visibility</h3>
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.visibilityHeading') }}</h3>
                   <p class="text-sm text-muted dark:text-neutral-400 mb-3">
-                    Control who can see your site
+                    {{ t('dashboard.editor.settings.visibilityText') }}
                   </p>
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="text-sm font-medium text-highlighted dark:text-white">
-                        {{ existingBio?.isPublished ? "Published" : "Draft" }}
+                        {{ existingBio?.isPublished ? t('dashboard.editor.settings.published') : t('dashboard.editor.settings.draft') }}
                       </p>
                       <p class="text-xs text-muted dark:text-neutral-400">
                         {{
                           existingBio?.isPublished
-                            ? "Your page is publicly visible"
-                            : "Only you can see this page"
+                            ? t('dashboard.editor.settings.publicText')
+                            : t('dashboard.editor.settings.privateText')
                         }}
                       </p>
                     </div>
@@ -304,7 +304,7 @@
                       :color="existingBio?.isPublished ? 'success' : 'neutral'"
                       variant="soft"
                     >
-                      {{ existingBio?.isPublished ? "Live" : "Draft" }}
+                      {{ existingBio?.isPublished ? t('dashboard.editor.settings.live') : t('dashboard.editor.settings.draft') }}
                     </UBadge>
                   </div>
                 </div>
@@ -340,6 +340,7 @@ definePageMeta({
 });
 
 const toast = useToast();
+const { t } = useI18n();
 const confirm = useConfirm();
 
 // State
@@ -410,11 +411,11 @@ const onBioPageChange = (username: string) => {
 // Editor tabs
 const previewOpen = ref(false);
 
-const editorTabs = [
-  { value: "site", label: "Site", icon: "i-lucide-layout-list" },
-  { value: "room", label: "3D room", icon: "i-lucide-box" },
-  { value: "settings", icon: "i-lucide-settings", "aria-label": "Settings" },
-];
+const editorTabs = computed(() => [
+  { value: "site", label: t("dashboard.editor.tabs.site"), icon: "i-lucide-layout-list" },
+  { value: "room", label: t("dashboard.editor.tabs.room"), icon: "i-lucide-box" },
+  { value: "settings", icon: "i-lucide-settings", "aria-label": t("common.settings") },
+]);
 
 // Computed
 const canProceed = computed(() => {
@@ -468,15 +469,15 @@ const sharePage = async () => {
   const url = `https://perlink.to/${username.value}`;
   try {
     await navigator.share({
-      title: bioData.title || "Your Name",
+      title: bioData.title || t("dashboard.editor.shareFallbackTitle"),
       url: url,
     });
   } catch (err) {
     // Fallback: copy to clipboard
     await navigator.clipboard.writeText(url);
     toast.add({
-      title: "Copied!",
-      description: "URL copied to clipboard",
+      title: t("dashboard.toast.copied"),
+      description: t("dashboard.toast.urlCopied"),
       color: "success",
     });
   }
@@ -484,14 +485,13 @@ const sharePage = async () => {
 
 const checkUsername = async () => {
   if (username.value.length < 3) {
-    usernameError.value = "Username must be at least 3 characters";
+    usernameError.value = t("dashboard.editor.usernameTooShort");
     usernameAvailable.value = false;
     return;
   }
 
   if (!/^[a-zA-Z0-9_-]+$/.test(username.value)) {
-    usernameError.value =
-      "Only letters, numbers, underscore and hyphen allowed";
+    usernameError.value = t("dashboard.editor.usernameInvalid");
     usernameAvailable.value = false;
     return;
   }
@@ -524,14 +524,14 @@ const createBioPage = async () => {
     existingBio.value = response.bioPage;
     step.value = "edit";
     toast.add({
-      title: "Site created!",
-      description: "Now customize your page",
+      title: t("dashboard.editor.created"),
+      description: t("dashboard.editor.createdText"),
       color: "success",
     });
   } catch (error: any) {
     toast.add({
-      title: "Error",
-      description: error.data?.statusMessage || "Failed to create site",
+      title: t("dashboard.toast.error"),
+      description: error.data?.statusMessage || t("dashboard.editor.createFailed"),
       color: "error",
     });
   } finally {
@@ -560,8 +560,8 @@ const removeLink = (index: number) => {
 const saveBio = async () => {
   if (!existingBio.value?.username) {
     toast.add({
-      title: "Error",
-      description: "No site to save",
+      title: t("dashboard.toast.error"),
+      description: t("dashboard.editor.noSiteToSave"),
       color: "error",
     });
     return;
@@ -582,14 +582,14 @@ const saveBio = async () => {
     });
 
     toast.add({
-      title: "Saved!",
-      description: "Your changes have been saved",
+      title: t("dashboard.toast.saved"),
+      description: t("dashboard.editor.savedText"),
       color: "success",
     });
   } catch (error: any) {
     toast.add({
-      title: "Error",
-      description: error.data?.statusMessage || "Failed to save",
+      title: t("dashboard.toast.error"),
+      description: error.data?.statusMessage || t("dashboard.editor.saveFailed"),
       color: "error",
     });
   } finally {
@@ -600,8 +600,8 @@ const saveBio = async () => {
 const publishBio = async () => {
   if (!existingBio.value?.username) {
     toast.add({
-      title: "Error",
-      description: "No site to publish",
+      title: t("dashboard.toast.error"),
+      description: t("dashboard.editor.noSiteToPublish"),
       color: "error",
     });
     return;
@@ -623,14 +623,14 @@ const publishBio = async () => {
     existingBio.value = response.bioPage;
 
     toast.add({
-      title: "Published!",
-      description: `Your page is now live at perlink.to/${existingBio.value.username}`,
+      title: t("dashboard.toast.published"),
+      description: t("dashboard.editor.publishedText", { username: existingBio.value.username }),
       color: "success",
     });
   } catch (error: any) {
     toast.add({
-      title: "Error",
-      description: error.data?.statusMessage || "Failed to publish",
+      title: t("dashboard.toast.error"),
+      description: error.data?.statusMessage || t("dashboard.editor.publishFailed"),
       color: "error",
     });
   } finally {
@@ -642,8 +642,8 @@ const copyUrl = () => {
   const url = `https://perlink.to/${existingBio.value.username}`;
   navigator.clipboard.writeText(url);
   toast.add({
-    title: "Copied!",
-    description: "URL copied to clipboard",
+    title: t("dashboard.toast.copied"),
+    description: t("dashboard.toast.urlCopied"),
     color: "success",
   });
 };
@@ -738,8 +738,8 @@ const applyTemplate = async (templateId: string) => {
   templatePickerDismissed.value = true;
   activeBlock.value = content.blocks[0]?.name ?? "header";
   toast.add({
-    title: `${template.name} applied`,
-    description: "Edit the sample content, then save or publish.",
+    title: t("dashboard.editor.templateApplied", { name: t(`dashboard.templates.${template.id}.name`) }),
+    description: t("dashboard.editor.templateAppliedText"),
     color: "success",
   });
 };
@@ -748,9 +748,9 @@ const confirmApplyTemplate = async (templateId: string) => {
   const template = PAGE_TEMPLATES.find((t) => t.id === templateId);
   if (!template) return;
   const ok = await confirm({
-    title: `Apply "${template.name}"?`,
-    description: "This replaces your current blocks, theme and 3D room. Your changes are not saved until you click Save.",
-    confirmLabel: "Apply template",
+    title: t("dashboard.editor.applyTitle", { name: t(`dashboard.templates.${template.id}.name`) }),
+    description: t("dashboard.editor.applyText"),
+    confirmLabel: t("dashboard.editor.applyConfirm"),
     color: "primary",
   });
   if (ok) await applyTemplate(templateId);
