@@ -46,18 +46,18 @@
         >
           <template #item="{ element: social, index }">
             <div
-              class="flex items-center gap-3 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-lg border border-gray-200 dark:border-white/10 p-3 mb-2 last:mb-0"
+              class="flex items-end gap-2 sm:gap-3 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-lg border border-gray-200 dark:border-white/10 p-3 mb-2 last:mb-0"
             >
               <!-- Drag Handle -->
               <div
-                class="drag-handle cursor-move text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300 flex-shrink-0"
+                class="drag-handle flex h-8 cursor-move items-center text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300 flex-shrink-0"
               >
                 <UIcon name="i-lucide-grip-vertical" class="w-5 h-5" />
               </div>
 
               <!-- Provider Icon -->
               <div
-                class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                class="size-8 rounded-lg flex items-center justify-center flex-shrink-0"
                 :style="{
                   backgroundColor: getProviderColor(social.provider) + '20',
                 }"
@@ -69,35 +69,23 @@
                 />
               </div>
 
-              <!-- URL Input -->
-              <UInput
-                :model-value="social.url"
-                :placeholder="!isUsernameProvider(social.provider) && !isInputFocused(social.id) ? '' : getProviderPlaceholder(social.provider)"
-                size="lg"
-                class="flex-1"
-                @update:model-value="updateSocialUrl(social.id, $event)"
-                @focus="onInputFocus(social.id)"
-                @blur="onInputBlur(social.id)"
-              >
-                <label
-                  class="flex items-center pointer-events-none absolute left-0 px-1.5 transition-all"
-                  :class="isUsernameProvider(social.provider) || isInputFocused(social.id) || !!social.url
-                    ? '-top-2.5 text-highlighted text-xs font-medium'
-                    : 'top-2 text-dimmed text-sm font-normal'"
-                >
-                  <span class="inline-flex bg-default px-1">
-                    {{ getProviderLabel(social.provider) }}
-
-                    <span
-                      class="inline-flex items-center text-xs text-gray-500 dark:text-neutral-400 ml-1"
-                      >{{ t('blocks.social.clicks', { n: social.clicks || 0 }) }}</span
-                    >
-                  </span>
+              <!-- Provider name above its link or username -->
+              <div class="min-w-0 flex-1">
+                <label :for="`social-${social.id}`" class="mb-1 block text-xs font-medium text-highlighted">
+                  {{ getProviderLabel(social.provider) }}
                 </label>
-                <template v-if="isUsernameProvider(social.provider)" #leading>
-                  <span>@</span>
-                </template>
-              </UInput>
+                <UInput
+                  :id="`social-${social.id}`"
+                  :model-value="social.url"
+                  :placeholder="getProviderPlaceholder(social.provider)"
+                  class="w-full"
+                  @update:model-value="updateSocialUrl(social.id, $event)"
+                >
+                  <template v-if="isUsernameProvider(social.provider)" #leading>
+                    <span class="text-muted">@</span>
+                  </template>
+                </UInput>
+              </div>
 
               <!-- Delete Button -->
               <UButton
@@ -105,7 +93,8 @@
                 color="neutral"
                 size="xs"
                 icon="i-lucide-trash-2"
-                class="flex-shrink-0 text-gray-400 dark:text-neutral-500 hover:text-red-500"
+                class="flex-shrink-0 mb-0.5 text-gray-400 dark:text-neutral-500 hover:text-red-500"
+                :aria-label="t('common.delete')"
                 @click="deleteSocial(social.id)"
               />
             </div>
@@ -129,10 +118,9 @@
       <UButton
         block
         color="neutral"
-        variant="solid"
+        variant="outline"
         icon="i-lucide-plus"
         :label="t('blocks.social.addSocial')"
-        class="bg-gray-900 text-white hover:bg-gray-800"
         @click="openAddModal"
       />
     </div>
@@ -234,20 +222,7 @@ function emitUpdate() {
 }
 
 const isAddModalOpen = ref(false);
-const focusedSocialIds = ref<Set<string>>(new Set());
 const providerSearchQuery = ref('');
-
-function onInputFocus(socialId: string) {
-  focusedSocialIds.value.add(socialId);
-}
-
-function onInputBlur(socialId: string) {
-  focusedSocialIds.value.delete(socialId);
-}
-
-function isInputFocused(socialId: string): boolean {
-  return focusedSocialIds.value.has(socialId);
-}
 
 // Get providers not yet added, filtered by search query
 const availableProviders = computed(() => {

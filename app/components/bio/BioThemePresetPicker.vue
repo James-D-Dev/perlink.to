@@ -14,30 +14,22 @@
           <button
             v-for="preset in getPresets(item.value as ThemePresetCategory)"
             :key="preset.id"
-            class="relative rounded-xl overflow-hidden border-2 text-left transition-all hover:scale-[1.02] active:scale-[0.98]"
-            :class="selectedId === preset.id ? 'border-perlink-cyan ring-2 ring-cyan-200' : 'border-transparent'"
+            type="button"
+            class="relative overflow-hidden rounded-lg text-left ring-1 transition hover:-translate-y-px active:translate-y-0"
+            :class="selectedId === preset.id ? 'ring-2 ring-inverted' : 'ring-default hover:ring-accented dark:ring-white/10'"
             @click="selectPreset(preset)"
           >
-            <!-- Preview swatch -->
+            <!-- Preview: a tiny page in the preset's colours -->
             <div
-              class="h-16 w-full flex flex-col items-center justify-center gap-1 px-2"
+              class="flex h-24 w-full flex-col items-center gap-1 px-3 pt-2.5"
               :style="previewBgStyle(preset)"
             >
-              <!-- Fake avatar -->
-              <div
-                class="w-6 h-6 rounded-full"
-                :style="{ backgroundColor: preset.preview.card, border: `2px solid ${preset.preview.text}40` }"
-              />
-              <!-- Fake card bars -->
-              <div class="w-full space-y-1 px-1">
-                <div
-                  class="h-2 rounded w-full opacity-70"
-                  :style="{ backgroundColor: preset.preview.card }"
-                />
-                <div
-                  class="h-2 rounded w-full opacity-50"
-                  :style="{ backgroundColor: preset.preview.card }"
-                />
+              <div class="size-5 shrink-0 rounded-full" :style="{ backgroundColor: preset.theme.colors?.secondary || preset.preview.text }" />
+              <div class="h-1 w-10 rounded-full" :style="{ backgroundColor: preset.preview.text }" />
+              <div class="mt-1 w-full space-y-1">
+                <div v-for="i in 2" :key="i" class="flex h-3.5 items-center justify-center rounded" :style="previewCardStyle(preset)">
+                  <div class="h-0.5 w-1/3 rounded-full" :style="{ backgroundColor: preset.theme.card?.textColor || preset.preview.text, opacity: 0.8 }" />
+                </div>
               </div>
             </div>
 
@@ -50,9 +42,9 @@
             <!-- Selected check -->
             <div
               v-if="selectedId === preset.id"
-              class="absolute top-1.5 right-1.5 w-4 h-4 bg-cyan-500 rounded-full flex items-center justify-center"
+              class="absolute top-1.5 right-1.5 flex size-4 items-center justify-center rounded-full bg-inverted text-inverted"
             >
-              <UIcon name="i-lucide-check" class="w-2.5 h-2.5 text-white" />
+              <UIcon name="i-lucide-check" class="size-2.5" />
             </div>
           </button>
         </div>
@@ -104,6 +96,21 @@ function previewBgStyle(preset: ThemePreset) {
     return { background: `linear-gradient(${angle}deg, ${stops})` }
   }
   return { backgroundColor: preset.preview.bg }
+}
+
+function previewCardStyle(preset: ThemePreset) {
+  // Cards are drawn in the accent colour on the real page
+  const color = preset.theme.card?.backgroundColor || preset.theme.colors?.primary || preset.preview.card
+  switch (preset.theme.card?.style) {
+    case 'outline':
+      return { border: `1px solid ${color}` }
+    case 'ghost':
+      return { backgroundColor: `color-mix(in srgb, ${color} 8%, transparent)` }
+    case 'soft':
+      return { backgroundColor: `color-mix(in srgb, ${color} 30%, transparent)` }
+    default:
+      return { backgroundColor: color }
+  }
 }
 
 function selectPreset(preset: ThemePreset) {

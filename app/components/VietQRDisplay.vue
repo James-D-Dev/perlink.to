@@ -26,8 +26,9 @@
 
     <!-- QR Content -->
     <div v-if="isActive" class="p-4 space-y-4">
-      <div class="grid grid-cols-2 gap-4">
-        <div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <!-- On phones the form comes first and the QR below it -->
+        <div class="order-last sm:order-none">
           <!-- QR Display -->
           <div
             v-if="qrString"
@@ -63,7 +64,7 @@
           <!-- Placeholder when no QR generated -->
           <div
             v-else
-            class="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-300 dark:border-white/15 bg-gray-50/50 dark:bg-white/[0.03] relative w-full aspect-[800/1157] overflow-hidden rounded-xl"
+            class="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-300 dark:border-white/15 bg-gray-50/50 dark:bg-white/[0.03] relative w-full overflow-hidden rounded-xl max-sm:py-6 sm:aspect-[800/1157]"
           >
             <UIcon name="i-lucide-qr-code" class="w-12 h-12 text-gray-300" />
             <p class="text-sm text-gray-500 dark:text-neutral-400 text-center">

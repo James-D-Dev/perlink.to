@@ -40,20 +40,29 @@
       <!-- Layout Selector -->
       <div>
         <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block">{{ t('blocks.album.layout') }}</label>
-        <div class="grid grid-cols-4 gap-2">
-          <UButton
-            v-for="layout in layouts"
-            :key="layout.value"
-            size="sm"
-            :variant="selectedLayout === layout.value ? 'solid' : 'outline'"
-            :color="selectedLayout === layout.value ? 'primary' : 'neutral'"
-            class="flex-1"
-            @click="selectLayout(layout.value)"
-          >
-            <UIcon :name="layout.icon" class="w-4 h-4 mr-1" />
-            {{ layout.label }}
-          </UButton>
-        </div>
+        <BioVisualPicker :model-value="selectedLayout" :options="layouts" @update:model-value="selectLayout($event)">
+          <template #preview="{ value }">
+            <span v-if="value === 'grid'" class="grid w-3/4 grid-cols-3 gap-0.5">
+              <span v-for="i in 6" :key="i" class="aspect-square rounded-[2px] bg-gray-300 dark:bg-white/25" />
+            </span>
+            <span v-else-if="value === 'masonry'" class="grid w-3/4 grid-cols-3 items-start gap-0.5">
+              <span class="h-5 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+              <span class="h-3 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+              <span class="h-6 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+              <span class="h-3 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+              <span class="h-5 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+              <span class="h-2 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+            </span>
+            <span v-else-if="value === 'vertical'" class="flex w-1/2 flex-col gap-0.5">
+              <span v-for="i in 3" :key="i" class="h-3 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+            </span>
+            <span v-else class="flex w-full items-center gap-0.5 overflow-hidden">
+              <span class="h-7 w-2 shrink-0 rounded-r-[2px] bg-gray-200 dark:bg-white/15" />
+              <span class="h-8 flex-1 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+              <span class="h-7 w-2 shrink-0 rounded-l-[2px] bg-gray-200 dark:bg-white/15" />
+            </span>
+          </template>
+        </BioVisualPicker>
       </div>
 
       <!-- Upload Area -->

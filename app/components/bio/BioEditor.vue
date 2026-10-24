@@ -48,7 +48,7 @@
               @toggle="$emit('toggleBlock', block.id)"
               @add="(link: Partial<BioLink>) => addLink(block, link)"
               @remove="(index: number) => removeLink(block, index)"
-              @update-link="(index: number, field: string, value: string) => updateLink(block, index, field, value)"
+              @update-link="(index: number, field: string, value: string | boolean) => updateLink(block, index, field, value)"
               @update="(items: BioLink[]) => patchData(block.id, { items: reorder(items) })"
               @select-image="onSelectImage"
               @update-title="(title: string) => patchData(block.id, { title })"
@@ -358,7 +358,7 @@ function removeLink(block: BioBlock, index: number) {
   patchData(block.id!, { items: reorder(items) });
 }
 
-function updateLink(block: BioBlock, index: number, field: string, value: string) {
+function updateLink(block: BioBlock, index: number, field: string, value: string | boolean) {
   const items = sortedLinks(block);
   if (!items[index]) return;
   items[index] = { ...items[index]!, [field]: value };

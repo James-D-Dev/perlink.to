@@ -19,12 +19,12 @@
       </UFormField>
 
       <div class="space-y-2">
-        <div v-for="(day, index) in data.days" :key="day.day" class="flex items-center gap-2">
-          <span class="w-12 text-sm font-medium text-gray-700 dark:text-neutral-200">{{ dayNames[day.day] }}</span>
-          <UInput type="time" :model-value="day.open" :disabled="day.closed" class="flex-1" @update:model-value="updateDay(index, { open: String($event) })" />
+        <div v-for="(day, index) in data.days" :key="day.day" class="flex items-center gap-1.5 sm:gap-2">
+          <span class="w-11 shrink-0 sm:w-16 whitespace-nowrap text-sm font-medium text-gray-700 dark:text-neutral-200">{{ dayNames[day.day] }}</span>
+          <UInput type="time" :model-value="day.open" :disabled="day.closed" class="min-w-0 flex-1" :ui="timeUi" @update:model-value="updateDay(index, { open: String($event) })" />
           <span class="text-gray-400 dark:text-neutral-500">–</span>
-          <UInput type="time" :model-value="day.close" :disabled="day.closed" class="flex-1" @update:model-value="updateDay(index, { close: String($event) })" />
-          <UCheckbox :model-value="day.closed" :label="t('blocks.hours.closed')" @update:model-value="updateDay(index, { closed: Boolean($event) })" />
+          <UInput type="time" :model-value="day.close" :disabled="day.closed" class="min-w-0 flex-1" :ui="timeUi" @update:model-value="updateDay(index, { close: String($event) })" />
+          <UCheckbox class="shrink-0" :model-value="day.closed" :label="t('blocks.hours.closed')" @update:model-value="updateDay(index, { closed: Boolean($event) })" />
         </div>
       </div>
 
@@ -57,6 +57,9 @@
 </template>
 
 <script setup lang="ts">
+// Phones tap the field for the native picker, so the clock icon only steals room
+const timeUi = { base: 'max-sm:px-2 max-sm:[&::-webkit-calendar-picker-indicator]:hidden' }
+
 import type { BioBlock, HoursBlock, OpeningDay } from '~/types/bio'
 import { DEFAULT_OPENING_DAYS } from '~/types/bio'
 import { useBioBlock } from '~/composables/useBioBlock'

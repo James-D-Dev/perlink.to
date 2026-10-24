@@ -142,7 +142,6 @@
 
 <script setup lang="ts">
 import type { ThemeHeaderLayout, SocialLink } from '~/types/bio'
-import avatarDefault from '~/assets/images/avatar-default-1.jpg'
 import { useBannerUpload } from '~/composables/useBannerUpload'
 
 const props = defineProps<{
@@ -184,6 +183,8 @@ const activeTab = ref<'no-banner' | 'banner'>(
 const activeOptions = computed(() => activeTab.value === 'banner' ? BANNER_OPTIONS.value : NO_BANNER_OPTIONS.value)
 
 
+// Neutral stand-in until the owner adds a photo
+const avatarDefault = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#d4d4d8"/><circle cx="20" cy="16" r="7" fill="#f4f4f5"/><path d="M6 40c1.5-8 7-12 14-12s12.5 4 14 12z" fill="#f4f4f5"/></svg>')}`
 const avatarSrc = computed(() => props.avatarUrl || avatarDefault)
 
 function onAvatarError(e: Event) {

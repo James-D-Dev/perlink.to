@@ -19,11 +19,14 @@
       "linkTitlePlaceholder": "Title (required)",
       "linkSubtitlePlaceholder": "Subtitle (optional)",
       "linkUrlPlaceholder": "URL or email (required)",
-      "add": "Add"
+      "add": "Add",
+      "visible": "Shown",
+      "hidden": "Hidden",
+      "addLabel": "Quick add a link",
+      "addHelp": "Paste an address and the title is filled in for you."
     },
     "social": {
       "title": "Social Links",
-      "clicks": "- Clicks: {n}",
       "empty": "No social links added yet",
       "addSocial": "Add social",
       "modalTitle": "Add Social Link",
@@ -153,7 +156,7 @@
     },
     "vietqr": {
       "title": "VietQR Payment",
-      "emptyHint": "Please complete the form beside and press the Generate button",
+      "emptyHint": "Fill in your bank details and press Generate",
       "selectBank": "Select bank",
       "accountNumber": "Account number",
       "accountName": "Account name",
@@ -299,6 +302,9 @@
       "detailPlaceholder": "e.g. Google review",
       "add": "Add a review",
       "stars": "{n} star | {n} stars"
+    },
+    "preview": {
+      "empty": "{name} — nothing to show yet"
     }
   }
 }

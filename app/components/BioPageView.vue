@@ -370,6 +370,16 @@
             :button-style="solidButtonStyle"
             :heading-style="headingStyle"
           />
+          <!-- In the editor, a block with nothing to show yet still gets a spot -->
+          <div
+            v-if="isPreview && !hasContent(block)"
+            :id="blockDomId(block)"
+            class="flex items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-5 text-sm opacity-60"
+            :style="{ borderColor: 'currentColor' }"
+          >
+            <UIcon name="i-lucide-square-dashed" class="size-4" />
+            {{ t('blocks.preview.empty', { name: t(`blocks.picker.items.${pickerKey(block.name)}.label`) }) }}
+          </div>
           <!-- more block -->
         </template>
       </div>
@@ -556,6 +566,8 @@ const avatarFallbackStyle = computed(() => ({
 // Previews (editor, template thumbnails) also show items that still need a
 // URL, so a fresh template looks complete; the public page hides them
 const isPreview = computed(() => props.mode === "preview");
+// Dashboard language, for editor-only hints
+const { t } = useI18n();
 
 // Each block renders from its own data, so a page can hold several of one type
 function linksOf(block: BioBlock): BioLink[] {
@@ -565,6 +577,27 @@ function linksOf(block: BioBlock): BioLink[] {
     .map((l) => (l.url ? l : { ...l, url: "#" }))
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 }
+
+// Mirrors the conditions each block above renders under
+function hasContent(block: BioBlock): boolean {
+  const d = block.data as any;
+  switch (block.name) {
+    case "social": return socialsOf(block).length > 0;
+    case "links": return linksOf(block).length > 0;
+    case "text": return !!(d?.content || d?.title);
+    case "image-album": return !!d?.images?.length;
+    case "vietqr": return !!d?.qrString;
+    case "birthday-countdown": return !!d?.birthDate;
+    case "menu": return !!d?.sections?.length;
+    case "hours": return !!d?.days?.length;
+    case "contact": return !!(d?.address || d?.phone || d?.email || d?.bookingUrl);
+    case "video": return !!videoEmbed(d?.url);
+    case "testimonials": return !!d?.items?.some((i: any) => i.quote);
+    default: return true;
+  }
+}
+
+const pickerKey = (name: string) => name.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
 
 function socialsOf(block: BioBlock): SocialLink[] {
   if (block.name !== "social") return [];

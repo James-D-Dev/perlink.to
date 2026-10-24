@@ -19,11 +19,14 @@
       "linkTitlePlaceholder": "Tiêu đề (bắt buộc)",
       "linkSubtitlePlaceholder": "Phụ đề (không bắt buộc)",
       "linkUrlPlaceholder": "URL hoặc email (bắt buộc)",
-      "add": "Thêm"
+      "add": "Thêm",
+      "visible": "Đang hiện",
+      "hidden": "Đang ẩn",
+      "addLabel": "Thêm liên kết nhanh",
+      "addHelp": "Dán đường dẫn, tiêu đề sẽ được tự điền."
     },
     "social": {
       "title": "Biểu tượng mạng xã hội",
-      "clicks": "- Lượt nhấn: {n}",
       "empty": "Chưa có liên kết mạng xã hội nào",
       "addSocial": "Thêm mạng xã hội",
       "modalTitle": "Thêm liên kết mạng xã hội",
@@ -153,7 +156,7 @@
     },
     "vietqr": {
       "title": "Thanh toán VietQR",
-      "emptyHint": "Điền thông tin bên cạnh rồi bấm nút Tạo mã QR",
+      "emptyHint": "Điền thông tin ngân hàng rồi bấm Tạo mã QR",
       "selectBank": "Chọn ngân hàng",
       "accountNumber": "Số tài khoản",
       "accountName": "Tên chủ tài khoản",
@@ -299,6 +302,9 @@
       "detailPlaceholder": "VD: Đánh giá Google",
       "add": "Thêm đánh giá",
       "stars": "{n} sao | {n} sao"
+    },
+    "preview": {
+      "empty": "{name} — chưa có nội dung"
     }
   }
 }

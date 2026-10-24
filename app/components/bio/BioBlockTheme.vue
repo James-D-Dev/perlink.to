@@ -38,7 +38,7 @@
               :selected-id="selectedPresetId"
               @select="onPresetSelect"
             />
-            <div>
+            <div class="mt-6">
               <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block"
                 >{{ t('theme.headerLayout.label') }}</label
               >
@@ -56,601 +56,212 @@
             </div>
           </template>
 
-          <!-- Custom editor -->
+          <!-- Custom editor, grouped so it doesn't read as one long form -->
           <template v-if="editMode === 'custom'">
-            <div class="space-y-6">
-              <!-- Colors -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.colors.title') }}</label
-                >
-                <BioColorPicker
-                  :primary="themeConfig.colors.primary"
-                  :secondary="themeConfig.colors.secondary"
-                  :third="themeConfig.colors.third"
-                  @select="
-                    (p) =>
-                      emit('updateTheme', {
-                        colors: {
-                          primary: p.primary,
-                          secondary: p.secondary,
-                          third: p.third,
-                        },
-                        card: {
-                          ...props.themeConfig.card,
-                          textColor: p.textColor,
-                        },
-                        button: {
-                          ...props.themeConfig.button,
-                          textColor: p.textColor,
-                        },
-                      })
-                  "
-                />
-                <div class="grid grid-cols-3 gap-2 mt-3">
-                  <div
-                    v-for="colorKey in [
-                      'primary',
-                      'secondary',
-                      'third',
-                    ] as const"
-                    :key="colorKey"
-                  >
-                    <label
-                      class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block"
-                      >{{ t(`theme.colors.${colorKey}`) }}</label
-                    >
-                    <div class="flex items-center gap-1.5">
+            <UAccordion
+              v-model="openSections"
+              type="multiple"
+              :items="customSections"
+              :ui="{ item: 'border-b border-default last:border-b-0 dark:border-white/10', trigger: 'py-3 text-sm', body: 'pb-4 pt-0' }"
+            >
+              <template #body="{ item }">
+                <!-- Colours -->
+                <div v-if="item.value === 'colors'" class="space-y-4">
+                  <BioColorPicker
+                    :primary="themeConfig.colors.primary"
+                    :secondary="themeConfig.colors.secondary"
+                    :third="themeConfig.colors.third"
+                    @select="
+                      (p) =>
+                        emit('updateTheme', {
+                          colors: { primary: p.primary, secondary: p.secondary, third: p.third },
+                          card: { ...props.themeConfig.card, textColor: p.textColor },
+                          button: { ...props.themeConfig.button, textColor: p.textColor },
+                        })
+                    "
+                  />
+                  <UFormField :label="t('theme.colors.accent')" :help="t('theme.colors.accentHelp')">
+                    <div class="flex items-center gap-2">
                       <UPopover>
-                        <UButton
-                          size="md"
-                          color="neutral"
-                          variant="outline"
-                          class="p-0 rounded-full overflow-hidden shrink-0"
-                        >
-                          <span
-                            class="size-6 rounded-full border-2 border-gray-300 dark:border-white/15"
-                            :style="{
-                              backgroundColor:
-                                themeConfig.colors[colorKey] || '#000000',
-                            }"
-                          />
+                        <UButton color="neutral" variant="outline" class="shrink-0 overflow-hidden rounded-full p-0" :aria-label="t('theme.colors.accent')">
+                          <span class="size-8 rounded-full border-2 border-white shadow-sm" :style="{ backgroundColor: themeConfig.colors.primary || '#000000' }" />
                         </UButton>
                         <template #content>
-                          <UColorPicker
-                            :model-value="
-                              themeConfig.colors[colorKey] || '#000000'
-                            "
-                            class="p-2"
-                            @update:model-value="
-                              emitColors(colorKey, $event || '#000000')
-                            "
-                          />
+                          <UColorPicker :model-value="themeConfig.colors.primary || '#000000'" class="p-2" @update:model-value="emitColors('primary', $event || '#000000')" />
                         </template>
                       </UPopover>
-                      <UInput
-                        :model-value="themeConfig.colors[colorKey]"
-                        size="xs"
-                        class="flex-1 font-mono"
-                        @update:model-value="
-                          emitColors(colorKey, $event as string)
-                        "
-                      />
+                      <UInput :model-value="themeConfig.colors.primary" class="w-32 font-mono" @update:model-value="emitColors('primary', $event as string)" />
                     </div>
+                  </UFormField>
+                  <div>
+                    <p class="mb-2 text-sm font-medium text-default">{{ t('theme.background.title') }}</p>
+                    <BioBackgroundPicker :background="themeConfig.background" @select="(v) => emit('updateTheme', { background: v })" />
                   </div>
                 </div>
-              </div>
 
-              <!-- Background -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.background.title') }}</label
-                >
-                <BioBackgroundPicker
-                  :background="themeConfig.background"
-                  @select="(v) => emit('updateTheme', { background: v })"
-                />
-              </div>
+                <!-- Text -->
+                <div v-else-if="item.value === 'text'" class="space-y-5">
+                  <UFormField :label="t('theme.text.general')" :help="t('theme.text.generalHelp')">
+                    <FontSelect :model-value="themeConfig.typography.paragraphFont" :font-options="paragraphFontOptions" @update:model-value="onGenericParagraphFontChange($event)" />
+                  </UFormField>
 
-              <!-- Header -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.header.title') }}</label
-                >
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  <!-- Font Family -->
-                  <UFormField :label="t('theme.fields.fontFamily')">
-                    <FontSelect
-                      :model-value="themeConfig.header.fontFamily || 'system-ui'"
-                      :font-options="nameFontOptions"
-                      @update:model-value="onNameFontChange($event)"
-                    />
-                  </UFormField>
-                  <!-- Font Size -->
-                  <UFormField :label="t('theme.fields.fontSize')">
-                    <USelect
-                      :model-value="themeConfig.header.fontSize || '1.5rem'"
-                      :items="headerFontSizeOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emitHeader('fontSize', $event)"
-                    />
-                  </UFormField>
-                  <!-- Text Color -->
-                  <UFormField :label="t('theme.fields.textColor')">
-                    <div class="flex items-center gap-2">
-                      <UPopover>
-                        <UButton
-                          size="md"
-                          color="neutral"
-                          variant="outline"
-                          class="p-0 rounded-full overflow-hidden"
-                        >
-                          <span
-                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
-                            :style="{
-                              backgroundColor:
-                                themeConfig.header.textColor ||
-                                themeConfig.colors?.primary ||
-                                '#000000',
-                            }"
-                          />
-                        </UButton>
-                        <template #content>
-                          <UColorPicker
-                            :model-value="
-                              themeConfig.header.textColor ||
-                              themeConfig.colors?.primary ||
-                              '#000000'
-                            "
-                            class="p-2"
-                            @update:model-value="
-                              emitHeader('textColor', $event)
-                            "
-                          />
-                        </template>
-                      </UPopover>
-                      <button
-                        v-if="themeConfig.header.textColor"
-                        class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
-                        @click="emitHeader('textColor', undefined)"
-                      >
-                        {{ t('common.reset') }}
-                      </button>
+                  <div>
+                    <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{{ t('theme.header.title') }}</p>
+                    <div class="grid grid-cols-2 gap-3">
+                      <UFormField :label="t('theme.fields.fontFamily')" class="col-span-2">
+                        <FontSelect :model-value="themeConfig.header.fontFamily || themeConfig.typography.nameFont || 'system-ui'" :font-options="nameFontOptions" @update:model-value="onNameFontChange($event)" />
+                      </UFormField>
+                      <UFormField :label="t('theme.fields.fontSize')">
+                        <USelect :model-value="themeConfig.header.fontSize || '1.5rem'" :items="headerFontSizeOptions" class="w-full" @update:model-value="emitHeader('fontSize', $event)" />
+                      </UFormField>
+                      <UFormField :label="t('theme.fields.weight')">
+                        <USelect :model-value="themeConfig.header.fontWeight || '700'" :items="fontWeightOptions" class="w-full" @update:model-value="emitHeader('fontWeight', $event)" />
+                      </UFormField>
+                      <UFormField :label="t('theme.fields.letterSpacing')">
+                        <USelect :model-value="themeConfig.header.letterSpacing || 'normal'" :items="letterSpacingOptions" class="w-full" @update:model-value="emitHeader('letterSpacing', $event === 'normal' ? undefined : $event)" />
+                      </UFormField>
+                      <UFormField :label="t('theme.fields.textColor')">
+                        <BioColorField :model-value="themeConfig.header.textColor" :fallback="themeConfig.typography.textColor || '#334155'" :label="t('theme.fields.textColor')" :placeholder="t('common.auto')" @update:model-value="emitHeader('textColor', $event)" />
+                      </UFormField>
                     </div>
-                  </UFormField>
-                  <!-- Weight -->
-                  <UFormField :label="t('theme.fields.weight')">
-                    <USelect
-                      :model-value="themeConfig.header.fontWeight || '700'"
-                      :items="fontWeightOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emitHeader('fontWeight', $event)"
-                    />
-                  </UFormField>
-                  <!-- Letter spacing -->
-                  <UFormField :label="t('theme.fields.letterSpacing')">
-                    <USelect
-                      :model-value="themeConfig.header.letterSpacing || 'normal'"
-                      :items="letterSpacingOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emitHeader('letterSpacing', $event === 'normal' ? undefined : $event)"
-                    />
-                  </UFormField>
-                  <!-- Block titles -->
-                  <UFormField :label="t('theme.header.blockTitleFont')">
-                    <FontSelect
-                      :model-value="themeConfig.typography.headingFont || 'system-ui'"
-                      :font-options="headingFontOptions"
-                      @update:model-value="onHeadingFontChange($event)"
-                    />
+                  </div>
+
+                  <div>
+                    <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{{ t('theme.bio.title') }}</p>
+                    <div class="grid grid-cols-2 gap-3">
+                      <UFormField :label="t('theme.fields.fontFamily')" class="col-span-2">
+                        <FontSelect :model-value="themeConfig.typography.bioFontFamily || themeConfig.typography.paragraphFont || 'system-ui'" :font-options="paragraphFontOptions" @update:model-value="onParagraphFontChange($event)" />
+                      </UFormField>
+                      <UFormField :label="t('theme.fields.fontSize')">
+                        <USelect :model-value="themeConfig.typography.bioFontSize || '0.875rem'" :items="bioFontSizeOptions" class="w-full" @update:model-value="emitTypography('bioFontSize', $event)" />
+                      </UFormField>
+                      <UFormField :label="t('theme.fields.textColor')">
+                        <BioColorField :model-value="themeConfig.typography.bioTextColor" :fallback="themeConfig.typography.textColor || '#334155'" :label="t('theme.fields.textColor')" :placeholder="t('common.auto')" @update:model-value="emitTypography('bioTextColor', $event)" />
+                      </UFormField>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{{ t('theme.page.blockTitles') }}</p>
+                    <div class="grid grid-cols-2 gap-3">
+                      <UFormField :label="t('theme.fields.fontFamily')" class="col-span-2 sm:col-span-1">
+                        <FontSelect :model-value="themeConfig.typography.headingFont || 'system-ui'" :font-options="headingFontOptions" @update:model-value="onHeadingFontChange($event)" />
+                      </UFormField>
+                      <UFormField :label="t('theme.text.align')" class="col-span-2 sm:col-span-1">
+                        <USelect :model-value="themeConfig.page?.titleAlign || 'center'" :items="titleAlignOptions" class="w-full" @update:model-value="emitPage('titleAlign', $event)" />
+                      </UFormField>
+                    </div>
+                  </div>
+
+                  <UFormField :label="t('theme.text.pageColor')" :help="t('theme.text.pageColorHelp')">
+                    <BioColorField :model-value="themeConfig.typography.textColor" fallback="#334155" :label="t('theme.page.textColorAria')" :placeholder="t('common.auto')" @update:model-value="emitTypography('textColor', $event)" />
                   </UFormField>
                 </div>
-              </div>
 
-              <!-- Bio Text -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.bio.title') }}</label
-                >
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  <!-- Font Family -->
-                  <UFormField :label="t('theme.fields.fontFamily')">
-                    <FontSelect
-                      :model-value="themeConfig.typography.bioFontFamily || 'system-ui'"
-                      :font-options="paragraphFontOptions"
-                      @update:model-value="onParagraphFontChange($event)"
-                    />
-                  </UFormField>
-                  <!-- Font Size -->
-                  <UFormField :label="t('theme.fields.fontSize')">
-                    <USelect
-                      :model-value="
-                        themeConfig.typography.bioFontSize || '0.875rem'
-                      "
-                      :items="bioFontSizeOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="
-                        emitTypography('bioFontSize', $event)
-                      "
-                    />
-                  </UFormField>
-                  <!-- Text Color -->
-                  <UFormField :label="t('theme.fields.textColor')">
-                    <div class="flex items-center gap-2">
-                      <UPopover>
-                        <UButton
-                          size="md"
-                          color="neutral"
-                          variant="outline"
-                          class="p-0 rounded-full overflow-hidden"
-                        >
-                          <span
-                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
-                            :style="{
-                              backgroundColor:
-                                themeConfig.typography.bioTextColor ||
-                                themeConfig.colors?.primary ||
-                                '#000000',
-                            }"
-                          />
-                        </UButton>
-                        <template #content>
-                          <UColorPicker
-                            :model-value="
-                              themeConfig.typography.bioTextColor ||
-                              themeConfig.colors?.primary ||
-                              '#000000'
-                            "
-                            class="p-2"
-                            @update:model-value="
-                              emitTypography('bioTextColor', $event)
-                            "
-                          />
-                        </template>
-                      </UPopover>
-                      <button
-                        v-if="themeConfig.typography.bioTextColor"
-                        class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
-                        @click="emitTypography('bioTextColor', undefined)"
-                      >
-                        {{ t('common.reset') }}
-                      </button>
-                    </div>
-                  </UFormField>
-                </div>
-              </div>
-
-              <!-- Card -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.card.title') }}</label
-                >
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  <!-- Style -->
+                <!-- Cards & buttons -->
+                <div v-else-if="item.value === 'cards'" class="space-y-4">
                   <UFormField :label="t('theme.card.style')">
-                    <USelect
-                      :model-value="themeConfig.card.style || 'filled'"
-                      :items="cardStyleOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emitCard('style', $event)"
-                    />
+                    <BioVisualPicker :model-value="themeConfig.card.style || 'filled'" :options="cardStyleOptions" @update:model-value="emitCard('style', $event)">
+                      <template #preview="{ value }">
+                        <span class="flex h-5 w-full items-center justify-center rounded text-[8px] font-semibold" :style="cardPreviewStyle(value)">Aa</span>
+                      </template>
+                    </BioVisualPicker>
                   </UFormField>
-                  <!-- Surface colour -->
-                  <UFormField :label="t('theme.card.color')" :help="t('theme.card.colorHelp')">
-                    <BioColorField
-                      :model-value="themeConfig.card.backgroundColor"
-                      :fallback="themeConfig.colors.primary"
-                      :label="t('theme.card.colorAria')"
-                      :placeholder="t('common.auto')"
-                      @update:model-value="emitCard('backgroundColor', $event)"
-                    />
-                  </UFormField>
-                  <!-- Border colour -->
-                  <UFormField :label="t('theme.card.borderColor')">
-                    <BioColorField
-                      :model-value="themeConfig.card.outlineColor"
-                      :fallback="themeConfig.colors.primary"
-                      :label="t('theme.card.borderColorAria')"
-                      :placeholder="t('common.auto')"
-                      @update:model-value="emitCard('outlineColor', $event)"
-                    />
-                  </UFormField>
-                  <!-- Text Color -->
-                  <UFormField :label="t('theme.fields.textColor')">
-                    <div class="flex items-center gap-2">
-                      <UPopover>
-                        <UButton
-                          size="md"
-                          color="neutral"
-                          variant="outline"
-                          class="p-0 rounded-full overflow-hidden"
-                        >
-                          <span
-                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
-                            :style="{
-                              backgroundColor:
-                                themeConfig.card.textColor || '#000000',
-                            }"
-                          />
-                        </UButton>
-                        <template #content>
-                          <UColorPicker
-                            :model-value="
-                              themeConfig.card.textColor || '#000000'
-                            "
-                            class="p-2"
-                            @update:model-value="emitCard('textColor', $event)"
-                          />
-                        </template>
-                      </UPopover>
+                  <UFormField :label="t('theme.card.cornerRadius')">
+                    <div class="flex flex-wrap gap-1.5">
                       <button
-                        v-if="themeConfig.card.textColor"
-                        class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
-                        @click="emitCard('textColor', undefined)"
+                        v-for="r in radiusOptions"
+                        :key="r.value"
+                        type="button"
+                        class="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs transition"
+                        :class="activeRadius === r.value ? 'border-inverted text-highlighted ring-1 ring-inverted' : 'border-default text-muted hover:border-accented dark:border-white/10'"
+                        @click="emitCard('cornerRadius', r.value)"
                       >
-                        {{ t('common.reset') }}
+                        <span class="size-3.5 border-2 border-current" :style="{ borderRadius: `${Math.min(r.value, 7)}px`, borderBottomColor: 'transparent', borderLeftColor: 'transparent' }" />
+                        {{ r.label }}
                       </button>
                     </div>
                   </UFormField>
-                  <!-- Corner Radius -->
-                  <UFormField :label="t('theme.card.cornerRadius')">
-                    <UInput
-                      :model-value="String(themeConfig.card.cornerRadius)"
-                      size="md"
-                      type="number"
-                      class="w-full"
-                      @update:model-value="
-                        emitCard('cornerRadius', Number($event))
-                      "
-                    />
-                  </UFormField>
-                  <!-- Shadow -->
-                  <UFormField :label="t('theme.card.shadow')">
-                    <USelect
-                      :model-value="themeConfig.card.shadow || 'none'"
-                      :items="shadowOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emitCard('shadow', $event as string)"
-                    />
-                  </UFormField>
-                  <!-- Backdrop Blur -->
-                  <UFormField :label="t('theme.card.backdropBlur')">
-                    <USelect
-                      :model-value="themeConfig.card.backdropBlur || 'none'"
-                      :items="backdropBlurOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="
-                        emitCard('backdropBlur', $event as string)
-                      "
-                    />
-                  </UFormField>
-                  <!-- Appear Animation -->
-                  <UFormField :label="t('theme.card.appearAnimation')">
-                    <USelect
-                      :model-value="themeConfig.card.animationAppear || 'none'"
-                      :items="appearOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="
-                        emitCard('animationAppear', $event as string)
-                      "
-                    />
-                  </UFormField>
-                  <!-- Hover Animation -->
-                  <UFormField :label="t('theme.card.hoverAnimation')">
-                    <USelect
-                      :model-value="themeConfig.card.animationHover || 'none'"
-                      :items="hoverOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="
-                        emitCard('animationHover', $event as string)
-                      "
-                    />
-                  </UFormField>
+                  <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <UFormField :label="t('theme.card.color')">
+                      <BioColorField :model-value="themeConfig.card.backgroundColor" :fallback="themeConfig.colors.primary" :label="t('theme.card.colorAria')" :placeholder="t('common.auto')" @update:model-value="emitCard('backgroundColor', $event)" />
+                    </UFormField>
+                    <UFormField :label="t('theme.fields.textColor')">
+                      <BioColorField :model-value="themeConfig.card.textColor" fallback="#ffffff" :label="t('theme.fields.textColor')" :placeholder="t('common.auto')" @update:model-value="emitCard('textColor', $event)" />
+                    </UFormField>
+                    <UFormField :label="t('theme.card.borderColor')">
+                      <BioColorField :model-value="themeConfig.card.outlineColor" :fallback="themeConfig.colors.primary" :label="t('theme.card.borderColorAria')" :placeholder="t('common.auto')" @update:model-value="emitCard('outlineColor', $event)" />
+                    </UFormField>
+                    <UFormField :label="t('theme.card.shadow')">
+                      <USelect :model-value="themeConfig.card.shadow || 'none'" :items="shadowOptions" class="w-full" @update:model-value="emitCard('shadow', $event as string)" />
+                    </UFormField>
+                    <UFormField :label="t('theme.card.backdropBlur')">
+                      <USelect :model-value="themeConfig.card.backdropBlur || 'none'" :items="backdropBlurOptions" class="w-full" @update:model-value="emitCard('backdropBlur', $event as string)" />
+                    </UFormField>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Button -->
-              <!-- <div>
-            `  <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">Button Style</label>
-              <div class="flex items-center gap-2 mb-3">
-                <label class="text-xs text-gray-500 dark:text-neutral-400">Text Color</label>
-                <input
-                  type="color"
-                  :value="themeConfig.button.textColor || '#ffffff'"
-                  class="w-8 h-8 rounded cursor-pointer border border-gray-200 dark:border-white/10"
-                  @input="emitButton('textColor', ($event.target as HTMLInputElement).value)"
-                />
-                <button
-                  v-if="themeConfig.button.textColor"
-                  class="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300"
-                  @click="emitButton('textColor', undefined)"
-                >reset</button>
-              </div>
-              <div class="flex gap-2 flex-wrap">
-                <UButton
-                  v-for="style in (['filled', 'outline', 'ghost', 'soft'] as const)"
-                  :key="style"
-                  size="xs"
-                  :variant="themeConfig.button.style === style ? 'solid' : 'outline'"
-                  :color="themeConfig.button.style === style ? 'primary' : 'neutral'"
-                  @click="emitButton('style', style)"
-                >
-                  {{ style }}
-                </UButton>
-              </div>
-              <div class="grid grid-cols-2 gap-3 mt-3">
-                <div>
-                  <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Appear animation</label>
-                  <USelect
-                    :model-value="themeConfig.button.animationAppear || 'none'"
-                    :items="appearOptions"
-                    size="sm"
-                    @update:model-value="emitButton('animationAppear', $event as string)"
-                  />
-                </div>
-                <div>
-                  <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Hover animation</label>
-                  <USelect
-                    :model-value="themeConfig.button.animationHover || 'none'"
-                    :items="hoverOptions"
-                    size="sm"
-                    @update:model-value="emitButton('animationHover', $event as string)"
-                  />
-                </div>
-              </div>
-              <div class="mt-3">
-                <label class="text-xs text-gray-500 dark:text-neutral-400 mb-1 block">Duration</label>
-                <USelect
-                  :model-value="themeConfig.button.animationDuration || 'normal'"
-                  :items="durationOptions"
-                  size="sm"
-                  @update:model-value="emitButton('animationDuration', $event as string)"
-                />
-              </div>
-            </div> -->
-
-              <!-- Page -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.page.title') }}</label
-                >
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  <UFormField :label="t('theme.fields.textColor')">
-                    <BioColorField
-                      :model-value="themeConfig.typography.textColor"
-                      fallback="#334155"
-                      :label="t('theme.page.textColorAria')"
-                      :placeholder="t('common.auto')"
-                      @update:model-value="emitTypography('textColor', $event)"
-                    />
+                <!-- Layout -->
+                <div v-else-if="item.value === 'layout'" class="space-y-4">
+                  <UFormField :label="t('theme.linkLayout.title')">
+                    <BioVisualPicker :model-value="themeConfig.link.layout" :options="linkLayoutOptions" @update:model-value="emitLink('layout', $event)">
+                      <template #preview="{ value }">
+                        <span
+                          class="flex w-full gap-1 rounded bg-white p-1 shadow-sm dark:bg-white/10"
+                          :class="value === 'vertical' ? 'flex-col' : value === 'horizontal-right' ? 'flex-row-reverse items-center' : value === 'centered' ? 'items-center justify-center py-2' : 'items-center'"
+                        >
+                          <span v-if="value !== 'centered'" class="shrink-0 rounded-sm bg-gray-300 dark:bg-white/25" :class="value === 'vertical' ? 'h-5 w-full' : 'size-5'" />
+                          <span class="flex min-w-0 flex-1 flex-col gap-0.5" :class="value === 'centered' ? 'items-center' : ''">
+                            <span class="h-1 w-3/4 rounded-full bg-gray-400 dark:bg-white/40" />
+                            <span class="h-1 w-1/2 rounded-full bg-gray-300 dark:bg-white/20" />
+                          </span>
+                        </span>
+                      </template>
+                    </BioVisualPicker>
                   </UFormField>
-                  <UFormField :label="t('theme.page.blockSpacing')">
-                    <USelect
-                      :model-value="themeConfig.page?.blockGap || 'normal'"
-                      :items="blockGapOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emitPage('blockGap', $event)"
-                    />
-                  </UFormField>
-                  <UFormField :label="t('theme.page.blockTitles')">
-                    <USelect
-                      :model-value="themeConfig.page?.titleAlign || 'center'"
-                      :items="titleAlignOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emitPage('titleAlign', $event)"
-                    />
+                  <UFormField :label="t('theme.avatar.title')">
+                    <BioVisualPicker :model-value="themeConfig.avatar.shape" :options="avatarShapeOptions" :cols="3" @update:model-value="emitAvatar('shape', $event)">
+                      <template #preview="{ value }">
+                        <img v-if="avatarUrl" :src="avatarUrl" alt="" class="size-10 object-cover" :style="{ borderRadius: avatarRadius(value) }">
+                        <span v-else class="flex size-10 items-center justify-center bg-gray-200 text-gray-400 dark:bg-white/10" :style="{ borderRadius: avatarRadius(value) }">
+                          <UIcon name="i-lucide-user" class="size-5" />
+                        </span>
+                      </template>
+                    </BioVisualPicker>
                   </UFormField>
                   <UFormField :label="t('theme.page.socialIcons')">
-                    <USelect
-                      :model-value="themeConfig.social?.style || 'soft'"
-                      :items="socialStyleOptions"
-                      size="md"
-                      class="w-full"
-                      @update:model-value="emit('updateTheme', { social: { style: $event as any } })"
-                    />
+                    <BioVisualPicker :model-value="themeConfig.social?.style || 'soft'" :options="socialStyleOptions" @update:model-value="emit('updateTheme', { social: { style: $event as any } })">
+                      <template #preview="{ value }">
+                        <span class="flex gap-1">
+                          <span v-for="i in 3" :key="i" class="flex size-5 items-center justify-center rounded-full" :style="socialPreviewStyle(value)">
+                            <span class="size-2 rounded-[2px]" :style="{ backgroundColor: value === 'filled' ? '#fff' : accent }" />
+                          </span>
+                        </span>
+                      </template>
+                    </BioVisualPicker>
+                  </UFormField>
+                  <UFormField :label="t('theme.page.blockSpacing')">
+                    <BioVisualPicker :model-value="themeConfig.page?.blockGap || 'normal'" :options="blockGapOptions" :cols="3" @update:model-value="emitPage('blockGap', $event)">
+                      <template #preview="{ value }">
+                        <span class="flex w-3/4 flex-col" :class="value === 'compact' ? 'gap-0.5' : value === 'relaxed' ? 'gap-2' : 'gap-1'">
+                          <span v-for="i in 3" :key="i" class="h-2 rounded-sm bg-gray-300 dark:bg-white/25" />
+                        </span>
+                      </template>
+                    </BioVisualPicker>
                   </UFormField>
                 </div>
-              </div>
 
-              <!-- Typography -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.font.title') }}</label
-                >
-                <FontSelect
-                  :model-value="themeConfig.typography.paragraphFont"
-                  :font-options="paragraphFontOptions"
-                  @update:model-value="onGenericParagraphFontChange($event)"
-                />
-              </div>
-
-              <!-- Avatar -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.avatar.title') }}</label
-                >
-                <div class="flex gap-3">
-                  <UButton
-                    v-for="shape in ['circle', 'rounded', 'square'] as const"
-                    :key="shape"
-                    variant="outline"
-                    color="neutral"
-                    class="flex flex-col items-center gap-1.5 flex-1 h-auto py-2 px-2"
-                    :class="
-                      themeConfig.avatar.shape === shape
-                        ? 'border-primary-500! bg-primary-50!'
-                        : ''
-                    "
-                    @click="emitAvatar('shape', shape)"
-                  >
-                    <img
-                      :src="avatarUrl || avatarDefaultImg"
-                      class="w-10 h-10 object-cover"
-                      :style="{
-                        borderRadius:
-                          shape === 'circle'
-                            ? '9999px'
-                            : shape === 'rounded'
-                              ? '8px'
-                              : '2px',
-                      }"
-                      @error="
-                        (e) =>
-                          ((e.target as HTMLImageElement).src =
-                            avatarDefaultImg)
-                      "
-                    />
-                    <span
-                      class="text-[10px] font-medium"
-                      :class="
-                        themeConfig.avatar.shape === shape
-                          ? 'text-primary-600'
-                          : 'text-gray-500 dark:text-neutral-400'
-                      "
-                      >{{ t(`theme.avatar.shapes.${shape}`) }}</span
-                    >
-                  </UButton>
+                <!-- Effects -->
+                <div v-else-if="item.value === 'effects'" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <UFormField :label="t('theme.card.appearAnimation')">
+                    <USelect :model-value="themeConfig.card.animationAppear || 'none'" :items="appearOptions" class="w-full" @update:model-value="emitCard('animationAppear', $event as string)" />
+                  </UFormField>
+                  <UFormField :label="t('theme.card.hoverAnimation')">
+                    <USelect :model-value="themeConfig.card.animationHover || 'none'" :items="hoverOptions" class="w-full" @update:model-value="emitCard('animationHover', $event as string)" />
+                  </UFormField>
                 </div>
-              </div>
-
-              <!-- Link Card Layout -->
-              <div>
-                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-                  >{{ t('theme.linkLayout.title') }}</label
-                >
-                <div class="flex flex-col gap-2">
-                  <UButton
-                    v-for="opt in linkLayoutOptions"
-                    :key="opt.value"
-                    size="xs"
-                    :variant="
-                      themeConfig.link.layout === opt.value
-                        ? 'solid'
-                        : 'outline'
-                    "
-                    :color="
-                      themeConfig.link.layout === opt.value
-                        ? 'primary'
-                        : 'neutral'
-                    "
-                    @click="emitLink('layout', opt.value)"
-                  >
-                    {{ opt.label }}
-                  </UButton>
-                </div>
-              </div>
-            </div>
+              </template>
+            </UAccordion>
           </template>
         </template>
       </UTabs>
@@ -663,7 +274,6 @@ import type { Template, ThemeConfig, SocialLink } from "~/types/bio";
 import { type ThemePreset } from "~/data/themePresets";
 import { nameFontOptions, headingFontOptions, paragraphFontOptions, type FontOption } from "~/data/fontOptions";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
-import avatarDefaultImg from "~/assets/images/avatar-default-1.jpg";
 
 const { t } = useI18n();
 
@@ -726,6 +336,73 @@ const titleAlignOptions = computed(() => [
   { label: t("theme.page.titleAlign.left"), value: "left" },
 ]);
 const selectedPresetId = ref<string | undefined>(undefined);
+
+// Sections of the custom tab; effects stay closed since few people need them
+const openSections = ref<string[]>(["colors"]);
+const customSections = computed(() => [
+  { label: t("theme.sections.colors"), icon: "i-lucide-palette", value: "colors" },
+  { label: t("theme.sections.text"), icon: "i-lucide-type", value: "text" },
+  { label: t("theme.sections.cards"), icon: "i-lucide-rectangle-horizontal", value: "cards" },
+  { label: t("theme.sections.layout"), icon: "i-lucide-layout-template", value: "layout" },
+  { label: t("theme.sections.effects"), icon: "i-lucide-sparkles", value: "effects" },
+]);
+
+const radiusOptions = computed(() => [
+  { label: t("theme.options.none"), value: 0 },
+  { label: t("theme.options.small"), value: 6 },
+  { label: t("theme.options.medium"), value: 12 },
+  { label: t("theme.options.large"), value: 20 },
+  { label: t("theme.card.pill"), value: 999 },
+]);
+
+// Older themes may hold any number; light up the nearest preset
+const activeRadius = computed(() => {
+  const current = Number(props.themeConfig.card.cornerRadius ?? 12);
+  return radiusOptions.value.reduce((best, r) =>
+    Math.abs(r.value - current) < Math.abs(best.value - current) ? r : best,
+  ).value;
+});
+
+const avatarShapeOptions = computed(() =>
+  (["circle", "rounded", "square"] as const).map((value) => ({
+    label: t(`theme.avatar.shapes.${value}`),
+    value,
+  })),
+);
+
+const avatarRadius = (shape: string) =>
+  shape === "circle" ? "9999px" : shape === "rounded" ? "8px" : "2px";
+
+const accent = computed(() => props.themeConfig.colors.primary || "#111827");
+
+// Small look-alikes of a card in each style, in the site's accent colour
+function cardPreviewStyle(style: string) {
+  const color = accent.value;
+  switch (style) {
+    case "outline":
+      return { border: `1.5px solid ${color}`, color };
+    case "ghost":
+      return { color };
+    case "soft":
+      return { backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`, color };
+    default:
+      return { backgroundColor: color, color: props.themeConfig.card.textColor || "#fff" };
+  }
+}
+
+function socialPreviewStyle(style: string) {
+  const color = accent.value;
+  switch (style) {
+    case "filled":
+      return { backgroundColor: color };
+    case "outline":
+      return { border: `1.5px solid ${color}` };
+    case "plain":
+      return {};
+    default:
+      return { backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)` };
+  }
+}
 
 function onPresetSelect(preset: ThemePreset) {
   selectedPresetId.value = preset.id;

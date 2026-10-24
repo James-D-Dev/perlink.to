@@ -48,7 +48,9 @@
         "playful": "Playful",
         "dark": "Dark",
         "gradient": "Gradient"
-      }
+      },
+      "accent": "Accent colour",
+      "accentHelp": "Used for cards, buttons and icons."
     },
     "background": {
       "title": "Background",
@@ -92,7 +94,8 @@
         "outline": "Outline",
         "ghost": "Ghost",
         "soft": "Soft"
-      }
+      },
+      "pill": "Pill"
     },
     "fontWeights": {
       "light": "Light",
@@ -265,6 +268,20 @@
       "neon-purple": {
         "description": "Vaporwave purple on dark"
       }
+    },
+    "sections": {
+      "colors": "Colours & background",
+      "text": "Text",
+      "cards": "Cards & buttons",
+      "layout": "Layout",
+      "effects": "Effects"
+    },
+    "text": {
+      "general": "Main font",
+      "generalHelp": "Used for the text in your blocks.",
+      "align": "Alignment",
+      "pageColor": "Content text colour",
+      "pageColorHelp": "Colour of the text inside blocks."
     }
   },
   "analytics": {

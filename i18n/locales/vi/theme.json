@@ -48,7 +48,9 @@
         "playful": "Vui tươi",
         "dark": "Tối",
         "gradient": "Chuyển sắc"
-      }
+      },
+      "accent": "Màu nhấn",
+      "accentHelp": "Dùng cho thẻ, nút và biểu tượng."
     },
     "background": {
       "title": "Nền",
@@ -92,7 +94,8 @@
         "outline": "Viền",
         "ghost": "Trong suốt",
         "soft": "Nhạt"
-      }
+      },
+      "pill": "Tròn hẳn"
     },
     "fontWeights": {
       "light": "Mảnh",
@@ -265,6 +268,20 @@
       "neon-purple": {
         "description": "Tím vaporwave trên nền tối"
       }
+    },
+    "sections": {
+      "colors": "Màu sắc & nền",
+      "text": "Chữ",
+      "cards": "Thẻ & nút",
+      "layout": "Bố cục",
+      "effects": "Hiệu ứng"
+    },
+    "text": {
+      "general": "Phông chữ chung",
+      "generalHelp": "Dùng cho nội dung các khối.",
+      "align": "Căn lề",
+      "pageColor": "Màu chữ nội dung",
+      "pageColorHelp": "Màu chữ của văn bản trong các khối."
     }
   },
   "analytics": {

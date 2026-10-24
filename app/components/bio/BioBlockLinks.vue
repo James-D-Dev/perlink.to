@@ -97,73 +97,39 @@
                 </button>
               </div>
 
-              <!-- Bottom Action Bar -->
+              <!-- Bottom bar: show or hide this link, delete it -->
               <div
-                class="flex items-center justify-between px-4 py-2 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]"
+                class="flex items-center justify-between gap-2 px-4 py-2 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]"
               >
-                <!-- Left: Action Icons -->
-                <div class="flex items-center gap-1">
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-lucide-star"
-                  />
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-lucide-calendar"
-                  />
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-lucide-clock"
-                  />
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-lucide-share"
-                  />
-                </div>
-
-                <!-- Right: More + Delete -->
-                <div class="flex items-center gap-1">
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-lucide-bar-chart-2"
-                  />
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-lucide-more-horizontal"
-                  />
-                  <div class="w-px h-4 bg-gray-300 mx-1" />
-                  <UButton
-                    color="error"
-                    variant="ghost"
-                    size="xs"
-                    icon="i-lucide-trash-2"
-                    @click="$emit('remove', index)"
-                  />
-                </div>
+                <USwitch
+                  :model-value="link.isActive !== false"
+                  size="sm"
+                  :label="link.isActive !== false ? t('blocks.links.visible') : t('blocks.links.hidden')"
+                  :ui="{ label: 'text-xs text-muted font-normal' }"
+                  @update:model-value="$emit('updateLink', index, 'isActive', $event)"
+                />
+                <UButton
+                  color="error"
+                  variant="ghost"
+                  size="xs"
+                  icon="i-lucide-trash-2"
+                  :label="t('common.delete')"
+                  @click="$emit('remove', index)"
+                />
               </div>
             </div>
           </template>
         </draggable>
 
-        <!-- Add Link Input -->
+        <!-- Add a link by pasting its address; the title is filled in for you -->
+        <UFormField :label="t('blocks.links.addLabel')" :help="t('blocks.links.addHelp')">
         <div class="flex gap-2">
           <UInput
             v-model="newLinkUrl"
             placeholder="https://..."
-            variant="soft"
+            icon="i-lucide-link"
             class="flex-1"
+            @keydown.enter.prevent="newLinkUrl && addLinkFromUrl()"
           />
           <UButton
             color="primary"
@@ -175,6 +141,7 @@
             {{ t('blocks.links.add') }}
           </UButton>
         </div>
+        </UFormField>
       </div>
     </div>
 
@@ -207,8 +174,8 @@ const emit = defineEmits<{
   remove: [index: number];
   updateLink: [
     index: number,
-    field: "title" | "subtitle" | "url" | "icon",
-    value: string,
+    field: "title" | "subtitle" | "url" | "icon" | "isActive",
+    value: string | boolean,
   ];
   selectImage: [index: number];
   update: [links: BioLink[]];

@@ -28,19 +28,23 @@
           <UInput :model-value="data.priceSuffix" :placeholder="t('blocks.menu.priceSuffixPlaceholder')" class="w-full" @update:model-value="update({ priceSuffix: String($event) })" />
         </UFormField>
         <UFormField :label="t('blocks.menu.layout')" class="col-span-2">
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              v-for="option in layouts"
-              :key="option.value"
-              type="button"
-              class="flex items-center gap-2 p-2 rounded-lg border text-sm transition-all"
-              :class="data.layout === option.value ? 'border-primary bg-primary/5' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'"
-              @click="update({ layout: option.value })"
-            >
-              <UIcon :name="option.icon" class="w-4 h-4" />
-              {{ option.label }}
-            </button>
-          </div>
+          <BioVisualPicker :model-value="data.layout || 'list'" :options="layouts" :cols="2" @update:model-value="update({ layout: $event })">
+            <template #preview="{ value }">
+              <!-- List: rows with a price on the right. Cards: tiles with a photo -->
+              <span v-if="value === 'list'" class="flex w-4/5 flex-col gap-1.5">
+                <span v-for="i in 3" :key="i" class="flex items-center gap-1">
+                  <span class="h-1 flex-1 rounded-full bg-gray-400 dark:bg-white/40" />
+                  <span class="h-1 w-3 rounded-full bg-gray-300 dark:bg-white/25" />
+                </span>
+              </span>
+              <span v-else class="grid w-4/5 grid-cols-2 gap-1">
+                <span v-for="i in 2" :key="i" class="flex flex-col gap-0.5 rounded-sm bg-white p-0.5 shadow-sm dark:bg-white/10">
+                  <span class="h-4 rounded-[2px] bg-gray-300 dark:bg-white/25" />
+                  <span class="h-0.5 w-3/4 rounded-full bg-gray-400 dark:bg-white/40" />
+                </span>
+              </span>
+            </template>
+          </BioVisualPicker>
         </UFormField>
       </div>
 
