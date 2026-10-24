@@ -345,6 +345,35 @@
       "deleteConfirmText": "Mọi thứ sẽ bị xóa vĩnh viễn và địa chỉ trang của bạn sẽ trống cho người khác dùng.",
       "deleteTypeEmail": "Nhập {email} để xác nhận.",
       "deleteForever": "Xóa vĩnh viễn"
+    },
+    "onboarding": {
+      "title": "Hoàn thiện trang của bạn",
+      "progress": "Đã xong {done}/{total}",
+      "expand": "Hiện các bước",
+      "collapse": "Ẩn các bước",
+      "dismiss": "Ẩn danh sách",
+      "steps": {
+        "photo": {
+          "title": "Thêm ảnh hoặc logo",
+          "text": "Khách tin tưởng hơn khi thấy gương mặt hoặc logo."
+        },
+        "bio": {
+          "title": "Viết đoạn giới thiệu ngắn",
+          "text": "Một hai dòng về bạn hoặc những gì bạn cung cấp."
+        },
+        "contact": {
+          "title": "Thêm cách liên hệ",
+          "text": "Liên kết, mạng xã hội, thông tin liên hệ hoặc form đặt chỗ."
+        },
+        "publish": {
+          "title": "Xuất bản trang",
+          "text": "Đưa trang lên tại địa chỉ perlink.to của bạn."
+        },
+        "share": {
+          "title": "Chia sẻ liên kết",
+          "text": "Gắn vào bio, gửi qua Zalo hoặc in mã QR để bàn."
+        }
+      }
     }
   }
 }

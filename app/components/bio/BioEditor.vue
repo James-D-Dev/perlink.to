@@ -298,6 +298,9 @@ const emit = defineEmits<{
   preview: [];
 }>();
 
+// Lets the page open the add-block popup (onboarding checklist)
+defineExpose({ openBlockModal: () => (showBlockModal.value = true) });
+
 function onSelectImage(index: number) {
   emit("selectLinkImage", index);
 }

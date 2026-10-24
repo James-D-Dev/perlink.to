@@ -122,6 +122,16 @@
           <template #content="{ item }">
             <!-- Site (2D page) Tab -->
             <template v-if="item.value === 'site'">
+              <!-- First steps to a live site -->
+              <SiteOnboarding
+                v-if="existingBio?.username && !showTemplatePicker"
+                ref="onboardingRef"
+                :bio-data="bioData"
+                :username="existingBio.username"
+                :published="!!existingBio.isPublished"
+                @action="onOnboardingAction"
+              />
+
               <!-- Template picker for empty pages -->
               <div v-if="showTemplatePicker" class="mt-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                 <div class="mb-3 flex items-start justify-between gap-3">
@@ -148,6 +158,7 @@
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pt-4">
                 <div class="lg:col-span-7">
                   <BioEditor
+                    ref="editorRef"
                     :active-block="activeBlock"
                     :bio-data="bioData"
                     :templates="templates"
@@ -492,7 +503,24 @@ const onAddBlock = (blockType: string) => {
   activeBlock.value = newBlock.id!;
 };
 
+// Onboarding checklist: each step takes the owner to the right place
+const onboardingRef = ref<{ markShared: () => void } | null>(null);
+const editorRef = ref<{ openBlockModal: () => void } | null>(null);
+const onOnboardingAction = (step: string) => {
+  if (step === "photo" || step === "bio") {
+    activeBlock.value = "header";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else if (step === "contact") {
+    editorRef.value?.openBlockModal();
+  } else if (step === "publish") {
+    publishBio();
+  } else if (step === "share") {
+    sharePage();
+  }
+};
+
 const sharePage = async () => {
+  onboardingRef.value?.markShared();
   const url = `https://perlink.to/${username.value}`;
   try {
     await navigator.share({
@@ -654,6 +682,7 @@ const publishBio = async () => {
 };
 
 const copyUrl = () => {
+  onboardingRef.value?.markShared();
   const url = `https://perlink.to/${existingBio.value.username}`;
   navigator.clipboard.writeText(url);
   toast.add({

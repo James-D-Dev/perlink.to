@@ -345,6 +345,35 @@
       "deleteConfirmText": "Everything is removed permanently and your site addresses become free for others.",
       "deleteTypeEmail": "Type {email} to confirm.",
       "deleteForever": "Delete forever"
+    },
+    "onboarding": {
+      "title": "Get your site ready",
+      "progress": "{done} of {total} done",
+      "expand": "Show steps",
+      "collapse": "Hide steps",
+      "dismiss": "Hide checklist",
+      "steps": {
+        "photo": {
+          "title": "Add a photo or logo",
+          "text": "People trust a page with a face or a logo."
+        },
+        "bio": {
+          "title": "Write a short intro",
+          "text": "One or two lines about who you are or what you offer."
+        },
+        "contact": {
+          "title": "Add a way to reach you",
+          "text": "Links, social icons, contact details or a booking form."
+        },
+        "publish": {
+          "title": "Publish your site",
+          "text": "Make it live at your perlink.to address."
+        },
+        "share": {
+          "title": "Share your link",
+          "text": "Put it in your bio, on Zalo or print a QR code for your tables."
+        }
+      }
     }
   }
 }
