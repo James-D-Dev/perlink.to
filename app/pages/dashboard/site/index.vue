@@ -21,7 +21,7 @@
       <div class="mx-auto w-full max-w-4xl space-y-6 py-2 sm:py-4">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 class="mk-display text-3xl text-ink sm:text-4xl">{{ t('dashboard.sites.heading') }}</h1>
+            <h1 class="mk-display text-3xl text-ink sm:text-4xl">{{ t('dashboard.sites.title') }}</h1>
             <p v-if="!loading" class="mt-1 text-sm text-ink-muted">
               {{ t('dashboard.sites.count', bioPages.length) }} · {{ t('dashboard.sites.liveCount', { n: liveCount }) }}
             </p>
@@ -109,6 +109,7 @@
                 size="sm"
                 class="ml-1"
                 :label="t('common.publish')"
+                :loading="pendingSite === bio.username"
                 @click="publishBio(bio.username)"
               />
               <UButton
@@ -118,14 +119,8 @@
                 size="sm"
                 class="ml-1 text-ink-muted"
                 :label="t('common.unpublish')"
+                :loading="pendingSite === bio.username"
                 @click="unpublishBio(bio.username)"
-              />
-              <UButton
-                :to="`/dashboard/site/${bio.username}`"
-                size="sm"
-                class="ml-1"
-                icon="i-lucide-pencil"
-                :label="t('common.edit')"
               />
             </div>
           </li>
@@ -238,43 +233,57 @@ const copyUrl = async (username: string) => {
   }
 };
 
+// Update the row right away: re-reading the list just after the write can
+// still return the old state, so the badge looked stuck until a reload
+const pendingSite = ref<string | null>(null);
+const setPublished = (username: string, published: boolean) => {
+  const site = bioPages.value.find((bio) => bio.username === username);
+  if (site) site.isPublished = published;
+};
+
 // Publish bio
 const publishBio = async (username: string) => {
+  pendingSite.value = username;
   try {
     await $fetch(`/api/admin/bio/${username}/publish`, {
       method: "POST" as const,
     });
+    setPublished(username, true);
     toast.add({
       title: t("dashboard.toast.published"),
       description: t("dashboard.sites.publishedText"),
     });
-    await fetchBioPages();
   } catch (error) {
     toast.add({
       title: t("dashboard.toast.error"),
       description: t("dashboard.sites.publishFailed"),
       color: "error",
     });
+  } finally {
+    pendingSite.value = null;
   }
 };
 
 // Unpublish bio
 const unpublishBio = async (username: string) => {
+  pendingSite.value = username;
   try {
     await $fetch(`/api/admin/bio/${username}/unpublish`, {
       method: "POST" as const,
     });
+    setPublished(username, false);
     toast.add({
       title: t("dashboard.toast.unpublished"),
       description: t("dashboard.sites.unpublishedText"),
     });
-    await fetchBioPages();
   } catch (error) {
     toast.add({
       title: t("dashboard.toast.error"),
       description: t("dashboard.sites.unpublishFailed"),
       color: "error",
     });
+  } finally {
+    pendingSite.value = null;
   }
 };
 
