@@ -139,6 +139,9 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: "cloudflare-pages",
+    // Prerender /vi as vi.html: Pages serves it at /vi, while vi/index.html
+    // would redirect to /vi/ and disagree with the canonical URL
+    prerender: { autoSubfolderIndex: false },
     compressPublicAssets: true,
     minify: true,
     timing: true,
