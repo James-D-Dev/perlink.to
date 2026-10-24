@@ -74,7 +74,8 @@ async function save(options: { silent?: boolean } = {}): Promise<boolean> {
   try {
     // Only themeConfig is sent; the API keeps every other field as it is
     const themeConfig = { ...bioPage.value.themeConfig, room: room.value }
-    await $fetch(`/api/admin/bio/${username.value}`, { method: 'PUT' as const, body: { themeConfig } })
+    // Saved as a draft on live sites; Publish makes it visible
+    await $fetch(`/api/admin/bio/${username.value}`, { method: 'PUT' as const, body: { themeConfig, draft: true } })
     bioPage.value = { ...bioPage.value, themeConfig }
     savedSnapshot.value = JSON.stringify(room.value)
     if (!options.silent) toast.add({ title: 'Room saved', color: 'success' })

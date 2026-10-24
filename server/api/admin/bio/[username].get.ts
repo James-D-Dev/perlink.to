@@ -1,4 +1,4 @@
-import { BioRepository } from '../../../repositories/bioRepository'
+import { BioRepository, editableBioPage } from '../../../repositories/bioRepository'
 
 export default defineEventHandler(async (event) => {
   // Check auth
@@ -38,8 +38,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // The editor sees unpublished edits; the public page never does
   return {
     success: true,
-    bioPage
+    bioPage: editableBioPage(bioPage)
   }
 })

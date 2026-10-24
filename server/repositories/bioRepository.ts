@@ -67,9 +67,24 @@ export interface BioPage {
   isPublished: boolean
   viewCount: number
   linkAnalytics: LinkAnalytics
+  /** Unpublished edits of a live site, if any */
+  draft: BioDraft | null
+  draftUpdatedAt: string | null
   createdAt: string
   updatedAt: string
 }
+
+/** The editable content of a site; a draft holds the same fields */
+export interface BioDraft {
+  title?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
+  templateId?: string
+  themeConfig?: ThemeConfig
+  blocks?: BioBlock[]
+}
+
+export const DRAFT_FIELDS = ['title', 'bio', 'avatarUrl', 'templateId', 'themeConfig', 'blocks'] as const
 
 export interface CreateBioPageInput {
   userId: string
@@ -81,6 +96,27 @@ export interface CreateBioPageInput {
   themeConfig?: ThemeConfig
   blocks?: BioBlock[]
   isPublished?: boolean
+}
+
+function parseDraft(value: unknown): BioDraft | null {
+  if (typeof value !== 'string' || !value) return null
+  try {
+    return JSON.parse(value)
+  } catch {
+    return null
+  }
+}
+
+/** What visitors may see: never the unpublished draft */
+export function publicBioPage(page: BioPage) {
+  const { draft: _draft, draftUpdatedAt: _draftUpdatedAt, ...live } = page
+  return live
+}
+
+/** What the editor works on: the live content with any draft on top */
+export function editableBioPage(page: BioPage) {
+  const { draft, ...live } = page
+  return { ...live, ...(draft ?? {}), hasDraft: !!draft }
 }
 
 export class BioRepository {
@@ -118,6 +154,8 @@ export class BioRepository {
       isPublished: Boolean(row.is_published),
       viewCount: row.view_count || 0,
       linkAnalytics: row.link_analytics ? JSON.parse(row.link_analytics) : {},
+      draft: parseDraft(row.draft),
+      draftUpdatedAt: row.draft_updated_at ?? null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }
@@ -216,6 +254,22 @@ export class BioRepository {
     ).run()
 
     return this.findById(id) as Promise<BioPage>
+  }
+
+  /** Store unpublished edits (needs migration 0021) */
+  async saveDraft(id: string, draft: BioDraft): Promise<void> {
+    await this.db.prepare('UPDATE bio_pages SET draft = ?, draft_updated_at = ? WHERE id = ?')
+      .bind(JSON.stringify(draft), new Date().toISOString(), id)
+      .run()
+  }
+
+  /** Drop unpublished edits; harmless before migration 0021 */
+  async clearDraft(id: string): Promise<void> {
+    try {
+      await this.db.prepare('UPDATE bio_pages SET draft = NULL, draft_updated_at = NULL WHERE id = ?').bind(id).run()
+    } catch (error) {
+      console.error('[bioRepository.clearDraft]', error)
+    }
   }
 
   async publish(id: string): Promise<BioPage> {

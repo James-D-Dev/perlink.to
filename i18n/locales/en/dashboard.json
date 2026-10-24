@@ -111,6 +111,13 @@
         "leaveTitle": "Leave without saving?",
         "leaveText": "Your changes to this site haven't been saved yet.",
         "leaveAction": "Leave"
+      },
+      "draft": {
+        "banner": "You have saved changes that visitors can’t see yet. Publish to make them live.",
+        "savedText": "Saved as a draft. Visitors still see the published version until you publish.",
+        "discard": "Discard changes",
+        "discardTitle": "Discard unpublished changes?",
+        "discardText": "The editor goes back to the version visitors see now."
       }
     },
     "username": {

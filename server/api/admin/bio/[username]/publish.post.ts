@@ -1,4 +1,4 @@
-import { BioRepository } from '../../../../repositories/bioRepository'
+import { BioRepository, type CreateBioPageInput } from '../../../../repositories/bioRepository'
 
 export default defineEventHandler(async (event) => {
   // Check auth
@@ -41,7 +41,11 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Publish bio
+    // Publishing applies any saved draft to the live site
+    if (bioPage.draft) {
+      await bioRepo.update(bioPage.id, bioPage.draft as Partial<CreateBioPageInput>)
+      await bioRepo.clearDraft(bioPage.id)
+    }
     const updated = await bioRepo.publish(bioPage.id)
 
     return {

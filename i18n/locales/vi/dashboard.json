@@ -111,6 +111,13 @@
         "leaveTitle": "Rời đi mà không lưu?",
         "leaveText": "Các thay đổi trên trang này chưa được lưu.",
         "leaveAction": "Rời đi"
+      },
+      "draft": {
+        "banner": "Bạn có thay đổi đã lưu nhưng khách chưa thấy. Bấm Xuất bản để cập nhật trang.",
+        "savedText": "Đã lưu nháp. Khách vẫn thấy bản đang xuất bản cho tới khi bạn bấm Xuất bản.",
+        "discard": "Bỏ thay đổi",
+        "discardTitle": "Bỏ các thay đổi chưa xuất bản?",
+        "discardText": "Editor sẽ quay về bản mà khách đang thấy."
       }
     },
     "username": {

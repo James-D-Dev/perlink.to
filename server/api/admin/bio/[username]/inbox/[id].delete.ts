@@ -1,5 +1,5 @@
 import { getDB } from '../../../../../utils/db'
-import { requireOwnedSite } from '../../../../../utils/inbox'
+import { requireOwnedSite } from '../../../../../utils/ownedSite'
 
 export default defineEventHandler(async (event) => {
   const bioPage = await requireOwnedSite(event)

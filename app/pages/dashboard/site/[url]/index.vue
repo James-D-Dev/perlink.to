@@ -134,6 +134,17 @@
                 <BioTemplatePicker @select="applyTemplate" />
               </div>
 
+              <!-- Edits saved but not yet visible to visitors -->
+              <div
+                v-if="existingBio?.isPublished && existingBio?.hasDraft"
+                class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+              >
+                <UIcon name="i-lucide-pencil-line" class="size-4 shrink-0" />
+                <p class="min-w-0 flex-1">{{ t('dashboard.editor.draft.banner') }}</p>
+                <UButton size="xs" color="neutral" variant="ghost" :label="t('dashboard.editor.draft.discard')" :loading="discarding" @click="discardDraft" />
+                <UButton size="xs" :label="t('common.publish')" :loading="publishing" @click="publishBio" />
+              </div>
+
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pt-4">
                 <div class="lg:col-span-7">
                   <BioEditor
@@ -232,7 +243,7 @@
                 </div>
 
                 <div class="flex justify-end gap-2">
-                  <UButton color="neutral" variant="outline" icon="i-lucide-save" :loading="saving" @click="saveBio">{{ t('common.saveDraft') }}</UButton>
+                  <UButton color="neutral" variant="outline" icon="i-lucide-save" :loading="saving" @click="saveBio()">{{ t('common.saveDraft') }}</UButton>
                   <UButton icon="i-lucide-globe" :loading="publishing" @click="publishBio">{{ t('common.publish') }}</UButton>
                 </div>
               </div>
@@ -554,7 +565,7 @@ const createBioPage = async () => {
   }
 };
 
-const saveBio = async () => {
+const saveBio = async ({ silent = false }: { silent?: boolean } = {}) => {
   if (!existingBio.value?.username) {
     toast.add({
       title: t("dashboard.toast.error"),
@@ -566,9 +577,11 @@ const saveBio = async () => {
 
   saving.value = true;
   try {
-    await $fetch(`/api/admin/bio/${existingBio.value.username}`, {
+    // Live sites get a draft; visitors keep seeing the published version until "Publish"
+    const response = await $fetch<{ bioPage: any }>(`/api/admin/bio/${existingBio.value.username}`, {
       method: "PUT" as const,
       body: {
+        draft: true,
         title: bioData.title,
         bio: bioData.bio,
         avatarUrl: bioData.avatarUrl,
@@ -578,12 +591,15 @@ const saveBio = async () => {
       },
     });
     markSaved();
+    existingBio.value = { ...existingBio.value, hasDraft: !!response.bioPage?.hasDraft };
 
-    toast.add({
-      title: t("dashboard.toast.saved"),
-      description: t("dashboard.editor.savedText"),
-      color: "success",
-    });
+    if (!silent) {
+      toast.add({
+        title: t("dashboard.toast.saved"),
+        description: existingBio.value?.hasDraft ? t("dashboard.editor.draft.savedText") : t("dashboard.editor.savedText"),
+        color: "success",
+      });
+    }
   } catch (error: any) {
     toast.add({
       title: t("dashboard.toast.error"),
@@ -607,8 +623,8 @@ const publishBio = async () => {
 
   publishing.value = true;
   try {
-    // First save
-    await saveBio();
+    // Save the edits, then publishing applies them to the live site
+    await saveBio({ silent: true });
 
     // Then publish
     const response = await $fetch(
@@ -807,6 +823,26 @@ const loadBio = async () => {
     }
   } finally {
     loading.value = false;
+  }
+};
+
+// Throw away unpublished edits and reload the live version
+const discarding = ref(false);
+const discardDraft = async () => {
+  if (!existingBio.value?.username) return;
+  const ok = await confirmLeave({
+    title: t("dashboard.editor.draft.discardTitle"),
+    description: t("dashboard.editor.draft.discardText"),
+    confirmLabel: t("dashboard.editor.draft.discard"),
+  });
+  if (!ok) return;
+  discarding.value = true;
+  try {
+    await $fetch(`/api/admin/bio/${existingBio.value.username}/discard-draft`, { method: "POST" as const });
+    savedSnapshot.value = null;
+    await loadBio();
+  } finally {
+    discarding.value = false;
   }
 };
 

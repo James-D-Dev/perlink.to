@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { getDB } from '../../../../../utils/db'
-import { requireOwnedSite } from '../../../../../utils/inbox'
+import { requireOwnedSite } from '../../../../../utils/ownedSite'
 
 // Mark a request as read or unread
 export default defineEventHandler(async (event) => {

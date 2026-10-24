@@ -1,4 +1,4 @@
-import { BioRepository } from '../../repositories/bioRepository'
+import { BioRepository, publicBioPage } from '../../repositories/bioRepository'
 import { AnalyticsRepository } from '../../repositories/analyticsRepository'
 import { isBot, parseDevice, hashIP, parseReferrer, parseUTMParams, detectSourceType } from '../../services/analytics'
 
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      bioPage
+      bioPage: publicBioPage(bioPage)
     }
   }
 
@@ -139,6 +139,6 @@ export default defineEventHandler(async (event) => {
   }
 
   return {
-    bioPage
+    bioPage: publicBioPage(bioPage)
   }
 })

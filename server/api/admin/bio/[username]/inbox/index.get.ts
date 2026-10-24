@@ -1,5 +1,5 @@
 import { getDB } from '../../../../../utils/db'
-import { requireOwnedSite } from '../../../../../utils/inbox'
+import { requireOwnedSite } from '../../../../../utils/ownedSite'
 
 // Requests sent through the site's forms, newest first
 export default defineEventHandler(async (event) => {
