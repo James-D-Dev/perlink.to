@@ -29,7 +29,10 @@ export default defineEventHandler(async (event) => {
     const result = await stmt.run()
     
     if (!result.success) throw createError({ statusCode: 500, statusMessage: 'Failed to toggle ban' })
-    
+
+    // Sign the user out everywhere right away (also harmless when unbanning)
+    await revokeUserSessions(event, userId)
+
     return { success: true }
   } catch (error: any) {
     throw createError({ statusCode: 500, statusMessage: `Failed to toggle ban: ${error.message}` })

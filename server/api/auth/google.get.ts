@@ -84,16 +84,12 @@ export default defineOAuthGoogleEventHandler({
       }
 
       // Set user session with secure cookie
-      await setUserSession(event, {
-        user: {
-          id: profile.id,
-          email: profile.email,
-          username: profile.username || null,
-          name: profile.name || user.name || null,
-          avatar: user.picture || profile.avatar || null,
-        } as any,
-        // Session expires in 7 days
-        maxAge: 60 * 60 * 24 * 7
+      await startUserSession(event, {
+        id: profile.id,
+        email: profile.email,
+        username: profile.username || null,
+        name: profile.name || user.name || null,
+        avatar: user.picture || profile.avatar || null,
       })
 
       // Get redirect path from query or default to dashboard

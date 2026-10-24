@@ -100,15 +100,12 @@ export default defineEventHandler(async (event) => {
     }
 
     // Set session
-    await setUserSession(event, {
-      user: {
-        id: profile.id,
-        email: profile.email || googlePayload.email,
-        username: profile.username,
-        name: profile.name || googlePayload.name || null,
-        avatar: profile.avatar || googlePayload.picture || null,
-      } as any,
-      maxAge: 60 * 60 * 24 * 7 // 7 days
+    await startUserSession(event, {
+      id: profile.id,
+      email: (profile.email || googlePayload.email)!,
+      username: profile.username,
+      name: profile.name || googlePayload.name || null,
+      avatar: profile.avatar || googlePayload.picture || null,
     })
 
     return { success: true, redirect: '/dashboard' }

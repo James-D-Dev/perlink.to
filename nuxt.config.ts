@@ -12,6 +12,15 @@ export default defineNuxtConfig({
 
   // Public runtime config only (private secrets handled by nuxt-auth-utils)
   runtimeConfig: {
+    // Login session: without maxAge the cookie has no expiry, so browsers drop
+    // it when they close (on phones that happens within hours)
+    session: {
+      maxAge: 60 * 60 * 24 * 30,
+      cookie: {
+        sameSite: "lax",
+        secure: isProd,
+      },
+    },
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
       oauthGoogleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID || "",
