@@ -8,7 +8,8 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'perlink-cyan',
-      neutral: 'slate',
+      // Warm grays, matching the paper/sand design system
+      neutral: 'stone',
     },
     colorMode:{
       preference: 'light',

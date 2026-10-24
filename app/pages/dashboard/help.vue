@@ -10,7 +10,7 @@
 
     <template #body>
       <div class="max-w-3xl mx-auto py-8 px-4">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Help & Support</h1>
+        <h1 class="text-2xl font-bold text-highlighted dark:text-white mb-6">Help & Support</h1>
 
         <UCard class="mb-6">
           <template #header>
@@ -19,8 +19,8 @@
                 <UIcon name="i-lucide-mail" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Contact Support</h2>
-                <p class="text-sm text-gray-500 dark:text-neutral-400">Get in touch with our team</p>
+                <h2 class="text-lg font-semibold text-highlighted dark:text-white">Contact Support</h2>
+                <p class="text-sm text-muted dark:text-neutral-400">Get in touch with our team</p>
               </div>
             </div>
           </template>
@@ -94,16 +94,16 @@
                 <UIcon name="i-lucide-help-circle" class="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Frequently Asked Questions</h2>
-                <p class="text-sm text-gray-500 dark:text-neutral-400">Quick answers to common questions</p>
+                <h2 class="text-lg font-semibold text-highlighted dark:text-white">Frequently Asked Questions</h2>
+                <p class="text-sm text-muted dark:text-neutral-400">Quick answers to common questions</p>
               </div>
             </div>
           </template>
 
           <div class="space-y-4">
-            <div v-for="(faq, index) in faqs" :key="index" class="border-b border-gray-100 dark:border-white/5 last:border-0 pb-4 last:pb-0">
-              <h3 class="font-medium text-gray-900 dark:text-white mb-2">{{ faq.question }}</h3>
-              <p class="text-sm text-gray-600 dark:text-neutral-300">{{ faq.answer }}</p>
+            <div v-for="(faq, index) in faqs" :key="index" class="border-b border-muted dark:border-white/5 last:border-0 pb-4 last:pb-0">
+              <h3 class="font-medium text-highlighted dark:text-white mb-2">{{ faq.question }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-300">{{ faq.answer }}</p>
             </div>
           </div>
         </UCard>
@@ -114,7 +114,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  colorMode: "dark",
+  colorMode: 'light',
   layout: "admin",
   middleware: "auth",
 });

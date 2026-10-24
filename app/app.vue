@@ -2,7 +2,7 @@
 const colorMode = useColorMode();
 
 const color = computed(() =>
-  colorMode.value === "dark" ? "#1b1718" : "white",
+  colorMode.value === "dark" ? "#0a0a0a" : "#fdfcfb",
 );
 
 useHead({
@@ -17,16 +17,18 @@ useHead({
   },
 });
 
-const title = "Perlink.to - Portfolio Templates & 3D Pages for Anything";
+// Defaults for pages that don't set their own
+const title = "Perlink — Personal websites and 3D worlds";
 const description =
-  "Build a beautiful page for you, your restaurant, your hotel or your shop with portfolio templates, drag-and-drop editing and interactive 3D mode.";
+  "Build a personal website for your work, restaurant, hotel or shop, and turn it into a 3D world people can explore.";
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-  ogImage: "https://perlink.to/logo-full.png",
+  ogImage: "https://perlink.to/images/og.jpg",
+  ogSiteName: "Perlink",
   twitterCard: "summary_large_image",
 });
 

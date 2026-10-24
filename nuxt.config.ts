@@ -34,16 +34,22 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css", "animate.css/animate.min.css"],
   app: {
     head: {
-      title: "Perlink.to - Portfolio Templates & 3D Pages for Anything",
+      title: "Perlink — Personal websites and 3D worlds",
       meta: [
         {
           name: "description",
           content:
-            "Build a beautiful page for you, your restaurant, your hotel or your shop with portfolio templates, drag-and-drop editing and interactive 3D mode.",
+            "Build a personal website for your work, restaurant, hotel or shop, and turn it into a 3D world people can explore.",
         },
         { name: "apple-mobile-web-app-title", content: "Perlink" },
       ],
       link: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@300;400;500&display=swap",
+        },
         {
           rel: "icon",
           type: "image/png",
@@ -67,6 +73,14 @@ export default defineNuxtConfig({
     "/dashboard/bio/**": { ssr: false },
     // Old user dashboard URLs
     "/admin": { redirect: { to: "/dashboard", statusCode: 301 } },
+    // Short links and QR codes are no longer offered (existing ones still resolve)
+    "/dashboard/links": { redirect: { to: "/dashboard", statusCode: 302 } },
+    "/dashboard/links/**": { redirect: { to: "/dashboard", statusCode: 302 } },
+    "/dashboard/qr": { redirect: { to: "/dashboard", statusCode: 302 } },
+    "/dashboard/qr/**": { redirect: { to: "/dashboard", statusCode: 302 } },
+    "/dashboard/qr-codes": { redirect: { to: "/dashboard", statusCode: 302 } },
+    // Help now opens as a popup from anywhere
+    "/dashboard/help": { redirect: { to: "/dashboard", statusCode: 302 } },
     "/admin/**": { redirect: { to: "/dashboard/**", statusCode: 301 } },
     "/**": {
       ...(isProd

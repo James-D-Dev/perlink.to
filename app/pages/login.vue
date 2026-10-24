@@ -1,147 +1,101 @@
 <template>
-  <Head>
-    <Meta charSet="utf-8" />
-    <Meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=contain, user-scalable=no"
-    />
-    <Title>Sign In - Perlink.to</Title>
-    <Meta
-      name="description"
-      content="Sign in to Perlink.to to create your bio link page, shorten URLs, and generate QR codes. Secure Google OAuth login."
-    />
-    <Meta
-      name="keywords"
-      content="login, sign in, Perlink, bio link, URL shortener, QR code, Google OAuth"
-    />
+  <div class="relative flex min-h-dvh flex-col bg-paper text-ink">
+    <header class="px-5 py-6 sm:px-8">
+      <NuxtLink to="/" aria-label="Perlink home" class="inline-flex">
+        <AppLogo :size="26" />
+      </NuxtLink>
+    </header>
 
-    <!-- Open Graph -->
-    <Meta property="og:title" content="Sign In - Perlink.to" />
-    <Meta property="og:description" content="Sign in to create your bio link page and short links on Perlink.to" />
-    <Meta property="og:url" content="https://perlink.to/login" />
-    <Meta property="og:site_name" content="Perlink.to" />
-    <Meta property="og:type" content="website" />
-
-    <!-- Twitter -->
-    <Meta name="twitter:card" content="summary_large_image" />
-    <Meta name="twitter:site" content="@perlinkto" />
-    <Meta name="twitter:title" content="Sign In - Perlink.to" />
-    <Meta name="twitter:description" content="Sign in to create your bio link page and short links on Perlink.to" />
-
-    <!-- PWA -->
-    <Meta name="mobile-web-app-capable" content="yes" />
-    <Meta name="apple-mobile-web-app-title" content="Sign In - Perlink.to" />
-    <Meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <Meta name="theme-color" content="#0984E3" />
-
-    <Link rel="canonical" href="https://perlink.to/login" />
-  </Head>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
-    <div class="w-full max-w-md space-y-8">
-      <!-- Logo -->
-      <div class="text-center">
-        <NuxtLink to="/" class="inline-flex items-center space-x-2">
-          <img src="/logo-full.png" class="h-10" alt="Perlink" />
-        </NuxtLink>
-      </div>
-
-      <!-- Login Card -->
-      <UCard class="shadow-xl">
-        <div class="space-y-6 p-2">
-          <div class="text-center space-y-2">
-            <h1 class="text-2xl font-bold text-gray-900">Welcome to Perlink.to</h1>
-            <p class="text-gray-500">Sign in to create your bio page & short links</p>
-          </div>
-
-          <!-- Error Alert -->
-          <UAlert
-            v-if="error"
-            color="error"
-            variant="soft"
-            :title="error"
-            icon="i-heroicons-exclamation-triangle"
-          />
-
-          <!-- Already logged in -->
-          <div v-if="loggedIn" class="text-center space-y-4">
-            <p class="text-green-600">✓ You are already signed in</p>
-            <div class="flex gap-3">
-              <UButton to="/dashboard" color="primary" size="xl" block>
-                Go to Dashboard
-              </UButton>
-              <UButton @click="logout" color="neutral" size="xl" variant="outline" block>
-                Sign Out
-              </UButton>
-            </div>
-          </div>
-
-          <!-- Google Login Button -->
-          <UButton
-            v-else
-            @click="handleGoogleLogin"
-            :loading="isLoading"
-            block
-            size="lg"
-            color="neutral"
-            variant="outline"
-            class="hover:bg-gray-50"
-          >
-            <template #leading>
-              <UIcon name="i-flat-color-icons-google" class="w-5 h-5" />
-            </template>
-            Continue with Google
-          </UButton>
-
-          <!-- Terms -->
-          <p class="text-center text-xs text-gray-500">
-            By signing in, you agree to our
-            <NuxtLink to="/terms" class="text-perlink-blue hover:underline">Terms of Service</NuxtLink>
-            and
-            <NuxtLink to="/privacy" class="text-perlink-blue hover:underline">Privacy Policy</NuxtLink>
-          </p>
+    <main class="flex flex-1 items-center justify-center px-5 pb-16">
+      <div class="w-full max-w-[360px]">
+        <div class="mb-8 flex justify-center gap-1.5" aria-hidden="true">
+          <MarketingMkOrb palette="sakura" :size="22" still />
+          <MarketingMkOrb palette="sunset" :size="22" still />
+          <MarketingMkOrb palette="lagoon" :size="22" still />
         </div>
-      </UCard>
 
-      <!-- Back to home -->
-      <div class="text-center">
-        <NuxtLink to="/" class="text-sm text-gray-500 hover:text-gray-700">
-          ← Back to home
-        </NuxtLink>
+        <template v-if="loggedIn">
+          <h1 class="mk-display text-center text-3xl">You're signed in</h1>
+          <p class="mt-3 text-center text-sm text-ink-muted">Pick up where you left off.</p>
+          <div class="mt-8 space-y-2.5">
+            <MarketingMkButton to="/dashboard" size="lg" block>Go to dashboard</MarketingMkButton>
+            <MarketingMkButton variant="outline" size="lg" block @click="logout">Sign out</MarketingMkButton>
+          </div>
+        </template>
+
+        <template v-else>
+          <h1 class="mk-display text-center text-3xl">Welcome to Perlink</h1>
+          <p class="mt-3 text-center text-sm leading-relaxed text-ink-muted">
+            Sign in to build your personal site and 3D world.
+          </p>
+
+          <div v-if="error" class="mt-6 flex items-start gap-2 rounded-xl bg-red-50 px-3.5 py-3 text-sm text-red-700" role="alert">
+            <UIcon name="i-lucide-circle-alert" class="mt-0.5 size-4 shrink-0" />
+            {{ error }}
+          </div>
+
+          <button
+            type="button"
+            class="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-paper text-[15px] font-medium text-ink ring-1 ring-inset ring-line transition-colors hover:bg-sand disabled:opacity-60"
+            :disabled="isLoading"
+            @click="handleGoogleLogin"
+          >
+            <UIcon v-if="isLoading" name="i-lucide-loader-circle" class="size-5 animate-spin" />
+            <UIcon v-else name="i-flat-color-icons-google" class="size-5" />
+            Continue with Google
+          </button>
+
+          <p class="mt-6 text-center text-xs leading-relaxed text-ink-faint">
+            New here? Signing in creates your free account.<br>
+            By continuing you agree to our
+            <NuxtLink to="/terms" class="text-ink-muted underline underline-offset-2 hover:text-ink">Terms</NuxtLink>
+            and
+            <NuxtLink to="/privacy" class="text-ink-muted underline underline-offset-2 hover:text-ink">Privacy Policy</NuxtLink>.
+          </p>
+        </template>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: "blank",
-});
+definePageMeta({ layout: 'blank', colorMode: 'light' })
+
+useSeoMeta({
+  title: 'Sign in — Perlink',
+  description: 'Sign in to Perlink to build your personal website and 3D world.',
+  ogTitle: 'Sign in — Perlink',
+  ogDescription: 'Sign in to Perlink to build your personal website and 3D world.',
+  ogImage: 'https://perlink.to/images/og.jpg',
+  robots: 'noindex, follow',
+})
+useHead({ link: [{ rel: 'canonical', href: 'https://perlink.to/login' }] })
 
 const { loggedIn, clear } = useUserSession()
+const route = useRoute()
 const error = ref('')
 const isLoading = ref(false)
-const route = useRoute()
 
-// Get error from query params (e.g., from OAuth failure)
 onMounted(() => {
   if (route.query.error) {
-    error.value = route.query.error === 'oauth_failed' 
-      ? 'Authentication failed. Please try again.'
+    error.value = route.query.error === 'oauth_failed'
+      ? 'Sign-in with Google did not finish. Please try again.'
       : String(route.query.error)
   }
 })
 
-const logout = async () => {
+async function logout() {
   await $fetch('/api/auth/logout', { method: 'POST' })
   await clear()
   window.location.reload()
 }
 
-const handleGoogleLogin = () => {
+function handleGoogleLogin() {
   isLoading.value = true
   error.value = ''
-  
-  // Redirect to Google OAuth with prompt to force account selection
+  // Remember where to go after Google sends the user back (e.g. a claimed name)
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+  if (redirect.startsWith('/') && !redirect.startsWith('//')) rememberPostLoginRedirect(redirect)
   window.location.href = '/api/auth/google?prompt=select_account'
 }
 </script>

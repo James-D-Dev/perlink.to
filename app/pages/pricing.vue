@@ -1,323 +1,50 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <Head>
-      <Title>Pricing - Perlink.to</Title>
-      <Meta name="description" content="Choose the perfect plan for your portfolio pages and templates. Free, Starter, Plus and Pro plans available." />
-    </Head>
-    <div class="py-8 md:py-12"></div>
-
-    <!-- Hero -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-      <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
-        Simple, transparent pricing
-      </h1>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-        Choose the perfect plan for your needs. Upgrade or downgrade anytime.
-      </p>
-    </div>
-
-    <!-- Pricing Cards -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-      <div class="grid md:grid-cols-4 gap-3">
-        <!-- Free Plan -->
-        <UCard class="bg-white border-gray-200 overflow-hidden rounded-2xl" :ui="{ body: '!p-0' }">
-          <!-- Dark Header -->
-          <div class="bg-slate-900 text-white px-6 py-4">
-            <div class="flex items-center justify-between">
-              <h2 class="text-xl font-bold">Free</h2>
-              <UBadge color="neutral" variant="soft" size="sm">With ads</UBadge>
-            </div>
-          </div>
-          
-          <div class="p-6">
-            <!-- Price -->
-            <div class="mb-6">
-              <span class="text-5xl font-bold text-slate-900">$0</span>
-              <span class="text-slate-600 ml-1">Forever</span>
-              <p class="text-sm text-slate-500 mt-1">No credit card required</p>
-            </div>
-
-            <!-- CTA Button -->
-            <UButton 
-              to="/login" 
-              variant="outline" 
-              color="primary" 
-              block 
-              size="xl"
-              class="rounded-full justify-between px-4"
-            >
-              <span>Start Free</span>
-              <UIcon name="i-lucide-arrow-right" class="w-5 h-5" />
-            </UButton>
-
-            <!-- Features -->
-            <div class="mt-8">
-              <p class="text-sm font-medium text-slate-700 mb-4">Free includes:</p>
-              <ul class="space-y-3 text-sm">
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">1 page</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">Basic QR codes</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">30-day analytics</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">1 custom theme</span>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Bottom note -->
-            <p class="mt-6 pt-4 border-t border-gray-100 text-xs text-slate-500">
-              1 page, templates & basic analytics
-            </p>
-          </div>
-        </UCard>
-
-        <!-- Starter Plan -->
-        <UCard class="bg-white border-gray-200 overflow-hidden rounded-2xl" :ui="{ body: '!p-0' }">
-          <!-- Dark Header -->
-          <div class="bg-slate-900 text-white px-6 py-4">
-            <h2 class="text-xl font-bold">Starter</h2>
-          </div>
-          
-          <div class="p-6">
-            <!-- Price -->
-            <div class="mb-6">
-              <span class="text-5xl font-bold text-slate-900">$5</span>
-              <span class="text-slate-600 ml-1">/month</span>
-              <p class="text-sm text-slate-500 mt-1">$60 billed annually</p>
-            </div>
-
-            <!-- CTA Button -->
-            <UButton 
-              to="/login" 
-              variant="outline" 
-              color="primary" 
-              block 
-              size="xl"
-              class="rounded-full justify-between px-4"
-            >
-              <span>Get Started</span>
-              <UIcon name="i-lucide-arrow-right" class="w-5 h-5" />
-            </UButton>
-
-            <!-- Features -->
-            <div class="mt-8">
-              <p class="text-sm font-medium text-slate-700 mb-4">Everything in Free, plus:</p>
-              <ul class="space-y-3 text-sm">
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span class="text-slate-600"><strong>2 pages</strong></span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span class="text-slate-600">Custom QR codes</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span class="text-slate-600">90-day analytics</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                  <span class="text-slate-600">5 custom themes</span>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Bottom note -->
-            <p class="mt-6 pt-4 border-t border-gray-100 text-xs text-slate-500">
-              2 pages, 5 themes & 90-day analytics
-            </p>
-          </div>
-        </UCard>
-
-        <!-- Plus Plan - Shows first on mobile -->
-        <div class="relative order-first md:order-none">
-          <!-- Recommended Badge -->
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-            <UBadge color="secondary" size="md" class="font-semibold px-4 shadow-sm">
-              Recommended
-            </UBadge>
-          </div>
-          
-          <UCard class="bg-white border-2 border-primary overflow-hidden relative rounded-2xl" :ui="{ body: '!p-0' }">
-            <!-- Orange Header -->
-            <div class="bg-primary text-white px-6 py-4">
-              <h2 class="text-xl font-bold">Plus</h2>
-            </div>
-            
-            <div class="p-6">
-              <!-- Price -->
-              <div class="mb-6">
-                <span class="text-5xl font-bold text-slate-900">$9</span>
-                <span class="text-slate-600 ml-1">/month</span>
-                <p class="text-sm text-slate-500 mt-1">$108 billed annually</p>
-              </div>
-
-              <!-- CTA Button -->
-              <UButton 
-                to="/login" 
-                color="primary" 
-                block 
-                size="xl"
-                class="rounded-full justify-between px-4"
-              >
-                <span>Upgrade to Plus</span>
-                <UIcon name="i-lucide-arrow-right" class="w-5 h-5" />
-              </UButton>
-
-              <!-- Features -->
-              <div class="mt-8">
-                <p class="text-sm font-medium text-slate-700 mb-4">Everything in Free, plus:</p>
-                <ul class="space-y-3 text-sm">
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600"><strong>10 pages</strong></span>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600">Customizable QR codes</span>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600">Full analytics history</span>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600">Premium themes</span>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600">Remove branding</span>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span class="text-slate-600">Custom domain</span>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Bottom note -->
-              <p class="mt-6 pt-4 border-t border-gray-100 text-xs text-slate-500">
-                10 pages, custom domain & full analytics
-              </p>
-            </div>
-          </UCard>
-        </div>
-
-        <!-- Pro Plan -->
-        <UCard class="bg-white border-gray-200 overflow-hidden rounded-2xl" :ui="{ body: '!p-0' }">
-          <!-- Dark Header -->
-          <div class="bg-slate-900 text-white px-6 py-4">
-            <h2 class="text-xl font-bold">Pro</h2>
-          </div>
-          
-          <div class="p-6">
-            <!-- Price -->
-            <div class="mb-6">
-              <span class="text-5xl font-bold text-slate-900">$29</span>
-              <span class="text-slate-600 ml-1">/month</span>
-              <p class="text-sm text-slate-500 mt-1">$348 billed annually</p>
-            </div>
-
-            <!-- CTA Button -->
-            <UButton 
-              to="/login" 
-              variant="outline" 
-              color="primary" 
-              block 
-              size="xl"
-              class="rounded-full justify-between px-4"
-            >
-              <span>Upgrade to Pro</span>
-              <UIcon name="i-lucide-arrow-right" class="w-5 h-5" />
-            </UButton>
-
-            <!-- Features -->
-            <div class="mt-8">
-              <p class="text-sm font-medium text-slate-700 mb-4">Everything in Pro, plus:</p>
-              <ul class="space-y-3 text-sm">
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600"><strong>Unlimited pages</strong></span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">Advanced QR & API access</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">Advanced analytics</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">Custom CSS themes</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">Team (5 members)</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <UIcon name="i-lucide-check" class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span class="text-slate-600">Priority support</span>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Bottom note -->
-            <p class="mt-6 pt-4 border-t border-gray-100 text-xs text-slate-500">
-              Unlimited everything with team features
-            </p>
-          </div>
-        </UCard>
+  <div class="bg-paper text-ink">
+    <MarketingMkSection :ruled="false" center>
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="mk-eyebrow mb-4">Pricing</p>
+        <h1 class="mk-display text-[44px] sm:text-6xl">Start free. Grow when you need to.</h1>
+        <p class="mt-5 text-lg text-ink-muted">Every plan includes templates, the drag-and-drop editor and a 3D world for your page.</p>
       </div>
-    </div>
-
-    <!-- FAQ Section -->
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-      <h2 class="text-2xl font-bold text-gray-900 text-center mb-8">
-        Frequently Asked Questions
-      </h2>
-      <div class="grid md:grid-cols-2 gap-6">
-        <UCard class="bg-white">
-          <h3 class="font-semibold text-gray-900 mb-2">Can I upgrade or downgrade anytime?</h3>
-          <p class="text-gray-600 text-sm">Yes, you can change your plan at any time. Changes take effect immediately.</p>
-        </UCard>
-        <UCard class="bg-white">
-          <h3 class="font-semibold text-gray-900 mb-2">What payment methods do you accept?</h3>
-          <p class="text-gray-600 text-sm">We accept all major credit cards, PayPal, and bank transfers for Pro plans.</p>
-        </UCard>
-        <UCard class="bg-white">
-          <h3 class="font-semibold text-gray-900 mb-2">Is there a free trial?</h3>
-          <p class="text-gray-600 text-sm">Plus and Pro plans come with a 14-day free trial. No credit card required.</p>
-        </UCard>
-        <UCard class="bg-white">
-          <h3 class="font-semibold text-gray-900 mb-2">What happens if I exceed my limits?</h3>
-          <p class="text-gray-600 text-sm">You'll be prompted to upgrade. Your existing content remains accessible.</p>
-        </UCard>
+      <div class="mt-14">
+        <MarketingMkPricing />
       </div>
-    </div>
+    </MarketingMkSection>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 py-8">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p class="text-gray-500 text-sm">
-          Questions? Contact us at <a href="mailto:kimduc10a@gmail.com" class="text-primary-600 hover:underline">kimduc10a@gmail.com</a>
-        </p>
+    <MarketingMkSection title="Questions about plans">
+      <div class="divide-y divide-line border-y border-line">
+        <details v-for="item in faq" :key="item.q" class="group py-5">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-[15px] text-ink [&::-webkit-details-marker]:hidden">
+            {{ item.q }}
+            <UIcon name="i-lucide-plus" class="size-4 shrink-0 text-ink-muted transition-transform group-open:rotate-45" />
+          </summary>
+          <p class="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">{{ item.a }}</p>
+        </details>
       </div>
-    </footer>
+    </MarketingMkSection>
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-});
+definePageMeta({ layout: 'default', colorMode: 'light' })
+
+const title = 'Pricing — Perlink'
+const description = 'Simple plans for personal websites and 3D worlds. Start free, upgrade for more pages, themes and extras.'
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+  ogUrl: 'https://perlink.to/pricing',
+  ogImage: 'https://perlink.to/images/og.jpg',
+  twitterCard: 'summary_large_image',
+})
+useHead({ link: [{ rel: 'canonical', href: 'https://perlink.to/pricing' }] })
+
+const faq = [
+  { q: 'Can I really use Perlink for free?', a: 'Yes. The free plan lets you create and publish a page with its own 3D world.' },
+  { q: 'How do I upgrade?', a: 'Use “Contact us to upgrade” on the plan you want and we will switch your account over. Online checkout is on its way.' },
+  { q: 'Can I change plans later?', a: 'Yes, you can move up or down at any time.' },
+  { q: 'What happens to my page if I downgrade?', a: 'Your page stays online at the same address.' },
+]
 </script>

@@ -2,7 +2,7 @@
   <UDashboardPanel id="bio">
     <template #header>
       <UDashboardNavbar
-        :title="step === 'template' ? 'Create Bio Page' : 'Edit Bio Page'"
+        :title="step === 'template' ? 'Create a site' : 'Edit site'"
       >
         <template #leading>
           <UDashboardSidebarCollapse />
@@ -14,7 +14,7 @@
             v-if="userBioPages.length > 0"
             v-model="selectedBioUsername"
             :items="userBioPages"
-            placeholder="Select bio page"
+            placeholder="Select site"
             class="hidden sm:block"
             size="xl"
             color="neutral"
@@ -53,7 +53,7 @@
       <div v-if="loading" class="flex justify-center py-20">
         <UIcon
           name="i-lucide-loader-2"
-          class="w-10 h-10 animate-spin text-gray-400 dark:text-neutral-500"
+          class="w-10 h-10 animate-spin text-dimmed dark:text-neutral-500"
         />
       </div>
 
@@ -98,8 +98,8 @@
               <div v-if="showTemplatePicker" class="mt-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                 <div class="mb-3 flex items-start justify-between gap-3">
                   <div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">Start from a template</h3>
-                    <p class="text-sm text-gray-500 dark:text-neutral-400">Pick a starting point. Every template includes sample content, a theme and a matching 3D room.</p>
+                    <h3 class="font-semibold text-highlighted dark:text-white">Start from a template</h3>
+                    <p class="text-sm text-muted dark:text-neutral-400">Pick a starting point. Every template includes sample content, a theme and a matching 3D room.</p>
                   </div>
                   <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" @click="templatePickerDismissed = true" />
                 </div>
@@ -108,7 +108,7 @@
 
               <!-- Page mode -->
               <div class="flex flex-wrap items-center justify-between gap-3 pt-4">
-                <div class="inline-flex rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl p-1">
+                <div class="inline-flex rounded-xl border border-default dark:border-white/10 bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl p-1">
                   <UButton
                     icon="i-lucide-layout-list"
                     label="2D page"
@@ -124,7 +124,7 @@
                     @click="setPageMode('3d')"
                   />
                 </div>
-                <p class="text-sm text-gray-500 dark:text-neutral-400">
+                <p class="text-sm text-muted dark:text-neutral-400">
                   {{ pageMode === '3d'
                     ? 'Visitors see your 3D room first and can switch to the 2D page.'
                     : 'Visitors see your classic page.' }}
@@ -203,39 +203,39 @@
             <!-- Settings Tab -->
             <template v-else-if="item.value === 'settings'">
               <div class="pt-4 max-w-lg mx-auto space-y-6">
-                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
-                  <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Bio Page URL</h3>
-                  <p class="text-sm text-gray-500 dark:text-neutral-400 mb-3">
-                    Your public bio page address
+                <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Site address</h3>
+                  <p class="text-sm text-muted dark:text-neutral-400 mb-3">
+                    Your public site address
                   </p>
                   <div
-                    class="flex items-center gap-2 bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2"
+                    class="flex items-center gap-2 bg-muted dark:bg-white/[0.03] border border-default dark:border-white/10 rounded-lg px-3 py-2"
                   >
-                    <span class="text-gray-500 dark:text-neutral-400 text-sm">perlink.to/</span>
-                    <span class="font-medium text-gray-900 dark:text-white text-sm">{{
+                    <span class="text-muted dark:text-neutral-400 text-sm">perlink.to/</span>
+                    <span class="font-medium text-highlighted dark:text-white text-sm">{{
                       existingBio?.username
                     }}</span>
                   </div>
                 </div>
 
                 <!-- Template -->
-                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
-                  <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Template</h3>
-                  <p class="text-sm text-gray-500 dark:text-neutral-400 mb-3">
+                <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Template</h3>
+                  <p class="text-sm text-muted dark:text-neutral-400 mb-3">
                     Replace the page content, theme and 3D room with a template.
                   </p>
                   <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
                 </div>
 
                 <!-- Share Button Toggle -->
-                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
+                <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
                   <div class="flex items-center justify-between">
                     <div>
-                      <h3 class="font-semibold text-gray-900 dark:text-white mb-1">
+                      <h3 class="font-semibold text-highlighted dark:text-white mb-1">
                         Share Button
                       </h3>
-                      <p class="text-sm text-gray-500 dark:text-neutral-400">
-                        Show a floating share button on your bio page
+                      <p class="text-sm text-muted dark:text-neutral-400">
+                        Show a floating share button on your site
                       </p>
                     </div>
                     <USwitch
@@ -248,17 +248,17 @@
                   </div>
                 </div>
 
-                <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 p-6">
-                  <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Visibility</h3>
-                  <p class="text-sm text-gray-500 dark:text-neutral-400 mb-3">
-                    Control who can see your bio page
+                <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Visibility</h3>
+                  <p class="text-sm text-muted dark:text-neutral-400 mb-3">
+                    Control who can see your site
                   </p>
                   <div class="flex items-center justify-between">
                     <div>
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      <p class="text-sm font-medium text-highlighted dark:text-white">
                         {{ existingBio?.isPublished ? "Published" : "Draft" }}
                       </p>
-                      <p class="text-xs text-gray-500 dark:text-neutral-400">
+                      <p class="text-xs text-muted dark:text-neutral-400">
                         {{
                           existingBio?.isPublished
                             ? "Your page is publicly visible"
@@ -299,7 +299,7 @@ import { createDefaultRoom, normalizeRoom, type PageMode, type RoomConfig } from
 import { useBioBlock } from "~/composables/useBioBlock";
 
 definePageMeta({
-  colorMode: "dark",
+  colorMode: 'light',
   layout: "admin",
   middleware: "auth",
   ssr: false,
@@ -488,14 +488,14 @@ const createBioPage = async () => {
     existingBio.value = response.bioPage;
     step.value = "edit";
     toast.add({
-      title: "Bio page created!",
+      title: "Site created!",
       description: "Now customize your page",
       color: "success",
     });
   } catch (error: any) {
     toast.add({
       title: "Error",
-      description: error.data?.statusMessage || "Failed to create bio page",
+      description: error.data?.statusMessage || "Failed to create site",
       color: "error",
     });
   } finally {
@@ -525,7 +525,7 @@ const saveBio = async () => {
   if (!existingBio.value?.username) {
     toast.add({
       title: "Error",
-      description: "No bio page to save",
+      description: "No site to save",
       color: "error",
     });
     return;
@@ -565,7 +565,7 @@ const publishBio = async () => {
   if (!existingBio.value?.username) {
     toast.add({
       title: "Error",
-      description: "No bio page to publish",
+      description: "No site to publish",
       color: "error",
     });
     return;

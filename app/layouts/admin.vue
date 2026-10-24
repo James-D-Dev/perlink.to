@@ -1,212 +1,74 @@
 <template>
   <UDashboardGroup unit="rem">
-    <!-- Subtle top light behind the glass panels (dark mode) -->
-    <div class="pointer-events-none absolute inset-0 hidden dark:block" aria-hidden="true">
-      <div class="absolute inset-x-0 top-0 h-[480px] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgb(255_255_255/0.07),transparent)]" />
-    </div>
-
     <UDashboardSidebar
       id="default"
       v-model:open="open"
       collapsible
       resizable
-      :min-size="17"
-      :max-size="17"
-      :default-size="17"
+      :min-size="16"
+      :max-size="16"
+      :default-size="16"
       :ui="{
-        root: 'bg-white dark:bg-[#0a0a0a]/80 dark:backdrop-blur-2xl',
-        footer: 'border-t border-default',
+        root: 'bg-paper border-r border-line',
+        header: 'h-16',
+        footer: 'border-t border-line',
         content: 'max-w-72',
       }"
     >
       <template #header="{ collapsed }">
-        <NuxtLink v-if="!collapsed" to="/" class="flex items-center gap-2.5">
-          <img src="/logo-perlink.png" class="size-8" alt="" />
-          <span class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Perlink.to</span>
-        </NuxtLink>
-        <NuxtLink v-else to="/" class="flex items-center justify-center">
-          <img src="/logo-perlink.png" class="h-10" alt="Perlink" />
+        <NuxtLink to="/" :aria-label="collapsed ? 'Perlink home' : undefined" class="flex items-center" :class="collapsed && 'w-full justify-center'">
+          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="24" />
         </NuxtLink>
       </template>
 
       <template #default="{ collapsed }">
-        <UButton
+        <NuxtLink
           to="/dashboard/create"
-          :label="collapsed ? undefined : 'Create new'"
-          icon="i-heroicons-plus"
-          block
-          :square="collapsed"
-          size="xl"
-          class="bg-gradient-to-r from-perlink-blue to-perlink-cyan hover:from-perlink-cyan hover:to-perlink-blue"
-        />
+          class="flex h-10 items-center justify-center gap-2 rounded-full bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
+          :class="collapsed ? 'mx-auto w-10' : 'w-full'"
+          :aria-label="collapsed ? 'Create a site' : undefined"
+        >
+          <UIcon name="i-lucide-plus" class="size-4" />
+          <span v-if="!collapsed">Create a site</span>
+        </NuxtLink>
 
         <UNavigationMenu
           :collapsed="collapsed"
           :items="navigationLinks"
           orientation="vertical"
+          class="mt-2"
           :ui="{
-            link: 'py-3',
+            link: 'rounded-lg py-2 text-ink-soft before:rounded-lg hover:text-ink data-active:text-ink data-active:before:bg-sand',
+            linkLeadingIcon: 'size-[18px] text-ink-muted group-data-active:text-ink',
           }"
         />
 
-        <!-- Pro Plan Card -->
-        <div
+        <!-- Upgrade -->
+        <NuxtLink
           v-if="!collapsed"
-          class="mx-2 mb-4 p-4 rounded-xl bg-gradient-to-br from-perlink-blue/10 to-perlink-cyan/10 border border-perlink-cyan/20"
+          to="/dashboard/upgrade"
+          class="group mt-4 block rounded-2xl bg-sand p-4 transition-colors hover:bg-sand-strong"
         >
-          <div class="flex items-center gap-2 mb-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-            >
-              <path d="M0 0h16v16H0z" fill="none" />
-              <g fill="none">
-                <path
-                  fill="url(#SVGtHgz6WvO)"
-                  d="M6.625 2H3.5a.5.5 0 0 0-.447.276l-2 4h4.503z"
-                />
-                <path
-                  fill="url(#SVGWfwR7b6S)"
-                  d="M10.444 6.276L9.375 2H12.5a.5.5 0 0 1 .447.276l2 4z"
-                />
-                <path
-                  fill="url(#SVGbKqqQeGY)"
-                  d="M6.015 2.379A.5.5 0 0 1 6.5 2h3a.5.5 0 0 1 .485.379l1 4q.015.06.015.121H5a.5.5 0 0 1 .015-.121z"
-                />
-                <path
-                  fill="url(#SVG9xXogciy)"
-                  d="M5.568 6H1.191l-.138.276a.5.5 0 0 0 .059.54l6.5 8a.5.5 0 0 0 .765.012z"
-                />
-                <path
-                  fill="url(#SVGGODBFdUo)"
-                  d="M7.623 14.828L10.432 6h4.377l.138.276a.5.5 0 0 1-.059.54l-6.5 8a.5.5 0 0 1-.765.012"
-                />
-                <path
-                  fill="url(#SVGoIdfzoRi)"
-                  d="m5.11 6l-.095.379a.5.5 0 0 0 .008.27l2.5 8a.5.5 0 0 0 .954 0l2.5-8a.5.5 0 0 0 .008-.27L10.89 6z"
-                />
-                <path
-                  fill="url(#SVGVVDu5gmx)"
-                  fill-opacity=".7"
-                  d="M3.5 2a.5.5 0 0 0-.447.276l-2 4a.5.5 0 0 0 .059.54l6.5 8a.5.5 0 0 0 .776 0l6.5-8a.5.5 0 0 0 .06-.54l-2-4A.5.5 0 0 0 12.5 2z"
-                />
-                <defs>
-                  <linearGradient
-                    id="SVGtHgz6WvO"
-                    x1="5.829"
-                    x2="3.513"
-                    y1=".218"
-                    y2="5.76"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#9ff0f9" />
-                    <stop offset="1" stop-color="#29c3ff" />
-                  </linearGradient>
-                  <linearGradient
-                    id="SVGWfwR7b6S"
-                    x1="11.365"
-                    x2="14.004"
-                    y1="2"
-                    y2="8.632"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#0fafff" />
-                    <stop offset="1" stop-color="#102784" />
-                  </linearGradient>
-                  <linearGradient
-                    id="SVGbKqqQeGY"
-                    x1="8"
-                    x2="8"
-                    y1="2"
-                    y2="7.625"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#3bd5ff" />
-                    <stop offset="1" stop-color="#367af2" />
-                  </linearGradient>
-                  <linearGradient
-                    id="SVG9xXogciy"
-                    x1="2.302"
-                    x2="7.818"
-                    y1="4.2"
-                    y2="14.84"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#0094f0" />
-                    <stop offset="1" stop-color="#6ce0ff" />
-                  </linearGradient>
-                  <linearGradient
-                    id="SVGGODBFdUo"
-                    x1="16.736"
-                    x2="8.517"
-                    y1="1.5"
-                    y2="13.828"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#1b44b1" />
-                    <stop offset="1" stop-color="#2052cb" />
-                  </linearGradient>
-                  <linearGradient
-                    id="SVGoIdfzoRi"
-                    x1="7.996"
-                    x2="7.996"
-                    y1="2.85"
-                    y2="15"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#2052cb" />
-                    <stop offset="1" stop-color="#0fafff" />
-                  </linearGradient>
-                  <linearGradient
-                    id="SVGVVDu5gmx"
-                    x1="-.422"
-                    x2="10.764"
-                    y1="-10.242"
-                    y2="16.053"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop offset=".533" stop-color="#ff6ce8" stop-opacity="0" />
-                    <stop offset="1" stop-color="#ff6ce8" />
-                  </linearGradient>
-                </defs>
-              </g>
-            </svg>
-
-            <span class="font-semibold text-sm text-primary">Pro Plan</span>
+          <div class="flex items-center gap-2">
+            <MarketingMkOrb palette="sunset" :size="18" still />
+            <p class="text-sm font-medium text-ink">Perlink Pro</p>
           </div>
-          <p class="text-xs text-muted-foreground mb-3">
-            Your plan will expire in 12 days
+          <p class="mt-1.5 text-xs leading-relaxed text-ink-muted">More sites, more 3D worlds and premium extras.</p>
+          <p class="mt-3 inline-flex items-center gap-1 text-xs font-medium text-ink">
+            See plans
+            <UIcon name="i-lucide-arrow-right" class="size-3.5 transition-transform group-hover:translate-x-0.5" />
           </p>
-          <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-1.5 mb-3">
-            <div
-              class="bg-perlink-cyan h-1.5 rounded-full"
-              style="width: 10%"
-            ></div>
-          </div>
-          <p class="text-xs text-muted-foreground mb-3">10% used</p>
-          <UButton
-            block
-            size="sm"
-            class="bg-gradient-to-r from-perlink-blue to-perlink-cyan hover:from-perlink-cyan hover:to-perlink-blue text-white"
-          >
-            Upgrade Plan
-          </UButton>
-        </div>
-        <!-- <div v-else class="mx-2 mb-4 flex justify-center">
-          <UButton
-            size="sm"
-            icon="i-heroicons-crown"
-            class="bg-gradient-to-r from-perlink-blue to-perlink-cyan text-white"
-          />
-        </div> -->
+        </NuxtLink>
 
         <UNavigationMenu
           :collapsed="collapsed"
           :items="supportLinks"
           orientation="vertical"
           class="mt-auto"
+          :ui="{
+            link: 'rounded-lg py-2 text-ink-soft before:rounded-lg hover:text-ink data-active:text-ink data-active:before:bg-sand',
+            linkLeadingIcon: 'size-[18px] text-ink-muted',
+          }"
         />
       </template>
 
@@ -218,6 +80,7 @@
 
     <slot />
     <NotificationsSlideover />
+    <HelpCenter />
   </UDashboardGroup>
 </template>
 
@@ -229,50 +92,17 @@ const { user: sessionUser, loggedIn } = useUserSession();
 const user = sessionUser as Ref<User | null>;
 const open = ref(false);
 
+const helpOpen = useHelpCenter();
+
 const navigationLinks: NavigationMenuItem[] = [
-  {
-    label: "Dashboard",
-    icon: "i-mingcute-dashboard-4-line",
-    to: "/dashboard",
-  },
-  {
-    label: "Bio Pages",
-    icon: "i-mingcute-profile-line",
-    to: "/dashboard/bio",
-  },
-  {
-    label: "QR Codes",
-    icon: "i-mingcute-qrcode-2-line",
-    to: "/dashboard/qr",
-  },
-  // {
-  //   label: "Analytics",
-  //   icon: "i-mingcute-chart-bar-line",
-  //   to: "/dashboard/analytics",
-  // },
-  // {
-  //   label: "Domains",
-  //   icon: "i-mingcute-earth-2-line",
-  //   to: "/dashboard/domains",
-  // },
-  {
-    label: "Settings",
-    icon: "i-mingcute-settings-6-line",
-    to: "/dashboard/settings",
-  },
+  { label: "Home", icon: "i-lucide-house", to: "/dashboard", exact: true },
+  { label: "Sites", icon: "i-lucide-layout-template", to: "/dashboard/bio" },
+  { label: "Settings", icon: "i-lucide-settings", to: "/dashboard/settings" },
 ];
 
 const supportLinks: NavigationMenuItem[] = [
-  {
-    label: "Help & Support",
-    icon: "i-mingcute-lifebuoy-line",
-    to: "/dashboard/help",
-  },
-  {
-    label: "Feedback",
-    icon: "i-mingcute-chat-4-line",
-    to: "/dashboard/feedback",
-  },
+  { label: "Help", icon: "i-lucide-circle-help", onSelect: () => (helpOpen.value = true) },
+  { label: "Feedback", icon: "i-lucide-message-square-heart", to: "/dashboard/feedback" },
 ];
 
 const groups = computed(() => [

@@ -11,20 +11,20 @@
     </template>
 
     <template #body>
-      <div class="min-h-screen bg-gray-50 dark:bg-white/[0.03]">
+      <div class="min-h-screen bg-muted dark:bg-white/[0.03]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left: Form -->
             <div class="lg:col-span-2 space-y-6">
               <!-- Code Details -->
-              <UCard class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl">
+              <UCard class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl">
                 <template #header>
                   <div class="flex items-center justify-between">
                     <div>
-                      <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                      <h2 class="text-lg font-medium text-highlighted dark:text-white">
                         Code details
                       </h2>
-                      <p class="text-sm text-gray-500 dark:text-neutral-400 mt-1">
+                      <p class="text-sm text-muted dark:text-neutral-400 mt-1">
                         You can create {{ remainingCodes }} more codes this
                         month.
                         <NuxtLink
@@ -34,7 +34,7 @@
                         >
                       </p>
                     </div>
-                    <UIcon name="i-lucide-chevron-up" class="text-gray-400 dark:text-neutral-500" />
+                    <UIcon name="i-lucide-chevron-up" class="text-dimmed dark:text-neutral-500" />
                   </div>
                 </template>
 
@@ -72,27 +72,27 @@
               </UCard>
 
               <!-- Advanced Settings -->
-              <UCard class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl">
+              <UCard class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl">
                 <template #header>
                   <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                    <h2 class="text-lg font-medium text-highlighted dark:text-white">
                       Advanced settings
                     </h2>
-                    <UIcon name="i-lucide-chevron-up" class="text-gray-400 dark:text-neutral-500" />
+                    <UIcon name="i-lucide-chevron-up" class="text-dimmed dark:text-neutral-500" />
                   </div>
                 </template>
 
                 <div class="space-y-4">
                   <!-- UTM Parameters -->
                   <div
-                    class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-white/5"
+                    class="flex items-center justify-between py-3 border-b border-muted dark:border-white/5"
                   >
                     <div class="flex items-center gap-3">
                       <UIcon
                         name="i-lucide-link"
-                        class="text-gray-500 dark:text-neutral-400 w-5 h-5"
+                        class="text-muted dark:text-neutral-400 w-5 h-5"
                       />
-                      <span class="text-gray-700 dark:text-neutral-200">UTM parameters</span>
+                      <span class="text-toned dark:text-neutral-200">UTM parameters</span>
                       <UKbd v-if="!isProUser" class="bg-primary/10 text-primary"
                         >Pro</UKbd
                       >
@@ -125,7 +125,7 @@
                         class="w-full"
                       />
                     </UFormField>
-                    <p class="text-xs text-gray-500 dark:text-neutral-400">
+                    <p class="text-xs text-muted dark:text-neutral-400">
                       Add UTMs to track web traffic in analytics tools.
                     </p>
                   </div>
@@ -135,9 +135,9 @@
                     <div class="flex items-center gap-3">
                       <UIcon
                         name="i-lucide-clock"
-                        class="text-gray-500 dark:text-neutral-400 w-5 h-5"
+                        class="text-muted dark:text-neutral-400 w-5 h-5"
                       />
-                      <span class="text-gray-700 dark:text-neutral-200">Code expiration</span>
+                      <span class="text-toned dark:text-neutral-200">Code expiration</span>
                       <UKbd v-if="!isProUser" class="bg-primary/10 text-primary"
                         >Pro</UKbd
                       >
@@ -168,14 +168,14 @@
             <!-- Right: Preview -->
             <div class="lg:col-span-1">
               <div class="sticky top-8 space-y-4">
-                <div class="text-sm font-medium text-gray-700 dark:text-neutral-200">Preview</div>
+                <div class="text-sm font-medium text-toned dark:text-neutral-200">Preview</div>
 
                 <div
-                  class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-lg shadow-sm border border-gray-200 dark:border-white/10 p-6"
+                  class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-lg shadow-sm border border-default dark:border-white/10 p-6"
                 >
                   <!-- QR Preview -->
                   <div
-                    class="aspect-square bg-gray-50 dark:bg-white/[0.03] rounded-lg flex items-center justify-center mb-4"
+                    class="aspect-square bg-muted dark:bg-white/[0.03] rounded-lg flex items-center justify-center mb-4"
                   >
                     <QRCodeRender
                       v-if="qrValue"
@@ -188,7 +188,7 @@
                       :size="200"
                       class="w-full h-full"
                     />
-                    <div v-else class="text-center text-gray-400 dark:text-neutral-500">
+                    <div v-else class="text-center text-dimmed dark:text-neutral-500">
                       <UIcon
                         name="i-lucide-qr-code"
                         class="w-16 h-16 mx-auto mb-2"
@@ -199,7 +199,7 @@
 
                   <!-- Destination URL Preview -->
                   <div v-if="form.destinationUrl" class="text-center">
-                    <p class="text-sm text-gray-500 dark:text-neutral-400 mb-1">
+                    <p class="text-sm text-muted dark:text-neutral-400 mb-1">
                       Your QR code will link to:
                     </p>
                     <NuxtLink
@@ -211,8 +211,8 @@
                     </NuxtLink>
                   </div>
 
-                  <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
-                    <p class="text-xs text-gray-500 dark:text-neutral-400 text-center">
+                  <div class="mt-4 pt-4 border-t border-muted dark:border-white/5">
+                    <p class="text-xs text-muted dark:text-neutral-400 text-center">
                       This code is preview only, so don't copy it just yet. Your
                       code will be generated once you finish creating it.
                     </p>
@@ -262,7 +262,7 @@ import {
 
 // Meta
 definePageMeta({
-  colorMode: "dark",
+  colorMode: 'light',
   layout: "admin",
   middleware: "auth",
 });

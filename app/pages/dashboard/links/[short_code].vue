@@ -32,7 +32,7 @@
 
         <template v-else>
           <!-- Link Header Card -->
-          <div class="sm:bg-white rounded-2xl sm:border border-gray-200 dark:border-white/10">
+          <div class="sm:bg-white rounded-2xl sm:border border-default dark:border-white/10">
             <div class="p-0 sm:p-6 space-y-6">
               <!-- Title Row -->
               <div
@@ -79,7 +79,7 @@
                         <span
                           v-for="tag in link.tags"
                           :key="tag"
-                          class="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-white/[0.06] text-gray-700 dark:text-neutral-200 mr-1"
+                          class="inline-flex items-center px-2 py-0.5 rounded-md bg-elevated dark:bg-white/[0.06] text-toned dark:text-neutral-200 mr-1"
                         >
                           {{ tag }}
                         </span>
@@ -134,14 +134,14 @@
                     <UIcon
                       v-else
                       name="i-mingcute-link-2-line"
-                      class="w-5 h-5 text-perlink-blue"
+                      class="w-5 h-5 text-highlighted"
                     />
                   </div>
                   <div class="flex-1 min-w-0">
                     <a
                       :href="shortLink"
                       target="_blank"
-                      class="text-sm sm:text-base font-semibold text-perlink-blue hover:underline flex items-center gap-1"
+                      class="text-sm sm:text-base font-semibold text-highlighted hover:underline flex items-center gap-1"
                     >
                       {{ shortLink }}
                       <UIcon
@@ -177,7 +177,7 @@
 
                 <!-- Stats Row -->
                 <div
-                  class="flex flex-wrap gap-3 border border-gray-200 dark:border-white/10 rounded-xl"
+                  class="flex flex-wrap gap-3 border border-default dark:border-white/10 rounded-xl"
                 >
                   <div class="p-3 rounded-xl">
                     <div class="flex items-center gap-2 mb-1">
@@ -233,7 +233,7 @@
                       >
                         <UIcon
                           name="i-mingcute-time-line"
-                          class="size-6 text-perlink-blue"
+                          class="size-6 text-highlighted"
                         />
                       </div>
                       <div>
@@ -261,7 +261,7 @@
             :model-value="activeTab"
             :ui="{ indicator: 'h-[2px]' }"
             @update:model-value="activeTab = $event as string"
-            class="w-full border-b border-gray-200 dark:border-white/10"
+            class="w-full border-b border-default dark:border-white/10"
           />
 
           <!-- QR Code Tab -->
@@ -270,7 +270,7 @@
               <!-- QR Preview -->
               <div class="space-y-4">
                 <div
-                  class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-8 border border-gray-200 dark:border-white/10 flex items-center justify-center"
+                  class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-8 border border-default dark:border-white/10 flex items-center justify-center"
                 >
                   <div class="w-[280px] h-[280px]">
                     <ClientOnly>
@@ -307,7 +307,7 @@
 
               <!-- QR Customization -->
               <div
-                class="space-y-6 bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10"
+                class="space-y-6 bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-default dark:border-white/10"
               >
                 <h3 class="text-lg font-semibold">Customize QR Code</h3>
 
@@ -324,7 +324,7 @@
                           class="p-0 rounded-full overflow-hidden shrink-0"
                         >
                           <span
-                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
+                            class="size-8 rounded-full border-2 border-accented dark:border-white/15"
                             :style="{ backgroundColor: qrConfig.foreground }"
                           />
                         </UButton>
@@ -355,7 +355,7 @@
                           class="p-0 rounded-full overflow-hidden shrink-0"
                         >
                           <span
-                            class="size-8 rounded-full border-2 border-gray-300 dark:border-white/15"
+                            class="size-8 rounded-full border-2 border-accented dark:border-white/15"
                             :style="{ backgroundColor: qrConfig.background }"
                           />
                         </UButton>
@@ -379,14 +379,14 @@
                 <div class="space-y-3">
                   <label class="text-sm font-medium">Logo</label>
                   <div
-                    class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.03]"
+                    class="flex items-center gap-3 p-3 rounded-xl border border-default dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.03]"
                   >
                     <div
                       class="w-8 h-8 rounded bg-perlink-blue/10 flex items-center justify-center"
                     >
                       <UIcon
                         name="i-mingcute-link-2-line"
-                        class="w-4 h-4 text-perlink-blue"
+                        class="w-4 h-4 text-highlighted"
                       />
                     </div>
                     <span class="text-sm font-medium flex-1">Perlink Logo</span>
@@ -462,7 +462,7 @@
               variant="link"
               size="sm"
               color="primary"
-              class="text-perlink-blue"
+              class="text-highlighted"
             >
               Learn more
             </UButton>
@@ -500,7 +500,7 @@ import type { AcceptableValue, TabsItem } from "@nuxt/ui";
 import { format } from "date-fns";
 
 definePageMeta({
-  colorMode: "dark",
+  colorMode: 'light',
   layout: "admin",
   middleware: "auth",
   ssr: false,

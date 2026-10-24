@@ -20,10 +20,10 @@
             </div>
 
             <!-- Title -->
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">QR Codes Management</h1>
+            <h1 class="text-2xl font-bold text-highlighted dark:text-white">QR Codes Management</h1>
 
             <!-- Coming Soon Message -->
-            <p class="text-gray-600 dark:text-neutral-300 max-w-md">
+            <p class="text-muted dark:text-neutral-300 max-w-md">
               This feature is currently under development. Soon you'll be able to
               create, customize, and manage all your QR codes in one place.
             </p>
@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  colorMode: "dark",
+  colorMode: 'light',
   layout: "admin",
   middleware: "auth",
 });

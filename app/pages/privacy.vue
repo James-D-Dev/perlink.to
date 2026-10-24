@@ -11,8 +11,7 @@
           <p class="text-gray-700 mb-4">
             Perlink.to ("we", "us", or "our") respects your privacy and is committed to protecting 
             your personal data. This Privacy Policy explains how we collect, use, disclose, and 
-            safeguard your information when you use our bio link pages, short URLs, and QR code 
-            generation services.
+            safeguard your information when you use Perlink to create personal websites and 3D worlds.
           </p>
         </section>
 
@@ -28,10 +27,10 @@
 
           <h3 class="text-lg font-medium text-gray-900 mb-2">2.2 Content You Create</h3>
           <ul class="list-disc pl-6 text-gray-700 mb-4">
-            <li>Bio page content (title, bio text, links, images)</li>
-            <li>Shortened URLs and their destinations</li>
-            <li>QR code configurations</li>
+            <li>Site content (title, text, links, menus, images)</li>
+            <li>3D world content (room layout, objects, uploaded photos, music choice)</li>
             <li>Theme and customization settings</li>
+            <li>Links and QR codes created with earlier versions of the Service</li>
           </ul>
 
           <h3 class="text-lg font-medium text-gray-900 mb-2">2.3 Analytics Data</h3>
@@ -56,7 +55,7 @@
           <h2 class="text-xl font-semibold text-gray-900 mb-4">3. How We Use Your Information</h2>
           <ul class="list-disc pl-6 text-gray-700 mb-4">
             <li>To provide and maintain our Service</li>
-            <li>To display your bio pages and short links to visitors</li>
+            <li>To display your sites and 3D worlds to visitors</li>
             <li>To generate analytics reports for your account</li>
             <li>To improve our Service and develop new features</li>
             <li>To detect and prevent fraud or abuse</li>
@@ -90,7 +89,7 @@
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">6. Public Content</h2>
           <p class="text-gray-700 mb-4">
-            Bio pages, short URLs, and QR codes you create are publicly accessible by design. 
+            Sites and 3D worlds you publish are publicly accessible by design. 
             Anyone with the link can view the content. Do not include sensitive personal 
             information in public-facing content.
           </p>

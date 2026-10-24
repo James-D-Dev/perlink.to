@@ -34,7 +34,7 @@
           <UCard
             v-for="i in 3"
             :key="i"
-            class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border border-gray-100 dark:border-white/5"
+            class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl border border-muted dark:border-white/5"
             :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
             <div class="flex items-start gap-4">
@@ -68,13 +68,13 @@
           <UCard
             v-for="qr in filteredQRCodes"
             :key="qr.id"
-            class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border border-gray-100 dark:border-white/5 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
+            class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl border border-muted dark:border-white/5 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
             @click="navigateTo(`/dashboard/qr/${qr.shortCode}`)"
             :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
             <div class="flex items-start gap-4">
               <!-- QR Preview -->
-              <div class="h-16 w-16 rounded-lg bg-gray-50 dark:bg-white/[0.03] flex items-center justify-center overflow-hidden shrink-0">
+              <div class="h-16 w-16 rounded-lg bg-muted dark:bg-white/[0.03] flex items-center justify-center overflow-hidden shrink-0">
                 <QRCodeRender
                   :value="qr.destinationUrl"
                   :dots-type="qr.styleConfig?.dotsType || 'rounded'"
@@ -101,12 +101,12 @@
                   />
                 </div>
 
-                <div class="flex items-center gap-1 text-sm text-gray-500 dark:text-neutral-400 mt-1 truncate">
+                <div class="flex items-center gap-1 text-sm text-muted dark:text-neutral-400 mt-1 truncate">
                   <UIcon name="i-lucide-link" class="w-3.5 h-3.5 shrink-0" />
                   <span class="truncate">{{ qr.destinationUrl }}</span>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400 dark:text-neutral-500 mt-2">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-dimmed dark:text-neutral-500 mt-2">
                   <span class="flex items-center gap-1 whitespace-nowrap">
                     <UIcon name="i-lucide-qr-code" class="w-3.5 h-3.5" />
                     perlink.to/qr/{{ qr.shortCode }}
@@ -165,12 +165,12 @@
         <!-- Empty State -->
         <div v-else class="text-center py-12">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-white/[0.06] mb-4"
+            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-elevated dark:bg-white/[0.06] mb-4"
           >
-            <UIcon name="i-lucide-qr-code" class="w-8 h-8 text-gray-400 dark:text-neutral-500" />
+            <UIcon name="i-lucide-qr-code" class="w-8 h-8 text-dimmed dark:text-neutral-500" />
           </div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white">No QR codes yet</h3>
-          <p class="text-gray-500 dark:text-neutral-400 mt-1 mb-4">Create your first QR code to get started</p>
+          <h3 class="text-lg font-medium text-highlighted dark:text-white">No QR codes yet</h3>
+          <p class="text-muted dark:text-neutral-400 mt-1 mb-4">Create your first QR code to get started</p>
           <UButton
             to="/dashboard/qr/create"
             color="primary"
@@ -190,7 +190,7 @@ import QRCodeRender from '~/components/features/QRCodeRender.vue'
 import type { User } from '#auth-utils'
 
 definePageMeta({
-  colorMode: "dark",
+  colorMode: 'light',
   layout: "admin",
   middleware: "auth",
   ssr: false,

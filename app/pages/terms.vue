@@ -10,8 +10,8 @@
           <h2 class="text-xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
           <p class="text-gray-700 mb-4">
             By accessing or using Perlink.to ("the Service"), you agree to be bound by these Terms of Service. 
-            If you do not agree to these terms, please do not use our service. Perlink.to is a SaaS platform 
-            that allows users to create bio link pages, short URLs, and QR codes.
+            If you do not agree to these terms, please do not use our service. Perlink.to is a platform 
+            that lets users create personal websites and interactive 3D worlds.
           </p>
         </section>
 
@@ -21,10 +21,11 @@
             Perlink.to provides tools for creating and managing:
           </p>
           <ul class="list-disc pl-6 text-gray-700 mb-4">
-            <li>Bio link pages with customizable themes and content</li>
-            <li>Shortened URLs with click tracking and analytics</li>
-            <li>QR codes for various use cases</li>
-            <li>Image albums and media hosting</li>
+            <li>Personal websites with customizable templates, themes and content</li>
+            <li>Interactive 3D worlds attached to those websites</li>
+            <li>Image albums, photo frames and media hosting</li>
+            <li>Page analytics</li>
+            <li>Links and QR codes created with earlier versions of the Service, which continue to work</li>
           </ul>
         </section>
 
@@ -67,7 +68,7 @@
             We reserve the right to:
           </p>
           <ul class="list-disc pl-6 text-gray-700 mb-4">
-            <li>Limit the number of links, bio pages, or QR codes per account</li>
+            <li>Limit the number of sites, 3D worlds or uploads per account</li>
             <li>Remove content that violates these terms</li>
             <li>Suspend or terminate accounts for policy violations</li>
             <li>Modify or discontinue features with reasonable notice</li>
@@ -134,7 +135,7 @@
 useHead({
   title: 'Terms of Service - Perlink.to',
   meta: [
-    { name: 'description', content: 'Terms of Service for Perlink.to - Bio links, short URLs, and QR codes platform' }
+    { name: 'description', content: 'Terms of Service for Perlink, the platform for personal websites and 3D worlds.' }
   ]
 });
 </script>

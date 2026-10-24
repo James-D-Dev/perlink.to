@@ -1,10 +1,10 @@
 <template>
   <form class="space-y-2" @submit.prevent="submit">
     <div
-      class="flex items-center gap-2 rounded-xl bg-white p-1.5 ring-1 ring-gray-200 transition focus-within:ring-2 focus-within:ring-perlink-blue dark:bg-white/[0.04] dark:ring-white/10 dark:focus-within:ring-perlink-blue"
+      class="flex items-center gap-2 rounded-full bg-default p-1.5 pl-3 ring-1 ring-default transition focus-within:ring-accented focus-within:ring-2 dark:bg-white/[0.04] dark:ring-white/10"
       :class="size === 'lg' ? 'sm:p-2' : ''"
     >
-      <span class="shrink-0 pl-2 font-medium text-gray-500 dark:text-neutral-400" :class="size === 'lg' ? 'sm:text-lg' : 'text-sm'">perlink.to/</span>
+      <span class="shrink-0 pl-2 font-medium text-muted dark:text-neutral-400" :class="size === 'lg' ? 'sm:text-lg' : 'text-sm'">perlink.to/</span>
       <input
         ref="inputRef"
         v-model="slug"
@@ -14,7 +14,7 @@
         autocapitalize="off"
         spellcheck="false"
         placeholder="your-site"
-        class="min-w-0 flex-1 bg-transparent font-medium text-gray-900 outline-none placeholder:text-gray-400 dark:text-white dark:placeholder:text-neutral-600"
+        class="min-w-0 flex-1 bg-transparent font-medium text-highlighted outline-none placeholder:text-dimmed dark:text-white dark:placeholder:text-neutral-600"
         :class="size === 'lg' ? 'sm:text-lg' : 'text-sm'"
         aria-label="Site address"
       >
@@ -24,7 +24,7 @@
         :loading="creating"
         :disabled="status !== 'available'"
         trailing-icon="i-lucide-arrow-right"
-        class="shrink-0 rounded-lg"
+        class="shrink-0 rounded-full"
       >
         <span class="hidden sm:inline">Create your site</span>
         <span class="sm:hidden">Create</span>
@@ -66,8 +66,8 @@ const message = ref('Letters, numbers, hyphens and underscores. You can change t
 const creating = ref(false)
 
 const messageClass = computed(() => ({
-  idle: 'text-gray-500 dark:text-neutral-500',
-  checking: 'text-gray-500 dark:text-neutral-400',
+  idle: 'text-muted dark:text-neutral-500',
+  checking: 'text-muted dark:text-neutral-400',
   available: 'text-emerald-600 dark:text-emerald-400',
   taken: 'text-red-600 dark:text-red-400',
   invalid: 'text-amber-600 dark:text-amber-400',
