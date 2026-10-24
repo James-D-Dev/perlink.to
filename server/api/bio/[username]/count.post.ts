@@ -1,4 +1,4 @@
-import { BioRepository } from '../../../repositories/bioRepository'
+import { BioRepository, VISITOR_ACTIONS } from '../../../repositories/bioRepository'
 
 export default defineEventHandler(async (event) => {
   const username = getRouterParam(event, 'username')
@@ -18,8 +18,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // type: 'link' | 'social' (default: 'link')
-  const type: 'link' | 'social' = body.type === 'social' ? 'social' : 'link'
+  // type: 'link' | 'social' | 'action' (default: 'link')
+  const type: 'link' | 'social' | 'action' = body.type === 'social' ? 'social' : body.type === 'action' ? 'action' : 'link'
+  if (type === 'action' && !(VISITOR_ACTIONS as readonly string[]).includes(body.linkId)) {
+    throw createError({ statusCode: 400, statusMessage: 'Unknown action' })
+  }
 
   try {
     const bioRepo = new BioRepository(event)
@@ -35,7 +38,9 @@ export default defineEventHandler(async (event) => {
     // Increment specific link or social click count (non-blocking)
     const incrementCount = async () => {
       try {
-        if (type === 'social') {
+        if (type === 'action') {
+          await bioRepo.incrementAction(bioPage.id, body.linkId)
+        } else if (type === 'social') {
           await bioRepo.incrementSocialClick(bioPage.id, body.linkId)
         } else {
           await bioRepo.incrementLinkClick(bioPage.id, body.linkId)

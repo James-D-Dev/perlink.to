@@ -21,7 +21,24 @@
           <FeaturesLinkAnalytics :link-id="bioPageId" />
         </div>
 
-        <div v-else-if="item.value === 'links'" class="pt-4">
+        <div v-else-if="item.value === 'links'" class="space-y-4 pt-4">
+          <!-- What visitors did: calls, directions, chats, bookings, form requests -->
+          <section class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+            <div class="border-b border-line px-4 py-3">
+              <h4 class="text-sm font-medium text-ink">{{ t('analytics.actions.title') }}</h4>
+              <p class="mt-0.5 text-xs text-ink-muted">{{ t('analytics.actions.text') }}</p>
+            </div>
+            <div class="grid grid-cols-2 gap-px bg-line sm:grid-cols-4">
+              <div v-for="action in actionTiles" :key="action.key" class="bg-paper p-4">
+                <p class="flex items-center gap-1.5 text-xs text-ink-muted">
+                  <UIcon :name="action.icon" class="size-3.5" />
+                  {{ action.label }}
+                </p>
+                <p class="mt-1 text-2xl font-semibold tabular-nums text-ink">{{ action.count }}</p>
+              </div>
+            </div>
+          </section>
+
           <div
             v-if="!bioLinks?.length && !socialLinks?.length"
             class="rounded-xl bg-paper py-12 text-center text-sm text-ink-muted ring-1 ring-line"
@@ -110,6 +127,24 @@ const getIconForLink = (link: BioLink) => {
 
 const linkClickCounts = ref<Record<string, number>>({});
 const socialClickCounts = ref<Record<string, number>>({});
+const actionCounts = ref<Record<string, number>>({});
+
+// Main actions always show; chat apps and email only once someone used them
+const actionTiles = computed(() => {
+  const all = [
+    { key: 'call', icon: 'i-lucide-phone' },
+    { key: 'map', icon: 'i-lucide-navigation' },
+    { key: 'book', icon: 'i-lucide-calendar-check' },
+    { key: 'form', icon: 'i-lucide-inbox' },
+    { key: 'zalo', icon: 'i-lucide-message-circle' },
+    { key: 'whatsapp', icon: 'i-simple-icons-whatsapp' },
+    { key: 'telegram', icon: 'i-simple-icons-telegram' },
+    { key: 'email', icon: 'i-lucide-mail' },
+  ]
+  return all
+    .map(a => ({ ...a, label: t(`analytics.actions.${a.key}`), count: actionCounts.value[a.key] ?? 0 }))
+    .filter((a, i) => i < 4 || a.count > 0)
+})
 
 const getLinkClickCount = (linkId: string) =>
   linkClickCounts.value[linkId] ?? 0;
@@ -135,9 +170,11 @@ const fetchClickCounts = async () => {
     const data = await $fetch<{
       links: Record<string, number>;
       social: Record<string, number>;
+      actions?: Record<string, number>;
     }>(`/api/bio/${props.username}/analytics`);
     linkClickCounts.value = data.links ?? {};
     socialClickCounts.value = data.social ?? {};
+    actionCounts.value = data.actions ?? {};
   } catch (error) {
     console.error("Failed to fetch click counts:", error);
   }

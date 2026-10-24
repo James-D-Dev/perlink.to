@@ -11,7 +11,8 @@
         {{ status.label }}
       </span>
     </div>
-    <ul class="space-y-1.5 text-sm">
+    <p v-if="paused && data.pause?.message" class="mb-3 rounded-lg bg-current/5 px-3 py-2 text-sm">{{ data.pause.message }}</p>
+    <ul class="space-y-1.5 text-sm" :class="paused && 'opacity-50'">
       <li
         v-for="day in orderedDays"
         :key="day.day"
@@ -35,7 +36,20 @@ const props = defineProps<{
   headingStyle?: Record<string, string | undefined>
 }>()
 
-const { t, weekday, time } = useSiteI18n()
+const { t, weekday, time, lang } = useSiteI18n()
+
+// Temporarily closed until the reopening date (works on the server too)
+const todayIso = new Date().toISOString().slice(0, 10)
+const paused = computed(() => {
+  const pause = props.data.pause
+  return !!pause?.enabled && (!pause.until || todayIso < pause.until)
+})
+const pauseLabel = computed(() => {
+  const until = props.data.pause?.until
+  if (!until) return t('temporarilyClosed')
+  const date = new Date(`${until}T00:00:00`).toLocaleDateString(lang.value, { day: 'numeric', month: 'short' })
+  return t('closedUntil', { date })
+})
 
 // Monday first
 const orderedDays = computed(() =>
@@ -59,6 +73,7 @@ const toMinutes = (time: string) => {
 }
 
 const status = computed(() => {
+  if (paused.value) return { open: false, label: pauseLabel.value }
   if (!now.value) return null
   const minutes = now.value.getHours() * 60 + now.value.getMinutes()
   const current = props.data.days?.find(d => d.day === now.value!.getDay())

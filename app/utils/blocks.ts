@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid'
 import type { BioBlock, BlockName, FormFields } from '~/types/bio'
 
 /** Block types a page may hold more than once; the rest are one per page */
-export const REPEATABLE_BLOCKS: BlockName[] = ['links', 'text', 'image-album', 'menu']
+export const REPEATABLE_BLOCKS: BlockName[] = ['links', 'text', 'image-album', 'menu', 'video']
 
 export function isRepeatableBlock(name: string) {
   return (REPEATABLE_BLOCKS as string[]).includes(name)
@@ -38,6 +38,54 @@ export function emptyBlockData(name: BlockName): BioBlock['data'] {
     case 'image-album': return { images: [], layout: 'grid' }
     case 'text': return { content: '', align: 'left', style: 'plain' }
     case 'form': return { kind: 'booking', fields: { ...FORM_PRESETS.booking } }
+    case 'video': return { url: '' }
+    case 'testimonials': return { items: [] }
     default: return {} as BioBlock['data']
   }
+}
+
+export interface VideoEmbed {
+  provider: 'youtube' | 'vimeo' | 'tiktok'
+  src: string
+  /** Width / height */
+  aspect: number
+}
+
+/** Embed address for a YouTube, Vimeo or TikTok link; null if unsupported */
+export function videoEmbed(url: string | undefined): VideoEmbed | null {
+  if (!url) return null
+  let parsed: URL
+  try {
+    parsed = new URL(url.trim().startsWith('http') ? url.trim() : `https://${url.trim()}`)
+  } catch {
+    return null
+  }
+  const host = parsed.hostname.replace(/^www\.|^m\./, '')
+  const path = parsed.pathname
+
+  if (host === 'youtube.com' || host === 'youtu.be' || host === 'music.youtube.com') {
+    const shorts = path.match(/^\/shorts\/([\w-]{6,})/)
+    const id = shorts?.[1]
+      ?? (host === 'youtu.be' ? path.slice(1).split('/')[0] : undefined)
+      ?? parsed.searchParams.get('v')
+      ?? path.match(/^\/(?:embed|live)\/([\w-]{6,})/)?.[1]
+    if (!id || !/^[\w-]{6,}$/.test(id)) return null
+    // youtube-nocookie avoids tracking cookies until the visitor presses play
+    return { provider: 'youtube', src: `https://www.youtube-nocookie.com/embed/${id}?rel=0`, aspect: shorts ? 9 / 16 : 16 / 9 }
+  }
+  if (host === 'vimeo.com' || host === 'player.vimeo.com') {
+    const id = path.match(/(\d{6,})/)?.[1]
+    return id ? { provider: 'vimeo', src: `https://player.vimeo.com/video/${id}`, aspect: 16 / 9 } : null
+  }
+  if (host === 'tiktok.com') {
+    const id = path.match(/\/video\/(\d{8,})/)?.[1]
+    return id ? { provider: 'tiktok', src: `https://www.tiktok.com/embed/v2/${id}`, aspect: 9 / 16 } : null
+  }
+  return null
+}
+
+/** Count a visitor action (call, directions, chat, booking) for the owner's analytics */
+export function trackVisitorAction(username: string, action: string, mode: string) {
+  if (mode === 'preview' || !username) return
+  $fetch(`/api/bio/${username}/count`, { method: 'POST', body: { linkId: action, type: 'action' } }).catch(() => {})
 }

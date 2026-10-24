@@ -267,7 +267,9 @@ export type BlockName =
   | 'menu'
   | 'hours'
   | 'contact'
-  | 'form';
+  | 'form'
+  | 'video'
+  | 'testimonials';
 
 export interface BaseBlock {
   /** Unique per page, so a page can hold several blocks of one type. Older pages get one on load */
@@ -351,6 +353,8 @@ export interface MenuItem {
   price?: string;
   imageUrl?: string;
   tag?: string;
+  /** Shown greyed out with a "Sold out" label */
+  soldOut?: boolean;
 }
 
 export interface MenuSection {
@@ -385,6 +389,8 @@ export interface HoursBlock extends BaseBlock {
     title: string;
     days: OpeningDay[];
     note?: string;
+    /** Temporarily closed (holidays, renovation); ends by itself after `until` */
+    pause?: { enabled: boolean; until?: string; message?: string };
   };
 }
 
@@ -425,6 +431,34 @@ export interface FormBlock extends BaseBlock {
   };
 }
 
+// YouTube, Vimeo or TikTok video
+export interface VideoBlock extends BaseBlock {
+  name: 'video';
+  data: {
+    title?: string;
+    url: string;
+    caption?: string;
+  };
+}
+
+// What customers say
+export interface Testimonial {
+  id: string;
+  quote: string;
+  author: string;
+  /** e.g. "Google review" or "Regular since 2019" */
+  detail?: string;
+  rating?: number;
+}
+
+export interface TestimonialsBlock extends BaseBlock {
+  name: 'testimonials';
+  data: {
+    title?: string;
+    items: Testimonial[];
+  };
+}
+
 export type BioBlock =
   | LinksBlock
   | SocialBlock
@@ -435,7 +469,9 @@ export type BioBlock =
   | MenuBlock
   | HoursBlock
   | ContactBlock
-  | FormBlock;
+  | FormBlock
+  | VideoBlock
+  | TestimonialsBlock;
 
 export const DEFAULT_OPENING_DAYS: OpeningDay[] = [1, 2, 3, 4, 5, 6, 0].map(day => ({
   day,

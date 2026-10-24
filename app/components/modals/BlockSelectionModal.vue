@@ -76,6 +76,7 @@ const groupDefs: { key: string; blocks: { id: string; key: string; icon: string 
       { id: 'social', key: 'social', icon: 'i-lucide-at-sign' },
       { id: 'text', key: 'text', icon: 'i-lucide-text' },
       { id: 'image-album', key: 'imageAlbum', icon: 'i-lucide-images' },
+      { id: 'video', key: 'video', icon: 'i-lucide-clapperboard' },
     ],
   },
   {
@@ -85,6 +86,7 @@ const groupDefs: { key: string; blocks: { id: string; key: string; icon: string 
       { id: 'hours', key: 'hours', icon: 'i-lucide-clock' },
       { id: 'contact', key: 'contact', icon: 'i-lucide-map-pin' },
       { id: 'form', key: 'form', icon: 'i-lucide-calendar-check' },
+      { id: 'testimonials', key: 'testimonials', icon: 'i-lucide-quote' },
     ],
   },
   {

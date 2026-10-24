@@ -52,7 +52,12 @@ export interface ThemeConfig {
 export interface LinkAnalytics {
   links: Record<string, number>
   social: Record<string, number>
+  /** Calls, directions, chats, bookings and form requests from visitors */
+  actions?: Record<string, number>
 }
+
+/** Visitor actions that are counted (see /api/bio/[username]/count) */
+export const VISITOR_ACTIONS = ['call', 'map', 'zalo', 'whatsapp', 'telegram', 'book', 'email', 'form'] as const
 
 export interface BioPage {
   id: string
@@ -309,6 +314,17 @@ export class BioRepository {
     if (!page) return
     const analytics = page.linkAnalytics
     analytics.social[platform] = (analytics.social[platform] || 0) + 1
+    await this.db.prepare(
+      'UPDATE bio_pages SET link_analytics = ? WHERE id = ?'
+    ).bind(JSON.stringify(analytics), id).run()
+  }
+
+  async incrementAction(id: string, action: string): Promise<void> {
+    const page = await this.findById(id)
+    if (!page) return
+    const analytics = page.linkAnalytics
+    analytics.actions = analytics.actions ?? {}
+    analytics.actions[action] = (analytics.actions[action] || 0) + 1
     await this.db.prepare(
       'UPDATE bio_pages SET link_analytics = ? WHERE id = ?'
     ).bind(JSON.stringify(analytics), id).run()

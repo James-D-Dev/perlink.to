@@ -317,7 +317,47 @@
             :card-style="cardStyle"
             :button-style="buttonStyle"
             :heading-style="headingStyle"
+            :username="username"
+            :mode="mode"
           />
+          <!-- Video -->
+          <section v-if="block.name === 'video' && videoEmbed(block.data?.url)" :id="blockDomId(block)">
+            <h2 v-if="block.data.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
+            <div
+              class="relative mx-auto w-full overflow-hidden bg-black"
+              :class="videoEmbed(block.data.url)!.aspect < 1 && 'max-w-[340px]'"
+              :style="{ aspectRatio: String(videoEmbed(block.data.url)!.aspect), borderRadius: cardStyle.borderRadius }"
+            >
+              <iframe
+                :src="videoEmbed(block.data.url)!.src"
+                :title="block.data.title || 'Video'"
+                class="absolute inset-0 size-full"
+                loading="lazy"
+                allow="encrypted-media; picture-in-picture; fullscreen"
+                allowfullscreen
+                referrerpolicy="strict-origin-when-cross-origin"
+              />
+            </div>
+            <p v-if="block.data.caption" class="mt-2 text-center text-sm opacity-70">{{ block.data.caption }}</p>
+          </section>
+
+          <!-- Testimonials -->
+          <section v-if="block.name === 'testimonials' && block.data?.items?.some((i) => i.quote)" :id="blockDomId(block)">
+            <h2 v-if="block.data.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
+            <div class="space-y-2.5">
+              <figure v-for="item in block.data.items.filter((i) => i.quote)" :key="item.id" class="p-4" :style="cardStyle">
+                <div v-if="item.rating" class="mb-1 flex text-sm tracking-[0.1em]" role="img" :aria-label="`${item.rating}/5`">
+                  <span v-for="n in 5" :key="n" :class="n > item.rating && 'opacity-25'">★</span>
+                </div>
+                <blockquote class="text-[15px] leading-relaxed">“{{ item.quote }}”</blockquote>
+                <figcaption v-if="item.author" class="mt-2 text-sm">
+                  <span class="font-medium">{{ item.author }}</span>
+                  <span v-if="item.detail" class="opacity-65"> · {{ item.detail }}</span>
+                </figcaption>
+              </figure>
+            </div>
+          </section>
+
           <!-- Booking / contact form -->
           <BioFormDisplay
             v-if="block.name === 'form' && block.id"
@@ -356,6 +396,7 @@
             :rel="action.external ? 'noopener noreferrer' : undefined"
             class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[11px] font-medium transition active:scale-95"
             :style="action.primary ? buttonStyle : { color: '#0c0b0a' }"
+            @click="trackVisitorAction(username, action.key, mode)"
           >
             <UIcon :name="action.icon" class="size-5" />
             <span class="truncate">{{ action.label }}</span>

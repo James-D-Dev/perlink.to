@@ -205,33 +205,73 @@
       "neon": "Neon"
     },
     "presets": {
-      "classic-white": { "description": "Trắng thanh lịch, điểm tím" },
-      "classic-ivory": { "description": "Ngà dịu nhẹ với nâu ấm" },
-      "classic-slate": { "description": "Xám đá chuyên nghiệp, điểm xanh" },
-      "vibrant-coral": { "description": "San hô và cam đầy năng lượng" },
-      "vibrant-emerald": { "description": "Xanh lá nhiệt đới tươi mới" },
-      "vibrant-rose": { "description": "Bảng màu hồng nổi bật" },
-      "dark-obsidian": { "description": "Tối sâu, điểm tím" },
-      "dark-midnight": { "description": "Chế độ tối xanh navy và xanh điện" },
-      "dark-charcoal": { "description": "Tối sang trọng, điểm vàng" },
-      "minimal-pure": { "description": "Siêu gọn gàng, không xao nhãng" },
-      "minimal-sand": { "description": "Tông trung tính dịu, không xao nhãng" },
-      "minimal-frost": { "description": "Tối giản xám nhạt mát lạnh" },
-      "gradient-aurora": { "description": "Cực quang — từ xanh ngọc sang tím" },
-      "gradient-sunset": { "description": "Hoàng hôn ấm từ cam sang hồng" },
-      "gradient-ocean": { "description": "Xanh đại dương sâu đến navy" },
-      "gradient-candy": { "description": "Hồng pastel đến oải hương vui mắt" },
-      "neon-cyber": { "description": "Vàng điện trên nền gần đen" },
-      "neon-matrix": { "description": "Xanh hacker trên nền đen" },
-      "neon-electric": { "description": "Xanh điện phát sáng trên nền đen sâu" },
-      "neon-purple": { "description": "Tím vaporwave trên nền tối" }
+      "classic-white": {
+        "description": "Trắng thanh lịch, điểm tím"
+      },
+      "classic-ivory": {
+        "description": "Ngà dịu nhẹ với nâu ấm"
+      },
+      "classic-slate": {
+        "description": "Xám đá chuyên nghiệp, điểm xanh"
+      },
+      "vibrant-coral": {
+        "description": "San hô và cam đầy năng lượng"
+      },
+      "vibrant-emerald": {
+        "description": "Xanh lá nhiệt đới tươi mới"
+      },
+      "vibrant-rose": {
+        "description": "Bảng màu hồng nổi bật"
+      },
+      "dark-obsidian": {
+        "description": "Tối sâu, điểm tím"
+      },
+      "dark-midnight": {
+        "description": "Chế độ tối xanh navy và xanh điện"
+      },
+      "dark-charcoal": {
+        "description": "Tối sang trọng, điểm vàng"
+      },
+      "minimal-pure": {
+        "description": "Siêu gọn gàng, không xao nhãng"
+      },
+      "minimal-sand": {
+        "description": "Tông trung tính dịu, không xao nhãng"
+      },
+      "minimal-frost": {
+        "description": "Tối giản xám nhạt mát lạnh"
+      },
+      "gradient-aurora": {
+        "description": "Cực quang — từ xanh ngọc sang tím"
+      },
+      "gradient-sunset": {
+        "description": "Hoàng hôn ấm từ cam sang hồng"
+      },
+      "gradient-ocean": {
+        "description": "Xanh đại dương sâu đến navy"
+      },
+      "gradient-candy": {
+        "description": "Hồng pastel đến oải hương vui mắt"
+      },
+      "neon-cyber": {
+        "description": "Vàng điện trên nền gần đen"
+      },
+      "neon-matrix": {
+        "description": "Xanh hacker trên nền đen"
+      },
+      "neon-electric": {
+        "description": "Xanh điện phát sáng trên nền đen sâu"
+      },
+      "neon-purple": {
+        "description": "Tím vaporwave trên nền tối"
+      }
     }
   },
   "analytics": {
     "unpublished": "Xuất bản trang để bắt đầu xem thống kê.",
     "tabs": {
       "overview": "Tổng quan",
-      "links": "Liên kết"
+      "links": "Hành động & liên kết"
     },
     "links": {
       "empty": "Trang này chưa có liên kết hay biểu tượng mạng xã hội nào.",
@@ -269,6 +309,18 @@
       "list": "Danh sách",
       "noData": "Chưa có dữ liệu",
       "viewsCount": "{n} lượt xem | {n} lượt xem"
+    },
+    "actions": {
+      "title": "Hành động của khách",
+      "text": "Số lần khách gọi, hỏi đường, nhắn tin hoặc đặt chỗ. Tính từ trước tới nay.",
+      "call": "Cuộc gọi",
+      "map": "Chỉ đường",
+      "book": "Bấm đặt chỗ",
+      "form": "Yêu cầu qua form",
+      "zalo": "Nhắn Zalo",
+      "whatsapp": "Nhắn WhatsApp",
+      "telegram": "Nhắn Telegram",
+      "email": "Email"
     }
   }
 }

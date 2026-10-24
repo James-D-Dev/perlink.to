@@ -97,5 +97,5 @@ export function useImageAlbumUpload() {
     }
   }
 
-  return { uploadMultiple, uploading, error, progress }
+  return { uploadImage, uploadMultiple, uploading, error, progress }
 }

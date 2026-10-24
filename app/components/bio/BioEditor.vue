@@ -97,6 +97,7 @@
               v-if="block.name === 'menu'"
               :is-active="activeBlock === block.id"
               :blocks="[block]"
+              :bio-page-id="bioPageId"
               @toggle="$emit('toggleBlock', block.id)"
               @remove="onRemoveBlock(block.id)"
               @update="(data: BioBlock['data']) => replaceData(block.id, data)"
@@ -113,6 +114,24 @@
 
             <BioBlockForm
               v-if="block.name === 'form'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
+            <BioBlockVideo
+              v-if="block.name === 'video'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
+            <BioBlockTestimonials
+              v-if="block.name === 'testimonials'"
               :is-active="activeBlock === block.id"
               :blocks="[block]"
               @toggle="$emit('toggleBlock', block.id)"

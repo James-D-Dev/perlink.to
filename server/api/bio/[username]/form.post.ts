@@ -76,6 +76,9 @@ export default defineEventHandler(async (event) => {
     .bind(crypto.randomUUID(), bioPage.id, blockId, JSON.stringify(data), ipHash)
     .run()
 
+  // Count it among visitor actions in analytics
+  runInBackground(event, new BioRepository(event).incrementAction(bioPage.id, 'form'))
+
   // Email the owner after responding (skipped until Resend is configured)
   if (emailEnabled(event)) runInBackground(event, notifyOwnerOfRequest(event, bioPage, data))
 

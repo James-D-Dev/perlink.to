@@ -2,15 +2,15 @@
   <section class="space-y-3 p-5" :style="cardStyle">
     <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || t('contact') }}</h2>
 
-    <a v-if="data.address" :href="mapHref" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 text-sm hover:underline">
+    <a v-if="data.address" :href="mapHref" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 text-sm hover:underline" @click="track('map')">
       <UIcon name="i-lucide-map-pin" class="mt-0.5 size-4 shrink-0" />
       <span>{{ data.address }}</span>
     </a>
-    <a v-if="data.phone" :href="`tel:${data.phone.replace(/\s+/g, '')}`" class="flex items-center gap-2 text-sm hover:underline">
+    <a v-if="data.phone" :href="`tel:${data.phone.replace(/\s+/g, '')}`" class="flex items-center gap-2 text-sm hover:underline" @click="track('call')">
       <UIcon name="i-lucide-phone" class="size-4 shrink-0" />
       <span>{{ data.phone }}</span>
     </a>
-    <a v-if="data.email" :href="`mailto:${data.email}`" class="flex items-center gap-2 text-sm hover:underline">
+    <a v-if="data.email" :href="`mailto:${data.email}`" class="flex items-center gap-2 text-sm hover:underline" @click="track('email')">
       <UIcon name="i-lucide-mail" class="size-4 shrink-0" />
       <span>{{ data.email }}</span>
     </a>
@@ -23,6 +23,7 @@
         rel="noopener noreferrer"
         class="flex flex-1 items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold"
         :style="buttonStyle"
+        @click="track('book')"
       >
         <UIcon name="i-lucide-calendar-check" class="size-4" />
         {{ data.bookingLabel || t('bookNow') }}
@@ -33,6 +34,7 @@
         class="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold"
         :class="data.bookingUrl ? '' : 'flex-1'"
         :style="buttonStyle"
+        @click="track('call')"
       >
         <UIcon name="i-lucide-phone-call" class="size-4" />
         {{ t('call') }}
@@ -49,7 +51,12 @@ const props = defineProps<{
   cardStyle: Record<string, string | undefined>
   buttonStyle: Record<string, string | undefined>
   headingStyle?: Record<string, string | undefined>
+  username?: string
+  mode?: string
 }>()
+
+// Calls, directions and bookings show up in the owner's analytics
+const track = (action: string) => trackVisitorAction(props.username ?? '', action, props.mode ?? 'preview')
 
 const { t } = useSiteI18n()
 

@@ -99,7 +99,11 @@
       "itemTagPlaceholder": "Nhãn, VD: Bán chạy",
       "itemImagePlaceholder": "URL ảnh (không bắt buộc)",
       "addItem": "Thêm món",
-      "addSection": "Thêm mục"
+      "addSection": "Thêm mục",
+      "itemPhoto": "Ảnh món",
+      "removePhoto": "Bỏ ảnh",
+      "soldOut": "Hết món",
+      "photoFailed": "Không tải được ảnh lên"
     },
     "hours": {
       "title": "Giờ mở cửa",
@@ -108,7 +112,12 @@
       "closed": "Nghỉ",
       "copyMonday": "Áp dụng giờ thứ Hai cho mọi ngày",
       "note": "Ghi chú",
-      "notePlaceholder": "VD: Bếp đóng sớm hơn 30 phút"
+      "notePlaceholder": "VD: Bếp đóng sớm hơn 30 phút",
+      "pause": "Tạm nghỉ",
+      "pauseHelp": "Dùng khi nghỉ lễ hoặc sửa chữa. Khách sẽ thấy bạn tạm nghỉ đến ngày bạn chọn.",
+      "pauseUntil": "Mở lại ngày",
+      "pauseMessage": "Lời nhắn",
+      "pauseMessagePlaceholder": "VD: Nghỉ Tết, hẹn gặp lại!"
     },
     "contact": {
       "title": "Liên hệ",
@@ -213,6 +222,14 @@
         "form": {
           "label": "Form đặt chỗ / liên hệ",
           "description": "Khách gửi yêu cầu đặt chỗ hoặc câu hỏi, bạn nhận trong Hộp thư."
+        },
+        "video": {
+          "label": "Video",
+          "description": "Video YouTube, Vimeo hoặc TikTok, phát ngay trên trang."
+        },
+        "testimonials": {
+          "label": "Đánh giá",
+          "description": "Đánh giá và lời khen của khách, kèm số sao."
         }
       }
     },
@@ -257,6 +274,31 @@
       "successPlaceholder": "Cảm ơn bạn! Chúng tôi sẽ liên hệ lại sớm.",
       "inboxNote": "Yêu cầu sẽ vào Hộp thư. Mở Hộp thư từ danh sách trang hoặc thanh trên cùng của editor.",
       "openInbox": "Mở Hộp thư"
+    },
+    "video": {
+      "title": "Video",
+      "urlLabel": "Liên kết video",
+      "urlHelp": "YouTube (kể cả Shorts), Vimeo hoặc TikTok.",
+      "unsupported": "Dán liên kết video YouTube, Vimeo hoặc TikTok.",
+      "providers": {
+        "youtube": "Video YouTube",
+        "vimeo": "Video Vimeo",
+        "tiktok": "Video TikTok"
+      },
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "VD: Bên trong quán",
+      "captionLabel": "Chú thích"
+    },
+    "testimonials": {
+      "title": "Đánh giá",
+      "count": "{n} đánh giá | {n} đánh giá",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Khách nói gì về chúng tôi",
+      "quotePlaceholder": "Khách đã nói gì?",
+      "authorPlaceholder": "Tên",
+      "detailPlaceholder": "VD: Đánh giá Google",
+      "add": "Thêm đánh giá",
+      "stars": "{n} sao | {n} sao"
     }
   }
 }

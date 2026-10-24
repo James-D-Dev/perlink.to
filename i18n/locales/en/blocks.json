@@ -99,7 +99,11 @@
       "itemTagPlaceholder": "Tag, e.g. Best seller",
       "itemImagePlaceholder": "Image URL (optional)",
       "addItem": "Add item",
-      "addSection": "Add section"
+      "addSection": "Add section",
+      "itemPhoto": "Photo",
+      "removePhoto": "Remove photo",
+      "soldOut": "Sold out",
+      "photoFailed": "Couldn’t upload the photo"
     },
     "hours": {
       "title": "Opening hours",
@@ -108,7 +112,12 @@
       "closed": "Closed",
       "copyMonday": "Copy Monday to all days",
       "note": "Note",
-      "notePlaceholder": "e.g. Kitchen closes 30 minutes earlier"
+      "notePlaceholder": "e.g. Kitchen closes 30 minutes earlier",
+      "pause": "Temporarily closed",
+      "pauseHelp": "For holidays or renovation. Visitors see that you're closed until the date you pick.",
+      "pauseUntil": "Back on",
+      "pauseMessage": "Message",
+      "pauseMessagePlaceholder": "e.g. Closed for Tết, see you soon!"
     },
     "contact": {
       "title": "Contact",
@@ -213,6 +222,14 @@
         "form": {
           "label": "Booking / contact form",
           "description": "Visitors send a booking or question; it lands in your inbox."
+        },
+        "video": {
+          "label": "Video",
+          "description": "A YouTube, Vimeo or TikTok video, played right on your page."
+        },
+        "testimonials": {
+          "label": "Testimonials",
+          "description": "Reviews and kind words from your customers, with stars."
         }
       }
     },
@@ -257,6 +274,31 @@
       "successPlaceholder": "Thanks! We’ll get back to you soon.",
       "inboxNote": "Requests go to your Inbox. Open it from the sites list or the editor’s top bar.",
       "openInbox": "Open inbox"
+    },
+    "video": {
+      "title": "Video",
+      "urlLabel": "Video link",
+      "urlHelp": "YouTube (including Shorts), Vimeo or TikTok.",
+      "unsupported": "Paste a YouTube, Vimeo or TikTok video link.",
+      "providers": {
+        "youtube": "YouTube video",
+        "vimeo": "Vimeo video",
+        "tiktok": "TikTok video"
+      },
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. A look inside",
+      "captionLabel": "Caption"
+    },
+    "testimonials": {
+      "title": "Testimonials",
+      "count": "{n} review | {n} reviews",
+      "titleLabel": "Title",
+      "titlePlaceholder": "What guests say",
+      "quotePlaceholder": "What did they say?",
+      "authorPlaceholder": "Name",
+      "detailPlaceholder": "e.g. Google review",
+      "add": "Add a review",
+      "stars": "{n} star | {n} stars"
     }
   }
 }

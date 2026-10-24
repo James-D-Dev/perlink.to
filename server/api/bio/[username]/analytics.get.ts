@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     links: bioPage.linkAnalytics.links,
-    social: bioPage.linkAnalytics.social
+    social: bioPage.linkAnalytics.social,
+    actions: bioPage.linkAnalytics.actions ?? {}
   }
 })

@@ -69,9 +69,20 @@
             class="w-full"
             @update:model-value="updateItem(sIndex, iIndex, { description: String($event) })"
           />
-          <div class="flex gap-2">
-            <UInput :model-value="item.tag" :placeholder="t('blocks.menu.itemTagPlaceholder')" class="w-40" @update:model-value="updateItem(sIndex, iIndex, { tag: String($event) })" />
-            <UInput :model-value="item.imageUrl" :placeholder="t('blocks.menu.itemImagePlaceholder')" icon="i-lucide-image" class="flex-1" @update:model-value="updateItem(sIndex, iIndex, { imageUrl: String($event) })" />
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Photo: upload, or remove -->
+            <label class="relative flex size-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-dashed border-accented bg-default text-muted hover:border-inverted dark:border-white/15" :title="t('blocks.menu.itemPhoto')">
+              <img v-if="item.imageUrl" :src="item.imageUrl" alt="" class="size-full object-cover">
+              <UIcon v-else-if="uploadingItem === item.id" name="i-lucide-loader-circle" class="size-4 animate-spin" />
+              <UIcon v-else name="i-lucide-image-plus" class="size-4" />
+              <input type="file" accept="image/*" class="hidden" @change="onItemPhoto($event, sIndex, iIndex, item.id)">
+            </label>
+            <UButton v-if="item.imageUrl" variant="ghost" color="neutral" size="xs" :label="t('blocks.menu.removePhoto')" @click="updateItem(sIndex, iIndex, { imageUrl: undefined })" />
+            <UInput :model-value="item.tag" :placeholder="t('blocks.menu.itemTagPlaceholder')" class="min-w-0 flex-1" @update:model-value="updateItem(sIndex, iIndex, { tag: String($event) })" />
+            <label class="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-muted">
+              <USwitch size="sm" :model-value="!!item.soldOut" @update:model-value="updateItem(sIndex, iIndex, { soldOut: $event })" />
+              {{ t('blocks.menu.soldOut') }}
+            </label>
           </div>
         </div>
 
@@ -91,6 +102,7 @@ import { useBioBlock } from '~/composables/useBioBlock'
 const props = defineProps<{
   isActive: boolean
   blocks: BioBlock[]
+  bioPageId?: string
 }>()
 
 const emit = defineEmits<{
@@ -100,6 +112,26 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const toast = useToast()
+
+// Dish photos go through the same resize + upload as gallery images
+const { uploadImage } = useImageAlbumUpload()
+const uploadingItem = ref<string | null>(null)
+async function onItemPhoto(event: Event, sIndex: number, iIndex: number, itemId: string) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file || !props.bioPageId) return
+  uploadingItem.value = itemId
+  try {
+    const url = await uploadImage(file, props.bioPageId)
+    updateItem(sIndex, iIndex, { imageUrl: url })
+  } catch {
+    toast.add({ title: t('blocks.menu.photoFailed'), color: 'error' })
+  } finally {
+    uploadingItem.value = null
+  }
+}
 
 const layouts = computed(() => [
   { value: 'list' as const, label: t('blocks.menu.layouts.list'), icon: 'i-lucide-list' },

@@ -63,6 +63,9 @@ const en = {
   qrScan: 'Scan to visit',
   qrMenu: 'Scan for our menu',
   qrBook: 'Scan to book',
+  soldOut: 'Sold out',
+  temporarilyClosed: 'Temporarily closed',
+  closedUntil: 'Closed until {date}',
 }
 
 export type SiteMessageKey = keyof typeof en
@@ -115,6 +118,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Quét để ghé trang',
     qrMenu: 'Quét để xem thực đơn',
     qrBook: 'Quét để đặt chỗ',
+
+    soldOut: 'Hết món',
+
+    temporarilyClosed: 'Tạm nghỉ',
+    closedUntil: 'Tạm nghỉ đến {date}',
   },
   es: {
     openingHours: 'Horario',
@@ -162,6 +170,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Escanea para visitar',
     qrMenu: 'Escanea para ver la carta',
     qrBook: 'Escanea para reservar',
+
+    soldOut: 'Agotado',
+
+    temporarilyClosed: 'Cerrado temporalmente',
+    closedUntil: 'Cerrado hasta el {date}',
   },
   fr: {
     openingHours: 'Horaires',
@@ -209,6 +222,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Scannez pour visiter',
     qrMenu: 'Scannez pour voir la carte',
     qrBook: 'Scannez pour réserver',
+
+    soldOut: 'Épuisé',
+
+    temporarilyClosed: 'Fermé temporairement',
+    closedUntil: 'Fermé jusqu’au {date}',
   },
   de: {
     openingHours: 'Öffnungszeiten',
@@ -256,6 +274,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Scannen und besuchen',
     qrMenu: 'Scannen für die Speisekarte',
     qrBook: 'Scannen zum Reservieren',
+
+    soldOut: 'Ausverkauft',
+
+    temporarilyClosed: 'Vorübergehend geschlossen',
+    closedUntil: 'Geschlossen bis {date}',
   },
   pt: {
     openingHours: 'Horário de funcionamento',
@@ -303,6 +326,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Escaneie para visitar',
     qrMenu: 'Escaneie para ver o cardápio',
     qrBook: 'Escaneie para reservar',
+
+    soldOut: 'Esgotado',
+
+    temporarilyClosed: 'Fechado temporariamente',
+    closedUntil: 'Fechado até {date}',
   },
   id: {
     openingHours: 'Jam buka',
@@ -350,6 +378,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Pindai untuk berkunjung',
     qrMenu: 'Pindai untuk lihat menu',
     qrBook: 'Pindai untuk reservasi',
+
+    soldOut: 'Habis',
+
+    temporarilyClosed: 'Tutup sementara',
+    closedUntil: 'Tutup sampai {date}',
   },
   th: {
     openingHours: 'เวลาทำการ',
@@ -397,6 +430,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'สแกนเพื่อเข้าชม',
     qrMenu: 'สแกนเพื่อดูเมนู',
     qrBook: 'สแกนเพื่อจอง',
+
+    soldOut: 'หมดแล้ว',
+
+    temporarilyClosed: 'ปิดชั่วคราว',
+    closedUntil: 'ปิดถึง {date}',
   },
   ja: {
     openingHours: '営業時間',
@@ -444,6 +482,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'スキャンしてアクセス',
     qrMenu: 'スキャンしてメニューを見る',
     qrBook: 'スキャンして予約',
+
+    soldOut: '売り切れ',
+
+    temporarilyClosed: '臨時休業',
+    closedUntil: '{date}まで休業',
   },
   ko: {
     openingHours: '영업시간',
@@ -491,6 +534,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: '스캔해서 방문하기',
     qrMenu: '스캔해서 메뉴 보기',
     qrBook: '스캔해서 예약하기',
+
+    soldOut: '품절',
+
+    temporarilyClosed: '임시 휴업',
+    closedUntil: '{date}까지 휴업',
   },
   zh: {
     openingHours: '营业时间',
@@ -538,6 +586,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: '扫码访问',
     qrMenu: '扫码查看菜单',
     qrBook: '扫码预订',
+
+    soldOut: '售罄',
+
+    temporarilyClosed: '暂停营业',
+    closedUntil: '暂停营业至 {date}',
   },
 }
 

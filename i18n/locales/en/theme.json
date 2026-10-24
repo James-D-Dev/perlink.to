@@ -205,33 +205,73 @@
       "neon": "Neon"
     },
     "presets": {
-      "classic-white": { "description": "Timeless white with purple accents" },
-      "classic-ivory": { "description": "Soft ivory tones with warm brown" },
-      "classic-slate": { "description": "Corporate slate with blue highlights" },
-      "vibrant-coral": { "description": "Bold coral and orange energy" },
-      "vibrant-emerald": { "description": "Fresh tropical greens with energy" },
-      "vibrant-rose": { "description": "Bold rose and pink palette" },
-      "dark-obsidian": { "description": "Deep dark with violet highlights" },
-      "dark-midnight": { "description": "Navy and electric blue dark mode" },
-      "dark-charcoal": { "description": "Sophisticated dark with gold accents" },
-      "minimal-pure": { "description": "Ultra-clean with no distractions" },
-      "minimal-sand": { "description": "Calm neutral tones, distraction-free" },
-      "minimal-frost": { "description": "Ice-cool light grey minimalism" },
-      "gradient-aurora": { "description": "Northern lights — teal to purple" },
-      "gradient-sunset": { "description": "Warm sunset from orange to pink" },
-      "gradient-ocean": { "description": "Deep ocean blues to navy" },
-      "gradient-candy": { "description": "Fun pastel pink to lavender" },
-      "neon-cyber": { "description": "Electric yellow on near-black" },
-      "neon-matrix": { "description": "Hacker green on black" },
-      "neon-electric": { "description": "Glowing electric blue on deep black" },
-      "neon-purple": { "description": "Vaporwave purple on dark" }
+      "classic-white": {
+        "description": "Timeless white with purple accents"
+      },
+      "classic-ivory": {
+        "description": "Soft ivory tones with warm brown"
+      },
+      "classic-slate": {
+        "description": "Corporate slate with blue highlights"
+      },
+      "vibrant-coral": {
+        "description": "Bold coral and orange energy"
+      },
+      "vibrant-emerald": {
+        "description": "Fresh tropical greens with energy"
+      },
+      "vibrant-rose": {
+        "description": "Bold rose and pink palette"
+      },
+      "dark-obsidian": {
+        "description": "Deep dark with violet highlights"
+      },
+      "dark-midnight": {
+        "description": "Navy and electric blue dark mode"
+      },
+      "dark-charcoal": {
+        "description": "Sophisticated dark with gold accents"
+      },
+      "minimal-pure": {
+        "description": "Ultra-clean with no distractions"
+      },
+      "minimal-sand": {
+        "description": "Calm neutral tones, distraction-free"
+      },
+      "minimal-frost": {
+        "description": "Ice-cool light grey minimalism"
+      },
+      "gradient-aurora": {
+        "description": "Northern lights — teal to purple"
+      },
+      "gradient-sunset": {
+        "description": "Warm sunset from orange to pink"
+      },
+      "gradient-ocean": {
+        "description": "Deep ocean blues to navy"
+      },
+      "gradient-candy": {
+        "description": "Fun pastel pink to lavender"
+      },
+      "neon-cyber": {
+        "description": "Electric yellow on near-black"
+      },
+      "neon-matrix": {
+        "description": "Hacker green on black"
+      },
+      "neon-electric": {
+        "description": "Glowing electric blue on deep black"
+      },
+      "neon-purple": {
+        "description": "Vaporwave purple on dark"
+      }
     }
   },
   "analytics": {
     "unpublished": "Publish your site to start seeing analytics.",
     "tabs": {
       "overview": "Overview",
-      "links": "Links"
+      "links": "Actions & links"
     },
     "links": {
       "empty": "This site has no links or social icons yet.",
@@ -269,6 +309,18 @@
       "list": "List",
       "noData": "No data yet",
       "viewsCount": "{n} view | {n} views"
+    },
+    "actions": {
+      "title": "Contact actions",
+      "text": "Times visitors called, asked for directions, messaged or booked. All time.",
+      "call": "Calls",
+      "map": "Directions",
+      "book": "Booking clicks",
+      "form": "Form requests",
+      "zalo": "Zalo chats",
+      "whatsapp": "WhatsApp chats",
+      "telegram": "Telegram chats",
+      "email": "Emails"
     }
   }
 }

@@ -30,6 +30,25 @@
 
       <UButton size="sm" variant="soft" color="neutral" icon="i-lucide-copy" :label="t('blocks.hours.copyMonday')" @click="copyMonday" />
 
+      <!-- Temporarily closed -->
+      <div class="space-y-3 rounded-lg border border-default bg-default p-3 dark:border-white/10">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-medium text-highlighted">{{ t('blocks.hours.pause') }}</p>
+            <p class="mt-0.5 text-xs text-muted">{{ t('blocks.hours.pauseHelp') }}</p>
+          </div>
+          <USwitch :model-value="!!data.pause?.enabled" @update:model-value="update({ pause: { ...data.pause, enabled: $event } })" />
+        </div>
+        <div v-if="data.pause?.enabled" class="grid gap-3 sm:grid-cols-[10rem_1fr]">
+          <UFormField :label="t('blocks.hours.pauseUntil')">
+            <UInput type="date" :model-value="data.pause?.until" class="w-full" @update:model-value="update({ pause: { ...data.pause!, until: String($event) || undefined } })" />
+          </UFormField>
+          <UFormField :label="t('blocks.hours.pauseMessage')">
+            <UInput :model-value="data.pause?.message" :placeholder="t('blocks.hours.pauseMessagePlaceholder')" class="w-full" @update:model-value="update({ pause: { ...data.pause!, message: String($event) } })" />
+          </UFormField>
+        </div>
+      </div>
+
       <UFormField :label="t('blocks.hours.note')">
         <UInput :model-value="data.note" :placeholder="t('blocks.hours.notePlaceholder')" class="w-full" @update:model-value="update({ note: String($event) })" />
       </UFormField>
@@ -69,6 +88,7 @@ const hoursBlock = computed(() => getBlock<HoursBlock>('hours'))
 const data = computed<HoursBlock['data']>(() => {
   const saved = hoursBlock.value?.data
   return {
+    ...saved,
     title: saved?.title ?? 'Opening hours',
     note: saved?.note ?? '',
     days: saved?.days?.length ? saved.days : DEFAULT_OPENING_DAYS,
