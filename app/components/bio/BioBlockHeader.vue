@@ -1,55 +1,35 @@
 <template>
-  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
+  <div class="rounded-xl border border-default bg-default dark:border-white/10 dark:bg-white/[0.04]">
     <!-- Header Edit Form -->
-    <div class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
-      <div class="space-y-4">
-        <div class="flex items-center gap-4">
-          <div class="flex-1 min-w-0">
-            <div>
-              <UInput
-                :model-value="title"
-                placeholder="Your name or title"
-                @update:model-value="$emit('update:title', $event)"
-                size="xl"
-                class="font-bold w-full"
-                :ui="{
-                  base: 'py-5 text-lg md:text-xl rounded-2xl !pl-[74px]',
-                  leading: 'pl-[1px]',
-                }"
-              >
-                <template #leading>
-                  <div
-                    class="relative shrink-0 cursor-pointer mr-2"
-                    @click="triggerFileInput"
-                  >
-                    <UAvatar
-                      :src="avatarUrl || '/default-avatar.png'"
-                      :alt="title"
-                      class="size-16 rounded-2xl"
-                      color="primary"
-                      icon="i-lucide-image"
-                    />
-                    <div
-                      class="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
-                    >
-                      <UIcon
-                        name="i-lucide-camera"
-                        class="w-5 h-5 text-white"
-                      />
-                    </div>
-                    <div
-                      v-if="uploading"
-                      class="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/50"
-                    >
-                      <UIcon
-                        name="i-lucide-loader-circle"
-                        class="w-5 h-5 text-white animate-spin"
-                      />
-                    </div>
-                  </div>
-                </template>
-              </UInput>
-            </div>
+    <div class="p-3 sm:p-4">
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            class="group relative size-14 shrink-0 overflow-hidden rounded-full bg-elevated ring-1 ring-default"
+            aria-label="Change photo"
+            @click="triggerFileInput"
+          >
+            <img v-if="avatarUrl" :src="avatarUrl" :alt="title" class="size-full object-cover">
+            <UIcon v-else name="i-lucide-image-plus" class="size-5 text-muted" />
+            <span class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              <UIcon name="i-lucide-camera" class="size-4 text-white" />
+            </span>
+            <span v-if="uploading" class="absolute inset-0 flex items-center justify-center bg-black/50">
+              <UIcon name="i-lucide-loader-circle" class="size-4 animate-spin text-white" />
+            </span>
+          </button>
+          <div class="min-w-0 flex-1">
+            <UInput
+              :model-value="title"
+              placeholder="Your name or title"
+              class="w-full"
+              :ui="{ base: 'font-semibold' }"
+              @update:model-value="$emit('update:title', $event)"
+            />
+            <button type="button" class="mt-1 text-xs text-muted hover:text-highlighted" @click="triggerFileInput">
+              {{ avatarUrl ? 'Change photo' : 'Add a photo' }}
+            </button>
             <p v-if="uploadError" class="text-xs text-red-500 mt-1">
               {{ uploadError }}
             </p>
@@ -68,7 +48,8 @@
             :model-value="bio"
             placeholder="Tell us about yourself"
             class="w-full"
-            :rows="3"
+            :rows="2"
+            autoresize
             @update:model-value="$emit('update:bio', $event)"
           />
         </div>

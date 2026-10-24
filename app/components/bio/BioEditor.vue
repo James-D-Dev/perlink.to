@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <!-- Block Selection Modal -->
     <ModalsBlockSelectionModal
       :open="showBlockModal"
@@ -9,7 +9,7 @@
     />
 
     <!-- Blocks List -->
-    <div class="space-y-3">
+    <div class="space-y-2">
       <BioBlockHeader
         :is-active="activeBlock === 'header'"
         :title="bioData.title"
@@ -128,14 +128,14 @@
       </draggable>
 
       <!-- Add Block Button -->
-      <UButton
-        color="neutral"
-        class="w-full py-3 rounded-xl border-2 border-dashed bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border-gray-300 dark:border-white/15 text-gray-500 dark:text-neutral-400 hover:text-white hover:bg-perlink-blue hover:border-perlink-blue"
+      <button
+        type="button"
+        class="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-accented py-2.5 text-sm font-medium text-muted transition hover:border-inverted hover:bg-elevated hover:text-highlighted dark:border-white/15 dark:text-neutral-400 dark:hover:border-white/40 dark:hover:text-white"
         @click="showBlockModal = true"
       >
-        <UIcon name="i-lucide-plus" class="w-5 h-5" />
+        <UIcon name="i-lucide-plus" class="size-4" />
         Add block
-      </UButton>
+      </button>
     </div>
 
     <BioBlockTheme
@@ -153,33 +153,37 @@
       @update-theme="$emit('updateTheme', $event)"
     />
 
-    <!-- Action Buttons -->
-    <div class="flex gap-4 pt-4">
-      <UButton
-        color="primary"
-        :loading="saving"
-        class="flex-1 py-4"
-        size="xl"
-        @click="$emit('save')"
-      >
-        <div class="flex items-center justify-center flex-1">
-          <UIcon name="i-lucide-save" class="size-6 mr-2" />
-          Save Draft
-        </div>
-      </UButton>
-      <UButton
-        color="success"
-        variant="outline"
-        :loading="publishing"
-        class="flex-1 py-4"
-        size="xl"
-        @click="$emit('publish')"
-      >
-        <div class="flex items-center justify-center flex-1">
-          <UIcon name="i-lucide-globe" class="size-6 mr-2" />
+    <!-- Action bar: stays at the bottom of the screen while editing -->
+    <div class="sticky bottom-0 z-20 -mx-4 border-t border-default bg-default/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-xl lg:border lg:px-3 dark:border-white/10">
+      <div class="flex items-center gap-2">
+        <UButton
+          icon="i-lucide-smartphone"
+          color="neutral"
+          variant="outline"
+          class="lg:hidden"
+          aria-label="Preview"
+          @click="$emit('preview')"
+        >
+          <span class="hidden sm:inline">Preview</span>
+        </UButton>
+        <div class="flex-1" />
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-save"
+          :loading="saving"
+          @click="$emit('save')"
+        >
+          Save draft
+        </UButton>
+        <UButton
+          icon="i-lucide-globe"
+          :loading="publishing"
+          @click="$emit('publish')"
+        >
           Publish
-        </div>
-      </UButton>
+        </UButton>
+      </div>
     </div>
   </div>
 </template>
@@ -290,6 +294,7 @@ const emit = defineEmits<{
   updateBlocks: [blocks: BioBlock[]];
   save: [];
   publish: [];
+  preview: [];
 }>();
 
 function onUpdateLink(index: number, field: string, value: string) {

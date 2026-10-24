@@ -25,7 +25,7 @@
     </BioBlockItemHeader>
 
     <!-- Edit Form -->
-    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
+    <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <UFormField label="Title" help="Optional heading above the images.">
         <UInput
           :model-value="imageAlbumBlock?.data.title"

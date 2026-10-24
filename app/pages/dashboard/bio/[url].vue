@@ -87,9 +87,10 @@
           :items="editorTabs"
           default-value="editor"
           color="neutral"
-          variant="pill"
+          variant="link"
+          size="md"
           class="w-full"
-          size="xl"
+          :ui="{ list: 'border-b border-default dark:border-white/10', trigger: 'px-2.5 sm:px-3' }"
         >
           <template #content="{ item }">
             <!-- Editor Tab -->
@@ -107,11 +108,12 @@
               </div>
 
               <!-- Page mode -->
-              <div class="flex flex-wrap items-center justify-between gap-3 pt-4">
-                <div class="inline-flex rounded-xl border border-default dark:border-white/10 bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl p-1">
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-2 pt-4">
+                <div class="inline-flex rounded-lg bg-elevated p-0.5 dark:bg-white/[0.06]">
                   <UButton
                     icon="i-lucide-layout-list"
                     label="2D page"
+                    size="sm"
                     :color="pageMode === '2d' ? 'primary' : 'neutral'"
                     :variant="pageMode === '2d' ? 'solid' : 'ghost'"
                     @click="setPageMode('2d')"
@@ -119,12 +121,13 @@
                   <UButton
                     icon="i-lucide-box"
                     label="3D room"
+                    size="sm"
                     :color="pageMode === '3d' ? 'primary' : 'neutral'"
                     :variant="pageMode === '3d' ? 'solid' : 'ghost'"
                     @click="setPageMode('3d')"
                   />
                 </div>
-                <p class="text-sm text-muted dark:text-neutral-400">
+                <p class="text-xs text-muted sm:text-sm dark:text-neutral-400">
                   {{ pageMode === '3d'
                     ? 'Visitors see your 3D room first and can switch to the 2D page.'
                     : 'Visitors see your classic page.' }}
@@ -133,10 +136,10 @@
 
               <!-- 3D room launcher -->
               <div v-if="pageMode === '3d'" class="mt-4 overflow-hidden rounded-xl border border-default bg-default/60 backdrop-blur-xl sm:flex">
-                <div class="relative h-56 sm:h-auto sm:w-1/2">
+                <div class="relative h-40 sm:h-auto sm:min-h-52 sm:w-1/2">
                   <LazyRoomCanvas :room="roomModel" preview class="pointer-events-none" />
                 </div>
-                <div class="flex flex-col justify-center gap-3 p-5 sm:w-1/2">
+                <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
                   <div>
                     <h3 class="font-semibold text-highlighted">Your 3D room</h3>
                     <p class="mt-1 text-sm text-muted">
@@ -144,13 +147,12 @@
                     </p>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <UButton icon="i-lucide-box" label="Open 3D editor" :loading="openingRoom" @click="openRoomEditor" />
-                    <UButton icon="i-lucide-globe" label="Publish" color="neutral" variant="outline" :loading="publishing" @click="publishBio" />
+                    <UButton icon="i-lucide-box" label="Open 3D editor" size="sm" :loading="openingRoom" @click="openRoomEditor" />
                   </div>
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pt-4">
                 <div class="lg:col-span-7">
                   <BioEditor
                     :active-block="activeBlock"
@@ -175,9 +177,10 @@
                     @select-template="bioData.templateId = $event"
                     @save="saveBio"
                     @publish="publishBio"
+                    @preview="previewOpen = true"
                   />
                 </div>
-                <div class="lg:col-span-5 sticky top-4 self-start">
+                <div class="hidden lg:block lg:col-span-5 sticky top-4 self-start">
                   <BioPreviewPanel
                     ref="previewPanelRef"
                     :preview-data="bioData"
@@ -186,6 +189,15 @@
                   />
                 </div>
               </div>
+
+              <!-- Phone preview (mobile and tablet; desktop shows it beside the editor) -->
+              <UModal v-model:open="previewOpen" title="Preview" :ui="{ content: 'max-w-sm', body: 'flex justify-center' }">
+                <template #body>
+                  <BioIPhone15ProMockup :width="320" :height="500">
+                    <BioPreview :bio-data="bioData" :username="existingBio?.username || username" />
+                  </BioIPhone15ProMockup>
+                </template>
+              </UModal>
             </template>
 
             <!-- Analytics Tab -->
@@ -374,6 +386,8 @@ const onBioPageChange = (username: string) => {
 };
 
 // Editor tabs
+const previewOpen = ref(false);
+
 const editorTabs = [
   { value: "editor", label: "Editor", icon: "i-lucide-pencil" },
   { value: "analytics", label: "Analytics", icon: "i-lucide-bar-chart-2" },

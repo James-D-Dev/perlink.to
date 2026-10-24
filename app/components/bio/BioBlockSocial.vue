@@ -33,7 +33,7 @@
     </BioBlockItemHeader>
 
     <!-- Social Edit Form -->
-    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
+    <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]">
       <!-- Draggable Social Links List -->
       <div class="space-y-3 mb-4">
         <draggable

@@ -16,7 +16,7 @@
       </template>
     </BioBlockItemHeader>
 
-    <div v-if="isActive" class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
+    <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Title" class="col-span-2">
           <UInput :model-value="data.title" placeholder="Menu, Rooms, Services..." class="w-full" @update:model-value="update({ title: String($event) })" />

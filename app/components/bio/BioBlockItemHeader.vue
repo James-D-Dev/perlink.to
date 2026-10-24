@@ -1,35 +1,35 @@
 <template>
   <div
-    class="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors select-none"
+    class="flex min-h-12 items-center gap-2 px-2.5 py-2 cursor-pointer hover:bg-elevated/60 dark:hover:bg-white/5 transition-colors select-none sm:gap-3 sm:px-3"
     @click="$emit('toggle')"
   >
     <!-- Drag Handle -->
     <div v-if="!container" class="drag-handle cursor-move text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300">
-      <UIcon name="i-lucide-grip-vertical" class="w-5 h-5" />
+      <UIcon name="i-lucide-grip-vertical" class="size-4" />
     </div>
 
     <!-- Icon (hidden on mobile) -->
     <div
       v-if="icon"
-      class="hidden md:flex w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/[0.06] items-center justify-center"
+      class="flex size-7 shrink-0 rounded-md bg-elevated dark:bg-white/[0.06] items-center justify-center"
     >
       <slot name="icon">
-        <UIcon :name="icon" class="w-4 h-4 text-gray-600 dark:text-neutral-300" />
+        <UIcon :name="icon" class="size-3.5 text-toned dark:text-neutral-300" />
       </slot>
     </div>
 
     <!-- Icon Image (for VietQR) -->
     <div
       v-else-if="iconImage"
-      class="hidden md:flex h-8 rounded-lg bg-gray-100 dark:bg-white/[0.06] items-center justify-center px-2"
+      class="flex h-7 shrink-0 rounded-md bg-elevated dark:bg-white/[0.06] items-center justify-center px-1.5"
     >
       <slot name="icon-image">
-        <img :src="iconImage" class="h-5" />
+        <img :src="iconImage" class="h-4" />
       </slot>
     </div>
 
     <!-- Title -->
-    <span class="font-medium text-sm md:text-base text-gray-900 dark:text-white flex-1">
+    <span class="min-w-0 flex-1 truncate text-sm font-medium text-highlighted dark:text-white">
       {{ title }}
     </span>
 

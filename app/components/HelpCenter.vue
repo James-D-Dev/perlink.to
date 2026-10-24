@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 print:hidden">
+  <div class="fixed right-5 z-50 flex flex-col items-end gap-3 print:hidden" :class="aboveActionBar ? 'bottom-20 lg:bottom-5' : 'bottom-5'">
     <Transition
       enter-active-class="transition duration-200 ease-out"
       enter-from-class="opacity-0 translate-y-2 scale-[0.98]"
@@ -62,6 +62,10 @@
 </template>
 
 <script setup lang="ts">
+// The site editor has a sticky action bar at the bottom on small screens
+const route = useRoute()
+const aboveActionBar = computed(() => route.path.startsWith('/dashboard/bio/'))
+
 // Floating help: common questions plus ways to reach us. Shared open state
 // so the dashboard sidebar's Help item can open it too.
 const open = useHelpCenter()
@@ -78,6 +82,5 @@ const answers = [
   { q: 'Can visitors still see a normal page?', a: 'Always. Visitors can switch from the 3D world to your 2D page with one tap.' },
 ]
 
-const route = useRoute()
 watch(() => route.fullPath, () => (open.value = false))
 </script>

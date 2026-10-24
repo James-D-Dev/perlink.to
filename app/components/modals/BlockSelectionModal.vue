@@ -1,35 +1,45 @@
 <template>
   <UModal
     :open="open"
-    title="Add Block"
-    :close="{ color: 'neutral', variant: 'ghost' }"
+    title="Add a block"
+    description="Blocks are the sections of your page. You can reorder them later."
+    :ui="{ content: 'sm:max-w-2xl', body: 'p-0 sm:p-0' }"
     @update:open="$emit('update:open', $event)"
   >
-    <template #content>
-      <div class="p-4">
-        <div class="grid grid-cols-2 gap-3">
-          <button
-            v-for="block in availableBlocks"
-            :key="block.id"
-            class="flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-primary hover:bg-primary/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:bg-transparent"
-            :disabled="block.disabled || enabledBlocks.includes(block.id)"
-            @click="selectBlock(block.id)"
-          >
-            <div
-              class="w-12 h-12 rounded-xl flex items-center justify-center"
-              :class="block.colorClass"
+    <template #body>
+      <div class="max-h-[70vh] space-y-5 overflow-y-auto p-4 sm:p-5">
+        <section v-for="group in groups" :key="group.label">
+          <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{{ group.label }}</h3>
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <button
+              v-for="block in group.blocks"
+              :key="block.id"
+              type="button"
+              class="group flex items-start gap-3 rounded-lg border border-default p-3 text-left transition hover:border-inverted/40 hover:bg-elevated/60 disabled:cursor-default disabled:opacity-60 disabled:hover:border-default disabled:hover:bg-transparent dark:border-white/10"
+              :disabled="isAdded(block.id)"
+              @click="selectBlock(block.id)"
             >
-              <UIcon :name="block.icon" class="w-6 h-6" />
-            </div>
-            <span class="font-medium text-sm text-gray-900 dark:text-white">{{ block.label }}</span>
-            <span
-              v-if="enabledBlocks.includes(block.id)"
-              class="text-xs text-gray-400 dark:text-neutral-500"
-            >
-              Already added
-            </span>
-          </button>
-        </div>
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated text-highlighted dark:bg-white/[0.06]">
+                <UIcon :name="block.icon" class="size-4" />
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-highlighted dark:text-white">{{ block.label }}</span>
+                  <span v-if="isAdded(block.id)" class="inline-flex items-center gap-0.5 text-[11px] font-medium text-muted">
+                    <UIcon name="i-lucide-check" class="size-3" />
+                    Added
+                  </span>
+                </span>
+                <span class="mt-0.5 block text-xs leading-snug text-muted">{{ block.description }}</span>
+              </span>
+              <UIcon
+                v-if="!isAdded(block.id)"
+                name="i-lucide-plus"
+                class="mt-2.5 size-4 shrink-0 text-dimmed transition group-hover:text-highlighted"
+              />
+            </button>
+          </div>
+        </section>
       </div>
     </template>
   </UModal>
@@ -39,9 +49,8 @@
 interface BlockOption {
   id: string
   label: string
+  description: string
   icon: string
-  colorClass: string
-  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<{
@@ -56,63 +65,37 @@ const emit = defineEmits<{
   select: [blockId: string]
 }>()
 
-const availableBlocks: BlockOption[] = [
+// Each block can appear once per page
+const groups: { label: string; blocks: BlockOption[] }[] = [
   {
-    id: 'social',
-    label: 'Social Links',
-    icon: 'i-lucide-link',
-    colorClass: 'bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400'
+    label: 'Content',
+    blocks: [
+      { id: 'links', label: 'Links', description: 'Buttons to your website, shop, videos or anything else.', icon: 'i-lucide-link' },
+      { id: 'social', label: 'Social icons', description: 'A row of icons for Instagram, TikTok, Zalo and more.', icon: 'i-lucide-at-sign' },
+      { id: 'text', label: 'Text', description: 'An about section or any paragraph with a title.', icon: 'i-lucide-text' },
+      { id: 'image-album', label: 'Gallery', description: 'Up to 6 photos as a grid, masonry, stack or carousel.', icon: 'i-lucide-images' },
+    ],
   },
   {
-    id: 'links',
-    label: 'Links',
-    icon: 'i-lucide-link',
-    colorClass: 'bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400'
+    label: 'Business',
+    blocks: [
+      { id: 'menu', label: 'Menu / price list', description: 'Dishes, rooms or services with prices.', icon: 'i-lucide-utensils' },
+      { id: 'hours', label: 'Opening hours', description: 'Your week, with a live "Open now" badge.', icon: 'i-lucide-clock' },
+      { id: 'contact', label: 'Contact & booking', description: 'Address, phone, email and a booking button.', icon: 'i-lucide-map-pin' },
+    ],
   },
   {
-    id: 'text',
-    label: 'Text',
-    icon: 'i-lucide-text',
-    colorClass: 'bg-stone-100 dark:bg-stone-500/15 text-stone-700 dark:text-stone-300'
+    label: 'Extras',
+    blocks: [
+      { id: 'vietqr', label: 'VietQR', description: 'A bank QR code so people can pay or tip you.', icon: 'i-lucide-qr-code' },
+      { id: 'birthday-countdown', label: 'Birthday countdown', description: 'Days until your next birthday.', icon: 'i-lucide-cake' },
+    ],
   },
-  {
-    id: 'vietqr',
-    label: 'VietQR',
-    icon: 'i-lucide-qr-code',
-    colorClass: 'bg-red-100 dark:bg-red-500/15 text-red-600 dark:text-red-400'
-  },
-  {
-    id: 'image-album',
-    label: 'Image Album',
-    icon: 'i-lucide-images',
-    colorClass: 'bg-purple-100 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400'
-  },
-  {
-    id: 'birthday-countdown',
-    label: 'Birthday Countdown',
-    icon: 'i-lucide-cake',
-    colorClass: 'bg-pink-100 dark:bg-pink-500/15 text-pink-600 dark:text-pink-400'
-  },
-  {
-    id: 'menu',
-    label: 'Menu / Price list',
-    icon: 'i-lucide-utensils',
-    colorClass: 'bg-orange-100 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400'
-  },
-  {
-    id: 'hours',
-    label: 'Opening Hours',
-    icon: 'i-lucide-clock',
-    colorClass: 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-  },
-  {
-    id: 'contact',
-    label: 'Contact & Booking',
-    icon: 'i-lucide-map-pin',
-    colorClass: 'bg-sky-100 dark:bg-sky-500/15 text-sky-600 dark:text-sky-400'
-  },
-  // more block
 ]
+
+function isAdded(blockId: string) {
+  return props.enabledBlocks.includes(blockId)
+}
 
 function selectBlock(blockId: string) {
   emit('select', blockId)

@@ -19,7 +19,7 @@
 
     <div
       v-if="isActive"
-      class="p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-5"
+      class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-5"
     >
       <!-- Mode toggle -->
       <UTabs
@@ -31,7 +31,7 @@
         color="neutral"
         variant="pill"
         class="w-full"
-        size="xl"
+        size="sm"
         @update:model-value="editMode = $event as 'presets' | 'custom'"
       >
         <template #content="{ item }">
@@ -64,7 +64,7 @@
             <div class="space-y-6">
               <!-- Colors -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Colors</label
                 >
                 <BioColorPicker
@@ -146,7 +146,7 @@
 
               <!-- Background -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Background</label
                 >
                 <BioBackgroundPicker
@@ -157,10 +157,10 @@
 
               <!-- Header -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Header Title</label
                 >
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <!-- Font Family -->
                   <UFormField label="Font Family">
                     <FontSelect
@@ -260,10 +260,10 @@
 
               <!-- Bio Text -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Bio Text</label
                 >
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <!-- Font Family -->
                   <UFormField label="Font Family">
                     <FontSelect
@@ -339,10 +339,10 @@
 
               <!-- Card -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Card Style</label
                 >
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <!-- Style -->
                   <UFormField label="Style">
                     <USelect
@@ -484,7 +484,7 @@
 
               <!-- Button -->
               <!-- <div>
-            `  <label class="text-lg font-bold text-perlink-blue/60 mb-2 block">Button Style</label>
+            `  <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted">Button Style</label>
               <div class="flex items-center gap-2 mb-3">
                 <label class="text-xs text-gray-500 dark:text-neutral-400">Text Color</label>
                 <input
@@ -544,10 +544,10 @@
 
               <!-- Page -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Page</label
                 >
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <UFormField label="Text Color">
                     <BioColorField
                       :model-value="themeConfig.typography.textColor"
@@ -589,7 +589,7 @@
 
               <!-- Typography -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Font</label
                 >
                 <FontSelect
@@ -601,7 +601,7 @@
 
               <!-- Avatar -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Avatar Shape</label
                 >
                 <div class="flex gap-3">
@@ -650,7 +650,7 @@
 
               <!-- Link Card Layout -->
               <div>
-                <label class="text-lg font-bold text-perlink-blue/60 mb-2 block"
+                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
                   >Link Card Layout</label
                 >
                 <div class="flex flex-col gap-2">
