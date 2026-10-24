@@ -157,11 +157,26 @@
               </div>
 
               <!-- Phone preview (mobile and tablet; desktop shows it beside the editor) -->
-              <UModal v-model:open="previewOpen" title="Preview" :ui="{ content: 'max-w-sm', body: 'flex justify-center' }">
-                <template #body>
-                  <BioIPhone15ProMockup :width="320" :height="500">
-                    <BioPreview :bio-data="bioData" :username="existingBio?.username || username" />
-                  </BioIPhone15ProMockup>
+              <!-- The phone frame is the card, so no modal chrome around it -->
+              <UModal
+                v-model:open="previewOpen"
+                title="Preview"
+                :ui="{ content: 'w-auto max-w-none bg-transparent shadow-none ring-0 divide-y-0 overflow-visible' }"
+              >
+                <template #content>
+                  <div class="relative">
+                    <BioIPhone15ProMockup :width="320" :height="500">
+                      <BioPreview :bio-data="bioData" :username="existingBio?.username || username" />
+                    </BioIPhone15ProMockup>
+                    <UButton
+                      icon="i-lucide-x"
+                      color="neutral"
+                      variant="solid"
+                      class="absolute -right-3 -top-3 rounded-full shadow-lg"
+                      aria-label="Close preview"
+                      @click="previewOpen = false"
+                    />
+                  </div>
                 </template>
               </UModal>
             </template>

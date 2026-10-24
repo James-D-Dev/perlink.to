@@ -1,12 +1,9 @@
 <template>
   <div class="space-y-4">
     <!-- No Data State -->
-    <div v-if="!bioPageId" class="text-center py-16 text-gray-500 dark:text-neutral-400">
-      <UIcon
-        name="i-lucide-bar-chart-2"
-        class="w-12 h-12 mx-auto mb-3 opacity-50"
-      />
-      <p class="text-sm">Publish your bio page to start tracking analytics</p>
+    <div v-if="!bioPageId" class="rounded-xl bg-paper py-16 text-center ring-1 ring-line">
+      <UIcon name="i-lucide-chart-column" class="mx-auto mb-3 size-8 text-ink-faint" />
+      <p class="text-sm text-ink-muted">Publish your site to start seeing analytics.</p>
     </div>
 
     <UTabs
@@ -15,94 +12,63 @@
       default-value="page"
       class="w-full"
       variant="link"
-      :ui="{
-        indicator: 'h-[3px]'
-      }"
-      size="xl"
+      color="neutral"
+      size="md"
+      :ui="{ list: 'border-b border-line', trigger: 'px-2.5 sm:px-3' }"
     >
       <template #content="{ item }">
-        <template v-if="item.value === 'page'">
-          <div class="space-y-4 pt-2">
-            <FeaturesLinkAnalytics :link-id="bioPageId" />
+        <div v-if="item.value === 'page'" class="pt-4">
+          <FeaturesLinkAnalytics :link-id="bioPageId" />
+        </div>
+
+        <div v-else-if="item.value === 'links'" class="pt-4">
+          <div
+            v-if="!bioLinks?.length && !socialLinks?.length"
+            class="rounded-xl bg-paper py-12 text-center text-sm text-ink-muted ring-1 ring-line"
+          >
+            This site has no links or social icons yet.
           </div>
-        </template>
 
-        <template v-else-if="item.value === 'links'">
-          <div class="space-y-4 pt-2">
-            <p class="text-sm text-gray-600 dark:text-neutral-300">
-              Analytics for individual links and social media clicks
-            </p>
+          <div v-else class="space-y-4">
+            <section v-if="bioLinks?.length" class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+              <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">Links</h4>
+              <ul class="divide-y divide-line">
+                <li v-for="link in bioLinks" :key="link.id" class="flex items-center gap-3 px-4 py-3">
+                  <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-sand">
+                    <UIcon :name="getIconForLink(link)" class="size-4 text-ink-soft" />
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-ink">{{ link.title }}</p>
+                    <p class="truncate text-xs text-ink-muted">{{ link.url }}</p>
+                  </div>
+                  <div class="shrink-0 text-right">
+                    <p class="text-lg font-semibold tabular-nums text-ink">{{ getLinkClickCount(link.id) }}</p>
+                    <p class="text-[11px] text-ink-muted">clicks</p>
+                  </div>
+                </li>
+              </ul>
+            </section>
 
-            <div
-              v-if="!bioLinks?.length && !socialLinks?.length"
-              class="text-center py-8 text-gray-400 dark:text-neutral-500 text-sm"
-            >
-              No links to display
-            </div>
-
-            <div class="grid gap-3">
-              <!-- Individual Link Click Count -->
-              <div
-                v-for="link in bioLinks"
-                :key="link.id"
-                class="border border-gray-200 dark:border-white/10 rounded-lg p-4"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-3 min-w-0">
-                    <UIcon
-                      :name="getIconForLink(link)"
-                      class="w-5 h-5 text-gray-600 dark:text-neutral-300 shrink-0"
-                    />
-                    <div class="min-w-0">
-                      <h4 class="font-medium text-gray-900 dark:text-white truncate">
-                        {{ link.title }}
-                      </h4>
-                      <p class="text-sm text-gray-500 dark:text-neutral-400 truncate max-w-xs">
-                        {{ link.url }}
-                      </p>
-                    </div>
+            <section v-if="socialLinks?.length" class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+              <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">Social icons</h4>
+              <ul class="divide-y divide-line">
+                <li v-for="social in socialLinks" :key="social.id" class="flex items-center gap-3 px-4 py-3">
+                  <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-sand">
+                    <UIcon :name="getSocialIcon(social.provider)" class="size-4" />
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium capitalize text-ink">{{ social.provider }}</p>
+                    <p class="truncate text-xs text-ink-muted">{{ getSocialUrl(social) || 'No link yet' }}</p>
                   </div>
-                  <div class="text-right shrink-0 ml-4">
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">
-                      {{ getLinkClickCount(link.id) }}
-                    </div>
-                    <div class="text-xs text-gray-500 dark:text-neutral-400">clicks</div>
+                  <div class="shrink-0 text-right">
+                    <p class="text-lg font-semibold tabular-nums text-ink">{{ getSocialClickCount(social.id) }}</p>
+                    <p class="text-[11px] text-ink-muted">clicks</p>
                   </div>
-                </div>
-              </div>
-
-              <!-- Social Links Click Count -->
-              <div
-                v-for="social in socialLinks"
-                :key="social.id"
-                class="border border-gray-200 dark:border-white/10 rounded-lg p-4"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-3 min-w-0">
-                    <UIcon
-                      :name="getSocialIcon(social.provider)"
-                      class="w-5 h-5 text-gray-600 dark:text-neutral-300 shrink-0"
-                    />
-                    <div class="min-w-0">
-                      <h4 class="font-medium text-gray-900 dark:text-white capitalize">
-                        {{ social.provider }}
-                      </h4>
-                      <p class="text-sm text-gray-500 dark:text-neutral-400 truncate max-w-xs">
-                        {{ getSocialUrl(social) }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="text-right shrink-0 ml-4">
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">
-                      {{ getSocialClickCount(social.id) }}
-                    </div>
-                    <div class="text-xs text-gray-500 dark:text-neutral-400">clicks</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                </li>
+              </ul>
+            </section>
           </div>
-        </template>
+        </div>
       </template>
     </UTabs>
   </div>
@@ -120,8 +86,8 @@ const props = defineProps<{
 }>();
 
 const tabs = [
-  { value: "page", label: "Page Analytics" },
-  { value: "links", label: "Link Analytics" },
+  { value: "page", label: "Overview" },
+  { value: "links", label: "Links" },
 ];
 
 const getIconForLink = (link: BioLink) => {

@@ -1,175 +1,82 @@
 <template>
-  <div class="space-y-6">
-    <!-- Period Selector -->
-    <div class="flex items-center justify-between">
-      <!-- <h3 class="text-lg font-semibold">Analytics</h3> -->
-      <div class="flex gap-1 bg-gray-100 dark:bg-white/[0.06] rounded-lg p-1">
-        <button
-          v-for="p in periods"
-          :key="p.value"
-          class="px-3 py-1 text-sm rounded-md transition-colors"
-          :class="
-            period === p.value
-              ? 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl shadow-sm font-medium text-gray-900 dark:text-white'
-              : 'text-gray-500 dark:text-neutral-400 hover:text-gray-700'
-          "
-          @click="period = p.value"
-        >
-          {{ p.label }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Overview Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div
-        v-for="card in overviewCards"
-        :key="card.label"
-        class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 border border-gray-200 dark:border-white/10"
+  <div class="space-y-4">
+    <!-- Period -->
+    <div class="inline-flex rounded-full bg-sand p-0.5" role="tablist" aria-label="Period">
+      <button
+        v-for="p in periods"
+        :key="p.value"
+        type="button"
+        role="tab"
+        :aria-selected="period === p.value"
+        class="rounded-full px-3 py-1 text-sm transition-colors"
+        :class="period === p.value ? 'bg-paper font-medium text-ink shadow-sm' : 'text-ink-muted hover:text-ink'"
+        @click="period = p.value"
       >
-        <div class="flex items-center gap-2 mb-2">
-          <div
-            class="w-8 h-8 rounded-lg flex items-center justify-center"
-            :class="card.bgClass"
-          >
-            <UIcon :name="card.icon" class="w-4 h-4" :class="card.iconClass" />
-          </div>
-        </div>
-        <div class="text-2xl font-bold">
-          {{ card.value.toLocaleString() }}
-        </div>
-        <div class="text-xs text-muted-foreground mt-1">{{ card.label }}</div>
+        {{ p.label }}
+      </button>
+    </div>
+
+    <!-- Stat tiles: cells on a hairline grid -->
+    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-line ring-1 ring-line md:grid-cols-4">
+      <div v-for="card in overviewCards" :key="card.label" class="bg-paper p-4 sm:p-5">
+        <p class="text-xs text-ink-muted">{{ card.label }}</p>
+        <p class="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink sm:text-3xl">{{ compact(card.value) }}</p>
       </div>
     </div>
 
-    <!-- Timeseries Chart -->
-    <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
-      <h4 class="text-sm font-medium mb-4">Clicks over time</h4>
-      <div v-if="timeseries.length === 0" class="text-center py-8 text-muted-foreground text-sm">
-        No data for this period
+    <!-- Views over time: column chart -->
+    <section class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
+      <div class="flex items-baseline justify-between gap-3">
+        <h4 class="text-sm font-medium text-ink">Views over time</h4>
+        <p v-if="timeseries.length" class="text-xs text-ink-muted">Peak {{ compact(maxClicks) }}</p>
       </div>
-      <div v-else class="space-y-2">
-        <div
-          v-for="point in timeseries"
-          :key="point.date"
-          class="flex items-center gap-3"
-        >
-          <span class="text-xs text-muted-foreground w-16 shrink-0">
-            {{ formatChartDate(point.date) }}
-          </span>
-          <div class="flex-1 h-6 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
+      <div v-if="timeseries.length === 0" class="py-10 text-center text-sm text-ink-muted">
+        No views in this period yet
+      </div>
+      <div v-else class="mt-4">
+        <div class="flex h-40 items-end gap-0.5 border-b border-line">
+          <div
+            v-for="point in timeseries"
+            :key="point.date"
+            class="group relative flex h-full flex-1 items-end justify-center"
+            :aria-label="`${formatChartDate(point.date)}: ${point.clicks} views`"
+          >
             <div
-              class="h-full bg-perlink-blue rounded-full transition-all"
-              :style="{ width: getBarWidth(point.clicks) + '%' }"
+              class="w-full max-w-6 rounded-t-[4px] bg-ink/85 transition-colors group-hover:bg-ink"
+              :style="{ height: `max(${getBarWidth(point.clicks)}%, 2px)` }"
             />
-          </div>
-          <span class="text-xs font-medium w-10 text-right">{{
-            point.clicks
-          }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Breakdown Panels -->
-    <div class="grid md:grid-cols-2 gap-4">
-      <!-- Referrers -->
-      <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
-        <h4 class="text-sm font-medium mb-4">Top Referrers</h4>
-        <div v-if="referrers.length === 0" class="text-center py-6 text-muted-foreground text-sm">
-          No data
-        </div>
-        <div v-else class="space-y-3">
-          <div
-            v-for="item in referrers"
-            :key="item.name"
-            class="flex items-center gap-3"
-          >
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-sm font-medium truncate">{{
-                  item.name
-                }}</span>
-                <span class="text-xs text-muted-foreground ml-2"
-                  >{{ item.clicks }} ({{ item.percentage }}%)</span
-                >
-              </div>
-              <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-perlink-cyan rounded-full"
-                  :style="{ width: item.percentage + '%' }"
-                />
-              </div>
+            <!-- Tooltip -->
+            <div class="pointer-events-none absolute bottom-full z-10 mb-1 hidden whitespace-nowrap rounded-md bg-ink px-2 py-1 text-xs text-paper group-hover:block">
+              {{ formatChartDate(point.date) }} · {{ point.clicks }} views
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Devices -->
-      <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
-        <h4 class="text-sm font-medium mb-4">Devices</h4>
-        <div v-if="devices.length === 0" class="text-center py-6 text-muted-foreground text-sm">
-          No data
+        <div class="mt-2 flex justify-between text-[11px] tabular-nums text-ink-muted">
+          <span>{{ formatChartDate(timeseries[0]!.date) }}</span>
+          <span v-if="timeseries.length > 1">{{ formatChartDate(timeseries[timeseries.length - 1]!.date) }}</span>
         </div>
-        <div v-else class="space-y-3">
-          <div
-            v-for="item in devices"
-            :key="item.name"
-            class="flex items-center gap-3"
-          >
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-sm font-medium truncate">{{
-                  item.name
-                }}</span>
-                <span class="text-xs text-muted-foreground ml-2"
-                  >{{ item.clicks }} ({{ item.percentage }}%)</span
-                >
-              </div>
-              <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-green-400 rounded-full"
-                  :style="{ width: item.percentage + '%' }"
-                />
-              </div>
+      </div>
+    </section>
+
+    <!-- Breakdowns -->
+    <div class="grid gap-4 md:grid-cols-2">
+      <section v-for="panel in breakdowns" :key="panel.title" class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
+        <h4 class="text-sm font-medium text-ink">{{ panel.title }}</h4>
+        <div v-if="panel.items.length === 0" class="py-8 text-center text-sm text-ink-muted">No data yet</div>
+        <ul v-else class="mt-4 space-y-3">
+          <li v-for="item in panel.items.slice(0, 8)" :key="item.name">
+            <div class="mb-1 flex items-baseline justify-between gap-2 text-sm">
+              <span class="truncate text-ink">{{ item.name }}</span>
+              <span class="shrink-0 tabular-nums text-ink-muted">{{ item.clicks }} <span class="text-ink-faint">· {{ item.percentage }}%</span></span>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Countries -->
-      <FeaturesCountryMap :countries="countries" />
-
-      <!-- Browsers -->
-      <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
-        <h4 class="text-sm font-medium mb-4">Browsers</h4>
-        <div v-if="browsers.length === 0" class="text-center py-6 text-muted-foreground text-sm">
-          No data
-        </div>
-        <div v-else class="space-y-3">
-          <div
-            v-for="item in browsers"
-            :key="item.name"
-            class="flex items-center gap-3"
-          >
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-sm font-medium truncate">{{
-                  item.name
-                }}</span>
-                <span class="text-xs text-muted-foreground ml-2"
-                  >{{ item.clicks }} ({{ item.percentage }}%)</span
-                >
-              </div>
-              <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-purple-400 rounded-full"
-                  :style="{ width: item.percentage + '%' }"
-                />
-              </div>
+            <div class="h-1 overflow-hidden rounded-full bg-sand-strong">
+              <div class="h-full rounded-full bg-ink/80" :style="{ width: item.percentage + '%' }" />
             </div>
-          </div>
-        </div>
-      </div>
+          </li>
+        </ul>
+      </section>
+
+      <FeaturesCountryMap :countries="countries" class="md:col-span-2" />
     </div>
   </div>
 </template>
@@ -209,35 +116,23 @@ const countries = ref<BreakdownItem[]>([]);
 const browsers = ref<BreakdownItem[]>([]);
 
 const overviewCards = computed(() => [
-  {
-    label: "Total Clicks",
-    value: overview.value.total_clicks,
-    icon: "i-mingcute-cursor-3-line",
-    bgClass: "bg-perlink-cyan/10",
-    iconClass: "text-perlink-cyan",
-  },
-  {
-    label: "Unique Clicks",
-    value: overview.value.unique_clicks,
-    icon: "i-mingcute-user-2-line",
-    bgClass: "bg-green-100",
-    iconClass: "text-green-600",
-  },
-  {
-    label: "Today",
-    value: overview.value.today_clicks,
-    icon: "i-mingcute-flash-line",
-    bgClass: "bg-amber-100",
-    iconClass: "text-amber-600",
-  },
-  {
-    label: "Bot Clicks",
-    value: overview.value.bot_clicks,
-    icon: "i-mingcute-robot-line",
-    bgClass: "bg-gray-100",
-    iconClass: "text-gray-500",
-  },
+  { label: "Views", value: overview.value.total_clicks },
+  { label: "Unique visitors", value: overview.value.unique_clicks },
+  { label: "Today", value: overview.value.today_clicks },
+  { label: "Bots filtered", value: overview.value.bot_clicks },
 ]);
+
+const breakdowns = computed(() => [
+  { title: "Top referrers", items: referrers.value },
+  { title: "Devices", items: devices.value },
+  { title: "Browsers", items: browsers.value },
+]);
+
+const maxClicks = computed(() => Math.max(...timeseries.value.map((p) => p.clicks), 0));
+
+// 1,284 / 12.9K / 4.2M
+const compact = (value: number) =>
+  new Intl.NumberFormat("en", { notation: value >= 10000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
 
 const fetchAnalytics = async () => {
   if (!props.linkId) return;
@@ -273,7 +168,7 @@ const getBarWidth = (clicks: number): number => {
 
 const formatChartDate = (date: string): string => {
   const d = new Date(date);
-  return d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 };
 
 // Fetch on mount and period change

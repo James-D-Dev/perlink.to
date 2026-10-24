@@ -1,15 +1,15 @@
 <template>
-  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-white/10">
+  <section class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
     <!-- Header with toggle -->
     <div class="flex items-center justify-between mb-4">
-      <h4 class="text-sm font-medium">Countries</h4>
-      <div class="flex items-center gap-1 bg-gray-100 dark:bg-white/[0.06] rounded-lg p-0.5">
+      <h4 class="text-sm font-medium text-ink">Countries</h4>
+      <div class="flex items-center gap-0.5 rounded-full bg-sand p-0.5">
         <button
-          class="flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-colors"
+          class="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs transition-colors"
           :class="
             view === 'map'
-              ? 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl shadow-sm font-medium text-gray-900 dark:text-white'
-              : 'text-gray-500 dark:text-neutral-400 hover:text-gray-700'
+              ? 'bg-paper font-medium text-ink shadow-sm'
+              : 'text-ink-muted hover:text-ink'
           "
           @click="view = 'map'"
         >
@@ -17,11 +17,11 @@
           Map
         </button>
         <button
-          class="flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-colors"
+          class="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs transition-colors"
           :class="
             view === 'list'
-              ? 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl shadow-sm font-medium text-gray-900 dark:text-white'
-              : 'text-gray-500 dark:text-neutral-400 hover:text-gray-700'
+              ? 'bg-paper font-medium text-ink shadow-sm'
+              : 'text-ink-muted hover:text-ink'
           "
           @click="view = 'list'"
         >
@@ -42,8 +42,8 @@
         <div
           v-for="item in countries.slice(0, 5)"
           :key="item.name"
-          class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-neutral-300 cursor-pointer select-none rounded px-1 py-0.5 transition-colors"
-          :class="hoveredLegend === item.name ? 'bg-gray-100 dark:bg-white/[0.06]' : 'hover:bg-gray-50 dark:hover:bg-white/5'"
+          class="flex items-center gap-1.5 text-xs text-ink-soft cursor-pointer select-none rounded px-1 py-0.5 transition-colors"
+          :class="hoveredLegend === item.name ? 'bg-sand' : 'hover:bg-sand'"
           @mouseenter="highlightCountry(item.name)"
           @mouseleave="clearHighlight"
           @click="highlightCountry(item.name)"
@@ -53,7 +53,7 @@
             :style="{ backgroundColor: rankColor(countries.indexOf(item)) }"
           />
           {{ resolveCountryName(item.name) }}
-          <span class="text-gray-400 dark:text-neutral-500">{{ item.clicks }}</span>
+          <span class="tabular-nums text-ink-muted">{{ item.clicks }}</span>
         </div>
       </div>
     </div>
@@ -62,11 +62,11 @@
     <div v-else class="space-y-3">
       <div
         v-if="countries.length === 0"
-        class="text-center py-8 text-gray-400 dark:text-neutral-500 text-sm"
+        class="py-8 text-center text-sm text-ink-muted"
       >
-        No data
+        No data yet
       </div>
-      <div v-else>
+      <div v-else class="space-y-3">
         <div
           v-for="item in countries"
           :key="item.name"
@@ -74,25 +74,19 @@
         >
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between mb-1">
-              <span class="text-sm font-medium truncate">{{ resolveCountryName(item.name) }}</span>
-              <span class="text-xs text-gray-500 dark:text-neutral-400 ml-2"
-                >{{ item.clicks }} ({{ item.percentage }}%)</span
+              <span class="truncate text-sm text-ink">{{ resolveCountryName(item.name) }}</span>
+              <span class="ml-2 shrink-0 text-sm tabular-nums text-ink-muted"
+                >{{ item.clicks }} <span class="text-ink-faint">· {{ item.percentage }}%</span></span
               >
             </div>
-            <div class="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-              <div
-                class="h-full rounded-full transition-all"
-                :style="{
-                  width: item.percentage + '%',
-                  backgroundColor: '#f59e0b',
-                }"
-              />
+            <div class="h-1 overflow-hidden rounded-full bg-sand-strong">
+              <div class="h-full rounded-full bg-ink/80 transition-all" :style="{ width: item.percentage + '%' }" />
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -140,18 +134,21 @@ function clearHighlight() {
   chartInstance.update();
 }
 
-// Amber color scale (light → dark) matching Google Analytics palette
-const SCALE_COLORS = [
-  "#fef3c7",
-  "#fcd34d",
-  "#f59e0b",
-  "#d97706",
-  "#b45309",
-  "#78350f",
-];
+// Sequential sand → ink scale (one hue, light = few views, dark = many)
+const EMPTY_COLOR = "#f5f3f1";
+function scaleColor(ratio: number): string {
+  if (ratio <= 0) return EMPTY_COLOR;
+  if (ratio > 0.75) return "#0c0b0a";
+  if (ratio > 0.5) return "#3a3631";
+  if (ratio > 0.25) return "#6b655e";
+  if (ratio > 0.1) return "#9b948c";
+  return "#d6cfc6";
+}
 
+// Legend swatches use the same scale as the map, by each country's share
 function rankColor(rank: number): string {
-  return SCALE_COLORS[Math.min(rank, SCALE_COLORS.length - 1)] ?? "#f59e0b";
+  const max = Math.max(...props.countries.map((c) => c.clicks), 1);
+  return scaleColor((props.countries[rank]?.clicks ?? 0) / max);
 }
 
 // ISO 3166-1 alpha-2 → { numeric id, display name }
@@ -437,17 +434,11 @@ async function buildChart() {
           data,
           backgroundColor(ctx: any) {
             const val: number = ctx.raw?.value ?? 0;
-            if (val === 0) return "#e5e7eb";
-            const ratio = val / maxClicks;
-            if (ratio > 0.75) return "#78350f";
-            if (ratio > 0.5) return "#b45309";
-            if (ratio > 0.25) return "#d97706";
-            if (ratio > 0.1) return "#f59e0b";
-            return "#fef3c7";
+            return scaleColor(val / maxClicks);
           },
-          borderColor: "#fff",
+          borderColor: "#fdfcfb",
           borderWidth: 0.5,
-          hoverBackgroundColor: "#0ea5e9",
+          hoverBackgroundColor: "#e4572e",
         },
       ],
     },
@@ -469,7 +460,7 @@ async function buildChart() {
             },
             label(ctx: any) {
               const val: number = ctx.raw?.value ?? 0;
-              return `${val} clicks`;
+              return `${val} views`;
             },
           },
         },
@@ -482,14 +473,7 @@ async function buildChart() {
         color: {
           axis: "x",
           display: false,
-          interpolate: (v: number) => {
-            if (v <= 0) return "#e5e7eb";
-            if (v > 0.75) return "#78350f";
-            if (v > 0.5) return "#b45309";
-            if (v > 0.25) return "#d97706";
-            if (v > 0.1) return "#f59e0b";
-            return "#fef3c7";
-          },
+          interpolate: (v: number) => scaleColor(v),
           min: 0,
           max: maxClicks,
         },
