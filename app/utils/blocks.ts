@@ -13,6 +13,18 @@ export function withBlockIds(blocks: BioBlock[]): BioBlock[] {
   return blocks.map(block => (block.id ? block : { ...block, id: nanoid(8) }))
 }
 
+/** Only allow web links (blocks javascript: and similar) */
+export function safeWebUrl(url: string) {
+  return /^https?:\/\//i.test(url) ? url : `https://${url.replace(/^[a-z]+:/i, '')}`
+}
+
+/** Map link for a contact block: its own link, or a Google Maps search for the address */
+export function contactMapHref(data: { mapUrl?: string; address?: string }) {
+  if (data.mapUrl) return safeWebUrl(data.mapUrl)
+  if (data.address) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.address)}`
+  return ''
+}
+
 /** Starting data for a freshly added block */
 export function emptyBlockData(name: BlockName): BioBlock['data'] {
   switch (name) {

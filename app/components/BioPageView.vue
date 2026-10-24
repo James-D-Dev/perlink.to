@@ -332,6 +332,24 @@
           {{ siteT(siteLang, 'madeWith') }}
         </NuxtLink>
       </div>
+
+      <!-- Quick contact buttons, stuck to the bottom of the screen -->
+      <div v-if="quickActions.length" class="sticky bottom-0 z-40 mt-8 px-4 pb-4 pt-2">
+        <div class="mx-auto flex max-w-md gap-2 rounded-2xl bg-white/85 p-1.5 shadow-lg ring-1 ring-black/5 backdrop-blur">
+          <a
+            v-for="action in quickActions"
+            :key="action.key"
+            :href="action.href"
+            :target="action.external ? '_blank' : undefined"
+            :rel="action.external ? 'noopener noreferrer' : undefined"
+            class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[11px] font-medium transition active:scale-95"
+            :style="action.primary ? buttonStyle : { color: '#0c0b0a' }"
+          >
+            <UIcon :name="action.icon" class="size-5" />
+            <span class="truncate">{{ action.label }}</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -339,6 +357,7 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, ref, watch, onMounted } from "vue";
 import type { BioData, BioLink, SocialLink, ThemeConfig, BioBlock } from "~/types/bio";
+import { SOCIAL_PROVIDERS } from "~/types/bio";
 import { useBioTheme } from "~/composables/useBioTheme";
 import { getEffectBgClass } from "~/utils/effectUtils";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
@@ -500,6 +519,37 @@ function socialsOf(block: BioBlock): SocialLink[] {
     .filter((s) => s.url?.trim() || isPreview.value)
     .sort((a, b) => (a.index || 0) - (b.index || 0));
 }
+
+// Sticky Call / Directions / chat buttons, switched on in the contact block
+const quickActions = computed(() => {
+  const contact = sortedBlocks.value.find((b) => b.name === "contact" && b.data?.quickBar);
+  if (!contact || contact.name !== "contact") return [];
+  const data = contact.data;
+  const actions: { key: string; label: string; icon: string; href: string; external: boolean; primary?: boolean }[] = [];
+  if (data.phone) {
+    actions.push({ key: "call", label: siteT(siteLang.value, "call"), icon: "i-lucide-phone", href: `tel:${data.phone.replace(/\s+/g, "")}`, external: false, primary: true });
+  }
+  const map = contactMapHref(data);
+  if (map) actions.push({ key: "map", label: siteT(siteLang.value, "directions"), icon: "i-lucide-navigation", href: map, external: true });
+  // Chat apps from the social icons block
+  const socials = sortedBlocks.value.flatMap((b) => (b.name === "social" ? b.data?.links ?? [] : []));
+  const chats = [
+    { provider: "zalo", label: "Zalo", icon: "i-lucide-message-circle" },
+    { provider: "whatsapp", label: "WhatsApp", icon: "i-simple-icons-whatsapp" },
+    { provider: "telegram", label: "Telegram", icon: "i-simple-icons-telegram" },
+  ];
+  for (const chat of chats) {
+    const social = socials.find((s) => s.provider === chat.provider && s.url?.trim());
+    if (!social) continue;
+    const prefix = SOCIAL_PROVIDERS.find((p) => p.key === chat.provider)?.prefix;
+    const href = prefix && !/^https?:/i.test(social.url) ? prefix + social.url : safeWebUrl(social.url);
+    actions.push({ key: chat.provider, label: chat.label, icon: chat.icon, href, external: true });
+  }
+  if (data.bookingUrl) {
+    actions.push({ key: "book", label: data.bookingLabel || siteT(siteLang.value, "bookNow"), icon: "i-lucide-calendar-check", href: safeWebUrl(data.bookingUrl), external: true, primary: !data.phone });
+  }
+  return actions.slice(0, 4);
+});
 
 // DOM id the editor scrolls the preview to
 function blockDomId(block: BioBlock) {

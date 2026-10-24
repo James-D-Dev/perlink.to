@@ -39,6 +39,13 @@
           <UInput :model-value="data.bookingUrl" placeholder="https://..." icon="i-lucide-link" class="w-full" @update:model-value="update({ bookingUrl: String($event) })" />
         </UFormField>
       </div>
+      <div class="flex items-start justify-between gap-4 rounded-lg border border-default bg-default p-3 dark:border-white/10">
+        <div>
+          <p class="text-sm font-medium text-highlighted">{{ t('blocks.contact.quickBar') }}</p>
+          <p class="mt-0.5 text-xs text-muted">{{ t('blocks.contact.quickBarHelp') }}</p>
+        </div>
+        <USwitch :model-value="!!data.quickBar" @update:model-value="update({ quickBar: $event })" />
+      </div>
     </div>
   </div>
 </template>

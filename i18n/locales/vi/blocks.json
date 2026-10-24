@@ -120,7 +120,9 @@
       "email": "Email",
       "bookingButton": "Nút đặt chỗ",
       "bookingButtonPlaceholder": "Đặt bàn",
-      "bookingLink": "Liên kết đặt chỗ"
+      "bookingLink": "Liên kết đặt chỗ",
+      "quickBar": "Nút liên hệ nhanh",
+      "quickBarHelp": "Các nút Gọi, Chỉ đường và nhắn tin luôn hiện ở cuối trang. Nút nhắn tin dùng Zalo, WhatsApp hoặc Telegram trong khối biểu tượng mạng xã hội."
     },
     "birthday": {
       "title": "Đếm ngược sinh nhật",

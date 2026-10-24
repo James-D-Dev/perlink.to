@@ -388,6 +388,8 @@ export interface ContactBlock extends BaseBlock {
     email?: string;
     bookingUrl?: string;
     bookingLabel?: string;
+    /** Sticky Call / Directions / chat buttons at the bottom of the page */
+    quickBar?: boolean;
   };
 }
 
