@@ -137,6 +137,7 @@
                     @save="saveBio"
                     @publish="publishBio"
                     @preview="previewOpen = true"
+                    :dirty="isDirty"
                   />
                 </div>
                 <div class="hidden lg:block lg:col-span-5 sticky top-4 self-start">
@@ -323,6 +324,7 @@
 
 <script setup lang="ts">
 import { nanoid } from "nanoid";
+import { useDebounceFn } from "@vueuse/core";
 import type {
   BioData,
   BioLink,
@@ -550,6 +552,7 @@ const saveBio = async () => {
         blocks: bioData.blocks,
       },
     });
+    markSaved();
 
     toast.add({
       title: t("dashboard.toast.saved"),
@@ -767,6 +770,9 @@ const loadBio = async () => {
       }
 
       step.value = "edit";
+      await nextTick();
+      markSavedSnapshotOnly();
+      offerDraftRestore();
     }
   } catch (error: any) {
     console.error("Failed to load bio:", error);
@@ -778,6 +784,98 @@ const loadBio = async () => {
     loading.value = false;
   }
 };
+
+// ---- Unsaved changes ----
+// "Save draft" writes straight to the site, so edits are never saved
+// automatically; instead we show what's unsaved, warn before leaving and
+// keep a local backup in case the tab closes.
+const savedSnapshot = ref<string | null>(null);
+const currentSnapshot = computed(() =>
+  JSON.stringify({
+    title: bioData.title,
+    bio: bioData.bio,
+    avatarUrl: bioData.avatarUrl,
+    templateId: bioData.templateId,
+    themeConfig: bioData.themeConfig,
+    blocks: bioData.blocks,
+  }),
+);
+const isDirty = computed(() => savedSnapshot.value !== null && savedSnapshot.value !== currentSnapshot.value);
+const draftKey = computed(() => `perlink:draft:${routeUsername.value}`);
+
+// After loading: the server copy is the saved state (keep any local backup)
+function markSavedSnapshotOnly() {
+  savedSnapshot.value = currentSnapshot.value;
+}
+
+function markSaved() {
+  savedSnapshot.value = currentSnapshot.value;
+  try {
+    localStorage.removeItem(draftKey.value);
+  } catch {}
+}
+
+const backupDraft = useDebounceFn(() => {
+  if (!isDirty.value) return;
+  try {
+    localStorage.setItem(draftKey.value, currentSnapshot.value);
+  } catch {}
+}, 1000);
+watch(currentSnapshot, backupDraft);
+
+// Offer to bring back edits that were never saved (tab closed, crash...)
+function offerDraftRestore() {
+  let draft: string | null = null;
+  try {
+    draft = localStorage.getItem(draftKey.value);
+  } catch {}
+  if (!draft || draft === savedSnapshot.value) return;
+  toast.add({
+    title: t("dashboard.editor.unsaved.restoreTitle"),
+    description: t("dashboard.editor.unsaved.restoreText"),
+    duration: 0,
+    actions: [
+      {
+        label: t("dashboard.editor.unsaved.restoreAction"),
+        color: "neutral",
+        onClick: () => {
+          try {
+            Object.assign(bioData, JSON.parse(draft!));
+          } catch {}
+        },
+      },
+      {
+        label: t("dashboard.editor.unsaved.discardAction"),
+        color: "neutral",
+        variant: "ghost",
+        onClick: () => {
+          try {
+            localStorage.removeItem(draftKey.value);
+          } catch {}
+        },
+      },
+    ],
+  });
+}
+
+function onBeforeUnload(event: BeforeUnloadEvent) {
+  if (!isDirty.value) return;
+  event.preventDefault();
+  event.returnValue = "";
+}
+onMounted(() => window.addEventListener("beforeunload", onBeforeUnload));
+onBeforeUnmount(() => window.removeEventListener("beforeunload", onBeforeUnload));
+
+const confirmLeave = useConfirm();
+onBeforeRouteLeave(async () => {
+  if (!isDirty.value) return true;
+  return await confirmLeave({
+    title: t("dashboard.editor.unsaved.leaveTitle"),
+    description: t("dashboard.editor.unsaved.leaveText"),
+    confirmLabel: t("dashboard.editor.unsaved.leaveAction"),
+    color: "warning",
+  });
+});
 
 onMounted(() => {
   loadBio();

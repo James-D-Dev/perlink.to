@@ -1,7 +1,9 @@
 {
   "blocks": {
     "editor": {
-      "addBlock": "Add block"
+      "addBlock": "Add block",
+      "unsavedChanges": "Unsaved changes",
+      "allSaved": "All changes saved"
     },
     "header": {
       "changePhoto": "Change photo",

@@ -162,7 +162,10 @@
         >
           <span class="hidden sm:inline">{{ t('common.preview') }}</span>
         </UButton>
-        <div class="flex-1" />
+        <p class="flex min-w-0 flex-1 items-center gap-1.5 truncate px-1 text-xs" :class="dirty ? 'text-highlighted' : 'text-muted'">
+          <span class="size-1.5 shrink-0 rounded-full" :class="dirty ? 'bg-amber-500' : 'bg-emerald-500'" />
+          <span class="truncate">{{ dirty ? t('blocks.editor.unsavedChanges') : t('blocks.editor.allSaved') }}</span>
+        </p>
         <UButton
           color="neutral"
           variant="outline"
@@ -207,6 +210,8 @@ const props = defineProps<{
   saving: boolean;
   publishing: boolean;
   bioPageId: string;
+  /** There are edits that haven't been saved */
+  dirty?: boolean;
 }>();
 
 const { t } = useI18n();

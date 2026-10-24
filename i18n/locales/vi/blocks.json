@@ -1,7 +1,9 @@
 {
   "blocks": {
     "editor": {
-      "addBlock": "Thêm khối"
+      "addBlock": "Thêm khối",
+      "unsavedChanges": "Chưa lưu thay đổi",
+      "allSaved": "Đã lưu"
     },
     "header": {
       "changePhoto": "Đổi ảnh",

@@ -102,7 +102,16 @@
       "templateAppliedText": "Sửa nội dung mẫu, rồi lưu hoặc xuất bản.",
       "applyTitle": "Áp dụng mẫu \"{name}\"?",
       "applyText": "Thao tác này sẽ thay các khối, giao diện và Phòng 3D hiện tại. Thay đổi chỉ được lưu khi bạn bấm Lưu.",
-      "applyConfirm": "Áp dụng mẫu"
+      "applyConfirm": "Áp dụng mẫu",
+      "unsaved": {
+        "restoreTitle": "Có thay đổi chưa lưu",
+        "restoreText": "Bạn còn các chỉnh sửa từ lần trước chưa được lưu.",
+        "restoreAction": "Khôi phục",
+        "discardAction": "Bỏ qua",
+        "leaveTitle": "Rời đi mà không lưu?",
+        "leaveText": "Các thay đổi trên trang này chưa được lưu.",
+        "leaveAction": "Rời đi"
+      }
     },
     "username": {
       "heading": "Chọn tên người dùng",
