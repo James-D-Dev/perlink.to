@@ -2,30 +2,35 @@
   <div v-if="hasImages" class="w-full">
     <!-- Grid: square tiles, two per row -->
     <div v-if="layout === 'grid'" class="grid grid-cols-2 gap-2">
-      <button
+      <!-- Not <button>: previews sit inside clickable template cards -->
+      <div
         v-for="(image, index) in sortedImages"
         :key="image.url"
-        type="button"
-        class="relative aspect-square overflow-hidden"
+        role="button"
+        tabindex="0"
+        class="relative aspect-square cursor-pointer overflow-hidden"
         :style="{ borderRadius: radius }"
         @click="openLightbox(index)"
+        @keydown.enter="openLightbox(index)"
       >
         <img :src="image.url" :alt="image.alt || ''" class="size-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy">
-      </button>
+      </div>
     </div>
 
     <!-- Masonry: two columns, natural heights -->
     <div v-else-if="layout === 'masonry'" class="columns-2 gap-2">
-      <button
+      <div
         v-for="(image, index) in sortedImages"
         :key="image.url"
-        type="button"
-        class="mb-2 block w-full overflow-hidden break-inside-avoid"
+        role="button"
+        tabindex="0"
+        class="mb-2 block w-full cursor-pointer overflow-hidden break-inside-avoid"
         :style="{ borderRadius: radius }"
         @click="openLightbox(index)"
+        @keydown.enter="openLightbox(index)"
       >
         <img :src="image.url" :alt="image.alt || ''" class="w-full transition-transform duration-300 hover:scale-105" loading="lazy">
-      </button>
+      </div>
     </div>
 
     <!-- Vertical Layout -->

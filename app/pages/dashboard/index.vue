@@ -67,16 +67,20 @@
             </button>
           </div>
 
-          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <button
+          <div class="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+            <!-- Not <button>: the live preview inside contains buttons of its own -->
+            <div
               v-for="template in filteredTemplates"
               :key="template.id"
-              type="button"
-              class="group overflow-hidden rounded-2xl border border-default bg-default text-left transition hover:-translate-y-0.5 hover:shadow-xl dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl dark:hover:border-white/20 dark:hover:shadow-black/40"
+              role="button"
+              tabindex="0"
+              class="group cursor-pointer overflow-hidden rounded-xl border border-default bg-default text-left transition hover:-translate-y-0.5 hover:shadow-xl dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl dark:hover:border-white/20 dark:hover:shadow-black/40"
               @click="openTemplate(template.id)"
+              @keydown.enter.prevent="openTemplate(template.id)"
+              @keydown.space.prevent="openTemplate(template.id)"
             >
-              <div class="relative aspect-[4/3] overflow-hidden border-b border-default dark:border-white/[0.08]">
-                <SiteTemplateThumbnail :template="template" :scale="0.42" class="transition duration-500 group-hover:scale-[1.03]" />
+              <div class="relative aspect-[3/4] overflow-hidden border-b border-default dark:border-white/[0.08]">
+                <SiteTemplateThumbnail :template="template" :scale="0.4" class="transition duration-500 group-hover:scale-[1.03]" />
                 <div class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/0 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
                   <span class="inline-flex items-center gap-1.5 rounded-lg bg-default px-3 py-1.5 text-sm font-semibold text-highlighted shadow">
                     Use template
@@ -84,18 +88,18 @@
                   </span>
                 </div>
               </div>
-              <div class="space-y-2 p-4">
+              <div class="space-y-1.5 p-3 sm:space-y-2 sm:p-4">
                 <div class="flex items-center justify-between gap-2">
-                  <h3 class="font-semibold text-highlighted dark:text-white">{{ template.name }}</h3>
-                  <span class="inline-flex items-center gap-1 rounded-md border border-default px-1.5 py-0.5 text-[11px] font-medium text-muted dark:border-white/10 dark:text-neutral-400">
+                  <h3 class="truncate text-sm font-semibold text-highlighted sm:text-base dark:text-white">{{ template.name }}</h3>
+                  <span class="hidden shrink-0 sm:inline-flex items-center gap-1 rounded-md border border-default px-1.5 py-0.5 text-[11px] font-medium text-muted dark:border-white/10 dark:text-neutral-400">
                     <UIcon name="i-lucide-box" class="size-3" />
                     3D
                   </span>
                 </div>
-                <p class="line-clamp-2 text-sm text-muted dark:text-neutral-400">{{ template.description }}</p>
+                <p class="line-clamp-2 text-xs text-muted sm:text-sm dark:text-neutral-400">{{ template.description }}</p>
                 <p class="text-xs text-dimmed dark:text-neutral-500">{{ categoryLabel(template.category) }}</p>
               </div>
-            </button>
+            </div>
           </div>
         </section>
       </div>
