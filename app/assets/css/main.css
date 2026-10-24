@@ -149,3 +149,13 @@ Must come after :root so it overrides the light --ui-bg above.
 @media (prefers-reduced-motion: reduce) {
   .mk-orb { animation: none !important; }
 }
+
+/* iOS Safari zooms the page when a field under 16px gets focus, which
+   breaks popups. Unlayered, so it wins over text-sm on touch screens. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]),
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}

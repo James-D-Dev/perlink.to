@@ -111,11 +111,11 @@
         :title="selectedTemplate?.name"
       >
         <template #content>
-          <div v-if="selectedTemplate" class="grid sm:grid-cols-2">
+          <div v-if="selectedTemplate" class="grid grid-cols-1 sm:grid-cols-2">
             <div class="relative hidden h-full min-h-96 border-r border-default dark:border-white/[0.08] sm:block">
               <SiteTemplateThumbnail :template="selectedTemplate" :scale="0.62" class="absolute inset-0" />
             </div>
-            <div class="flex flex-col p-6">
+            <div class="flex min-w-0 flex-col p-5 sm:p-6">
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <p class="text-xs font-medium uppercase tracking-wide text-muted dark:text-neutral-500">
