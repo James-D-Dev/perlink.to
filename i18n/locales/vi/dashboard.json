@@ -258,6 +258,16 @@
       "business": "Kinh doanh",
       "creative": "Sáng tạo",
       "events": "Sự kiện"
+    },
+    "seo": {
+      "heading": "Tìm kiếm & chia sẻ",
+      "text": "Trang của bạn hiện ra thế nào trên Google và khi gửi liên kết qua Zalo, Messenger hay Facebook.",
+      "titleLabel": "Tiêu đề",
+      "descriptionLabel": "Mô tả",
+      "imageLabel": "Ảnh chia sẻ",
+      "imageHelp": "Chọn một ảnh của bạn. Tự động sẽ dùng ảnh bìa, nếu không có thì dùng ảnh đại diện.",
+      "auto": "Tự động",
+      "previewLabel": "Xem trước khi chia sẻ liên kết"
     }
   }
 }

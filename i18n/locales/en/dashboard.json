@@ -258,6 +258,16 @@
       "business": "Business",
       "creative": "Creative",
       "events": "Events"
+    },
+    "seo": {
+      "heading": "Search & sharing",
+      "text": "How your site appears on Google and when the link is shared on Zalo, Messenger or Facebook.",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "imageLabel": "Share image",
+      "imageHelp": "Pick one of your photos. Auto uses your banner, then your profile photo.",
+      "auto": "Auto",
+      "previewLabel": "Preview of a shared link"
     }
   }
 }

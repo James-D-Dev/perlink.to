@@ -221,6 +221,14 @@ export interface ThemeSocial {
   style: "soft" | "filled" | "outline" | "plain";
 }
 
+/** How the site appears in search results and shared links */
+export interface ThemeSeo {
+  title?: string;
+  description?: string;
+  /** One of the site's own photos; empty picks banner, then avatar */
+  imageUrl?: string;
+}
+
 export interface ThemePage {
   /** Space between blocks */
   blockGap: "compact" | "normal" | "relaxed";
@@ -241,6 +249,7 @@ export interface ThemeConfig {
   page?: ThemePage;
   /** Language of the words visitors see, e.g. "vi" (see utils/siteI18n) */
   language?: string;
+  seo?: ThemeSeo;
   showShare?: boolean;
   /** '3d' shows the page as an interactive mini room */
   pageMode?: PageMode;

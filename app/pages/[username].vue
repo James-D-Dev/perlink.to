@@ -10,7 +10,7 @@
       <Meta name="emotion-insertion-point" content="" />
       <Meta
         name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=contain, user-scalable=no"
+        content="width=device-width, initial-scale=1, viewport-fit=contain"
       />
       <Title>{{ metaTitle }}</Title>
       <Meta name="description" :content="metaDesc" />
@@ -19,8 +19,6 @@
       <Meta property="og:url" :content="metaUrl" />
       <Meta property="og:site_name" content="Perlink" />
       <Meta property="og:image" :content="metaImg" />
-      <Meta property="og:image:width" content="600" />
-      <Meta property="og:image:height" content="600" />
       <Meta property="og:type" content="website" />
 
       <Link rel="canonical" :href="metaUrl" />
@@ -128,17 +126,21 @@ const { data, pending, error } = await useFetch<{ bioPage: ApiBioPage }>(
 
 const bioPage = computed(() => data.value?.bioPage);
 
-const metaTitle = computed(() => {
-  return `@${bioPage.value?.username} | ${bioPage.value?.title} | Perlink`;
-});
-const metaDesc = computed(() => {
-  return `@${bioPage.value?.username}: ${bioPage.value?.title}. ${bioPage.value?.bio}`;
-});
-const metaUrl = computed(() => {
-  return `https://perlink.to/${bioPage.value?.username}`;
-});
-const metaImg = computed(() => {
-  return `${bioPage.value?.avatarUrl ?? undefined}`;
+// Owner's own title/description/image, or sensible defaults (utils/siteSeo)
+const seo = computed(() => siteSeo(bioPage.value ?? {}, bioPage.value?.username ?? username));
+const metaTitle = computed(() => seo.value.title);
+const metaDesc = computed(() => seo.value.description);
+const metaUrl = computed(() => seo.value.url);
+const metaImg = computed(() => seo.value.image);
+
+// Address, phone and opening hours for search engines
+const businessJsonLd = computed(() => (bioPage.value ? localBusinessJsonLd(bioPage.value, bioPage.value.username) : null));
+useHead({
+  script: computed(() =>
+    businessJsonLd.value
+      ? [{ type: "application/ld+json", innerHTML: JSON.stringify(businessJsonLd.value).replace(/</g, "\\u003c") }]
+      : [],
+  ),
 });
 
 const bioPageAsBioData = computed<BioData | undefined>(() => {
