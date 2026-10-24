@@ -6,7 +6,7 @@
       v-if="theme.showShare"
       @click="sharePage"
       class="fixed top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200"
-      aria-label="Share page"
+:aria-label="siteT(siteLang, 'sharePage')"
       variant="soft"
     >
       <UIcon name="i-uil-share" class="w-5 h-5 text-gray-700" />
@@ -328,7 +328,7 @@
           class="inline-flex items-center gap-2 rounded-full bg-white/90 py-2 pl-3 pr-4 text-xs font-medium text-[#0c0b0a] shadow-sm ring-1 ring-black/5 backdrop-blur transition hover:bg-white"
         >
           <AppLogo variant="mark" :size="16" />
-          Made with Perlink
+          {{ siteT(siteLang, 'madeWith') }}
         </NuxtLink>
       </div>
     </div>
@@ -414,6 +414,10 @@ const {
   avatarAppearClasses,
   avatarHoverClasses,
 } = useBioTheme(themeSource);
+
+// Words visitors see follow the site's language
+const siteLang = computed(() => normalizeSiteLanguage(theme.value.language));
+provide(SITE_LANG_KEY, siteLang);
 
 // The bio follows the header: left-aligned next to a left avatar
 const bioAlign = computed(() =>
@@ -524,7 +528,7 @@ async function sharePage() {
     try {
       await navigator.clipboard.writeText(url);
       // Could add toast notification here
-      alert("Link copied to clipboard!");
+      useToast().add({ title: siteT(siteLang.value, "linkCopied") });
     } catch (err) {
       console.error("Failed to copy:", err);
     }

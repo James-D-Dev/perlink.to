@@ -15,30 +15,30 @@
         <div v-if="!isBirthdayToday" class="grid grid-cols-4 gap-2">
           <div class="flex flex-col items-center">
             <span class="text-2xl font-bold tabular-nums">{{ timeLeft.days }}</span>
-            <span class="text-xs opacity-70 uppercase">days</span>
+            <span class="text-xs opacity-70 uppercase">{{ t('days') }}</span>
           </div>
           <div class="flex flex-col items-center">
             <span class="text-2xl font-bold tabular-nums">{{ timeLeft.hours }}</span>
-            <span class="text-xs opacity-70 uppercase">hrs</span>
+            <span class="text-xs opacity-70 uppercase">{{ t('hours') }}</span>
           </div>
           <div class="flex flex-col items-center">
             <span class="text-2xl font-bold tabular-nums">{{ timeLeft.minutes }}</span>
-            <span class="text-xs opacity-70 uppercase">min</span>
+            <span class="text-xs opacity-70 uppercase">{{ t('minutes') }}</span>
           </div>
           <div class="flex flex-col items-center">
             <span class="text-2xl font-bold tabular-nums">{{ timeLeft.seconds }}</span>
-            <span class="text-xs opacity-70 uppercase">sec</span>
+            <span class="text-xs opacity-70 uppercase">{{ t('seconds') }}</span>
           </div>
         </div>
         <div v-else class="flex flex-col items-center gap-2 text-xl font-bold">
           <UIcon name="i-lucide-party-popper" class="w-12 h-12 animate-bounce" />
-          <span>It's Birthday Time!</span>
+          <span>{{ t('birthdayTime') }}</span>
         </div>
       </div>
 
       <!-- Age Info -->
       <div v-if="data.showAge && nextBirthdayAge" class="text-sm opacity-80 mb-2">
-        Turning {{ nextBirthdayAge }}
+        {{ t('turning', { age: nextBirthdayAge }) }}
       </div>
 
       <!-- Date Display -->
@@ -56,6 +56,8 @@ import type { BirthdayCountdownBlock } from '~/types/bio';
 const props = defineProps<{
   data: BirthdayCountdownBlock['data'];
 }>();
+
+const { t, lang } = useSiteI18n();
 
 const now = ref(new Date());
 let interval: ReturnType<typeof setInterval> | null = null;
@@ -136,7 +138,7 @@ const nextBirthdayAge = computed(() => {
 // Format birth date for display
 const formattedBirthDate = computed(() => {
   if (!birthDate.value) return '';
-  return birthDate.value.toLocaleDateString('en-US', {
+  return birthDate.value.toLocaleDateString(lang.value, {
     month: 'long',
     day: 'numeric',
   });

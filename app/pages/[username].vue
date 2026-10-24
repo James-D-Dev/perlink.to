@@ -68,6 +68,7 @@
           :title="bioPage.title || bioPage.username"
           :bio="bioPage.bio || undefined"
           :avatar-url="bioPage.avatarUrl || undefined"
+          :lang="siteLang"
           @switch2d="show2d = true"
         />
         <template #fallback>
@@ -89,7 +90,7 @@
         class="fixed bottom-4 left-4 z-50 shadow-lg"
         color="neutral"
         icon="i-lucide-box"
-        label="3D room"
+        :label="siteT(siteLang, 'room3d')"
         @click="show2d = false"
       />
     </div>
@@ -149,6 +150,10 @@ const bioPageAsBioData = computed<BioData | undefined>(() => {
     avatarUrl: p.avatarUrl || "",
     templateId: p.templateId,
     themeConfig: {
+      // Keep every saved setting (social, page, language, showShare...),
+      // then merge the nested groups over their defaults
+      ...DEFAULT_THEME,
+      ...(p.themeConfig || {}),
       colors: { ...DEFAULT_THEME.colors, ...(p.themeConfig?.colors || {}) },
       background: {
         ...DEFAULT_THEME.background,
@@ -167,6 +172,9 @@ const bioPageAsBioData = computed<BioData | undefined>(() => {
     blocks: p.blocks || [],
   };
 });
+
+const siteLang = computed(() => normalizeSiteLanguage(bioPage.value?.themeConfig?.language));
+useHead({ htmlAttrs: { lang: siteLang } });
 
 // Pages in 3D mode open as a room; visitors can switch to the 2D page
 const room = computed<RoomConfig | null>(() => {

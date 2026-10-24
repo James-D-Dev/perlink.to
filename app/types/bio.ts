@@ -239,6 +239,8 @@ export interface ThemeConfig {
   link: ThemeLink;
   social?: ThemeSocial;
   page?: ThemePage;
+  /** Language of the words visitors see, e.g. "vi" (see utils/siteI18n) */
+  language?: string;
   showShare?: boolean;
   /** '3d' shows the page as an interactive mini room */
   pageMode?: PageMode;

@@ -15,6 +15,7 @@ function mergeWithDefault(theme: Partial<ThemeConfig> | undefined | null): Theme
     typography: { ...DEFAULT_THEME.typography, ...theme.typography },
     social: { ...DEFAULT_THEME.social!, ...theme.social },
     page: { ...DEFAULT_THEME.page!, ...theme.page },
+    language: theme.language,
     showShare: theme.showShare ?? DEFAULT_THEME.showShare,
   }
 }

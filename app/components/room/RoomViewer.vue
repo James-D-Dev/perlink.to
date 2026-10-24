@@ -10,12 +10,12 @@
 
     <!-- Profile (tap to switch to the 2D page) + controls -->
     <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-4">
-      <UTooltip text="Switch to 2D page" :content="{ side: 'bottom', align: 'start' }">
+      <UTooltip :text="t('switchTo2d')" :content="{ side: 'bottom', align: 'start' }">
         <button
           type="button"
           class="group pointer-events-auto flex min-w-0 max-w-[16rem] items-center gap-2.5 rounded-2xl bg-black/30 p-1.5 pr-3 text-left text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/40"
           :class="{ 'py-2 pl-3': !avatarUrl }"
-          aria-label="Switch to 2D page"
+          :aria-label="t('switchTo2d')"
           @click="emit('switch2d')"
         >
           <img
@@ -33,23 +33,23 @@
       </UTooltip>
 
       <div class="pointer-events-auto flex items-center gap-2">
-        <UTooltip v-if="track" :text="musicOn ? 'Mute music' : `Play music: ${track.title}`">
+        <UTooltip v-if="track" :text="musicOn ? t('muteMusic') : t('playMusic', { title: track.title })">
           <button
             type="button"
             class="flex size-10 items-center justify-center rounded-full shadow-lg ring-1 backdrop-blur-xl transition"
             :class="musicOn ? 'bg-white/25 text-white ring-white/30' : 'bg-black/30 text-white/80 ring-white/15 hover:bg-black/40'"
-            :aria-label="musicOn ? 'Mute music' : 'Play music'"
+            :aria-label="musicOn ? t('muteMusic') : t('playMusic', { title: track.title })"
             data-music-toggle
             @click="toggleMusic"
           >
             <UIcon :name="musicOn ? 'i-lucide-volume-2' : 'i-lucide-volume-x'" class="size-5" />
           </button>
         </UTooltip>
-        <UTooltip :text="isDayShown ? 'Switch to night' : 'Switch to day'">
+        <UTooltip :text="isDayShown ? t('switchToNight') : t('switchToDay')">
           <button
             type="button"
             class="flex size-10 items-center justify-center rounded-full bg-black/30 text-white/80 shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/40"
-            :aria-label="isDayShown ? 'Switch to night' : 'Switch to day'"
+            :aria-label="isDayShown ? t('switchToNight') : t('switchToDay')"
             @click="toggleDayNight"
           >
             <UIcon :name="isDayShown ? 'i-lucide-moon' : 'i-lucide-sun'" class="size-5" />
@@ -70,7 +70,7 @@
         class="absolute inset-0 z-20 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
         role="dialog"
         aria-modal="true"
-        aria-label="Photo"
+        :aria-label="t('viewPhoto')"
         @click.self="photo = null"
       >
         <div class="relative flex max-h-full max-w-full flex-col items-center gap-3">
@@ -92,7 +92,7 @@
           <button
             type="button"
             class="absolute -right-2 -top-2 flex size-9 items-center justify-center rounded-full bg-black/40 text-white shadow-lg ring-1 ring-white/20 backdrop-blur-xl transition hover:bg-black/60"
-            aria-label="Close photo"
+            :aria-label="t('closePhoto')"
             @click="photo = null"
           >
             <UIcon name="i-lucide-x" class="size-5" />
@@ -138,6 +138,7 @@
 </template>
 
 <script setup lang="ts">
+import type { SiteLanguage, SiteMessageKey } from '~/utils/siteI18n'
 import type { RoomConfig, RoomObject } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import { getDaylight } from '~/utils/room/daylight'
@@ -151,9 +152,12 @@ const props = defineProps<{
   title: string
   bio?: string
   avatarUrl?: string
+  lang?: SiteLanguage
 }>()
 
 const emit = defineEmits<{ switch2d: [] }>()
+
+const t = (key: SiteMessageKey, params?: Record<string, string | number>) => siteT(props.lang ?? 'en', key, params)
 
 const hovered = ref<{ label: string; x: number; y: number } | null>(null)
 
@@ -239,7 +243,7 @@ function safeUrl(url: string) {
 
 function onHover(id: string | null, x: number, y: number) {
   const obj = id ? props.room.objects.find(o => o.id === id) : undefined
-  if (obj?.image) hovered.value = { label: 'View photo', x, y }
+  if (obj?.image) hovered.value = { label: t('viewPhoto'), x, y }
   else hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y } : null
 }
 

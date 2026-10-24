@@ -1,7 +1,7 @@
 <template>
   <section class="p-5" :style="cardStyle">
     <div class="mb-3 flex items-center justify-between gap-2">
-      <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || 'Opening hours' }}</h2>
+      <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || t('openingHours') }}</h2>
       <span
         v-if="status"
         class="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
@@ -18,8 +18,8 @@
         class="flex justify-between gap-4"
         :class="today === day.day ? 'font-semibold' : 'opacity-80'"
       >
-        <span>{{ DAY_NAMES[day.day] }}</span>
-        <span class="tabular-nums">{{ day.closed ? 'Closed' : `${day.open} – ${day.close}` }}</span>
+        <span class="capitalize">{{ weekday(day.day) }}</span>
+        <span class="tabular-nums">{{ day.closed ? t('closed') : `${time(day.open)} – ${time(day.close)}` }}</span>
       </li>
     </ul>
     <p v-if="data.note" class="mt-3 text-xs opacity-70">{{ data.note }}</p>
@@ -35,7 +35,7 @@ const props = defineProps<{
   headingStyle?: Record<string, string | undefined>
 }>()
 
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const { t, weekday, time } = useSiteI18n()
 
 // Monday first
 const orderedDays = computed(() =>
@@ -66,14 +66,14 @@ const status = computed(() => {
 
   // Yesterday's hours may run past midnight (e.g. 18:00 – 02:00)
   if (yesterday && !yesterday.closed && toMinutes(yesterday.close) < toMinutes(yesterday.open) && minutes < toMinutes(yesterday.close)) {
-    return { open: true, label: `Open until ${yesterday.close}` }
+    return { open: true, label: t('openUntil', { time: time(yesterday.close) }) }
   }
-  if (!current || current.closed) return { open: false, label: 'Closed today' }
+  if (!current || current.closed) return { open: false, label: t('closedToday') }
   const open = toMinutes(current.open)
   const close = toMinutes(current.close)
   const overnight = close < open
   const isOpen = overnight ? minutes >= open : minutes >= open && minutes < close
-  if (isOpen) return { open: true, label: `Open until ${current.close}` }
-  return { open: false, label: minutes < open ? `Opens at ${current.open}` : 'Closed now' }
+  if (isOpen) return { open: true, label: t('openUntil', { time: time(current.close) }) }
+  return { open: false, label: minutes < open ? t('opensAt', { time: time(current.open) }) : t('closedNow') }
 })
 </script>

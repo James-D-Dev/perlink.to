@@ -238,6 +238,20 @@
                   </div>
                 </div>
 
+                <!-- Site language -->
+                <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">Site language</h3>
+                  <p class="text-sm text-muted dark:text-neutral-400 mb-3">
+                    The language of buttons and labels your visitors see, like opening hours and “Book now”. Your own text stays as you write it.
+                  </p>
+                  <USelect
+                    :model-value="normalizeSiteLanguage(bioData.themeConfig.language)"
+                    :items="SITE_LANGUAGES.map((l) => ({ label: l.label, value: l.code }))"
+                    class="w-full"
+                    @update:model-value="handleUpdateTheme({ language: $event as string })"
+                  />
+                </div>
+
                 <!-- Template -->
                 <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
                   <h3 class="font-semibold text-highlighted dark:text-white mb-1">Template</h3>

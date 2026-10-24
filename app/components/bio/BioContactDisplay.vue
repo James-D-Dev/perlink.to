@@ -1,6 +1,6 @@
 <template>
   <section class="space-y-3 p-5" :style="cardStyle">
-    <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || 'Contact' }}</h2>
+    <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || t('contact') }}</h2>
 
     <a v-if="data.address" :href="mapHref" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 text-sm hover:underline">
       <UIcon name="i-lucide-map-pin" class="mt-0.5 size-4 shrink-0" />
@@ -25,7 +25,7 @@
         :style="buttonStyle"
       >
         <UIcon name="i-lucide-calendar-check" class="size-4" />
-        {{ data.bookingLabel || 'Book now' }}
+        {{ data.bookingLabel || t('bookNow') }}
       </a>
       <a
         v-if="data.phone"
@@ -35,7 +35,7 @@
         :style="buttonStyle"
       >
         <UIcon name="i-lucide-phone-call" class="size-4" />
-        Call
+        {{ t('call') }}
       </a>
     </div>
   </section>
@@ -50,6 +50,8 @@ const props = defineProps<{
   buttonStyle: Record<string, string | undefined>
   headingStyle?: Record<string, string | undefined>
 }>()
+
+const { t } = useSiteI18n()
 
 // Only allow web links (blocks javascript: and similar)
 function safeUrl(url: string) {
