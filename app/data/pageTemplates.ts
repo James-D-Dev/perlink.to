@@ -10,6 +10,8 @@ import { DEFAULT_ROOM_ENVIRONMENT, DEFAULT_ROOM_STYLE } from '~/types/room'
 export interface PageTemplateContent {
   title: string
   bio: string
+  /** Sample photo, used only when the page has no avatar yet */
+  avatarUrl?: string
   blocks: BioBlock[]
   themeConfig: ThemeConfig
   room: RoomConfig
@@ -112,10 +114,11 @@ function look(l: Look): ThemeConfig {
   }
 }
 
-const art = (name: string) => `/images/templates/${name}.svg`
+// Sample photos from Pexels (free to use, no attribution required)
+const photo = (name: string) => `/images/templates/photos/${name}.jpg`
 
 function album(...names: string[]) {
-  return names.map((name, index) => ({ id: nanoid(6), url: art(name), index }))
+  return names.map((name, index) => ({ id: nanoid(6), url: photo(name), index }))
 }
 
 function room(style: Partial<RoomStyle>, objects: Omit<RoomObject, 'id' | 'scale'>[]): RoomConfig {
@@ -164,6 +167,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Your Name',
       bio: 'Designer & developer. I build friendly products for the web.',
+      avatarUrl: photo('personal-avatar'),
       themeConfig: look({
         bg: '#F7F5F2', text: '#1C1A17', accent: '#1C1A17', onAccent: '#FFFFFF',
         surface: '#FFFFFF', border: '#E8E4DF', radius: 10,
@@ -174,7 +178,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'social', data: { links: social('instagram', 'linkedin', 'github', 'email') } },
         { name: 'links', data: { items: links(['Portfolio', ''], ['Latest project', ''], ['Book a call', '']) } },
         { name: 'text', data: { title: 'About', content: 'I design and build calm, useful software. Eight years across startups and studios, now independent and open to new projects.', align: 'left', style: 'plain' } },
-        { name: 'image-album', data: { title: 'Selected work', images: album('tile-sand', 'tile-lagoon', 'tile-sage', 'tile-blush'), layout: 'grid' } },
+        { name: 'image-album', data: { title: 'Selected work', images: album('personal-work-1', 'personal-work-2', 'personal-work-3', 'personal-work-4'), layout: 'grid' } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#f3ede4', floorColor: '#c8a27a', floorMaterial: 'wood' }, [
         { type: 'window', position: [0.6, 1.6, -3], rotation: 0, wall: 'back' },
@@ -202,11 +206,12 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Your Restaurant',
       bio: 'Fresh, seasonal cooking in the heart of the city.',
+      avatarUrl: photo('restaurant-avatar'),
       themeConfig: look({
         bg: '#F4EEE6', text: '#2B1D14', accent: '#9A3B1C', onAccent: '#FFF7EF',
         surface: '#FFFBF6', border: '#E6D9C8', radius: 8,
         nameFont: 'Playfair Display, serif', nameWeight: '500', nameSize: '2.25rem',
-        header: 'banner-circle', banner: art('banner-ember'), link: 'centered', social: 'soft',
+        header: 'banner-circle', banner: photo('restaurant-cover'), link: 'centered', social: 'soft',
       }),
       blocks: withIndex([
         { name: 'text', data: { title: 'Our story', content: 'Family recipes, market produce and a charcoal grill. We cook what is in season and change the menu every month.', align: 'center', style: 'plain' } },
@@ -255,14 +260,15 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Your Homestay',
       bio: 'A quiet place to stay, five minutes from the beach.',
+      avatarUrl: photo('hotel-avatar'),
       themeConfig: look({
         bg: '#F3F1EC', text: '#1F2A2E', accent: '#1F4E5F', onAccent: '#FFFFFF',
         surface: '#FFFFFF', radius: 10, shadow: 'sm',
         nameFont: 'Cormorant Garamond, serif', nameWeight: '500', nameSize: '2.25rem',
-        header: 'banner-square', banner: art('banner-lagoon'), avatar: 'rounded', link: 'centered', social: 'outline',
+        header: 'banner-square', banner: photo('hotel-cover'), avatar: 'rounded', link: 'centered', social: 'outline',
       }),
       blocks: withIndex([
-        { name: 'image-album', data: { images: album('photo-lagoon', 'photo-sand', 'photo-ember'), layout: 'carousel' } },
+        { name: 'image-album', data: { images: album('hotel-room-1', 'hotel-room-2', 'hotel-room-3'), layout: 'carousel' } },
         { name: 'text', data: { title: 'The house', content: 'Six rooms around a garden courtyard, with breakfast on the terrace and bikes to borrow.', align: 'center', style: 'plain' } },
         {
           name: 'menu',
@@ -305,6 +311,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Your Café',
       bio: 'Specialty coffee, homemade cakes and good music.',
+      avatarUrl: photo('cafe-avatar'),
       themeConfig: look({
         bg: '#EDF0E8', text: '#223326', accent: '#3F6B4B', onAccent: '#FFFFFF',
         surface: '#F9FAF6', border: '#D9E0D1', radius: 12,
@@ -325,7 +332,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
             ]),
           },
         },
-        { name: 'image-album', data: { title: 'Inside the café', images: album('tile-sage', 'tile-ember', 'tile-sand', 'tile-blush'), layout: 'grid' } },
+        { name: 'image-album', data: { title: 'Inside the café', images: album('cafe-1', 'cafe-2', 'cafe-3', 'cafe-4'), layout: 'grid' } },
         { name: 'hours', data: { title: 'Opening hours', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '07:00', close: '21:30' })), note: '' } },
         { name: 'contact', data: { title: 'Visit us', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
@@ -356,14 +363,15 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Your Studio',
       bio: 'Illustration, prints and commissions.',
+      avatarUrl: photo('creator-avatar'),
       themeConfig: look({
         bg: '#111015', text: '#F3EFE8', accent: '#CDB4FF', onAccent: '#17122B',
         surface: '#1B1A21', border: '#2C2A33', radius: 10,
         nameFont: 'Inter Tight, sans-serif', nameWeight: '400', nameSize: '2.25rem', tracking: '-0.03em',
-        header: 'banner-circle', banner: art('banner-dusk'), link: 'centered', social: 'plain',
+        header: 'banner-circle', banner: photo('creator-cover'), link: 'centered', social: 'plain',
       }),
       blocks: withIndex([
-        { name: 'image-album', data: { title: 'Recent work', images: album('art-dusk-tall', 'art-ember', 'art-blush', 'art-lagoon-tall'), layout: 'masonry' } },
+        { name: 'image-album', data: { title: 'Recent work', images: album('creator-art-1', 'creator-art-2', 'creator-art-3', 'creator-art-4'), layout: 'masonry' } },
         { name: 'links', data: { title: 'Shop & commissions', items: links(['Shop prints', ''], ['Commission me', ''], ['Behance', '']) } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'pinterest') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
@@ -394,6 +402,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Your Name',
       bio: 'Creator · sharing what I make and love.',
+      avatarUrl: photo('link-avatar'),
       themeConfig: look({
         bg: '#0C0B0A', text: '#F5F3F1', accent: '#F5F3F1', onAccent: '#0C0B0A',
         surface: '#1A1917', radius: 12,
@@ -427,6 +436,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Your Studio',
       bio: 'Photography, design and video for small businesses.',
+      avatarUrl: photo('services-avatar'),
       themeConfig: look({
         bg: '#FFFFFF', text: '#18181B', accent: '#18181B', onAccent: '#FFFFFF',
         surface: '#F4F4F5', radius: 10,
@@ -476,11 +486,12 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: 'Anna & Minh',
       bio: 'We’re getting married! Saturday, 12 June 2027.',
+      avatarUrl: photo('event-avatar'),
       themeConfig: look({
         bg: '#FBF4F0', text: '#3A2530', accent: '#8C4A62', onAccent: '#FFFFFF',
         surface: '#FFFFFF', border: '#F0DCD6', radius: 10,
         nameFont: 'Cormorant Garamond, serif', nameWeight: '500', nameSize: '2.25rem',
-        header: 'banner-circle', banner: art('banner-blush'), link: 'centered', social: 'soft', gap: 'relaxed',
+        header: 'banner-circle', banner: photo('event-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
       }),
       blocks: withIndex([
         { name: 'text', data: { title: 'Join us', content: 'We would love to celebrate with you. Dinner, dancing and a garden full of flowers. Please let us know if you can come by 1 May.', align: 'center', style: 'plain' } },
@@ -496,7 +507,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
           },
         },
         { name: 'contact', data: { title: 'Venue', address: 'Rose Garden Hotel, 8 Lake Road', bookingLabel: 'RSVP', bookingUrl: '' } },
-        { name: 'image-album', data: { title: 'Us', images: album('tile-blush', 'tile-sand', 'tile-ember', 'tile-lagoon'), layout: 'grid' } },
+        { name: 'image-album', data: { title: 'Us', images: album('event-1', 'event-2', 'event-3', 'event-4'), layout: 'grid' } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#fde2e4', floorColor: '#e8c4a0', floorMaterial: 'wood', trimColor: '#ffffff' }, [
         { type: 'string-lights', position: [0, 2.6, -3], rotation: 0, wall: 'back', color: '#ffe8a3' },

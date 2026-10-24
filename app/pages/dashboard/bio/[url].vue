@@ -687,6 +687,7 @@ const applyTemplate = async (templateId: string) => {
   if (!template) return;
   const content = template.build();
   bioData.title = bioData.title || content.title;
+  bioData.avatarUrl = bioData.avatarUrl || content.avatarUrl || "";
   bioData.bio = content.bio;
   bioData.blocks = content.blocks;
   bioData.themeConfig = {

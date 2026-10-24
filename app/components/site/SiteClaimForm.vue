@@ -131,6 +131,7 @@ async function submit() {
         body: {
           title: content.title,
           bio: content.bio,
+          avatarUrl: content.avatarUrl,
           blocks: content.blocks,
           themeConfig: { ...content.themeConfig, pageMode: '2d', room: content.room },
         },

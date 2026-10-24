@@ -28,7 +28,7 @@ const bioData = computed<BioData>(() => {
   return {
     title: content.title,
     bio: content.bio,
-    avatarUrl: '',
+    avatarUrl: content.avatarUrl || '',
     templateId: 'modern',
     themeConfig: { ...content.themeConfig, showShare: false },
     blocks: content.blocks,
