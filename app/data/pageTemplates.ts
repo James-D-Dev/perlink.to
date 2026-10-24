@@ -131,7 +131,7 @@ function room(style: Partial<RoomStyle>, objects: Omit<RoomObject, 'id' | 'scale
 }
 
 function withIndex(blocks: Omit<BioBlock, 'index' | 'hidden'>[]): BioBlock[] {
-  return blocks.map((b, index) => ({ ...b, index, hidden: false }) as BioBlock)
+  return blocks.map((b, index) => ({ ...b, id: nanoid(8), index, hidden: false }) as BioBlock)
 }
 
 function menu(sections: { name: string; items: [string, string, string?, string?][] }[]): MenuSection[] {

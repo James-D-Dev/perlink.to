@@ -1,6 +1,5 @@
 <template>
   <div
-    id="birthday-countdown-block"
     class="w-full"
     :class="themeClasses"
   >

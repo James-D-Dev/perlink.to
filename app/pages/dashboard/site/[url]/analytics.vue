@@ -41,7 +41,6 @@
 
 <script setup lang="ts">
 import type { BioBlock } from '~/types/bio'
-import { useBioBlock } from '~/composables/useBioBlock'
 
 definePageMeta({
   colorMode: 'light',
@@ -59,7 +58,9 @@ useSeoMeta({ title: () => t('dashboard.analyticsPage.seoTitle', { username: user
 const loading = ref(true)
 const bioPage = ref<{ id: string; username: string; blocks?: BioBlock[] } | null>(null)
 const blocks = computed(() => bioPage.value?.blocks ?? [])
-const { links, socialLinks } = useBioBlock({ blocks })
+// Every links and social block on the page (a page can hold several)
+const links = computed(() => blocks.value.flatMap(b => (b.name === 'links' ? b.data?.items ?? [] : [])))
+const socialLinks = computed(() => blocks.value.flatMap(b => (b.name === 'social' ? b.data?.links ?? [] : [])))
 
 onMounted(async () => {
   try {

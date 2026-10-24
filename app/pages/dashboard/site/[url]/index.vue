@@ -128,17 +128,10 @@
                     :saving="saving"
                     :publishing="publishing"
                     :bio-page-id="existingBio?.id ?? ''"
-                    :enabled-blocks="enabledBlocks"
                     @add-block="onAddBlock"
                     @toggle-block="toggleBlock"
                     @update-data="updateBioData"
-                    @update-vietqr="handleUpdateVietQR"
-                    @update-image-album="handleUpdateImageAlbum"
                     @update-blocks="bioData.blocks = $event"
-                    @add-link="addLink"
-                    @remove-link="removeLink"
-                    @update-link="handleUpdateLink"
-                    @update-social="handleUpdateSocial"
                     @update-theme="handleUpdateTheme"
                     @select-template="bioData.templateId = $event"
                     @save="saveBio"
@@ -350,8 +343,7 @@ const existingBio = ref<any>(null);
 
 // Block-based editor state
 const activeBlock = ref<string | null>("header");
-const enabledBlocks = ref<string[]>([
-]);
+
 
 const selectedTemplate = ref("modern");
 const username = ref("");
@@ -369,16 +361,6 @@ const bioData = reactive<BioData>({
   themeConfig: { ...DEFAULT_THEME },
   blocks: [],
 });
-
-// Use composable for block management
-const blocksRef = toRef(bioData, "blocks");
-const {
-  links,
-  socialLinks,
-  addLink: addLinkToBlock,
-  removeLink: removeLinkFromBlock,
-  updateLink: updateLinkInBlock,
-} = useBioBlock({ blocks: blocksRef });
 
 // Bio page selector state
 const userBioPages = ref<{ label: string; value: string }[]>([]);
@@ -441,28 +423,23 @@ const toggleBlock = (blockId: string) => {
   }
 };
 
-const onAddBlock = (blockId: string) => {
-  // Check if block already exists in bioData.blocks
-  const existingIndex = bioData.blocks.findIndex((b) => b.name === blockId);
-
-  if (existingIndex === -1) {
-    // Create new block with proper structure
-    const newBlock = {
-      name: blockId,
-      index: bioData.blocks.length,
-      hidden: false,
-      data: {},
-    } as BioBlock;
-    // Create new array to trigger reactivity
-    bioData.blocks = [...bioData.blocks, newBlock];
-    // Add to enabledBlocks
-    if (!enabledBlocks.value.includes(blockId)) {
-      enabledBlocks.value.push(blockId);
-    }
+const onAddBlock = (blockType: string) => {
+  const name = blockType as BioBlock["name"];
+  // One-per-page blocks just open the existing one
+  const existing = bioData.blocks.find((b) => b.name === name);
+  if (existing && !isRepeatableBlock(name)) {
+    activeBlock.value = existing.id ?? null;
+    return;
   }
-
-  // Auto-expand the newly added block
-  activeBlock.value = blockId;
+  const newBlock = {
+    id: nanoid(8),
+    name,
+    index: bioData.blocks.length,
+    hidden: false,
+    data: emptyBlockData(name),
+  } as BioBlock;
+  bioData.blocks = [...bioData.blocks, newBlock];
+  activeBlock.value = newBlock.id!;
 };
 
 const sharePage = async () => {
@@ -537,24 +514,6 @@ const createBioPage = async () => {
   } finally {
     creating.value = false;
   }
-};
-
-const addLink = (linkData?: Partial<BioLink>) => {
-  const newLink: BioLink = {
-    id: nanoid(6),
-    title: linkData?.title || "",
-    subtitle: linkData?.subtitle || "",
-    url: linkData?.url || "",
-    imageUrl: linkData?.imageUrl || "",
-    icon: "link",
-    order: links.value.length,
-    isActive: true,
-  };
-  addLinkToBlock(newLink);
-};
-
-const removeLink = (index: number) => {
-  removeLinkFromBlock(index);
 };
 
 const saveBio = async () => {
@@ -653,20 +612,6 @@ const updateBioData = (key: keyof BioData, value: any) => {
   (bioData[key] as any) = value;
 };
 
-const updateLink = (
-  index: number,
-  field: "title" | "url" | "subtitle" | "icon",
-  value: string,
-) => {
-  updateLinkInBlock(index, { [field]: value });
-};
-
-const updateSocial = (socials: SocialLink[]) => {
-  // Update via composable
-  const { setSocialLinks } = useBioBlock({ blocks: toRef(bioData, "blocks") });
-  setSocialLinks(socials);
-};
-
 const updateTheme = (update: Partial<ThemeConfig>) => {
   const merged: any = { ...bioData.themeConfig };
   for (const key of Object.keys(update) as (keyof ThemeConfig)[]) {
@@ -686,31 +631,10 @@ const updateTheme = (update: Partial<ThemeConfig>) => {
   bioData.themeConfig = merged;
 };
 
-const handleUpdateLink = (
-  index: number,
-  field: "title" | "url" | "subtitle" | "icon",
-  value: string,
-) => {
-  updateLink(index, field, value);
-};
-
-const handleUpdateSocial = (socials: SocialLink[]) => {
-  updateSocial(socials);
-};
-
 const handleUpdateTheme = (patch: Partial<ThemeConfig>) => {
   updateTheme(patch);
 };
 
-const handleUpdateVietQR = (data: VietQRInfo) => {
-  const { setVietQR } = useBioBlock({ blocks: toRef(bioData, "blocks") });
-  setVietQR(data);
-};
-
-const handleUpdateImageAlbum = (data: { images: any[]; layout: any }) => {
-  const { setImageAlbum } = useBioBlock({ blocks: toRef(bioData, "blocks") });
-  setImageAlbum(data.images, data.layout);
-};
 
 // Templates
 const templatePickerDismissed = ref(false);
@@ -725,18 +649,15 @@ const applyTemplate = async (templateId: string) => {
   bioData.title = bioData.title || content.title;
   bioData.avatarUrl = bioData.avatarUrl || content.avatarUrl || "";
   bioData.bio = content.bio;
-  bioData.blocks = content.blocks;
+  bioData.blocks = withBlockIds(content.blocks);
   bioData.themeConfig = {
     ...content.themeConfig,
     showShare: bioData.themeConfig.showShare,
     pageMode: bioData.themeConfig.pageMode || "2d",
     room: content.room,
   };
-  for (const block of content.blocks) {
-    if (!enabledBlocks.value.includes(block.name)) enabledBlocks.value.push(block.name);
-  }
   templatePickerDismissed.value = true;
-  activeBlock.value = content.blocks[0]?.name ?? "header";
+  activeBlock.value = bioData.blocks[0]?.id ?? "header";
   toast.add({
     title: t("dashboard.editor.templateApplied", { name: t(`dashboard.templates.${template.id}.name`) }),
     description: t("dashboard.editor.templateAppliedText"),
@@ -810,7 +731,7 @@ const loadBio = async () => {
       bioData.bio = response.bioPage.bio || "";
       bioData.avatarUrl = response.bioPage.avatarUrl || "";
       bioData.templateId = response.bioPage.templateId || "modern";
-      bioData.blocks = response.bioPage.blocks || [];
+      bioData.blocks = withBlockIds(response.bioPage.blocks || []);
       const savedTheme = response.bioPage.themeConfig || {};
       bioData.themeConfig = Object.keys(DEFAULT_THEME).reduce((acc, k) => {
         const key = k as keyof ThemeConfig;
@@ -832,43 +753,6 @@ const loadBio = async () => {
       bioData.themeConfig.pageMode = (savedTheme as any).pageMode === "3d" ? "3d" : "2d";
       if ((savedTheme as any).room) {
         bioData.themeConfig.room = normalizeRoom((savedTheme as any).room);
-      }
-
-      // Mark every block the page already has as added
-      for (const block of bioData.blocks) {
-        if (!enabledBlocks.value.includes(block.name)) enabledBlocks.value.push(block.name);
-      }
-
-      // Enable VietQR block if exists
-      if (
-        bioData.blocks.some((b) => b.name === "vietqr") &&
-        !enabledBlocks.value.includes("vietqr")
-      ) {
-        enabledBlocks.value.push("vietqr");
-      }
-
-      // Enable Image Album block if exists
-      if (
-        bioData.blocks.some((b) => b.name === "image-album") &&
-        !enabledBlocks.value.includes("image-album")
-      ) {
-        enabledBlocks.value.push("image-album");
-      }
-
-      // Enable Links block if exists
-      if (
-        bioData.blocks.some((b) => b.name === "links") &&
-        !enabledBlocks.value.includes("links")
-      ) {
-        enabledBlocks.value.push("links");
-      }
-
-      // Enable Social block if exists
-      if (
-        bioData.blocks.some((b) => b.name === "social") &&
-        !enabledBlocks.value.includes("social")
-      ) {
-        enabledBlocks.value.push("social");
       }
 
       step.value = "edit";

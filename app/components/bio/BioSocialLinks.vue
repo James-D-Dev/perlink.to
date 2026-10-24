@@ -1,5 +1,5 @@
 <template>
-  <div id="social-block" :class="[...cardAppearClasses, align === 'left' ? 'justify-start' : 'justify-center']" class="flex flex-wrap gap-2.5">
+  <div :class="[...cardAppearClasses, align === 'left' ? 'justify-start' : 'justify-center']" class="flex flex-wrap gap-2.5">
     <a
       v-for="social in socials"
       :key="social.id"

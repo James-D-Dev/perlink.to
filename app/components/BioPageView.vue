@@ -211,11 +211,12 @@
 
       <!-- Blocks, evenly spaced -->
       <div class="flex flex-col px-4" :style="{ gap: blockGap }">
-        <template v-for="block in sortedBlocks" :key="block.name">
+        <template v-for="block in sortedBlocks" :key="block.id ?? block.name">
           <!-- Social Links Block -->
           <BioSocialLinks
-            v-if="block.name === 'social' && activeSocials.length > 0"
-            :socials="activeSocials"
+            v-if="block.name === 'social' && socialsOf(block).length > 0"
+            :id="blockDomId(block)"
+            :socials="socialsOf(block)"
             :social-button-style="socialButtonStyle"
             :monochrome="theme.social?.style !== 'soft'"
             :align="bioAlign === 'left' ? 'left' : 'center'"
@@ -226,11 +227,11 @@
           />
 
           <!-- Links Block -->
-          <section v-if="block.name === 'links' && activeLinks.length" id="links-block">
+          <section v-if="block.name === 'links' && linksOf(block).length" :id="blockDomId(block)">
             <h2 v-if="block.data?.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
             <div class="space-y-2.5">
               <BioLinkCard
-                v-for="(link, index) in activeLinks"
+                v-for="(link, index) in linksOf(block)"
                 :key="link.id"
                 :link="link"
                 :animation-delay="`${index * 80}ms`"
@@ -251,7 +252,7 @@
           <!-- Text Block -->
           <section
             v-if="block.name === 'text' && (block.data?.content || block.data?.title)"
-            id="text-block"
+:id="blockDomId(block)"
             :class="block.data.style === 'card' && 'p-5'"
             :style="[{ textAlign: block.data.align || 'left' }, block.data.style === 'card' ? cardStyle : {}]"
           >
@@ -260,42 +261,42 @@
           </section>
 
           <!-- Image Album Block -->
-          <section v-if="block.name === 'image-album' && albumImages.length > 0" id="image-album-block">
+          <section v-if="block.name === 'image-album' && block.data?.images?.length" :id="blockDomId(block)">
             <h2 v-if="block.data?.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
             <BioImageAlbum
-              :data="{ images: albumImages, layout: albumLayout } as any"
+              :data="{ images: block.data.images, layout: block.data.layout || 'vertical' } as any"
               :radius="cardStyle.borderRadius"
             />
           </section>
 
           <!-- VietQR Block -->
           <div
-            v-if="block.name === 'vietqr' && vietQRData?.qrString"
-            id="vietqr-block"
+            v-if="block.name === 'vietqr' && block.data?.qrString"
+            :id="blockDomId(block)"
             class="flex flex-col items-center gap-4"
           >
             <ClientOnly>
               <QRCodeWithTheme
-                :qr-string="vietQRData.qrString"
-                :bank-name="vietQRData.bankName"
-                :account-number="vietQRData.accountNumber"
-                :account-name="vietQRData.accountName"
-                :amount="parseFloat(vietQRData.amount || '0')"
-                :theme-id="vietQRData.theme || 'vietnam'"
+                :qr-string="block.data.qrString"
+                :bank-name="block.data.bankName"
+                :account-number="block.data.accountNumber"
+                :account-name="block.data.accountName"
+                :amount="parseFloat(block.data.amount || '0')"
+                :theme-id="block.data.theme || 'vietnam'"
                 class="w-full"
               />
             </ClientOnly>
           </div>
           <!-- Birthday Countdown Block -->
           <BioBlockBirthdayCountdownDisplay
-            v-if="block.name === 'birthday-countdown' && birthdayCountdownData?.birthDate"
-            id="birthday-countdown-block"
-            :data="birthdayCountdownData"
+            v-if="block.name === 'birthday-countdown' && block.data?.birthDate"
+            :id="blockDomId(block)"
+            :data="block.data"
           />
           <!-- Menu Block -->
           <BioMenuDisplay
             v-if="block.name === 'menu' && block.data?.sections?.length"
-            id="menu-block"
+:id="blockDomId(block)"
             :data="block.data"
             :card-style="cardStyle"
             :heading-style="headingStyle"
@@ -303,7 +304,7 @@
           <!-- Opening Hours Block -->
           <BioHoursDisplay
             v-if="block.name === 'hours' && block.data?.days?.length"
-            id="hours-block"
+:id="blockDomId(block)"
             :data="block.data"
             :card-style="cardStyle"
             :heading-style="headingStyle"
@@ -311,7 +312,7 @@
           <!-- Contact Block -->
           <BioContactDisplay
             v-if="block.name === 'contact' && (block.data?.address || block.data?.phone || block.data?.email || block.data?.bookingUrl)"
-            id="contact-block"
+:id="blockDomId(block)"
             :data="block.data"
             :card-style="cardStyle"
             :button-style="buttonStyle"
@@ -336,12 +337,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineAsyncComponent, ref, watch, onMounted, toRef } from "vue";
+import { computed, defineAsyncComponent, ref, watch, onMounted } from "vue";
 import type { BioData, BioLink, SocialLink, ThemeConfig, BioBlock } from "~/types/bio";
 import { useBioTheme } from "~/composables/useBioTheme";
 import { getEffectBgClass } from "~/utils/effectUtils";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
-import { useBioBlock } from "~/composables/useBioBlock";
 
 const bgEffectMap: Record<string, ReturnType<typeof defineAsyncComponent>> = {
   particles: defineAsyncComponent(
@@ -481,27 +481,30 @@ const avatarFallbackStyle = computed(() => ({
   backgroundColor: "#f3f4f6",
 }));
 
-// Use composable to extract data from blocks
-const blocksRef = toRef(props.bioData, 'blocks');
-const { links, socialLinks, albumImages, albumLayout, vietQRData, birthdayCountdownData } = useBioBlock({ blocks: blocksRef });
-
 // Previews (editor, template thumbnails) also show items that still need a
 // URL, so a fresh template looks complete; the public page hides them
 const isPreview = computed(() => props.mode === "preview");
 
-const activeLinks = computed<BioLink[]>(
-  () =>
-    links.value
-      ?.filter((l) => l.isActive && l.title && (l.url || isPreview.value))
-      .map((l) => (l.url ? l : { ...l, url: "#" }))
-      .sort((a, b) => (a.order || 0) - (b.order || 0)) ?? [],
-);
+// Each block renders from its own data, so a page can hold several of one type
+function linksOf(block: BioBlock): BioLink[] {
+  if (block.name !== "links") return [];
+  return (block.data?.items ?? [])
+    .filter((l) => l.isActive && l.title && (l.url || isPreview.value))
+    .map((l) => (l.url ? l : { ...l, url: "#" }))
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+}
 
-const activeSocials = computed(() => {
-  return socialLinks.value
+function socialsOf(block: BioBlock): SocialLink[] {
+  if (block.name !== "social") return [];
+  return (block.data?.links ?? [])
     .filter((s) => s.url?.trim() || isPreview.value)
     .sort((a, b) => (a.index || 0) - (b.index || 0));
-});
+}
+
+// DOM id the editor scrolls the preview to
+function blockDomId(block: BioBlock) {
+  return `block-${block.id ?? block.name}`;
+}
 
 // Sort blocks by index for rendering
 const sortedBlocks = computed(() => {

@@ -45,7 +45,8 @@ const { t } = useI18n();
 // Method to scroll to a specific block in the preview
 const scrollToBlock = (blockId: string) => {
   // Map blockId to the corresponding DOM element ID in BioPageView
-  const blockElementId = `${blockId}-block`;
+  // The header keeps its fixed id; blocks use block-<id> (see BioPageView)
+  const blockElementId = blockId === 'header' ? 'header-block' : `block-${blockId}`;
   
   // Find the preview container - it's the element with overflow auto that contains BioPageView
   // BioPreview uses style with overflow: auto
@@ -53,7 +54,7 @@ const scrollToBlock = (blockId: string) => {
   
   for (const container of previewElements) {
     // Find the target block element within this container
-    const targetBlock = container.querySelector(`#${blockElementId}`) as HTMLElement;
+    const targetBlock = container.querySelector(`#${CSS.escape(blockElementId)}`) as HTMLElement;
     if (targetBlock) {
       // Scroll the target block into view with smooth animation
       targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });

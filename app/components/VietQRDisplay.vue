@@ -17,7 +17,9 @@
           variant="ghost"
           color="neutral"
           size="xs"
-          icon="i-lucide-more-vertical"
+          icon="i-lucide-trash-2"
+          :aria-label="t('common.delete')"
+          @click.stop="$emit('remove')"
         />
       </template>
     </BioBlockItemHeader>
@@ -206,6 +208,7 @@ const { vietQRData, vietQRBlock, setVietQR, removeVietQR, toggleBlockHidden } =
 
 const emit = defineEmits<{
   toggle: [];
+  remove: [];
   "update:vietqr": [
     data: {
       bankId: string;

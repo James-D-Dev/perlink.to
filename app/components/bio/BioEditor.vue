@@ -24,106 +24,102 @@
 
       <draggable
         v-model="localBlocks"
-        item-key="name"
+        item-key="id"
         handle=".drag-handle"
         @end="onDragEnd"
       >
         <template #item="{ element: block }">
           <div class="relative group mb-2">
-            <!-- Drag Handle -->
-            <!-- <div class="drag-handle absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-move opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <UIcon name="i-lucide-grip-vertical" class="w-5 h-5 text-gray-400 dark:text-neutral-500" />
-            </div> -->
-
-            <!-- Social Block -->
+            <!-- Each editor receives just its own block, so a page can hold several of one type.
+                 (Comments must stay inside this div: draggable needs exactly one child per item) -->
             <BioBlockSocial
               v-if="block.name === 'social'"
-              :is-active="activeBlock === 'social'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'social')"
-              @update="onUpdateSocial"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @update="(links: SocialLink[]) => patchData(block.id, { links })"
+              @remove="onRemoveBlock(block.id)"
             />
 
-            <!-- Links Block -->
             <BioBlockLinks
               v-if="block.name === 'links'"
-              :is-active="activeBlock === 'links'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'links')"
-              @add="$emit('addLink', $event)"
-              @remove="$emit('removeLink', $event)"
-              @update-link="onUpdateLink"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @add="(link: Partial<BioLink>) => addLink(block, link)"
+              @remove="(index: number) => removeLink(block, index)"
+              @update-link="(index: number, field: string, value: string) => updateLink(block, index, field, value)"
+              @update="(items: BioLink[]) => patchData(block.id, { items: reorder(items) })"
               @select-image="onSelectImage"
-              @update-title="onUpdateBlockTitle('links', $event)"
+              @update-title="(title: string) => patchData(block.id, { title })"
+              @remove-block="onRemoveBlock(block.id)"
             />
 
-            <!-- VietQR Block -->
             <VietQRDisplay
               v-if="block.name === 'vietqr'"
-              :is-active="activeBlock === 'vietqr'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'vietqr')"
-              @update:vietqr="$emit('updateVietqr', $event)"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @update:vietqr="(data: VietQRInfo) => replaceData(block.id, data)"
+              @remove="onRemoveBlock(block.id)"
             />
 
-            <!-- Image Album Block -->
             <BioBlockImageAlbum
               v-if="block.name === 'image-album'"
-              :is-active="activeBlock === 'image-album'"
-              :blocks="blocksRef"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
               :bio-page-id="bioPageId"
-              @toggle="$emit('toggleBlock', 'image-album')"
-              @update="$emit('updateImageAlbum', $event)"
-              @update-title="onUpdateBlockTitle('image-album', $event)"
+              @toggle="$emit('toggleBlock', block.id)"
+              @update="(data: { images: any[]; layout: ImageAlbumLayout }) => patchData(block.id, data)"
+              @update-title="(title: string) => patchData(block.id, { title })"
+              @remove="onRemoveBlock(block.id)"
             />
-            <!-- Text Block -->
+
             <BioBlockText
               v-if="block.name === 'text'"
-              :is-active="activeBlock === 'text'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'text')"
-              @remove="onRemoveBlock('text')"
-              @update="onUpdateBlockData('text', $event)"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
-            <!-- Birthday Countdown Block -->
+
             <BioBlockBirthdayCountdown
               v-if="block.name === 'birthday-countdown'"
-              :is-active="activeBlock === 'birthday-countdown'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'birthday-countdown')"
-              @remove="onRemoveBlock('birthday-countdown')"
-              @update="onUpdateBirthdayCountdown"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
-            <!-- Menu Block -->
+
             <BioBlockMenu
               v-if="block.name === 'menu'"
-              :is-active="activeBlock === 'menu'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'menu')"
-              @remove="onRemoveBlock('menu')"
-              @update="onUpdateBlockData('menu', $event)"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
-            <!-- Opening Hours Block -->
+
             <BioBlockHours
               v-if="block.name === 'hours'"
-              :is-active="activeBlock === 'hours'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'hours')"
-              @remove="onRemoveBlock('hours')"
-              @update="onUpdateBlockData('hours', $event)"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
-            <!-- Contact Block -->
+
             <BioBlockContact
               v-if="block.name === 'contact'"
-              :is-active="activeBlock === 'contact'"
-              :blocks="blocksRef"
-              @toggle="$emit('toggleBlock', 'contact')"
-              @remove="onRemoveBlock('contact')"
-              @update="onUpdateBlockData('contact', $event)"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
-            <!-- more block -->
           </div>
-
         </template>
       </draggable>
 
@@ -189,47 +185,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, toRef, watch, nextTick } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import draggable from "vuedraggable";
+import { nanoid } from "nanoid";
 import type {
   BioData,
   Template,
   BioLink,
   ThemeConfig,
-  ImageAlbumBlock,
   SocialLink,
-  LinksBlock,
-  SocialBlock,
   ImageAlbumLayout,
   BioBlock,
-  BirthdayCountdownBlock,
+  VietQRInfo,
 } from "~/types/bio";
 
-const props = withDefaults(
-  defineProps<{
-    activeBlock: string | null;
-    bioData: BioData;
-    templates: Template[];
-    selectedTemplate: string;
-    saving: boolean;
-    publishing: boolean;
-    bioPageId: string;
-    enabledBlocks?: string[];
-  }>(),
-  {
-    enabledBlocks: () => ["links", "social", "image-album", "vietqr"],
-  },
-);
+const props = defineProps<{
+  activeBlock: string | null;
+  bioData: BioData;
+  templates: Template[];
+  selectedTemplate: string;
+  saving: boolean;
+  publishing: boolean;
+  bioPageId: string;
+}>();
 
 const { t } = useI18n();
 
 const showBlockModal = ref(false);
 
-// Use computed for reactivity when blocks array changes
-const blocksRef = computed(() => props.bioData.blocks);
-const { links, socialLinks, toggleBlockHidden } = useBioBlock({
-  blocks: blocksRef,
-});
+// All social links on the page, for the header layout picker
+const socialLinks = computed<SocialLink[]>(() =>
+  props.bioData.blocks.flatMap((b) => (b.name === "social" ? b.data?.links ?? [] : [])),
+);
 
 // Local copy for drag-and-drop
 const localBlocks = ref<BioBlock[]>([]);
@@ -261,85 +248,84 @@ function onDragEnd() {
   emitBlockUpdate();
 }
 
-function selectBlock(blockId: string) {
-  emit("addBlock", blockId);
+function selectBlock(blockType: string) {
+  emit("addBlock", blockType);
 }
 
 const emit = defineEmits<{
   addBlock: [blockType: string];
   toggleBlock: [blockId: string];
   updateData: [key: keyof BioData, value: any];
-  addLink: [link: Partial<BioLink>];
-  removeLink: [index: number];
-  updateLink: [
-    index: number,
-    field: "title" | "subtitle" | "url" | "icon",
-    value: string,
-  ];
   selectLinkImage: [index: number];
-  updateSocial: [socials: SocialLink[]];
   updateTheme: [patch: Partial<ThemeConfig>];
   selectTemplate: [id: string];
-  updateVietqr: [
-    data: {
-      bankId: string;
-      bankName: string;
-      accountNumber: string;
-      accountName?: string;
-      amount?: string;
-      note?: string;
-      theme?: string;
-      qrString: string;
-    },
-  ];
-  updateImageAlbum: [data: { images: any[]; layout: ImageAlbumLayout }];
   updateBlocks: [blocks: BioBlock[]];
   save: [];
   publish: [];
   preview: [];
 }>();
 
-function onUpdateLink(index: number, field: string, value: string) {
-  emit(
-    "updateLink",
-    index,
-    field as "title" | "subtitle" | "url" | "icon",
-    value,
-  );
-}
 function onSelectImage(index: number) {
   emit("selectLinkImage", index);
 }
-function onUpdateSocial(socials: SocialLink[]) {
-  emit("updateSocial", socials);
+
+// ---- Block updates, all by block id ----
+
+function replaceData(blockId: string, data: BioBlock["data"]) {
+  const index = localBlocks.value.findIndex((b) => b.id === blockId);
+  if (index === -1) return;
+  localBlocks.value[index] = { ...localBlocks.value[index]!, data } as BioBlock;
+  emitBlockUpdate();
 }
 
-function onRemoveBlock(blockName: string) {
-  const index = localBlocks.value.findIndex(b => b.name === blockName);
+function patchData(blockId: string, patch: Record<string, unknown>) {
+  const block = localBlocks.value.find((b) => b.id === blockId);
+  if (block) replaceData(blockId, { ...(block.data as object), ...patch } as BioBlock["data"]);
+}
+
+function onRemoveBlock(blockId: string) {
+  const index = localBlocks.value.findIndex((b) => b.id === blockId);
   if (index !== -1) {
     localBlocks.value.splice(index, 1);
     emitBlockUpdate();
   }
 }
 
-function onUpdateBlockData(blockName: BioBlock['name'], data: BioBlock['data']) {
-  const index = localBlocks.value.findIndex(b => b.name === blockName);
-  if (index !== -1 && localBlocks.value[index]) {
-    localBlocks.value[index] = { ...localBlocks.value[index]!, data } as BioBlock;
-    emitBlockUpdate();
-  }
+// Links keep an explicit order; editors work with the sorted list
+function sortedLinks(block: BioBlock): BioLink[] {
+  const items = block.name === "links" ? block.data?.items ?? [] : [];
+  return [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
-function onUpdateBlockTitle(blockName: 'links' | 'image-album', title: string) {
-  const block = localBlocks.value.find(b => b.name === blockName);
-  if (block) onUpdateBlockData(blockName, { ...block.data, title } as BioBlock['data']);
+function reorder(items: BioLink[]): BioLink[] {
+  return items.map((item, order) => ({ ...item, order }));
 }
 
-function onUpdateBirthdayCountdown(data: BirthdayCountdownBlock['data']) {
-  const index = localBlocks.value.findIndex(b => b.name === 'birthday-countdown');
-  if (index !== -1 && localBlocks.value[index]) {
-    localBlocks.value[index]!.data = data;
-    emitBlockUpdate();
-  }
+function addLink(block: BioBlock, link: Partial<BioLink>) {
+  const items = sortedLinks(block);
+  items.push({
+    id: nanoid(6),
+    title: link.title || "",
+    subtitle: link.subtitle || "",
+    url: link.url || "",
+    imageUrl: link.imageUrl || "",
+    icon: "link",
+    order: items.length,
+    isActive: true,
+  });
+  patchData(block.id!, { items: reorder(items) });
+}
+
+function removeLink(block: BioBlock, index: number) {
+  const items = sortedLinks(block);
+  items.splice(index, 1);
+  patchData(block.id!, { items: reorder(items) });
+}
+
+function updateLink(block: BioBlock, index: number, field: string, value: string) {
+  const items = sortedLinks(block);
+  if (!items[index]) return;
+  items[index] = { ...items[index]!, [field]: value };
+  patchData(block.id!, { items });
 }
 </script>

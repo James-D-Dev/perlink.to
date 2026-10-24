@@ -107,8 +107,9 @@ const groups = computed<{ label: string; blocks: BlockOption[] }[]>(() =>
   })),
 )
 
+// Repeatable blocks (links, text, gallery, menu) can always be added again
 function isAdded(blockId: string) {
-  return props.enabledBlocks.includes(blockId)
+  return !isRepeatableBlock(blockId) && props.enabledBlocks.includes(blockId)
 }
 
 function selectBlock(blockId: string) {

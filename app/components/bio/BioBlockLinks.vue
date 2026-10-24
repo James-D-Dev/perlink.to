@@ -13,7 +13,9 @@
           variant="ghost"
           color="neutral"
           size="xs"
-          icon="i-lucide-more-vertical"
+          icon="i-lucide-trash-2"
+          :aria-label="t('common.delete')"
+          @click.stop="$emit('removeBlock')"
         />
       </template>
     </BioBlockItemHeader>
@@ -200,6 +202,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   toggle: [];
+  removeBlock: [];
   add: [link: Partial<BioLink>];
   remove: [index: number];
   updateLink: [

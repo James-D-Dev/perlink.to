@@ -260,6 +260,8 @@ export type BlockName =
   | 'contact';
 
 export interface BaseBlock {
+  /** Unique per page, so a page can hold several blocks of one type. Older pages get one on load */
+  id?: string;
   name: BlockName;
   index: number;
   hidden: boolean;
