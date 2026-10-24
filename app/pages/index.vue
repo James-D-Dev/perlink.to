@@ -93,7 +93,9 @@
           <p class="mt-1 text-sm text-ink-muted">Menus, rooms, portfolios and links, laid out for phones first.</p>
           <div class="mt-8 flex flex-1 items-end justify-center">
             <div class="w-[62%] max-w-[260px] overflow-hidden rounded-t-[28px] border-x-[6px] border-t-[6px] border-ink bg-white shadow-[0_20px_50px_rgba(12,11,10,0.15)]">
-              <img src="/images/landing/site-menu.jpg" alt="A restaurant menu site made with Perlink" class="aspect-[3/4] w-full object-cover object-top" loading="lazy">
+              <div class="aspect-[3/4] w-full" role="img" aria-label="A restaurant menu site made with Perlink">
+                <SiteTemplateThumbnail :template="showcaseTemplate" :scale="0.5" />
+              </div>
             </div>
           </div>
         </div>
@@ -290,6 +292,7 @@ const audiences = [
 ]
 
 const templates = PAGE_TEMPLATES.slice(0, 8)
+const showcaseTemplate = PAGE_TEMPLATES.find(t => t.id === 'restaurant')!
 
 const worldFeatures = [
   { icon: 'i-lucide-mountain-snow', title: 'Five lands', text: 'Sky island, sakura, winter, Mars and a city with traffic.' },
