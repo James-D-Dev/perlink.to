@@ -4,7 +4,7 @@
     :class="scrolled || menuOpen ? 'border-b border-line bg-paper/85 backdrop-blur-xl' : 'border-b border-transparent bg-paper'"
   >
     <div class="mx-auto flex h-16 max-w-6xl items-center gap-8 px-5 sm:px-8">
-      <NuxtLink to="/" class="shrink-0" aria-label="Perlink home">
+      <NuxtLink :to="home" class="shrink-0" :aria-label="copy.header.home">
         <AppLogo :size="26" />
       </NuxtLink>
 
@@ -20,18 +20,27 @@
       </nav>
 
       <div class="ml-auto flex items-center gap-2">
+        <!-- Language: the home page exists in English (/) and Vietnamese (/vi) -->
+        <NuxtLink
+          :to="lang === 'vi' ? '/' : '/vi'"
+          :hreflang="lang === 'vi' ? 'en' : 'vi'"
+          class="hidden rounded-full px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-sand hover:text-ink sm:inline-flex"
+          :aria-label="copy.header.language"
+        >
+          {{ lang === 'vi' ? 'EN' : 'VI' }}
+        </NuxtLink>
         <template v-if="loggedIn">
-          <MarketingMkButton to="/dashboard" size="sm" variant="solid">Dashboard</MarketingMkButton>
+          <MarketingMkButton to="/dashboard" size="sm" variant="solid">{{ copy.header.dashboard }}</MarketingMkButton>
         </template>
         <template v-else>
-          <MarketingMkButton to="/login" size="sm" variant="outline" class="hidden sm:inline-flex">Log in</MarketingMkButton>
-          <MarketingMkButton to="/login" size="sm">Get started</MarketingMkButton>
+          <MarketingMkButton to="/login" size="sm" variant="outline" class="hidden sm:inline-flex">{{ copy.header.login }}</MarketingMkButton>
+          <MarketingMkButton to="/login" size="sm">{{ copy.header.start }}</MarketingMkButton>
         </template>
         <button
           type="button"
           class="-mr-2 inline-flex size-9 items-center justify-center rounded-full text-ink hover:bg-sand md:hidden"
           :aria-expanded="menuOpen"
-          aria-label="Menu"
+:aria-label="copy.header.menu"
           @click="menuOpen = !menuOpen"
         >
           <UIcon :name="menuOpen ? 'i-lucide-x' : 'i-lucide-menu'" class="size-5" />
@@ -51,7 +60,10 @@
         {{ item.label }}
         <UIcon name="i-lucide-arrow-up-right" class="size-4 text-ink-faint" />
       </NuxtLink>
-      <MarketingMkButton v-if="!loggedIn" to="/login" variant="outline" block class="mt-5">Log in</MarketingMkButton>
+      <MarketingMkButton v-if="!loggedIn" to="/login" variant="outline" block class="mt-5">{{ copy.header.login }}</MarketingMkButton>
+      <NuxtLink :to="lang === 'vi' ? '/' : '/vi'" class="mt-4 block text-center text-sm text-ink-muted" @click="menuOpen = false">
+        {{ lang === 'vi' ? 'English' : 'Tiếng Việt' }}
+      </NuxtLink>
     </nav>
   </header>
 </template>
@@ -59,12 +71,13 @@
 <script setup lang="ts">
 const { loggedIn } = useUserSession()
 
-const nav = [
-  { label: 'Templates', to: '/#templates' },
-  { label: '3D sites', to: '/#3d' },
-  { label: 'Trends', to: '/trends' },
-  { label: 'Pricing', to: '/pricing' },
-]
+const { lang, copy, home, anchor } = useMarketingLang()
+const nav = computed(() => [
+  { label: copy.value.header.nav.templates, to: anchor('templates') },
+  { label: copy.value.header.nav.worlds, to: anchor('3d') },
+  { label: copy.value.header.nav.trends, to: '/trends' },
+  { label: copy.value.header.nav.pricing, to: '/pricing' },
+])
 
 const menuOpen = ref(false)
 const scrolled = ref(false)

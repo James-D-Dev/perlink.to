@@ -3,7 +3,7 @@ import { getDB } from '../utils/db'
 const SITE = 'https://perlink.to'
 
 /** Public marketing pages, then every published site */
-const STATIC_PAGES = ['/', '/trends', '/pricing', '/terms', '/privacy']
+const STATIC_PAGES = ['/', '/vi', '/trends', '/pricing', '/terms', '/privacy']
 
 const escapeXml = (value: string) => value.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[c]!)
 

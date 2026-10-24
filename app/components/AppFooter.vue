@@ -5,7 +5,7 @@
         <div class="max-w-xs">
           <AppLogo :size="26" />
           <p class="mt-4 text-sm leading-relaxed text-ink-muted">
-            Personal websites and 3D worlds for people, places and small businesses.
+            {{ copy.footer.tagline }}
           </p>
         </div>
         <div v-for="column in columns" :key="column.title">
@@ -20,7 +20,7 @@
     </div>
     <div class="border-t border-line">
       <div class="mx-auto flex max-w-6xl flex-col gap-2 border-x border-line px-5 py-6 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <p>© {{ year }} Perlink. All rights reserved.</p>
+        <p>© {{ year }} Perlink. {{ copy.footer.rights }}</p>
         <p>perlink.to</p>
       </div>
     </div>
@@ -30,30 +30,34 @@
 <script setup lang="ts">
 const year = new Date().getFullYear()
 
-const columns = [
-  {
-    title: 'Product',
-    links: [
-      { label: 'Templates', to: '/#templates' },
-      { label: '3D sites', to: '/#3d' },
-      { label: 'Trends', to: '/trends' },
-      { label: 'Pricing', to: '/pricing' },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'Get started', to: '/login' },
-      { label: 'FAQ', to: '/#faq' },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Terms', to: '/terms' },
-      { label: 'Privacy', to: '/privacy' },
-      { label: 'Cookies', to: '/cookie-notice' },
-    ],
-  },
-]
+const { copy, anchor } = useMarketingLang()
+const columns = computed(() => {
+  const f = copy.value.footer
+  return [
+    {
+      title: f.product,
+      links: [
+        { label: f.templates, to: anchor('templates') },
+        { label: f.worlds, to: anchor('3d') },
+        { label: f.trends, to: '/trends' },
+        { label: f.pricing, to: '/pricing' },
+      ],
+    },
+    {
+      title: f.resources,
+      links: [
+        { label: f.start, to: '/login' },
+        { label: f.faq, to: anchor('faq') },
+      ],
+    },
+    {
+      title: f.legal,
+      links: [
+        { label: f.terms, to: '/terms' },
+        { label: f.privacy, to: '/privacy' },
+        { label: f.cookies, to: '/cookie-notice' },
+      ],
+    },
+  ]
+})
 </script>

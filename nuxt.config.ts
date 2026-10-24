@@ -93,6 +93,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     "/": { prerender: true },
+    "/vi": { prerender: true },
     "/dashboard/site/**": { ssr: false },
     // Sites used to live under /dashboard/bio
     "/dashboard/bio": { redirect: { to: "/dashboard/site", statusCode: 301 } },

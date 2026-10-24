@@ -13,12 +13,12 @@
       </div>
       <span class="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-paper/90 px-2.5 py-1 text-xs font-medium text-ink backdrop-blur">
         <UIcon :name="trend.kind === '3d' ? 'i-lucide-box' : 'i-lucide-layout-template'" class="size-3.5" />
-        {{ trend.kind === '3d' ? '3D world' : 'Site' }}
+        {{ trend.kind === '3d' ? copy.trends.world : copy.trends.site }}
       </span>
     </div>
-    <h3 class="mt-4 text-base font-medium text-ink">{{ trend.title }}</h3>
-    <p class="mt-1 text-sm leading-relaxed text-ink-muted">{{ trend.description }}</p>
-    <p class="mt-2 text-xs text-ink-faint">{{ trend.tags.join(' · ') }}</p>
+    <h3 class="mt-4 text-base font-medium text-ink">{{ copy.trends.items[trend.id]?.title ?? trend.title }}</h3>
+    <p class="mt-1 text-sm leading-relaxed text-ink-muted">{{ copy.trends.items[trend.id]?.description ?? trend.description }}</p>
+    <p v-if="lang === 'en'" class="mt-2 text-xs text-ink-faint">{{ trend.tags.join(' · ') }}</p>
   </article>
 </template>
 
@@ -27,5 +27,6 @@ import type { Trend } from '~/data/trends'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
 
 const props = defineProps<{ trend: Trend }>()
+const { lang, copy } = useMarketingLang()
 const template = computed(() => (props.trend.template ? PAGE_TEMPLATES.find(t => t.id === props.trend.template) : undefined))
 </script>
