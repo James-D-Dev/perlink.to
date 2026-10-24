@@ -11,7 +11,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const linkRepo = new LinkRepository(event)
-  
+
+  // Only the owner may delete a link
+  const user = event.context.user
+  const link = await linkRepo.findByShortCode(shortCode)
+  if (!link) {
+    return { success: false, message: 'Link not found' }
+  }
+  if (!user || link.user_id !== user.id) {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+  }
+
   try {
     const result = await linkRepo.delete(shortCode)
 

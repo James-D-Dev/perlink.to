@@ -56,6 +56,11 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Only the owner may change a link
+    if (!event.context.user || currentLink.user_id !== event.context.user.id) {
+      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+    }
+
     // Cập nhật meta fields
     let updatedMeta = { ...currentLink.meta } as Record<string, any>
 

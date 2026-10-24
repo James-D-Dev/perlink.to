@@ -22,6 +22,20 @@ export default defineEventHandler(async (event) => {
         }
       }
 
+      // Only the owner sees the destination and settings. Everyone else (e.g.
+      // the password page) gets just the message, never the password or URL.
+      const user = event.context.user
+      if (!user || user.id !== data.user_id) {
+        const password = (data.meta as any)?.password
+        return {
+          success: true,
+          data: {
+            short_code: data.short_code,
+            meta: { password: { enabled: !!password?.enabled, message: password?.message ?? '' } },
+          }
+        }
+      }
+
       return {
         success: true,
         data: {
