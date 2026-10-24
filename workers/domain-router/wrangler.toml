@@ -1,0 +1,9 @@
+# Deploy: npx wrangler deploy --config workers/domain-router/wrangler.toml
+# Then: npx wrangler secret put DOMAIN_PROXY_SECRET --config workers/domain-router/wrangler.toml
+name = "perlink-domain-router"
+main = "index.ts"
+compatibility_date = "2025-06-01"
+
+# Catches customer domains added as Cloudflare for SaaS custom hostnames.
+# perlink.to itself passes straight through to Pages (see index.ts).
+routes = [{ pattern = "*/*", zone_name = "perlink.to" }]

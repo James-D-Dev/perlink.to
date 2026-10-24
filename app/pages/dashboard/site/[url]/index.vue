@@ -292,6 +292,13 @@
                   />
                 </div>
 
+                <!-- Custom domain -->
+                <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.domain.heading') }}</h3>
+                  <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.domain.text') }}</p>
+                  <SiteDomainSettings v-if="existingBio?.username" :username="existingBio.username" />
+                </div>
+
                 <!-- Search & sharing -->
                 <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
                   <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.seo.heading') }}</h3>

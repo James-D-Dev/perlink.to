@@ -22,15 +22,15 @@ export function siteSeoDefaults(page: SeoSource, username: string) {
   return { title, description, image }
 }
 
-/** Final values for the page head */
-export function siteSeo(page: SeoSource, username: string) {
+/** Final values for the page head; `domain` is the site's own domain, if it has one */
+export function siteSeo(page: SeoSource, username: string, domain?: string) {
   const defaults = siteSeoDefaults(page, username)
   const seo = page.themeConfig?.seo ?? {}
   return {
     title: seo.title?.trim() || defaults.title,
     description: (seo.description?.trim() || defaults.description).slice(0, 300),
     image: absolute(seo.imageUrl || defaults.image),
-    url: `${SITE}/${username}`,
+    url: domain ? `https://${domain}/` : `${SITE}/${username}`,
   }
 }
 
@@ -40,12 +40,12 @@ const SCHEMA_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fr
  * schema.org LocalBusiness for pages with a contact or hours block, so search
  * engines can show the address, phone and opening hours. Null otherwise.
  */
-export function localBusinessJsonLd(page: SeoSource, username: string) {
+export function localBusinessJsonLd(page: SeoSource, username: string, domain?: string) {
   const blocks = (page.blocks ?? []).filter(b => !b.hidden)
   const contact = blocks.find(b => b.name === 'contact')
   const hours = blocks.find(b => b.name === 'hours')
   if (!contact && !hours) return null
-  const seo = siteSeo(page, username)
+  const seo = siteSeo(page, username, domain)
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',

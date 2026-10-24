@@ -374,6 +374,29 @@
           "text": "Gắn vào bio, gửi qua Zalo hoặc in mã QR để bàn."
         }
       }
+    },
+    "domain": {
+      "heading": "Tên miền riêng",
+      "text": "Hiển thị trang này tại tên miền của bạn, ví dụ www.cuahang.com. Địa chỉ perlink.to vẫn hoạt động.",
+      "unavailable": "Tính năng tên miền riêng sắp ra mắt.",
+      "connect": "Kết nối",
+      "connectFailed": "Không kết nối được tên miền",
+      "status": {
+        "pending": "Đang chờ DNS",
+        "active": "Đang hoạt động",
+        "error": "Kiểm tra lại DNS"
+      },
+      "open": "Mở",
+      "instructions": "Thêm các bản ghi sau ở nơi bạn mua tên miền (bấm vào giá trị để sao chép):",
+      "type": "Loại",
+      "name": "Tên",
+      "value": "Giá trị",
+      "wait": "Thường mất vài phút, có khi tới một ngày. Trong lúc chờ, địa chỉ perlink.to vẫn hoạt động.",
+      "check": "Kiểm tra lại",
+      "nowActive": "Tên miền đã hoạt động",
+      "remove": "Gỡ tên miền",
+      "removeTitle": "Gỡ tên miền này?",
+      "removeText": "Trang vẫn ở địa chỉ perlink.to."
     }
   }
 }

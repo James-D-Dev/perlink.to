@@ -43,6 +43,14 @@ export default defineNuxtConfig({
     // Email via Resend (https://resend.com). Empty key = emails are skipped.
     // Set NUXT_RESEND_API_KEY (and optionally NUXT_EMAIL_FROM) as Cloudflare Pages secrets.
     resendApiKey: "",
+    // Custom domains through Cloudflare for SaaS (see docs/custom-domains.md).
+    // Empty token = the feature shows as not available yet.
+    cfSaasZoneId: "",
+    cfSaasApiToken: "",
+    // Shared with the domain-router Worker so only it can say which domain a request came from
+    domainProxySecret: "",
+    // Where owners point their domain (CNAME target)
+    domainCnameTarget: "sites.perlink.to",
     emailFrom: "Perlink <notifications@perlink.to>",
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
@@ -92,7 +100,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/": { prerender: true },
+    // "/" is rendered per request: on a site's own domain it shows that site
     "/vi": { prerender: true },
     "/dashboard/site/**": { ssr: false },
     // Sites used to live under /dashboard/bio

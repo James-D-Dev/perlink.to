@@ -374,6 +374,29 @@
           "text": "Put it in your bio, on Zalo or print a QR code for your tables."
         }
       }
+    },
+    "domain": {
+      "heading": "Custom domain",
+      "text": "Show this site on your own domain, like www.myshop.com. Your perlink.to address keeps working.",
+      "unavailable": "Custom domains are coming soon.",
+      "connect": "Connect",
+      "connectFailed": "Couldn’t connect the domain",
+      "status": {
+        "pending": "Waiting for DNS",
+        "active": "Active",
+        "error": "Check your DNS"
+      },
+      "open": "Open",
+      "instructions": "Add these records at the company where you bought the domain (click a value to copy it):",
+      "type": "Type",
+      "name": "Name",
+      "value": "Value",
+      "wait": "It usually takes a few minutes, sometimes up to a day. Your perlink.to address works in the meantime.",
+      "check": "Check again",
+      "nowActive": "Your domain is live",
+      "remove": "Remove domain",
+      "removeTitle": "Remove this domain?",
+      "removeText": "The site stays at its perlink.to address."
     }
   }
 }
