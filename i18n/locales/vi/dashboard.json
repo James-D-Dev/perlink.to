@@ -277,6 +277,24 @@
       "imageHelp": "Chọn một ảnh của bạn. Tự động sẽ dùng ảnh bìa, nếu không có thì dùng ảnh đại diện.",
       "auto": "Tự động",
       "previewLabel": "Xem trước khi chia sẻ liên kết"
+    },
+    "inbox": {
+      "title": "Hộp thư",
+      "editSite": "Sửa trang",
+      "unreadCount": "không có yêu cầu chưa đọc | {n} yêu cầu chưa đọc | {n} yêu cầu chưa đọc",
+      "all": "Tất cả",
+      "unread": "Chưa đọc",
+      "emptyTitle": "Chưa có yêu cầu nào",
+      "emptyText": "Thêm form đặt chỗ hoặc liên hệ vào trang. Yêu cầu của khách sẽ hiện ở đây.",
+      "addForm": "Thêm form",
+      "noUnread": "Bạn đã đọc hết.",
+      "guests": "{n} khách | {n} khách",
+      "markRead": "Đánh dấu đã đọc",
+      "markUnread": "Đánh dấu chưa đọc",
+      "deleteTitle": "Xóa yêu cầu này?",
+      "deleteText": "Yêu cầu sẽ bị xóa khỏi Hộp thư.",
+      "loadFailed": "Không tải được Hộp thư",
+      "open": "Hộp thư"
     }
   }
 }

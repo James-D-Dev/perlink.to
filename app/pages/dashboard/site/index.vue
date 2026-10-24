@@ -94,6 +94,11 @@
               <UTooltip :text="t('common.analytics')">
                 <UButton :to="`/dashboard/site/${bio.username}/analytics`" color="neutral" variant="ghost" icon="i-lucide-chart-column" :aria-label="t('common.analytics')" />
               </UTooltip>
+              <UTooltip :text="t('dashboard.inbox.open')">
+                <UChip :show="(bio.unreadRequests || 0) > 0" :text="bio.unreadRequests" size="2xl" color="error" inset>
+                  <UButton :to="`/dashboard/site/${bio.username}/inbox`" color="neutral" variant="ghost" icon="i-lucide-inbox" :aria-label="t('dashboard.inbox.open')" />
+                </UChip>
+              </UTooltip>
               <UTooltip :text="t('common.copyLink')">
                 <UButton color="neutral" variant="ghost" icon="i-lucide-copy" :aria-label="t('common.copyLink')" @click="copyUrl(bio.username)" />
               </UTooltip>

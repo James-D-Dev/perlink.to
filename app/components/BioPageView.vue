@@ -318,6 +318,18 @@
             :button-style="buttonStyle"
             :heading-style="headingStyle"
           />
+          <!-- Booking / contact form -->
+          <BioFormDisplay
+            v-if="block.name === 'form' && block.id"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :block-id="block.id"
+            :username="username"
+            :preview="isPreview"
+            :card-style="cardStyle"
+            :button-style="solidButtonStyle"
+            :heading-style="headingStyle"
+          />
           <!-- more block -->
         </template>
       </div>
@@ -519,6 +531,18 @@ function socialsOf(block: BioBlock): SocialLink[] {
     .filter((s) => s.url?.trim() || isPreview.value)
     .sort((a, b) => (a.index || 0) - (b.index || 0));
 }
+
+// A button that always stands out from the card it sits on. Older themes
+// fill cards with the primary colour, so the button flips to the card's text colour
+const solidButtonStyle = computed(() => {
+  const t = theme.value;
+  const radius = buttonStyle.value.borderRadius;
+  if (!t.card.backgroundColor && t.card.style === "filled") {
+    return { borderRadius: radius, backgroundColor: t.card.textColor || "#ffffff", color: t.colors.primary, border: "none" };
+  }
+  if (t.button.style === "filled") return buttonStyle.value;
+  return { borderRadius: radius, backgroundColor: t.colors.primary, color: t.button.textColor || "#ffffff", border: "none" };
+});
 
 // Sticky Call / Directions / chat buttons, switched on in the contact block
 const quickActions = computed(() => {

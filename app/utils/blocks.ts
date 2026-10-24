@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import type { BioBlock, BlockName } from '~/types/bio'
+import type { BioBlock, BlockName, FormFields } from '~/types/bio'
 
 /** Block types a page may hold more than once; the rest are one per page */
 export const REPEATABLE_BLOCKS: BlockName[] = ['links', 'text', 'image-album', 'menu']
@@ -25,6 +25,11 @@ export function contactMapHref(data: { mapUrl?: string; address?: string }) {
   return ''
 }
 
+export const FORM_PRESETS: Record<'booking' | 'contact', FormFields> = {
+  booking: { phone: true, email: false, date: true, time: true, guests: true, message: true },
+  contact: { phone: true, email: true, date: false, time: false, guests: false, message: true },
+}
+
 /** Starting data for a freshly added block */
 export function emptyBlockData(name: BlockName): BioBlock['data'] {
   switch (name) {
@@ -32,6 +37,7 @@ export function emptyBlockData(name: BlockName): BioBlock['data'] {
     case 'social': return { links: [] }
     case 'image-album': return { images: [], layout: 'grid' }
     case 'text': return { content: '', align: 'left', style: 'plain' }
+    case 'form': return { kind: 'booking', fields: { ...FORM_PRESETS.booking } }
     default: return {} as BioBlock['data']
   }
 }

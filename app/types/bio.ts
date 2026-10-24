@@ -266,7 +266,8 @@ export type BlockName =
   | 'birthday-countdown'
   | 'menu'
   | 'hours'
-  | 'contact';
+  | 'contact'
+  | 'form';
 
 export interface BaseBlock {
   /** Unique per page, so a page can hold several blocks of one type. Older pages get one on load */
@@ -402,6 +403,28 @@ export interface ContactBlock extends BaseBlock {
   };
 }
 
+// Booking / contact form; requests land in the site's inbox
+export interface FormFields {
+  phone: boolean;
+  email: boolean;
+  date: boolean;
+  time: boolean;
+  guests: boolean;
+  message: boolean;
+}
+
+export interface FormBlock extends BaseBlock {
+  name: 'form';
+  data: {
+    title?: string;
+    description?: string;
+    kind: 'booking' | 'contact';
+    fields: FormFields;
+    submitLabel?: string;
+    successMessage?: string;
+  };
+}
+
 export type BioBlock =
   | LinksBlock
   | SocialBlock
@@ -411,7 +434,8 @@ export type BioBlock =
   | BirthdayCountdownBlock
   | MenuBlock
   | HoursBlock
-  | ContactBlock;
+  | ContactBlock
+  | FormBlock;
 
 export const DEFAULT_OPENING_DAYS: OpeningDay[] = [1, 2, 3, 4, 5, 6, 0].map(day => ({
   day,

@@ -111,6 +111,15 @@
               @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
 
+            <BioBlockForm
+              v-if="block.name === 'form'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
             <BioBlockContact
               v-if="block.name === 'contact'"
               :is-active="activeBlock === block.id"

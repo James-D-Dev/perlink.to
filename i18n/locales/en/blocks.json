@@ -209,6 +209,10 @@
         "birthdayCountdown": {
           "label": "Birthday countdown",
           "description": "Days until your next birthday."
+        },
+        "form": {
+          "label": "Booking / contact form",
+          "description": "Visitors send a booking or question; it lands in your inbox."
         }
       }
     },
@@ -224,6 +228,35 @@
       "deletedTitle": "Link deleted",
       "deletedDescription": "The link has been successfully deleted",
       "failed": "Failed to delete link. Please try again."
+    },
+    "form": {
+      "title": "Form",
+      "defaultTitle": "Booking form",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Book a table",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "We’ll confirm by phone within the hour.",
+      "kind": "Type",
+      "kinds": {
+        "booking": "Booking",
+        "contact": "Contact"
+      },
+      "fieldsLabel": "Fields",
+      "fieldsHelp": "Name is always asked.",
+      "fields": {
+        "phone": "Phone",
+        "email": "Email",
+        "date": "Date",
+        "time": "Time",
+        "guests": "Guests",
+        "message": "Message"
+      },
+      "submitLabel": "Button text",
+      "submitPlaceholder": "Request a booking",
+      "successLabel": "Thank-you message",
+      "successPlaceholder": "Thanks! We’ll get back to you soon.",
+      "inboxNote": "Requests go to your Inbox. Open it from the sites list or the editor’s top bar.",
+      "openInbox": "Open inbox"
     }
   }
 }

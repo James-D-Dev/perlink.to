@@ -41,6 +41,17 @@
             />
           </UTooltip>
 
+          <!-- Inbox -->
+          <UTooltip v-if="existingBio?.username" :text="t('dashboard.inbox.open')">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-inbox"
+              :aria-label="t('dashboard.inbox.open')"
+              :to="`/dashboard/site/${existingBio.username}/inbox`"
+            />
+          </UTooltip>
+
           <!-- Copy URL -->
           <UTooltip :text="t('dashboard.editor.copyUrl')">
             <UButton

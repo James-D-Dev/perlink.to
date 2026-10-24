@@ -277,6 +277,24 @@
       "imageHelp": "Pick one of your photos. Auto uses your banner, then your profile photo.",
       "auto": "Auto",
       "previewLabel": "Preview of a shared link"
+    },
+    "inbox": {
+      "title": "Inbox",
+      "editSite": "Edit site",
+      "unreadCount": "no unread requests | {n} unread request | {n} unread requests",
+      "all": "All",
+      "unread": "Unread",
+      "emptyTitle": "No requests yet",
+      "emptyText": "Add a booking or contact form to your site. Requests from visitors will show up here.",
+      "addForm": "Add a form",
+      "noUnread": "You’re all caught up.",
+      "guests": "{n} guest | {n} guests",
+      "markRead": "Mark as read",
+      "markUnread": "Mark as unread",
+      "deleteTitle": "Delete this request?",
+      "deleteText": "It will be removed from your inbox.",
+      "loadFailed": "Couldn’t load your inbox",
+      "open": "Inbox"
     }
   }
 }

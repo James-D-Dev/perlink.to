@@ -209,6 +209,10 @@
         "birthdayCountdown": {
           "label": "Đếm ngược sinh nhật",
           "description": "Số ngày tới sinh nhật tiếp theo của bạn."
+        },
+        "form": {
+          "label": "Form đặt chỗ / liên hệ",
+          "description": "Khách gửi yêu cầu đặt chỗ hoặc câu hỏi, bạn nhận trong Hộp thư."
         }
       }
     },
@@ -224,6 +228,35 @@
       "deletedTitle": "Đã xoá liên kết",
       "deletedDescription": "Liên kết đã được xoá",
       "failed": "Không xoá được liên kết. Vui lòng thử lại."
+    },
+    "form": {
+      "title": "Form",
+      "defaultTitle": "Form đặt chỗ",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Đặt bàn",
+      "descriptionLabel": "Mô tả",
+      "descriptionPlaceholder": "Chúng tôi sẽ gọi xác nhận trong vòng một giờ.",
+      "kind": "Loại",
+      "kinds": {
+        "booking": "Đặt chỗ",
+        "contact": "Liên hệ"
+      },
+      "fieldsLabel": "Các ô",
+      "fieldsHelp": "Luôn hỏi họ tên.",
+      "fields": {
+        "phone": "Số điện thoại",
+        "email": "Email",
+        "date": "Ngày",
+        "time": "Giờ",
+        "guests": "Số khách",
+        "message": "Lời nhắn"
+      },
+      "submitLabel": "Chữ trên nút",
+      "submitPlaceholder": "Gửi yêu cầu đặt chỗ",
+      "successLabel": "Lời cảm ơn",
+      "successPlaceholder": "Cảm ơn bạn! Chúng tôi sẽ liên hệ lại sớm.",
+      "inboxNote": "Yêu cầu sẽ vào Hộp thư. Mở Hộp thư từ danh sách trang hoặc thanh trên cùng của editor.",
+      "openInbox": "Mở Hộp thư"
     }
   }
 }

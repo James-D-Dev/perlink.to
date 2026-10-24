@@ -84,6 +84,7 @@ const groupDefs: { key: string; blocks: { id: string; key: string; icon: string 
       { id: 'menu', key: 'menu', icon: 'i-lucide-utensils' },
       { id: 'hours', key: 'hours', icon: 'i-lucide-clock' },
       { id: 'contact', key: 'contact', icon: 'i-lucide-map-pin' },
+      { id: 'form', key: 'form', icon: 'i-lucide-calendar-check' },
     ],
   },
   {

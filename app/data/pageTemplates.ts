@@ -230,6 +230,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         },
         { name: 'hours', data: { title: 'Opening hours', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '10:00', close: '22:00' })), note: 'Last orders 30 minutes before closing.' } },
         { name: 'contact', data: { title: 'Find us', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, bookingLabel: 'Book a table', bookingUrl: '' } },
+        { name: 'form', data: { title: 'Book a table', description: 'We’ll confirm by phone within the hour.', kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: true, message: true } } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'zalo') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#7a4b3a', floorColor: '#9c6b46', floorMaterial: 'wood', trimColor: '#3b2a22' }, [
@@ -283,6 +284,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
           },
         },
         { name: 'contact', data: { title: 'Contact & booking', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, email: '', bookingLabel: 'Book your stay', bookingUrl: '' } },
+        { name: 'form', data: { title: 'Ask about your dates', kind: 'booking', fields: { phone: true, email: true, date: true, time: false, guests: true, message: true }, submitLabel: 'Check availability' } },
         { name: 'hours', data: { title: 'Reception', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '07:00', close: '23:00' })), note: 'Check-in from 14:00, check-out before 12:00.' } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'whatsapp') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
@@ -457,6 +459,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
           },
         },
         { name: 'contact', data: { title: 'Book a call', email: 'hello@yourstudio.com', phone: SAMPLE_PHONE, bookingLabel: 'Book a free call', bookingUrl: '' } },
+        { name: 'form', data: { title: 'Tell me about your project', kind: 'contact', fields: { phone: true, email: true, date: false, time: false, guests: false, message: true }, submitLabel: 'Send message' } },
         { name: 'hours', data: { title: 'Availability', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '09:00', close: '18:00', closed: d.day === 0 || d.day === 6 })), note: 'Replies within one business day.' } },
         { name: 'social', data: { links: social('linkedin', 'instagram', 'website') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
