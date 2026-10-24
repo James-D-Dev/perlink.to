@@ -17,29 +17,29 @@
     <!-- Top bar -->
     <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2 sm:p-3">
       <div class="pointer-events-auto rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
-        <UTooltip text="Back to page editor" :content="{ side: 'right' }">
-          <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" aria-label="Back to page editor" @click="emit('back')" />
+        <UTooltip :text="t('room.toolbar.back')" :content="{ side: 'right' }">
+          <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" :aria-label="t('room.toolbar.back')" @click="emit('back')" />
         </UTooltip>
       </div>
 
       <div class="pointer-events-auto flex items-center gap-1 rounded-2xl bg-default/70 ring-1 ring-white/10 p-1 shadow-lg backdrop-blur-xl">
-        <UTooltip text="Undo (Ctrl+Z)">
+        <UTooltip :text="t('room.toolbar.undo')">
           <UButton icon="i-lucide-undo-2" color="neutral" variant="ghost" :disabled="!canUndo" @click="undo" />
         </UTooltip>
-        <UTooltip text="Redo (Ctrl+Shift+Z)">
+        <UTooltip :text="t('room.toolbar.redo')">
           <UButton icon="i-lucide-redo-2" color="neutral" variant="ghost" :disabled="!canRedo" @click="redo" />
         </UTooltip>
         <UTooltip :text="previewLabel">
           <UButton :icon="previewIcon" color="neutral" variant="ghost" @click="cyclePreview" />
         </UTooltip>
-        <UTooltip :text="dirty ? 'Unsaved changes (Ctrl+S)' : 'All changes saved'">
+        <UTooltip :text="dirty ? t('room.toolbar.unsaved') : t('room.toolbar.allSaved')">
           <UButton icon="i-lucide-save" :loading="saving" color="neutral" variant="soft" class="relative" @click="emit('save')">
-            <span class="hidden sm:inline">Save</span>
+            <span class="hidden sm:inline">{{ t('common.save') }}</span>
             <span v-if="dirty" class="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-amber-500 ring-2 ring-default" />
           </UButton>
         </UTooltip>
         <UButton icon="i-lucide-globe" :loading="publishing" @click="emit('publish')">
-          <span class="hidden sm:inline">Publish</span>
+          <span class="hidden sm:inline">{{ t('common.publish') }}</span>
         </UButton>
       </div>
     </div>
@@ -57,8 +57,8 @@
           v-if="!panelOpen"
           type="button"
           class="flex origin-top-left items-center gap-1.5 rounded-2xl bg-default/70 px-3 py-2 text-sm font-semibold tabular-nums text-highlighted shadow-lg ring-1 ring-white/10 backdrop-blur-xl transition hover:bg-elevated"
-          :aria-label="`Show objects (${room.objects.length})`"
-          title="Objects"
+          :aria-label="t('room.panel.showObjects', { n: room.objects.length })"
+          :title="t('room.panel.objects')"
           @click="openPanel('list')"
         >
           <UIcon name="i-lucide-layers" class="size-4" />
@@ -77,30 +77,30 @@
           >
             <div v-if="panelView === 'detail' && selectedObject && selectedItem" key="detail" class="flex min-h-0 flex-1 flex-col">
               <div class="flex items-center gap-2 border-b border-white/[0.08] py-2.5 pl-1.5 pr-3">
-                <UButton icon="i-lucide-chevron-left" size="xs" color="neutral" variant="ghost" aria-label="Back to objects" @click="panelView = 'list'" />
+                <UButton icon="i-lucide-chevron-left" size="xs" color="neutral" variant="ghost" :aria-label="t('room.panel.backToObjects')" @click="panelView = 'list'" />
                 <div class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated">
-                  <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-8 object-contain">
+                  <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="objectName(selectedItem)" class="size-8 object-contain">
                 </div>
                 <div class="min-w-0 flex-1">
-                  <p class="truncate text-sm font-semibold text-highlighted">{{ selectedItem.name }}</p>
+                  <p class="truncate text-sm font-semibold text-highlighted">{{ objectName(selectedItem) }}</p>
                   <p class="truncate text-xs text-muted">
-                    {{ selectedItem.wallMounted ? 'Drag along the walls to move' : 'Drag to move · drop on furniture to stack' }}
+                    {{ selectedItem.wallMounted ? t('room.detail.dragWall') : t('room.detail.dragFloor') }}
                   </p>
                 </div>
-                <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close objects" @click="panelOpen = false" />
+                <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" :aria-label="t('room.panel.closeObjects')" @click="panelOpen = false" />
               </div>
 
               <div class="flex-1 space-y-4 overflow-y-auto p-3">
                 <div v-if="!selectedItem.wallMounted" class="flex items-center justify-between gap-2">
-                  <span class="text-xs font-medium text-muted">Rotate</span>
+                  <span class="text-xs font-medium text-muted">{{ t('room.detail.rotate') }}</span>
                   <div class="flex items-center rounded-lg bg-elevated">
-                    <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Rotate left" @click="rotateBy(-45)" />
+                    <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" :aria-label="t('room.detail.rotateLeft')" @click="rotateBy(-45)" />
                     <span class="w-10 text-center text-xs tabular-nums text-default">{{ selectedObject.rotation }}°</span>
-                    <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="ghost" aria-label="Rotate right" @click="rotateBy(45)" />
+                    <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="ghost" :aria-label="t('room.detail.rotateRight')" @click="rotateBy(45)" />
                   </div>
                 </div>
                 <div v-else class="flex items-center justify-between gap-2">
-                  <span class="text-xs font-medium text-muted">Wall</span>
+                  <span class="text-xs font-medium text-muted">{{ t('room.detail.wall') }}</span>
                   <USelect
                     size="sm"
                     :model-value="selectedObject.wall || 'back'"
@@ -111,42 +111,42 @@
                 </div>
 
                 <div class="flex items-center justify-between gap-2">
-                  <span class="text-xs font-medium text-muted">Size</span>
+                  <span class="text-xs font-medium text-muted">{{ t('room.detail.size') }}</span>
                   <div class="flex items-center rounded-lg bg-elevated">
-                    <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Smaller" @click="scaleBy(-0.1)" />
+                    <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" :aria-label="t('room.detail.smaller')" @click="scaleBy(-0.1)" />
                     <span class="w-11 text-center text-xs tabular-nums text-default">{{ Math.round(selectedObject.scale * 100) }}%</span>
-                    <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Bigger" @click="scaleBy(0.1)" />
+                    <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" :aria-label="t('room.detail.bigger')" @click="scaleBy(0.1)" />
                   </div>
                 </div>
 
                 <div v-if="selectedItem.photo" class="space-y-2">
                   <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
                     <UIcon name="i-lucide-image" class="size-3.5" />
-                    Photo
+                    {{ t('room.detail.photo') }}
                   </span>
                   <div class="flex items-center gap-3">
                     <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-elevated ring-1 ring-white/10">
-                      <img v-if="selectedObject.image" :src="selectedObject.image" alt="Photo" class="size-full object-cover">
+                      <img v-if="selectedObject.image" :src="selectedObject.image" :alt="t('room.detail.photo')" class="size-full object-cover">
                       <UIcon v-else name="i-lucide-image-plus" class="size-6 text-dimmed" />
                     </div>
                     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
                       <UButton size="sm" color="neutral" variant="soft" icon="i-lucide-upload" :loading="photoUploading" class="justify-center" @click="photoInput?.click()">
-                        {{ selectedObject.image ? 'Replace photo' : 'Upload photo' }}
+                        {{ selectedObject.image ? t('room.detail.replacePhoto') : t('room.detail.uploadPhoto') }}
                       </UButton>
                       <UButton v-if="selectedObject.image" size="sm" color="neutral" variant="ghost" icon="i-lucide-x" class="justify-center" @click="updateSelected({ image: undefined })">
-                        Remove
+                        {{ t('room.detail.remove') }}
                       </UButton>
                     </div>
                   </div>
-                  <p class="text-xs text-muted">Visitors click the frame to see the photo full size.</p>
+                  <p class="text-xs text-muted">{{ t('room.detail.photoHint') }}</p>
                   <input ref="photoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onPhotoPicked">
                 </div>
 
                 <div v-if="!selectedItem.fromModel && !(selectedItem.photo && selectedObject.image)" class="space-y-2">
                   <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium text-muted">Color</span>
-                    <UTooltip text="Reset to default color">
-                      <UButton size="xs" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Reset color" @click="updateSelected({ color: undefined })" />
+                    <span class="text-xs font-medium text-muted">{{ t('room.detail.color') }}</span>
+                    <UTooltip :text="t('room.detail.resetColor')">
+                      <UButton size="xs" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" :aria-label="t('room.detail.resetColorAria')" @click="updateSelected({ color: undefined })" />
                     </UTooltip>
                   </div>
                   <div class="flex flex-wrap gap-2">
@@ -157,10 +157,10 @@
                       class="size-7 shrink-0 rounded-full border-2 transition hover:scale-110"
                       :class="(selectedObject.color || selectedItem.defaultColor).toLowerCase() === color ? 'border-perlink-blue ring-2 ring-perlink-blue/30' : 'border-white/80 shadow'"
                       :style="{ background: color }"
-                      :aria-label="`Color ${color}`"
+                      :aria-label="t('room.detail.colorSwatch', { color })"
                       @click="updateSelected({ color })"
                     />
-                    <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" aria-label="Custom color">
+                    <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" :aria-label="t('room.detail.customColor')">
                       <input type="color" class="absolute inset-0 cursor-pointer opacity-0" :value="selectedObject.color || selectedItem.defaultColor" @input="updateSelected({ color: ($event.target as HTMLInputElement).value })">
                     </label>
                   </div>
@@ -169,31 +169,31 @@
                 <div class="space-y-2">
                   <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
                     <UIcon name="i-lucide-link" class="size-3.5" />
-                    Link
+                    {{ t('room.detail.link') }}
                   </span>
-                  <p class="text-xs text-muted">Visitors click this object to open the link.</p>
-                  <UInput :model-value="selectedObject.link?.label || ''" size="sm" placeholder="Label, e.g. My Instagram" class="w-full" @update:model-value="updateLink({ label: String($event) })" />
+                  <p class="text-xs text-muted">{{ t('room.detail.linkHint') }}</p>
+                  <UInput :model-value="selectedObject.link?.label || ''" size="sm" :placeholder="t('room.detail.linkLabel')" class="w-full" @update:model-value="updateLink({ label: String($event) })" />
                   <UInput :model-value="selectedObject.link?.url || ''" size="sm" placeholder="https://..." icon="i-lucide-link" class="w-full" @update:model-value="updateLink({ url: String($event) })" />
                 </div>
               </div>
 
               <div class="flex gap-2 border-t border-white/[0.08] p-2">
                 <UButton icon="i-lucide-copy" color="neutral" variant="soft" size="sm" class="flex-1 justify-center" @click="duplicateSelected">
-                  Duplicate
+                  {{ t('room.detail.duplicate') }}
                 </UButton>
                 <UButton icon="i-lucide-trash-2" color="error" variant="soft" size="sm" class="flex-1 justify-center" @click="removeSelected">
-                  Delete
+                  {{ t('common.delete') }}
                 </UButton>
               </div>
             </div>
             <div v-else key="list" class="flex min-h-0 flex-1 flex-col">
               <div class="flex items-center gap-2 border-b border-white/[0.08] px-3 py-2.5">
                 <UIcon name="i-lucide-layers" class="size-4 text-muted" />
-                <p class="flex-1 text-sm font-semibold text-highlighted">Objects <span class="font-normal text-muted">· {{ room.objects.length }}</span></p>
-                <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close objects" @click="panelOpen = false" />
+                <p class="flex-1 text-sm font-semibold text-highlighted">{{ t('room.panel.objects') }} <span class="font-normal text-muted">· {{ room.objects.length }}</span></p>
+                <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" :aria-label="t('room.panel.closeObjects')" @click="panelOpen = false" />
               </div>
               <div class="border-b border-white/[0.08] p-2">
-                <UInput v-model="listQuery" size="sm" icon="i-lucide-search" placeholder="Search objects" class="w-full" />
+                <UInput v-model="listQuery" size="sm" icon="i-lucide-search" :placeholder="t('room.panel.search')" class="w-full" />
               </div>
               <ul ref="listRef" class="flex-1 overflow-y-auto p-1.5">
                 <li v-for="row in objectRows" :key="row.id" :data-object-id="row.id">
@@ -221,13 +221,13 @@
                       color="error"
                       variant="ghost"
                       class="opacity-60 group-hover:opacity-100"
-                      :aria-label="`Delete ${row.name}`"
+                      :aria-label="t('room.panel.deleteObject', { name: row.name })"
                       @click.stop="removeObject(row.id)"
                     />
                   </div>
                 </li>
                 <li v-if="objectRows.length === 0" class="px-3 py-8 text-center text-sm text-muted">
-                  {{ room.objects.length ? 'No objects match your search.' : 'No objects yet. Add some from the bar below.' }}
+                  {{ room.objects.length ? t('room.panel.noMatch') : t('room.panel.empty') }}
                 </li>
               </ul>
             </div>
@@ -239,27 +239,27 @@
     <!-- Camera controls -->
     <div class="absolute right-2 top-16 flex flex-col items-center gap-2 sm:right-3">
       <div class="flex flex-col items-center gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
-        <UTooltip text="Zoom in" :content="{ side: 'left' }">
-          <UButton icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Zoom in" @click="canvasRef?.zoomBy(0.8)" />
+        <UTooltip :text="t('room.camera.zoomIn')" :content="{ side: 'left' }">
+          <UButton icon="i-lucide-plus" color="neutral" variant="ghost" :aria-label="t('room.camera.zoomIn')" @click="canvasRef?.zoomBy(0.8)" />
         </UTooltip>
-        <UTooltip text="Zoom out" :content="{ side: 'left' }">
-          <UButton icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Zoom out" @click="canvasRef?.zoomBy(1.25)" />
+        <UTooltip :text="t('room.camera.zoomOut')" :content="{ side: 'left' }">
+          <UButton icon="i-lucide-minus" color="neutral" variant="ghost" :aria-label="t('room.camera.zoomOut')" @click="canvasRef?.zoomBy(1.25)" />
         </UTooltip>
-        <UTooltip text="Reset view" :content="{ side: 'left' }">
-          <UButton icon="i-lucide-scan" color="neutral" variant="ghost" aria-label="Reset view" @click="canvasRef?.resetView()" />
+        <UTooltip :text="t('room.camera.resetView')" :content="{ side: 'left' }">
+          <UButton icon="i-lucide-scan" color="neutral" variant="ghost" :aria-label="t('room.camera.resetView')" @click="canvasRef?.resetView()" />
         </UTooltip>
       </div>
 
       <!-- Selected object: tap to open its details -->
-      <UTooltip v-if="selectedObject && selectedItem" :text="showingDetail ? 'Hide details' : `Edit ${selectedItem.name}`" :content="{ side: 'left' }">
+      <UTooltip v-if="selectedObject && selectedItem" :text="showingDetail ? t('room.camera.hideDetails') : t('room.camera.editObject', { name: objectName(selectedItem) })" :content="{ side: 'left' }">
         <button
           type="button"
           class="relative flex size-12 items-center justify-center rounded-2xl bg-default/70 shadow-lg ring-1 backdrop-blur-xl transition"
           :class="showingDetail ? 'ring-perlink-blue/60 bg-perlink-blue/15' : 'ring-white/10 hover:bg-elevated'"
-          :aria-label="`Edit ${selectedItem.name}`"
+          :aria-label="t('room.camera.editObject', { name: objectName(selectedItem) })"
           @click="toggleDetail"
         >
-          <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-9 object-contain">
+          <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="objectName(selectedItem)" class="size-9 object-contain">
           <UIcon v-else name="i-lucide-box" class="size-5" />
           <span v-if="!showingDetail" class="absolute -right-0.5 -top-0.5 flex size-3">
             <span class="absolute inline-flex size-full animate-ping rounded-full bg-perlink-blue opacity-75" />
@@ -271,7 +271,7 @@
 
     <!-- Navigation hint -->
     <p class="pointer-events-none absolute left-1/2 top-16 hidden -translate-x-1/2 rounded-full bg-black/40 px-3 py-1 text-xs text-white/80 backdrop-blur sm:block">
-      Drag to rotate · Right-drag to pan · Scroll to zoom
+      {{ t('room.hint.navigation') }}
     </p>
 
     <!-- Bottom area: inventory bar -->
@@ -280,11 +280,11 @@
       <div v-if="stats" class="flex w-full justify-end">
         <div
           class="pointer-events-auto flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-medium tabular-nums text-white/85 ring-1 ring-white/10 backdrop-blur-md"
-          :title="`${stats.drawCalls} draw calls · ${stats.triangles.toLocaleString()} triangles · capped at ${stats.cap} fps ${stats.cap < 60 ? '(idle)' : ''}`"
+          :title="`${t('room.stats.title', { drawCalls: stats.drawCalls, triangles: stats.triangles.toLocaleString(), cap: stats.cap })}${stats.cap < 60 ? ` ${t('room.stats.idleParen')}` : ''}`"
         >
           <span class="size-1.5 rounded-full" :class="fpsColor" />
-          {{ stats.fps }} FPS
-          <span v-if="stats.cap < 60" class="text-white/50">· idle</span>
+          {{ t('room.stats.fps', { fps: stats.fps }) }}
+          <span v-if="stats.cap < 60" class="text-white/50">{{ t('room.stats.idle') }}</span>
         </div>
       </div>
 
@@ -299,22 +299,22 @@
               :key="item.type"
               type="button"
               class="group flex w-20 shrink-0 touch-pan-x flex-col items-center gap-1 rounded-xl border border-default bg-elevated/50 p-1.5 transition hover:-translate-y-0.5 hover:border-perlink-blue hover:shadow-md sm:w-24"
-              :title="`Drag into the room or tap to add`"
+              :title="t('room.tray.addItem')"
               @pointerdown="onItemPointerDown($event, item.type)"
               @click.prevent
             >
               <div class="flex aspect-square w-full items-center justify-center">
-                <img v-if="thumbnails[item.type]" :src="thumbnails[item.type]" :alt="item.name" class="size-full object-contain transition group-hover:scale-105" draggable="false">
+                <img v-if="thumbnails[item.type]" :src="thumbnails[item.type]" :alt="objectName(item)" class="size-full object-contain transition group-hover:scale-105" draggable="false">
                 <USkeleton v-else class="size-3/4 rounded-lg" />
               </div>
-              <span class="w-full truncate text-center text-[11px] font-medium text-default">{{ item.name }}</span>
+              <span class="w-full truncate text-center text-[11px] font-medium text-default">{{ objectName(item) }}</span>
             </button>
           </div>
 
           <!-- Room style -->
           <div v-else-if="activeTab === 'room'" class="flex items-stretch gap-4 overflow-x-auto p-3">
             <div class="shrink-0">
-              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">Style</p>
+              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{{ t('room.roomStyle.style') }}</p>
               <div class="flex gap-2">
                 <button
                   v-for="preset in ROOM_STYLE_PRESETS"
@@ -325,16 +325,16 @@
                   @click="updateStyle(preset.style)"
                 >
                   <div class="flex h-20 items-center justify-center bg-elevated/60">
-                    <img v-if="styleThumbnails[preset.name]" :src="styleThumbnails[preset.name]" :alt="preset.name" class="size-full object-contain">
+                    <img v-if="styleThumbnails[preset.name]" :src="styleThumbnails[preset.name]" :alt="styleName(preset.name)" class="size-full object-contain">
                     <USkeleton v-else class="size-3/4 rounded-lg" />
                   </div>
-                  <p class="truncate px-2 py-1 text-[11px] font-medium text-default">{{ preset.name }}</p>
+                  <p class="truncate px-2 py-1 text-[11px] font-medium text-default">{{ styleName(preset.name) }}</p>
                 </button>
               </div>
             </div>
 
             <div class="shrink-0">
-              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">Floor</p>
+              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{{ t('room.roomStyle.floor') }}</p>
               <div class="flex gap-2">
                 <button
                   v-for="floor in floorOptions"
@@ -351,7 +351,7 @@
             </div>
 
             <div class="shrink-0">
-              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">Colors</p>
+              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{{ t('room.roomStyle.colors') }}</p>
               <div class="flex gap-3">
                 <label v-for="field in colorFields" :key="field.key" class="flex cursor-pointer flex-col items-center gap-1">
                   <span class="relative size-11 rounded-full border-2 border-white shadow" :style="{ background: room.style[field.key] }">
@@ -363,12 +363,12 @@
             </div>
 
             <div class="shrink-0">
-              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">Size</p>
+              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{{ t('room.roomStyle.size') }}</p>
               <div class="space-y-1">
                 <div v-for="dim in sizeFields" :key="dim.key" class="flex items-center gap-1">
                   <span class="w-12 text-[11px] text-muted">{{ dim.label }}</span>
                   <UButton size="xs" icon="i-lucide-minus" color="neutral" variant="soft" @click="stepSize(dim, -1)" />
-                  <span class="w-12 text-center text-xs tabular-nums text-highlighted">{{ room.style[dim.key] }} m</span>
+                  <span class="w-12 text-center text-xs tabular-nums text-highlighted">{{ t('room.roomStyle.meters', { n: room.style[dim.key] }) }}</span>
                   <UButton size="xs" icon="i-lucide-plus" color="neutral" variant="soft" @click="stepSize(dim, 1)" />
                 </div>
               </div>
@@ -390,8 +390,8 @@
                 <UIcon v-if="(room.land ?? 'island') === land.id" name="i-lucide-circle-check" class="absolute right-1.5 top-1.5 size-4 text-white drop-shadow" />
               </div>
               <div class="p-2">
-                <p class="text-sm font-semibold text-highlighted">{{ land.name }}</p>
-                <p class="line-clamp-2 text-[11px] leading-snug text-muted">{{ land.description }}</p>
+                <p class="text-sm font-semibold text-highlighted">{{ label(`room.lands.${land.id}.name`, land.name) }}</p>
+                <p class="line-clamp-2 text-[11px] leading-snug text-muted">{{ label(`room.lands.${land.id}.description`, land.description) }}</p>
               </div>
             </button>
           </div>
@@ -405,7 +405,7 @@
               @click="selectTrack(null)"
             >
               <UIcon name="i-lucide-volume-x" class="size-6 text-muted" />
-              <span class="text-sm font-semibold text-highlighted">No music</span>
+              <span class="text-sm font-semibold text-highlighted">{{ t('room.music.none') }}</span>
             </button>
 
             <div
@@ -423,14 +423,14 @@
                 :color="musicTrackId === track.id ? 'primary' : 'neutral'"
                 :variant="musicTrackId === track.id ? 'solid' : 'soft'"
                 class="shrink-0 rounded-full"
-                :aria-label="`Preview ${track.title}`"
+                :aria-label="t('room.music.previewTrack', { title: track.title })"
                 :disabled="missingTracks.has(track.id)"
                 @click.stop="togglePreview(track.id)"
               />
               <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-semibold text-highlighted">{{ track.title }}</p>
                 <p class="truncate text-xs text-muted">
-                  {{ missingTracks.has(track.id) ? 'File missing' : `${track.mood} · ${track.duration}` }}
+                  {{ missingTracks.has(track.id) ? t('room.music.fileMissing') : `${label(`room.music.moods.${track.id}`, track.mood)} · ${track.duration}` }}
                 </p>
                 <p class="truncate text-[11px] text-dimmed">{{ track.artist }}</p>
               </div>
@@ -445,11 +445,11 @@
                 :model-value="musicAutoplay"
                 :disabled="!musicTrackId"
                 size="sm"
-                label="Autoplay"
+                :label="t('room.music.autoplay')"
                 @update:model-value="setMusic({ autoplay: $event })"
               />
               <p class="text-[11px] leading-snug text-dimmed">
-                {{ musicAutoplay ? 'Starts when visitors open the room, or on their first tap if the browser blocks sound.' : 'Visitors start muted and can turn the music on.' }} Music from
+                {{ musicAutoplay ? t('room.music.autoplayOn') : t('room.music.autoplayOff') }} {{ t('room.music.creditPrefix') }}
                 <a href="https://pixabay.com/music/" target="_blank" rel="noopener noreferrer" class="underline hover:text-default">Pixabay</a>.
               </p>
             </div>
@@ -475,7 +475,7 @@
                 <UIcon :name="phase.icon" class="size-4 text-muted" />
                 <span class="w-10 text-xs text-muted">{{ phase.label }}</span>
                 <UButton size="xs" icon="i-lucide-minus" color="neutral" variant="soft" @click="stepCycle(phase.key, -0.5)" />
-                <span class="w-14 text-center text-xs tabular-nums text-highlighted">{{ room.environment[phase.key] }} min</span>
+                <span class="w-14 text-center text-xs tabular-nums text-highlighted">{{ t('room.time.minutes', { n: room.environment[phase.key] }) }}</span>
                 <UButton size="xs" icon="i-lucide-plus" color="neutral" variant="soft" @click="stepCycle(phase.key, 0.5)" />
               </div>
             </div>
@@ -500,7 +500,7 @@
             :icon="trayOpen ? 'i-lucide-chevron-down' : 'i-lucide-chevron-up'"
             color="neutral"
             variant="ghost"
-            :aria-label="trayOpen ? 'Hide tray' : 'Show tray'"
+            :aria-label="trayOpen ? t('room.tray.hide') : t('room.tray.show')"
             @click="trayOpen = !trayOpen"
           />
         </div>
@@ -522,7 +522,7 @@
       v-if="room.objects.length === 0"
       class="pointer-events-none absolute inset-x-0 top-1/3 text-center text-sm font-medium text-white drop-shadow"
     >
-      Drag furniture from the bar below into your room
+      {{ t('room.hint.firstRun') }}
     </p>
   </div>
 </template>
@@ -555,6 +555,12 @@ const emit = defineEmits<{
 }>()
 
 const room = defineModel<RoomConfig>('room', { required: true })
+
+const { t, te } = useI18n()
+/** Translated label, or the data file's own text when there's no key for it */
+const label = (key: string, fallback: string) => (te(key) ? t(key) : fallback)
+const objectName = (item: { type: string; name: string }) => label(`room.objects.${item.type}`, item.name)
+const styleName = (name: string) => label(`room.styles.${name.toLowerCase().replace(/\s+/g, '-')}`, name)
 
 type Tab = CatalogCategory | 'room' | 'land' | 'time' | 'music'
 
@@ -596,11 +602,11 @@ const CATEGORY_ICONS: Record<CatalogCategory, string> = {
 }
 
 const tabs = computed<{ value: Tab; label: string; icon: string }[]>(() => [
-  ...(Object.keys(CATEGORY_LABELS) as CatalogCategory[]).map(c => ({ value: c, label: CATEGORY_LABELS[c], icon: CATEGORY_ICONS[c] })),
-  { value: 'room', label: 'Room', icon: 'i-lucide-paint-roller' },
-  { value: 'land', label: 'Land', icon: 'i-lucide-mountain-snow' },
-  { value: 'time', label: 'Day & night', icon: 'i-lucide-sun-moon' },
-  ...(ROOM_MUSIC_ENABLED ? [{ value: 'music' as const, label: 'Music', icon: 'i-lucide-music' }] : []),
+  ...(Object.keys(CATEGORY_LABELS) as CatalogCategory[]).map(c => ({ value: c, label: label(`room.categories.${c}`, CATEGORY_LABELS[c]), icon: CATEGORY_ICONS[c] })),
+  { value: 'room', label: t('room.tabs.room'), icon: 'i-lucide-paint-roller' },
+  { value: 'land', label: t('room.tabs.land'), icon: 'i-lucide-mountain-snow' },
+  { value: 'time', label: t('room.tabs.time'), icon: 'i-lucide-sun-moon' },
+  ...(ROOM_MUSIC_ENABLED ? [{ value: 'music' as const, label: t('room.tabs.music'), icon: 'i-lucide-music' }] : []),
 ])
 
 const activeCategory = computed(() => (activeTab.value in CATEGORY_LABELS ? (activeTab.value as CatalogCategory) : null))
@@ -608,48 +614,46 @@ const activeItems = computed(() => ROOM_CATALOG.filter(i => i.category === activ
 
 const palette = ['#f5f5f2', '#2f2f36', '#8b5e3c', '#d9b382', '#c0605a', '#e76f51', '#e9c46a', '#4f8a4b', '#2a9d8f', '#6c8ebf', '#8338ec', '#ff4fd8']
 
-const wallOptions = [
-  { label: 'Back wall', value: 'back' },
-  { label: 'Left wall', value: 'left' },
-]
+const wallOptions = computed(() => [
+  { label: t('room.places.backWall'), value: 'back' },
+  { label: t('room.places.leftWall'), value: 'left' },
+])
 
-const floorOptions: { label: string; value: FloorMaterial }[] = [
-  { label: 'Wood', value: 'wood' },
-  { label: 'Tile', value: 'tile' },
-  { label: 'Carpet', value: 'carpet' },
-  { label: 'Concrete', value: 'concrete' },
-]
+const FLOOR_MATERIALS: FloorMaterial[] = ['wood', 'tile', 'carpet', 'concrete']
+const floorOptions = computed(() => FLOOR_MATERIALS.map(value => ({ value, label: t(`room.roomStyle.floors.${value}`) })))
 
-const colorFields: { key: 'wallColor' | 'floorColor' | 'trimColor'; label: string }[] = [
-  { key: 'wallColor', label: 'Walls' },
-  { key: 'floorColor', label: 'Floor' },
-  { key: 'trimColor', label: 'Trim' },
-]
+const colorFields = computed(() => (['wallColor', 'floorColor', 'trimColor'] as const).map(key => ({ key, label: t(`room.roomStyle.colorFields.${key}`) })))
 
-const sizeFields: { key: 'width' | 'depth' | 'height'; label: string; min: number; max: number; step: number }[] = [
-  { key: 'width', label: 'Width', min: 4, max: 10, step: 0.5 },
-  { key: 'depth', label: 'Depth', min: 4, max: 10, step: 0.5 },
-  { key: 'height', label: 'Height', min: 2.6, max: 4, step: 0.2 },
-]
+type SizeField = { key: 'width' | 'depth' | 'height'; label: string; min: number; max: number; step: number }
+const sizeFields = computed<SizeField[]>(() => [
+  { key: 'width', label: t('room.roomStyle.sizeFields.width'), min: 4, max: 10, step: 0.5 },
+  { key: 'depth', label: t('room.roomStyle.sizeFields.depth'), min: 4, max: 10, step: 0.5 },
+  { key: 'height', label: t('room.roomStyle.sizeFields.height'), min: 2.6, max: 4, step: 0.2 },
+])
 
-const dayNightModes: { value: DayNightMode; label: string; description: string; icon: string; iconClass: string }[] = [
-  { value: 'auto', label: 'Real time', description: "Follows each visitor's local clock", icon: 'i-lucide-clock', iconClass: 'text-perlink-blue' },
-  { value: 'cycle', label: 'Custom cycle', description: 'Loop day and night, e.g. 1 min each', icon: 'i-lucide-refresh-cw', iconClass: 'text-violet-500' },
-  { value: 'day', label: 'Always day', description: 'Sunny all the time', icon: 'i-lucide-sun', iconClass: 'text-amber-500' },
-  { value: 'night', label: 'Always night', description: 'Lamps always on', icon: 'i-lucide-moon', iconClass: 'text-indigo-500' },
+const DAY_NIGHT_MODES: { value: DayNightMode; icon: string; iconClass: string }[] = [
+  { value: 'auto', icon: 'i-lucide-clock', iconClass: 'text-perlink-blue' },
+  { value: 'cycle', icon: 'i-lucide-refresh-cw', iconClass: 'text-violet-500' },
+  { value: 'day', icon: 'i-lucide-sun', iconClass: 'text-amber-500' },
+  { value: 'night', icon: 'i-lucide-moon', iconClass: 'text-indigo-500' },
 ]
+const dayNightModes = computed(() => DAY_NIGHT_MODES.map(mode => ({
+  ...mode,
+  label: t(`room.time.modes.${mode.value}.label`),
+  description: t(`room.time.modes.${mode.value}.description`),
+})))
 
-const cycleFields: { key: 'dayMinutes' | 'nightMinutes'; label: string; icon: string }[] = [
-  { key: 'dayMinutes', label: 'Day', icon: 'i-lucide-sun' },
-  { key: 'nightMinutes', label: 'Night', icon: 'i-lucide-moon' },
-]
+const cycleFields = computed<{ key: 'dayMinutes' | 'nightMinutes'; label: string; icon: string }[]>(() => [
+  { key: 'dayMinutes', label: t('room.time.day'), icon: 'i-lucide-sun' },
+  { key: 'nightMinutes', label: t('room.time.night'), icon: 'i-lucide-moon' },
+])
 
 // Floor texture swatches, tinted with the floor color via CSS multiply
 const floorPreviews = reactive<Partial<Record<FloorMaterial, string>>>({})
 onMounted(() => {
-  for (const floor of floorOptions) {
-    const texture = createFloorTexture(floor.value, 3, 3)
-    floorPreviews[floor.value] = (texture.image as HTMLCanvasElement).toDataURL('image/png')
+  for (const floor of FLOOR_MATERIALS) {
+    const texture = createFloorTexture(floor, 3, 3)
+    floorPreviews[floor] = (texture.image as HTMLCanvasElement).toDataURL('image/png')
     texture.dispose()
   }
 })
@@ -662,11 +666,11 @@ const objectRows = computed(() => {
   const rows = room.value.objects.map((o) => {
     const item = CATALOG_BY_TYPE[o.type]
     seen[o.type] = (seen[o.type] || 0) + 1
-    const base = item?.name ?? o.type
+    const base = item ? objectName(item) : o.type
     const name = totals[o.type]! > 1 ? `${base} ${seen[o.type]}` : base
     const place = item?.wallMounted
-      ? (o.wall === 'left' ? 'Left wall' : 'Back wall')
-      : (o.position[1] > 0.05 ? 'On furniture' : 'Floor')
+      ? (o.wall === 'left' ? t('room.places.leftWall') : t('room.places.backWall'))
+      : (o.position[1] > 0.05 ? t('room.places.onFurniture') : t('room.places.floor'))
     return { id: o.id, type: o.type, name, place, linked: !!o.link?.url }
   })
   const query = listQuery.value.trim().toLowerCase()
@@ -731,11 +735,7 @@ const previewIcon = computed(() => {
   return getDaylight(room.value.environment, now.value).isDay ? 'i-lucide-sun-dim' : 'i-lucide-moon-star'
 })
 
-const previewLabel = computed(() => ({
-  live: 'Preview: live (click for day)',
-  day: 'Preview: day (click for night)',
-  night: 'Preview: night (click for live)',
-})[previewMode.value])
+const previewLabel = computed(() => t(`room.preview.${previewMode.value}`))
 
 function cyclePreview() {
   previewMode.value = previewMode.value === 'live' ? 'day' : previewMode.value === 'day' ? 'night' : 'live'
@@ -911,11 +911,11 @@ function resizePhoto(file: File): Promise<Blob> {
       canvas.width = Math.round(img.width * scale)
       canvas.height = Math.round(img.height * scale)
       canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
-      canvas.toBlob(blob => (blob ? resolve(blob) : reject(new Error('Could not process image'))), 'image/jpeg', 0.88)
+      canvas.toBlob(blob => (blob ? resolve(blob) : reject(new Error(t('room.toast.imageProcessFailed')))), 'image/jpeg', 0.88)
     }
     img.onerror = () => {
       URL.revokeObjectURL(src)
-      reject(new Error('Could not read image'))
+      reject(new Error(t('room.toast.imageReadFailed')))
     }
     img.src = src
   })
@@ -937,7 +937,7 @@ async function onPhotoPicked(event: Event) {
     setObjects(room.value.objects.map(o => (o.id === targetId ? { ...o, image: url } : o)))
   } catch (error) {
     const message = (error as { data?: { statusMessage?: string } })?.data?.statusMessage || (error as Error).message
-    toast.add({ title: 'Photo upload failed', description: message, color: 'error' })
+    toast.add({ title: t('room.toast.photoUploadFailed'), description: message, color: 'error' })
   } finally {
     photoUploading.value = false
   }
@@ -1006,7 +1006,7 @@ function updateStyle(patch: Partial<RoomStyle>) {
   room.value = { ...room.value, style: { ...room.value.style, ...patch } }
 }
 
-function stepSize(dim: (typeof sizeFields)[number], direction: number) {
+function stepSize(dim: SizeField, direction: number) {
   const value = Math.round((room.value.style[dim.key] + dim.step * direction) * 10) / 10
   updateStyle({ [dim.key]: Math.min(dim.max, Math.max(dim.min, value)) })
 }

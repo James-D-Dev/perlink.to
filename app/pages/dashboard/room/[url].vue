@@ -7,9 +7,9 @@
     <UEmpty
       v-else-if="!bioPage"
       icon="i-lucide-box"
-      title="Page not found"
-      description="This page doesn't exist or you don't have access to it."
-      :actions="[{ label: 'Back to my pages', to: '/dashboard/site' }]"
+      :title="t('room.page.notFoundTitle')"
+      :description="t('room.page.notFoundText')"
+      :actions="[{ label: t('room.page.backToPages'), to: '/dashboard/site' }]"
       class="min-h-screen"
     />
 
@@ -39,9 +39,10 @@ definePageMeta({
 
 const route = useRoute()
 const toast = useToast()
+const { t } = useI18n()
 const username = computed(() => route.params.url as string)
 
-useHead({ title: () => `3D Room · ${username.value} | Perlink` })
+useHead({ title: () => t('room.page.title', { name: username.value }) })
 
 const loading = ref(true)
 const saving = ref(false)
@@ -75,13 +76,13 @@ async function save(options: { silent?: boolean } = {}): Promise<boolean> {
     // Only themeConfig is sent; the API keeps every other field as it is
     const themeConfig = { ...bioPage.value.themeConfig, room: room.value }
     // Saved as a draft on live sites; Publish makes it visible
-    await $fetch(`/api/admin/bio/${username.value}`, { method: 'PUT' as const, body: { themeConfig, draft: true } })
+    const response = await $fetch<{ bioPage?: { hasDraft?: boolean } }>(`/api/admin/bio/${username.value}`, { method: 'PUT' as const, body: { themeConfig, draft: true } })
     bioPage.value = { ...bioPage.value, themeConfig }
     savedSnapshot.value = JSON.stringify(room.value)
-    if (!options.silent) toast.add({ title: 'Room saved', color: 'success' })
+    if (!options.silent) toast.add({ title: response?.bioPage?.hasDraft ? t('room.toast.savedDraft') : t('room.toast.saved'), color: 'success' })
     return true
   } catch (error: any) {
-    toast.add({ title: 'Failed to save', description: error?.data?.statusMessage, color: 'error' })
+    toast.add({ title: t('room.toast.saveFailed'), description: error?.data?.statusMessage, color: 'error' })
     return false
   } finally {
     saving.value = false
@@ -95,13 +96,13 @@ async function publish() {
     if (!(await save({ silent: true }))) return
     await $fetch(`/api/admin/bio/${username.value}/publish`, { method: 'POST' as const })
     toast.add({
-      title: 'Published',
-      description: `Your room is live at perlink.to/${username.value}`,
+      title: t('room.toast.published'),
+      description: t('room.toast.publishedText', { name: username.value }),
       color: 'success',
-      actions: [{ label: 'View', onClick: () => { window.open(`/${username.value}`, '_blank') } }],
+      actions: [{ label: t('room.toast.view'), onClick: () => { window.open(`/${username.value}`, '_blank') } }],
     })
   } catch (error: any) {
-    toast.add({ title: 'Failed to publish', description: error?.data?.statusMessage, color: 'error' })
+    toast.add({ title: t('room.toast.publishFailed'), description: error?.data?.statusMessage, color: 'error' })
   } finally {
     publishing.value = false
   }
@@ -112,9 +113,9 @@ const confirm = useConfirm()
 async function goBack() {
   if (dirty.value) {
     const leave = await confirm({
-      title: 'Leave without saving?',
-      description: 'Your room changes have not been saved.',
-      confirmLabel: 'Leave',
+      title: t('room.page.leaveTitle'),
+      description: t('room.page.leaveText'),
+      confirmLabel: t('room.page.leave'),
       color: 'warning',
     })
     if (!leave) return

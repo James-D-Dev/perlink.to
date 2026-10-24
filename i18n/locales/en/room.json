@@ -1,0 +1,279 @@
+{
+  "room": {
+    "page": {
+      "title": "3D Room · {name} {'|'} Perlink",
+      "notFoundTitle": "Page not found",
+      "notFoundText": "This page doesn't exist or you don't have access to it.",
+      "backToPages": "Back to my pages",
+      "leaveTitle": "Leave without saving?",
+      "leaveText": "Your room changes have not been saved.",
+      "leave": "Leave"
+    },
+    "toast": {
+      "saved": "Room saved",
+      "savedDraft": "Room saved as a draft. Publish to show it to visitors.",
+      "saveFailed": "Failed to save",
+      "published": "Published",
+      "publishedText": "Your room is live at perlink.to/{name}",
+      "view": "View",
+      "publishFailed": "Failed to publish",
+      "photoUploadFailed": "Photo upload failed",
+      "imageProcessFailed": "Could not process image",
+      "imageReadFailed": "Could not read image"
+    },
+    "toolbar": {
+      "back": "Back to page editor",
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Shift+Z)",
+      "unsaved": "Unsaved changes (Ctrl+S)",
+      "allSaved": "All changes saved"
+    },
+    "preview": {
+      "live": "Preview: live (click for day)",
+      "day": "Preview: day (click for night)",
+      "night": "Preview: night (click for live)"
+    },
+    "panel": {
+      "showObjects": "Show objects ({n})",
+      "objects": "Objects",
+      "backToObjects": "Back to objects",
+      "closeObjects": "Close objects",
+      "search": "Search objects",
+      "noMatch": "No objects match your search.",
+      "empty": "No objects yet. Add some from the bar below.",
+      "deleteObject": "Delete {name}"
+    },
+    "places": {
+      "backWall": "Back wall",
+      "leftWall": "Left wall",
+      "onFurniture": "On furniture",
+      "floor": "Floor"
+    },
+    "detail": {
+      "dragWall": "Drag along the walls to move",
+      "dragFloor": "Drag to move · drop on furniture to stack",
+      "rotate": "Rotate",
+      "rotateLeft": "Rotate left",
+      "rotateRight": "Rotate right",
+      "wall": "Wall",
+      "size": "Size",
+      "smaller": "Smaller",
+      "bigger": "Bigger",
+      "photo": "Photo",
+      "replacePhoto": "Replace photo",
+      "uploadPhoto": "Upload photo",
+      "remove": "Remove",
+      "photoHint": "Visitors click the frame to see the photo full size.",
+      "color": "Color",
+      "resetColor": "Reset to default color",
+      "resetColorAria": "Reset color",
+      "colorSwatch": "Color {color}",
+      "customColor": "Custom color",
+      "link": "Link",
+      "linkHint": "Visitors click this object to open the link.",
+      "linkLabel": "Label, e.g. My Instagram",
+      "duplicate": "Duplicate"
+    },
+    "camera": {
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "resetView": "Reset view",
+      "hideDetails": "Hide details",
+      "editObject": "Edit {name}"
+    },
+    "hint": {
+      "navigation": "Drag to rotate · Right-drag to pan · Scroll to zoom",
+      "firstRun": "Drag furniture from the bar below into your room"
+    },
+    "stats": {
+      "title": "{drawCalls} draw calls · {triangles} triangles · capped at {cap} fps",
+      "idleParen": "(idle)",
+      "fps": "{fps} FPS",
+      "idle": "· idle"
+    },
+    "tray": {
+      "addItem": "Drag into the room or tap to add",
+      "hide": "Hide tray",
+      "show": "Show tray"
+    },
+    "tabs": {
+      "room": "Room",
+      "land": "Land",
+      "time": "Day & night",
+      "music": "Music"
+    },
+    "roomStyle": {
+      "style": "Style",
+      "floor": "Floor",
+      "colors": "Colors",
+      "size": "Size",
+      "meters": "{n} m",
+      "floors": {
+        "wood": "Wood",
+        "tile": "Tile",
+        "carpet": "Carpet",
+        "concrete": "Concrete"
+      },
+      "colorFields": {
+        "wallColor": "Walls",
+        "floorColor": "Floor",
+        "trimColor": "Trim"
+      },
+      "sizeFields": {
+        "width": "Width",
+        "depth": "Depth",
+        "height": "Height"
+      }
+    },
+    "time": {
+      "modes": {
+        "auto": {
+          "label": "Real time",
+          "description": "Follows each visitor's local clock"
+        },
+        "cycle": {
+          "label": "Custom cycle",
+          "description": "Loop day and night, e.g. 1 min each"
+        },
+        "day": {
+          "label": "Always day",
+          "description": "Sunny all the time"
+        },
+        "night": {
+          "label": "Always night",
+          "description": "Lamps always on"
+        }
+      },
+      "day": "Day",
+      "night": "Night",
+      "minutes": "{n} min"
+    },
+    "music": {
+      "none": "No music",
+      "previewTrack": "Preview {title}",
+      "fileMissing": "File missing",
+      "autoplay": "Autoplay",
+      "autoplayOn": "Starts when visitors open the room, or on their first tap if the browser blocks sound.",
+      "autoplayOff": "Visitors start muted and can turn the music on.",
+      "creditPrefix": "Music from",
+      "moods": {
+        "fun-game": "Upbeat",
+        "happy-runner": "Energetic",
+        "puzzle-casual": "Light",
+        "pixel-plains": "Chiptune",
+        "happy-8bit": "8-bit",
+        "marimba-travel": "Tropical",
+        "fairytale-quest": "Dreamy",
+        "playful-kids": "Playful",
+        "game-background": "Chill"
+      }
+    },
+    "categories": {
+      "furniture": "Furniture",
+      "lighting": "Lighting",
+      "decor": "Decor",
+      "wall": "Wall",
+      "tech": "Tech",
+      "dungeon": "Dungeon"
+    },
+    "styles": {
+      "cozy-wood": "Cozy wood",
+      "minimal-white": "Minimal white",
+      "pastel": "Pastel",
+      "sage": "Sage",
+      "night-studio": "Night studio",
+      "industrial": "Industrial",
+      "dungeon": "Dungeon"
+    },
+    "lands": {
+      "island": {
+        "name": "Sky island",
+        "description": "Floating island above the clouds, flowers and butterflies"
+      },
+      "mars": {
+        "name": "Mars",
+        "description": "Red planet surface floating in space, planets all around"
+      },
+      "sakura": {
+        "name": "Sakura",
+        "description": "Cherry blossoms, falling petals, butterflies and a pond"
+      },
+      "city": {
+        "name": "City",
+        "description": "Downtown block: streets, traffic, street lamps and lit windows at night"
+      },
+      "winter": {
+        "name": "Winter",
+        "description": "Snowfall, snowy pines and a snowman with a Santa hat"
+      }
+    },
+    "objects": {
+      "bed": "Bed",
+      "sofa": "Sofa",
+      "desk": "Desk",
+      "chair": "Chair",
+      "coffee-table": "Coffee table",
+      "bookshelf": "Bookshelf",
+      "cabinet": "Dresser",
+      "floor-lamp": "Floor lamp",
+      "desk-lamp": "Desk lamp",
+      "candle": "Candle",
+      "wall-lamp": "Wall lamp",
+      "string-lights": "String lights",
+      "plant": "Plant",
+      "rug": "Rug",
+      "mug": "Mug",
+      "window": "Window",
+      "picture-frame": "Picture",
+      "wall-clock": "Clock",
+      "neon-sign": "Neon sign",
+      "tv": "TV stand",
+      "laptop": "Laptop",
+      "dungeon-chest": "Chest",
+      "dungeon-chest-gold": "Treasure chest",
+      "dungeon-barrel": "Barrel",
+      "dungeon-candelabrum": "Candelabrum",
+      "dungeon-candelabrum-tall": "Tall candelabrum",
+      "dungeon-candle": "Candlestick",
+      "dungeon-torch": "Standing torch",
+      "dungeon-wall-torch": "Wall torch",
+      "dungeon-book-open": "Open book",
+      "dungeon-book": "Book",
+      "dungeon-books": "Spell book",
+      "dungeon-potion-blue": "Blue potion",
+      "dungeon-potion-green": "Green potion",
+      "dungeon-potion-ice": "Ice potion",
+      "dungeon-potion-vial": "Vial",
+      "dungeon-potion-dark": "Dark potion",
+      "dungeon-potion-gold": "Gold potion",
+      "dungeon-bones": "Skeleton",
+      "dungeon-bones-pile": "Bones",
+      "dungeon-rock": "Rock",
+      "dungeon-rock-flat": "Flat rock",
+      "dungeon-carpet": "Royal carpet",
+      "dungeon-column": "Column",
+      "dungeon-column-broken": "Broken column",
+      "dungeon-column-ruin": "Fallen column",
+      "dungeon-stairs": "Stairs",
+      "dungeon-window": "Barred window",
+      "dungeon-bars": "Iron bars",
+      "dungeon-arch": "Stone arch",
+      "garden-flower-pot": "Flower pot",
+      "garden-ceramic-flowers": "Ceramic planter",
+      "garden-flower-vase": "Flower vase",
+      "garden-bud-vase": "Bud vase",
+      "garden-flower-bowl": "Flower bowl",
+      "garden-flower-bed": "Flower bed",
+      "garden-bush-flowers": "Flowering shrub",
+      "garden-fern-pot": "Potted fern",
+      "garden-indoor-tree": "Indoor tree",
+      "garden-pine-pot": "Potted pine",
+      "garden-bush": "Bush",
+      "garden-autumn-bush": "Autumn bush",
+      "garden-tall-grass": "Tall grass",
+      "garden-mushrooms": "Mushrooms",
+      "garden-rocks": "Garden rocks",
+      "garden-pebble-tray": "Pebble tray"
+    }
+  }
+}

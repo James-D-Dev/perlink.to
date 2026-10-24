@@ -1,0 +1,279 @@
+{
+  "room": {
+    "page": {
+      "title": "Phòng 3D · {name} {'|'} Perlink",
+      "notFoundTitle": "Không tìm thấy trang",
+      "notFoundText": "Trang này không tồn tại hoặc bạn không có quyền truy cập.",
+      "backToPages": "Về trang của tôi",
+      "leaveTitle": "Rời đi mà không lưu?",
+      "leaveText": "Các thay đổi trong phòng chưa được lưu.",
+      "leave": "Rời đi"
+    },
+    "toast": {
+      "saved": "Đã lưu phòng",
+      "savedDraft": "Đã lưu nháp phòng. Bấm Xuất bản để khách thấy.",
+      "saveFailed": "Lưu không thành công",
+      "published": "Đã xuất bản",
+      "publishedText": "Phòng của bạn đã lên sóng tại perlink.to/{name}",
+      "view": "Xem",
+      "publishFailed": "Xuất bản không thành công",
+      "photoUploadFailed": "Tải ảnh lên không thành công",
+      "imageProcessFailed": "Không xử lý được ảnh",
+      "imageReadFailed": "Không đọc được ảnh"
+    },
+    "toolbar": {
+      "back": "Về trình sửa trang",
+      "undo": "Hoàn tác (Ctrl+Z)",
+      "redo": "Làm lại (Ctrl+Shift+Z)",
+      "unsaved": "Có thay đổi chưa lưu (Ctrl+S)",
+      "allSaved": "Đã lưu mọi thay đổi"
+    },
+    "preview": {
+      "live": "Xem trước: theo giờ thật (bấm để xem ban ngày)",
+      "day": "Xem trước: ban ngày (bấm để xem ban đêm)",
+      "night": "Xem trước: ban đêm (bấm để xem theo giờ thật)"
+    },
+    "panel": {
+      "showObjects": "Hiện đồ vật ({n})",
+      "objects": "Đồ vật",
+      "backToObjects": "Về danh sách đồ vật",
+      "closeObjects": "Đóng danh sách đồ vật",
+      "search": "Tìm đồ vật",
+      "noMatch": "Không có đồ vật nào khớp.",
+      "empty": "Chưa có đồ vật nào. Thêm từ thanh bên dưới nhé.",
+      "deleteObject": "Xóa {name}"
+    },
+    "places": {
+      "backWall": "Tường sau",
+      "leftWall": "Tường trái",
+      "onFurniture": "Trên nội thất",
+      "floor": "Sàn"
+    },
+    "detail": {
+      "dragWall": "Kéo dọc tường để di chuyển",
+      "dragFloor": "Kéo để di chuyển · thả lên nội thất để xếp chồng",
+      "rotate": "Xoay",
+      "rotateLeft": "Xoay trái",
+      "rotateRight": "Xoay phải",
+      "wall": "Tường",
+      "size": "Kích thước",
+      "smaller": "Nhỏ hơn",
+      "bigger": "Lớn hơn",
+      "photo": "Ảnh",
+      "replacePhoto": "Thay ảnh",
+      "uploadPhoto": "Tải ảnh lên",
+      "remove": "Gỡ bỏ",
+      "photoHint": "Khách bấm vào khung ảnh để xem ảnh cỡ lớn.",
+      "color": "Màu",
+      "resetColor": "Về màu mặc định",
+      "resetColorAria": "Đặt lại màu",
+      "colorSwatch": "Màu {color}",
+      "customColor": "Màu tùy chỉnh",
+      "link": "Liên kết",
+      "linkHint": "Khách bấm vào đồ vật này để mở liên kết.",
+      "linkLabel": "Tên hiển thị, ví dụ: Instagram của tôi",
+      "duplicate": "Nhân bản"
+    },
+    "camera": {
+      "zoomIn": "Phóng to",
+      "zoomOut": "Thu nhỏ",
+      "resetView": "Đặt lại góc nhìn",
+      "hideDetails": "Ẩn chi tiết",
+      "editObject": "Sửa {name}"
+    },
+    "hint": {
+      "navigation": "Kéo để xoay · Kéo chuột phải để di chuyển · Cuộn để thu phóng",
+      "firstRun": "Kéo nội thất từ thanh bên dưới vào phòng của bạn"
+    },
+    "stats": {
+      "title": "{drawCalls} lệnh vẽ · {triangles} tam giác · giới hạn {cap} fps",
+      "idleParen": "(nghỉ)",
+      "fps": "{fps} FPS",
+      "idle": "· nghỉ"
+    },
+    "tray": {
+      "addItem": "Kéo vào phòng hoặc chạm để thêm",
+      "hide": "Ẩn khay",
+      "show": "Hiện khay"
+    },
+    "tabs": {
+      "room": "Phòng",
+      "land": "Vùng đất",
+      "time": "Ngày & đêm",
+      "music": "Nhạc"
+    },
+    "roomStyle": {
+      "style": "Phong cách",
+      "floor": "Sàn",
+      "colors": "Màu sắc",
+      "size": "Kích thước",
+      "meters": "{n} m",
+      "floors": {
+        "wood": "Gỗ",
+        "tile": "Gạch",
+        "carpet": "Thảm",
+        "concrete": "Bê tông"
+      },
+      "colorFields": {
+        "wallColor": "Tường",
+        "floorColor": "Sàn",
+        "trimColor": "Viền"
+      },
+      "sizeFields": {
+        "width": "Rộng",
+        "depth": "Sâu",
+        "height": "Cao"
+      }
+    },
+    "time": {
+      "modes": {
+        "auto": {
+          "label": "Giờ thật",
+          "description": "Theo giờ địa phương của từng khách"
+        },
+        "cycle": {
+          "label": "Chu kỳ tùy chỉnh",
+          "description": "Lặp ngày và đêm, ví dụ mỗi phần 1 phút"
+        },
+        "day": {
+          "label": "Luôn là ngày",
+          "description": "Lúc nào cũng nắng"
+        },
+        "night": {
+          "label": "Luôn là đêm",
+          "description": "Đèn luôn bật"
+        }
+      },
+      "day": "Ngày",
+      "night": "Đêm",
+      "minutes": "{n} phút"
+    },
+    "music": {
+      "none": "Không nhạc",
+      "previewTrack": "Nghe thử {title}",
+      "fileMissing": "Thiếu tệp nhạc",
+      "autoplay": "Tự phát",
+      "autoplayOn": "Phát khi khách mở phòng, hoặc ở lần chạm đầu tiên nếu trình duyệt chặn âm thanh.",
+      "autoplayOff": "Khách vào phòng sẽ tắt tiếng và có thể tự bật nhạc.",
+      "creditPrefix": "Nhạc từ",
+      "moods": {
+        "fun-game": "Sôi động",
+        "happy-runner": "Năng động",
+        "puzzle-casual": "Nhẹ nhàng",
+        "pixel-plains": "Chiptune",
+        "happy-8bit": "8-bit",
+        "marimba-travel": "Nhiệt đới",
+        "fairytale-quest": "Mơ màng",
+        "playful-kids": "Tinh nghịch",
+        "game-background": "Thư giãn"
+      }
+    },
+    "categories": {
+      "furniture": "Nội thất",
+      "lighting": "Đèn",
+      "decor": "Trang trí",
+      "wall": "Tường",
+      "tech": "Công nghệ",
+      "dungeon": "Hầm ngục"
+    },
+    "styles": {
+      "cozy-wood": "Gỗ ấm cúng",
+      "minimal-white": "Trắng tối giản",
+      "pastel": "Pastel",
+      "sage": "Xanh lá dịu",
+      "night-studio": "Studio đêm",
+      "industrial": "Công nghiệp",
+      "dungeon": "Hầm ngục"
+    },
+    "lands": {
+      "island": {
+        "name": "Đảo trên mây",
+        "description": "Hòn đảo bay trên mây, đầy hoa và bướm"
+      },
+      "mars": {
+        "name": "Sao Hỏa",
+        "description": "Mặt đất hành tinh đỏ lơ lửng giữa vũ trụ, xung quanh là các hành tinh"
+      },
+      "sakura": {
+        "name": "Hoa anh đào",
+        "description": "Hoa anh đào, cánh hoa rơi, bướm và hồ nước"
+      },
+      "city": {
+        "name": "Thành phố",
+        "description": "Khu phố trung tâm: đường phố, xe cộ, đèn đường và cửa sổ sáng đèn về đêm"
+      },
+      "winter": {
+        "name": "Mùa đông",
+        "description": "Tuyết rơi, thông phủ tuyết và người tuyết đội mũ Ông già Noel"
+      }
+    },
+    "objects": {
+      "bed": "Giường",
+      "sofa": "Ghế sofa",
+      "desk": "Bàn làm việc",
+      "chair": "Ghế",
+      "coffee-table": "Bàn trà",
+      "bookshelf": "Kệ sách",
+      "cabinet": "Tủ ngăn kéo",
+      "floor-lamp": "Đèn cây",
+      "desk-lamp": "Đèn bàn",
+      "candle": "Nến",
+      "wall-lamp": "Đèn tường",
+      "string-lights": "Dây đèn trang trí",
+      "plant": "Cây xanh",
+      "rug": "Thảm",
+      "mug": "Cốc",
+      "window": "Cửa sổ",
+      "picture-frame": "Khung ảnh",
+      "wall-clock": "Đồng hồ",
+      "neon-sign": "Biển neon",
+      "tv": "Kệ TV",
+      "laptop": "Laptop",
+      "dungeon-chest": "Rương",
+      "dungeon-chest-gold": "Rương kho báu",
+      "dungeon-barrel": "Thùng gỗ",
+      "dungeon-candelabrum": "Chân nến",
+      "dungeon-candelabrum-tall": "Chân nến cao",
+      "dungeon-candle": "Cây nến",
+      "dungeon-torch": "Đuốc đứng",
+      "dungeon-wall-torch": "Đuốc treo tường",
+      "dungeon-book-open": "Sách mở",
+      "dungeon-book": "Sách",
+      "dungeon-books": "Sách phép thuật",
+      "dungeon-potion-blue": "Bình thuốc xanh dương",
+      "dungeon-potion-green": "Bình thuốc xanh lá",
+      "dungeon-potion-ice": "Bình thuốc băng",
+      "dungeon-potion-vial": "Lọ thuốc",
+      "dungeon-potion-dark": "Bình thuốc bóng tối",
+      "dungeon-potion-gold": "Bình thuốc vàng",
+      "dungeon-bones": "Bộ xương",
+      "dungeon-bones-pile": "Đống xương",
+      "dungeon-rock": "Tảng đá",
+      "dungeon-rock-flat": "Đá phẳng",
+      "dungeon-carpet": "Thảm hoàng gia",
+      "dungeon-column": "Cột đá",
+      "dungeon-column-broken": "Cột gãy",
+      "dungeon-column-ruin": "Cột đổ",
+      "dungeon-stairs": "Cầu thang",
+      "dungeon-window": "Cửa sổ song sắt",
+      "dungeon-bars": "Song sắt",
+      "dungeon-arch": "Cổng vòm đá",
+      "garden-flower-pot": "Chậu hoa",
+      "garden-ceramic-flowers": "Chậu gốm",
+      "garden-flower-vase": "Bình hoa",
+      "garden-bud-vase": "Bình hoa nhỏ",
+      "garden-flower-bowl": "Bát hoa",
+      "garden-flower-bed": "Luống hoa",
+      "garden-bush-flowers": "Bụi hoa",
+      "garden-fern-pot": "Chậu dương xỉ",
+      "garden-indoor-tree": "Cây trong nhà",
+      "garden-pine-pot": "Chậu thông",
+      "garden-bush": "Bụi cây",
+      "garden-autumn-bush": "Bụi cây mùa thu",
+      "garden-tall-grass": "Cỏ cao",
+      "garden-mushrooms": "Nấm",
+      "garden-rocks": "Đá sân vườn",
+      "garden-pebble-tray": "Khay sỏi"
+    }
+  }
+}

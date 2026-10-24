@@ -18,8 +18,8 @@ export default defineNuxtConfig({
     strategy: "no_prefix",
     defaultLocale: "en",
     locales: [
-      { code: "en", language: "en-US", name: "English", files: ["en/common.json", "en/dashboard.json", "en/blocks.json", "en/theme.json"] },
-      { code: "vi", language: "vi-VN", name: "Tiếng Việt", files: ["vi/common.json", "vi/dashboard.json", "vi/blocks.json", "vi/theme.json"] },
+      { code: "en", language: "en-US", name: "English", files: ["en/common.json", "en/dashboard.json", "en/blocks.json", "en/theme.json", "en/room.json"] },
+      { code: "vi", language: "vi-VN", name: "Tiếng Việt", files: ["vi/common.json", "vi/dashboard.json", "vi/blocks.json", "vi/theme.json", "vi/room.json"] },
     ],
     detectBrowserLanguage: {
       useCookie: true,
