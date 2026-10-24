@@ -318,6 +318,33 @@
       "print": "Print 4 per page",
       "downloadPng": "Download PNG",
       "downloadSvg": "SVG"
+    },
+    "account": {
+      "title": "Account",
+      "profile": "Profile",
+      "namePlaceholder": "Your name",
+      "nameSaved": "Name saved",
+      "memberSince": "Member since {date}",
+      "language": "Dashboard language",
+      "languageText": "The language of this dashboard. Each site has its own language in its settings.",
+      "plan": "Plan",
+      "sites": "{n} site | {n} site | {n} sites",
+      "seePlans": "See plans",
+      "signOutAll": "Sign out everywhere",
+      "signOutAllText": "Sign out on every phone and computer, including this one.",
+      "signOutAllAction": "Sign out everywhere",
+      "signOutAllTitle": "Sign out on every device?",
+      "signOutAllConfirm": "You’ll need to sign in again on each device.",
+      "export": "Download your data",
+      "exportText": "Your profile, sites, form requests and short links as a JSON file.",
+      "exportAction": "Download",
+      "delete": "Delete account",
+      "deleteText": "Permanently delete your account, all your sites, form requests, short links and uploaded images. This can’t be undone.",
+      "deleteAction": "Delete account",
+      "deleteTitle": "Delete your account?",
+      "deleteConfirmText": "Everything is removed permanently and your site addresses become free for others.",
+      "deleteTypeEmail": "Type {email} to confirm.",
+      "deleteForever": "Delete forever"
     }
   }
 }

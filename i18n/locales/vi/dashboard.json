@@ -318,6 +318,33 @@
       "print": "In 4 thẻ mỗi trang",
       "downloadPng": "Tải PNG",
       "downloadSvg": "SVG"
+    },
+    "account": {
+      "title": "Tài khoản",
+      "profile": "Hồ sơ",
+      "namePlaceholder": "Tên của bạn",
+      "nameSaved": "Đã lưu tên",
+      "memberSince": "Thành viên từ {date}",
+      "language": "Ngôn ngữ dashboard",
+      "languageText": "Ngôn ngữ của bảng điều khiển này. Mỗi trang có ngôn ngữ riêng trong phần cài đặt của trang.",
+      "plan": "Gói dịch vụ",
+      "sites": "{n} trang | {n} trang | {n} trang",
+      "seePlans": "Xem các gói",
+      "signOutAll": "Đăng xuất mọi thiết bị",
+      "signOutAllText": "Đăng xuất trên mọi điện thoại và máy tính, kể cả máy này.",
+      "signOutAllAction": "Đăng xuất mọi nơi",
+      "signOutAllTitle": "Đăng xuất trên mọi thiết bị?",
+      "signOutAllConfirm": "Bạn sẽ cần đăng nhập lại trên từng thiết bị.",
+      "export": "Tải dữ liệu của bạn",
+      "exportText": "Hồ sơ, các trang, yêu cầu từ form và short link dưới dạng tệp JSON.",
+      "exportAction": "Tải xuống",
+      "delete": "Xóa tài khoản",
+      "deleteText": "Xóa vĩnh viễn tài khoản, tất cả trang, yêu cầu từ form, short link và ảnh đã tải lên. Không thể hoàn tác.",
+      "deleteAction": "Xóa tài khoản",
+      "deleteTitle": "Xóa tài khoản của bạn?",
+      "deleteConfirmText": "Mọi thứ sẽ bị xóa vĩnh viễn và địa chỉ trang của bạn sẽ trống cho người khác dùng.",
+      "deleteTypeEmail": "Nhập {email} để xác nhận.",
+      "deleteForever": "Xóa vĩnh viễn"
     }
   }
 }
