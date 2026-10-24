@@ -70,7 +70,10 @@ export default defineNuxtConfig({
 
   routeRules: {
     "/": { prerender: true },
-    "/dashboard/bio/**": { ssr: false },
+    "/dashboard/site/**": { ssr: false },
+    // Sites used to live under /dashboard/bio
+    "/dashboard/bio": { redirect: { to: "/dashboard/site", statusCode: 301 } },
+    "/dashboard/bio/**": { redirect: { to: "/dashboard/site/**", statusCode: 301 } },
     // Old user dashboard URLs
     "/admin": { redirect: { to: "/dashboard", statusCode: 301 } },
     // Short links and QR codes are no longer offered (existing ones still resolve)

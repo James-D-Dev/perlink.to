@@ -30,6 +30,17 @@
             </template>
           </USelect>
 
+          <!-- Analytics -->
+          <UTooltip v-if="existingBio?.username" text="Analytics">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-chart-column"
+              aria-label="Analytics"
+              :to="`/dashboard/site/${existingBio.username}/analytics`"
+            />
+          </UTooltip>
+
           <!-- Copy URL -->
           <UTooltip text="Copy URL">
             <UButton
@@ -85,7 +96,7 @@
       <div v-else-if="step === 'edit'">
         <UTabs
           :items="editorTabs"
-          default-value="editor"
+          default-value="site"
           color="neutral"
           variant="link"
           size="md"
@@ -93,8 +104,8 @@
           :ui="{ list: 'border-b border-default dark:border-white/10', trigger: 'px-2.5 sm:px-3' }"
         >
           <template #content="{ item }">
-            <!-- Editor Tab -->
-            <template v-if="item.value === 'editor'">
+            <!-- Site (2D page) Tab -->
+            <template v-if="item.value === 'site'">
               <!-- Template picker for empty pages -->
               <div v-if="showTemplatePicker" class="mt-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                 <div class="mb-3 flex items-start justify-between gap-3">
@@ -105,51 +116,6 @@
                   <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" @click="templatePickerDismissed = true" />
                 </div>
                 <BioTemplatePicker @select="applyTemplate" />
-              </div>
-
-              <!-- Page mode -->
-              <div class="flex flex-wrap items-center gap-x-3 gap-y-2 pt-4">
-                <div class="inline-flex rounded-lg bg-elevated p-0.5 dark:bg-white/[0.06]">
-                  <UButton
-                    icon="i-lucide-layout-list"
-                    label="2D page"
-                    size="sm"
-                    :color="pageMode === '2d' ? 'primary' : 'neutral'"
-                    :variant="pageMode === '2d' ? 'solid' : 'ghost'"
-                    @click="setPageMode('2d')"
-                  />
-                  <UButton
-                    icon="i-lucide-box"
-                    label="3D room"
-                    size="sm"
-                    :color="pageMode === '3d' ? 'primary' : 'neutral'"
-                    :variant="pageMode === '3d' ? 'solid' : 'ghost'"
-                    @click="setPageMode('3d')"
-                  />
-                </div>
-                <p class="text-xs text-muted sm:text-sm dark:text-neutral-400">
-                  {{ pageMode === '3d'
-                    ? 'Visitors see your 3D room first and can switch to the 2D page.'
-                    : 'Visitors see your classic page.' }}
-                </p>
-              </div>
-
-              <!-- 3D room launcher -->
-              <div v-if="pageMode === '3d'" class="mt-4 overflow-hidden rounded-xl border border-default bg-default/60 backdrop-blur-xl sm:flex">
-                <div class="relative h-40 sm:h-auto sm:min-h-52 sm:w-1/2">
-                  <LazyRoomCanvas :room="roomModel" preview class="pointer-events-none" />
-                </div>
-                <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
-                  <div>
-                    <h3 class="font-semibold text-highlighted">Your 3D room</h3>
-                    <p class="mt-1 text-sm text-muted">
-                      {{ roomModel.objects.length }} objects · decorate it in the full-screen editor, then publish.
-                    </p>
-                  </div>
-                  <div class="flex flex-wrap gap-2">
-                    <UButton icon="i-lucide-box" label="Open 3D editor" size="sm" :loading="openingRoom" @click="openRoomEditor" />
-                  </div>
-                </div>
               </div>
 
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pt-4">
@@ -200,15 +166,42 @@
               </UModal>
             </template>
 
-            <!-- Analytics Tab -->
-            <template v-else-if="item.value === 'analytics'">
-              <div class="max-w-5xl mx-auto pt-4">
-                <BioAnalytics
-                  :bio-page-id="existingBio?.id ?? ''"
-                  :username="existingBio?.username ?? ''"
-                  :bio-links="links"
-                  :social-links="socialLinks"
-                />
+            <!-- 3D room Tab -->
+            <template v-else-if="item.value === 'room'">
+              <div class="max-w-3xl space-y-4 pt-4">
+                <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
+                  <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
+                    <LazyRoomCanvas :room="roomModel" preview class="pointer-events-none" />
+                  </div>
+                  <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
+                    <div>
+                      <h3 class="font-semibold text-highlighted">Your 3D room</h3>
+                      <p class="mt-1 text-sm text-muted">
+                        {{ roomModel.objects.length }} objects. Furnish it and pick a land in the full-screen editor.
+                      </p>
+                    </div>
+                    <div>
+                      <UButton icon="i-lucide-box" label="Open 3D editor" size="sm" :loading="openingRoom" @click="openRoomEditor" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-start justify-between gap-4 rounded-xl border border-default bg-default p-4 dark:border-white/10">
+                  <div>
+                    <p class="text-sm font-medium text-highlighted">Show the 3D room first</p>
+                    <p class="mt-0.5 text-sm text-muted">
+                      {{ pageMode === '3d'
+                        ? 'Visitors land in your 3D room and can switch to the site with one tap.'
+                        : 'Visitors see your site. The 3D room stays hidden until you turn this on.' }}
+                    </p>
+                  </div>
+                  <USwitch :model-value="pageMode === '3d'" @update:model-value="setPageMode($event ? '3d' : '2d')" />
+                </div>
+
+                <div class="flex justify-end gap-2">
+                  <UButton color="neutral" variant="outline" icon="i-lucide-save" :loading="saving" @click="saveBio">Save draft</UButton>
+                  <UButton icon="i-lucide-globe" :loading="publishing" @click="publishBio">Publish</UButton>
+                </div>
               </div>
             </template>
 
@@ -381,7 +374,7 @@ const loadUserBioPages = async () => {
 // Handle bio page selection change
 const onBioPageChange = (username: string) => {
   if (username && username !== routeUsername.value) {
-    navigateTo(`/dashboard/bio/${username}`);
+    navigateTo(`/dashboard/site/${username}`);
   }
 };
 
@@ -389,9 +382,9 @@ const onBioPageChange = (username: string) => {
 const previewOpen = ref(false);
 
 const editorTabs = [
-  { value: "editor", label: "Editor", icon: "i-lucide-pencil" },
-  { value: "analytics", label: "Analytics", icon: "i-lucide-bar-chart-2" },
-  { value: "settings", label: "Settings", icon: "i-lucide-settings" },
+  { value: "site", label: "Site", icon: "i-lucide-layout-list" },
+  { value: "room", label: "3D room", icon: "i-lucide-box" },
+  { value: "settings", icon: "i-lucide-settings", "aria-label": "Settings" },
 ];
 
 // Computed
@@ -750,6 +743,8 @@ const openingRoom = ref(false);
 const openRoomEditor = async () => {
   if (!existingBio.value?.username) return;
   openingRoom.value = true;
+  // The room can be furnished before it's switched on for visitors
+  if (!bioData.themeConfig.room) bioData.themeConfig = { ...bioData.themeConfig, room: createDefaultRoom() };
   await saveBio();
   openingRoom.value = false;
   navigateTo(`/dashboard/room/${existingBio.value.username}`);

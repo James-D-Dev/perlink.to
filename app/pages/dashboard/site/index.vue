@@ -77,7 +77,7 @@
             v-for="bio in filteredBioPages"
             :key="bio.id"
             class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl border border-muted dark:border-white/5 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
-            @click="navigateTo(`/dashboard/bio/${bio.username}`)"
+            @click="navigateTo(`/dashboard/site/${bio.username}`)"
             :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
             <div class="flex items-start gap-4">
@@ -131,7 +131,7 @@
 
               <!-- Actions -->
               <div
-                class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                class="flex flex-col gap-2 transition-opacity lg:opacity-0 lg:group-hover:opacity-100"
               >
                 <UTooltip text="View">
                   <UButton
@@ -142,6 +142,18 @@
                     variant="subtle"
                     size="md"
                     icon="i-lucide-external-link"
+                  />
+                </UTooltip>
+
+                <UTooltip text="Analytics">
+                  <UButton
+                    :to="`/dashboard/site/${bio.username}/analytics`"
+                    color="neutral"
+                    variant="subtle"
+                    size="md"
+                    icon="i-lucide-chart-column"
+                    aria-label="Analytics"
+                    @click.stop
                   />
                 </UTooltip>
 

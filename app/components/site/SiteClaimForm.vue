@@ -140,7 +140,7 @@ async function submit() {
 
     emit('created', username)
     toast.add({ title: 'Your site is ready', description: `perlink.to/${username}`, color: 'success' })
-    await navigateTo(`/dashboard/bio/${username}`)
+    await navigateTo(`/dashboard/site/${username}`)
   } catch (error: any) {
     toast.add({
       title: 'Could not create your site',

@@ -96,7 +96,7 @@ const helpOpen = useHelpCenter();
 
 const navigationLinks: NavigationMenuItem[] = [
   { label: "Home", icon: "i-lucide-house", to: "/dashboard", exact: true },
-  { label: "Sites", icon: "i-lucide-layout-template", to: "/dashboard/bio" },
+  { label: "Sites", icon: "i-lucide-layout-template", to: "/dashboard/site" },
   { label: "Settings", icon: "i-lucide-settings", to: "/dashboard/settings" },
 ];
 

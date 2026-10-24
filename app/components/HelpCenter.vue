@@ -64,7 +64,7 @@
 <script setup lang="ts">
 // The site editor has a sticky action bar at the bottom on small screens
 const route = useRoute()
-const aboveActionBar = computed(() => route.path.startsWith('/dashboard/bio/'))
+const aboveActionBar = computed(() => /^\/dashboard\/site\/[^/]+\/?$/.test(route.path))
 
 // Floating help: common questions plus ways to reach us. Shared open state
 // so the dashboard sidebar's Help item can open it too.

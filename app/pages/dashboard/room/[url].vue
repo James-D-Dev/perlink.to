@@ -9,7 +9,7 @@
       icon="i-lucide-box"
       title="Page not found"
       description="This page doesn't exist or you don't have access to it."
-      :actions="[{ label: 'Back to my pages', to: '/dashboard/bio' }]"
+      :actions="[{ label: 'Back to my pages', to: '/dashboard/site' }]"
       class="min-h-screen"
     />
 
@@ -119,7 +119,7 @@ async function goBack() {
     if (!leave) return
     savedSnapshot.value = JSON.stringify(room.value)
   }
-  navigateTo(`/dashboard/bio/${username.value}`)
+  navigateTo(`/dashboard/site/${username.value}`)
 }
 
 // Warn before closing the tab with unsaved changes

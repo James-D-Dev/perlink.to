@@ -6,7 +6,7 @@
           <UDashboardSidebarCollapse />
         </template>
         <template #right>
-          <UButton to="/dashboard/bio" color="neutral" variant="ghost" icon="i-lucide-layout-grid" label="My sites" />
+          <UButton to="/dashboard/site" color="neutral" variant="ghost" icon="i-lucide-layout-grid" label="My sites" />
         </template>
       </UDashboardNavbar>
     </template>
