@@ -1,4 +1,5 @@
 import { BioRepository } from '../repositories/bioRepository'
+import { isReservedName } from '../utils/reservedNames'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -17,6 +18,13 @@ export default defineEventHandler(async (event) => {
     return {
       success: false,
       message: 'Username must be 3-30 characters, lowercase letters, numbers, hyphens, or underscores only'
+    }
+  }
+
+  if (isReservedName(username)) {
+    return {
+      success: false,
+      message: 'This name is reserved'
     }
   }
 

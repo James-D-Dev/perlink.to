@@ -1,5 +1,6 @@
 import { BioRepository } from '../../repositories/bioRepository'
 import { z } from 'zod'
+import { isReservedName } from '../../utils/reservedNames'
 
 const createBioSchema = z.object({
   username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_-]+$/),
@@ -53,6 +54,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     const bioRepo = new BioRepository(event)
+
+    if (isReservedName(result.data.username)) {
+      throw createError({ statusCode: 400, statusMessage: 'This name is reserved' })
+    }
 
     // Check if username is available
     const isAvailable = await bioRepo.isUsernameAvailable(result.data.username)

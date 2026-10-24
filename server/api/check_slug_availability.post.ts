@@ -1,3 +1,4 @@
+import { isReservedName } from '../utils/reservedNames'
 import { BioRepository } from '../repositories/bioRepository'
 import { LinkRepository } from '../repositories/linkRepository'
 
@@ -27,7 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check reserved routes
-  if (whiteListedRoutes.includes(trimmedSlug)) {
+  if (whiteListedRoutes.includes(trimmedSlug) || isReservedName(trimmedSlug)) {
     return {
       success: false,
       message: 'This name is reserved'
