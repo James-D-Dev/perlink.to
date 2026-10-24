@@ -8,7 +8,7 @@
 
         <template #right>
           <UButton
-            to="/dashboard/create?domain=perlink.to"
+            to="/dashboard"
             color="primary"
             icon="i-lucide-plus"
             label="Create a site"
@@ -18,206 +18,125 @@
     </template>
 
     <template #body>
-      <div class="max-w-5xl mx-auto w-full px-2 md:px-4 py-4 space-y-6">
-        <div class="flex flex-wrap items-center gap-4">
-          <!-- Search -->
+      <div class="mx-auto w-full max-w-4xl space-y-6 py-2 sm:py-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 class="mk-display text-3xl text-ink sm:text-4xl">Your sites</h1>
+            <p v-if="!loading" class="mt-1 text-sm text-ink-muted">
+              {{ bioPages.length }} {{ bioPages.length === 1 ? 'site' : 'sites' }} · {{ liveCount }} live
+            </p>
+          </div>
           <UInput
+            v-if="bioPages.length > 1"
             v-model="searchQuery"
-            placeholder="Search sites…"
+            placeholder="Search sites"
             icon="i-lucide-search"
-            class="max-w-md w-full"
+            class="w-full sm:w-64"
           />
         </div>
 
-        <!-- Loading Skeleton -->
-        <div v-if="loading" class="space-y-3">
-          <UCard
-            v-for="i in 3"
-            :key="i"
-            class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl border border-muted dark:border-white/5"
-            :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
-          >
-            <div class="flex items-start gap-4">
-              <!-- Avatar Skeleton -->
-              <USkeleton class="h-12 w-12 rounded-full" />
-
-              <!-- Content Skeleton -->
-              <div class="flex-1 min-w-0 space-y-2">
-                <div class="flex items-center gap-2">
-                  <USkeleton class="h-5 w-32" />
-                  <USkeleton class="h-4 w-16" />
-                </div>
-                <USkeleton class="h-4 w-40" />
-                <div class="flex items-center gap-4 pt-1">
-                  <USkeleton class="h-3 w-16" />
-                  <USkeleton class="h-3 w-16" />
-                </div>
-              </div>
-
-              <!-- Actions Skeleton -->
-              <div class="flex flex-col gap-2">
-                <USkeleton class="h-8 w-8" />
-                <USkeleton class="h-8 w-8" />
-              </div>
+        <!-- Loading -->
+        <div v-if="loading" class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+          <div v-for="i in 3" :key="i" class="flex items-center gap-4 p-4">
+            <USkeleton class="size-12 rounded-full" />
+            <div class="flex-1 space-y-2">
+              <USkeleton class="h-4 w-40" />
+              <USkeleton class="h-3 w-56" />
             </div>
-
-            <!-- Footer Skeleton -->
-            <div class="mt-3 pt-3 border-t border-muted dark:border-white/5">
-              <div class="flex items-center justify-between">
-                <USkeleton class="h-5 w-20" />
-                <USkeleton class="h-6 w-16" />
-              </div>
-            </div>
-          </UCard>
+            <USkeleton class="hidden h-8 w-40 sm:block" />
+          </div>
         </div>
 
-        <!-- Bio Pages List -->
-        <div v-else-if="filteredBioPages.length > 0" class="space-y-3">
-          <UCard
+        <!-- Sites -->
+        <ul v-else-if="filteredBioPages.length > 0" class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+          <li
             v-for="bio in filteredBioPages"
             :key="bio.id"
-            class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl border border-muted dark:border-white/5 hover:border-primary/80 hover:bg-primary/5 transition-colors group cursor-pointer hover:shadow-md"
+            class="group flex cursor-pointer flex-col gap-3 p-4 transition-colors hover:bg-sand/50 sm:flex-row sm:items-center sm:gap-4"
             @click="navigateTo(`/dashboard/site/${bio.username}`)"
-            :ui="{ body: 'p-4 sm:p-4', root: 'rounded-xl' }"
           >
-            <div class="flex items-start gap-4">
-              <!-- Avatar -->
-              <UAvatar
-                :src="bio.avatarUrl || '/images/avatar-default-1.jpg'"
-                :alt="bio.username"
-                size="3xl"
-                color="primary"
-              />
-
-              <!-- Content -->
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <h3 class="font-semibold truncate">
-                    {{ bio.title || bio.username }}
-                  </h3>
-                  <UBadge
-                    :color="bio.isPublished ? 'success' : 'neutral'"
-                    variant="soft"
-                    size="xs"
-                    :label="bio.isPublished ? 'Published' : 'Draft'"
-                  />
-                </div>
-
-                <div class="flex items-center gap-1 text-sm text-muted dark:text-neutral-400 mt-1">
-                  <UIcon name="i-lucide-link" class="w-3.5 h-3.5" />
-                  <span>perlink.to/{{ bio.username }}</span>
-                </div>
-
-                <div class="flex items-center gap-4 text-xs text-dimmed dark:text-neutral-500 mt-2">
-                  <span class="flex items-center gap-1">
-                    <UIcon name="i-lucide-eye" class="w-3.5 h-3.5" />
-                    {{ bio.viewCount || 0 }} views
-                  </span>
-                  <!-- <span class="flex items-center gap-1">
-                    <UIcon name="i-lucide-calendar" class="w-3.5 h-3.5" />
-                    {{ formatDate(bio.createdAt) }}
-                  </span> -->
-
-                  <!-- Links count -->
-                  <span
-                    v-if="bio.links"
-                    class="flex items-center gap-1 text-xs text-dimmed dark:text-neutral-500"
-                  >
-                    <UIcon name="i-lucide-list" class="w-3.5 h-3.5" />
-                    {{ getLinksCount(bio.links) }} links
-                  </span>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div
-                class="flex flex-col gap-2 transition-opacity lg:opacity-0 lg:group-hover:opacity-100"
+            <div class="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+              <!-- Avatar, or the first letter of the name -->
+              <img
+                v-if="bio.avatarUrl"
+                :src="bio.avatarUrl"
+                :alt="bio.title || bio.username"
+                class="size-12 shrink-0 rounded-full object-cover ring-1 ring-line"
               >
-                <UTooltip text="View">
-                  <UButton
-                    @click.stop=""
-                    :to="`/${bio.username}`"
-                    target="_blank"
-                    color="neutral"
-                    variant="subtle"
-                    size="md"
-                    icon="i-lucide-external-link"
-                  />
-                </UTooltip>
+              <span v-else class="flex size-12 shrink-0 items-center justify-center rounded-full bg-sand text-lg font-medium text-ink-soft">
+                {{ (bio.title || bio.username || '?').trim().charAt(0).toUpperCase() }}
+              </span>
 
-                <UTooltip text="Analytics">
-                  <UButton
-                    :to="`/dashboard/site/${bio.username}/analytics`"
-                    color="neutral"
-                    variant="subtle"
-                    size="md"
-                    icon="i-lucide-chart-column"
-                    aria-label="Analytics"
-                    @click.stop
-                  />
-                </UTooltip>
-
-                <UTooltip text="Copy URL">
-                  <UButton
-                    color="neutral"
-                    variant="subtle"
-                    size="md"
-                    icon="i-lucide-copy"
-                    @click.stop="copyUrl(bio.username)"
-                  />
-                </UTooltip>
-              </div>
-            </div>
-
-            <!-- Template badge -->
-            <div class="mt-3 pt-3 border-t border-muted dark:border-white/5">
-              <div class="flex items-center justify-between">
-                <UBadge
-                  color="neutral"
-                  variant="soft"
-                  size="xs"
-                  :label="bio.templateId || 'modern'"
-                />
-
-                <div class="flex gap-1">
-                  <UButton
-                    v-if="!bio.isPublished"
-                    color="primary"
-                    variant="soft"
-                    size="xs"
-                    label="Publish"
-                    @click="publishBio(bio.username)"
-                  />
-                  <UButton
-                    v-else
-                    color="neutral"
-                    variant="soft"
-                    size="xs"
-                    label="Unpublish"
-                    @click="unpublishBio(bio.username)"
-                  />
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <h3 class="truncate font-medium text-ink">{{ bio.title || bio.username }}</h3>
+                  <span
+                    class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
+                    :class="bio.isPublished ? 'bg-emerald-50 text-emerald-700' : 'bg-sand text-ink-muted'"
+                  >
+                    <span class="size-1.5 rounded-full" :class="bio.isPublished ? 'bg-emerald-500' : 'bg-ink-faint'" />
+                    {{ bio.isPublished ? 'Live' : 'Draft' }}
+                  </span>
                 </div>
+                <p class="truncate text-sm text-ink-muted">perlink.to/{{ bio.username }}</p>
+                <p class="mt-0.5 text-xs text-ink-faint">
+                  {{ (bio.viewCount || 0).toLocaleString() }} views
+                  <template v-if="bio.updatedAt || bio.createdAt"> · Updated {{ formatDate(bio.updatedAt || bio.createdAt) }}</template>
+                </p>
               </div>
             </div>
-          </UCard>
+
+            <!-- Actions, in a row -->
+            <div class="flex items-center gap-1 pl-15 sm:pl-0" @click.stop>
+              <UTooltip text="Open site">
+                <UButton :to="`/${bio.username}`" target="_blank" color="neutral" variant="ghost" icon="i-lucide-external-link" aria-label="Open site" />
+              </UTooltip>
+              <UTooltip text="Analytics">
+                <UButton :to="`/dashboard/site/${bio.username}/analytics`" color="neutral" variant="ghost" icon="i-lucide-chart-column" aria-label="Analytics" />
+              </UTooltip>
+              <UTooltip text="Copy link">
+                <UButton color="neutral" variant="ghost" icon="i-lucide-copy" aria-label="Copy link" @click="copyUrl(bio.username)" />
+              </UTooltip>
+              <UButton
+                v-if="!bio.isPublished"
+                color="neutral"
+                variant="outline"
+                size="sm"
+                class="ml-1"
+                label="Publish"
+                @click="publishBio(bio.username)"
+              />
+              <UButton
+                v-else
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                class="ml-1 text-ink-muted"
+                label="Unpublish"
+                @click="unpublishBio(bio.username)"
+              />
+              <UButton
+                :to="`/dashboard/site/${bio.username}`"
+                size="sm"
+                class="ml-1"
+                icon="i-lucide-pencil"
+                label="Edit"
+              />
+            </div>
+          </li>
+        </ul>
+
+        <!-- No search results -->
+        <div v-else-if="bioPages.length > 0" class="rounded-xl bg-paper py-12 text-center text-sm text-ink-muted ring-1 ring-line">
+          No sites match “{{ searchQuery }}”.
         </div>
 
         <!-- Empty State -->
-        <div v-else class="text-center py-12">
-          <div
-            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-elevated dark:bg-white/[0.06] mb-4"
-          >
-            <UIcon name="i-lucide-user-circle" class="w-8 h-8 text-dimmed dark:text-neutral-500" />
-          </div>
-          <h3 class="text-lg font-medium text-highlighted dark:text-white">No sites yet</h3>
-          <p class="text-muted dark:text-neutral-400 mt-1 mb-4">Create your first bio link page</p>
-          <UButton
-            to="/dashboard/create?domain=perlink.to"
-            color="primary"
-            icon="i-lucide-plus"
-            size="xl"
-            label="Create a site"
-          />
+        <div v-else class="flex flex-col items-center rounded-xl bg-sand px-6 py-14 text-center">
+          <MarketingMkOrb palette="sunset" :size="72" />
+          <h3 class="mt-6 text-lg font-medium text-ink">No sites yet</h3>
+          <p class="mt-1 max-w-sm text-sm text-ink-muted">Claim your perlink.to address and start from a template. It takes about a minute.</p>
+          <UButton to="/dashboard" class="mt-6" icon="i-lucide-plus" label="Create a site" />
         </div>
       </div>
     </template>
@@ -260,6 +179,8 @@ const fetchBioPages = async () => {
     loading.value = false;
   }
 };
+
+const liveCount = computed(() => bioPages.value.filter((bio) => bio.isPublished).length);
 
 // Filtered bio pages
 const filteredBioPages = computed(() => {
