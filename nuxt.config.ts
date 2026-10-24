@@ -40,6 +40,10 @@ export default defineNuxtConfig({
         secure: isProd,
       },
     },
+    // Email via Resend (https://resend.com). Empty key = emails are skipped.
+    // Set NUXT_RESEND_API_KEY (and optionally NUXT_EMAIL_FROM) as Cloudflare Pages secrets.
+    resendApiKey: "",
+    emailFrom: "Perlink <notifications@perlink.to>",
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
       oauthGoogleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID || "",

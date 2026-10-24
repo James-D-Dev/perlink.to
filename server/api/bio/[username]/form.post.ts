@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { BioRepository } from '../../../repositories/bioRepository'
 import { hashIP } from '../../../services/analytics'
 import { getDB } from '../../../utils/db'
+import { emailEnabled, runInBackground } from '../../../utils/email'
+import { notifyOwnerOfRequest } from '../../../utils/formNotification'
 
 // A visitor sends a site's form (booking or contact request)
 
@@ -73,6 +75,9 @@ export default defineEventHandler(async (event) => {
     .prepare('INSERT INTO form_submissions (id, bio_page_id, block_id, data, ip_hash) VALUES (?, ?, ?, ?, ?)')
     .bind(crypto.randomUUID(), bioPage.id, blockId, JSON.stringify(data), ipHash)
     .run()
+
+  // Email the owner after responding (skipped until Resend is configured)
+  if (emailEnabled(event)) runInBackground(event, notifyOwnerOfRequest(event, bioPage, data))
 
   return { success: true }
 })
