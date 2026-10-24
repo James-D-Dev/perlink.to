@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import type { BioData } from '~/types/bio'
+import { localizeTemplateContent } from '~/data/templateCopyVi'
 import type { PageTemplate } from '~/data/pageTemplates'
 
 const props = withDefaults(defineProps<{
@@ -23,8 +24,14 @@ const props = withDefaults(defineProps<{
   scale: 0.5,
 })
 
+// Dashboard previews follow the dashboard language; marketing pages their URL
+const route = useRoute()
+const { locale } = useI18n()
+const { lang: marketingLang } = useMarketingLang()
+const lang = computed(() => (route.path.startsWith('/dashboard') ? locale.value : marketingLang.value))
+
 const bioData = computed<BioData>(() => {
-  const content = props.template.build()
+  const content = localizeTemplateContent(props.template.build(), lang.value)
   return {
     title: content.title,
     bio: content.bio,

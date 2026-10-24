@@ -370,6 +370,7 @@ import type {
 } from "~/types/bio";
 import { DEFAULT_THEME } from "~/types/bio";
 import { PAGE_TEMPLATES } from "~/data/pageTemplates";
+import { localizeTemplateContent } from "~/data/templateCopyVi";
 import { createDefaultRoom, normalizeRoom, type PageMode, type RoomConfig } from "~/types/room";
 import { useBioBlock } from "~/composables/useBioBlock";
 
@@ -381,7 +382,7 @@ definePageMeta({
 });
 
 const toast = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const confirm = useConfirm();
 
 // State
@@ -700,7 +701,8 @@ const showTemplatePicker = computed(
 const applyTemplate = async (templateId: string) => {
   const template = PAGE_TEMPLATES.find((t) => t.id === templateId);
   if (!template) return;
-  const content = template.build();
+  // Vietnamese users get Vietnamese sample content and site language
+  const content = localizeTemplateContent(template.build(), locale.value);
   bioData.title = bioData.title || content.title;
   bioData.avatarUrl = bioData.avatarUrl || content.avatarUrl || "";
   bioData.bio = content.bio;

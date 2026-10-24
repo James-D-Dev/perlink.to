@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
+import { localizeTemplateContent } from '~/data/templateCopyVi'
 
 const props = withDefaults(defineProps<{
   /** Template to apply after the site is created; none opens the editor's template picker */
@@ -59,7 +60,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ created: [username: string] }>()
 
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const inputRef = ref<HTMLInputElement | null>(null)
 const slug = ref(props.initialSlug)
 const status = ref<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle')
@@ -130,7 +131,8 @@ async function submit() {
 
     const template = props.templateId ? PAGE_TEMPLATES.find(t => t.id === props.templateId) : undefined
     if (template) {
-      const content = template.build()
+      // Vietnamese users get Vietnamese sample content and site language
+      const content = localizeTemplateContent(template.build(), locale.value)
       await $fetch(`/api/admin/bio/${username}`, {
         method: 'PUT' as const,
         body: {
