@@ -8,8 +8,9 @@
         editable
         :selected-id="selectedId"
         :force-mode="previewMode === 'live' ? null : previewMode"
-        @select="selectedId = $event"
+        @select="onCanvasSelect"
         @object-change="onObjectChange"
+        @stats="stats = $event"
       />
     </div>
 
@@ -43,187 +44,201 @@
       </div>
     </div>
 
-    <!-- Object list: pick small or overlapping objects -->
-    <div
-      v-if="listOpen && !detailOpen"
-      class="absolute left-2 top-16 flex max-h-[min(60vh,34rem)] w-[calc(100%-5rem)] max-w-80 flex-col overflow-hidden rounded-2xl bg-default/80 shadow-xl ring-1 ring-white/10 backdrop-blur-xl sm:left-3"
-    >
-      <div class="flex items-center gap-2 border-b border-white/[0.08] px-3 py-2.5">
-        <UIcon name="i-lucide-layers" class="size-4 text-muted" />
-        <p class="flex-1 text-sm font-semibold text-highlighted">Objects <span class="font-normal text-muted">· {{ room.objects.length }}</span></p>
-        <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close list" @click="listOpen = false" />
-      </div>
-      <div class="border-b border-white/[0.08] p-2">
-        <UInput v-model="listQuery" size="sm" icon="i-lucide-search" placeholder="Search objects" class="w-full" />
-      </div>
-      <ul class="flex-1 overflow-y-auto p-1.5">
-        <li v-for="row in objectRows" :key="row.id">
-          <div
-            class="group flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition"
-            :class="row.id === selectedId ? 'bg-perlink-blue/15 ring-1 ring-perlink-blue/40' : 'hover:bg-elevated'"
-            role="button"
-            tabindex="0"
-            @click="focusFromList(row.id)"
-            @keydown.enter="focusFromList(row.id)"
+    <!-- Objects panel: a button that unfolds into the object list; picking an object shows its details -->
+    <div class="absolute left-2 top-16 z-10 sm:left-3">
+      <Transition
+        mode="out-in"
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="scale-90 opacity-0"
+        leave-active-class="transition duration-150 ease-in"
+        leave-to-class="scale-90 opacity-0"
+      >
+        <button
+          v-if="!panelOpen"
+          type="button"
+          class="flex origin-top-left items-center gap-1.5 rounded-2xl bg-default/70 px-3 py-2 text-sm font-semibold tabular-nums text-highlighted shadow-lg ring-1 ring-white/10 backdrop-blur-xl transition hover:bg-elevated"
+          :aria-label="`Show objects (${room.objects.length})`"
+          title="Objects"
+          @click="openPanel('list')"
+        >
+          <UIcon name="i-lucide-layers" class="size-4" />
+          {{ room.objects.length }}
+        </button>
+        <div
+          v-else
+          class="flex max-h-[min(60vh,34rem)] w-[min(20rem,calc(100vw-5rem))] origin-top-left flex-col overflow-hidden rounded-2xl bg-default/80 shadow-xl ring-1 ring-white/10 backdrop-blur-xl"
+        >
+          <Transition
+            mode="out-in"
+            enter-active-class="transition duration-150 ease-out"
+            :enter-from-class="panelView === 'detail' ? 'translate-x-4 opacity-0' : '-translate-x-4 opacity-0'"
+            leave-active-class="transition duration-100 ease-in"
+            leave-to-class="opacity-0"
           >
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated">
-              <img v-if="thumbnails[row.type]" :src="thumbnails[row.type]" :alt="row.name" class="size-8 object-contain">
+            <div v-if="panelView === 'detail' && selectedObject && selectedItem" key="detail" class="flex min-h-0 flex-1 flex-col">
+              <div class="flex items-center gap-2 border-b border-white/[0.08] py-2.5 pl-1.5 pr-3">
+                <UButton icon="i-lucide-chevron-left" size="xs" color="neutral" variant="ghost" aria-label="Back to objects" @click="panelView = 'list'" />
+                <div class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated">
+                  <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-8 object-contain">
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold text-highlighted">{{ selectedItem.name }}</p>
+                  <p class="truncate text-xs text-muted">
+                    {{ selectedItem.wallMounted ? 'Drag along the walls to move' : 'Drag to move · drop on furniture to stack' }}
+                  </p>
+                </div>
+                <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close objects" @click="panelOpen = false" />
+              </div>
+
+              <div class="flex-1 space-y-4 overflow-y-auto p-3">
+                <div v-if="!selectedItem.wallMounted" class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-medium text-muted">Rotate</span>
+                  <div class="flex items-center rounded-lg bg-elevated">
+                    <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Rotate left" @click="rotateBy(-45)" />
+                    <span class="w-10 text-center text-xs tabular-nums text-default">{{ selectedObject.rotation }}°</span>
+                    <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="ghost" aria-label="Rotate right" @click="rotateBy(45)" />
+                  </div>
+                </div>
+                <div v-else class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-medium text-muted">Wall</span>
+                  <USelect
+                    size="sm"
+                    :model-value="selectedObject.wall || 'back'"
+                    :items="wallOptions"
+                    class="w-32"
+                    @update:model-value="moveToWall($event as WallSide)"
+                  />
+                </div>
+
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-medium text-muted">Size</span>
+                  <div class="flex items-center rounded-lg bg-elevated">
+                    <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Smaller" @click="scaleBy(-0.1)" />
+                    <span class="w-11 text-center text-xs tabular-nums text-default">{{ Math.round(selectedObject.scale * 100) }}%</span>
+                    <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Bigger" @click="scaleBy(0.1)" />
+                  </div>
+                </div>
+
+                <div v-if="selectedItem.photo" class="space-y-2">
+                  <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
+                    <UIcon name="i-lucide-image" class="size-3.5" />
+                    Photo
+                  </span>
+                  <div class="flex items-center gap-3">
+                    <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-elevated ring-1 ring-white/10">
+                      <img v-if="selectedObject.image" :src="selectedObject.image" alt="Photo" class="size-full object-cover">
+                      <UIcon v-else name="i-lucide-image-plus" class="size-6 text-dimmed" />
+                    </div>
+                    <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+                      <UButton size="sm" color="neutral" variant="soft" icon="i-lucide-upload" :loading="photoUploading" class="justify-center" @click="photoInput?.click()">
+                        {{ selectedObject.image ? 'Replace photo' : 'Upload photo' }}
+                      </UButton>
+                      <UButton v-if="selectedObject.image" size="sm" color="neutral" variant="ghost" icon="i-lucide-x" class="justify-center" @click="updateSelected({ image: undefined })">
+                        Remove
+                      </UButton>
+                    </div>
+                  </div>
+                  <p class="text-xs text-muted">Visitors click the frame to see the photo full size.</p>
+                  <input ref="photoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onPhotoPicked">
+                </div>
+
+                <div v-if="!selectedItem.fromModel && !(selectedItem.photo && selectedObject.image)" class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-medium text-muted">Color</span>
+                    <UTooltip text="Reset to default color">
+                      <UButton size="xs" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Reset color" @click="updateSelected({ color: undefined })" />
+                    </UTooltip>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="color in palette"
+                      :key="color"
+                      type="button"
+                      class="size-7 shrink-0 rounded-full border-2 transition hover:scale-110"
+                      :class="(selectedObject.color || selectedItem.defaultColor).toLowerCase() === color ? 'border-perlink-blue ring-2 ring-perlink-blue/30' : 'border-white/80 shadow'"
+                      :style="{ background: color }"
+                      :aria-label="`Color ${color}`"
+                      @click="updateSelected({ color })"
+                    />
+                    <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" aria-label="Custom color">
+                      <input type="color" class="absolute inset-0 cursor-pointer opacity-0" :value="selectedObject.color || selectedItem.defaultColor" @input="updateSelected({ color: ($event.target as HTMLInputElement).value })">
+                    </label>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
+                    <UIcon name="i-lucide-link" class="size-3.5" />
+                    Link
+                  </span>
+                  <p class="text-xs text-muted">Visitors click this object to open the link.</p>
+                  <UInput :model-value="selectedObject.link?.label || ''" size="sm" placeholder="Label, e.g. My Instagram" class="w-full" @update:model-value="updateLink({ label: String($event) })" />
+                  <UInput :model-value="selectedObject.link?.url || ''" size="sm" placeholder="https://..." icon="i-lucide-link" class="w-full" @update:model-value="updateLink({ url: String($event) })" />
+                </div>
+              </div>
+
+              <div class="flex gap-2 border-t border-white/[0.08] p-2">
+                <UButton icon="i-lucide-copy" color="neutral" variant="soft" size="sm" class="flex-1 justify-center" @click="duplicateSelected">
+                  Duplicate
+                </UButton>
+                <UButton icon="i-lucide-trash-2" color="error" variant="soft" size="sm" class="flex-1 justify-center" @click="removeSelected">
+                  Delete
+                </UButton>
+              </div>
             </div>
-            <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium text-highlighted">{{ row.name }}</p>
-              <p class="flex items-center gap-1 truncate text-xs text-muted">
-                {{ row.place }}
-                <UIcon v-if="row.linked" name="i-lucide-link" class="size-3 text-perlink-blue" />
-              </p>
+            <div v-else key="list" class="flex min-h-0 flex-1 flex-col">
+              <div class="flex items-center gap-2 border-b border-white/[0.08] px-3 py-2.5">
+                <UIcon name="i-lucide-layers" class="size-4 text-muted" />
+                <p class="flex-1 text-sm font-semibold text-highlighted">Objects <span class="font-normal text-muted">· {{ room.objects.length }}</span></p>
+                <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close objects" @click="panelOpen = false" />
+              </div>
+              <div class="border-b border-white/[0.08] p-2">
+                <UInput v-model="listQuery" size="sm" icon="i-lucide-search" placeholder="Search objects" class="w-full" />
+              </div>
+              <ul ref="listRef" class="flex-1 overflow-y-auto p-1.5">
+                <li v-for="row in objectRows" :key="row.id" :data-object-id="row.id">
+                  <div
+                    class="group flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition"
+                    :class="row.id === selectedId ? 'bg-perlink-blue/15 ring-1 ring-perlink-blue/40' : 'hover:bg-elevated'"
+                    role="button"
+                    tabindex="0"
+                    @click="focusFromList(row.id)"
+                    @keydown.enter="focusFromList(row.id)"
+                  >
+                    <div class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated">
+                      <img v-if="thumbnails[row.type]" :src="thumbnails[row.type]" :alt="row.name" class="size-8 object-contain">
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-medium text-highlighted">{{ row.name }}</p>
+                      <p class="flex items-center gap-1 truncate text-xs text-muted">
+                        {{ row.place }}
+                        <UIcon v-if="row.linked" name="i-lucide-link" class="size-3 text-perlink-blue" />
+                      </p>
+                    </div>
+                    <UButton
+                      icon="i-lucide-trash-2"
+                      size="xs"
+                      color="error"
+                      variant="ghost"
+                      class="opacity-60 group-hover:opacity-100"
+                      :aria-label="`Delete ${row.name}`"
+                      @click.stop="removeObject(row.id)"
+                    />
+                  </div>
+                </li>
+                <li v-if="objectRows.length === 0" class="px-3 py-8 text-center text-sm text-muted">
+                  {{ room.objects.length ? 'No objects match your search.' : 'No objects yet. Add some from the bar below.' }}
+                </li>
+              </ul>
             </div>
-            <UButton
-              icon="i-lucide-trash-2"
-              size="xs"
-              color="error"
-              variant="ghost"
-              class="opacity-60 group-hover:opacity-100"
-              :aria-label="`Delete ${row.name}`"
-              @click.stop="removeObject(row.id)"
-            />
-          </div>
-        </li>
-        <li v-if="objectRows.length === 0" class="px-3 py-8 text-center text-sm text-muted">
-          {{ room.objects.length ? 'No objects match your search.' : 'No objects yet. Add some from the bar below.' }}
-        </li>
-      </ul>
-    </div>
-
-    <!-- Selected object details: opened from the chip under the right dock -->
-    <div
-      v-if="detailOpen && selectedObject && selectedItem"
-      class="absolute left-2 top-16 flex max-h-[min(60vh,34rem)] w-[calc(100%-5rem)] max-w-80 flex-col overflow-hidden rounded-2xl bg-default/80 shadow-xl ring-1 ring-white/10 backdrop-blur-xl sm:left-3"
-    >
-      <div class="flex items-center gap-2.5 border-b border-white/[0.08] px-3 py-2.5">
-        <div class="flex size-9 shrink-0 items-center justify-center rounded-md bg-elevated">
-          <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-8 object-contain">
+          </Transition>
         </div>
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-semibold text-highlighted">{{ selectedItem.name }}</p>
-          <p class="truncate text-xs text-muted">
-            {{ selectedItem.wallMounted ? 'Drag along the walls to move' : 'Drag to move · drop on furniture to stack' }}
-          </p>
-        </div>
-        <UButton icon="i-lucide-x" size="xs" color="neutral" variant="ghost" aria-label="Close details" @click="detailOpen = false" />
-      </div>
-
-      <div class="flex-1 space-y-4 overflow-y-auto p-3">
-        <div v-if="!selectedItem.wallMounted" class="flex items-center justify-between gap-2">
-          <span class="text-xs font-medium text-muted">Rotate</span>
-          <div class="flex items-center rounded-lg bg-elevated">
-            <UButton size="sm" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Rotate left" @click="rotateBy(-45)" />
-            <span class="w-10 text-center text-xs tabular-nums text-default">{{ selectedObject.rotation }}°</span>
-            <UButton size="sm" icon="i-lucide-rotate-cw" color="neutral" variant="ghost" aria-label="Rotate right" @click="rotateBy(45)" />
-          </div>
-        </div>
-        <div v-else class="flex items-center justify-between gap-2">
-          <span class="text-xs font-medium text-muted">Wall</span>
-          <USelect
-            size="sm"
-            :model-value="selectedObject.wall || 'back'"
-            :items="wallOptions"
-            class="w-32"
-            @update:model-value="moveToWall($event as WallSide)"
-          />
-        </div>
-
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-xs font-medium text-muted">Size</span>
-          <div class="flex items-center rounded-lg bg-elevated">
-            <UButton size="sm" icon="i-lucide-minus" color="neutral" variant="ghost" aria-label="Smaller" @click="scaleBy(-0.1)" />
-            <span class="w-11 text-center text-xs tabular-nums text-default">{{ Math.round(selectedObject.scale * 100) }}%</span>
-            <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Bigger" @click="scaleBy(0.1)" />
-          </div>
-        </div>
-
-        <div v-if="selectedItem.photo" class="space-y-2">
-          <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
-            <UIcon name="i-lucide-image" class="size-3.5" />
-            Photo
-          </span>
-          <div class="flex items-center gap-3">
-            <div class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-elevated ring-1 ring-white/10">
-              <img v-if="selectedObject.image" :src="selectedObject.image" alt="Photo" class="size-full object-cover">
-              <UIcon v-else name="i-lucide-image-plus" class="size-6 text-dimmed" />
-            </div>
-            <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-              <UButton size="sm" color="neutral" variant="soft" icon="i-lucide-upload" :loading="photoUploading" class="justify-center" @click="photoInput?.click()">
-                {{ selectedObject.image ? 'Replace photo' : 'Upload photo' }}
-              </UButton>
-              <UButton v-if="selectedObject.image" size="sm" color="neutral" variant="ghost" icon="i-lucide-x" class="justify-center" @click="updateSelected({ image: undefined })">
-                Remove
-              </UButton>
-            </div>
-          </div>
-          <p class="text-xs text-muted">Visitors click the frame to see the photo full size.</p>
-          <input ref="photoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" @change="onPhotoPicked">
-        </div>
-
-        <div v-if="!selectedItem.fromModel && !(selectedItem.photo && selectedObject.image)" class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-medium text-muted">Color</span>
-            <UTooltip text="Reset to default color">
-              <UButton size="xs" icon="i-lucide-rotate-ccw" color="neutral" variant="ghost" aria-label="Reset color" @click="updateSelected({ color: undefined })" />
-            </UTooltip>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="color in palette"
-              :key="color"
-              type="button"
-              class="size-7 shrink-0 rounded-full border-2 transition hover:scale-110"
-              :class="(selectedObject.color || selectedItem.defaultColor).toLowerCase() === color ? 'border-perlink-blue ring-2 ring-perlink-blue/30' : 'border-white/80 shadow'"
-              :style="{ background: color }"
-              :aria-label="`Color ${color}`"
-              @click="updateSelected({ color })"
-            />
-            <label class="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] shadow" aria-label="Custom color">
-              <input type="color" class="absolute inset-0 cursor-pointer opacity-0" :value="selectedObject.color || selectedItem.defaultColor" @input="updateSelected({ color: ($event.target as HTMLInputElement).value })">
-            </label>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
-            <UIcon name="i-lucide-link" class="size-3.5" />
-            Link
-          </span>
-          <p class="text-xs text-muted">Visitors click this object to open the link.</p>
-          <UInput :model-value="selectedObject.link?.label || ''" size="sm" placeholder="Label, e.g. My Instagram" class="w-full" @update:model-value="updateLink({ label: String($event) })" />
-          <UInput :model-value="selectedObject.link?.url || ''" size="sm" placeholder="https://..." icon="i-lucide-link" class="w-full" @update:model-value="updateLink({ url: String($event) })" />
-        </div>
-      </div>
-
-      <div class="flex gap-2 border-t border-white/[0.08] p-2">
-        <UButton icon="i-lucide-copy" color="neutral" variant="soft" size="sm" class="flex-1 justify-center" @click="duplicateSelected">
-          Duplicate
-        </UButton>
-        <UButton icon="i-lucide-trash-2" color="error" variant="soft" size="sm" class="flex-1 justify-center" @click="removeSelected">
-          Delete
-        </UButton>
-      </div>
+      </Transition>
     </div>
 
     <!-- Camera controls -->
     <div class="absolute right-2 top-16 flex flex-col items-center gap-2 sm:right-3">
       <div class="flex flex-col items-center gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
-        <UTooltip text="All objects in the room" :content="{ side: 'left' }">
-          <button
-            type="button"
-            class="flex w-10 flex-col items-center gap-0.5 rounded-xl py-1.5 transition"
-            :class="listOpen && !detailOpen ? 'bg-perlink-blue/15 text-perlink-blue' : 'text-default hover:bg-elevated'"
-            aria-label="Objects"
-            @click="toggleList"
-          >
-            <UIcon name="i-lucide-layers" class="size-5" />
-            <span class="text-[11px] font-semibold tabular-nums leading-none">{{ room.objects.length }}</span>
-          </button>
-        </UTooltip>
-        <div class="my-0.5 h-px w-6 bg-white/10" />
         <UTooltip text="Zoom in" :content="{ side: 'left' }">
           <UButton icon="i-lucide-plus" color="neutral" variant="ghost" aria-label="Zoom in" @click="canvasRef?.zoomBy(0.8)" />
         </UTooltip>
@@ -236,17 +251,17 @@
       </div>
 
       <!-- Selected object: tap to open its details -->
-      <UTooltip v-if="selectedObject && selectedItem" :text="detailOpen ? 'Hide details' : `Edit ${selectedItem.name}`" :content="{ side: 'left' }">
+      <UTooltip v-if="selectedObject && selectedItem" :text="showingDetail ? 'Hide details' : `Edit ${selectedItem.name}`" :content="{ side: 'left' }">
         <button
           type="button"
           class="relative flex size-12 items-center justify-center rounded-2xl bg-default/70 shadow-lg ring-1 backdrop-blur-xl transition"
-          :class="detailOpen ? 'ring-perlink-blue/60 bg-perlink-blue/15' : 'ring-white/10 hover:bg-elevated'"
+          :class="showingDetail ? 'ring-perlink-blue/60 bg-perlink-blue/15' : 'ring-white/10 hover:bg-elevated'"
           :aria-label="`Edit ${selectedItem.name}`"
-          @click="detailOpen = !detailOpen"
+          @click="toggleDetail"
         >
           <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="selectedItem.name" class="size-9 object-contain">
           <UIcon v-else name="i-lucide-box" class="size-5" />
-          <span v-if="!detailOpen" class="absolute -right-0.5 -top-0.5 flex size-3">
+          <span v-if="!showingDetail" class="absolute -right-0.5 -top-0.5 flex size-3">
             <span class="absolute inline-flex size-full animate-ping rounded-full bg-perlink-blue opacity-75" />
             <span class="relative inline-flex size-3 rounded-full bg-perlink-blue shadow-[0_0_8px_2px] shadow-perlink-blue/70 ring-2 ring-default" />
           </span>
@@ -261,6 +276,18 @@
 
     <!-- Bottom area: inventory bar -->
     <div ref="barRef" class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-2 sm:p-3">
+      <!-- FPS readout (bottom right, above the bar) -->
+      <div v-if="stats" class="flex w-full justify-end">
+        <div
+          class="pointer-events-auto flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-medium tabular-nums text-white/85 ring-1 ring-white/10 backdrop-blur-md"
+          :title="`${stats.drawCalls} draw calls · ${stats.triangles.toLocaleString()} triangles · capped at ${stats.cap} fps ${stats.cap < 60 ? '(idle)' : ''}`"
+        >
+          <span class="size-1.5 rounded-full" :class="fpsColor" />
+          {{ stats.fps }} FPS
+          <span v-if="stats.cap < 60" class="text-white/50">· idle</span>
+        </div>
+      </div>
+
       <!-- Inventory bar -->
       <div class="pointer-events-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-default/75 ring-1 ring-white/10 shadow-xl backdrop-blur-xl">
         <!-- Tray -->
@@ -503,13 +530,14 @@
 <script setup lang="ts">
 import { nanoid } from 'nanoid'
 import type { DayNightMode, FloorMaterial, RoomConfig, RoomObject, RoomObjectLink, RoomStyle, WallSide } from '~/types/room'
-import { ROOM_CATALOG, CATALOG_BY_TYPE, CATEGORY_LABELS, type CatalogCategory } from '~/utils/room/catalog'
+import { ROOM_CATALOG, CATALOG_BY_TYPE, CATEGORY_LABELS, preloadDungeonModels, type CatalogCategory } from '~/utils/room/catalog'
 import type { ObjectPatch } from '~/utils/room/RoomScene'
 import { createFloorTexture } from '~/utils/room/RoomScene'
 import { getDaylight } from '~/utils/room/daylight'
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
 import { ROOM_MUSIC, MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 import { LANDS } from '~/utils/room/lands'
+import type { RoomSceneStats } from '~/utils/room/RoomScene'
 
 // Pinch zooms the camera, never the page
 usePreventPageZoom()
@@ -536,9 +564,19 @@ const selectedId = ref<string | null>(null)
 const activeTab = ref<Tab>('furniture')
 const trayOpen = ref(true)
 const previewMode = ref<'live' | 'day' | 'night'>('live')
-const listOpen = ref(false)
-/** Left panel with the selected object's settings */
-const detailOpen = ref(false)
+/** Rendering stats from the scene, for the FPS readout */
+const stats = ref<RoomSceneStats | null>(null)
+const fpsColor = computed(() => {
+  if (!stats.value) return ''
+  // Judge against the current cap: 30 fps while idle is on purpose
+  const ratio = stats.value.fps / stats.value.cap
+  return ratio >= 0.85 ? 'bg-emerald-400' : ratio >= 0.5 ? 'bg-amber-400' : 'bg-red-500'
+})
+
+/** Left objects panel: collapsed to a button, or open on the list or the selected object's details */
+const panelOpen = ref(false)
+const panelView = ref<'list' | 'detail'>('list')
+const showingDetail = computed(() => panelOpen.value && panelView.value === 'detail')
 const listQuery = ref('')
 const thumbnails = useRoomThumbnails()
 const styleThumbnails = useRoomStyleThumbnails()
@@ -635,21 +673,27 @@ const objectRows = computed(() => {
   return query ? rows.filter(r => r.name.toLowerCase().includes(query) || r.place.toLowerCase().includes(query)) : rows
 })
 
-function toggleList() {
-  // Both panels share the left side; the list takes over from the details
-  if (detailOpen.value) {
-    detailOpen.value = false
-    listOpen.value = true
-  } else {
-    listOpen.value = !listOpen.value
-  }
+function openPanel(view: 'list' | 'detail') {
+  panelView.value = view
+  panelOpen.value = true
+}
+
+/** The selected-object chip opens its details, or folds the panel away if they're showing */
+function toggleDetail() {
+  if (showingDetail.value) panelOpen.value = false
+  else openPanel('detail')
+}
+
+/** Picking an object in the 3D view; on desktop there's room to show its details straight away */
+function onCanvasSelect(id: string | null) {
+  selectedId.value = id
+  if (id && window.matchMedia('(min-width: 1024px)').matches) openPanel('detail')
 }
 
 function focusFromList(id: string) {
   selectedId.value = id
   canvasRef.value?.focusObject(id)
-  // Small screens: close the list so the room and the object panel are visible
-  if (window.innerWidth < 640) listOpen.value = false
+  panelView.value = 'detail'
 }
 
 function removeObject(id: string) {
@@ -660,7 +704,20 @@ function removeObject(id: string) {
 const selectedObject = computed(() => room.value.objects.find(o => o.id === selectedId.value) || null)
 const selectedItem = computed(() => (selectedObject.value ? CATALOG_BY_TYPE[selectedObject.value.type] : undefined))
 watch(selectedObject, (object) => {
-  if (!object) detailOpen.value = false
+  if (!object) panelView.value = 'list'
+})
+
+// Keep the selected object visible in the list, e.g. after picking it in the 3D view
+const listRef = ref<HTMLElement | null>(null)
+watch([selectedId, panelOpen, panelView], async () => {
+  if (!selectedId.value || !panelOpen.value || panelView.value !== 'list') return
+  await nextTick()
+  // The list may still be mid-transition after opening or coming back from the details
+  setTimeout(() => {
+    listRef.value
+      ?.querySelector(`[data-object-id="${selectedId.value}"]`)
+      ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, 160)
 })
 
 // ---------- Day/night preview ----------
@@ -753,6 +810,7 @@ let checkedTracks = false
 
 // Stop previews when leaving the Music tab; flag tracks whose file is missing
 watch(activeTab, (tab) => {
+  if (tab === 'dungeon') preloadDungeonModels()
   if (tab !== 'music') return stopPreview()
   if (checkedTracks) return
   checkedTracks = true

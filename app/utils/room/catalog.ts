@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { attachDungeonModel } from './dungeonModels'
+import { attachDungeonModel, loadDungeonModel } from './dungeonModels'
+import { attachNaturePieces, greenLeaves, type NaturePiece } from './natureModels'
 
 // Procedural model catalog for the 3D mini room.
 // Every model is assembled from primitives at runtime, so a room is fully
@@ -100,6 +101,13 @@ const WHITE = '#f5f5f2'
 const WARM_LIGHT = '#ffd59a'
 
 /** Catalog entry backed by a Modular Dungeon model; the model loads asynchronously */
+const DUNGEON_MODEL_NAMES = new Set<string>()
+
+/** Fetch and parse every dungeon model ahead of time so adding one is instant (cached after the first call) */
+export function preloadDungeonModels() {
+  for (const name of DUNGEON_MODEL_NAMES) loadDungeonModel(name).catch(() => {})
+}
+
 function dungeonItem(
   type: string,
   name: string,
@@ -108,6 +116,7 @@ function dungeonItem(
   scale: number,
   extra: Partial<CatalogItem> = {},
 ): CatalogItem {
+  DUNGEON_MODEL_NAMES.add(model)
   return {
     type,
     name,
@@ -526,6 +535,206 @@ export const ROOM_CATALOG: CatalogItem[] = [
 ]
 
 ROOM_CATALOG.push(...DUNGEON_ITEMS)
+
+// ---------- Garden collection (Decor) ----------
+// Arrangements built from the land's nature models (Quaternius, CC0): flowers,
+// grass, ferns, mushrooms and rocks, some in a pot or planter.
+
+const SOIL = '#4a3426'
+const GOLD = '#d4a64a'
+
+type Profile = [number, number][]
+
+/** Turned shape (pot, vase, bowl) from a radius/height outline, bottom to rim and back down inside */
+function lathe(profile: Profile, material: THREE.Material, y = 0) {
+  return mesh(new THREE.LatheGeometry(profile.map(([r, h]) => new THREE.Vector2(r, h)), 40), material, 0, y)
+}
+
+/** Soil surface inside a container */
+function soil(radius: number, y: number) {
+  return cyl(radius, radius, 0.012, mat(SOIL, { roughness: 1 }), 0, y - 0.012)
+}
+
+const glaze = (color: string) => mat(color, { roughness: 0.32 })
+
+/** Container builders: parts plus the height plants stand on */
+type Container = (color: string) => [THREE.Object3D[], number]
+
+/** Classic terracotta pot with a rolled rim, on a saucer */
+const terracottaPot = (scale = 1): Container => (color) => {
+  const k = scale
+  const clay = mat(color, { roughness: 0.85 })
+  const pot: Profile = [[0, 0.02], [0.12, 0.02], [0.13, 0.035], [0.155, 0.24], [0.18, 0.245], [0.185, 0.3], [0.17, 0.305], [0.165, 0.27], [0, 0.27]]
+  const saucer: Profile = [[0, 0], [0.16, 0], [0.175, 0.03], [0.165, 0.032], [0.15, 0.012], [0, 0.012]]
+  const scaled = (p: Profile): Profile => p.map(([r, h]) => [r * k, h * k])
+  return [[lathe(scaled(saucer), clay), lathe(scaled(pot), clay), soil(0.165 * k, 0.272 * k)], 0.27 * k]
+}
+
+/** Rounded glazed planter with a gold band */
+const ceramicPlanter = (scale = 1): Container => (color) => {
+  const k = scale
+  const body: Profile = [[0, 0], [0.1, 0], [0.16, 0.04], [0.195, 0.12], [0.19, 0.2], [0.165, 0.26], [0.17, 0.285], [0.155, 0.29], [0.15, 0.26], [0, 0.26]]
+  const band = new THREE.Mesh(new THREE.TorusGeometry(0.192 * k, 0.006 * k, 8, 48), mat(GOLD, { metalness: 0.7, roughness: 0.3 }))
+  band.rotation.x = Math.PI / 2
+  band.position.y = 0.16 * k
+  return [[lathe(body.map(([r, h]) => [r * k, h * k]), glaze(color)), band, soil(0.152 * k, 0.262 * k)], 0.26 * k]
+}
+
+/** Tall slim vase with a flared lip */
+const tallVase: Container = (color) => {
+  const body: Profile = [[0, 0], [0.055, 0], [0.085, 0.05], [0.095, 0.13], [0.075, 0.24], [0.042, 0.32], [0.038, 0.37], [0.058, 0.41], [0.05, 0.412], [0.032, 0.375], [0, 0.375]]
+  return [[lathe(body, glaze(color))], 0.37]
+}
+
+/** Small round bud vase */
+const budVase: Container = (color) => {
+  const body: Profile = [[0, 0], [0.04, 0], [0.07, 0.04], [0.075, 0.08], [0.05, 0.13], [0.022, 0.16], [0.03, 0.185], [0.024, 0.186], [0.016, 0.165], [0, 0.165]]
+  return [[lathe(body, glaze(color))], 0.16]
+}
+
+/** Wide, low glazed bowl */
+const flowerBowl: Container = (color) => {
+  const body: Profile = [[0, 0], [0.12, 0], [0.13, 0.02], [0.24, 0.07], [0.29, 0.13], [0.3, 0.145], [0.285, 0.148], [0.27, 0.125], [0, 0.125]]
+  return [[lathe(body, glaze(color)), soil(0.27, 0.127)], 0.125]
+}
+
+/** Wooden planter box with a top trim and little feet */
+const planterBox: Container = (color) => {
+  const wood = mat(color, { roughness: 0.8 })
+  const trim = mat(new THREE.Color(color).multiplyScalar(0.8).getStyle(), { roughness: 0.8 })
+  const parts: THREE.Object3D[] = [
+    box(0.96, 0.26, 0.38, wood, 0, 0.05),
+    box(1.02, 0.04, 0.44, trim, 0, 0.31),
+    box(0.9, 0.012, 0.32, mat(SOIL, { roughness: 1 }), 0, 0.3),
+  ]
+  for (const [x, z] of [[-0.42, -0.14], [0.42, -0.14], [-0.42, 0.14], [0.42, 0.14]] as const) {
+    parts.push(box(0.07, 0.06, 0.07, trim, x, 0, z))
+  }
+  return [parts, 0.31]
+}
+
+/** Tall cylinder planter for trees */
+const cylinderPlanter: Container = (color) => {
+  const body: Profile = [[0, 0], [0.24, 0], [0.25, 0.02], [0.26, 0.5], [0.24, 0.5], [0.24, 0.47], [0, 0.47]]
+  return [[lathe(body, mat(color, { roughness: 0.5 })), soil(0.24, 0.472)], 0.47]
+}
+
+function natureItem(
+  type: string,
+  name: string,
+  icon: string,
+  pieces: NaturePiece[],
+  container?: { defaultColor: string; build: Container },
+): CatalogItem {
+  return {
+    type,
+    name,
+    icon,
+    category: 'decor',
+    defaultColor: container?.defaultColor ?? '#ffffff',
+    // Without a container there's nothing to recolour
+    fromModel: !container,
+    build: (color) => {
+      const g = new THREE.Group()
+      let base = 0
+      if (container) {
+        const [parts, top] = container.build(color)
+        g.add(...parts)
+        base = top
+      }
+      g.userData.ready = attachNaturePieces(g, pieces.map(p => ({ ...p, y: (p.y ?? 0) + base })))
+      return g
+    },
+  }
+}
+
+const GARDEN_ITEMS: CatalogItem[] = [
+  // Flowers, always in a container
+  natureItem('garden-flower-pot', 'Flower pot', 'i-lucide-flower', [
+    { model: 'Flower_3_Group', height: 0.3 },
+    { model: 'Grass_Common_Short', height: 0.12, x: 0.07, z: 0.05, rotation: 1.5 },
+  ], { defaultColor: '#c8734f', build: terracottaPot() }),
+  natureItem('garden-ceramic-flowers', 'Ceramic planter', 'i-lucide-flower-2', [
+    { model: 'Flower_4_Group', height: 0.32 },
+    { model: 'Flower_3_Single', height: 0.26, x: -0.07, z: 0.05, rotation: 2 },
+    { model: 'Grass_Common_Short', height: 0.12, x: 0.08, z: -0.05 },
+  ], { defaultColor: '#2f5d62', build: ceramicPlanter() }),
+  natureItem('garden-flower-vase', 'Flower vase', 'i-lucide-flower', [
+    { model: 'Flower_4_Single', height: 0.32 },
+    { model: 'Flower_3_Single', height: 0.28, x: 0.02, z: 0.015, rotation: 2.1 },
+    { model: 'Flower_4_Single', height: 0.26, x: -0.02, z: -0.01, rotation: 4.2 },
+  ], { defaultColor: '#f2efe9', build: tallVase }),
+  natureItem('garden-bud-vase', 'Bud vase', 'i-lucide-flower-2', [
+    { model: 'Flower_3_Single', height: 0.22 },
+  ], { defaultColor: '#e9a6b3', build: budVase }),
+  natureItem('garden-flower-bowl', 'Flower bowl', 'i-lucide-flower', [
+    { model: 'Flower_3_Group', height: 0.28, x: -0.1 },
+    { model: 'Flower_4_Group', height: 0.26, x: 0.1, z: 0.04, rotation: 1.4 },
+    { model: 'Grass_Common_Short', height: 0.12, x: 0.02, z: -0.12 },
+    { model: 'Clover_1', height: 0.05, x: 0.15, z: -0.1 },
+  ], { defaultColor: '#efe6d6', build: flowerBowl }),
+  natureItem('garden-flower-bed', 'Flower bed', 'i-lucide-flower', [
+    { model: 'Flower_4_Group', height: 0.32, x: -0.3, z: 0 },
+    { model: 'Flower_3_Group', height: 0.3, x: 0.02, z: 0.02, rotation: 1.2 },
+    { model: 'Flower_4_Group', height: 0.28, x: 0.32, z: -0.02, rotation: 2.4 },
+    { model: 'Grass_Common_Short', height: 0.15, x: -0.14, z: 0.08 },
+    { model: 'Grass_Common_Short', height: 0.14, x: 0.18, z: 0.07, rotation: 2 },
+  ], { defaultColor: '#9a6a46', build: planterBox }),
+  natureItem('garden-bush-flowers', 'Flowering shrub', 'i-lucide-flower-2', [
+    { model: 'Bush_Common_Flowers', height: 0.6 },
+  ], { defaultColor: '#c8734f', build: terracottaPot(1.5) }),
+
+  // Green plants
+  natureItem('garden-fern-pot', 'Potted fern', 'i-lucide-leaf', [
+    { model: 'Fern_1', height: 0.5 },
+  ], { defaultColor: '#f2efe9', build: ceramicPlanter() }),
+  natureItem('garden-indoor-tree', 'Indoor tree', 'i-lucide-tree-deciduous', [
+    { model: 'CommonTree_1', height: 1.6 },
+  ], { defaultColor: '#3d3d42', build: cylinderPlanter }),
+  natureItem('garden-pine-pot', 'Potted pine', 'i-lucide-tree-pine', [
+    { model: 'Pine_1', height: 1.2 },
+  ], { defaultColor: '#c8734f', build: terracottaPot(1.4) }),
+
+  // Ground decor
+  natureItem('garden-bush', 'Bush', 'i-lucide-shrub', [
+    { model: 'Bush_Common', height: 0.7, material: greenLeaves },
+  ]),
+  natureItem('garden-autumn-bush', 'Autumn bush', 'i-lucide-shrub', [
+    { model: 'Bush_Common', height: 0.7 },
+  ]),
+  natureItem('garden-tall-grass', 'Tall grass', 'i-lucide-sprout', [
+    { model: 'Grass_Wispy_Tall', height: 0.6 },
+    { model: 'Grass_Common_Tall', height: 0.5, x: 0.14, z: 0.04, rotation: 1 },
+    { model: 'Grass_Common_Tall', height: 0.44, x: -0.12, z: 0.08, rotation: 2.3 },
+  ]),
+  natureItem('garden-mushrooms', 'Mushrooms', 'i-lucide-sprout', [
+    { model: 'Mushroom_Common', height: 0.22 },
+    { model: 'Mushroom_Common', height: 0.16, x: 0.18, z: 0.07, rotation: 1.8 },
+    { model: 'Mushroom_Common', height: 0.11, x: 0.07, z: 0.16, rotation: 3.4 },
+    { model: 'Clover_2', height: 0.07, x: -0.14, z: 0.06 },
+    { model: 'Grass_Common_Short', height: 0.14, x: 0.06, z: -0.14, rotation: 1.4 },
+  ]),
+  natureItem('garden-rocks', 'Garden rocks', 'i-lucide-mountain', [
+    { model: 'Rock_Medium_1', height: 0.34 },
+    { model: 'Rock_Medium_2', height: 0.2, x: 0.36, z: 0.12, rotation: 1 },
+    { model: 'Pebble_Round_1', height: 0.06, x: -0.26, z: 0.22 },
+    { model: 'Pebble_Round_3', height: 0.05, x: 0.12, z: 0.3 },
+    { model: 'Grass_Common_Short', height: 0.18, x: -0.24, z: -0.12 },
+    { model: 'Fern_1', height: 0.3, x: 0.26, z: -0.22, rotation: 2 },
+  ]),
+  natureItem('garden-pebble-tray', 'Pebble tray', 'i-lucide-circle-dot', [
+    { model: 'Pebble_Round_1', height: 0.05, x: -0.2, z: 0.05 },
+    { model: 'Pebble_Round_2', height: 0.045, x: -0.05, z: -0.1, rotation: 1 },
+    { model: 'Pebble_Round_4', height: 0.05, x: 0.08, z: 0.1, rotation: 2 },
+    { model: 'Pebble_Round_5', height: 0.04, x: 0.2, z: -0.05 },
+    { model: 'Plant_1', height: 0.22, x: 0.22, z: 0.1 },
+  ], {
+    defaultColor: '#e8e2d6',
+    build: color => [[box(0.7, 0.06, 0.45, mat(color, { roughness: 0.6 }))], 0.06],
+  }),
+]
+
+ROOM_CATALOG.push(...GARDEN_ITEMS)
 
 export const CATALOG_BY_TYPE: Record<string, CatalogItem> = Object.fromEntries(
   ROOM_CATALOG.map(item => [item.type, item]),

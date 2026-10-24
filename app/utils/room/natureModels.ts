@@ -118,12 +118,29 @@ export function cherryLeaves(material: THREE.Material): THREE.Material {
   return pink
 }
 
+/** Green leaves for models whose own leaf texture is the red twisted-tree one (Bush_Common) */
+const greenMaterials = new WeakMap<THREE.Material, THREE.Material>()
+export function greenLeaves(material: THREE.Material): THREE.Material {
+  if (!material.name.startsWith('Leaves')) return material
+  let green = greenMaterials.get(material)
+  if (!green) {
+    const m = (material as THREE.MeshStandardMaterial).clone()
+    m.map = loadTexture('Leaves_NormalTree_C.png')
+    m.userData.shared = true
+    m.userData.wind = false
+    addWindSway(m)
+    greenMaterials.set(material, m)
+    green = m
+  }
+  return green
+}
+
 /**
  * Add instanced copies of a model to `group` once it has loaded.
  * Resources are shared between lands, so meshes are marked to skip disposal.
  */
 /** Side length of the culling cells scattered instances are grouped into (meters) */
-const CHUNK_SIZE = 6
+const CHUNK_SIZE = 11
 
 export async function scatterModel(
   group: THREE.Group,
@@ -136,7 +153,8 @@ export async function scatterModel(
   const place = new THREE.Matrix4()
   const quat = new THREE.Quaternion()
   const yAxis = new THREE.Vector3(0, 1, 0)
-  // Group instances into ~6 m cells so each batch has a tight bounding sphere
+  // Group instances into ~11 m cells so batches far out of view are skipped;
+  // smaller cells cull more but cost a draw call per cell and model part
   // and the camera skips the ones that are out of view
   const cells = new Map<string, ScatterItem[]>()
   for (const item of items) {
@@ -168,4 +186,58 @@ export async function scatterModel(
       group.add(mesh)
     }
   }
+}
+
+export interface NaturePiece {
+  /** Model file name, e.g. 'Flower_3_Group' */
+  model: string
+  /** Target height in meters */
+  height: number
+  x?: number
+  y?: number
+  z?: number
+  rotation?: number
+  /** Swap materials, e.g. greenLeaves */
+  material?: (material: THREE.Material) => THREE.Material
+}
+
+/**
+ * Place nature models as ordinary room objects (decor), each piece scaled to
+ * its target height with its base at `y`. Geometry and materials stay shared
+ * with the land scenery, so meshes are marked to skip disposal.
+ */
+export async function attachNaturePieces(group: THREE.Group, pieces: NaturePiece[]) {
+  const models = await Promise.all(pieces.map(p => loadModel(p.model)))
+  const place = new THREE.Matrix4()
+  const quat = new THREE.Quaternion()
+  const yAxis = new THREE.Vector3(0, 1, 0)
+  pieces.forEach((piece, i) => {
+    const model = models[i]!
+    const s = piece.height / model.height
+    // Lift so the lowest point of the model sits on the base
+    const minY = Math.min(...model.parts.map((part) => {
+      part.geometry.computeBoundingBox()
+      return part.geometry.boundingBox!.clone().applyMatrix4(part.matrix).min.y
+    }))
+    quat.setFromAxisAngle(yAxis, piece.rotation ?? 0)
+    const base = new THREE.Matrix4().compose(
+      new THREE.Vector3(piece.x ?? 0, (piece.y ?? 0) - minY * s, piece.z ?? 0),
+      quat,
+      new THREE.Vector3(s, s, s),
+    )
+    for (const part of model.parts) {
+      const material = piece.material ? piece.material(part.material) : part.material
+      const mesh = new THREE.Mesh(part.geometry, material)
+      place.multiplyMatrices(base, part.matrix)
+      place.decompose(mesh.position, mesh.quaternion, mesh.scale)
+      mesh.castShadow = true
+      mesh.receiveShadow = true
+      const std = material as THREE.MeshStandardMaterial
+      if (std.alphaTest > 0 && std.map) {
+        mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: std.map, alphaTest: std.alphaTest })
+      }
+      mesh.userData.shared = true
+      group.add(mesh)
+    }
+  })
 }

@@ -21,16 +21,32 @@ export interface RoomSceneOptions {
   onObjectChange?: (id: string, patch: ObjectPatch) => void
   onHover?: (id: string | null, x: number, y: number) => void
   onActivate?: (id: string) => void
+  /** Called about once a second with rendering stats (editor FPS readout) */
+  onStats?: (stats: RoomSceneStats) => void
+}
+
+export interface RoomSceneStats {
+  /** Frames actually rendered in the last second */
+  fps: number
+  /** Frame rate cap currently in effect (60 interacting, 30 idle, 15 preview) */
+  cap: number
+  drawCalls: number
+  triangles: number
 }
 
 interface ObjectEntry {
   data: RoomObject
   item: CatalogItem
   root: THREE.Group
+  /** Borrowed from the fixed light pool */
   light?: THREE.PointLight
   glowMaterials: THREE.MeshStandardMaterial[]
   skyMaterials: THREE.MeshStandardMaterial[]
   signature: string
+  /** When the object appeared (after loading and shader compilation); null while loading */
+  revealedAt: number | null
+  /** Still playing the pop-in animation */
+  popping?: boolean
 }
 
 /** Quality steps used by the adaptive renderer, best first */
@@ -80,6 +96,15 @@ export class RoomScene {
   private sunDisc: THREE.Mesh
   private moonDisc: THREE.Mesh
   private stars = createStarSphere()
+  /**
+   * Lamp lights are a fixed pool: changing the number of lights would make
+   * three.js recompile every material in the scene, freezing the page
+   */
+  private lightPool: THREE.PointLight[] = []
+  /** Pulsing marker shown where an object is still loading */
+  private loadingMarkers = new Map<string, THREE.Mesh>()
+  private loadingMarkerGeometry = new THREE.SphereGeometry(0.14, 16, 12)
+  private loadingMarkerMaterial = new THREE.MeshBasicMaterial({ color: '#5aa9ff', transparent: true, opacity: 0.6, depthWrite: false, fog: false })
   private land?: LandInstance
   private landKey = ''
   private clock = new THREE.Clock()
@@ -111,6 +136,9 @@ export class RoomScene {
   private visibilityObserver: IntersectionObserver
   private onScreen = true
   private lastRender = 0
+  private statsFrames = 0
+  private statsSince = 0
+  private statsCap = 60
   private activeUntil = 0
   private quality = 0
   private frameRatios: number[] = []
@@ -194,6 +222,11 @@ export class RoomScene {
       new THREE.MeshBasicMaterial({ color: '#e8ecff', fog: false }),
     )
     this.scene.add(this.sunDisc, this.moonDisc, this.stars.points, this.shell, this.objectsGroup, this.outdoor)
+    for (let i = 0; i < MAX_POINT_LIGHTS; i++) {
+      const light = new THREE.PointLight('#ffffff', 0, 2, 1.6)
+      this.lightPool.push(light)
+      this.scene.add(light)
+    }
 
     this.selectionBox.visible = false
     this.scene.add(this.selectionBox)
@@ -334,6 +367,8 @@ export class RoomScene {
 
   dispose() {
     this.disposed = true
+    this.loadingMarkerGeometry.dispose()
+    this.loadingMarkerMaterial.dispose()
     cancelAnimationFrame(this.frame)
     this.resizeObserver.disconnect()
     this.visibilityObserver.disconnect()
@@ -371,7 +406,8 @@ export class RoomScene {
 
   private buildOutdoor(landId: LandId, style: RoomStyle) {
     this.clearGroup(this.outdoor)
-    this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS })
+    // Lighter scenery on devices that start at a reduced quality level (phones, low memory)
+    this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS, detail: this.quality >= 2 ? 0.55 : 1 })
     this.outdoor.add(this.land.group)
   }
 
@@ -391,7 +427,8 @@ export class RoomScene {
         continue
       }
       if (existing) this.removeEntry(data.id)
-      this.addEntry(data, item, signature)
+      // Rebuilt objects (e.g. a colour change) swap in quietly; new ones get the loading marker and pop-in
+      this.addEntry(data, item, signature, !existing)
     }
     for (const id of [...this.entries.keys()]) {
       if (!seen.has(id)) this.removeEntry(id)
@@ -400,7 +437,7 @@ export class RoomScene {
     this.selectionBox.visible = !!this.selectedId
   }
 
-  private addEntry(data: RoomObject, item: CatalogItem, signature: string) {
+  private addEntry(data: RoomObject, item: CatalogItem, signature: string, animate: boolean) {
     const root = new THREE.Group()
     const model = item.build(data.color || item.defaultColor)
     root.add(model)
@@ -421,18 +458,83 @@ export class RoomScene {
     // Model-based items load asynchronously; pick up their glowing parts when ready
     ;(model.userData.ready as Promise<void> | undefined)?.then(collectMaterials).catch(() => {})
 
-    let light: THREE.PointLight | undefined
-    const lightCount = [...this.entries.values()].filter(e => e.light).length
-    if (item.light && lightCount < MAX_POINT_LIGHTS) {
-      light = new THREE.PointLight(item.light.color, 0, item.light.distance, 1.6)
-      light.position.set(...item.light.offset)
-      root.add(light)
-    }
-
-    const entry: ObjectEntry = { data, item, root, light, glowMaterials, skyMaterials, signature }
+    const entry: ObjectEntry = { data, item, root, glowMaterials, skyMaterials, signature, revealedAt: null }
     this.entries.set(data.id, entry)
+    this.assignLight(entry)
     this.objectsGroup.add(root)
     this.applyTransform(entry)
+    this.revealWhenReady(entry, model, animate)
+  }
+
+  /**
+   * Keep a new object hidden (with a pulsing marker) until its model has
+   * loaded and its shaders are compiled in the background, then pop it in.
+   * Compiling on first draw instead would stall the page.
+   */
+  private revealWhenReady(entry: ObjectEntry, model: THREE.Group, animate: boolean) {
+    entry.root.visible = false
+    const marker = new THREE.Mesh(this.loadingMarkerGeometry, this.loadingMarkerMaterial)
+    marker.visible = animate
+    this.loadingMarkers.set(entry.data.id, marker)
+    this.scene.add(marker)
+    const ready = (model.userData.ready as Promise<void> | undefined) ?? Promise.resolve()
+    const current = () => !this.disposed && this.entries.get(entry.data.id) === entry
+    ready
+      .catch(() => {})
+      .then(() => (current() ? this.renderer.compileAsync(entry.root, this.camera, this.scene) : undefined))
+      .catch(() => {})
+      .then(() => {
+        this.removeLoadingMarker(entry.data.id, marker)
+        if (!current()) return
+        entry.root.visible = true
+        entry.revealedAt = performance.now()
+        entry.popping = animate
+        this.markActive()
+      })
+  }
+
+  private removeLoadingMarker(id: string, marker: THREE.Mesh) {
+    this.scene.remove(marker)
+    if (this.loadingMarkers.get(id) === marker) this.loadingMarkers.delete(id)
+  }
+
+  /** Give a lamp a light from the pool, if one is free */
+  private assignLight(entry: ObjectEntry) {
+    if (!entry.item.light || entry.light) return
+    const used = new Set([...this.entries.values()].map(e => e.light))
+    const light = this.lightPool.find(l => !used.has(l))
+    if (!light) return
+    light.color.set(entry.item.light.color)
+    light.distance = entry.item.light.distance
+    light.intensity = 0
+    entry.light = light
+  }
+
+  /** Pooled lights live in the scene, so follow their lamp each frame; markers pulse while loading */
+  private updateObjectEffects(now: number) {
+    const offset = new THREE.Vector3()
+    for (const entry of this.entries.values()) {
+      if (entry.popping && entry.revealedAt !== null) {
+        // Pop in: a quick overshoot from slightly smaller to full size
+        const t = Math.min((now - entry.revealedAt) / 260, 1)
+        const back = 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2
+        entry.root.scale.setScalar((entry.data.scale || 1) * (0.7 + 0.3 * back))
+        if (t >= 1) entry.popping = false
+      }
+      if (entry.light && entry.item.light) {
+        entry.root.updateWorldMatrix(true, false)
+        entry.light.position.copy(entry.root.localToWorld(offset.set(...entry.item.light.offset)))
+        if (entry.revealedAt === null) entry.light.intensity = 0
+      }
+      const marker = this.loadingMarkers.get(entry.data.id)
+      if (marker) {
+        entry.root.updateWorldMatrix(true, false)
+        marker.position.setFromMatrixPosition(entry.root.matrixWorld)
+        marker.position.y += entry.item.wallMounted ? 0 : 0.3
+        marker.scale.setScalar(0.8 + 0.3 * Math.sin(now / 160))
+      }
+    }
+    this.loadingMarkerMaterial.opacity = 0.45 + 0.25 * Math.sin(now / 160)
   }
 
   /** Show an uploaded photo in the item's photo area, cropped to fill it */
@@ -488,6 +590,14 @@ export class RoomScene {
     this.objectsGroup.remove(entry.root)
     this.clearGroup(entry.root)
     this.entries.delete(id)
+    const marker = this.loadingMarkers.get(id)
+    if (marker) this.removeLoadingMarker(id, marker)
+    if (entry.light) {
+      // Return the light to the pool and hand it to a lamp that had none
+      entry.light.intensity = 0
+      const waiting = [...this.entries.values()].find(e => e.item.light && !e.light)
+      if (waiting) this.assignLight(waiting)
+    }
   }
 
   private applyTransform(entry: ObjectEntry) {
@@ -757,8 +867,9 @@ export class RoomScene {
     this.frame = requestAnimationFrame(this.animate)
     if (!this.onScreen) return
     // 60 fps while interacting, 30 fps for ambient motion, 15 fps for previews
-    const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active || !!this.intro
+    const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active || !!this.intro || this.loadingMarkers.size > 0
     const fps = this.options.preview ? 15 : active ? 60 : 30
+    this.statsCap = fps
     const target = 1000 / fps
     const interval = now - this.lastRender
     if (interval < target - 2) return
@@ -784,8 +895,26 @@ export class RoomScene {
     }
     if (this.intro) this.updateIntro(now)
     else this.controls.update()
+    this.updateObjectEffects(now)
     this.keepSkyAroundCamera()
     this.renderer.render(this.scene, this.camera)
+    this.reportStats(now)
+  }
+
+  private reportStats(now: number) {
+    if (!this.options.onStats) return
+    this.statsFrames++
+    if (!this.statsSince) this.statsSince = now
+    if (now - this.statsSince < 1000) return
+    const { render } = this.renderer.info
+    this.options.onStats({
+      fps: Math.round((this.statsFrames * 1000) / (now - this.statsSince)),
+      cap: this.statsCap,
+      drawCalls: render.calls,
+      triangles: render.triangles,
+    })
+    this.statsFrames = 0
+    this.statsSince = now
   }
 
   /**
@@ -873,7 +1002,7 @@ export class RoomScene {
     const lamps = THREE.MathUtils.smoothstep(0.6 - d, 0, 0.45)
     this.lamps = lamps
     for (const entry of this.entries.values()) {
-      if (entry.light && entry.item.light) {
+      if (entry.light && entry.item.light && entry.revealedAt !== null) {
         entry.light.intensity = entry.item.light.intensity * lamps * (entry.data.scale || 1)
       }
       for (const m of entry.glowMaterials) {

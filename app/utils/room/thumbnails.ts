@@ -9,7 +9,7 @@ import { DEFAULT_ROOM_STYLE } from '~/types/room'
 
 const SIZE = 192
 // Bump when catalog models change so cached thumbnails are regenerated
-const CACHE_KEY = 'perlink-room-thumbs-v4'
+const CACHE_KEY = 'perlink-room-thumbs-v6'
 
 let memoryCache: Record<string, string> | null = null
 
@@ -99,9 +99,14 @@ export async function loadRoomThumbnails(onUpdate: (type: string, url: string) =
     for (const item of missing) {
       // Yield between renders so the page stays responsive
       await new Promise(resolve => setTimeout(resolve, 0))
-      const url = await renderItem(renderer, item)
-      cache[item.type] = url
-      onUpdate(item.type, url)
+      // One broken item shouldn't leave every thumbnail after it blank
+      try {
+        const url = await renderItem(renderer, item)
+        cache[item.type] = url
+        onUpdate(item.type, url)
+      } catch (error) {
+        console.error(`Failed to render thumbnail for ${item.type}:`, error)
+      }
     }
     writeCache(cache)
   } finally {

@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { cherryLeaves, natureWind, scatterModel, type ScatterItem } from './natureModels'
 import type { LandId, RoomStyle } from '~/types/room'
 
@@ -48,6 +49,8 @@ export interface LandContext {
   style: RoomStyle
   /** Top of the ground, just under the room floor */
   groundY: number
+  /** Scenery density, 1 = full; lower on phones and low-memory devices */
+  detail?: number
 }
 
 // ---------- Helpers ----------
@@ -62,6 +65,39 @@ function seeded(seed: number) {
 
 function std(color: string, opts: Partial<THREE.MeshStandardMaterialParameters> = {}) {
   return new THREE.MeshStandardMaterial({ color, roughness: 0.9, ...opts })
+}
+
+/**
+ * Bake a group of plain-coloured meshes into a single vertex-coloured mesh, so
+ * it costs one draw call and one material instead of one per part.
+ */
+function bakeGroup(source: THREE.Object3D, flatShading = true): THREE.Mesh {
+  source.updateMatrixWorld(true)
+  const inverse = source.matrixWorld.clone().invert()
+  const relative = new THREE.Matrix4()
+  const parts: THREE.BufferGeometry[] = []
+  source.traverse((obj) => {
+    const mesh = obj as THREE.Mesh
+    if (!mesh.isMesh) return
+    const geometry = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone()
+    geometry.applyMatrix4(relative.multiplyMatrices(inverse, mesh.matrixWorld))
+    for (const name of Object.keys(geometry.attributes)) {
+      if (name !== 'position' && name !== 'normal') geometry.deleteAttribute(name)
+    }
+    const { r, g, b } = (mesh.material as THREE.MeshStandardMaterial).color
+    const colors = new Float32Array(geometry.attributes.position!.count * 3)
+    for (let i = 0; i < colors.length; i += 3) colors.set([r, g, b], i)
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+    parts.push(geometry)
+    mesh.geometry.dispose()
+    ;(mesh.material as THREE.Material).dispose()
+  })
+  const merged = mergeGeometries(parts)
+  parts.forEach(p => p.dispose())
+  const mesh = new THREE.Mesh(merged, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, flatShading }))
+  mesh.castShadow = true
+  mesh.receiveShadow = true
+  return mesh
 }
 
 function place<T extends THREE.Object3D>(obj: T, x: number, y: number, z: number, shadow = true): T {
@@ -176,8 +212,11 @@ function pineTree(rand: () => number, scale = 1, snow = false) {
       tree.add(cap)
     }
   }
-  tree.scale.setScalar(scale)
-  return tree
+  // Trunk, tiers and snow caps become one mesh (they were ~9 draw calls per tree)
+  const baked = new THREE.Group()
+  baked.add(bakeGroup(tree))
+  baked.scale.setScalar(scale)
+  return baked
 }
 
 // ---------- Butterflies (fly from flower to flower) ----------
@@ -354,12 +393,15 @@ function createPetals(count: number, ctx: LandContext, sources: THREE.Vector3[],
 function cloudPuff(rand: () => number, material: THREE.Material) {
   const g = new THREE.Group()
   const n = 4 + Math.floor(rand() * 3)
+  // The puffs are merged into one mesh: one draw call per cloud instead of one per puff
+  const parts: THREE.BufferGeometry[] = []
   for (let i = 0; i < n; i++) {
     const r = 0.8 + rand() * 0.9
-    const s = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 8), material)
-    s.position.set((i - n / 2) * 0.9 + rand() * 0.4, rand() * 0.5, (rand() - 0.5) * 1.2)
-    g.add(s)
+    parts.push(new THREE.SphereGeometry(r, 12, 8).translate((i - n / 2) * 0.9 + rand() * 0.4, rand() * 0.5, (rand() - 0.5) * 1.2))
   }
+  const geometry = mergeGeometries(parts)
+  parts.forEach(p => p.dispose())
+  g.add(new THREE.Mesh(geometry, material))
   g.scale.y = 0.55
   return g
 }
@@ -566,10 +608,13 @@ function plantGroves(group: THREE.Group, ctx: LandContext, radius: number, terra
 
 /** Dense grass clumps, flower patches, bushes and pebbles in front; returns flower tops for butterflies */
 function plantMeadow(group: THREE.Group, ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, avoid?: (x: number, z: number) => boolean) {
-  scatterModel(group, 'Grass_Common_Short', clumps(rand, terrain, landSpots(rand, ctx, radius, 60), 16, 0.9, [0.2, 0.32], avoid), { castShadow: false })
-  scatterModel(group, 'Grass_Wispy_Short', clumps(rand, terrain, landSpots(rand, ctx, radius, 30), 10, 0.7, [0.22, 0.34], avoid), { castShadow: false })
-  scatterModel(group, 'Grass_Common_Tall', clumps(rand, terrain, landSpots(rand, ctx, radius, 22), 8, 0.6, [0.35, 0.55], avoid), { castShadow: false })
-  scatterModel(group, 'Grass_Wispy_Tall', clumps(rand, terrain, landSpots(rand, ctx, radius, 12), 6, 0.5, [0.45, 0.65], avoid), { castShadow: false })
+  // Grass is most of the land's triangles: the wispy variants are 3-4x heavier
+  // per clump than the common ones, so they're used sparingly
+  const per = (n: number) => Math.max(1, Math.round(n * (ctx.detail ?? 1)))
+  scatterModel(group, 'Grass_Common_Short', clumps(rand, terrain, landSpots(rand, ctx, radius, 56), per(15), 0.9, [0.2, 0.32], avoid), { castShadow: false })
+  scatterModel(group, 'Grass_Wispy_Short', clumps(rand, terrain, landSpots(rand, ctx, radius, 18), per(8), 0.7, [0.22, 0.34], avoid), { castShadow: false })
+  scatterModel(group, 'Grass_Common_Tall', clumps(rand, terrain, landSpots(rand, ctx, radius, 22), per(8), 0.6, [0.35, 0.55], avoid), { castShadow: false })
+  scatterModel(group, 'Grass_Wispy_Tall', clumps(rand, terrain, landSpots(rand, ctx, radius, 10), per(6), 0.5, [0.45, 0.65], avoid), { castShadow: false })
 
   // Flower patches: each patch is one kind, like wildflowers grow
   const patchCenters = Array.from({ length: 8 }, () => outdoorSpot(rand, ctx.style, radius, 0.8))
@@ -724,24 +769,132 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
   }
 }
 
+/**
+ * Mars ground: rolling dunes and highlands pocked with impact craters (sunken
+ * bowl, raised rim, light ejecta rays), flat around the room.
+ */
+function createMarsTerrain(ctx: LandContext, radius: number, rand: () => number) {
+  const { width, depth } = ctx.style
+  const roomDistance = (x: number, z: number) => Math.hypot(Math.max(Math.abs(x) - width / 2, 0), Math.max(Math.abs(z) - depth / 2, 0))
+
+  // A few large craters and many small ones, kept clear of the room and of each other
+  type Crater = { x: number; z: number; r: number; depth: number; fresh: boolean; rays: number }
+  const craters: Crater[] = []
+  const tryCrater = (r: number, tries = 40) => {
+    for (let t = 0; t < tries; t++) {
+      const a = rand() * Math.PI * 2
+      const d = Math.sqrt(rand()) * (radius - r - 0.6)
+      const x = Math.cos(a) * d
+      const z = Math.sin(a) * d
+      if (roomDistance(x, z) < r + 0.9) continue
+      if (craters.some(c => Math.hypot(c.x - x, c.z - z) < (c.r + r) * 0.9)) continue
+      craters.push({ x, z, r, depth: r * (0.22 + rand() * 0.12), fresh: rand() < 0.6, rays: rand() * 100 })
+      return
+    }
+  }
+  for (let i = 0; i < 3; i++) tryCrater(1.6 + rand() * 1.2)
+  for (let i = 0; i < 9; i++) tryCrater(0.6 + rand() * 0.6)
+  for (let i = 0; i < 22; i++) tryCrater(0.18 + rand() * 0.3)
+
+  /** Crater shape at distance ratio t = d / r: bowl inside, rim at the edge, ejecta fading outside */
+  const craterProfile = (t: number) => {
+    const bowl = t < 1 ? -(1 - t * t) : 0
+    const rim = Math.exp(-((t - 1) ** 2) / 0.045) * 0.55
+    return bowl + rim
+  }
+  const relief = (x: number, z: number) => {
+    const fromRoom = THREE.MathUtils.smoothstep(roomDistance(x, z), 0.5, 2.2)
+    const edge = 1 - THREE.MathUtils.smoothstep(Math.hypot(x, z), radius - 1, radius - 0.05)
+    // Wind-shaped dunes plus broad highlands behind the room
+    const dunes = (fbm(x * 0.35 + z * 0.12, z * 0.35, 41) - 0.45) * 0.45
+    const ridges = Math.abs(fbm(x * 0.18, z * 0.18, 47) - 0.5) * 0.9
+    let h = (dunes + ridges) * fromRoom
+    for (const c of craters) {
+      const t = Math.hypot(x - c.x, z - c.z) / c.r
+      if (t < 1.8) h += craterProfile(t) * c.depth
+    }
+    return h * edge
+  }
+
+  const geometry = new THREE.RingGeometry(0.001, radius, 200, 90)
+  geometry.rotateX(-Math.PI / 2)
+  const pos = geometry.attributes.position as THREE.BufferAttribute
+  const colors = new Float32Array(pos.count * 3)
+  const base = ['#a24f2e', '#b25c38', '#bd6a45', '#934527'].map(c => new THREE.Color(c))
+  const floor = new THREE.Color('#5e2814')
+  const dust = new THREE.Color('#dba27c')
+  const c = new THREE.Color()
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i)
+    const z = pos.getZ(i)
+    pos.setY(i, relief(x, z))
+    const n = fbm(x * 0.45, z * 0.45, 53)
+    const idx = Math.min(Math.floor(n * base.length), base.length - 1)
+    c.copy(base[idx]!).lerp(base[Math.min(idx + 1, base.length - 1)]!, (n * base.length) % 1)
+    for (const cr of craters) {
+      const dx = x - cr.x
+      const dz = z - cr.z
+      const t = Math.hypot(dx, dz) / cr.r
+      if (t < 0.9) c.lerp(floor, (1 - (t / 0.9) ** 2) * 0.6)
+      else if (t < 1.15) c.lerp(dust, 0.45)
+      else if (cr.fresh && t < 2.4) {
+        // Bright ejecta rays streaking out of fresh craters
+        const ray = Math.max(0, Math.sin(Math.atan2(dz, dx) * 7 + cr.rays) * Math.sin(Math.atan2(dz, dx) * 3 + cr.rays * 1.7))
+        c.lerp(dust, ray * (1 - (t - 1.15) / 1.25) * 0.55)
+      }
+    }
+    colors.set([c.r, c.g, c.b], i * 3)
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+  geometry.computeVertexNormals()
+  const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true })
+  const mesh = new THREE.Mesh(geometry, material)
+  mesh.position.y = ctx.groundY + 0.01
+  mesh.receiveShadow = true
+  mesh.castShadow = true
+
+  return { mesh, material, craters, heightAt: (x: number, z: number) => ctx.groundY + relief(x, z), roomDistance }
+}
+
 function buildMars(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(23)
-  const sand = std('#c4572d', { flatShading: true })
-  const { group } = floatingGround(ctx, radius, sand, '#8c3a1d', '#5a2a1a', 7)
+  const group = new THREE.Group()
+  const terrain = createMarsTerrain(ctx, radius, rand)
+  group.add(terrain.mesh)
 
-  // Craters and rocks
-  for (let i = 0; i < 7; i++) {
-    const [x, z] = outdoorSpot(rand, ctx.style, radius, 1)
-    const crater = new THREE.Mesh(new THREE.TorusGeometry(0.35 + rand() * 0.45, 0.08, 6, 18), std('#9e4322', { flatShading: true }))
-    crater.rotation.x = Math.PI / 2
-    crater.position.set(x, ctx.groundY + 0.02, z)
-    group.add(crater)
+  // Edge band and underside, so the crater bowls aren't hidden by a solid top
+  const crust = std('#8c3a1d', { flatShading: true })
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.98, 0.4, 160, 1, true), crust)
+  band.position.y = ctx.groundY - 0.2
+  const underside = new THREE.Mesh(new THREE.CircleGeometry(radius * 0.98, 160), crust)
+  underside.rotation.x = Math.PI / 2
+  underside.position.y = ctx.groundY - 0.4
+  group.add(band, underside)
+
+  // Boulders: scattered, and clustered on the rims of the bigger craters
+  const rockColors = ['#7a3418', '#8f4020', '#6a2c14', '#9a4a2a']
+  const rocks = new THREE.Group()
+  const addRock = (x: number, z: number, size: number) => {
+    const rock = new THREE.Mesh(jitter(new THREE.DodecahedronGeometry(size, 0), rand, size * 0.25), std(rockColors[Math.floor(rand() * rockColors.length)]!, { flatShading: true }))
+    rock.scale.y = 0.55 + rand() * 0.35
+    rock.rotation.set(rand() * 0.6, rand() * Math.PI * 2, rand() * 0.6)
+    rocks.add(place(rock, x, terrain.heightAt(x, z) + size * 0.25, z))
   }
-  for (let i = 0; i < 12; i++) {
+  for (const crater of terrain.craters.filter(cr => cr.r > 0.5)) {
+    const count = Math.round(crater.r * 3)
+    for (let i = 0; i < count; i++) {
+      const a = rand() * Math.PI * 2
+      const d = crater.r * (1 + (rand() - 0.3) * 0.35)
+      addRock(crater.x + Math.cos(a) * d, crater.z + Math.sin(a) * d, 0.06 + rand() * 0.14 * crater.r / 2)
+    }
+  }
+  for (let i = 0; i < 26; i++) {
     const [x, z] = outdoorSpot(rand, ctx.style, radius, 0.6)
-    const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.12 + rand() * 0.25), std('#7a3418', { flatShading: true }))
-    group.add(place(rock, x, ctx.groundY + 0.08, z))
+    if (terrain.roomDistance(x, z) < 0.4) continue
+    addRock(x, z, 0.05 + rand() ** 2 * 0.3)
   }
+  // All boulders as one mesh
+  group.add(bakeGroup(rocks))
 
   // Planets around the room (no fog so they stay crisp)
   const planets = new THREE.Group()
@@ -794,15 +947,15 @@ function buildMars(ctx: LandContext, radius: number): LandInstance {
     return { a, angle, r, speed: 0.02 + rand() * 0.04, baseY: a.position.y }
   })
 
-  const sandDay = new THREE.Color('#c4572d')
-  const sandNight = new THREE.Color('#8a3a1e')
+  const tintDay = new THREE.Color('#ffffff')
+  const tintNight = new THREE.Color('#b4a29c')
 
   return {
     group,
     starsAlways: true,
     sky: { night: new THREE.Color('#05030c'), dusk: new THREE.Color('#1a0d2e'), day: new THREE.Color('#2a1440') },
     update(time, _dt, daylight) {
-      sand.color.copy(sandNight).lerp(sandDay, daylight)
+      terrain.material.color.copy(tintNight).lerp(tintDay, daylight)
       giant.rotation.y = time * 0.02
       blue.rotation.y = time * 0.05
       moon.position.x = -6 + Math.cos(time * 0.15) * 5

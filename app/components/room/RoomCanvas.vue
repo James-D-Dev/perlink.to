@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import type { RoomConfig, WallSide } from '~/types/room'
-import { RoomScene, type ObjectPatch } from '~/utils/room/RoomScene'
+import { RoomScene, type ObjectPatch, type RoomSceneStats } from '~/utils/room/RoomScene'
 import { daylightAtHour, getDaylight } from '~/utils/room/daylight'
 
 const props = withDefaults(defineProps<{
@@ -33,6 +33,7 @@ const emit = defineEmits<{
   objectChange: [id: string, patch: ObjectPatch]
   hover: [id: string | null, x: number, y: number]
   activate: [id: string]
+  stats: [stats: RoomSceneStats]
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -48,6 +49,7 @@ onMounted(() => {
     onObjectChange: (id, patch) => emit('objectChange', id, patch),
     onHover: (id, x, y) => emit('hover', id, x, y),
     onActivate: id => emit('activate', id),
+    onStats: stats => emit('stats', stats),
   })
   scene.setRoom(props.room)
   scene.select(props.selectedId)
