@@ -116,3 +116,19 @@ export function getGoogleFontsUrl(fontOptions?: FontOption[]): string {
 
   return `https://fonts.googleapis.com/css2?family=${families.join('&family=')}&display=swap`;
 }
+
+/**
+ * Stylesheet URL for just the Google Fonts a theme uses, from CSS font
+ * values like "Lora, serif". System and unknown families are skipped.
+ */
+export function googleFontsUrlFor(values: (string | undefined)[]): string {
+  const families = new Set<string>();
+  for (const value of values) {
+    const name = value?.split(',')[0]?.replace(/["']/g, '').trim();
+    if (!name) continue;
+    const entry = GOOGLE_FONTS.find(gf => gf.split(':')[0] === name.replace(/ /g, '+'));
+    if (entry) families.add(entry);
+  }
+  if (!families.size) return '';
+  return `https://fonts.googleapis.com/css2?family=${[...families].join('&family=')}&display=swap`;
+}

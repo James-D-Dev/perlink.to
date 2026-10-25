@@ -103,6 +103,22 @@
 
                 <!-- Text -->
                 <div v-else-if="item.value === 'text'" class="space-y-5">
+                  <!-- One tap sets heading and body fonts that go together -->
+                  <UFormField :label="t('theme.text.pairs')">
+                    <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                      <button
+                        v-for="pair in FONT_PAIRS"
+                        :key="pair.id"
+                        type="button"
+                        class="flex flex-col items-start gap-0.5 rounded-lg border px-2.5 py-2 text-left transition"
+                        :class="activePair === pair.id ? 'border-inverted ring-1 ring-inverted' : 'border-default hover:border-accented dark:border-white/10'"
+                        @click="applyFontPair(pair)"
+                      >
+                        <span class="max-w-full truncate text-lg leading-tight text-highlighted" :style="{ fontFamily: pair.heading }">Aa Bb</span>
+                        <span class="max-w-full truncate text-[11px] text-muted" :style="{ fontFamily: pair.body }">{{ fontName(pair.heading) }} · {{ fontName(pair.body) }}</span>
+                      </button>
+                    </div>
+                  </UFormField>
                   <UFormField :label="t('theme.text.general')" :help="t('theme.text.generalHelp')">
                     <FontSelect :model-value="themeConfig.typography.paragraphFont" :font-options="paragraphFontOptions" @update:model-value="onGenericParagraphFontChange($event)" />
                   </UFormField>
@@ -274,7 +290,7 @@
 <script setup lang="ts">
 import type { Template, ThemeConfig, SocialLink } from "~/types/bio";
 import { type ThemePreset } from "~/data/themePresets";
-import { nameFontOptions, headingFontOptions, paragraphFontOptions, type FontOption } from "~/data/fontOptions";
+import { nameFontOptions, headingFontOptions, paragraphFontOptions, FONT_PAIRS, type FontOption } from "~/data/fontOptions";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
 
 const { t } = useI18n();
@@ -416,7 +432,8 @@ function onPresetSelect(preset: ThemePreset) {
   emit("updateTheme", {
     ...theme,
     card: { backgroundColor: undefined, outlineColor: undefined, ...theme.card },
-    header: { fontWeight: undefined, letterSpacing: undefined, fontFamily: undefined, fontSize: undefined, textColor: undefined, ...theme.header },
+    // The owner's header layout (and banner) stays; the preset only restyles it
+    header: { fontWeight: undefined, letterSpacing: undefined, fontFamily: undefined, fontSize: undefined, textColor: undefined, ...theme.header, layout: props.themeConfig.header.layout },
     typography: { textColor: undefined, bioTextColor: undefined, bioFontFamily: undefined, ...theme.typography },
     social: theme.social ?? { style: "soft" },
     page: theme.page ?? { blockGap: "normal", titleAlign: "center" },
@@ -430,6 +447,33 @@ const { loadFont, preloadBioFonts } = useGoogleFonts();
 onMounted(() => {
   preloadBioFonts();
 });
+
+const fontName = (value: string) => value.split(",")[0]!.replace(/["']/g, "").trim();
+
+// The pair the page uses now, if its heading and body fonts match one
+const activePair = computed(() => {
+  const tc = props.themeConfig;
+  const heading = fontName(tc.header.fontFamily || tc.typography.nameFont || "");
+  const body = fontName(tc.typography.paragraphFont || "");
+  return FONT_PAIRS.find((p) => fontName(p.heading) === heading && fontName(p.body) === body)?.id;
+});
+
+function applyFontPair(pair: (typeof FONT_PAIRS)[number]) {
+  for (const value of [pair.heading, pair.body]) {
+    const font = [...nameFontOptions, ...paragraphFontOptions].find((f) => f.value === value);
+    if (font) loadFont(font);
+  }
+  emit("updateTheme", {
+    header: { ...props.themeConfig.header, fontFamily: pair.heading },
+    typography: {
+      ...props.themeConfig.typography,
+      nameFont: pair.heading,
+      headingFont: pair.heading,
+      paragraphFont: pair.body,
+      bioFontFamily: pair.body,
+    },
+  });
+}
 
 // Font change handlers with dynamic loading
 function onNameFontChange(value: string) {

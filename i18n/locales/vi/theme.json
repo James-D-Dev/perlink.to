@@ -200,73 +200,175 @@
       }
     },
     "presetCategories": {
-      "classic": "Cổ điển",
-      "vibrant": "Rực rỡ",
-      "dark": "Tối",
       "minimal": "Tối giản",
-      "gradient": "Chuyển sắc",
-      "neon": "Neon"
+      "warm": "Ấm áp",
+      "elegant": "Sang trọng",
+      "playful": "Vui tươi",
+      "nature": "Thiên nhiên",
+      "pastel": "Pastel",
+      "dark": "Tối",
+      "festive": "Lễ hội"
     },
     "presets": {
-      "classic-white": {
-        "description": "Trắng thanh lịch, điểm tím"
+      "paper": {
+        "name": "Giấy trắng",
+        "description": "Trang trắng, chữ đen, không thừa chi tiết"
       },
-      "classic-ivory": {
-        "description": "Ngà dịu nhẹ với nâu ấm"
+      "stone": {
+        "name": "Đá xám",
+        "description": "Xám ấm với thẻ nhẹ nhàng"
       },
-      "classic-slate": {
-        "description": "Xám đá chuyên nghiệp, điểm xanh"
+      "mono": {
+        "name": "Đơn sắc",
+        "description": "Nút đen, góc vuông"
       },
-      "vibrant-coral": {
-        "description": "San hô và cam đầy năng lượng"
+      "swiss": {
+        "name": "Thụy Sĩ",
+        "description": "Căn trái, điểm nhấn đỏ"
       },
-      "vibrant-emerald": {
-        "description": "Xanh lá nhiệt đới tươi mới"
+      "cloud": {
+        "name": "Mây",
+        "description": "Xanh xám thoáng đãng, bo tròn"
       },
-      "vibrant-rose": {
-        "description": "Bảng màu hồng nổi bật"
+      "coffee": {
+        "name": "Quán cà phê",
+        "description": "Kem và nâu espresso, hợp quán cà phê"
       },
-      "dark-obsidian": {
-        "description": "Tối sâu, điểm tím"
+      "terracotta": {
+        "name": "Đất nung",
+        "description": "Cam đất trên nền cát"
       },
-      "dark-midnight": {
-        "description": "Chế độ tối xanh navy và xanh điện"
+      "bakery": {
+        "name": "Tiệm bánh",
+        "description": "Vàng bơ và nâu"
       },
-      "dark-charcoal": {
-        "description": "Tối sang trọng, điểm vàng"
+      "honey": {
+        "name": "Mật ong",
+        "description": "Chuyển sắc vàng, chữ đậm"
       },
-      "minimal-pure": {
-        "description": "Siêu gọn gàng, không xao nhãng"
+      "cinnamon": {
+        "name": "Quế",
+        "description": "Nâu đậm, thẻ màu kem"
       },
-      "minimal-sand": {
-        "description": "Tông trung tính dịu, không xao nhãng"
+      "ivory": {
+        "name": "Ngà",
+        "description": "Chữ có chân trên nền ngà, đường viền mảnh"
       },
-      "minimal-frost": {
-        "description": "Tối giản xám nhạt mát lạnh"
+      "spa": {
+        "name": "Spa",
+        "description": "Xanh xô thơm và vải lanh, tĩnh lặng"
       },
-      "gradient-aurora": {
-        "description": "Cực quang — từ xanh ngọc sang tím"
+      "champagne": {
+        "name": "Champagne",
+        "description": "Vàng nhạt trên nền hồng phấn"
       },
-      "gradient-sunset": {
-        "description": "Hoàng hôn ấm từ cam sang hồng"
+      "noir": {
+        "name": "Đen vàng",
+        "description": "Đen và vàng kim, sang trọng"
       },
-      "gradient-ocean": {
-        "description": "Xanh đại dương sâu đến navy"
+      "atelier": {
+        "name": "Xưởng may",
+        "description": "Xanh navy và kem, chỉn chu"
       },
-      "gradient-candy": {
-        "description": "Hồng pastel đến oải hương vui mắt"
+      "bubblegum": {
+        "name": "Kẹo cao su",
+        "description": "Hồng, tròn trịa, vui nhộn"
       },
-      "neon-cyber": {
-        "description": "Vàng điện trên nền gần đen"
+      "lemonade": {
+        "name": "Nước chanh",
+        "description": "Vàng chanh, nút xanh dương"
       },
-      "neon-matrix": {
-        "description": "Xanh hacker trên nền đen"
+      "sticker": {
+        "name": "Nhãn dán",
+        "description": "Thẻ trắng viền dày"
       },
-      "neon-electric": {
-        "description": "Xanh điện phát sáng trên nền đen sâu"
+      "candy": {
+        "name": "Kẹo ngọt",
+        "description": "Chuyển sắc ngọt ngào, thẻ trắng"
       },
-      "neon-purple": {
-        "description": "Tím vaporwave trên nền tối"
+      "retro": {
+        "name": "Hoài cổ",
+        "description": "Cam và xanh ngọc thập niên 70"
+      },
+      "forest": {
+        "name": "Rừng xanh",
+        "description": "Xanh lá đậm, chữ màu kem"
+      },
+      "matcha": {
+        "name": "Trà xanh",
+        "description": "Tông trà xanh dịu nhẹ"
+      },
+      "ocean": {
+        "name": "Biển xanh",
+        "description": "Chuyển sắc xanh biển, thẻ trắng"
+      },
+      "sand": {
+        "name": "Bãi biển",
+        "description": "Cát và xanh ngọc, hợp homestay"
+      },
+      "lotus": {
+        "name": "Sen hồng",
+        "description": "Hồng sen và xanh lá"
+      },
+      "lavender": {
+        "name": "Oải hương",
+        "description": "Nền tím nhạt, nút tím"
+      },
+      "peach": {
+        "name": "Đào",
+        "description": "Chuyển sắc đào, điểm nhấn san hô"
+      },
+      "mint": {
+        "name": "Bạc hà",
+        "description": "Bạc hà và xanh ngọc tươi mát"
+      },
+      "sky": {
+        "name": "Xanh baby",
+        "description": "Xanh nhạt, nhẹ nhàng thân thiện"
+      },
+      "sorbet": {
+        "name": "Kem trái cây",
+        "description": "Chuyển sắc pastel cầu vồng"
+      },
+      "midnight": {
+        "name": "Nửa đêm",
+        "description": "Gần như đen, thẻ trắng"
+      },
+      "graphite": {
+        "name": "Than chì",
+        "description": "Thẻ xám than, viền kín đáo"
+      },
+      "neon": {
+        "name": "Đêm neon",
+        "description": "Hồng phát sáng trên tím đậm"
+      },
+      "aurora": {
+        "name": "Cực quang",
+        "description": "Chuyển sắc cực quang, thẻ kính mờ"
+      },
+      "starry": {
+        "name": "Trời sao",
+        "description": "Trời đêm với sao băng"
+      },
+      "tet": {
+        "name": "Tết",
+        "description": "Đỏ và vàng ngày Tết"
+      },
+      "wedding": {
+        "name": "Đám cưới",
+        "description": "Tên viết tay, hồng phấn và trắng"
+      },
+      "birthday": {
+        "name": "Sinh nhật",
+        "description": "Màu sắc rộn ràng, thẻ bo tròn"
+      },
+      "christmas": {
+        "name": "Giáng sinh",
+        "description": "Xanh thông, đỏ và tuyết"
+      },
+      "midautumn": {
+        "name": "Trung thu",
+        "description": "Cam đèn lồng trên nền đêm xanh"
       }
     },
     "sections": {
@@ -281,7 +383,12 @@
       "generalHelp": "Dùng cho nội dung các khối.",
       "align": "Căn lề",
       "pageColor": "Màu chữ nội dung",
-      "pageColorHelp": "Màu chữ của văn bản trong các khối."
+      "pageColorHelp": "Màu chữ của văn bản trong các khối.",
+      "pairs": "Cặp phông gợi ý"
+    },
+    "presetActions": {
+      "random": "Thử ngẫu nhiên",
+      "count": "{n} giao diện"
     }
   },
   "analytics": {

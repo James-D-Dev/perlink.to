@@ -433,7 +433,7 @@ import type { BioData, BioLink, SocialLink, ThemeConfig, BioBlock } from "~/type
 import { SOCIAL_PROVIDERS } from "~/types/bio";
 import { useBioTheme } from "~/composables/useBioTheme";
 import { getEffectBgClass } from "~/utils/effectUtils";
-import { useGoogleFonts } from "~/composables/useGoogleFonts";
+import { googleFontsUrlFor } from "~/composables/useGoogleFonts";
 
 const bgEffectMap: Record<string, ReturnType<typeof defineAsyncComponent>> = {
   particles: defineAsyncComponent(
@@ -707,10 +707,20 @@ async function sharePage() {
   }
 }
 
-// Preload Google Fonts
-const { preloadBioFonts } = useGoogleFonts();
-onMounted(() => {
-  preloadBioFonts();
+// Only the fonts this page uses, in the server-rendered head so text
+// doesn't jump once they arrive
+const fontsHref = computed(() => {
+  const t = theme.value;
+  return googleFontsUrlFor([
+    t.header.fontFamily,
+    t.typography.nameFont,
+    t.typography.headingFont,
+    t.typography.paragraphFont,
+    t.typography.bioFontFamily,
+  ]);
+});
+useHead({
+  link: computed(() => (fontsHref.value ? [{ key: fontsHref.value, rel: "stylesheet", href: fontsHref.value }] : [])),
 });
 </script>
 

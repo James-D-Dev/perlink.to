@@ -200,73 +200,175 @@
       }
     },
     "presetCategories": {
-      "classic": "Classic",
-      "vibrant": "Vibrant",
-      "dark": "Dark",
       "minimal": "Minimal",
-      "gradient": "Gradient",
-      "neon": "Neon"
+      "warm": "Warm",
+      "elegant": "Elegant",
+      "playful": "Playful",
+      "nature": "Nature",
+      "pastel": "Pastel",
+      "dark": "Dark",
+      "festive": "Festive"
     },
     "presets": {
-      "classic-white": {
-        "description": "Timeless white with purple accents"
+      "paper": {
+        "name": "Paper",
+        "description": "White page, black type, nothing extra"
       },
-      "classic-ivory": {
-        "description": "Soft ivory tones with warm brown"
+      "stone": {
+        "name": "Stone",
+        "description": "Warm grey with soft cards"
       },
-      "classic-slate": {
-        "description": "Corporate slate with blue highlights"
+      "mono": {
+        "name": "Mono",
+        "description": "Black buttons, square corners"
       },
-      "vibrant-coral": {
-        "description": "Bold coral and orange energy"
+      "swiss": {
+        "name": "Swiss",
+        "description": "Left-aligned, red accent"
       },
-      "vibrant-emerald": {
-        "description": "Fresh tropical greens with energy"
+      "cloud": {
+        "name": "Cloud",
+        "description": "Airy blue-grey, rounded"
       },
-      "vibrant-rose": {
-        "description": "Bold rose and pink palette"
+      "coffee": {
+        "name": "Coffee house",
+        "description": "Cream and espresso, for cafés"
       },
-      "dark-obsidian": {
-        "description": "Deep dark with violet highlights"
+      "terracotta": {
+        "name": "Terracotta",
+        "description": "Clay orange on sand"
       },
-      "dark-midnight": {
-        "description": "Navy and electric blue dark mode"
+      "bakery": {
+        "name": "Bakery",
+        "description": "Butter yellow and brown"
       },
-      "dark-charcoal": {
-        "description": "Sophisticated dark with gold accents"
+      "honey": {
+        "name": "Honey",
+        "description": "Golden gradient, dark text"
       },
-      "minimal-pure": {
-        "description": "Ultra-clean with no distractions"
+      "cinnamon": {
+        "name": "Cinnamon",
+        "description": "Deep brown with cream cards"
       },
-      "minimal-sand": {
-        "description": "Calm neutral tones, distraction-free"
+      "ivory": {
+        "name": "Ivory",
+        "description": "Serif type on ivory, thin lines"
       },
-      "minimal-frost": {
-        "description": "Ice-cool light grey minimalism"
+      "spa": {
+        "name": "Spa",
+        "description": "Sage and linen, calm and clean"
       },
-      "gradient-aurora": {
-        "description": "Northern lights — teal to purple"
+      "champagne": {
+        "name": "Champagne",
+        "description": "Soft gold on blush"
       },
-      "gradient-sunset": {
-        "description": "Warm sunset from orange to pink"
+      "noir": {
+        "name": "Noir",
+        "description": "Black and gold, for evenings"
       },
-      "gradient-ocean": {
-        "description": "Deep ocean blues to navy"
+      "atelier": {
+        "name": "Atelier",
+        "description": "Navy and cream, tailored"
       },
-      "gradient-candy": {
-        "description": "Fun pastel pink to lavender"
+      "bubblegum": {
+        "name": "Bubblegum",
+        "description": "Pink, round and bouncy"
       },
-      "neon-cyber": {
-        "description": "Electric yellow on near-black"
+      "lemonade": {
+        "name": "Lemonade",
+        "description": "Lemon yellow, blue buttons"
       },
-      "neon-matrix": {
-        "description": "Hacker green on black"
+      "sticker": {
+        "name": "Sticker",
+        "description": "White cards with thick outlines"
       },
-      "neon-electric": {
-        "description": "Glowing electric blue on deep black"
+      "candy": {
+        "name": "Candy",
+        "description": "Sweet gradient, white cards"
       },
-      "neon-purple": {
-        "description": "Vaporwave purple on dark"
+      "retro": {
+        "name": "Retro",
+        "description": "Seventies orange and teal"
+      },
+      "forest": {
+        "name": "Forest",
+        "description": "Deep green with cream text"
+      },
+      "matcha": {
+        "name": "Matcha",
+        "description": "Soft green tea tones"
+      },
+      "ocean": {
+        "name": "Ocean",
+        "description": "Sea blue gradient, white cards"
+      },
+      "sand": {
+        "name": "Beach",
+        "description": "Sand and turquoise, for homestays"
+      },
+      "lotus": {
+        "name": "Lotus",
+        "description": "Lotus pink and leaf green"
+      },
+      "lavender": {
+        "name": "Lavender",
+        "description": "Lilac page, purple buttons"
+      },
+      "peach": {
+        "name": "Peach",
+        "description": "Peach gradient, coral accent"
+      },
+      "mint": {
+        "name": "Mint",
+        "description": "Fresh mint and teal"
+      },
+      "sky": {
+        "name": "Baby blue",
+        "description": "Light blue, gentle and friendly"
+      },
+      "sorbet": {
+        "name": "Sorbet",
+        "description": "Rainbow pastel gradient"
+      },
+      "midnight": {
+        "name": "Midnight",
+        "description": "Near-black with white cards"
+      },
+      "graphite": {
+        "name": "Graphite",
+        "description": "Charcoal cards, quiet borders"
+      },
+      "neon": {
+        "name": "Neon night",
+        "description": "Glowing pink on deep purple"
+      },
+      "aurora": {
+        "name": "Aurora",
+        "description": "Northern lights gradient, glass cards"
+      },
+      "starry": {
+        "name": "Starry",
+        "description": "Navy sky with falling stars"
+      },
+      "tet": {
+        "name": "Lunar New Year",
+        "description": "Red and gold for Tết"
+      },
+      "wedding": {
+        "name": "Wedding",
+        "description": "Script names, blush and white"
+      },
+      "birthday": {
+        "name": "Birthday",
+        "description": "Confetti colours, round cards"
+      },
+      "christmas": {
+        "name": "Christmas",
+        "description": "Pine green, red and snow"
+      },
+      "midautumn": {
+        "name": "Mid-Autumn",
+        "description": "Lantern orange on night blue"
       }
     },
     "sections": {
@@ -281,7 +383,12 @@
       "generalHelp": "Used for the text in your blocks.",
       "align": "Alignment",
       "pageColor": "Content text colour",
-      "pageColorHelp": "Colour of the text inside blocks."
+      "pageColorHelp": "Colour of the text inside blocks.",
+      "pairs": "Font pairs"
+    },
+    "presetActions": {
+      "random": "Surprise me",
+      "count": "{n} themes"
     }
   },
   "analytics": {

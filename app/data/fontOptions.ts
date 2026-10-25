@@ -34,6 +34,14 @@ export const GOOGLE_FONTS = [
   'Allura:wght@400',
   'Parisienne:wght@400',
   'Tangerine:wght@400;700',
+  'Be+Vietnam+Pro:wght@400;500;600;700',
+  'Lora:wght@400;500;600;700',
+  'Nunito:wght@400;600;700;800',
+  'Quicksand:wght@400;500;600;700',
+  'Josefin+Sans:wght@400;600;700',
+  'Space+Grotesk:wght@400;500;600;700',
+  'Noto+Serif:wght@400;600;700',
+  'Comfortaa:wght@400;600;700',
 ];
 
 // Font options for Typography (Name/Bio font)
@@ -66,6 +74,14 @@ export const nameFontOptions: FontOption[] = [
   { label: 'Abril Fatface', value: 'Abril Fatface, serif', family: 'Abril Fatface', weights: [400], category: 'display' },
   { label: 'Bebas Neue', value: 'Bebas Neue, sans-serif', family: 'Bebas Neue', weights: [400], category: 'display' },
   { label: 'Cinzel', value: 'Cinzel, serif', family: 'Cinzel', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Be Vietnam Pro', value: 'Be Vietnam Pro, sans-serif', family: 'Be Vietnam Pro', weights: [400, 500, 600, 700] },
+  { label: 'Nunito', value: 'Nunito, sans-serif', family: 'Nunito', weights: [400, 600, 700, 800] },
+  { label: 'Quicksand', value: 'Quicksand, sans-serif', family: 'Quicksand', weights: [400, 500, 600, 700] },
+  { label: 'Josefin Sans', value: 'Josefin Sans, sans-serif', family: 'Josefin Sans', weights: [400, 600, 700] },
+  { label: 'Space Grotesk', value: 'Space Grotesk, sans-serif', family: 'Space Grotesk', weights: [400, 500, 600, 700] },
+  { label: 'Comfortaa', value: 'Comfortaa, sans-serif', family: 'Comfortaa', weights: [400, 600, 700], category: 'display' },
+  { label: 'Lora', value: 'Lora, serif', family: 'Lora', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Noto Serif', value: 'Noto Serif, serif', family: 'Noto Serif', weights: [400, 600, 700], category: 'serif' },
 ];
 
 // Font options for Heading
@@ -98,6 +114,14 @@ export const headingFontOptions: FontOption[] = [
   { label: 'Abril Fatface', value: 'Abril Fatface, serif', family: 'Abril Fatface', weights: [400], category: 'display' },
   { label: 'Bebas Neue', value: 'Bebas Neue, sans-serif', family: 'Bebas Neue', weights: [400], category: 'display' },
   { label: 'Cinzel', value: 'Cinzel, serif', family: 'Cinzel', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Be Vietnam Pro', value: 'Be Vietnam Pro, sans-serif', family: 'Be Vietnam Pro', weights: [400, 500, 600, 700] },
+  { label: 'Nunito', value: 'Nunito, sans-serif', family: 'Nunito', weights: [400, 600, 700, 800] },
+  { label: 'Quicksand', value: 'Quicksand, sans-serif', family: 'Quicksand', weights: [400, 500, 600, 700] },
+  { label: 'Josefin Sans', value: 'Josefin Sans, sans-serif', family: 'Josefin Sans', weights: [400, 600, 700] },
+  { label: 'Space Grotesk', value: 'Space Grotesk, sans-serif', family: 'Space Grotesk', weights: [400, 500, 600, 700] },
+  { label: 'Comfortaa', value: 'Comfortaa, sans-serif', family: 'Comfortaa', weights: [400, 600, 700], category: 'display' },
+  { label: 'Lora', value: 'Lora, serif', family: 'Lora', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Noto Serif', value: 'Noto Serif, serif', family: 'Noto Serif', weights: [400, 600, 700], category: 'serif' },
 ];
 
 // Font options for Paragraph
@@ -114,7 +138,31 @@ export const paragraphFontOptions: FontOption[] = [
   { label: 'Playfair Display', value: 'Playfair Display, serif', family: 'Playfair Display', weights: [400, 500, 600, 700], category: 'serif' },
   { label: 'Cormorant Garamond', value: 'Cormorant Garamond, serif', family: 'Cormorant Garamond', weights: [400, 500, 600, 700], category: 'serif' },
   { label: 'Times New Roman', value: '"Times New Roman", Times, serif', family: 'Times New Roman', category: 'serif' },
+  { label: 'Be Vietnam Pro', value: 'Be Vietnam Pro, sans-serif', family: 'Be Vietnam Pro', weights: [400, 500, 600, 700] },
+  { label: 'Nunito', value: 'Nunito, sans-serif', family: 'Nunito', weights: [400, 600, 700, 800] },
+  { label: 'Quicksand', value: 'Quicksand, sans-serif', family: 'Quicksand', weights: [400, 500, 600, 700] },
+  { label: 'Josefin Sans', value: 'Josefin Sans, sans-serif', family: 'Josefin Sans', weights: [400, 600, 700] },
+  { label: 'Space Grotesk', value: 'Space Grotesk, sans-serif', family: 'Space Grotesk', weights: [400, 500, 600, 700] },
+  { label: 'Comfortaa', value: 'Comfortaa, sans-serif', family: 'Comfortaa', weights: [400, 600, 700], category: 'display' },
+  { label: 'Lora', value: 'Lora, serif', family: 'Lora', weights: [400, 500, 600, 700], category: 'serif' },
+  { label: 'Noto Serif', value: 'Noto Serif, serif', family: 'Noto Serif', weights: [400, 600, 700], category: 'serif' },
 ];
 
 // Legacy font options for backward compatibility
 export const fontOptions = nameFontOptions;
+
+/** Heading + body pairs that work together, for one-tap typography */
+export const FONT_PAIRS: { id: string; heading: string; body: string }[] = [
+  { id: 'modern', heading: 'Inter Tight, sans-serif', body: 'Inter, sans-serif' },
+  { id: 'vietnam', heading: 'Be Vietnam Pro, sans-serif', body: 'Be Vietnam Pro, sans-serif' },
+  { id: 'editorial', heading: 'Playfair Display, serif', body: 'Inter, sans-serif' },
+  { id: 'classic', heading: 'Lora, serif', body: 'Be Vietnam Pro, sans-serif' },
+  { id: 'refined', heading: 'Cormorant Garamond, serif', body: 'Josefin Sans, sans-serif' },
+  { id: 'friendly', heading: 'Nunito, sans-serif', body: 'Nunito, sans-serif' },
+  { id: 'soft', heading: 'Quicksand, sans-serif', body: 'Quicksand, sans-serif' },
+  { id: 'tech', heading: 'Space Grotesk, sans-serif', body: 'Space Grotesk, sans-serif' },
+  { id: 'bold', heading: 'Montserrat, sans-serif', body: 'Inter, sans-serif' },
+  { id: 'rounded', heading: 'Comfortaa, sans-serif', body: 'Nunito, sans-serif' },
+  { id: 'handwritten', heading: 'Dancing Script, cursive', body: 'Lora, serif' },
+  { id: 'fun', heading: 'Pacifico, cursive', body: 'Poppins, sans-serif' },
+];

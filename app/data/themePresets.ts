@@ -1,12 +1,18 @@
-import type { ThemeConfig } from '~/types/bio'
+import type { LinkCardLayout, ThemeConfig, ThemeHeaderLayout, ThemePage, ThemeSocial } from '~/types/bio'
+
+// Ready-made looks, grouped by feel rather than by colour: people pick "warm"
+// or "elegant", not "orange". Each one sets everything the theme editor can,
+// so picking a preset and then tweaking a control always works.
 
 export type ThemePresetCategory =
-  | 'classic'
-  | 'vibrant'
-  | 'dark'
   | 'minimal'
-  | 'gradient'
-  | 'neon'
+  | 'warm'
+  | 'elegant'
+  | 'playful'
+  | 'nature'
+  | 'pastel'
+  | 'dark'
+  | 'festive'
 
 export interface ThemePreset {
   id: string
@@ -22,366 +28,270 @@ export interface ThemePreset {
 }
 
 export const THEME_PRESET_CATEGORIES: { id: ThemePresetCategory; label: string }[] = [
-  { id: 'classic',  label: 'Classic' },
-  { id: 'vibrant',  label: 'Vibrant' },
-  { id: 'dark',     label: 'Dark' },
-  { id: 'minimal',  label: 'Minimal' },
-  { id: 'gradient', label: 'Gradient' },
-  { id: 'neon',     label: 'Neon' },
+  { id: 'minimal', label: 'Minimal' },
+  { id: 'warm', label: 'Warm' },
+  { id: 'elegant', label: 'Elegant' },
+  { id: 'playful', label: 'Playful' },
+  { id: 'nature', label: 'Nature' },
+  { id: 'pastel', label: 'Pastel' },
+  { id: 'dark', label: 'Dark' },
+  { id: 'festive', label: 'Festive' },
 ]
 
-export const THEME_PRESETS: ThemePreset[] = [
-  // ─── CLASSIC ──────────────────────────────────────────────────
-  {
-    id: 'classic-white',
-    name: 'Clean White',
-    category: 'classic',
-    description: 'Timeless white with purple accents',
-    preview: { bg: '#FFFFFF', card: '#F9FAFB', text: '#111827' },
-    theme: {
-      colors: { primary: '#7C3AED', secondary: '#A78BFA', third: '#EDE9FE' },
-      background: { type: 'solid', color: '#FFFFFF' },
-      card: { style: 'filled', textColor: "#ffffff", cornerRadius: 12, transparency: 1, shadow: 'sm', animationAppear: 'fadeInUp', animationHover: 'pulse' },
-      button: { style: 'filled', cornerRadius: 12, shadow: 'none' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: false, animationAppear: 'fadeIn', animationHover: 'pulse' },
-      link: { layout: 'horizontal-left' as const },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'classic-ivory',
-    name: 'Warm Ivory',
-    category: 'classic',
-    description: 'Soft ivory tones with warm brown',
-    preview: { bg: '#FDFAF6', card: '#FEF3C7', text: '#78350F' },
-    theme: {
-      colors: { primary: '#D97706', secondary: '#FCD34D', third: '#FEF3C7' },
-      background: { type: 'solid', color: '#FDFAF6' },
-      card: { style: 'filled', textColor: "#ffffff", cornerRadius: 16, transparency: 1, shadow: 'sm', animationAppear: 'fadeIn', animationHover: 'headShake' },
-      button: { style: 'soft', cornerRadius: 16, shadow: 'none' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: true, borderColor: '#D97706', animationAppear: 'fadeIn', animationHover: 'headShake' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Georgia, serif', headingFont: 'Georgia, serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'classic-slate',
-    name: 'Slate Professional',
-    category: 'classic',
-    description: 'Corporate slate with blue highlights',
-    preview: { bg: '#F8FAFC', card: '#E2E8F0', text: '#1E293B' },
-    theme: {
-      colors: { primary: '#0F172A', secondary: '#3B82F6', third: '#EFF6FF' },
-      background: { type: 'solid', color: '#F8FAFC' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 8, transparency: 1, shadow: 'sm', outlineColor: '#E2E8F0', animationAppear: 'fadeInLeft' },
-      button: { style: 'outline', cornerRadius: 8, shadow: 'none', animationHover: 'wobble' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'rounded', size: 'lg', border: true, borderColor: '#3B82F6', animationAppear: 'fadeInLeft', animationHover: 'headShake' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
+// Font values match the options in data/fontOptions, so the editor shows their names
+const F = {
+  inter: 'Inter, sans-serif',
+  interTight: 'Inter Tight, sans-serif',
+  beVietnam: 'Be Vietnam Pro, sans-serif',
+  montserrat: 'Montserrat, sans-serif',
+  poppins: 'Poppins, sans-serif',
+  nunito: 'Nunito, sans-serif',
+  quicksand: 'Quicksand, sans-serif',
+  josefin: 'Josefin Sans, sans-serif',
+  grotesk: 'Space Grotesk, sans-serif',
+  comfortaa: 'Comfortaa, sans-serif',
+  playfair: 'Playfair Display, serif',
+  cormorant: 'Cormorant Garamond, serif',
+  lora: 'Lora, serif',
+  notoSerif: 'Noto Serif, serif',
+  dancing: 'Dancing Script, cursive',
+  pacifico: 'Pacifico, cursive',
+  lobster: 'Lobster, cursive',
+} as const
 
-  // ─── VIBRANT ──────────────────────────────────────────────────
-  {
-    id: 'vibrant-coral',
-    name: 'Sunset Coral',
-    category: 'vibrant',
-    description: 'Bold coral and orange energy',
-    preview: { bg: '#FFF7ED', card: '#FED7AA', text: '#9A3412' },
+interface Spec {
+  id: string
+  name: string
+  category: ThemePresetCategory
+  description: string
+  /** A colour, or a gradient [from, to] / [from, via, to] */
+  bg: string | [string, string] | [string, string, string]
+  angle?: number
+  /** Animated background drawn over the colour */
+  effect?: string
+  /** Text on the page */
+  text: string
+  accent: string
+  /** Text on accent-filled cards and buttons */
+  onAccent?: string
+  /** Card colour; omit to fill cards with the accent */
+  surface?: string
+  /** Text on surface cards, if it differs from the page text */
+  surfaceText?: string
+  card?: ThemeConfig['card']['style']
+  border?: string
+  radius: number
+  shadow?: ThemeConfig['card']['shadow']
+  blur?: ThemeConfig['card']['backdropBlur']
+  /** [name, body] */
+  fonts: [string, string]
+  nameWeight?: string
+  nameSize?: string
+  tracking?: string
+  header?: ThemeHeaderLayout
+  avatar?: ThemeConfig['avatar']['shape']
+  link?: LinkCardLayout
+  social?: ThemeSocial['style']
+  gap?: ThemePage['blockGap']
+  titleAlign?: ThemePage['titleAlign']
+}
+
+function preset(s: Spec): ThemePreset {
+  const style = s.card ?? (s.border ? 'outline' : 'filled')
+  const onAccent = s.onAccent ?? '#ffffff'
+  const cardText = s.surface ? (s.surfaceText ?? s.text) : onAccent
+  const gradient = Array.isArray(s.bg)
+    ? { angle: s.angle ?? 160, from: s.bg[0], via: s.bg.length === 3 ? s.bg[1] : undefined, to: s.bg[s.bg.length - 1] }
+    : undefined
+  const bgColor = Array.isArray(s.bg) ? s.bg[0] : s.bg
+  return {
+    id: s.id,
+    name: s.name,
+    category: s.category,
+    description: s.description,
+    preview: { bg: bgColor, card: s.surface ?? s.accent, text: s.text },
     theme: {
-      colors: { primary: '#EA580C', secondary: '#FB923C', third: '#FFEDD5' },
-      background: { type: 'solid', color: '#FFF7ED' },
-      card: { style: 'filled', textColor: "#ffffff", cornerRadius: 20, transparency: 1, shadow: 'md', animationAppear: 'bounceInDown', animationHover: 'rubberBand', animationDuration: 'fast' },
-      button: { style: 'filled', cornerRadius: 20, shadow: 'sm', animationHover: 'tada' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'xl', border: true, borderColor: '#EA580C', animationAppear: 'bounceIn', animationHover: 'rubberBand', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'xl', paragraphSize: 'sm' },
+      colors: { primary: s.accent, secondary: s.border ?? s.surface ?? s.accent, third: bgColor },
+      background: s.effect
+        ? { type: 'effect', effectId: s.effect, color: bgColor }
+        : gradient ? { type: 'gradient', gradient } : { type: 'solid', color: bgColor },
+      card: {
+        style,
+        backgroundColor: s.surface,
+        outlineColor: s.border,
+        textColor: cardText,
+        cornerRadius: s.radius,
+        transparency: 1,
+        shadow: s.shadow ?? 'none',
+        backdropBlur: s.blur ?? 'none',
+        animationAppear: 'fadeInUp',
+        animationHover: 'none',
+      },
+      button: { style: 'filled', cornerRadius: s.radius, shadow: 'none', textColor: onAccent },
+      header: {
+        alignment: 'center',
+        spacing: 'normal',
+        layout: s.header ?? 'centered',
+        fontFamily: s.fonts[0],
+        fontSize: s.nameSize ?? '1.875rem',
+        fontWeight: s.nameWeight ?? '700',
+        letterSpacing: s.tracking,
+        textColor: s.text,
+      },
+      avatar: { shape: s.avatar ?? 'circle', size: 'lg', border: false, animationAppear: 'fadeIn', animationHover: 'none' },
+      link: { layout: s.link ?? 'horizontal-left' },
+      typography: {
+        nameFont: s.fonts[0],
+        headingFont: s.fonts[0],
+        paragraphFont: s.fonts[1],
+        nameSize: 'lg',
+        paragraphSize: 'sm',
+        bioFontFamily: s.fonts[1],
+        bioTextColor: s.text,
+        textColor: s.text,
+      },
+      social: { style: s.social ?? 'soft' },
+      page: { blockGap: s.gap ?? 'normal', titleAlign: s.titleAlign ?? 'center' },
     },
-  },
-  {
-    id: 'vibrant-emerald',
-    name: 'Tropical Emerald',
-    category: 'vibrant',
-    description: 'Fresh tropical greens with energy',
-    preview: { bg: '#ECFDF5', card: '#A7F3D0', text: '#065F46' },
-    theme: {
-      colors: { primary: '#059669', secondary: '#34D399', third: '#ECFDF5' },
-      background: { type: 'solid', color: '#ECFDF5' },
-      card: { style: 'filled', textColor: "#ffffff", cornerRadius: 16, transparency: 1, shadow: 'md', animationAppear: 'zoomIn', animationHover: 'pulse', animationDuration: 'fast' },
-      button: { style: 'filled', cornerRadius: 16, shadow: 'sm', animationHover: 'bounce' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: true, borderColor: '#059669', animationAppear: 'zoomIn', animationHover: 'bounce', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'vibrant-rose',
-    name: 'Rose Garden',
-    category: 'vibrant',
-    description: 'Bold rose and pink palette',
-    preview: { bg: '#FFF1F2', card: '#FECDD3', text: '#9F1239' },
-    theme: {
-      colors: { primary: '#E11D48', secondary: '#FB7185', third: '#FFF1F2' },
-      background: { type: 'solid', color: '#FFF1F2' },
-      card: { style: 'filled', textColor: "#ffffff", cornerRadius: 24, transparency: 1, shadow: 'sm', animationAppear: 'fadeInUp', animationHover: 'heartBeat', animationDuration: 'fast' },
-      button: { style: 'filled', cornerRadius: 24, shadow: 'none', animationHover: 'swing' },
-      header: { alignment: 'center', spacing: 'spacious' },
-      avatar: { shape: 'circle', size: 'xl', border: true, borderColor: '#E11D48', animationAppear: 'fadeInDown', animationHover: 'heartBeat', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Georgia, serif', headingFont: 'Georgia, serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'xl', paragraphSize: 'sm' },
-    },
-  },
+  }
+}
+
+export const THEME_PRESETS: ThemePreset[] = [
+  // ─── MINIMAL ──────────────────────────────────────────────────
+  preset({ id: 'paper', name: 'Paper', category: 'minimal', description: 'White page, black type, nothing extra',
+    bg: '#FFFFFF', text: '#111111', accent: '#111111', surface: '#FFFFFF', border: '#E5E5E5', radius: 10,
+    fonts: [F.interTight, F.inter], nameWeight: '600', tracking: '-0.03em', social: 'plain' }),
+  preset({ id: 'stone', name: 'Stone', category: 'minimal', description: 'Warm grey with soft cards',
+    bg: '#F4F2EE', text: '#2B2A27', accent: '#2B2A27', surface: '#FFFFFF', radius: 14, shadow: 'sm',
+    fonts: [F.beVietnam, F.beVietnam], nameWeight: '600', tracking: '-0.02em', social: 'outline' }),
+  preset({ id: 'mono', name: 'Mono', category: 'minimal', description: 'Black buttons, square corners',
+    bg: '#FAFAFA', text: '#0A0A0A', accent: '#0A0A0A', radius: 0,
+    fonts: [F.grotesk, F.grotesk], nameWeight: '700', tracking: '-0.02em', avatar: 'square', link: 'centered', social: 'filled' }),
+  preset({ id: 'swiss', name: 'Swiss', category: 'minimal', description: 'Left-aligned, red accent',
+    bg: '#FFFFFF', text: '#111111', accent: '#E11D2E', surface: '#F5F5F5', radius: 4,
+    fonts: [F.interTight, F.inter], nameWeight: '700', tracking: '-0.04em', header: 'left', titleAlign: 'left', social: 'plain' }),
+  preset({ id: 'cloud', name: 'Cloud', category: 'minimal', description: 'Airy blue-grey, rounded',
+    bg: '#F3F6FA', text: '#1E293B', accent: '#334155', surface: '#FFFFFF', radius: 18, shadow: 'sm',
+    fonts: [F.beVietnam, F.inter], nameWeight: '600', social: 'soft', gap: 'relaxed' }),
+
+  // ─── WARM ─────────────────────────────────────────────────────
+  preset({ id: 'coffee', name: 'Coffee house', category: 'warm', description: 'Cream and espresso, for cafés',
+    bg: '#F6EFE6', text: '#3B2A1E', accent: '#6F4E37', surface: '#FFFAF3', border: '#E6D7C3', radius: 12,
+    fonts: [F.lora, F.beVietnam], nameWeight: '600', social: 'soft' }),
+  preset({ id: 'terracotta', name: 'Terracotta', category: 'warm', description: 'Clay orange on sand',
+    bg: '#F7EDE2', text: '#4A2C21', accent: '#C2552D', radius: 16, shadow: 'sm',
+    fonts: [F.playfair, F.inter], nameWeight: '700', link: 'centered', social: 'filled' }),
+  preset({ id: 'bakery', name: 'Bakery', category: 'warm', description: 'Butter yellow and brown',
+    bg: '#FFF7E6', text: '#5A3A1A', accent: '#D98E04', surface: '#FFFFFF', radius: 20, shadow: 'sm',
+    fonts: [F.nunito, F.nunito], nameWeight: '800', social: 'soft' }),
+  preset({ id: 'honey', name: 'Honey', category: 'warm', description: 'Golden gradient, dark text',
+    bg: ['#FDE68A', '#FBBF24'], angle: 170, text: '#422006', accent: '#422006', onAccent: '#FDE68A', radius: 14,
+    fonts: [F.poppins, F.poppins], nameWeight: '700', social: 'filled' }),
+  preset({ id: 'cinnamon', name: 'Cinnamon', category: 'warm', description: 'Deep brown with cream cards',
+    bg: '#3E2723', text: '#FFF3E0', accent: '#FFB74D', onAccent: '#3E2723', surface: '#4E342E', radius: 12,
+    fonts: [F.lora, F.inter], nameWeight: '600', social: 'outline' }),
+
+  // ─── ELEGANT ──────────────────────────────────────────────────
+  preset({ id: 'ivory', name: 'Ivory', category: 'elegant', description: 'Serif type on ivory, thin lines',
+    bg: '#FBF8F2', text: '#2C2620', accent: '#2C2620', surface: '#FBF8F2', border: '#D9CFC1', radius: 2,
+    fonts: [F.cormorant, F.lora], nameWeight: '500', nameSize: '2.25rem', link: 'centered', social: 'plain', gap: 'relaxed' }),
+  preset({ id: 'spa', name: 'Spa', category: 'elegant', description: 'Sage and linen, calm and clean',
+    bg: '#EEF1EA', text: '#2F3A2F', accent: '#6B7F65', surface: '#F8F9F5', radius: 24,
+    fonts: [F.cormorant, F.josefin], nameWeight: '600', nameSize: '2.25rem', link: 'centered', social: 'outline', gap: 'relaxed' }),
+  preset({ id: 'champagne', name: 'Champagne', category: 'elegant', description: 'Soft gold on blush',
+    bg: ['#FBF3EC', '#F3E2D3'], text: '#4B3A2E', accent: '#B08D57', surface: '#FFFFFF', radius: 999,
+    fonts: [F.playfair, F.josefin], nameWeight: '500', link: 'centered', social: 'outline' }),
+  preset({ id: 'noir', name: 'Noir', category: 'elegant', description: 'Black and gold, for evenings',
+    bg: '#0E0E0E', text: '#F2EDE4', accent: '#C9A45C', onAccent: '#0E0E0E', surface: '#0E0E0E', border: '#3A3326', radius: 2,
+    fonts: [F.cormorant, F.josefin], nameWeight: '500', nameSize: '2.25rem', tracking: '0.04em', link: 'centered', social: 'plain' }),
+  preset({ id: 'atelier', name: 'Atelier', category: 'elegant', description: 'Navy and cream, tailored',
+    bg: '#F5F1E8', text: '#1B2A41', accent: '#1B2A41', onAccent: '#F5F1E8', radius: 6,
+    fonts: [F.notoSerif, F.inter], nameWeight: '600', header: 'left', titleAlign: 'left', social: 'filled' }),
+
+  // ─── PLAYFUL ──────────────────────────────────────────────────
+  preset({ id: 'bubblegum', name: 'Bubblegum', category: 'playful', description: 'Pink, round and bouncy',
+    bg: '#FFE4F1', text: '#5B1340', accent: '#EC4899', radius: 999, shadow: 'md',
+    fonts: [F.comfortaa, F.nunito], nameWeight: '700', link: 'centered', social: 'filled' }),
+  preset({ id: 'lemonade', name: 'Lemonade', category: 'playful', description: 'Lemon yellow, blue buttons',
+    bg: '#FFF9C4', text: '#1E3A8A', accent: '#2563EB', radius: 16, shadow: 'md',
+    fonts: [F.nunito, F.nunito], nameWeight: '800', social: 'filled' }),
+  preset({ id: 'sticker', name: 'Sticker', category: 'playful', description: 'White cards with thick outlines',
+    bg: '#A7F3D0', text: '#111827', accent: '#111827', surface: '#FFFFFF', border: '#111827', radius: 14, shadow: 'lg',
+    fonts: [F.grotesk, F.grotesk], nameWeight: '700', social: 'outline' }),
+  preset({ id: 'candy', name: 'Candy', category: 'playful', description: 'Sweet gradient, white cards',
+    bg: ['#FBC2EB', '#A6C1EE'], angle: 135, text: '#3B0764', accent: '#7C3AED', surface: '#FFFFFF', radius: 20, shadow: 'md',
+    fonts: [F.quicksand, F.quicksand], nameWeight: '700', social: 'soft' }),
+  preset({ id: 'retro', name: 'Retro', category: 'playful', description: 'Seventies orange and teal',
+    bg: '#FDF0D5', text: '#003049', accent: '#F77F00', surface: '#FCBF49', surfaceText: '#003049', radius: 12, shadow: 'md',
+    fonts: [F.lobster, F.poppins], nameWeight: '400', nameSize: '2.25rem', social: 'filled' }),
+
+  // ─── NATURE ───────────────────────────────────────────────────
+  preset({ id: 'forest', name: 'Forest', category: 'nature', description: 'Deep green with cream text',
+    bg: '#1F3B2D', text: '#F1EBDD', accent: '#D9C38F', onAccent: '#1F3B2D', surface: '#2A4A39', radius: 14,
+    fonts: [F.lora, F.inter], nameWeight: '600', social: 'outline' }),
+  preset({ id: 'matcha', name: 'Matcha', category: 'nature', description: 'Soft green tea tones',
+    bg: '#EEF3E2', text: '#2E3B1F', accent: '#7A9A3B', surface: '#FFFFFF', radius: 16,
+    fonts: [F.quicksand, F.beVietnam], nameWeight: '700', social: 'soft' }),
+  preset({ id: 'ocean', name: 'Ocean', category: 'nature', description: 'Sea blue gradient, white cards',
+    bg: ['#E0F2FE', '#BAE6FD'], text: '#0C4A6E', accent: '#0369A1', surface: '#FFFFFF', radius: 16, shadow: 'sm',
+    fonts: [F.montserrat, F.inter], nameWeight: '700', social: 'soft' }),
+  preset({ id: 'sand', name: 'Beach', category: 'nature', description: 'Sand and turquoise, for homestays',
+    bg: '#F5EBDD', text: '#3D3426', accent: '#14B8A6', surface: '#FFFDF8', radius: 20, shadow: 'sm',
+    fonts: [F.josefin, F.inter], nameWeight: '700', link: 'vertical', social: 'filled' }),
+  preset({ id: 'lotus', name: 'Lotus', category: 'nature', description: 'Lotus pink and leaf green',
+    bg: '#FDF2F4', text: '#3F1D2B', accent: '#5B8C51', surface: '#FFFFFF', border: '#F3C6D2', radius: 18,
+    fonts: [F.playfair, F.beVietnam], nameWeight: '600', link: 'centered', social: 'outline' }),
+
+  // ─── PASTEL ───────────────────────────────────────────────────
+  preset({ id: 'lavender', name: 'Lavender', category: 'pastel', description: 'Lilac page, purple buttons',
+    bg: '#F3EEFF', text: '#3B2A63', accent: '#8B5CF6', radius: 999,
+    fonts: [F.quicksand, F.quicksand], nameWeight: '700', link: 'centered', social: 'soft' }),
+  preset({ id: 'peach', name: 'Peach', category: 'pastel', description: 'Peach gradient, coral accent',
+    bg: ['#FFE5D9', '#FFD6E0'], text: '#5C2A2A', accent: '#F27059', surface: '#FFFFFF', radius: 18, shadow: 'sm',
+    fonts: [F.nunito, F.nunito], nameWeight: '800', social: 'soft' }),
+  preset({ id: 'mint', name: 'Mint', category: 'pastel', description: 'Fresh mint and teal',
+    bg: '#E8FAF2', text: '#134E4A', accent: '#14B8A6', surface: '#FFFFFF', radius: 14,
+    fonts: [F.beVietnam, F.beVietnam], nameWeight: '700', social: 'soft' }),
+  preset({ id: 'sky', name: 'Baby blue', category: 'pastel', description: 'Light blue, gentle and friendly',
+    bg: '#EAF4FF', text: '#1E3A5F', accent: '#5B9BD5', surface: '#FFFFFF', radius: 999,
+    fonts: [F.comfortaa, F.nunito], nameWeight: '700', link: 'centered', social: 'outline' }),
+  preset({ id: 'sorbet', name: 'Sorbet', category: 'pastel', description: 'Rainbow pastel gradient',
+    bg: ['#FFDEE9', '#E3F0FF', '#D7FFE9'], angle: 160, text: '#33334D', accent: '#33334D', surface: '#FFFFFF', radius: 16, shadow: 'sm', blur: 'md',
+    fonts: [F.poppins, F.poppins], nameWeight: '600', social: 'soft' }),
 
   // ─── DARK ─────────────────────────────────────────────────────
-  {
-    id: 'dark-obsidian',
-    name: 'Obsidian',
-    category: 'dark',
-    description: 'Deep dark with violet highlights',
-    preview: { bg: '#0F0F0F', card: '#1C1C1E', text: '#FFFFFF' },
-    theme: {
-      colors: { primary: '#8B5CF6', secondary: '#6D28D9', third: '#1C1C2E' },
-      background: { type: 'solid', color: '#0F0F0F' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 12, transparency: 0.9, shadow: 'lg', outlineColor: '#2D2D3D', animationAppear: 'fadeIn', animationHover: 'pulse' },
-      button: { style: 'soft', cornerRadius: 12, shadow: 'md', animationHover: 'rubberBand' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: true, borderColor: '#8B5CF6', animationAppear: 'fadeIn', animationHover: 'pulse' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'dark-midnight',
-    name: 'Midnight Blue',
-    category: 'dark',
-    description: 'Navy and electric blue dark mode',
-    preview: { bg: '#0D1117', card: '#161B22', text: '#58A6FF' },
-    theme: {
-      colors: { primary: '#58A6FF', secondary: '#1F6FEB', third: '#0D1117' },
-      background: { type: 'solid', color: '#0D1117' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 8, transparency: 1, shadow: 'md', outlineColor: '#30363D', animationAppear: 'slideInDown', animationHover: 'headShake' },
-      button: { style: 'outline', cornerRadius: 8, shadow: 'none', animationHover: 'flash' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'rounded', size: 'lg', border: true, borderColor: '#58A6FF', animationAppear: 'slideInDown', animationHover: 'headShake' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'ui-monospace, monospace', headingFont: 'ui-monospace, monospace', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'dark-charcoal',
-    name: 'Charcoal Gold',
-    category: 'dark',
-    description: 'Sophisticated dark with gold accents',
-    preview: { bg: '#1A1A1A', card: '#2A2A2A', text: '#F5C842' },
-    theme: {
-      colors: { primary: '#F5C842', secondary: '#D4A017', third: '#2A2A2A' },
-      background: { type: 'solid', color: '#1A1A1A' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 4, transparency: 1, shadow: 'lg', outlineColor: '#3A3A2A', animationAppear: 'backInUp', animationHover: 'wobble' },
-      button: { style: 'outline', cornerRadius: 4, shadow: 'none', animationHover: 'jello' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'square', size: 'lg', border: true, borderColor: '#F5C842', animationAppear: 'backInUp', animationHover: 'wobble' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Georgia, serif', headingFont: 'Georgia, serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
+  preset({ id: 'midnight', name: 'Midnight', category: 'dark', description: 'Near-black with white cards',
+    bg: '#0B0B0F', text: '#F4F4F5', accent: '#FFFFFF', onAccent: '#0B0B0F', radius: 12,
+    fonts: [F.interTight, F.inter], nameWeight: '600', tracking: '-0.03em', social: 'outline' }),
+  preset({ id: 'graphite', name: 'Graphite', category: 'dark', description: 'Charcoal cards, quiet borders',
+    bg: '#18181B', text: '#E4E4E7', accent: '#A1A1AA', surface: '#27272A', border: '#3F3F46', radius: 10,
+    fonts: [F.grotesk, F.inter], nameWeight: '600', social: 'plain' }),
+  preset({ id: 'neon', name: 'Neon night', category: 'dark', description: 'Glowing pink on deep purple',
+    bg: ['#12002B', '#2A0845'], text: '#FDF4FF', accent: '#F472B6', surface: '#12002B', border: '#F472B6', radius: 14, shadow: 'lg',
+    fonts: [F.grotesk, F.grotesk], nameWeight: '700', social: 'outline' }),
+  preset({ id: 'aurora', name: 'Aurora', category: 'dark', description: 'Northern lights gradient, glass cards',
+    bg: ['#0F172A', '#134E4A', '#312E81'], angle: 160, text: '#F0FDFA', accent: '#5EEAD4', onAccent: '#0F172A', surface: '#FFFFFF1A', radius: 16, blur: 'lg',
+    fonts: [F.montserrat, F.inter], nameWeight: '700', social: 'outline' }),
+  preset({ id: 'starry', name: 'Starry', category: 'dark', description: 'Navy sky with falling stars',
+    bg: '#0B1026', effect: 'falling-stars', text: '#E8EDFF', accent: '#A5B4FC', onAccent: '#0B1026', surface: '#151B3B', radius: 14,
+    fonts: [F.josefin, F.inter], nameWeight: '700', social: 'outline' }),
 
-  // ─── MINIMAL ──────────────────────────────────────────────────
-  {
-    id: 'minimal-pure',
-    name: 'Pure White',
-    category: 'minimal',
-    description: 'Ultra-clean with no distractions',
-    preview: { bg: '#FFFFFF', card: '#FFFFFF', text: '#000000' },
-    theme: {
-      colors: { primary: '#000000', secondary: '#525252', third: '#F5F5F5' },
-      background: { type: 'solid', color: '#FFFFFF' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 0, transparency: 1, shadow: 'none', outlineColor: '#E5E5E5', animationAppear: 'fadeIn' },
-      button: { style: 'outline', cornerRadius: 0, shadow: 'none', animationHover: 'headShake' },
-      header: { alignment: 'center', spacing: 'spacious' },
-      avatar: { shape: 'circle', size: 'lg', border: false, animationAppear: 'fadeIn' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'minimal-sand',
-    name: 'Desert Sand',
-    category: 'minimal',
-    description: 'Calm neutral tones, distraction-free',
-    preview: { bg: '#FAF9F6', card: '#F0EDE4', text: '#4A3728' },
-    theme: {
-      colors: { primary: '#8B6F47', secondary: '#C4A882', third: '#F0EDE4' },
-      background: { type: 'solid', color: '#FAF9F6' },
-      card: { style: 'ghost', textColor: "#000000", cornerRadius: 8, transparency: 1, shadow: 'none', animationAppear: 'fadeInUp' },
-      button: { style: 'ghost', cornerRadius: 8, shadow: 'none', animationHover: 'pulse' },
-      header: { alignment: 'center', spacing: 'spacious' },
-      avatar: { shape: 'circle', size: 'md', border: false, animationAppear: 'fadeInUp' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Georgia, serif', headingFont: 'Georgia, serif', paragraphFont: 'Georgia, serif', nameSize: 'md', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'minimal-frost',
-    name: 'Frost',
-    category: 'minimal',
-    description: 'Ice-cool light grey minimalism',
-    preview: { bg: '#F0F4F8', card: '#FFFFFF', text: '#334155' },
-    theme: {
-      colors: { primary: '#64748B', secondary: '#94A3B8', third: '#F0F4F8' },
-      background: { type: 'solid', color: '#F0F4F8' },
-      card: { style: 'soft', textColor: "#ffffff", cornerRadius: 16, transparency: 1, shadow: 'sm', animationAppear: 'zoomIn', animationHover: 'pulse' },
-      button: { style: 'soft', cornerRadius: 16, shadow: 'none' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: false, animationAppear: 'zoomIn', animationHover: 'pulse' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-
-  // ─── GRADIENT ─────────────────────────────────────────────────
-  {
-    id: 'gradient-aurora',
-    name: 'Aurora',
-    category: 'gradient',
-    description: 'Northern lights — teal to purple',
-    preview: { bg: '#0D9488', card: 'rgba(255,255,255,0.15)', text: '#FFFFFF' },
-    theme: {
-      colors: { primary: '#FFFFFF', secondary: '#A5F3FC', third: '#4C1D95' },
-      background: { type: 'gradient', gradient: { angle: 135, from: '#0D9488', via: '#6366F1', to: '#7C3AED' } },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 16, transparency: 0.15, shadow: 'md', outlineColor: 'rgba(255,255,255,0.2)', animationAppear: 'fadeInUp', animationHover: 'pulse', animationDuration: 'fast' },
-      button: { style: 'soft', cornerRadius: 16, shadow: 'none', animationHover: 'bounce' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: true, borderColor: 'rgba(255,255,255,0.6)', animationAppear: 'zoomIn', animationHover: 'pulse', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'gradient-sunset',
-    name: 'Sunset',
-    category: 'gradient',
-    description: 'Warm sunset from orange to pink',
-    preview: { bg: '#F97316', card: 'rgba(255,255,255,0.2)', text: '#FFFFFF' },
-    theme: {
-      colors: { primary: '#FFFFFF', secondary: '#FDE68A', third: '#831843' },
-      background: { type: 'gradient', gradient: { angle: 135, from: '#F97316', via: '#EC4899', to: '#9333EA' } },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 20, transparency: 0.2, shadow: 'lg', outlineColor: 'rgba(255,255,255,0.25)', animationAppear: 'bounceInUp', animationHover: 'rubberBand', animationDuration: 'fast' },
-      button: { style: 'soft', cornerRadius: 20, shadow: 'sm', animationHover: 'heartBeat' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'xl', border: true, borderColor: 'rgba(255,255,255,0.7)', animationAppear: 'bounceInDown', animationHover: 'heartBeat', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'xl', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'gradient-ocean',
-    name: 'Ocean Deep',
-    category: 'gradient',
-    description: 'Deep ocean blues to navy',
-    preview: { bg: '#0EA5E9', card: 'rgba(255,255,255,0.12)', text: '#FFFFFF' },
-    theme: {
-      colors: { primary: '#FFFFFF', secondary: '#BAE6FD', third: '#0C4A6E' },
-      background: { type: 'gradient', gradient: { angle: 160, from: '#0EA5E9', via: '#0369A1', to: '#0C4A6E' } },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 12, transparency: 0.12, shadow: 'md', outlineColor: 'rgba(255,255,255,0.15)', animationAppear: 'slideInUp', animationHover: 'wobble' },
-      button: { style: 'soft', cornerRadius: 12, shadow: 'none', animationHover: 'swing' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: true, borderColor: 'rgba(186,230,253,0.8)', animationAppear: 'slideInUp', animationHover: 'swing' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'gradient-candy',
-    name: 'Candy Pop',
-    category: 'gradient',
-    description: 'Fun pastel pink to lavender',
-    preview: { bg: '#F9A8D4', card: 'rgba(255,255,255,0.3)', text: '#701A75' },
-    theme: {
-      colors: { primary: '#A21CAF', secondary: '#F0ABFC', third: '#FDF4FF' },
-      background: { type: 'gradient', gradient: { angle: 120, from: '#F9A8D4', via: '#C084FC', to: '#818CF8' } },
-      card: { style: 'soft', textColor: "#ffffff", cornerRadius: 24, transparency: 0.3, shadow: 'sm', animationAppear: 'zoomIn', animationHover: 'tada', animationDuration: 'fast' },
-      button: { style: 'soft', cornerRadius: 24, shadow: 'none', animationHover: 'bounce' },
-      header: { alignment: 'center', spacing: 'spacious' },
-      avatar: { shape: 'circle', size: 'xl', border: true, borderColor: 'rgba(255,255,255,0.7)', animationAppear: 'zoomIn', animationHover: 'tada', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'xl', paragraphSize: 'sm' },
-    },
-  },
-
-  // ─── NEON ─────────────────────────────────────────────────────
-  {
-    id: 'neon-cyber',
-    name: 'Cyberpunk',
-    category: 'neon',
-    description: 'Electric yellow on near-black',
-    preview: { bg: '#0A0A0A', card: '#111111', text: '#FACC15' },
-    theme: {
-      colors: { primary: '#FACC15', secondary: '#FDE047', third: '#1A1A00' },
-      background: { type: 'solid', color: '#0A0A0A' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 0, transparency: 1, shadow: 'none', outlineColor: '#FACC15', animationAppear: 'lightSpeedInRight', animationHover: 'flash', animationDuration: 'faster' },
-      button: { style: 'outline', cornerRadius: 0, shadow: 'none', animationHover: 'shakeX' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'square', size: 'lg', border: true, borderColor: '#FACC15', animationAppear: 'lightSpeedInRight', animationHover: 'flash', animationDuration: 'faster' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'ui-monospace, monospace', headingFont: 'ui-monospace, monospace', paragraphFont: 'ui-monospace, monospace', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'neon-matrix',
-    name: 'Matrix',
-    category: 'neon',
-    description: 'Hacker green on black',
-    preview: { bg: '#000000', card: '#001100', text: '#00FF41' },
-    theme: {
-      colors: { primary: '#00FF41', secondary: '#008F11', third: '#001100' },
-      background: { type: 'solid', color: '#000000' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 4, transparency: 1, shadow: 'none', outlineColor: '#00FF41', animationAppear: 'flipInX', animationHover: 'flash', animationDuration: 'faster' },
-      button: { style: 'outline', cornerRadius: 4, shadow: 'none', animationHover: 'jello' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'square', size: 'lg', border: true, borderColor: '#00FF41', animationAppear: 'flipInX', animationHover: 'flash', animationDuration: 'faster' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'ui-monospace, monospace', headingFont: 'ui-monospace, monospace', paragraphFont: 'ui-monospace, monospace', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'neon-electric',
-    name: 'Electric Blue',
-    category: 'neon',
-    description: 'Glowing electric blue on deep black',
-    preview: { bg: '#020617', card: '#0F172A', text: '#38BDF8' },
-    theme: {
-      colors: { primary: '#38BDF8', secondary: '#0EA5E9', third: '#0F172A' },
-      background: { type: 'solid', color: '#020617' },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 8, transparency: 1, shadow: 'lg', outlineColor: '#38BDF8', animationAppear: 'rotateIn', animationHover: 'rubberBand', animationDuration: 'fast' },
-      button: { style: 'outline', cornerRadius: 8, shadow: 'none', animationHover: 'wobble' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: true, borderColor: '#38BDF8', animationAppear: 'rotateIn', animationHover: 'rubberBand', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'ui-monospace, monospace', headingFont: 'ui-monospace, monospace', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
-  {
-    id: 'neon-purple',
-    name: 'Neon Purple',
-    category: 'neon',
-    description: 'Vaporwave purple on dark',
-    preview: { bg: '#0D0019', card: '#1A0033', text: '#D946EF' },
-    theme: {
-      colors: { primary: '#D946EF', secondary: '#A855F7', third: '#1A0033' },
-      background: { type: 'gradient', gradient: { angle: 135, from: '#0D0019', to: '#1A0033' } },
-      card: { style: 'outline', textColor: "#ffffff", cornerRadius: 12, transparency: 1, shadow: 'lg', outlineColor: '#D946EF', animationAppear: 'backInDown', animationHover: 'tada', animationDuration: 'fast' },
-      button: { style: 'soft', cornerRadius: 12, shadow: 'md', animationHover: 'swing' },
-      header: { alignment: 'center', spacing: 'normal' },
-      avatar: { shape: 'circle', size: 'lg', border: true, borderColor: '#D946EF', animationAppear: 'backInDown', animationHover: 'tada', animationDuration: 'fast' },
-      link: { layout: 'horizontal-left' },
-      typography: { nameFont: 'Inter, system-ui, sans-serif', headingFont: 'Inter, system-ui, sans-serif', paragraphFont: 'Inter, system-ui, sans-serif', nameSize: 'lg', paragraphSize: 'sm' },
-    },
-  },
+  // ─── FESTIVE ──────────────────────────────────────────────────
+  preset({ id: 'tet', name: 'Lunar New Year', category: 'festive', description: 'Red and gold for Tết',
+    bg: ['#B91C1C', '#7F1D1D'], text: '#FFF7E0', accent: '#FBBF24', onAccent: '#7F1D1D', surface: '#991B1B', border: '#FBBF24', radius: 12, shadow: 'md',
+    fonts: [F.playfair, F.beVietnam], nameWeight: '700', link: 'centered', social: 'outline' }),
+  preset({ id: 'wedding', name: 'Wedding', category: 'festive', description: 'Script names, blush and white',
+    bg: '#FDF6F4', effect: 'rose', text: '#5A3E3A', accent: '#C08479', surface: '#FFFFFF', border: '#EBD3CE', radius: 999,
+    fonts: [F.dancing, F.lora], nameWeight: '600', nameSize: '2.5rem', link: 'centered', social: 'outline', gap: 'relaxed' }),
+  preset({ id: 'birthday', name: 'Birthday', category: 'festive', description: 'Confetti colours, round cards',
+    bg: ['#FFF1C1', '#FFD1E8'], angle: 135, text: '#4C1D95', accent: '#F43F5E', radius: 999, shadow: 'md',
+    fonts: [F.pacifico, F.nunito], nameWeight: '400', nameSize: '2.25rem', link: 'centered', social: 'filled' }),
+  preset({ id: 'christmas', name: 'Christmas', category: 'festive', description: 'Pine green, red and snow',
+    bg: '#14452F', effect: 'snow', text: '#FFFFFF', accent: '#DC2626', surface: '#1B5E3F', radius: 14,
+    fonts: [F.lora, F.inter], nameWeight: '700', social: 'filled' }),
+  preset({ id: 'midautumn', name: 'Mid-Autumn', category: 'festive', description: 'Lantern orange on night blue',
+    bg: ['#1E1B4B', '#312E81'], text: '#FEF3C7', accent: '#F59E0B', onAccent: '#1E1B4B', surface: '#2E2A6B', radius: 16, shadow: 'md',
+    fonts: [F.notoSerif, F.beVietnam], nameWeight: '700', link: 'centered', social: 'outline' }),
 ]
 
 export const THEME_PRESETS_BY_CATEGORY = THEME_PRESET_CATEGORIES.map(cat => ({
