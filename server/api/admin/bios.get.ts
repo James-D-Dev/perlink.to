@@ -1,5 +1,5 @@
 import { getDB } from '../../utils/db'
-import { BioRepository } from '../../repositories/bioRepository'
+import { BioRepository, editableBioPage } from '../../repositories/bioRepository'
 
 export default defineEventHandler(async (event) => {
   // Check auth
@@ -32,9 +32,35 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Visits per day over the last 14 days: this week for the chart, the
+    // week before to show the change
+    const days = 14
+    const daily: Record<string, Record<string, number>> = {}
+    if (bioPages.length) {
+      try {
+        const since = new Date(Date.now() - (days - 1) * 86_400_000).toISOString().slice(0, 10)
+        const rows = await getDB(event)
+          .prepare(`SELECT link_id AS id, substr(timestamp, 1, 10) AS day, COUNT(*) AS n FROM click_events WHERE link_type = 'bio' AND is_bot = 0 AND timestamp >= ? AND link_id IN (${bioPages.map(() => '?').join(',')}) GROUP BY link_id, day`)
+          .bind(since, ...bioPages.map(p => p.id))
+          .all<{ id: string; day: string; n: number }>()
+        for (const row of rows.results ?? []) (daily[row.id] ??= {})[row.day] = row.n
+      } catch (error) {
+        console.error('[GET /api/admin/bios] visits', error)
+      }
+    }
+    const dayKeys = Array.from({ length: days }, (_, i) => new Date(Date.now() - (days - 1 - i) * 86_400_000).toISOString().slice(0, 10))
+
     return {
       success: true,
-      bioPages: bioPages.map(page => ({ ...page, unreadRequests: unread[page.id] ?? 0 }))
+      // The owner sees their latest edits, draft included
+      bioPages: bioPages.map((page) => {
+        const counts = dayKeys.map(day => daily[page.id]?.[day] ?? 0)
+        return {
+          ...editableBioPage(page),
+          unreadRequests: unread[page.id] ?? 0,
+          visits: { days: dayKeys.slice(7), week: counts.slice(7), previousTotal: counts.slice(0, 7).reduce((a, b) => a + b, 0) },
+        }
+      }),
     }
   } catch (error: any) {
     console.error('[GET /api/admin/bios]', error)

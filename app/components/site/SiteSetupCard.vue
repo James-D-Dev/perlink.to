@@ -6,7 +6,7 @@
         type="button"
         class="mx-auto mt-4 flex size-10 items-center justify-center rounded-full transition-colors hover:bg-sand"
         :aria-label="t('dashboard.onboarding.cardTitle')"
-        @click="open = true"
+        @click="openChecklist"
       >
         <SiteProgressRing :value="progress" :size="28" />
       </button>
@@ -23,7 +23,7 @@
       <button
         type="button"
         class="mt-3 flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-ink text-xs font-medium text-paper transition-colors hover:bg-ink-soft"
-        @click="open = true"
+        @click="openChecklist"
       >
         {{ t('dashboard.onboarding.cardAction') }}
         <UIcon name="i-lucide-arrow-right" class="size-3.5" />
@@ -39,5 +39,10 @@ const { t } = useI18n()
 const { current: setup, open } = useSiteSetup()
 
 const total = computed(() => setup.value?.steps.value.length ?? 5)
+function openChecklist() {
+  if (setup.value?.openChecklist) setup.value.openChecklist()
+  else open.value = true
+}
+
 const progress = computed(() => (setup.value ? setup.value.done.value / total.value : 0))
 </script>

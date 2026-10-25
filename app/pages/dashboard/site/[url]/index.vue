@@ -907,6 +907,11 @@ const loadBio = async () => {
       step.value = "edit";
       await nextTick();
       markSavedSnapshotOnly();
+      // Came from the sidebar card on another page: show the checklist
+      if (route.query.setup) {
+        useSiteSetup().open.value = true;
+        navigateTo({ query: { ...route.query, setup: undefined } }, { replace: true });
+      }
       offerDraftRestore();
     }
   } catch (error: any) {

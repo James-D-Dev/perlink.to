@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import type { BioData } from '~/types/bio'
-import type { SetupStepKey } from '~/composables/useSiteSetup'
+import type { SetupStepKey } from '~/utils/siteSetup'
 
 // First steps to a live site, ticked off from the site's own content
 const props = defineProps<{
@@ -55,23 +55,16 @@ const emit = defineEmits<{ action: [step: SetupStepKey] }>()
 const { t } = useI18n()
 const { current, open } = useSiteSetup()
 
-const storageKey = computed(() => `perlink:onboarding:${props.username}`)
 const dismissed = ref(false)
 const shared = ref(false)
 
 onMounted(() => {
-  try {
-    const saved = JSON.parse(localStorage.getItem(storageKey.value) || '{}')
-    dismissed.value = !!saved.dismissed
-    shared.value = !!saved.shared
-  } catch {}
+  const memory = readSetupMemory(props.username)
+  dismissed.value = memory.dismissed
+  shared.value = memory.shared
 })
 
-function remember() {
-  try {
-    localStorage.setItem(storageKey.value, JSON.stringify({ dismissed: dismissed.value, shared: shared.value }))
-  } catch {}
-}
+const remember = () => writeSetupMemory(props.username, { dismissed: dismissed.value, shared: shared.value })
 
 function dismiss() {
   dismissed.value = true
@@ -91,25 +84,7 @@ function markShared() {
 }
 defineExpose({ markShared })
 
-// Something visitors can act on: a link, a social icon, contact details or a form
-const hasWayToReach = computed(() =>
-  props.bioData.blocks.some((b) => {
-    if (b.hidden) return false
-    if (b.name === 'links') return b.data?.items?.some(i => i.url)
-    if (b.name === 'social') return b.data?.links?.some(l => l.url?.trim())
-    if (b.name === 'contact') return !!(b.data?.phone || b.data?.email || b.data?.address || b.data?.bookingUrl)
-    return b.name === 'form'
-  }),
-)
-
-const steps = computed(() => [
-  { key: 'photo' as const, done: !!props.bioData.avatarUrl },
-  { key: 'bio' as const, done: !!props.bioData.bio?.trim() },
-  { key: 'contact' as const, done: hasWayToReach.value },
-  { key: 'publish' as const, done: props.published },
-  { key: 'share' as const, done: shared.value },
-])
-
+const steps = computed(() => siteSetupSteps(props.bioData, props.published, shared.value))
 const done = computed(() => steps.value.filter(s => s.done).length)
 const visible = computed(() => !dismissed.value && done.value < steps.value.length)
 

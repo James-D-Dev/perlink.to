@@ -45,7 +45,29 @@
       "publishedText": "Your site is now live",
       "publishFailed": "Failed to publish site",
       "unpublishedText": "Your site is now hidden",
-      "unpublishFailed": "Failed to unpublish site"
+      "unpublishFailed": "Failed to unpublish site",
+      "edit": "Edit",
+      "newSite": "New site",
+      "greeting": {
+        "morning": "Good morning, {name}",
+        "afternoon": "Good afternoon, {name}",
+        "evening": "Good evening, {name}",
+        "morningPlain": "Good morning",
+        "afternoonPlain": "Good afternoon",
+        "eveningPlain": "Good evening"
+      },
+      "week": {
+        "heading": "In the last 7 days",
+        "visits": "Visits",
+        "change": "{n}% vs the week before",
+        "details": "See analytics",
+        "requestsTitle": "You have {n} new request | You have {n} new requests",
+        "requestsText": "Visitors sent booking or contact requests through your site.",
+        "nudgeTitle": "Have you added your link to your social bios?",
+        "nudgeText": "Paste it into your Instagram, TikTok or Facebook bio, or print the QR code so people find you.",
+        "goodTitle": "People are visiting your site",
+        "goodText": "Share it again to reach even more."
+      }
     },
     "editor": {
       "titleCreate": "Create a site",

@@ -45,7 +45,29 @@
       "publishedText": "Trang của bạn đang hiển thị",
       "publishFailed": "Không xuất bản được trang",
       "unpublishedText": "Trang của bạn đã được ẩn",
-      "unpublishFailed": "Không ngừng xuất bản được trang"
+      "unpublishFailed": "Không ngừng xuất bản được trang",
+      "edit": "Sửa",
+      "newSite": "Tạo trang mới",
+      "greeting": {
+        "morning": "Chào buổi sáng, {name}",
+        "afternoon": "Chào buổi chiều, {name}",
+        "evening": "Chào buổi tối, {name}",
+        "morningPlain": "Chào buổi sáng",
+        "afternoonPlain": "Chào buổi chiều",
+        "eveningPlain": "Chào buổi tối"
+      },
+      "week": {
+        "heading": "7 ngày qua",
+        "visits": "Lượt truy cập",
+        "change": "{n}% so với tuần trước",
+        "details": "Xem thống kê",
+        "requestsTitle": "Bạn có {n} yêu cầu mới | Bạn có {n} yêu cầu mới",
+        "requestsText": "Khách vừa gửi yêu cầu đặt lịch hoặc liên hệ qua trang của bạn.",
+        "nudgeTitle": "Đã gắn link trang vào bio mạng xã hội chưa?",
+        "nudgeText": "Dán link vào bio Instagram, TikTok, Facebook hoặc in mã QR để khách tìm thấy bạn.",
+        "goodTitle": "Trang của bạn đang có khách ghé thăm",
+        "goodText": "Chia sẻ thêm để nhiều người biết đến bạn hơn."
+      }
     },
     "editor": {
       "titleCreate": "Tạo trang",

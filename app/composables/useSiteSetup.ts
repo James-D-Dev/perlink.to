@@ -1,6 +1,7 @@
 import type { ComputedRef } from 'vue'
+import type { SetupStepKey } from '~/utils/siteSetup'
 
-export type SetupStepKey = 'photo' | 'bio' | 'contact' | 'publish' | 'share'
+export type { SetupStepKey }
 
 export interface SiteSetupState {
   username: string
@@ -8,10 +9,12 @@ export interface SiteSetupState {
   done: ComputedRef<number>
   /** Still worth showing: steps left and not hidden by the owner */
   visible: ComputedRef<boolean>
+  /** Away from the editor, the card's button goes there instead of opening the popup */
+  openChecklist?: () => void
 }
 
-// The site editor registers its checklist here; the sidebar shows a progress
-// card from it and opens the checklist popup. Client-only (the editor is SPA).
+// The site editor (or the sites list) registers a checklist here; the sidebar
+// shows a progress card from it. Client-only (the dashboard is SPA).
 const current = shallowRef<SiteSetupState | null>(null)
 
 export function useSiteSetup() {
