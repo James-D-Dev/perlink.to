@@ -389,6 +389,12 @@
     "presetActions": {
       "random": "Surprise me",
       "count": "{n} themes"
+    },
+    "rows": {
+      "theme": "Theme",
+      "themeHint": "40 ready-made looks",
+      "customize": "Customize",
+      "custom": "Custom"
     }
   },
   "analytics": {

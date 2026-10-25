@@ -84,7 +84,8 @@
         "room": "Phòng 3D",
         "content": "Nội dung",
         "design": "Giao diện",
-        "settings": "Cài đặt"
+        "settings": "Cài đặt",
+        "header": "Đầu trang"
       },
       "room": {
         "heading": "Phòng 3D của bạn",
@@ -155,7 +156,8 @@
       "update": "Cập nhật trang",
       "upToDate": "Khách đang thấy bản mới nhất",
       "previewHint": "Bấm vào một phần trong điện thoại để sửa phần đó",
-      "templateReopen": "Bắt đầu từ một mẫu có sẵn"
+      "templateReopen": "Bắt đầu từ một mẫu có sẵn",
+      "sections": "Các phần của trang"
     },
     "username": {
       "heading": "Chọn tên người dùng",

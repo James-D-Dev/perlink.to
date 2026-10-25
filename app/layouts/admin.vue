@@ -3,6 +3,7 @@
     <UDashboardSidebar
       id="default"
       v-model:open="open"
+      v-model:collapsed="collapsed"
       collapsible
       resizable
       :min-size="16"
@@ -94,6 +95,28 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 const { user: sessionUser, loggedIn } = useUserSession();
 const user = sessionUser as Ref<User | null>;
 const open = ref(false);
+
+// Focus mode: the site editor gets the room, so the menu folds to icons
+// there and comes back as it was elsewhere
+const route = useRoute();
+const collapsed = ref(false);
+const isEditor = computed(() => /^\/dashboard\/site\/[^/]+\/?$/.test(route.path));
+let collapsedBefore = false;
+watch(isEditor, (editing, wasEditing) => {
+  if (editing && !wasEditing) {
+    collapsedBefore = collapsed.value;
+    collapsed.value = true;
+  } else if (!editing && wasEditing) {
+    collapsed.value = collapsedBefore;
+  }
+});
+// The sidebar restores its saved state on mount, so fold after that
+onMounted(() => nextTick(() => {
+  if (isEditor.value) {
+    collapsedBefore = collapsed.value;
+    collapsed.value = true;
+  }
+}));
 
 const helpOpen = useHelpCenter();
 const { current: setup } = useSiteSetup();

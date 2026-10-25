@@ -19,7 +19,10 @@
       "changePhoto": "Đổi ảnh",
       "addPhoto": "Thêm ảnh",
       "titlePlaceholder": "Tên hoặc tiêu đề của bạn",
-      "bioPlaceholder": "Giới thiệu đôi chút về bạn"
+      "bioPlaceholder": "Giới thiệu đôi chút về bạn",
+      "nameLabel": "Tên hiển thị",
+      "bioLabel": "Giới thiệu",
+      "removePhoto": "Gỡ ảnh"
     },
     "links": {
       "title": "Liên kết",

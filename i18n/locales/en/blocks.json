@@ -19,7 +19,10 @@
       "changePhoto": "Change photo",
       "addPhoto": "Add a photo",
       "titlePlaceholder": "Your name or title",
-      "bioPlaceholder": "Tell us about yourself"
+      "bioPlaceholder": "Tell us about yourself",
+      "nameLabel": "Display name",
+      "bioLabel": "Intro",
+      "removePhoto": "Remove"
     },
     "links": {
       "title": "Links",

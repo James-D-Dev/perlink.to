@@ -1,74 +1,46 @@
 <template>
-  <div :class="standalone ? '' : 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden'">
-    <BioBlockItemHeader
-      v-if="!standalone"
-      container
-      :is-active="isActive"
-      :title="t('theme.panelTitle')"
-      icon="i-lucide-palette"
-      @toggle="$emit('toggle')"
-    >
-      <!-- <template #actions>
-        <UButton
-          variant="ghost"
-          color="neutral"
-          size="xs"
-          icon="i-lucide-more-vertical"
-        />
-      </template> -->
-    </BioBlockItemHeader>
+  <div>
+    <!-- Root: one row per part of the look, with what it's set to now -->
+    <div v-if="view === 'root'" class="space-y-5">
+      <button type="button" class="design-row" @click="view = 'theme'">
+        <span class="flex size-11 shrink-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-xl ring-1 ring-line" :style="rootBgStyle">
+          <span class="h-1.5 w-6 rounded-full" :style="{ backgroundColor: accent }" />
+          <span class="h-1.5 w-6 rounded-full opacity-60" :style="{ backgroundColor: accent }" />
+        </span>
+        <span class="min-w-0 flex-1 text-left">
+          <span class="block text-sm font-medium text-ink">{{ t('theme.rows.theme') }}</span>
+          <span class="block truncate text-xs text-ink-muted">{{ t('theme.rows.themeHint') }}</span>
+        </span>
+        <span class="max-w-[40%] truncate text-sm text-ink-muted">{{ currentPresetName }}</span>
+        <UIcon name="i-lucide-chevron-right" class="size-4 shrink-0 text-ink-faint" />
+      </button>
 
-    <div
-      v-if="isActive || standalone"
-      class="space-y-5"
-      :class="standalone ? '' : 'p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]'"
-    >
-      <!-- Mode toggle -->
-      <UTabs
-        :items="modeTabs"
-        :model-value="editMode"
-        color="neutral"
-        variant="pill"
-        class="w-full"
-        size="sm"
-        @update:model-value="editMode = $event as 'presets' | 'custom'"
-      >
-        <template #content="{ item }">
-          <!-- Preset picker -->
-          <template v-if="editMode === 'presets'">
-            <BioThemePresetPicker
-              :selected-id="selectedPresetId"
-              @select="onPresetSelect"
-            />
-            <div class="mt-6">
-              <label class="text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2 block"
-                >{{ t('theme.headerLayout.label') }}</label
-              >
-              <BioHeaderLayoutPicker
-                :model-value="themeConfig.header.layout"
-                :avatar-url="avatarUrl"
-                :title="title"
-                :bio="bio"
-                :social-links="socialLinks"
-                :banner-url="themeConfig.header.bannerUrl"
-                :bio-page-id="bioPageId"
-                @update:model-value="emitHeader('layout', $event)"
-                @update:banner-url="emitHeader('bannerUrl', $event)"
-              />
-            </div>
-          </template>
+      <div>
+        <p class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ t('theme.rows.customize') }}</p>
+        <div class="divide-y divide-line overflow-hidden rounded-2xl bg-paper ring-1 ring-line">
+          <button v-for="row in rootRows" :key="row.view" type="button" class="design-row rounded-none ring-0" @click="view = row.view">
+            <span class="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-sand" :style="row.swatchStyle">
+              <span v-if="row.text" class="text-base leading-none" :style="row.textStyle">{{ row.text }}</span>
+              <UIcon v-else :name="row.icon" class="size-4 text-ink-soft" />
+            </span>
+            <span class="min-w-0 flex-1 text-left text-sm font-medium text-ink">{{ row.label }}</span>
+            <span class="max-w-[45%] truncate text-sm text-ink-muted">{{ row.value }}</span>
+            <UIcon name="i-lucide-chevron-right" class="size-4 shrink-0 text-ink-faint" />
+          </button>
+        </div>
+      </div>
+    </div>
 
-          <!-- Custom editor, grouped so it doesn't read as one long form -->
-          <template v-if="editMode === 'custom'">
-            <UAccordion
-              v-model="openSections"
-              type="multiple"
-              :items="customSections"
-              :ui="{ item: 'border-b border-default last:border-b-0 dark:border-white/10', trigger: 'py-3 text-sm', body: 'pb-4 pt-0' }"
-            >
-              <template #body="{ item }">
+    <!-- One part, opened from the list -->
+    <div v-else class="space-y-5">
+      <div class="flex items-center gap-2">
+        <UButton icon="i-lucide-chevron-left" color="neutral" variant="ghost" size="sm" :aria-label="t('common.back')" @click="view = 'root'" />
+        <h3 class="text-lg font-semibold text-ink">{{ viewTitle }}</h3>
+      </div>
+
+      <BioThemePresetPicker v-if="view === 'theme'" :selected-id="themeConfig.presetId" @select="onPresetSelect" />
                 <!-- Colours -->
-                <div v-if="item.value === 'colors'" class="space-y-4">
+                <div v-if="view === 'colors'" class="space-y-4">
                   <BioColorPicker
                     :primary="themeConfig.colors.primary"
                     :secondary="themeConfig.colors.secondary"
@@ -102,7 +74,7 @@
                 </div>
 
                 <!-- Text -->
-                <div v-else-if="item.value === 'text'" class="space-y-5">
+                <div v-else-if="view === 'text'" class="space-y-5">
                   <!-- One tap sets heading and body fonts that go together -->
                   <UFormField :label="t('theme.text.pairs')">
                     <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">
@@ -177,7 +149,7 @@
                 </div>
 
                 <!-- Cards & buttons -->
-                <div v-else-if="item.value === 'cards'" class="space-y-4">
+                <div v-else-if="view === 'cards'" class="space-y-4">
                   <UFormField :label="t('theme.card.style')">
                     <BioVisualPicker :model-value="themeConfig.card.style || 'filled'" :options="cardStyleOptions" @update:model-value="emitCard('style', $event)">
                       <template #preview="{ value }">
@@ -220,7 +192,7 @@
                 </div>
 
                 <!-- Layout -->
-                <div v-else-if="item.value === 'layout'" class="space-y-4">
+                <div v-else-if="view === 'layout'" class="space-y-4">
                   <UFormField :label="t('theme.linkLayout.title')">
                     <BioVisualPicker :model-value="themeConfig.link.layout" :options="linkLayoutOptions" @update:model-value="emitLink('layout', $event)">
                       <template #preview="{ value }">
@@ -270,7 +242,7 @@
                 </div>
 
                 <!-- Effects -->
-                <div v-else-if="item.value === 'effects'" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div v-else-if="view === 'effects'" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <UFormField :label="t('theme.card.appearAnimation')">
                     <USelect :model-value="themeConfig.card.animationAppear || 'none'" :items="appearOptions" class="w-full" @update:model-value="emitCard('animationAppear', $event as string)" />
                   </UFormField>
@@ -278,11 +250,6 @@
                     <USelect :model-value="themeConfig.card.animationHover || 'none'" :items="hoverOptions" class="w-full" @update:model-value="emitCard('animationHover', $event as string)" />
                   </UFormField>
                 </div>
-              </template>
-            </UAccordion>
-          </template>
-        </template>
-      </UTabs>
     </div>
   </div>
 </template>
@@ -293,7 +260,7 @@ import { type ThemePreset } from "~/data/themePresets";
 import { nameFontOptions, headingFontOptions, paragraphFontOptions, FONT_PAIRS, type FontOption } from "~/data/fontOptions";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
 
-const { t } = useI18n();
+const { t, te } = useI18n();
 
 const props = defineProps<{
   /** Shown on its own tab: no collapsible header around it */
@@ -315,12 +282,39 @@ const emit = defineEmits<{
   updateTheme: [patch: Partial<ThemeConfig>];
 }>();
 
-const editMode = ref<"presets" | "custom">("presets");
+type DesignView = "root" | "theme" | "colors" | "text" | "cards" | "layout" | "effects";
+const view = ref<DesignView>("root");
 
-const modeTabs = computed(() => [
-  { label: t("theme.tabs.presets"), value: "presets" },
-  { label: t("theme.tabs.custom"), value: "custom" },
-]);
+const viewTitle = computed(() =>
+  view.value === "theme" ? t("theme.rows.theme") : t(`theme.sections.${view.value}`),
+);
+
+const rootBgStyle = computed(() => {
+  const bg = props.themeConfig.background;
+  if (bg?.type === "gradient" && bg.gradient) return { background: `linear-gradient(${bg.gradient.angle ?? 160}deg, ${bg.gradient.from}, ${bg.gradient.to})` };
+  return { backgroundColor: bg?.color || props.themeConfig.colors.third || "#fff" };
+});
+
+const currentPresetName = computed(() => {
+  const id = props.themeConfig.presetId;
+  if (!id) return t("theme.rows.custom");
+  const key = `theme.presets.${id}.name`;
+  return te(key) ? t(key) : id;
+});
+
+const rootRows = computed(() => {
+  const tc = props.themeConfig;
+  const nameFont = tc.header.fontFamily || tc.typography.nameFont || "";
+  const fontLabel = (v: string) => v.split(",")[0]!.replace(/["']/g, "").trim() || t("common.auto");
+  const bgLabel = { solid: t("theme.background.tabs.solid"), gradient: t("theme.background.tabs.gradient"), image: t("theme.background.tabs.image"), video: t("theme.background.tabs.video"), effect: t("theme.background.tabs.effect") }[tc.background?.type ?? "solid"];
+  return [
+    { view: "colors" as const, label: t("theme.sections.colors"), value: bgLabel, swatchStyle: { ...rootBgStyle.value, boxShadow: `inset 0 0 0 6px transparent` }, icon: "i-lucide-palette", text: "●", textStyle: { color: accent.value, fontSize: "20px" } },
+    { view: "text" as const, label: t("theme.sections.text"), value: fontLabel(nameFont), swatchStyle: {}, icon: "", text: "Aa", textStyle: { fontFamily: nameFont, fontWeight: 600 } },
+    { view: "cards" as const, label: t("theme.sections.cards"), value: t(`theme.card.styles.${tc.card.style || "filled"}`), swatchStyle: {}, icon: "i-lucide-rectangle-horizontal", text: "", textStyle: {} },
+    { view: "layout" as const, label: t("theme.sections.layout"), value: linkLayoutOptions.value.find((o) => o.value === tc.link.layout)?.label ?? "", swatchStyle: {}, icon: "i-lucide-layout-template", text: "", textStyle: {} },
+    { view: "effects" as const, label: t("theme.sections.effects"), value: tc.card.animationAppear && tc.card.animationAppear !== "none" ? t(`theme.animations.appear.${tc.card.animationAppear}`) : t("theme.options.none"), swatchStyle: {}, icon: "i-lucide-sparkles", text: "", textStyle: {} },
+  ];
+});
 
 const headerFontSizeOptions = computed(() => [
   { label: t("theme.options.small"), value: "1.25rem" },
@@ -355,17 +349,8 @@ const titleAlignOptions = computed(() => [
   { label: t("theme.page.titleAlign.center"), value: "center" },
   { label: t("theme.page.titleAlign.left"), value: "left" },
 ]);
-const selectedPresetId = ref<string | undefined>(undefined);
 
-// Sections of the custom tab; effects stay closed since few people need them
-const openSections = ref<string[]>(["colors"]);
-const customSections = computed(() => [
-  { label: t("theme.sections.colors"), icon: "i-lucide-palette", value: "colors" },
-  { label: t("theme.sections.text"), icon: "i-lucide-type", value: "text" },
-  { label: t("theme.sections.cards"), icon: "i-lucide-rectangle-horizontal", value: "cards" },
-  { label: t("theme.sections.layout"), icon: "i-lucide-layout-template", value: "layout" },
-  { label: t("theme.sections.effects"), icon: "i-lucide-sparkles", value: "effects" },
-]);
+
 
 const radiusOptions = computed(() => [
   { label: t("theme.options.none"), value: 0 },
@@ -425,12 +410,12 @@ function socialPreviewStyle(style: string) {
 }
 
 function onPresetSelect(preset: ThemePreset) {
-  selectedPresetId.value = preset.id;
   // Theme patches merge into the current theme, so clear the extras a
   // template may have set that the preset doesn't define
   const theme = preset.theme;
   emit("updateTheme", {
     ...theme,
+    presetId: preset.id,
     card: { backgroundColor: undefined, outlineColor: undefined, ...theme.card },
     // The owner's header layout (and banner) stays; the preset only restyles it
     header: { fontWeight: undefined, letterSpacing: undefined, fontFamily: undefined, fontSize: undefined, textColor: undefined, ...theme.header, layout: props.themeConfig.header.layout },
@@ -649,3 +634,23 @@ function emitHeader(key: string, value: any) {
   });
 }
 </script>
+
+<style scoped>
+.design-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  background: var(--color-paper);
+  box-shadow: inset 0 0 0 1px var(--color-line);
+  transition: background-color 0.15s;
+}
+.design-row:hover {
+  background: color-mix(in srgb, var(--color-sand) 60%, var(--color-paper));
+}
+.design-row.ring-0 {
+  box-shadow: none;
+}
+</style>

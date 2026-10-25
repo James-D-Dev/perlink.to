@@ -1,7 +1,7 @@
 <template>
   <!-- Saves happen on their own; publishing is the one decision left.
-       Fixed to the bottom on phones, sticky inside the editor column on desktop. -->
-  <div class="fixed inset-x-0 bottom-0 z-20 border-t border-default bg-default/90 px-3 py-2.5 backdrop-blur sm:px-4 lg:sticky lg:mt-4 lg:rounded-xl lg:border lg:px-3 dark:border-white/10">
+       Phones and tablets only; on desktop these live in the editor bar. -->
+  <div class="fixed inset-x-0 bottom-0 z-20 border-t border-default bg-default/90 px-3 py-2.5 backdrop-blur sm:px-4 lg:hidden dark:border-white/10">
     <div class="flex items-center gap-2">
       <!-- Phone preview and the design switch, on screens without the side column -->
       <UButton
@@ -12,15 +12,7 @@
         :aria-label="t('common.preview')"
         @click="$emit('preview')"
       />
-      <UButton
-        v-if="tab === 'content' || tab === 'design'"
-        :icon="tab === 'design' ? 'i-lucide-layout-list' : 'i-lucide-palette'"
-        color="neutral"
-        variant="outline"
-        class="lg:hidden"
-        :label="tab === 'design' ? t('dashboard.editor.tabs.content') : t('dashboard.editor.tabs.design')"
-        @click="$emit('switchTab', tab === 'design' ? 'content' : 'design')"
-      />
+
 
       <p class="flex min-w-0 flex-1 items-center gap-1.5 truncate px-1 text-xs" :class="status.tone === 'muted' ? 'text-muted' : 'text-highlighted'">
         <UIcon v-if="saving" name="i-lucide-loader-circle" class="size-3 shrink-0 animate-spin" />

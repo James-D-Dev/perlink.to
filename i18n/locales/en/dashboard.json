@@ -84,7 +84,8 @@
         "room": "3D room",
         "content": "Content",
         "design": "Design",
-        "settings": "Settings"
+        "settings": "Settings",
+        "header": "Header"
       },
       "room": {
         "heading": "Your 3D room",
@@ -155,7 +156,8 @@
       "update": "Update site",
       "upToDate": "Visitors see the latest version",
       "previewHint": "Tap a part of the phone to edit it",
-      "templateReopen": "Start from a template"
+      "templateReopen": "Start from a template",
+      "sections": "Editor sections"
     },
     "username": {
       "heading": "Choose Your Username",

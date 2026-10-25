@@ -6,16 +6,7 @@
         <h3 class="font-semibold text-gray-900 dark:text-white">{{ t('common.preview') }}</h3>
         <p class="truncate text-xs text-muted">{{ t('dashboard.editor.previewHint') }}</p>
       </div>
-      <UButton
-        v-if="existingBio?.isPublished"
-        :to="`/${username}`"
-        target="_blank"
-        size="xs"
-        color="neutral"
-        variant="outline"
-        icon="i-lucide-external-link"
-        :label="t('common.openSite')"
-      />
+
     </div>
 
     <!-- Phone Mockup -->

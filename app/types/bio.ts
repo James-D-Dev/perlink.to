@@ -251,6 +251,8 @@ export interface ThemeConfig {
   language?: string;
   seo?: ThemeSeo;
   showShare?: boolean;
+  /** The ready-made theme last picked, for showing its name */
+  presetId?: string;
   /** '3d' shows the page as an interactive mini room */
   pageMode?: PageMode;
   room?: RoomConfig;

@@ -19,7 +19,8 @@
     "reset": "reset",
     "auto": "Auto",
     "optional": "Optional",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "back": "Back"
   },
   "menu": {
     "account": "My account",

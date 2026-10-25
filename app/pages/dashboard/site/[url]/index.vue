@@ -1,78 +1,67 @@
 <template>
-  <UDashboardPanel id="bio">
+  <UDashboardPanel id="bio" :ui="{ body: step === 'edit' ? 'bg-sand' : '' }">
     <template #header>
-      <UDashboardNavbar
-        :title="step === 'template' ? t('dashboard.editor.titleCreate') : t('dashboard.editor.titleEdit')"
-      >
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+      <!-- Editor bar: where you are on the left, what you can do with the site on the right -->
+      <div class="flex h-16 shrink-0 items-center gap-2 border-b border-line bg-paper px-3 sm:px-4">
+        <UDashboardSidebarToggle class="lg:hidden" />
+        <UDashboardSidebarCollapse />
+        <template v-if="step === 'edit' && existingBio?.username">
+          <UTooltip :text="t('dashboard.sites.title')">
+            <UButton to="/dashboard/site" icon="i-lucide-arrow-left" color="neutral" variant="ghost" class="hidden sm:inline-flex" :aria-label="t('dashboard.sites.title')" />
+          </UTooltip>
 
-        <template #right>
-          <!-- Bio Page Selector -->
-          <USelect
-            v-if="userBioPages.length > 0"
-            v-model="selectedBioUsername"
-            :items="userBioPages"
-            :placeholder="t('dashboard.editor.selectSite')"
-            class="hidden sm:block"
-            size="xl"
+          <!-- Which site, and a quick switch to another -->
+          <UDropdownMenu :items="siteMenu" :content="{ align: 'start' }" :ui="{ content: 'w-64' }">
+            <button type="button" class="flex min-w-0 items-center gap-2 rounded-full bg-sand py-1 pl-1 pr-3 transition-colors hover:bg-sand-strong">
+              <img v-if="bioData.avatarUrl" :src="bioData.avatarUrl" alt="" class="size-7 shrink-0 rounded-full object-cover">
+              <span v-else class="flex size-7 shrink-0 items-center justify-center rounded-full bg-paper text-xs font-semibold text-ink-soft">{{ (bioData.title || existingBio.username).charAt(0).toUpperCase() }}</span>
+              <span class="min-w-0 text-left leading-tight">
+                <span class="block max-w-40 truncate text-sm font-medium text-ink sm:max-w-56">{{ bioData.title || existingBio.username }}</span>
+                <span class="block max-w-40 truncate text-[11px] text-ink-muted sm:max-w-56">perlink.to/{{ existingBio.username }}</span>
+              </span>
+              <UIcon name="i-lucide-chevrons-up-down" class="size-3.5 shrink-0 text-ink-muted" />
+            </button>
+          </UDropdownMenu>
+
+          <div class="flex-1" />
+
+          <!-- Save state, desktop (phones see it in the bottom bar) -->
+          <p class="hidden items-center gap-1.5 text-xs lg:flex" :class="saveStatus.tone === 'muted' ? 'text-ink-muted' : 'text-ink'">
+            <UIcon v-if="saving" name="i-lucide-loader-circle" class="size-3 animate-spin" />
+            <span v-else class="size-1.5 rounded-full" :class="{ 'bg-emerald-500': saveStatus.tone === 'muted', 'bg-amber-500': saveStatus.tone === 'pending', 'bg-red-500': saveStatus.tone === 'error' }" />
+            {{ saveStatus.text }}
+          </p>
+          <UButton
+            v-if="existingBio?.isPublished && existingBio?.hasDraft"
             color="neutral"
-            variant="subtle"
-            @update:model-value="onBioPageChange"
-          >
-            <template #item-label="{ item }">
-              <span>perlink.to/{{ item.value }}</span>
-            </template>
-            <template #default="{ modelValue }">
-              <span class="font-medium">perlink.to/{{ modelValue }}</span>
-            </template>
-          </USelect>
+            variant="ghost"
+            size="sm"
+            icon="i-lucide-undo-2"
+            class="hidden lg:inline-flex"
+            :loading="discarding"
+            :label="t('dashboard.editor.draft.discard')"
+            @click="discardDraft"
+          />
 
-          <!-- Analytics -->
-          <UTooltip v-if="existingBio?.username" :text="t('common.analytics')">
+          <UTooltip :text="t('common.openSite')">
+            <UButton :to="`/${existingBio.username}`" target="_blank" icon="i-lucide-external-link" color="neutral" variant="ghost" class="hidden sm:inline-flex" :aria-label="t('common.openSite')" />
+          </UTooltip>
+          <UDropdownMenu :items="shareMenu" :content="{ align: 'end' }" :ui="{ content: 'w-56' }">
+            <UButton icon="i-lucide-share" color="neutral" variant="outline" :label="t('dashboard.editor.share')" class="max-sm:[&>span:last-child]:hidden" />
+          </UDropdownMenu>
+          <UTooltip :text="t('dashboard.editor.upToDate')" :disabled="!publishDisabled">
             <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-chart-column"
-              :aria-label="t('common.analytics')"
-              :to="`/dashboard/site/${existingBio.username}/analytics`"
+              icon="i-lucide-globe"
+              class="hidden lg:inline-flex"
+              :loading="publishing"
+              :disabled="publishDisabled"
+              :label="existingBio?.isPublished ? t('dashboard.editor.update') : t('common.publish')"
+              @click="publishBio"
             />
-          </UTooltip>
-
-          <!-- Printable QR card -->
-          <UTooltip v-if="existingBio?.username" :text="t('dashboard.qr.open')">
-            <UButton color="neutral" variant="ghost" icon="i-lucide-qr-code" :aria-label="t('dashboard.qr.open')" @click="qrOpen = true" />
-          </UTooltip>
-
-          <!-- Inbox -->
-          <UTooltip v-if="existingBio?.username" :text="t('dashboard.inbox.open')">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-inbox"
-              :aria-label="t('dashboard.inbox.open')"
-              :to="`/dashboard/site/${existingBio.username}/inbox`"
-            />
-          </UTooltip>
-
-          <!-- Copy URL -->
-          <UTooltip :text="t('dashboard.editor.copyUrl')">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-copy"
-              :aria-label="t('dashboard.editor.copyUrl')"
-              @click="copyUrl"
-            />
-          </UTooltip>
-
-          <!-- Share -->
-          <UTooltip :text="t('dashboard.editor.share')">
-            <UButton color="primary" icon="i-lucide-share" :aria-label="t('dashboard.editor.share')" @click="sharePage" />
           </UTooltip>
         </template>
-      </UDashboardNavbar>
+        <h1 v-else class="text-base font-semibold text-ink">{{ t('dashboard.editor.titleCreate') }}</h1>
+      </div>
     </template>
 
     <template #body>
@@ -109,22 +98,46 @@
       </template>
 
       <!-- Bio Editor (Step 2) -->
-      <div v-else-if="step === 'edit'" class="pb-20 lg:pb-0">
-        <!-- Tabs only switch the left column; the phone preview stays put -->
-        <UTabs
-          v-model="activeTab"
-          :items="editorTabs"
-          :content="false"
-          color="neutral"
-          variant="link"
-          size="md"
-          class="w-full"
-          :ui="{ list: 'border-b border-default dark:border-white/10', trigger: 'px-2 sm:px-3', leadingIcon: 'max-sm:hidden' }"
-        />
+      <div v-else-if="step === 'edit'" class="pb-20 lg:flex lg:gap-6 lg:pb-0">
+        <!-- Sections: a labelled rail on desktop, chips on phones -->
+        <nav class="sticky top-0 hidden h-fit w-16 shrink-0 flex-col items-center gap-3 pt-2 lg:flex" :aria-label="t('dashboard.editor.sections')">
+          <button
+            v-for="tab in editorTabs"
+            :key="tab.value"
+            type="button"
+            class="group flex w-full flex-col items-center gap-1"
+            :aria-current="activeTab === tab.value ? 'page' : undefined"
+            @click="activeTab = tab.value as EditorTab"
+          >
+            <span
+              class="flex size-11 items-center justify-center rounded-full transition-colors"
+              :class="activeTab === tab.value ? 'bg-ink text-paper' : 'bg-paper text-ink-soft ring-1 ring-line group-hover:bg-sand'"
+            >
+              <UIcon :name="tab.icon" class="size-5" />
+            </span>
+            <span class="text-[11px] font-medium" :class="activeTab === tab.value ? 'text-ink' : 'text-ink-muted'">{{ tab.label }}</span>
+          </button>
+        </nav>
+
+        <div class="min-w-0 flex-1">
+        <div class="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:hidden">
+          <button
+            v-for="tab in editorTabs"
+            :key="tab.value"
+            type="button"
+            class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors"
+            :class="activeTab === tab.value ? 'bg-ink text-paper' : 'bg-paper text-ink-soft ring-1 ring-line'"
+            @click="activeTab = tab.value as EditorTab"
+          >
+            <UIcon :name="tab.icon" class="size-4" />
+            {{ tab.label }}
+          </button>
+        </div>
 
         <!-- Content and design, with the preview beside them -->
-        <div v-if="activeTab === 'content' || activeTab === 'design'" class="grid grid-cols-1 gap-6 pt-4 lg:grid-cols-12 lg:gap-8">
-          <div class="lg:col-span-7">
+        <div v-if="activeTab === 'content' || activeTab === 'header' || activeTab === 'design'" class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+          <div class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-6 lg:col-span-7">
+            <h2 class="mb-5 hidden text-xl font-semibold text-ink lg:block">{{ editorTabs.find((tab) => tab.value === activeTab)?.label }}</h2>
             <template v-if="activeTab === 'content'">
               <!-- Template picker for empty pages -->
               <div v-if="showTemplatePicker" class="mb-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
@@ -151,6 +164,7 @@
 
               <BioEditor
                 ref="editorRef"
+                @edit-header="activeTab = 'header'"
                 :active-block="activeBlock"
                 :bio-data="bioData"
                 :bio-page-id="existingBio?.id ?? ''"
@@ -161,6 +175,34 @@
                 @focus-block="openBlock"
               />
             </template>
+
+            <!-- Photo, name, intro and the header layout -->
+            <div v-else-if="activeTab === 'header'" class="space-y-8">
+              <BioBlockHeader
+                :is-active="true"
+                :title="bioData.title"
+                :bio="bioData.bio"
+                :avatar-url="bioData.avatarUrl"
+                :bio-page-id="existingBio?.id ?? ''"
+                @update:title="updateBioData('title', $event)"
+                @update:bio="updateBioData('bio', $event)"
+                @update:avatar-url="updateBioData('avatarUrl', $event)"
+              />
+              <div>
+                <p class="mb-3 text-sm font-medium text-ink">{{ t('theme.headerLayout.label') }}</p>
+                <BioHeaderLayoutPicker
+                  :model-value="bioData.themeConfig.header.layout"
+                  :avatar-url="bioData.avatarUrl"
+                  :title="bioData.title"
+                  :bio="bioData.bio"
+                  :social-links="socialLinks"
+                  :banner-url="bioData.themeConfig.header.bannerUrl"
+                  :bio-page-id="existingBio?.id ?? ''"
+                  @update:model-value="handleUpdateTheme({ header: { ...bioData.themeConfig.header, layout: $event } })"
+                  @update:banner-url="handleUpdateTheme({ header: { ...bioData.themeConfig.header, bannerUrl: $event } })"
+                />
+              </div>
+            </div>
 
             <BioBlockTheme
               v-else
@@ -191,7 +233,7 @@
           </div>
 
           <div class="hidden lg:block lg:col-span-5">
-            <div class="sticky top-4 space-y-4">
+            <div class="sticky top-0 space-y-4">
               <BioPreviewPanel
                 ref="previewPanelRef"
                 :preview-data="bioData"
@@ -358,6 +400,8 @@
           </div>
         </div>
 
+        </div>
+
         <!-- Setup checklist popup; the sidebar card opens it -->
         <SiteOnboarding
           v-if="existingBio?.username"
@@ -495,16 +539,39 @@ const onBioPageChange = (username: string) => {
 const previewOpen = ref(false);
 const qrOpen = ref(false);
 
-type EditorTab = "content" | "design" | "room" | "settings";
+type EditorTab = "content" | "header" | "design" | "room" | "settings";
 const activeTab = ref<EditorTab>("content");
 const editorTabs = computed(() => [
   { value: "content", label: t("dashboard.editor.tabs.content"), icon: "i-lucide-layout-list" },
+  { value: "header", label: t("dashboard.editor.tabs.header"), icon: "i-lucide-circle-user-round" },
   { value: "design", label: t("dashboard.editor.tabs.design"), icon: "i-lucide-palette" },
   { value: "room", label: t("dashboard.editor.tabs.room"), icon: "i-lucide-box" },
   { value: "settings", label: t("dashboard.editor.tabs.settings"), icon: "i-lucide-settings" },
 ]);
 
 // Social icons on the page, for the header layout thumbnails
+// Bar menus: switch site, and everything you do with the link
+const siteMenu = computed(() => [
+  userBioPages.value.map((page) => ({
+    label: `perlink.to/${page.value}`,
+    icon: page.value === routeUsername.value ? "i-lucide-check" : "i-lucide-globe",
+    onSelect: () => onBioPageChange(page.value),
+  })),
+  [{ label: t("dashboard.sites.title"), icon: "i-lucide-layout-grid", to: "/dashboard/site" }],
+]);
+
+const shareMenu = computed(() => [
+  [
+    { label: t("dashboard.editor.copyUrl"), icon: "i-lucide-copy", onSelect: () => copyUrl() },
+    { label: t("dashboard.editor.share"), icon: "i-lucide-share-2", onSelect: () => sharePage() },
+    { label: t("dashboard.qr.open"), icon: "i-lucide-qr-code", onSelect: () => (qrOpen.value = true) },
+  ],
+  [
+    { label: t("common.analytics"), icon: "i-lucide-chart-column", to: `/dashboard/site/${routeUsername.value}/analytics` },
+    { label: t("dashboard.inbox.open"), icon: "i-lucide-inbox", to: `/dashboard/site/${routeUsername.value}/inbox` },
+  ],
+]);
+
 const socialLinks = computed<SocialLink[]>(() =>
   bioData.blocks.flatMap((b) => (b.name === "social" ? b.data?.links ?? [] : [])),
 );
@@ -534,6 +601,11 @@ const toggleBlock = (blockId: string) => {
 };
 
 const openBlock = (blockId: string) => {
+  // The page's top has its own section
+  if (blockId === "header") {
+    activeTab.value = "header";
+    return;
+  }
   activeTab.value = "content";
   activeBlock.value = blockId;
   nextTick(() => {

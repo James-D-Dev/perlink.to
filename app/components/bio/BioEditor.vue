@@ -10,19 +10,23 @@
 
     <!-- Blocks List -->
     <div class="space-y-2">
-      <div id="edit-header" class="scroll-mt-24">
-        <BioBlockHeader
-          :is-active="activeBlock === 'header'"
-          :title="bioData.title"
-          :bio="bioData.bio"
-          :avatar-url="bioData.avatarUrl"
-          :bio-page-id="bioPageId"
-          @toggle="$emit('toggleBlock', 'header')"
-          @update:title="$emit('updateData', 'title', $event)"
-          @update:bio="$emit('updateData', 'bio', $event)"
-          @update:avatar-url="$emit('updateData', 'avatarUrl', $event)"
-        />
-      </div>
+      <!-- Who the page is about; edited in the Header section -->
+      <button
+        id="edit-header"
+        type="button"
+        class="flex w-full scroll-mt-24 items-center gap-3 rounded-2xl p-2 text-left transition-colors hover:bg-sand/60"
+        @click="$emit('editHeader')"
+      >
+        <img v-if="bioData.avatarUrl" :src="bioData.avatarUrl" alt="" class="size-14 shrink-0 rounded-full object-cover ring-1 ring-line">
+        <span v-else class="flex size-14 shrink-0 items-center justify-center rounded-full bg-sand text-ink-muted">
+          <UIcon name="i-lucide-image-plus" class="size-5" />
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate font-semibold text-ink">{{ bioData.title || t('blocks.header.titlePlaceholder') }}</span>
+          <span class="line-clamp-2 text-sm text-ink-muted">{{ bioData.bio || t('blocks.header.bioPlaceholder') }}</span>
+        </span>
+        <UIcon name="i-lucide-pencil" class="size-4 shrink-0 text-ink-faint" />
+      </button>
 
       <!-- Each editor receives just its own block, so a page can hold several of one type.
            The wrapper gives the block header its move / duplicate / delete menu.
@@ -252,6 +256,8 @@ const emit = defineEmits<{
   updateBlocks: [blocks: BioBlock[]];
   /** A block was added or duplicated and should open */
   focusBlock: [blockId: string];
+  /** Open the Header section (photo, name, intro) */
+  editHeader: [];
 }>();
 
 // Lets the page open the add-block popup (onboarding checklist)

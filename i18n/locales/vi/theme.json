@@ -389,6 +389,12 @@
     "presetActions": {
       "random": "Thử ngẫu nhiên",
       "count": "{n} giao diện"
+    },
+    "rows": {
+      "theme": "Giao diện có sẵn",
+      "themeHint": "40 bộ màu, phông và kiểu thẻ phối sẵn",
+      "customize": "Tùy chỉnh",
+      "custom": "Tự phối"
     }
   },
   "analytics": {
