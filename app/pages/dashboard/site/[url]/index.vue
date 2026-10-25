@@ -284,7 +284,7 @@
             <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
               <!-- The picture saved by the room editor; the live scene only until there is one -->
               <img v-if="existingBio?.roomThumbnailUrl" :src="existingBio.roomThumbnailUrl" :alt="t('dashboard.editor.room.heading')" class="absolute inset-0 size-full object-cover">
-              <LazyRoomCanvas v-else :room="roomModel" preview class="pointer-events-none" />
+              <LazyRoomCanvas v-else :room="roomModel" preview force-mode="day" class="pointer-events-none" />
             </div>
             <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
               <div>
