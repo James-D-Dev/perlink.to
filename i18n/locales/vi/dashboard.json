@@ -157,7 +157,9 @@
       "upToDate": "Khách đang thấy bản mới nhất",
       "previewHint": "Bấm vào một phần trong điện thoại để sửa phần đó",
       "templateReopen": "Bắt đầu từ một mẫu có sẵn",
-      "sections": "Các phần của trang"
+      "sections": "Các phần của trang",
+      "yourSites": "Trang của bạn",
+      "notLiveYet": "Chưa xuất bản, khách chưa xem được"
     },
     "username": {
       "heading": "Chọn tên người dùng",

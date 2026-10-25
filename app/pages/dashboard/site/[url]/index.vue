@@ -11,8 +11,8 @@
           </UTooltip>
 
           <!-- Which site, and a quick switch to another -->
-          <UDropdownMenu :items="siteMenu" :content="{ align: 'start' }" :ui="{ content: 'w-64' }">
-            <button type="button" class="flex min-w-0 items-center gap-2 rounded-full bg-sand py-1 pl-1 pr-3 transition-colors hover:bg-sand-strong">
+          <UDropdownMenu :items="siteMenu" :content="{ align: 'start', sideOffset: 8 }" :ui="{ content: 'w-72' }">
+            <button type="button" class="flex min-w-0 items-center gap-2 rounded-full bg-white/70 py-1 pl-1 pr-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-black/[0.06] backdrop-blur-xl transition-[background-color,transform] duration-150 hover:bg-white/90 active:scale-[0.98] data-[state=open]:bg-white">
               <img v-if="bioData.avatarUrl" :src="bioData.avatarUrl" alt="" class="size-7 shrink-0 rounded-full object-cover">
               <span v-else class="flex size-7 shrink-0 items-center justify-center rounded-full bg-paper text-xs font-semibold text-ink-soft">{{ (bioData.title || existingBio.username).charAt(0).toUpperCase() }}</span>
               <span class="min-w-0 text-left leading-tight">
@@ -611,25 +611,39 @@ const editorTabs = computed(() => [
 // Social icons on the page, for the header layout thumbnails
 // Bar menus: switch site, and everything you do with the link
 const siteMenu = computed(() => [
-  userBioPages.value.map((page) => {
-    const current = page.value === routeUsername.value;
-    // This editor's site shows its live edits; the others what the list returned
-    const title = (current ? bioData.title : page.title) || page.value;
-    const src = (current ? bioData.avatarUrl : page.avatarUrl) || undefined;
-    return {
-      label: title,
-      description: `perlink.to/${page.value}`,
-      avatar: { src, alt: title, size: "md" as const, ui: { root: "bg-paper ring-1 ring-line" } },
-      // The open site is marked by its background
-      class: current ? "bg-sand" : undefined,
-      onSelect: () => onBioPageChange(page.value),
-    };
-  }),
-  [{ label: t("dashboard.sites.title"), icon: "i-lucide-layout-grid", to: "/dashboard/site" }],
+  [
+    { type: "label" as const, label: t("dashboard.editor.yourSites") },
+    ...userBioPages.value.map((page) => {
+      const current = page.value === routeUsername.value;
+      // This editor's site shows its live edits; the others what the list returned
+      const title = (current ? bioData.title : page.title) || page.value;
+      const src = (current ? bioData.avatarUrl : page.avatarUrl) || undefined;
+      return {
+        label: title,
+        description: `perlink.to/${page.value}`,
+        avatar: { src, alt: title, size: "md" as const, ui: { root: "bg-paper ring-1 ring-black/[0.06]" } },
+        // The open site gets a tick, like the current choice in an iOS menu
+        type: "checkbox" as const,
+        checked: current,
+        onSelect: () => onBioPageChange(page.value),
+      };
+    }),
+  ],
+  [
+    { label: t("nav.createSite"), icon: "i-lucide-plus", to: "/dashboard/create" },
+    { label: t("dashboard.sites.title"), icon: "i-lucide-layout-grid", to: "/dashboard/site" },
+  ],
 ]);
 
 const shareMenu = computed(() => [
   [
+    // Which link is being shared, and whether visitors can open it yet
+    {
+      type: "label" as const,
+      label: `perlink.to/${routeUsername.value}`,
+      icon: existingBio.value?.isPublished ? "i-lucide-globe" : "i-lucide-eye-off",
+      description: existingBio.value?.isPublished ? undefined : t("dashboard.editor.notLiveYet"),
+    },
     { label: t("dashboard.editor.copyUrl"), icon: "i-lucide-copy", onSelect: () => copyUrl() },
     { label: t("dashboard.editor.share"), icon: "i-lucide-share-2", onSelect: () => sharePage() },
     { label: t("dashboard.qr.open"), icon: "i-lucide-qr-code", onSelect: () => (qrOpen.value = true) },

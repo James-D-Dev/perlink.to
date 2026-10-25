@@ -157,7 +157,9 @@
       "upToDate": "Visitors see the latest version",
       "previewHint": "Tap a part of the phone to edit it",
       "templateReopen": "Start from a template",
-      "sections": "Editor sections"
+      "sections": "Editor sections",
+      "yourSites": "Your sites",
+      "notLiveYet": "Not published yet, visitors can’t see it"
     },
     "username": {
       "heading": "Choose Your Username",

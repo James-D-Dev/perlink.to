@@ -58,6 +58,10 @@ All set once in `app/app.config.ts`, so every screen matches:
   typing with a gentle accent ring; errors tint red.
 - **Toasts** are glass capsules at the top centre (`UApp :toaster` in
   `app/app.vue`) that drop in with a small bounce and lift out.
+- **Menus** (dropdown, context menu, select, select menu, input menu,
+  popover) are glass panels that spring open from where they were opened,
+  with roomy rounded rows, hairline group dividers and a tick on the current
+  choice. Tooltips are small dark capsules.
 - **Alerts** are rounder, frosted when neutral, and fade up into place.
 - **Dialogs** spring open (`ios-sheet-in`). Keyframes `ios-*` live in
   `app/assets/css/main.css`; reduced-motion users get no animation.

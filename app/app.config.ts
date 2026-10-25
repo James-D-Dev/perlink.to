@@ -1,7 +1,6 @@
 // Glass surfaces for dark mode (dashboard and superadmin). Every override
 // below is a dark: class, so the light public site is unchanged.
 const glassPanel = 'dark:bg-white/[0.03] dark:backdrop-blur-xl dark:ring-white/[0.08]'
-const glassOverlay = 'dark:bg-[#141414]/90 dark:backdrop-blur-2xl dark:ring-white/10'
 
 // Liquid glass (iOS 26 style) for every dialog: frosted, translucent, bright
 // top edge and a soft long shadow. Matches .glass-sheet in main.css, which
@@ -33,6 +32,32 @@ const iosField = {
   ],
 }
 
+// iOS 26 menus (dropdowns, selects, popovers): a glass panel that springs
+// open from where it was opened, roomy rounded rows, hairline separators
+const menuMotion = 'data-[state=open]:animate-[ios-menu-in_240ms_cubic-bezier(0.22,1.25,0.36,1)] data-[state=closed]:animate-[ios-menu-out_120ms_ease-in]'
+const glassMenu = `${liquidGlass} rounded-[20px] ${menuMotion}`
+const menuRows = {
+  slots: {
+    content: `${glassMenu} p-1`,
+    viewport: 'divide-y divide-black/[0.07] dark:divide-white/10',
+    group: 'p-0.5',
+    label: 'px-3 pt-2 pb-1 text-xs font-medium text-muted',
+    separator: 'mx-3 my-1 h-px bg-black/[0.08] dark:bg-white/10',
+    item: 'before:inset-0 before:rounded-[14px] data-highlighted:before:bg-black/[0.06] dark:data-highlighted:before:bg-white/10',
+    itemLeadingIcon: 'text-muted',
+    itemDescription: 'text-[12px]',
+  },
+  variants: {
+    size: {
+      md: { item: 'px-3 py-2.5 text-[15px] gap-3', itemLeadingIcon: 'size-[18px]', label: 'px-3 pt-2 pb-1 text-xs' },
+      sm: { item: 'px-2.5 py-2 text-sm gap-2.5' },
+    },
+  },
+  compoundVariants: [
+    { color: 'neutral', active: true, class: { item: 'before:bg-black/[0.06] dark:before:bg-white/10' } },
+  ],
+}
+
 // iOS 26 buttons: capsules that press in slightly; neutral outline and
 // subtle buttons are frosted glass, soft ones a light translucent fill
 const glassButton = 'ring-black/[0.08] bg-white/70 backdrop-blur-xl shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_1px_2px_rgb(0_0_0/0.06)] hover:bg-white/90 active:bg-white dark:bg-white/[0.07] dark:ring-white/10 dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] dark:hover:bg-white/[0.12]'
@@ -55,10 +80,24 @@ export default defineAppConfig({
     },
     input: iosField,
     textarea: iosField,
-    inputMenu: iosField,
+    inputMenu: {
+      ...iosField,
+      slots: { ...iosField.slots, ...menuRows.slots },
+      variants: { ...iosField.variants, size: menuRows.variants.size },
+    },
     inputNumber: iosField,
-    select: { ...iosField, slots: { ...iosField.slots, content: glassOverlay } },
-    selectMenu: { ...iosField, slots: { ...iosField.slots, content: glassOverlay } },
+    select: {
+      ...iosField,
+      slots: { ...iosField.slots, ...menuRows.slots },
+      variants: { ...iosField.variants, size: menuRows.variants.size },
+      compoundVariants: [...iosField.compoundVariants, { transition: true, class: { content: menuMotion } }],
+    },
+    selectMenu: {
+      ...iosField,
+      slots: { ...iosField.slots, ...menuRows.slots },
+      variants: { ...iosField.variants, size: menuRows.variants.size },
+      compoundVariants: [...iosField.compoundVariants, { transition: true, class: { content: menuMotion } }],
+    },
     button: {
       slots: {
         base: 'rounded-full transition-[background-color,color,box-shadow,transform,opacity] duration-150 active:scale-[0.97] disabled:active:scale-100',
@@ -143,8 +182,14 @@ export default defineAppConfig({
       slots: { content: `${liquidGlass} divide-y-0` },
       variants: { overlay: { true: { overlay: glassBackdrop } } },
     },
-    popover: { slots: { content: glassOverlay } },
-    dropdownMenu: { slots: { content: glassOverlay } },
+    popover: { slots: { content: glassMenu } },
+    dropdownMenu: menuRows,
+    contextMenu: menuRows,
+    tooltip: {
+      slots: {
+        content: 'h-7 rounded-full px-3 text-[12px] font-medium bg-neutral-900/85 text-white ring-0 backdrop-blur-xl shadow-lg dark:bg-white/90 dark:text-neutral-900 data-[state=delayed-open]:animate-[ios-menu-in_180ms_cubic-bezier(0.22,1.25,0.36,1)]',
+      },
+    },
     dashboardNavbar: { slots: { root: 'dark:bg-[#0a0a0a]/70 dark:backdrop-blur-xl dark:border-white/[0.08]' } },
   },
 })
