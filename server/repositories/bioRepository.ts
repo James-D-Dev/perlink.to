@@ -75,6 +75,10 @@ export interface BioPage {
   /** Unpublished edits of a live site, if any */
   draft: BioDraft | null
   draftUpdatedAt: string | null
+  /** Snapshot of the page as last edited (may show draft edits: owner only) */
+  thumbnailUrl: string | null
+  /** Snapshot of the 3D room */
+  roomThumbnailUrl: string | null
   createdAt: string
   updatedAt: string
 }
@@ -114,7 +118,8 @@ function parseDraft(value: unknown): BioDraft | null {
 
 /** What visitors may see: never the unpublished draft */
 export function publicBioPage(page: BioPage) {
-  const { draft: _draft, draftUpdatedAt: _draftUpdatedAt, ...live } = page
+  // Snapshots can show unpublished edits, so they stay with the owner too
+  const { draft: _draft, draftUpdatedAt: _draftUpdatedAt, thumbnailUrl: _thumb, roomThumbnailUrl: _roomThumb, ...live } = page
   return live
 }
 
@@ -161,6 +166,8 @@ export class BioRepository {
       linkAnalytics: row.link_analytics ? JSON.parse(row.link_analytics) : {},
       draft: parseDraft(row.draft),
       draftUpdatedAt: row.draft_updated_at ?? null,
+      thumbnailUrl: row.thumbnail_url ?? null,
+      roomThumbnailUrl: row.room_thumbnail_url ?? null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }
@@ -269,6 +276,12 @@ export class BioRepository {
   }
 
   /** Drop unpublished edits; harmless before migration 0021 */
+  /** Before migration 0023 the columns don't exist; callers treat that as "not saved" */
+  async setThumbnail(id: string, kind: 'page' | 'room', url: string): Promise<void> {
+    const column = kind === 'room' ? 'room_thumbnail_url' : 'thumbnail_url'
+    await this.db.prepare(`UPDATE bio_pages SET ${column} = ? WHERE id = ?`).bind(url, id).run()
+  }
+
   async clearDraft(id: string): Promise<void> {
     try {
       await this.db.prepare('UPDATE bio_pages SET draft = NULL, draft_updated_at = NULL WHERE id = ?').bind(id).run()

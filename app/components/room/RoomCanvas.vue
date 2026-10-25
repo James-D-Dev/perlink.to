@@ -74,6 +74,9 @@ function applyPreview() {
 }
 
 defineExpose({
+  snapshot() {
+    return scene?.snapshot() ?? Promise.resolve(null)
+  },
   resetView() {
     scene?.resetView()
   },

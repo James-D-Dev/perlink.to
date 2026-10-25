@@ -15,6 +15,7 @@
 
     <LazyRoomStudio
       v-else
+      ref="studioRef"
       v-model:room="room"
       :saving="saving"
       :publishing="publishing"
@@ -80,12 +81,24 @@ async function save(options: { silent?: boolean } = {}): Promise<boolean> {
     bioPage.value = { ...bioPage.value, themeConfig }
     savedSnapshot.value = JSON.stringify(room.value)
     if (!options.silent) toast.add({ title: response?.bioPage?.hasDraft ? t('room.toast.savedDraft') : t('room.toast.saved'), color: 'success' })
+    saveRoomPicture()
     return true
   } catch (error: any) {
     toast.add({ title: t('room.toast.saveFailed'), description: error?.data?.statusMessage, color: 'error' })
     return false
   } finally {
     saving.value = false
+  }
+}
+
+// A picture of the room for the site editor and "My sites"; best effort
+const studioRef = ref<{ snapshot: () => Promise<Blob | null> } | null>(null)
+async function saveRoomPicture() {
+  try {
+    const blob = await studioRef.value?.snapshot()
+    if (blob) await uploadSnapshot(username.value, 'room', blob)
+  } catch (error) {
+    console.warn('[room] snapshot failed', error)
   }
 }
 

@@ -287,6 +287,22 @@ export class RoomScene {
     this.syncObjects(room.objects)
   }
 
+  /** Picture of the current view for the site's thumbnail, without the selection box */
+  snapshot(): Promise<Blob | null> {
+    const boxWasVisible = this.selectionBox.visible
+    this.selectionBox.visible = false
+    this.renderer.render(this.scene, this.camera)
+    // Copy the frame now, before the WebGL buffer is cleared, at thumbnail size
+    const source = this.renderer.domElement
+    const width = Math.min(960, source.width)
+    const small = document.createElement('canvas')
+    small.width = width
+    small.height = Math.round(source.height * (width / source.width))
+    small.getContext('2d')?.drawImage(source, 0, 0, small.width, small.height)
+    this.selectionBox.visible = boxWasVisible
+    return new Promise<Blob | null>(resolve => small.toBlob(resolve, 'image/webp', 0.82))
+  }
+
   select(id: string | null) {
     this.selectedId = id && this.entries.has(id) ? id : null
     this.selectionBox.visible = !!this.selectedId

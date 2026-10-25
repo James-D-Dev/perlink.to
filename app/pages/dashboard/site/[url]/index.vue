@@ -250,7 +250,9 @@
         <div v-else-if="activeTab === 'room'" class="max-w-3xl space-y-4 pt-4">
           <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
             <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
-              <LazyRoomCanvas :room="roomModel" preview class="pointer-events-none" />
+              <!-- The picture saved by the room editor; the live scene only until there is one -->
+              <img v-if="existingBio?.roomThumbnailUrl" :src="existingBio.roomThumbnailUrl" :alt="t('dashboard.editor.room.heading')" class="absolute inset-0 size-full object-cover">
+              <LazyRoomCanvas v-else :room="roomModel" preview class="pointer-events-none" />
             </div>
             <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
               <div>
@@ -587,7 +589,35 @@ const canProceed = computed(() => {
   );
 });
 
-const previewPanelRef = ref<{ scrollToBlock: (blockId: string) => void } | null>(null);
+const previewPanelRef = ref<{ scrollToBlock: (blockId: string) => void; snapshot: (username: string) => Promise<unknown> } | null>(null);
+
+// ---- Thumbnail ----
+// The phone preview is photographed for the site's card in "My sites": a
+// while after edits settle, right after publishing, and once for sites that
+// don't have a picture yet. At most about once a minute.
+const SNAPSHOT_DELAY = 10_000;
+const SNAPSHOT_MIN_GAP = 60_000;
+let lastSnapshotAt = 0;
+let snapshotTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function takeSnapshot() {
+  const username = existingBio.value?.username;
+  if (!username || !previewPanelRef.value) return;
+  try {
+    const result = await previewPanelRef.value.snapshot(username);
+    if (result) lastSnapshotAt = Date.now();
+  } catch (error) {
+    // A missing picture only means the card renders the page instead
+    console.warn("[editor] snapshot failed", error);
+  }
+}
+
+function scheduleSnapshot(delay = SNAPSHOT_DELAY) {
+  if (snapshotTimer) clearTimeout(snapshotTimer);
+  const wait = Math.max(delay, lastSnapshotAt + SNAPSHOT_MIN_GAP - Date.now());
+  snapshotTimer = setTimeout(takeSnapshot, wait);
+}
+onBeforeUnmount(() => snapshotTimer && clearTimeout(snapshotTimer));
 
 const toggleBlock = (blockId: string) => {
   const isOpening = activeBlock.value !== blockId;
@@ -775,6 +805,7 @@ const saveBio = async ({ silent = false }: { silent?: boolean } = {}) => {
     markSaved(snapshot);
     existingBio.value = { ...existingBio.value, hasDraft: !!response.bioPage?.hasDraft };
     saveError.value = false;
+    scheduleSnapshot();
 
     if (!silent) {
       toast.add({
@@ -824,6 +855,9 @@ const publishBio = async () => {
     );
 
     existingBio.value = response.bioPage;
+    // The card should show what just went live
+    if (snapshotTimer) clearTimeout(snapshotTimer);
+    nextTick(takeSnapshot);
 
     toast.add({
       title: t("dashboard.toast.published"),
@@ -1005,6 +1039,8 @@ const loadBio = async () => {
       step.value = "edit";
       await nextTick();
       markSavedSnapshotOnly();
+      // Sites from before thumbnails get their first picture once the preview has drawn
+      if (!response.bioPage.thumbnailUrl) scheduleSnapshot(3000);
       // Came from the sidebar card on another page: show the checklist
       if (route.query.setup) {
         useSiteSetup().open.value = true;

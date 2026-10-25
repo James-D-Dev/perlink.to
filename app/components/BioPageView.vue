@@ -385,6 +385,7 @@
           <div
             v-if="isPreview && !hasContent(block)"
             :id="blockDomId(block)"
+            data-placeholder
             class="flex items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-5 text-sm opacity-60"
             :style="{ borderColor: 'currentColor' }"
           >
@@ -740,4 +741,9 @@ useHead({
   outline-offset: 6px;
   border-radius: 12px;
 }
+/* While the editor takes a snapshot for the thumbnail */
+.pv-capturing .pv-active > *,
+.pv-capturing.pv-active-self,
+.pv-capturing .pv-active-self { outline: none; }
+.pv-capturing [data-placeholder] { display: none; }
 </style>

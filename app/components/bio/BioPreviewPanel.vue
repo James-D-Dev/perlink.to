@@ -10,7 +10,7 @@
     </div>
 
     <!-- Phone Mockup -->
-    <BioIPhone15ProMockup :width="320" :height="500">
+    <BioIPhone15ProMockup ref="phoneRef" :width="320" :height="500">
       <BioPreview
         v-if="previewData"
         :bio-data="previewData"
@@ -42,7 +42,18 @@ const scrollToBlock = (blockId: string) => {
   }
 };
 
-defineExpose({ scrollToBlock });
+const phoneRef = ref<{ $el: Element } | null>(null);
+
+/** Snapshot of the phone screen for the site's thumbnail; null when the preview isn't on screen */
+async function snapshot(username: string) {
+  // The page element inside the phone (the one BioPreview scales)
+  const root = phoneRef.value?.$el as Element | undefined;
+  const el = root?.parentElement?.querySelector<HTMLElement>('[style*="overflow: auto"]');
+  if (!el || !el.offsetParent) return null;
+  return await snapshotPage(username, el);
+}
+
+defineExpose({ scrollToBlock, snapshot });
 
 defineProps<{
   previewData: any;

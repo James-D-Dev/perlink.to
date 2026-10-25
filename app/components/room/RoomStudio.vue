@@ -564,7 +564,7 @@ const styleName = (name: string) => label(`room.styles.${name.toLowerCase().repl
 
 type Tab = CatalogCategory | 'room' | 'land' | 'time' | 'music'
 
-const canvasRef = ref<{ resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; ridersOf: (id: string) => string[]; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
+const canvasRef = ref<{ snapshot: () => Promise<Blob | null>; resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; ridersOf: (id: string) => string[]; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
 const barRef = ref<HTMLElement | null>(null)
 const selectedId = ref<string | null>(null)
 const activeTab = ref<Tab>('furniture')
@@ -1114,4 +1114,7 @@ onBeforeUnmount(() => {
   cancelDrag()
   stopPreview()
 })
+
+// The page saves a picture of the room after each save
+defineExpose({ snapshot: () => canvasRef.value?.snapshot() ?? Promise.resolve(null) })
 </script>

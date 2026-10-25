@@ -2,9 +2,18 @@
   <article class="group relative flex aspect-[4/5] flex-col overflow-hidden rounded-3xl bg-sand ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
     <!-- The site itself, scaled down; the whole card opens the editor -->
     <NuxtLink :to="editTo" class="absolute inset-0" :aria-label="t('dashboard.sites.edit')">
-      <div ref="frame" class="pointer-events-none absolute inset-0 overflow-hidden" :style="{ background: previewBg }" aria-hidden="true" inert>
-        <!-- Rendered at phone width, then scaled to the card -->
-        <div class="absolute left-0 top-0 origin-top-left" :style="{ width: `${PHONE_WIDTH}px`, transform: `scale(${scale})` }">
+      <!-- The snapshot taken in the editor; the live page only until there is one -->
+      <img
+        v-if="picture"
+        :src="picture"
+        :alt="site.title || site.username"
+        loading="lazy"
+        decoding="async"
+        class="absolute inset-0 size-full object-cover object-top"
+      >
+      <div v-else ref="frame" class="pointer-events-none absolute inset-0 overflow-hidden" :style="{ background: previewBg }" aria-hidden="true" inert>
+        <!-- Rendered at phone width, then scaled to the card; only once the card is on screen -->
+        <div v-if="onScreen" class="absolute left-0 top-0 origin-top-left" :style="{ width: `${PHONE_WIDTH}px`, transform: `scale(${scale})` }">
           <BioPageView :bio-data="bioData" :username="site.username" mode="thumbnail" />
         </div>
       </div>
@@ -60,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useIntersectionObserver } from '@vueuse/core'
 import type { BioData } from '~/types/bio'
 
 const props = defineProps<{
@@ -82,6 +91,15 @@ const PHONE_WIDTH = 390
 const frame = ref<HTMLElement | null>(null)
 const { width: frameWidth } = useElementSize(frame)
 const scale = computed(() => (frameWidth.value ? frameWidth.value / PHONE_WIDTH : 0.8))
+const onScreen = ref(false)
+useIntersectionObserver(frame, ([entry]) => {
+  if (entry?.isIntersecting) onScreen.value = true
+}, { rootMargin: '200px' })
+
+// Sites that open in 3D show their room
+const picture = computed(() =>
+  props.site.themeConfig?.pageMode === '3d' && props.site.roomThumbnailUrl ? props.site.roomThumbnailUrl : props.site.thumbnailUrl,
+)
 
 const editTo = computed(() => `/dashboard/site/${props.site.username}`)
 
