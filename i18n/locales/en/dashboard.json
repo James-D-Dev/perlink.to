@@ -130,8 +130,9 @@
       "applyText": "All current blocks, the theme and the 3D room will be replaced. Text you wrote will be lost.",
       "applyConfirm": "Apply template",
       "unsaved": {
-        "restoreTitle": "Unsaved changes found",
-        "restoreText": "You have edits from a previous session that were never saved.",
+        "restoreTitle": "Unsaved edits on {site}",
+        "restoreText": "Edits from {time} that never reached the server: {sections}.",
+        "restoreTextNoTime": "Edits from an earlier session that never reached the server: {sections}.",
         "restoreAction": "Restore",
         "discardAction": "Discard",
         "leaveTitle": "Leave without saving?",

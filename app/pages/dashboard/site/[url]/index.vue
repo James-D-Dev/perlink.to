@@ -534,7 +534,8 @@ const loadUserBioPages = async () => {
 // Handle bio page selection change
 const onBioPageChange = (username: string) => {
   if (username && username !== routeUsername.value) {
-    navigateTo(`/dashboard/site/${username}`);
+    // Stay on the same tab in the other site
+    navigateTo(`/dashboard/site/${username}${window.location.hash}`);
   }
 };
 
@@ -543,7 +544,23 @@ const previewOpen = ref(false);
 const qrOpen = ref(false);
 
 type EditorTab = "content" | "header" | "design" | "room" | "settings";
-const activeTab = ref<EditorTab>("content");
+const EDITOR_TABS: EditorTab[] = ["content", "header", "design", "room", "settings"];
+const tabFromHash = (hash: string): EditorTab => {
+  const tab = hash.replace(/^#/, "") as EditorTab;
+  return EDITOR_TABS.includes(tab) ? tab : "content";
+};
+// The open tab lives in the URL (#header, #design...) so a reload lands on it
+const activeTab = ref<EditorTab>(tabFromHash(window.location.hash));
+watch(activeTab, (tab) => {
+  const hash = tab === "content" ? "" : `#${tab}`;
+  if (window.location.hash === hash) return;
+  // Straight to history: going through the router would scroll to a matching #id
+  const { pathname, search } = window.location;
+  history.replaceState(history.state, "", `${pathname}${search}${hash}`);
+});
+const onHashChange = () => (activeTab.value = tabFromHash(window.location.hash));
+onMounted(() => window.addEventListener("hashchange", onHashChange));
+onBeforeUnmount(() => window.removeEventListener("hashchange", onHashChange));
 const editorTabs = computed(() => [
   { value: "content", label: t("dashboard.editor.tabs.content"), icon: "i-lucide-layout-list" },
   { value: "header", label: t("dashboard.editor.tabs.header"), icon: "i-lucide-circle-user-round" },
@@ -1044,7 +1061,7 @@ const loadBio = async () => {
       // Came from the sidebar card on another page: show the checklist
       if (route.query.setup) {
         useSiteSetup().open.value = true;
-        navigateTo({ query: { ...route.query, setup: undefined } }, { replace: true });
+        navigateTo({ query: { ...route.query, setup: undefined }, hash: window.location.hash }, { replace: true });
       }
       offerDraftRestore();
     }
@@ -1124,7 +1141,7 @@ const scheduleAutosave: () => void = useDebounceFn(() => {
 const backupDraft = useDebounceFn(() => {
   if (!isDirty.value) return;
   try {
-    localStorage.setItem(draftKey.value, currentSnapshot.value);
+    localStorage.setItem(draftKey.value, JSON.stringify({ at: Date.now(), snapshot: currentSnapshot.value }));
   } catch {}
 }, 1000);
 watch(currentSnapshot, () => {
@@ -1152,35 +1169,101 @@ const publishDisabled = computed(
 );
 
 // Offer to bring back edits that were never saved (tab closed, crash...)
+// Same page content? Block ids are made up on load and key order can drift, so neither counts.
+function canonical(value: any): any {
+  if (Array.isArray(value)) return value.map(canonical);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.keys(value)
+      .sort()
+      .map((key) => [key, canonical(value[key])]),
+  );
+}
+const sameJson = (a: unknown, b: unknown) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
+const withoutBlockIds = (blocks: any[] = []) => blocks.map(({ id, ...rest }) => rest);
+
+// Which editor tabs a draft touches, so the toast can say what it would bring back
+function changedSections(draft: any, saved: any): EditorTab[] {
+  const sections: EditorTab[] = [];
+  const { room: draftRoom, pageMode: draftMode, ...draftTheme } = draft.themeConfig ?? {};
+  const { room: savedRoom, pageMode: savedMode, ...savedTheme } = saved.themeConfig ?? {};
+  if (!sameJson(withoutBlockIds(draft.blocks), withoutBlockIds(saved.blocks))) sections.push("content");
+  if (!sameJson([draft.title, draft.bio, draft.avatarUrl], [saved.title, saved.bio, saved.avatarUrl])) sections.push("header");
+  if (!sameJson([draft.templateId, draftTheme], [saved.templateId, savedTheme])) sections.push("design");
+  if (!sameJson([draftRoom, draftMode], [savedRoom, savedMode])) sections.push("room");
+  return sections;
+}
+
+// The toast never times out, so it must not follow you to another site
+let restoreToastId: string | null = null;
+onBeforeUnmount(() => {
+  if (restoreToastId) toast.remove(restoreToastId);
+});
+
+// Offer to bring back edits that were never saved (tab closed, crash...)
 function offerDraftRestore() {
-  let draft: string | null = null;
+  let raw: string | null = null;
   try {
-    draft = localStorage.getItem(draftKey.value);
+    raw = localStorage.getItem(draftKey.value);
   } catch {}
-  if (!draft || draft === savedSnapshot.value) return;
+  if (!raw || !savedSnapshot.value) return;
+
+  let draft: any;
+  let at: number | null = null;
+  try {
+    const stored = JSON.parse(raw);
+    // Older backups were the bare snapshot
+    if (typeof stored?.snapshot === "string") {
+      draft = JSON.parse(stored.snapshot);
+      at = stored.at ?? null;
+    } else {
+      draft = stored;
+    }
+  } catch {}
+  const forgetDraft = () => {
+    try {
+      localStorage.removeItem(draftKey.value);
+    } catch {}
+  };
+
+  const sections = draft ? changedSections(draft, JSON.parse(savedSnapshot.value)) : [];
+  // Nothing in it that isn't already saved
+  if (!sections.length) {
+    forgetDraft();
+    return;
+  }
+
+  const sectionNames = sections.map((tab) => editorTabs.value.find((item) => item.value === tab)!.label).join(", ");
+  const when = at
+    ? new Date(at).toLocaleString(locale.value === "vi" ? "vi-VN" : "en-GB", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+  restoreToastId = `draft-restore:${routeUsername.value}`;
   toast.add({
-    title: t("dashboard.editor.unsaved.restoreTitle"),
-    description: t("dashboard.editor.unsaved.restoreText"),
+    id: restoreToastId,
+    title: t("dashboard.editor.unsaved.restoreTitle", { site: `perlink.to/${routeUsername.value}` }),
+    description: when
+      ? t("dashboard.editor.unsaved.restoreText", { sections: sectionNames, time: when })
+      : t("dashboard.editor.unsaved.restoreTextNoTime", { sections: sectionNames }),
     duration: 0,
     actions: [
       {
         label: t("dashboard.editor.unsaved.restoreAction"),
         color: "neutral",
         onClick: () => {
-          try {
-            Object.assign(bioData, JSON.parse(draft!));
-          } catch {}
+          Object.assign(bioData, draft);
+          activeTab.value = sections[0]!;
         },
       },
       {
         label: t("dashboard.editor.unsaved.discardAction"),
         color: "neutral",
         variant: "ghost",
-        onClick: () => {
-          try {
-            localStorage.removeItem(draftKey.value);
-          } catch {}
-        },
+        onClick: forgetDraft,
       },
     ],
   });

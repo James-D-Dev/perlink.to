@@ -130,8 +130,9 @@
       "applyText": "Toàn bộ khối, giao diện và Phòng 3D hiện tại sẽ bị thay thế. Nội dung bạn đã viết sẽ mất.",
       "applyConfirm": "Áp dụng mẫu",
       "unsaved": {
-        "restoreTitle": "Có thay đổi chưa lưu",
-        "restoreText": "Bạn còn các chỉnh sửa từ lần trước chưa được lưu.",
+        "restoreTitle": "Chỉnh sửa chưa lưu trên {site}",
+        "restoreText": "Chỉnh sửa lúc {time} chưa được lưu lên máy chủ: {sections}.",
+        "restoreTextNoTime": "Chỉnh sửa từ lần trước chưa được lưu lên máy chủ: {sections}.",
         "restoreAction": "Khôi phục",
         "discardAction": "Bỏ qua",
         "leaveTitle": "Rời đi mà không lưu?",
