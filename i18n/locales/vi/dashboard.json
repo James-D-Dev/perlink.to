@@ -522,6 +522,112 @@
       "liveWarning": "Trang đang hiển thị: sau khi đổi, {old} sẽ không còn hoạt động.",
       "saved": "Đã đổi địa chỉ",
       "failed": "Không đổi được địa chỉ"
+    },
+    "billing": {
+      "plans": {
+        "free": {
+          "name": "Miễn phí",
+          "description": "Để bắt đầu"
+        },
+        "starter": {
+          "name": "Starter",
+          "description": "Cho cá nhân, KOL"
+        },
+        "plus": {
+          "name": "Plus",
+          "description": "Cho shop và doanh nghiệp nhỏ"
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Cho agency và chuyên nghiệp"
+        }
+      },
+      "features": {
+        "sites": "{n} trang | {n} trang",
+        "sitesUnlimited": "Không giới hạn trang",
+        "basics": "Mọi mẫu trang và 50 theme",
+        "room": "Thế giới 3D cho trang",
+        "proThemes": "20 theme Pro (kính, ánh kim, cá tính)",
+        "customDomain": "Tên miền riêng",
+        "removeBranding": "Gỡ dòng “Tạo bằng Perlink”",
+        "analytics": "Thống kê {n} ngày",
+        "analyticsYear": "Thống kê 1 năm",
+        "analyticsAll": "Toàn bộ lịch sử thống kê",
+        "support": "Hỗ trợ ưu tiên qua Zalo"
+      },
+      "monthly": "Theo tháng",
+      "annual": "Theo năm",
+      "annualSave": "Tiết kiệm 2 tháng",
+      "perMonth": "/tháng",
+      "billedYearly": "{amount} mỗi năm",
+      "recommended": "Phổ biến",
+      "current": "Gói hiện tại",
+      "choose": "Chọn {plan}",
+      "renew": "Gia hạn",
+      "startFree": "Bắt đầu miễn phí",
+      "contact": "Liên hệ nâng cấp",
+      "contactNote": "Thanh toán online sắp mở. Trong lúc chờ, hãy liên hệ để được nâng cấp.",
+      "payNote": "Thanh toán bằng chuyển khoản / quét mã VietQR, gói bật tự động trong vài giây.",
+      "status": {
+        "free": "Bạn đang dùng gói Miễn phí",
+        "paid": "Bạn đang dùng gói {plan}",
+        "until": "Đến {date}",
+        "sites": "Đang dùng {used}/{max} trang"
+      },
+      "trial": {
+        "title": "Dùng thử Plus 7 ngày, miễn phí",
+        "text": "Theme Pro, tên miền riêng, gỡ thương hiệu. Không cần thẻ, hết hạn tự về gói Miễn phí.",
+        "start": "Dùng thử miễn phí",
+        "started": "Đã bật Plus đến {date}",
+        "failed": "Không bật được dùng thử"
+      },
+      "checkout": {
+        "title": "Thanh toán gói {plan}",
+        "periodMonthly": "1 tháng",
+        "periodAnnual": "1 năm",
+        "scan": "Quét bằng app ngân hàng bất kỳ",
+        "manual": "Hoặc chuyển khoản thủ công",
+        "bank": "Ngân hàng",
+        "account": "Số tài khoản",
+        "accountName": "Chủ tài khoản",
+        "amount": "Số tiền",
+        "note": "Nội dung",
+        "noteHint": "Ghi đúng nội dung này để gói được bật tự động.",
+        "waiting": "Đang chờ tiền về…",
+        "waitingHint": "Thường dưới 1 phút sau khi chuyển. Bạn có thể đóng cửa sổ, gói vẫn tự bật.",
+        "paidTitle": "Thanh toán thành công",
+        "paidText": "Gói {plan} đã bật đến {date}. Cảm ơn bạn!",
+        "done": "Xong",
+        "failed": "Không tạo được thanh toán",
+        "copied": "Đã sao chép"
+      },
+      "prompt": {
+        "sites": {
+          "title": "Bạn đã dùng hết số trang",
+          "text": "Gói {plan} cho bạn tạo tới {n} trang, kèm theme Pro và nhiều hơn nữa."
+        },
+        "customDomain": {
+          "title": "Tên miền riêng có từ gói {plan}",
+          "text": "Gắn www.tencuaban.com cho trang để khách thấy chuyên nghiệp và dễ nhớ hơn."
+        },
+        "proThemes": {
+          "title": "Theme Pro có từ gói {plan}",
+          "text": "Bạn vẫn xem thử thoải mái trong trình chỉnh sửa. Nâng cấp để xuất bản trang với theme này."
+        },
+        "removeBranding": {
+          "title": "Gỡ thương hiệu Perlink từ gói {plan}",
+          "text": "Trang của bạn sẽ không còn dòng “Tạo bằng Perlink” ở cuối."
+        },
+        "seePlans": "Xem các gói",
+        "later": "Để sau",
+        "trial": "Dùng thử Plus 7 ngày miễn phí"
+      },
+      "history": "Lịch sử thanh toán",
+      "paymentStatus": {
+        "pending": "Chờ thanh toán",
+        "paid": "Đã thanh toán",
+        "expired": "Hết hạn"
+      }
     }
   }
 }

@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   
   try {
     const stmt = db.prepare(`
-      UPDATE profiles SET plan = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+      UPDATE profiles SET plan = ?, plan_expires_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?
     `).bind(plan, userId)
     
     const result = await stmt.run()

@@ -1,5 +1,7 @@
 import { BioRepository, publicBioPage } from '../../repositories/bioRepository'
 import { AnalyticsRepository } from '../../repositories/analyticsRepository'
+import { getAccountPlan } from '../../utils/plan'
+import { PLAN_LIMITS } from '#shared/plans'
 import { isBot, parseDevice, hashIP, parseReferrer, parseUTMParams, detectSourceType } from '../../services/analytics'
 
 export default defineEventHandler(async (event) => {
@@ -23,6 +25,10 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Bio page not found'
     })
   }
+
+  // Free sites carry the "Made with Perlink" badge
+  const ownerPlan = await getAccountPlan(event, bioPage.userId).catch(() => null)
+  const page = { ...publicBioPage(bioPage), showBranding: !ownerPlan || !PLAN_LIMITS[ownerPlan.plan].removeBranding }
 
   // For bots: track as bot view (deduplicated per bot per day), then return data
   if (isBot(userAgent)) {
@@ -72,7 +78,7 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      bioPage: publicBioPage(bioPage)
+      bioPage: page
     }
   }
 
@@ -139,6 +145,6 @@ export default defineEventHandler(async (event) => {
   }
 
   return {
-    bioPage: publicBioPage(bioPage)
+    bioPage: page
   }
 })

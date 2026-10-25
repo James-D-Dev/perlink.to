@@ -345,6 +345,7 @@ const publishBio = async (username: string) => {
       description: t("dashboard.sites.publishedText"),
     });
   } catch (error) {
+    if (useUpgradePrompt().fromError(error)) return;
     toast.add({
       title: t("dashboard.toast.error"),
       description: t("dashboard.sites.publishFailed"),

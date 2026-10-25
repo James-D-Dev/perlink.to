@@ -109,6 +109,7 @@ async function connect() {
     domain.value = response.domain
     hostname.value = ''
   } catch (error: any) {
+    if (useUpgradePrompt().fromError(error)) return
     toast.add({ title: t('dashboard.domain.connectFailed'), description: error?.data?.statusMessage, color: 'error' })
   } finally {
     busy.value = false

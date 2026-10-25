@@ -574,6 +574,8 @@ export interface BioData {
   templateId: string;
   themeConfig: ThemeConfig;
   blocks: BioBlock[];
+  /** Public pages: false when the owner's plan removes the Perlink badge */
+  showBranding?: boolean;
 }
 
 export interface Template {

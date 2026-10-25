@@ -10,22 +10,96 @@
 
     <template #body>
       <div class="mx-auto w-full max-w-6xl py-2 sm:py-6">
-        <div class="mb-10 max-w-xl">
+        <div class="mb-8 max-w-xl">
           <h1 class="mk-display text-4xl sm:text-5xl">{{ t('dashboard.upgrade.heading') }}</h1>
           <p class="mt-3 text-muted">{{ t('dashboard.upgrade.intro') }}</p>
         </div>
-        <MarketingMkPricing />
+
+        <!-- Where the account stands -->
+        <div v-if="info" class="mb-8 grid gap-3 lg:grid-cols-2">
+          <div class="flex items-center gap-4 rounded-2xl bg-paper p-5 ring-1 ring-line">
+            <div class="flex size-11 shrink-0 items-center justify-center rounded-xl" :class="info.plan === 'free' ? 'bg-sand text-ink-muted' : 'bg-gradient-to-br from-amber-400 to-pink-500 text-white'">
+              <UIcon :name="info.plan === 'free' ? 'i-lucide-user' : 'i-lucide-crown'" class="size-5" />
+            </div>
+            <div class="min-w-0">
+              <p class="font-medium text-ink">
+                {{ info.plan === 'free' ? t('dashboard.billing.status.free') : t('dashboard.billing.status.paid', { plan: t(`dashboard.billing.plans.${info.plan}.name`) }) }}
+              </p>
+              <p class="mt-0.5 text-sm text-ink-muted">
+                <template v-if="info.expiresAt">{{ t('dashboard.billing.status.until', { date: formatDate(info.expiresAt) }) }} · </template>
+                {{ t('dashboard.billing.status.sites', { used: info.sites, max: info.limits.sites >= 1000 ? '∞' : info.limits.sites }) }}
+              </p>
+            </div>
+          </div>
+
+          <!-- One free trial for free accounts -->
+          <div v-if="info.canTrial" class="relative isolate flex flex-wrap items-center gap-4 overflow-hidden rounded-2xl bg-paper p-5 ring-1 ring-line">
+            <MarketingMkHeroBackdrop :fade="false" />
+            <div class="min-w-0 flex-1">
+              <p class="font-medium text-ink">{{ t('dashboard.billing.trial.title') }}</p>
+              <p class="mt-0.5 text-sm text-ink-muted">{{ t('dashboard.billing.trial.text') }}</p>
+            </div>
+            <UButton icon="i-lucide-sparkles" :loading="startingTrial" :label="t('dashboard.billing.trial.start')" @click="startTrial" />
+          </div>
+        </div>
+
+        <MarketingMkPricing :highlight="highlight" />
+
+        <!-- Payments -->
+        <section v-if="info?.payments.length" class="mt-12">
+          <h2 class="mb-3 text-sm font-medium text-ink">{{ t('dashboard.billing.history') }}</h2>
+          <div class="divide-y divide-line overflow-hidden rounded-xl bg-paper text-sm ring-1 ring-line">
+            <div v-for="p in info.payments" :key="p.id" class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+              <div class="min-w-0">
+                <p class="font-medium text-ink">
+                  {{ t(`dashboard.billing.plans.${p.plan}.name`) }} · {{ t(p.period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly') }}
+                </p>
+                <p class="text-xs text-ink-muted">{{ formatDate(p.paidAt || p.createdAt) }} · <span class="font-mono">{{ p.code }}</span></p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-medium text-ink">{{ formatVnd(p.amount) }}</span>
+                <UBadge :color="p.status === 'paid' ? 'success' : 'neutral'" variant="soft" :label="t(`dashboard.billing.paymentStatus.${p.status}`)" />
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </template>
   </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
+import { formatVnd, isPlanId } from '#shared/plans'
+
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
   colorMode: 'light',
 })
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const toast = useToast()
+const route = useRoute()
 useSeoMeta({ title: () => t('dashboard.upgrade.seoTitle'), robots: 'noindex' })
+
+const { info, refresh } = useBilling()
+onMounted(refresh)
+
+// The plan an upgrade prompt pointed to
+const highlight = computed(() => (isPlanId(route.query.plan) ? route.query.plan : undefined))
+
+const formatDate = (iso: string) => new Date(iso.includes('T') ? iso : `${iso.replace(' ', 'T')}Z`).toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB')
+
+const startingTrial = ref(false)
+async function startTrial() {
+  startingTrial.value = true
+  try {
+    const res = await $fetch<{ expiresAt: string }>('/api/billing/trial', { method: 'POST' })
+    await refresh()
+    toast.add({ title: t('dashboard.billing.trial.started', { date: formatDate(res.expiresAt) }), color: 'success' })
+  } catch (error: any) {
+    toast.add({ title: t('dashboard.billing.trial.failed'), description: error?.data?.statusMessage, color: 'error' })
+  } finally {
+    startingTrial.value = false
+  }
+}
 </script>

@@ -52,6 +52,14 @@ export default defineNuxtConfig({
     // Where owners point their domain (CNAME target)
     domainCnameTarget: "sites.perlink.to",
     emailFrom: "Perlink <notifications@perlink.to>",
+    // Plan payments by bank transfer (VietQR), confirmed by SePay's webhook
+    // (see docs/billing.md). Empty account = checkout shows as not available.
+    billing: {
+      bankBin: "",
+      accountNumber: "",
+      accountName: "",
+      sepayApiKey: "",
+    },
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
       oauthGoogleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID || "",

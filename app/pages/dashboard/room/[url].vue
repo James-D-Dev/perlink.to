@@ -113,6 +113,7 @@ async function publish() {
       actions: [{ label: t('room.toast.view'), onClick: () => { window.open(`/${username.value}`, '_blank') } }],
     })
   } catch (error: any) {
+    if (useUpgradePrompt().fromError(error)) return
     toast.add({ title: t('room.toast.publishFailed'), description: error?.data?.statusMessage, color: 'error' })
   } finally {
     publishing.value = false

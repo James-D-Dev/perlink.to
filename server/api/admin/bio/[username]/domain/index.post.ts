@@ -1,11 +1,13 @@
 import { z } from 'zod'
 import { getDB } from '../../../../../utils/db'
 import { requireOwnedSite } from '../../../../../utils/ownedSite'
+import { requirePlanFeature } from '../../../../../utils/plan'
 import { cfCreateHostname, customDomainsEnabled, domainRecords, domainStatus, normalizeHostname } from '../../../../../utils/customDomains'
 
 // Connect a domain to the site (one per site)
 export default defineEventHandler(async (event) => {
   const site = await requireOwnedSite(event)
+  await requirePlanFeature(event, site.userId, 'customDomain')
   if (!customDomainsEnabled(event)) {
     throw createError({ statusCode: 503, statusMessage: 'Custom domains are not available yet' })
   }

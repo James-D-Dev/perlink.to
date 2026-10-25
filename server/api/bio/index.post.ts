@@ -1,6 +1,7 @@
 import { BioRepository } from '../../repositories/bioRepository'
 import { z } from 'zod'
 import { isReservedName } from '../../utils/reservedNames'
+import { requireRoomForSite } from '../../utils/plan'
 
 const createBioSchema = z.object({
   username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_-]+$/),
@@ -54,6 +55,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const bioRepo = new BioRepository(event)
+    await requireRoomForSite(event, user.id)
 
     if (isReservedName(result.data.username)) {
       throw createError({ statusCode: 400, statusMessage: 'This name is reserved' })
@@ -86,8 +88,8 @@ export default defineEventHandler(async (event) => {
       bioPage
     }
   } catch (e: any) {
-    console.error('[POST /api/bio]', e)
     if (e.statusCode) throw e
+    console.error('[POST /api/bio]', e)
     throw createError({
       statusCode: 500,
       statusMessage: e?.message ?? 'Internal server error',

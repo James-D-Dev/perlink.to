@@ -520,8 +520,8 @@
       "random": "Surprise me",
       "count": "{n} themes",
       "pro": "Pro",
-      "proNote": "Pro themes are free to use during launch.",
-      "seePlans": "See Pro plans"
+      "proNote": "Pro themes: try them free, publish from the Starter plan.",
+      "seePlans": "See plans"
     },
     "rows": {
       "theme": "Theme",

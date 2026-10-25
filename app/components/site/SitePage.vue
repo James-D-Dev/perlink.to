@@ -118,6 +118,7 @@ interface ApiBioPage {
   isPublished: boolean;
   viewCount: number;
   blocks?: BioBlock[];
+  showBranding?: boolean;
 }
 
 const username = props.username;
@@ -154,6 +155,7 @@ const bioPageAsBioData = computed<BioData | undefined>(() => {
     bio: p.bio || "",
     avatarUrl: p.avatarUrl || "",
     templateId: p.templateId,
+    showBranding: p.showBranding,
     themeConfig: {
       // Keep every saved setting (social, page, language, showShare...),
       // then merge the nested groups over their defaults

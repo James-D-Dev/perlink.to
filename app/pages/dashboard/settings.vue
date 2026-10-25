@@ -52,7 +52,7 @@
               <h2 class="text-sm font-medium text-ink">{{ t('dashboard.account.plan') }}</h2>
               <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.account.sites', { n: account.sites }, account.sites) }}</p>
               <div class="mt-3 flex items-center justify-between gap-3">
-                <span class="text-lg font-semibold capitalize text-ink">{{ account.plan }}</span>
+                <span class="text-lg font-semibold text-ink">{{ t(`dashboard.billing.plans.${account.plan}.name`) }}</span>
                 <UButton to="/dashboard/upgrade" size="sm" color="neutral" variant="outline" :label="t('dashboard.account.seePlans')" />
               </div>
             </div>

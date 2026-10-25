@@ -902,6 +902,8 @@ const tempAddress = computed(() => !!(bioData.themeConfig as any).tempAddress);
 const addressOpen = ref(false);
 const publishAfterRename = ref(false);
 
+const upgradePrompt = useUpgradePrompt();
+
 async function openAddress(thenPublish: boolean) {
   publishAfterRename.value = thenPublish;
   // Edits go to the current address before it changes
@@ -920,7 +922,10 @@ async function onRenamed(username: string) {
       await $fetch(`/api/admin/bio/${username}/publish`, { method: "POST" as const });
       toast.add({ title: t("dashboard.toast.published"), description: t("dashboard.editor.publishedText", { username }), color: "success" });
     } catch (error: any) {
-      toast.add({ title: t("dashboard.toast.error"), description: error?.data?.statusMessage || t("dashboard.editor.publishFailed"), color: "error" });
+      // The address change went through either way, so carry on to it
+      if (!upgradePrompt.fromError(error)) {
+        toast.add({ title: t("dashboard.toast.error"), description: error?.data?.statusMessage || t("dashboard.editor.publishFailed"), color: "error" });
+      }
     } finally {
       publishing.value = false;
     }
@@ -970,6 +975,7 @@ const publishBio = async () => {
       color: "success",
     });
   } catch (error: any) {
+    if (upgradePrompt.fromError(error)) return;
     toast.add({
       title: t("dashboard.toast.error"),
       description: error.data?.statusMessage || t("dashboard.editor.publishFailed"),

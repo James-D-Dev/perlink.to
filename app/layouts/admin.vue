@@ -49,7 +49,7 @@
 
         <!-- Upgrade (gives way to the setup card) -->
         <NuxtLink
-          v-if="!collapsed && !setup?.visible.value"
+          v-if="!collapsed && !setup?.visible.value && !hasPaidPlan"
           to="/dashboard/upgrade"
           class="group mt-4 block rounded-2xl bg-sand p-4 transition-colors hover:bg-sand-strong"
         >
@@ -84,6 +84,7 @@
 
     <slot />
     <NotificationsSlideover />
+    <BillingUpgradeDialog />
     <HelpCenter />
   </UDashboardGroup>
 </template>
@@ -125,6 +126,11 @@ onMounted(() => nextTick(() => (isEditor.value ? fold() : unfold())));
 
 const helpOpen = useHelpCenter();
 const { current: setup } = useSiteSetup();
+
+// The upgrade card is for free accounts
+const { info: billing, ensure: ensureBilling } = useBilling();
+const hasPaidPlan = computed(() => !!billing.value && billing.value.plan !== "free");
+onMounted(() => { if (loggedIn.value) ensureBilling(); });
 
 const { t } = useI18n();
 

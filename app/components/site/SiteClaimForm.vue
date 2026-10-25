@@ -133,6 +133,7 @@ async function submit() {
     toast.add({ title: t('dashboard.claim.ready'), description: `perlink.to/${username}`, color: 'success' })
     await navigateTo(`/dashboard/site/${username}`)
   } catch (error: any) {
+    if (useUpgradePrompt().fromError(error)) return
     toast.add({
       title: t('dashboard.claim.createFailed'),
       description: error?.data?.statusMessage || error?.message,

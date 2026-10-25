@@ -173,8 +173,9 @@ async function useTemplate(id: string) {
     const username = await createSite({ templateId: id })
     await navigateTo(`/dashboard/site/${username}`)
   } catch (error: any) {
-    toast.add({ title: t('dashboard.claim.createFailed'), description: error?.data?.statusMessage || error?.message, color: 'error' })
     creatingId.value = null
+    if (useUpgradePrompt().fromError(error)) return
+    toast.add({ title: t('dashboard.claim.createFailed'), description: error?.data?.statusMessage || error?.message, color: 'error' })
   }
 }
 </script>

@@ -522,6 +522,112 @@
       "liveWarning": "This site is live: after the change, {old} stops working.",
       "saved": "Address changed",
       "failed": "Couldn’t change the address"
+    },
+    "billing": {
+      "plans": {
+        "free": {
+          "name": "Free",
+          "description": "To get started"
+        },
+        "starter": {
+          "name": "Starter",
+          "description": "For individuals and creators"
+        },
+        "plus": {
+          "name": "Plus",
+          "description": "For shops and small businesses"
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For agencies and professionals"
+        }
+      },
+      "features": {
+        "sites": "{n} site | {n} sites",
+        "sitesUnlimited": "Unlimited sites",
+        "basics": "Every template and 50 themes",
+        "room": "A 3D world for your page",
+        "proThemes": "20 Pro themes (glass, luxe, bold)",
+        "customDomain": "Custom domain",
+        "removeBranding": "Remove “Made with Perlink”",
+        "analytics": "{n}-day analytics",
+        "analyticsYear": "1 year of analytics",
+        "analyticsAll": "Full analytics history",
+        "support": "Priority support"
+      },
+      "monthly": "Monthly",
+      "annual": "Yearly",
+      "annualSave": "2 months free",
+      "perMonth": "/month",
+      "billedYearly": "{amount} per year",
+      "recommended": "Popular",
+      "current": "Your current plan",
+      "choose": "Choose {plan}",
+      "renew": "Renew",
+      "startFree": "Start free",
+      "contact": "Contact us to upgrade",
+      "contactNote": "Online checkout is coming soon. Until then, contact us and we will upgrade your account.",
+      "payNote": "Pay by bank transfer / VietQR; your plan turns on automatically within seconds.",
+      "status": {
+        "free": "You're on the Free plan",
+        "paid": "You're on {plan}",
+        "until": "Until {date}",
+        "sites": "Using {used}/{max} sites"
+      },
+      "trial": {
+        "title": "Try Plus free for 7 days",
+        "text": "Pro themes, a custom domain, no Perlink badge. No card needed; it goes back to Free when it ends.",
+        "start": "Start free trial",
+        "started": "Plus is on until {date}",
+        "failed": "Couldn't start the trial"
+      },
+      "checkout": {
+        "title": "Pay for {plan}",
+        "periodMonthly": "1 month",
+        "periodAnnual": "1 year",
+        "scan": "Scan with any banking app",
+        "manual": "Or transfer manually",
+        "bank": "Bank",
+        "account": "Account number",
+        "accountName": "Account name",
+        "amount": "Amount",
+        "note": "Transfer note",
+        "noteHint": "Use exactly this note so your plan turns on automatically.",
+        "waiting": "Waiting for the transfer…",
+        "waitingHint": "Usually under a minute. You can close this; the plan still turns on.",
+        "paidTitle": "Payment received",
+        "paidText": "{plan} is on until {date}. Thank you!",
+        "done": "Done",
+        "failed": "Couldn't start the payment",
+        "copied": "Copied"
+      },
+      "prompt": {
+        "sites": {
+          "title": "You've used all your sites",
+          "text": "{plan} lets you have up to {n} sites, plus Pro themes and more."
+        },
+        "customDomain": {
+          "title": "Custom domains come with {plan}",
+          "text": "Put your page on www.yourname.com so it looks professional and is easy to remember."
+        },
+        "proThemes": {
+          "title": "Pro themes come with {plan}",
+          "text": "Try it as much as you like in the editor. Upgrade to publish your page with this theme."
+        },
+        "removeBranding": {
+          "title": "Remove Perlink branding with {plan}",
+          "text": "Your page won't show “Made with Perlink” at the bottom."
+        },
+        "seePlans": "See plans",
+        "later": "Not now",
+        "trial": "Try Plus free for 7 days"
+      },
+      "history": "Payment history",
+      "paymentStatus": {
+        "pending": "Waiting for payment",
+        "paid": "Paid",
+        "expired": "Expired"
+      }
     }
   }
 }
