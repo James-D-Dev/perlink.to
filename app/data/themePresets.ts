@@ -13,6 +13,9 @@ export type ThemePresetCategory =
   | 'pastel'
   | 'dark'
   | 'festive'
+  | 'glass'
+  | 'bold'
+  | 'luxe'
 
 export interface ThemePreset {
   id: string
@@ -25,9 +28,14 @@ export interface ThemePreset {
     text: string
   }
   theme: ThemeConfig
+  /** A Perlink Pro look (labelled; not locked yet) */
+  pro?: boolean
 }
 
 export const THEME_PRESET_CATEGORIES: { id: ThemePresetCategory; label: string }[] = [
+  { id: 'glass', label: 'Glass' },
+  { id: 'luxe', label: 'Luxe' },
+  { id: 'bold', label: 'Bold' },
   { id: 'minimal', label: 'Minimal' },
   { id: 'warm', label: 'Warm' },
   { id: 'elegant', label: 'Elegant' },
@@ -67,6 +75,11 @@ interface Spec {
   /** A colour, or a gradient [from, to] / [from, via, to] */
   bg: string | [string, string] | [string, string, string]
   angle?: number
+  /** Soft mesh of three colours over `bg` (also the aurora's colours) */
+  mesh?: [string, string, string]
+  /** Fine pattern over the background */
+  pattern?: NonNullable<ThemeConfig['background']['pattern']>['id']
+  patternColor?: string
   /** Animated background drawn over the colour */
   effect?: string
   /** Text on the page */
@@ -83,6 +96,12 @@ interface Spec {
   radius: number
   shadow?: ThemeConfig['card']['shadow']
   blur?: ThemeConfig['card']['backdropBlur']
+  borderWidth?: number
+  /** Second accent, for gradient names */
+  accent2?: string
+  /** The site name painted with accent → accent2 */
+  nameGradient?: boolean
+  pro?: boolean
   /** [name, body] */
   fonts: [string, string]
   nameWeight?: string
@@ -104,17 +123,21 @@ function preset(s: Spec): ThemePreset {
     ? { angle: s.angle ?? 160, from: s.bg[0], via: s.bg.length === 3 ? s.bg[1] : undefined, to: s.bg[s.bg.length - 1] }
     : undefined
   const bgColor = Array.isArray(s.bg) ? s.bg[0] : s.bg
+  const mesh = s.mesh ? { style: 'mesh' as const, from: s.mesh[0], via: s.mesh[1], to: s.mesh[2] } : undefined
+  const pattern = s.pattern ? { id: s.pattern, color: s.patternColor } : undefined
   return {
     id: s.id,
     name: s.name,
     category: s.category,
     description: s.description,
+    pro: s.pro,
     preview: { bg: bgColor, card: s.surface ?? s.accent, text: s.text },
     theme: {
-      colors: { primary: s.accent, secondary: s.border ?? s.surface ?? s.accent, third: bgColor },
+      colors: { primary: s.accent, secondary: s.accent2 ?? s.border ?? s.surface ?? s.accent, third: bgColor },
       background: s.effect
-        ? { type: 'effect', effectId: s.effect, color: bgColor }
-        : gradient ? { type: 'gradient', gradient } : { type: 'solid', color: bgColor },
+        ? { type: 'effect', effectId: s.effect, color: bgColor, gradient: mesh }
+        : mesh ? { type: 'gradient', color: bgColor, gradient: mesh, pattern }
+          : gradient ? { type: 'gradient', gradient, pattern } : { type: 'solid', color: bgColor, pattern },
       card: {
         style,
         backgroundColor: s.surface,
@@ -124,6 +147,7 @@ function preset(s: Spec): ThemePreset {
         transparency: 1,
         shadow: s.shadow ?? 'none',
         backdropBlur: s.blur ?? 'none',
+        borderWidth: s.borderWidth,
         animationAppear: 'fadeInUp',
         animationHover: 'none',
       },
@@ -137,6 +161,7 @@ function preset(s: Spec): ThemePreset {
         fontWeight: s.nameWeight ?? '700',
         letterSpacing: s.tracking,
         textColor: s.text,
+        textGradient: s.nameGradient,
       },
       avatar: { shape: s.avatar ?? 'circle', size: 'lg', border: false, animationAppear: 'fadeIn', animationHover: 'none' },
       link: { layout: s.link ?? 'horizontal-left' },
@@ -292,6 +317,131 @@ export const THEME_PRESETS: ThemePreset[] = [
   preset({ id: 'midautumn', name: 'Mid-Autumn', category: 'festive', description: 'Lantern orange on night blue',
     bg: ['#1E1B4B', '#312E81'], text: '#FEF3C7', accent: '#F59E0B', onAccent: '#1E1B4B', surface: '#2E2A6B', radius: 16, shadow: 'md',
     fonts: [F.notoSerif, F.beVietnam], nameWeight: '700', link: 'centered', social: 'outline' }),
+  // ─── GLASS ────────────────────────────────────────────────────
+  preset({ id: 'aurora-glass', name: 'Aurora glass', category: 'glass', description: 'Living aurora behind frosted glass cards', pro: true,
+    bg: '#f7f4ff', effect: 'aurora', mesh: ['#ff9ec7', '#a78bfa', '#7dd3fc'],
+    text: '#2a1f4d', accent: '#7c3aed', accent2: '#ec4899', surface: '#ffffff8c', border: '#ffffffcc', borderWidth: 1, blur: 'lg', radius: 22, shadow: 'glow',
+    fonts: [F.interTight, F.inter], nameWeight: '700', tracking: '-0.03em', nameGradient: true, link: 'centered', social: 'outline', gap: 'relaxed' }),
+  preset({ id: 'frost', name: 'Frost', category: 'glass', description: 'Ice-blue mesh, clear glass, crisp type', pro: true,
+    bg: '#f4faff', mesh: ['#bfe3ff', '#d9ccff', '#bff3e3'],
+    text: '#0f2a43', accent: '#2563eb', accent2: '#06b6d4', surface: '#ffffffa6', border: '#ffffff', borderWidth: 1, blur: 'md', radius: 18, shadow: 'md',
+    fonts: [F.interTight, F.inter], nameWeight: '600', tracking: '-0.03em', nameGradient: true, social: 'soft' }),
+  preset({ id: 'midnight-glass', name: 'Midnight glass', category: 'glass', description: 'Glowing glass over a deep violet night', pro: true,
+    bg: '#0b0b1a', mesh: ['#4f2aa8', '#0f5ea8', '#a12e8f'],
+    text: '#f5f3ff', accent: '#a78bfa', accent2: '#38bdf8', onAccent: '#0b0b1a', surface: '#ffffff14', surfaceText: '#f5f3ff', border: '#ffffff2e', borderWidth: 1, blur: 'lg', radius: 20, shadow: 'glow',
+    fonts: [F.grotesk, F.inter], nameWeight: '700', nameGradient: true, link: 'centered', social: 'outline' }),
+  preset({ id: 'sakura-glass', name: 'Sakura glass', category: 'glass', description: 'Cherry blossom pink in soft glass', pro: true,
+    bg: '#fff6f9', mesh: ['#ffc2d9', '#ffe0ec', '#e8d4ff'],
+    text: '#5b1f3a', accent: '#db2777', accent2: '#a855f7', surface: '#ffffffa0', border: '#ffffff', borderWidth: 1, blur: 'md', radius: 999, shadow: 'sm',
+    fonts: [F.playfair, F.beVietnam], nameWeight: '600', nameSize: '2.25rem', nameGradient: true, link: 'centered', social: 'outline', gap: 'relaxed' }),
+  preset({ id: 'lagoon-glass', name: 'Lagoon', category: 'glass', description: 'Turquoise light drifting under clear cards',
+    bg: '#f0fbfb', effect: 'aurora', mesh: ['#5eead4', '#7dd3fc', '#a5b4fc'],
+    text: '#083344', accent: '#0e7490', accent2: '#14b8a6', surface: '#ffffff99', border: '#ffffffcc', borderWidth: 1, blur: 'lg', radius: 18,
+    fonts: [F.montserrat, F.inter], nameWeight: '700', nameGradient: true, social: 'soft' }),
+
+  // ─── LUXE ─────────────────────────────────────────────────────
+  preset({ id: 'gold-noir', name: 'Gold noir', category: 'luxe', description: 'Black silk, gold lines and a gold name', pro: true,
+    bg: '#0c0b09', pattern: 'diagonal', patternColor: '#c9a45c',
+    text: '#f2e6c9', accent: '#c9a45c', accent2: '#f5e3a1', onAccent: '#0c0b09', surface: '#0c0b09d9', surfaceText: '#f2e6c9', border: '#c9a45c', borderWidth: 1, radius: 2,
+    fonts: [F.cormorant, F.josefin], nameWeight: '600', nameSize: '2.5rem', tracking: '0.04em', nameGradient: true, link: 'centered', social: 'plain', gap: 'relaxed' }),
+  preset({ id: 'marble', name: 'Marble', category: 'luxe', description: 'Soft stone tones, thin borders, serif type', pro: true,
+    bg: '#fbfaf8', mesh: ['#ece8e1', '#f6f2ea', '#e6e2dc'],
+    text: '#2b2621', accent: '#8b7355', accent2: '#c2a878', surface: '#ffffffd9', border: '#e2dbd0', borderWidth: 1, radius: 4, shadow: 'sm',
+    fonts: [F.cormorant, F.lora], nameWeight: '500', nameSize: '2.5rem', link: 'centered', social: 'outline', gap: 'relaxed' }),
+  preset({ id: 'emerald', name: 'Emerald velvet', category: 'luxe', description: 'Deep green velvet with gold trim', pro: true,
+    bg: ['#0b3d2e', '#062019'], angle: 170,
+    text: '#f4ead2', accent: '#d4af37', accent2: '#f3dc8a', onAccent: '#062019', surface: '#0f4a37', surfaceText: '#f4ead2', border: '#d4af37', borderWidth: 1, radius: 6, shadow: 'lg',
+    fonts: [F.playfair, F.josefin], nameWeight: '600', nameSize: '2.25rem', nameGradient: true, link: 'centered', social: 'outline' }),
+  preset({ id: 'royal', name: 'Royal navy', category: 'luxe', description: 'Navy and gold, quietly grand', pro: true,
+    bg: ['#0b1d3a', '#13294b', '#0a1630'], angle: 160,
+    text: '#eef2ff', accent: '#e6c36a', accent2: '#fff1c1', onAccent: '#0b1d3a', surface: '#ffffff0f', surfaceText: '#eef2ff', border: '#e6c36a66', borderWidth: 1, blur: 'md', radius: 10,
+    fonts: [F.notoSerif, F.inter], nameWeight: '600', nameGradient: true, social: 'outline' }),
+  preset({ id: 'rose-gold', name: 'Rose gold', category: 'luxe', description: 'Blush mesh and rose-gold accents', pro: true,
+    bg: '#fff8f6', mesh: ['#f6d5cf', '#fbe7df', '#ecd2dc'],
+    text: '#4a2a2a', accent: '#b76e79', accent2: '#e0a96d', surface: '#ffffffcc', border: '#ead2cc', borderWidth: 1, radius: 999, shadow: 'sm',
+    fonts: [F.playfair, F.josefin], nameWeight: '600', nameSize: '2.25rem', nameGradient: true, link: 'centered', social: 'outline', gap: 'relaxed' }),
+  preset({ id: 'pearl', name: 'Pearl', category: 'luxe', description: 'Iridescent pearl sheen, white cards',
+    bg: '#fdfcff', mesh: ['#f1e8ff', '#e6f6ff', '#fff0f5'],
+    text: '#262338', accent: '#5b5b8a', accent2: '#c084fc', surface: '#ffffff', border: '#ece8f5', borderWidth: 1, radius: 14, shadow: 'md',
+    fonts: [F.cormorant, F.inter], nameWeight: '600', nameSize: '2.25rem', link: 'centered', social: 'soft' }),
+
+  // ─── BOLD ─────────────────────────────────────────────────────
+  preset({ id: 'brutal', name: 'Brutal', category: 'bold', description: 'Thick outlines, hard shadows, loud and clear',
+    bg: '#fff5d6', pattern: 'dots', patternColor: '#111111',
+    text: '#111111', accent: '#ff5c39', surface: '#ffffff', border: '#111111', borderWidth: 2, radius: 8, shadow: 'hard',
+    fonts: [F.grotesk, F.grotesk], nameWeight: '700', tracking: '-0.03em', social: 'outline', titleAlign: 'left' }),
+  preset({ id: 'brutal-pink', name: 'Hot pink', category: 'bold', description: 'Bubblegum pink with black outlines', pro: true,
+    bg: '#ff90e8', text: '#000000', accent: '#000000', onAccent: '#ff90e8', surface: '#ffffff', border: '#000000', borderWidth: 3, radius: 0, shadow: 'hard',
+    fonts: [F.grotesk, F.grotesk], nameWeight: '700', nameSize: '2.25rem', tracking: '-0.04em', avatar: 'square', social: 'filled' }),
+  preset({ id: 'y2k', name: 'Y2K', category: 'bold', description: 'Chrome pastels, pill outlines, 2000s energy', pro: true,
+    bg: ['#e0c3fc', '#8ec5fc'], angle: 135,
+    text: '#1a1a2e', accent: '#ff4fd8', accent2: '#4f7bff', surface: '#ffffff', border: '#1a1a2e', borderWidth: 2, radius: 999, shadow: 'hard',
+    fonts: [F.comfortaa, F.nunito], nameWeight: '700', nameSize: '2.25rem', nameGradient: true, link: 'centered', social: 'filled' }),
+  preset({ id: 'vaporwave', name: 'Vaporwave', category: 'bold', description: 'Neon pink and cyan on a purple dusk', pro: true,
+    bg: ['#2b0f54', '#ab1fa8', '#ff6c95'], angle: 180, pattern: 'grid', patternColor: '#ff71ce',
+    text: '#ffffff', accent: '#01cdfe', accent2: '#ff71ce', onAccent: '#1a0b33', surface: '#1a0b33cc', surfaceText: '#ffffff', border: '#01cdfe', borderWidth: 1, radius: 4, shadow: 'glow',
+    fonts: [F.grotesk, F.grotesk], nameWeight: '700', nameSize: '2.25rem', tracking: '0.02em', nameGradient: true, link: 'centered', social: 'outline' }),
+  preset({ id: 'comic', name: 'Comic', category: 'bold', description: 'Halftone yellow, black ink, red pops',
+    bg: '#ffe14d', pattern: 'dots', patternColor: '#e11d48',
+    text: '#111111', accent: '#e11d48', surface: '#ffffff', border: '#111111', borderWidth: 3, radius: 14, shadow: 'hard',
+    fonts: [F.lobster, F.nunito], nameWeight: '400', nameSize: '2.5rem', link: 'centered', social: 'filled' }),
+  preset({ id: 'terminal', name: 'Terminal', category: 'bold', description: 'Green phosphor on a black grid', pro: true,
+    bg: '#050a05', pattern: 'grid', patternColor: '#39ff14',
+    text: '#b6ffa8', accent: '#39ff14', onAccent: '#050a05', surface: '#050a05e6', surfaceText: '#b6ffa8', border: '#39ff14', borderWidth: 1, radius: 0, shadow: 'glow',
+    fonts: ['ui-monospace, monospace', 'ui-monospace, monospace'], nameWeight: '700', avatar: 'square', titleAlign: 'left', social: 'plain' }),
+  preset({ id: 'poster', name: 'Poster', category: 'bold', description: 'Big type, red blocks, paper cream',
+    bg: '#f3ede1', text: '#141414', accent: '#e63946', radius: 0,
+    fonts: [F.montserrat, F.inter], nameWeight: '800', nameSize: '2.5rem', tracking: '-0.05em', header: 'left', titleAlign: 'left', avatar: 'square', link: 'centered', social: 'filled' }),
+
+  // ─── More in the other groups ─────────────────────────────────
+  preset({ id: 'notebook', name: 'Notebook', category: 'minimal', description: 'Grid paper and ink-blue notes',
+    bg: '#fdfdf8', pattern: 'grid', patternColor: '#4f7bd9',
+    text: '#1e2b4a', accent: '#2f5bd3', surface: '#ffffff', border: '#d7def0', borderWidth: 1, radius: 8,
+    fonts: [F.grotesk, F.inter], nameWeight: '600', titleAlign: 'left', social: 'outline' }),
+  preset({ id: 'ruled', name: 'Ruled paper', category: 'minimal', description: 'Soft lined paper, calm serif',
+    bg: '#fffdf7', pattern: 'lines', patternColor: '#8fb3d9',
+    text: '#2b2a27', accent: '#2b2a27', surface: '#fffdf7', border: '#e7e1d4', borderWidth: 1, radius: 4,
+    fonts: [F.lora, F.inter], nameWeight: '600', social: 'plain' }),
+  preset({ id: 'latte', name: 'Latte art', category: 'warm', description: 'Creamy coffee mesh, caramel accents', pro: true,
+    bg: '#fbf4ec', mesh: ['#ead2b8', '#f6e1c6', '#e2c2a6'],
+    text: '#3b2a1e', accent: '#9a5b2e', accent2: '#d6a15c', surface: '#fffaf3d9', border: '#ead9c3', borderWidth: 1, blur: 'sm', radius: 18, shadow: 'sm',
+    fonts: [F.lora, F.nunito], nameWeight: '600', nameSize: '2.25rem', social: 'soft' }),
+  preset({ id: 'sunset-mesh', name: 'Golden hour', category: 'warm', description: 'Peach, coral and honey melting together', pro: true,
+    bg: '#fff4ec', mesh: ['#ffb38a', '#ff8fb1', '#ffd36e'],
+    text: '#4a1d10', accent: '#e8590c', accent2: '#d6336c', surface: '#ffffffb3', border: '#ffffff', borderWidth: 1, blur: 'md', radius: 20, shadow: 'md',
+    fonts: [F.poppins, F.poppins], nameWeight: '700', nameGradient: true, social: 'soft' }),
+  preset({ id: 'botanical', name: 'Botanical', category: 'nature', description: 'Leaf green dots on linen',
+    bg: '#f3f1e7', pattern: 'dots', patternColor: '#3f6b3a',
+    text: '#22331f', accent: '#3f6b3a', surface: '#fbfaf4', border: '#d9d6c4', borderWidth: 1, radius: 16,
+    fonts: [F.cormorant, F.beVietnam], nameWeight: '600', nameSize: '2.25rem', link: 'centered', social: 'outline' }),
+  preset({ id: 'meadow', name: 'Meadow', category: 'nature', description: 'Fresh grass and sky in a soft mesh', pro: true,
+    bg: '#f6fbf2', mesh: ['#c8eeb0', '#b9e4ff', '#f2f6b5'],
+    text: '#1f3a1a', accent: '#3a8a2e', accent2: '#0ea5a4', surface: '#ffffffb8', border: '#ffffff', borderWidth: 1, blur: 'sm', radius: 18,
+    fonts: [F.quicksand, F.beVietnam], nameWeight: '700', nameGradient: true, social: 'soft' }),
+  preset({ id: 'cotton-candy', name: 'Cotton candy', category: 'pastel', description: 'Pastel aurora that never sits still', pro: true,
+    bg: '#fff7fc', effect: 'aurora', mesh: ['#ffc6e0', '#c9b8ff', '#b8f0ff'],
+    text: '#3d2a5a', accent: '#d946ef', accent2: '#6366f1', surface: '#ffffffb3', border: '#ffffff', borderWidth: 1, blur: 'md', radius: 999,
+    fonts: [F.comfortaa, F.nunito], nameWeight: '700', nameGradient: true, link: 'centered', social: 'soft' }),
+  preset({ id: 'dreamy', name: 'Dreamy', category: 'pastel', description: 'Lilac and sky mesh, round and soft',
+    bg: '#fbf9ff', mesh: ['#e3d5ff', '#cfe8ff', '#ffd9ec'],
+    text: '#33284d', accent: '#7c5cff', surface: '#ffffffc2', border: '#ffffff', borderWidth: 1, blur: 'sm', radius: 22,
+    fonts: [F.quicksand, F.quicksand], nameWeight: '700', social: 'soft' }),
+  preset({ id: 'cyber', name: 'Cyber glow', category: 'dark', description: 'Cyan neon edges on deep black', pro: true,
+    bg: '#04060c', pattern: 'grid', patternColor: '#22d3ee',
+    text: '#e6fbff', accent: '#22d3ee', accent2: '#a855f7', onAccent: '#04060c', surface: '#0b1220', surfaceText: '#e6fbff', border: '#22d3ee', borderWidth: 1, radius: 12, shadow: 'glow',
+    fonts: [F.grotesk, F.inter], nameWeight: '700', nameGradient: true, social: 'outline' }),
+  preset({ id: 'obsidian', name: 'Obsidian', category: 'dark', description: 'Polished black with a violet glow',
+    bg: ['#0a0a0f', '#16141f'], angle: 170,
+    text: '#ece9f6', accent: '#8b5cf6', accent2: '#ec4899', surface: '#17151f', surfaceText: '#ece9f6', border: '#2a2638', borderWidth: 1, radius: 14, shadow: 'glow',
+    fonts: [F.interTight, F.inter], nameWeight: '600', tracking: '-0.03em', social: 'outline' }),
+  preset({ id: 'lixi', name: 'Lì xì', category: 'festive', description: 'Red envelope red with gold waves', pro: true,
+    bg: '#b3121f', pattern: 'waves', patternColor: '#f5c542',
+    text: '#fff3d6', accent: '#f5c542', accent2: '#ffe08a', onAccent: '#7a0a12', surface: '#8f0d18', surfaceText: '#fff3d6', border: '#f5c542', borderWidth: 2, radius: 14, shadow: 'lg',
+    fonts: [F.playfair, F.beVietnam], nameWeight: '700', nameSize: '2.25rem', nameGradient: true, link: 'centered', social: 'outline' }),
+  preset({ id: 'party', name: 'Party', category: 'festive', description: 'Confetti dots and neon outlines', pro: true,
+    bg: '#1b0b3a', pattern: 'dots', patternColor: '#facc15',
+    text: '#fdf4ff', accent: '#f472b6', accent2: '#facc15', onAccent: '#1b0b3a', surface: '#2a1257', surfaceText: '#fdf4ff', border: '#f472b6', borderWidth: 2, radius: 999, shadow: 'glow',
+    fonts: [F.pacifico, F.nunito], nameWeight: '400', nameSize: '2.5rem', nameGradient: true, link: 'centered', social: 'filled' }),
 ]
 
 export const THEME_PRESETS_BY_CATEGORY = THEME_PRESET_CATEGORIES.map(cat => ({

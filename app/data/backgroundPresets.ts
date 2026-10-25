@@ -44,6 +44,25 @@ export const backgroundCategories: BackgroundCategory[] = [
       { id: 'grad-arctic', name: 'Arctic', preview: 'linear-gradient(135deg, #BAE6FD, #E0F2FE)', value: { type: 'gradient', gradient: { angle: 135, from: '#BAE6FD', to: '#E0F2FE' } } },
       { id: 'grad-peach', name: 'Peach', preview: 'linear-gradient(135deg, #FED7AA, #FCA5A5)', value: { type: 'gradient', gradient: { angle: 135, from: '#FED7AA', to: '#FCA5A5' } } },
       { id: 'grad-midnight', name: 'Midnight Blue', preview: 'linear-gradient(135deg, #1E3A5F, #0F172A)', value: { type: 'gradient', gradient: { angle: 135, from: '#1E3A5F', to: '#0F172A' } } },
+      { id: 'mesh-dream', name: 'Dream', preview: '', value: { type: 'gradient', color: '#fff7fb', gradient: { style: 'mesh', from: '#ffc6e0', via: '#d9c6ff', to: '#bfe8ff' } } },
+      { id: 'mesh-peach', name: 'Peach mesh', preview: '', value: { type: 'gradient', color: '#fff8f1', gradient: { style: 'mesh', from: '#ffd1b3', via: '#ffb3c7', to: '#ffe9a8' } } },
+      { id: 'mesh-lagoon', name: 'Lagoon mesh', preview: '', value: { type: 'gradient', color: '#f3fbff', gradient: { style: 'mesh', from: '#a7e8ff', via: '#b6c8ff', to: '#b7f5df' } } },
+      { id: 'mesh-sunset', name: 'Sunset mesh', preview: '', value: { type: 'gradient', color: '#fff4ec', gradient: { style: 'mesh', from: '#ffb38a', via: '#ff8fb1', to: '#ffd36e' } } },
+      { id: 'mesh-night', name: 'Night mesh', preview: '', value: { type: 'gradient', color: '#0b0b1a', gradient: { style: 'mesh', from: '#4f2aa8', via: '#0f5ea8', to: '#a12e8f' } } },
+      { id: 'mesh-forest', name: 'Forest mesh', preview: '', value: { type: 'gradient', color: '#f4fbf3', gradient: { style: 'mesh', from: '#b9e6b0', via: '#e3f3a7', to: '#a7dccf' } } },
+    ],
+  },
+  {
+    // Laid over the current solid or gradient background
+    label: 'Pattern',
+    value: 'pattern',
+    presets: [
+      { id: 'pat-dots', name: 'dots', preview: '', value: { type: 'solid', pattern: { id: 'dots' } } },
+      { id: 'pat-grid', name: 'grid', preview: '', value: { type: 'solid', pattern: { id: 'grid' } } },
+      { id: 'pat-lines', name: 'lines', preview: '', value: { type: 'solid', pattern: { id: 'lines' } } },
+      { id: 'pat-checker', name: 'checker', preview: '', value: { type: 'solid', pattern: { id: 'checker' } } },
+      { id: 'pat-diagonal', name: 'diagonal', preview: '', value: { type: 'solid', pattern: { id: 'diagonal' } } },
+      { id: 'pat-waves', name: 'waves', preview: '', value: { type: 'solid', pattern: { id: 'waves' } } },
     ],
   },
   {
@@ -69,6 +88,7 @@ export const backgroundCategories: BackgroundCategory[] = [
     label: 'Effect',
     value: 'effect',
     presets: [
+      { id: 'fx-aurora', name: 'Aurora', preview: 'fx-aurora', value: { type: 'effect', effectId: 'aurora', color: '#fdf7ff' } },
       { id: 'fx-particles', name: 'Particles', preview: 'fx-particles', value: { type: 'effect', effectId: 'particles' } },
       { id: 'fx-falling-stars', name: 'Falling Stars', preview: 'fx-falling-stars', value: { type: 'effect', effectId: 'falling-stars' } },
       { id: 'fx-stars', name: 'Stars', preview: 'fx-stars', value: { type: 'effect', effectId: 'stars' } },

@@ -59,7 +59,8 @@
         "gradient": "Gradient",
         "image": "Image",
         "video": "Video",
-        "effect": "Effect"
+        "effect": "Effect",
+        "pattern": "Pattern"
       },
       "custom": "Custom",
       "customGradient": "Custom gradient",
@@ -95,7 +96,11 @@
         "ghost": "Ghost",
         "soft": "Soft"
       },
-      "pill": "Pill"
+      "pill": "Pill",
+      "shadowHard": "Hard",
+      "shadowGlow": "Glow",
+      "borderWidth": "Border width",
+      "borderAuto": "By style"
     },
     "fontWeights": {
       "light": "Light",
@@ -207,7 +212,10 @@
       "nature": "Nature",
       "pastel": "Pastel",
       "dark": "Dark",
-      "festive": "Festive"
+      "festive": "Festive",
+      "glass": "Glass",
+      "luxe": "Luxe",
+      "bold": "Bold"
     },
     "presets": {
       "paper": {
@@ -369,6 +377,126 @@
       "midautumn": {
         "name": "Mid-Autumn",
         "description": "Lantern orange on night blue"
+      },
+      "aurora-glass": {
+        "name": "Aurora glass",
+        "description": "Living aurora behind frosted glass cards"
+      },
+      "frost": {
+        "name": "Frost",
+        "description": "Ice-blue mesh, clear glass, crisp type"
+      },
+      "midnight-glass": {
+        "name": "Midnight glass",
+        "description": "Glowing glass over a deep violet night"
+      },
+      "sakura-glass": {
+        "name": "Sakura glass",
+        "description": "Cherry blossom pink in soft glass"
+      },
+      "lagoon-glass": {
+        "name": "Lagoon",
+        "description": "Turquoise light drifting under clear cards"
+      },
+      "gold-noir": {
+        "name": "Gold noir",
+        "description": "Black silk, gold lines and a gold name"
+      },
+      "marble": {
+        "name": "Marble",
+        "description": "Soft stone tones, thin borders, serif type"
+      },
+      "emerald": {
+        "name": "Emerald velvet",
+        "description": "Deep green velvet with gold trim"
+      },
+      "royal": {
+        "name": "Royal navy",
+        "description": "Navy and gold, quietly grand"
+      },
+      "rose-gold": {
+        "name": "Rose gold",
+        "description": "Blush mesh and rose-gold accents"
+      },
+      "pearl": {
+        "name": "Pearl",
+        "description": "Iridescent pearl sheen, white cards"
+      },
+      "brutal": {
+        "name": "Brutal",
+        "description": "Thick outlines, hard shadows, loud and clear"
+      },
+      "brutal-pink": {
+        "name": "Hot pink",
+        "description": "Bubblegum pink with black outlines"
+      },
+      "y2k": {
+        "name": "Y2K",
+        "description": "Chrome pastels, pill outlines, 2000s energy"
+      },
+      "vaporwave": {
+        "name": "Vaporwave",
+        "description": "Neon pink and cyan on a purple dusk"
+      },
+      "comic": {
+        "name": "Comic",
+        "description": "Halftone yellow, black ink, red pops"
+      },
+      "terminal": {
+        "name": "Terminal",
+        "description": "Green phosphor on a black grid"
+      },
+      "poster": {
+        "name": "Poster",
+        "description": "Big type, red blocks, paper cream"
+      },
+      "notebook": {
+        "name": "Notebook",
+        "description": "Grid paper and ink-blue notes"
+      },
+      "ruled": {
+        "name": "Ruled paper",
+        "description": "Soft lined paper, calm serif"
+      },
+      "latte": {
+        "name": "Latte art",
+        "description": "Creamy coffee mesh, caramel accents"
+      },
+      "sunset-mesh": {
+        "name": "Golden hour",
+        "description": "Peach, coral and honey melting together"
+      },
+      "botanical": {
+        "name": "Botanical",
+        "description": "Leaf green dots on linen"
+      },
+      "meadow": {
+        "name": "Meadow",
+        "description": "Fresh grass and sky in a soft mesh"
+      },
+      "cotton-candy": {
+        "name": "Cotton candy",
+        "description": "Pastel aurora that never sits still"
+      },
+      "dreamy": {
+        "name": "Dreamy",
+        "description": "Lilac and sky mesh, round and soft"
+      },
+      "cyber": {
+        "name": "Cyber glow",
+        "description": "Cyan neon edges on deep black"
+      },
+      "obsidian": {
+        "name": "Obsidian",
+        "description": "Polished black with a violet glow"
+      },
+      "lixi": {
+        "name": "Lì xì",
+        "description": "Red envelope red with gold waves"
+      },
+      "party": {
+        "name": "Party",
+        "description": "Confetti dots and neon outlines"
       }
     },
     "sections": {
@@ -384,11 +512,16 @@
       "align": "Alignment",
       "pageColor": "Content text colour",
       "pageColorHelp": "Colour of the text inside blocks.",
-      "pairs": "Font pairs"
+      "pairs": "Font pairs",
+      "nameGradient": "Gradient name",
+      "nameGradientHelp": "Paint the site name with the accent colours."
     },
     "presetActions": {
       "random": "Surprise me",
-      "count": "{n} themes"
+      "count": "{n} themes",
+      "pro": "Pro",
+      "proNote": "Pro themes are free to use during launch.",
+      "seePlans": "See Pro plans"
     },
     "rows": {
       "theme": "Theme",

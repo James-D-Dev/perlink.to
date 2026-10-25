@@ -69,7 +69,7 @@
                   </UFormField>
                   <div>
                     <p class="mb-2 text-sm font-medium text-default">{{ t('theme.background.title') }}</p>
-                    <BioBackgroundPicker :background="themeConfig.background" @select="(v) => emit('updateTheme', { background: v })" />
+                    <BioBackgroundPicker :background="themeConfig.background" :text-color="themeConfig.typography.textColor" @select="(v) => emit('updateTheme', { background: v })" />
                   </div>
                 </div>
 
@@ -113,6 +113,13 @@
                       <UFormField :label="t('theme.fields.textColor')">
                         <BioColorField :model-value="themeConfig.header.textColor" :fallback="themeConfig.typography.textColor || '#334155'" :label="t('theme.fields.textColor')" :placeholder="t('common.auto')" @update:model-value="emitHeader('textColor', $event)" />
                       </UFormField>
+                      <div class="col-span-2 flex items-center justify-between gap-3 rounded-lg bg-sand/60 px-3 py-2.5">
+                        <span class="min-w-0">
+                          <span class="block text-sm font-medium text-ink">{{ t('theme.text.nameGradient') }}</span>
+                          <span class="block text-xs text-ink-muted">{{ t('theme.text.nameGradientHelp') }}</span>
+                        </span>
+                        <USwitch :model-value="!!themeConfig.header.textGradient" @update:model-value="emitHeader('textGradient', $event)" />
+                      </div>
                     </div>
                   </div>
 
@@ -173,6 +180,21 @@
                     </div>
                   </UFormField>
                   <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <UFormField :label="t('theme.card.borderWidth')" class="col-span-2 sm:col-span-3">
+                      <div class="flex flex-wrap gap-1.5">
+                        <button
+                          v-for="w in borderWidthOptions"
+                          :key="w"
+                          type="button"
+                          class="flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs transition"
+                          :class="(themeConfig.card.borderWidth ?? 0) === w ? 'border-inverted text-highlighted ring-1 ring-inverted' : 'border-default text-muted hover:border-accented dark:border-white/10'"
+                          @click="emitCard('borderWidth', w)"
+                        >
+                          <span class="h-3 w-5 rounded-sm" :style="{ border: w ? `${w}px solid currentColor` : '1px dashed currentColor', opacity: w ? 1 : 0.5 }" />
+                          {{ w ? `${w}px` : t('theme.card.borderAuto') }}
+                        </button>
+                      </div>
+                    </UFormField>
                     <UFormField :label="t('theme.card.color')">
                       <BioColorField :model-value="themeConfig.card.backgroundColor" :fallback="themeConfig.colors.primary" :label="t('theme.card.colorAria')" :placeholder="t('common.auto')" @update:model-value="emitCard('backgroundColor', $event)" />
                     </UFormField>
@@ -259,6 +281,7 @@ import type { Template, ThemeConfig, SocialLink } from "~/types/bio";
 import { type ThemePreset } from "~/data/themePresets";
 import { nameFontOptions, headingFontOptions, paragraphFontOptions, FONT_PAIRS, type FontOption } from "~/data/fontOptions";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
+import { backgroundCss } from "~/utils/themeBackground";
 
 const { t, te } = useI18n();
 
@@ -289,11 +312,9 @@ const viewTitle = computed(() =>
   view.value === "theme" ? t("theme.rows.theme") : t(`theme.sections.${view.value}`),
 );
 
-const rootBgStyle = computed(() => {
-  const bg = props.themeConfig.background;
-  if (bg?.type === "gradient" && bg.gradient) return { background: `linear-gradient(${bg.gradient.angle ?? 160}deg, ${bg.gradient.from}, ${bg.gradient.to})` };
-  return { backgroundColor: bg?.color || props.themeConfig.colors.third || "#fff" };
-});
+const rootBgStyle = computed(() =>
+  backgroundCss(props.themeConfig.background, props.themeConfig.colors.third || "#fff", props.themeConfig.typography.textColor),
+);
 
 const currentPresetName = computed(() => {
   const id = props.themeConfig.presetId;
@@ -416,9 +437,11 @@ function onPresetSelect(preset: ThemePreset) {
   emit("updateTheme", {
     ...theme,
     presetId: preset.id,
-    card: { backgroundColor: undefined, outlineColor: undefined, ...theme.card },
+    // Backgrounds replace each other whole: no pattern or mesh left over
+    background: { gradient: undefined, pattern: undefined, effectId: undefined, imageUrl: undefined, videoUrl: undefined, ...theme.background },
+    card: { backgroundColor: undefined, outlineColor: undefined, borderWidth: undefined, backdropBlur: undefined, ...theme.card },
     // The owner's header layout (and banner) stays; the preset only restyles it
-    header: { fontWeight: undefined, letterSpacing: undefined, fontFamily: undefined, fontSize: undefined, textColor: undefined, ...theme.header, layout: props.themeConfig.header.layout },
+    header: { fontWeight: undefined, letterSpacing: undefined, fontFamily: undefined, fontSize: undefined, textColor: undefined, textGradient: undefined, ...theme.header, layout: props.themeConfig.header.layout, bannerUrl: props.themeConfig.header.bannerUrl },
     typography: { textColor: undefined, bioTextColor: undefined, bioFontFamily: undefined, ...theme.typography },
     social: theme.social ?? { style: "soft" },
     page: theme.page ?? { blockGap: "normal", titleAlign: "center" },
@@ -534,7 +557,11 @@ const shadowOptions = computed(() => [
   { label: t("theme.options.small"), value: "sm" },
   { label: t("theme.options.medium"), value: "md" },
   { label: t("theme.options.large"), value: "lg" },
+  { label: t("theme.card.shadowHard"), value: "hard" },
+  { label: t("theme.card.shadowGlow"), value: "glow" },
 ]);
+
+const borderWidthOptions = [0, 1, 2, 3];
 
 const APPEAR_ANIMATIONS = [
   "fadeIn", "fadeInDown", "fadeInUp", "fadeInLeft", "fadeInRight",

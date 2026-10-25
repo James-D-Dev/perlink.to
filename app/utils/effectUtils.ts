@@ -10,6 +10,8 @@ export const EFFECT_BG_CLASS: Record<string, string> = {
   'silk': 'bg-purple-900',
   'black-hole': 'bg-white',
   'thunderstorm': 'bg-slate-900',
+  // Lights over the page's own background colour
+  'aurora': 'bg-transparent',
 }
 
 export function getEffectBgClass(effectId?: string): string {

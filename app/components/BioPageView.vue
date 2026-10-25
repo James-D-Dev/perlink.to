@@ -28,6 +28,7 @@
     <component
       :is="bgEffectComponent"
       v-if="theme.background.type === 'effect' && bgEffectComponent"
+      :colors="effectColors"
       class="fixed inset-0 w-full h-full"
       :class="getEffectBgClass(theme.background.effectId)"
     />
@@ -437,6 +438,9 @@ import { getEffectBgClass } from "~/utils/effectUtils";
 import { googleFontsUrlFor } from "~/composables/useGoogleFonts";
 
 const bgEffectMap: Record<string, ReturnType<typeof defineAsyncComponent>> = {
+  aurora: defineAsyncComponent(
+    () => import("~/components/background-effects/AuroraBg.vue"),
+  ),
   particles: defineAsyncComponent(
     () => import("~/components/background-effects/ParticlesBg.vue"),
   ),
@@ -527,6 +531,13 @@ provide(SITE_LANG_KEY, siteLang);
 const bioAlign = computed(() =>
   headerLayout.value === 'left' ? 'left' : headerLayout.value === 'centered' ? headerAlignment.value : 'center',
 );
+
+// Colours for effects that follow the theme (aurora): the gradient, else the accents
+const effectColors = computed(() => {
+  const g = theme.value.background.gradient;
+  const c = theme.value.colors;
+  return g?.from ? [g.from, g.via || g.to || c.secondary, g.to || c.primary] : [c.primary, c.secondary || c.primary, c.third || c.primary];
+});
 
 const bgEffectComponent = computed(() => {
   if (theme.value.background.type !== "effect") return null;

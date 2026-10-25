@@ -1,3 +1,4 @@
+import { backgroundCss } from '~/utils/themeBackground'
 import { computed } from 'vue'
 import type { ThemeConfig, ThemeShadow, AnimateDuration } from '~/types/bio'
 import { DEFAULT_THEME } from '~/types/bio'
@@ -20,11 +21,17 @@ function mergeWithDefault(theme: Partial<ThemeConfig> | undefined | null): Theme
   }
 }
 
-function shadowToCss(shadow: ThemeShadow): string {
+/** `edge` colours the hard shadow, `accent` the glow */
+function shadowToCss(shadow: ThemeShadow, colors: { edge?: string; accent?: string } = {}): string {
   switch (shadow) {
     case 'sm': return '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)'
     case 'md': return '0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06)'
     case 'lg': return '0 10px 25px rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.08)'
+    case 'hard': return `4px 4px 0 0 ${colors.edge || '#111111'}`
+    case 'glow': {
+      const glow = colors.accent || '#a78bfa'
+      return `0 0 0 1px color-mix(in srgb, ${glow} 35%, transparent), 0 8px 30px color-mix(in srgb, ${glow} 45%, transparent)`
+    }
     default:   return 'none'
   }
 }
@@ -110,28 +117,11 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
     return mergeWithDefault(raw)
   })
 
-  const backgroundStyle = computed(() => {
-    const bg = theme.value.background
-    if (bg.type === 'gradient' && bg.gradient) {
-      const { angle, from, to, via } = bg.gradient
-      const stops = via
-        ? `${from}, ${via}, ${to}`
-        : `${from}, ${to}`
-      return { background: `linear-gradient(${angle}deg, ${stops})` }
-    }
-    if (bg.type === 'image' && bg.imageUrl) {
-      return {
-        backgroundImage: bg.imageOverlay
-          ? `linear-gradient(${bg.imageOverlay}, ${bg.imageOverlay}), url(${bg.imageUrl})`
-          : `url(${bg.imageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }
-    }
-    // Older pages only stored the colour in colors.third
-    return { backgroundColor: bg.color || theme.value.colors.third || '#FFFFFF' }
-  })
+  // Colour, linear or mesh gradient, image and pattern (see utils/themeBackground).
+  // Older pages only stored the colour in colors.third
+  const backgroundStyle = computed(() =>
+    backgroundCss(theme.value.background, theme.value.colors.third || '#FFFFFF', theme.value.typography.textColor || '#111111'),
+  )
 
   const bgLayerStyle = computed(() => backgroundStyle.value)
 
@@ -150,34 +140,44 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
     // const cardBg = bg.type === 'solid' ? (bg.color || '#FFFFFF') : '#FFFFFF'
     const blurMap: Record<string, string> = { sm: 'blur(4px)', md: 'blur(8px)', lg: 'blur(16px)', xl: 'blur(24px)' }
     const backdropFilter = card.backdropBlur && card.backdropBlur !== 'none' ? blurMap[card.backdropBlur] : undefined
+    // The outline colour, else the card text, else the accent: used by the
+    // hard shadow and a set border width
+    const edge = card.outlineColor || card.textColor || color
     const base = {
       borderRadius: `${card.cornerRadius}px`,
-      boxShadow: shadowToCss(card.shadow),
+      boxShadow: shadowToCss(card.shadow, { edge, accent: color }),
       backdropFilter,
     }
     const cardText = card.textColor || undefined
-    // An explicit surface colour: the style only decides the border
-    if (card.backgroundColor) {
-      const surface = withAlpha(card.backgroundColor, card.transparency ?? 1)
+    // A chosen border width wins over the style's own border
+    const width = card.borderWidth ?? 0
+    const withBorder = <T extends Record<string, unknown>>(style: T) =>
+      width > 0 ? { ...style, border: `${width}px solid ${card.outlineColor || edge}` } : style
+    const pick = () => {
+      // An explicit surface colour: the style only decides the border
+      if (card.backgroundColor) {
+        const surface = withAlpha(card.backgroundColor, card.transparency ?? 1)
+        switch (card.style) {
+          case 'outline':
+            return { ...base, backgroundColor: surface, border: `1px solid ${card.outlineColor || color}`, color: cardText }
+          case 'ghost':
+            return { ...base, backgroundColor: 'transparent', border: `1px solid ${card.outlineColor || card.backgroundColor}`, color: cardText }
+          default:
+            return { ...base, backgroundColor: surface, border: 'none', color: cardText }
+        }
+      }
       switch (card.style) {
         case 'outline':
-          return { ...base, backgroundColor: surface, border: `1px solid ${card.outlineColor || color}`, color: cardText }
+          return { ...base, backgroundColor: `${color}20`, border: `1px solid ${card.outlineColor || color}`, color: cardText }
         case 'ghost':
-          return { ...base, backgroundColor: 'transparent', border: `1px solid ${card.outlineColor || card.backgroundColor}`, color: cardText }
+          return { ...base, backgroundColor: `${color}60`, border: 'none', color: cardText }
+        case 'soft':
+          return { ...base, backgroundColor: `${color}80`, border: 'none', color: cardText }
         default:
-          return { ...base, backgroundColor: surface, border: 'none', color: cardText }
+          return { ...base, backgroundColor: color, border: 'none', color: cardText }
       }
     }
-    switch (card.style) {
-      case 'outline':
-        return { ...base, backgroundColor: `${color}20`, border: `1px solid ${card.outlineColor || color}`, color: cardText }
-      case 'ghost':
-        return { ...base, backgroundColor: `${color}60`, border: 'none', color: cardText }
-      case 'soft':
-        return { ...base, backgroundColor: `${color}80`, border: 'none', color: cardText }
-      default:
-        return { ...base, backgroundColor: color, border: 'none', color: cardText }
-    }
+    return withBorder(pick())
   })
 
   const buttonStyle = computed(() => {
@@ -251,6 +251,16 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
     letterSpacing: theme.value.header.letterSpacing,
     lineHeight: '1.15',
     color: theme.value.header.textColor,
+    // A gradient name: the accent colours painted through the letters
+    ...(theme.value.header.textGradient
+      ? {
+          backgroundImage: `linear-gradient(100deg, ${theme.value.colors.primary}, ${theme.value.colors.secondary || theme.value.colors.primary})`,
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+          WebkitTextFillColor: 'transparent',
+        }
+      : {}),
   }))
 
   // Block titles ("Menu", "Gallery"...) share the name's colour and weight

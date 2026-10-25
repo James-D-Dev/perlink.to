@@ -81,6 +81,14 @@ export interface ThemeBackground {
     from?: string;
     to?: string;
     via?: string;
+    /** "mesh": soft blobs of the three colours instead of a straight blend */
+    style?: "linear" | "mesh";
+  };
+  /** A fine pattern drawn over a solid or gradient background */
+  pattern?: {
+    id: "dots" | "grid" | "lines" | "checker" | "diagonal" | "waves";
+    /** Defaults to the page text colour, faintly */
+    color?: string;
   };
   imageUrl?: string;
   imageOverlay?: string;
@@ -88,7 +96,8 @@ export interface ThemeBackground {
   effectId?: string;
 }
 
-export type ThemeShadow = "none" | "sm" | "md" | "lg";
+/** "hard": a solid offset shadow (neo-brutalist); "glow": a soft halo in the accent colour */
+export type ThemeShadow = "none" | "sm" | "md" | "lg" | "hard" | "glow";
 
 export type AnimateAppear =
   | "none"
@@ -144,6 +153,8 @@ export interface ThemeCard {
   shadow: ThemeShadow;
   backdropBlur?: ThemeBackdropBlur;
   outlineColor?: string;
+  /** Border thickness in px; 0 or unset keeps the style's own border */
+  borderWidth?: number;
   /** Surface colour. When set, cards use it instead of a tint of the primary colour */
   backgroundColor?: string;
   textColor?: string;
@@ -182,6 +193,8 @@ export interface ThemeHeader {
   /** CSS letter-spacing for the name, e.g. "-0.02em" */
   letterSpacing?: string;
   textColor?: string;
+  /** The name filled with a gradient of the accent colours */
+  textGradient?: boolean;
 }
 
 export interface ThemeAvatar {

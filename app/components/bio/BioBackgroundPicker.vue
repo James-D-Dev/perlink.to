@@ -51,7 +51,7 @@
                 <span
                   class="w-full aspect-9/16 rounded-lg border-2 transition-all block"
                   :class="isSelected(preset) ? 'border-primary-500 scale-105 shadow-md' : 'border-gray-200 dark:border-white/10 hover:border-gray-400'"
-                  :style="{ background: preset.preview }"
+                  :style="preset.preview ? { background: preset.preview } : backgroundCss(preset.value, '#ffffff')"
                 />
               </button>
             </div>
@@ -86,6 +86,32 @@
                   />
                 </div>
               </div>
+            </div>
+          </template>
+
+          <!-- Pattern, over whatever colour or gradient is set -->
+          <template v-else-if="item.value === 'pattern'">
+            <div class="grid grid-cols-4 gap-1 md:grid-cols-7">
+              <button type="button" class="flex flex-col items-center gap-1" @click="emit('select', { ...background, pattern: undefined })">
+                <span
+                  class="flex aspect-square w-full items-center justify-center rounded-lg border-2 text-[10px] text-muted transition-all"
+                  :class="!background.pattern ? 'border-primary-500 shadow-md' : 'border-gray-200 hover:border-gray-400 dark:border-white/10'"
+                  :style="backgroundCss({ ...background, pattern: undefined }, '#ffffff', textColor)"
+                >{{ t('theme.options.none') }}</span>
+              </button>
+              <button
+                v-for="preset in getPresets('pattern')"
+                :key="preset.id"
+                type="button"
+                class="flex flex-col items-center gap-1"
+                @click="emit('select', { ...background, type: background.type === 'gradient' ? 'gradient' : 'solid', pattern: preset.value.pattern })"
+              >
+                <span
+                  class="block aspect-square w-full rounded-lg border-2 transition-all"
+                  :class="background.pattern?.id === preset.value.pattern?.id ? 'border-primary-500 shadow-md' : 'border-gray-200 hover:border-gray-400 dark:border-white/10'"
+                  :style="backgroundCss({ ...background, type: background.type === 'gradient' ? 'gradient' : 'solid', pattern: preset.value.pattern }, '#ffffff', textColor)"
+                />
+              </button>
             </div>
           </template>
 
@@ -168,6 +194,7 @@ import { computed, defineAsyncComponent } from 'vue'
 import { backgroundCategories } from '~/data/backgroundPresets'
 import type { ThemeBackground } from '~/types/bio'
 import { getEffectBgClass } from '~/utils/effectUtils'
+import { backgroundCss } from '~/utils/themeBackground'
 
 const effectComponents: Record<string, ReturnType<typeof defineAsyncComponent>> = {
   'particles': defineAsyncComponent(() => import('~/components/background-effects/ParticlesBg.vue')),
@@ -180,12 +207,15 @@ const effectComponents: Record<string, ReturnType<typeof defineAsyncComponent>> 
   'neural': defineAsyncComponent(() => import('~/components/background-effects/NeuralBg.vue')),
   'black-hole': defineAsyncComponent(() => import('~/components/background-effects/BlackHoleBackground.vue')),
   'thunderstorm': defineAsyncComponent(() => import('~/components/background-effects/ThunderstormBackground.vue')),
+  'aurora': defineAsyncComponent(() => import('~/components/background-effects/AuroraBg.vue')),
 }
 
 const { t } = useI18n()
 
 const props = defineProps<{
   background: ThemeBackground
+  /** Page text colour: patterns are drawn in it, as on the site */
+  textColor?: string
 }>()
 
 const emit = defineEmits<{
@@ -204,7 +234,7 @@ function isSelected(preset: { value: ThemeBackground }) {
   const bg = props.background
   if (bg.type !== preset.value.type) return false
   if (bg.type === 'solid') return bg.color === preset.value.color
-  if (bg.type === 'gradient') return bg.gradient?.from === preset.value.gradient?.from && bg.gradient?.to === preset.value.gradient?.to
+  if (bg.type === 'gradient') return bg.gradient?.from === preset.value.gradient?.from && bg.gradient?.to === preset.value.gradient?.to && (bg.gradient?.style ?? 'linear') === (preset.value.gradient?.style ?? 'linear')
   if (bg.type === 'image') return bg.imageUrl === preset.value.imageUrl
   if (bg.type === 'effect') return bg.effectId === preset.value.effectId
   return false
@@ -212,6 +242,7 @@ function isSelected(preset: { value: ThemeBackground }) {
 
 function emitGradient(key: 'from' | 'via' | 'to', value: string) {
   emit('select', {
+    ...props.background,
     type: 'gradient',
     gradient: { ...props.background.gradient, [key]: value },
   })

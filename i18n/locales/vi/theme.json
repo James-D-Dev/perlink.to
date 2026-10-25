@@ -59,7 +59,8 @@
         "gradient": "Chuyển sắc",
         "image": "Ảnh",
         "video": "Video",
-        "effect": "Hiệu ứng"
+        "effect": "Hiệu ứng",
+        "pattern": "Họa tiết"
       },
       "custom": "Tự chọn",
       "customGradient": "Chuyển sắc tự chọn",
@@ -95,7 +96,11 @@
         "ghost": "Trong suốt",
         "soft": "Nhạt"
       },
-      "pill": "Tròn hẳn"
+      "pill": "Tròn hẳn",
+      "shadowHard": "Cứng",
+      "shadowGlow": "Phát sáng",
+      "borderWidth": "Độ dày viền",
+      "borderAuto": "Theo kiểu"
     },
     "fontWeights": {
       "light": "Mảnh",
@@ -207,7 +212,10 @@
       "nature": "Thiên nhiên",
       "pastel": "Pastel",
       "dark": "Tối",
-      "festive": "Lễ hội"
+      "festive": "Lễ hội",
+      "glass": "Kính mờ",
+      "luxe": "Cao cấp",
+      "bold": "Cá tính"
     },
     "presets": {
       "paper": {
@@ -369,6 +377,126 @@
       "midautumn": {
         "name": "Trung thu",
         "description": "Cam đèn lồng trên nền đêm xanh"
+      },
+      "aurora-glass": {
+        "name": "Cực quang kính",
+        "description": "Cực quang chuyển động sau những thẻ kính mờ"
+      },
+      "frost": {
+        "name": "Sương giá",
+        "description": "Mesh xanh băng, kính trong, chữ sắc nét"
+      },
+      "midnight-glass": {
+        "name": "Kính nửa đêm",
+        "description": "Kính phát sáng trên nền đêm tím thẫm"
+      },
+      "sakura-glass": {
+        "name": "Kính anh đào",
+        "description": "Hồng hoa anh đào trong lớp kính mềm"
+      },
+      "lagoon-glass": {
+        "name": "Đầm xanh",
+        "description": "Ánh xanh ngọc trôi dưới thẻ trong suốt"
+      },
+      "gold-noir": {
+        "name": "Đen ánh kim",
+        "description": "Lụa đen, đường kẻ vàng và tên mạ vàng"
+      },
+      "marble": {
+        "name": "Cẩm thạch",
+        "description": "Tông đá dịu, viền mảnh, chữ có chân"
+      },
+      "emerald": {
+        "name": "Nhung lục bảo",
+        "description": "Nhung xanh lục đậm viền vàng"
+      },
+      "royal": {
+        "name": "Hoàng gia",
+        "description": "Xanh navy và vàng, sang trọng trầm lắng"
+      },
+      "rose-gold": {
+        "name": "Vàng hồng",
+        "description": "Mesh hồng phấn, điểm nhấn vàng hồng"
+      },
+      "pearl": {
+        "name": "Ngọc trai",
+        "description": "Ánh ngọc trai óng ánh, thẻ trắng"
+      },
+      "brutal": {
+        "name": "Táo bạo",
+        "description": "Viền dày, bóng đổ cứng, nổi bật rõ ràng"
+      },
+      "brutal-pink": {
+        "name": "Hồng rực",
+        "description": "Hồng kẹo ngọt với viền đen đậm"
+      },
+      "y2k": {
+        "name": "Y2K",
+        "description": "Pastel ánh kim, viền tròn, chất những năm 2000"
+      },
+      "vaporwave": {
+        "name": "Vaporwave",
+        "description": "Hồng và xanh neon trên hoàng hôn tím"
+      },
+      "comic": {
+        "name": "Truyện tranh",
+        "description": "Vàng chấm bi, mực đen, điểm đỏ"
+      },
+      "terminal": {
+        "name": "Terminal",
+        "description": "Chữ xanh phát quang trên lưới đen"
+      },
+      "poster": {
+        "name": "Áp phích",
+        "description": "Chữ lớn, khối đỏ, giấy màu kem"
+      },
+      "notebook": {
+        "name": "Vở ô li",
+        "description": "Giấy kẻ ô và chữ xanh mực"
+      },
+      "ruled": {
+        "name": "Giấy kẻ dòng",
+        "description": "Giấy kẻ dòng dịu nhẹ, chữ có chân"
+      },
+      "latte": {
+        "name": "Latte",
+        "description": "Mesh cà phê sữa, điểm nhấn caramel"
+      },
+      "sunset-mesh": {
+        "name": "Giờ vàng",
+        "description": "Đào, san hô và mật ong hòa quyện"
+      },
+      "botanical": {
+        "name": "Thực vật",
+        "description": "Chấm xanh lá trên nền vải lanh"
+      },
+      "meadow": {
+        "name": "Đồng cỏ",
+        "description": "Cỏ non và bầu trời trong mesh dịu"
+      },
+      "cotton-candy": {
+        "name": "Kẹo bông",
+        "description": "Cực quang pastel không ngừng chuyển động"
+      },
+      "dreamy": {
+        "name": "Mơ màng",
+        "description": "Mesh tím nhạt và xanh trời, tròn mềm"
+      },
+      "cyber": {
+        "name": "Neon cyber",
+        "description": "Viền neon xanh trên nền đen sâu"
+      },
+      "obsidian": {
+        "name": "Hắc thạch",
+        "description": "Đen bóng với ánh tím phát sáng"
+      },
+      "lixi": {
+        "name": "Lì xì",
+        "description": "Đỏ bao lì xì với sóng vàng"
+      },
+      "party": {
+        "name": "Tiệc tùng",
+        "description": "Chấm confetti và viền neon"
       }
     },
     "sections": {
@@ -384,11 +512,16 @@
       "align": "Căn lề",
       "pageColor": "Màu chữ nội dung",
       "pageColorHelp": "Màu chữ của văn bản trong các khối.",
-      "pairs": "Cặp phông gợi ý"
+      "pairs": "Cặp phông gợi ý",
+      "nameGradient": "Tên chữ chuyển sắc",
+      "nameGradientHelp": "Tô tên trang bằng dải màu nhấn."
     },
     "presetActions": {
       "random": "Thử ngẫu nhiên",
-      "count": "{n} giao diện"
+      "count": "{n} giao diện",
+      "pro": "Pro",
+      "proNote": "Theme Pro đang mở miễn phí trong giai đoạn ra mắt.",
+      "seePlans": "Xem gói Pro"
     },
     "rows": {
       "theme": "Giao diện có sẵn",
