@@ -56,7 +56,7 @@
       </article>
     </div>
 
-    <BioOrderSheet v-model:product="ordering" :data="data" :block-id="blockId" :username="username" :preview="preview" :can-transfer="canTransfer" />
+    <BioOrderSheet v-model:product="ordering" :data="data" :block-id="blockId" :username="username" :preview="preview" :can-transfer="canTransfer" :accent="[buttonStyle.backgroundColor, buttonStyle.color]" />
   </section>
 </template>
 

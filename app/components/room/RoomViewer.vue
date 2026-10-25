@@ -169,6 +169,7 @@
       :block-id="orderBlock.id!"
       :username="username"
       :can-transfer="canTransfer"
+      :accent="accent"
     />
 
     <!-- A gift's message -->
