@@ -65,12 +65,32 @@
     </template>
 
     <template #body>
-      <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center py-20">
-        <UIcon
-          name="i-lucide-loader-2"
-          class="w-10 h-10 animate-spin text-dimmed dark:text-neutral-500"
-        />
+      <!-- Loading: the editor's own shape, shimmering -->
+      <div v-if="loading" class="lg:flex lg:gap-6" aria-busy="true">
+        <div class="hidden w-16 shrink-0 flex-col items-center gap-3 pt-2 lg:flex">
+          <div v-for="i in 5" :key="i" class="flex flex-col items-center gap-1.5">
+            <USkeleton class="size-11 rounded-full" />
+            <USkeleton class="h-2.5 w-10" />
+          </div>
+        </div>
+        <div class="grid min-w-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+          <div class="space-y-4 rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-6 lg:col-span-7">
+            <USkeleton class="hidden h-6 w-32 lg:block" />
+            <div class="flex items-center gap-3 p-2">
+              <USkeleton class="size-14 rounded-full" />
+              <div class="flex-1 space-y-2">
+                <USkeleton class="h-4 w-40" />
+                <USkeleton class="h-3 w-64 max-w-full" />
+              </div>
+            </div>
+            <USkeleton v-for="i in 4" :key="i" class="h-12 w-full rounded-xl" />
+            <USkeleton class="h-11 w-full rounded-xl" />
+          </div>
+          <div class="hidden flex-col items-center gap-4 lg:col-span-5 lg:flex">
+            <USkeleton class="h-4 w-24 self-start" />
+            <USkeleton class="h-[500px] w-[260px] rounded-[2.5rem]" />
+          </div>
+        </div>
       </div>
 
       <!-- Template Selection (Step 1) -->
@@ -511,7 +531,7 @@ const bioData = reactive<BioData>({
 });
 
 // Bio page selector state
-const userBioPages = ref<{ label: string; value: string }[]>([]);
+const userBioPages = ref<{ label: string; value: string; title?: string; avatarUrl?: string }[]>([]);
 const selectedBioUsername = ref<string>("");
 
 // Load all user bio pages for selector
@@ -522,6 +542,8 @@ const loadUserBioPages = async () => {
       userBioPages.value = response.bioPages.map((bp: any) => ({
         label: bp.username,
         value: bp.username,
+        title: bp.title || "",
+        avatarUrl: bp.avatarUrl || "",
       }));
       // Set default selected based on current route
       selectedBioUsername.value = routeUsername.value;
@@ -568,11 +590,20 @@ const editorTabs = computed(() => [
 // Social icons on the page, for the header layout thumbnails
 // Bar menus: switch site, and everything you do with the link
 const siteMenu = computed(() => [
-  userBioPages.value.map((page) => ({
-    label: `perlink.to/${page.value}`,
-    icon: page.value === routeUsername.value ? "i-lucide-check" : "i-lucide-globe",
-    onSelect: () => onBioPageChange(page.value),
-  })),
+  userBioPages.value.map((page) => {
+    const current = page.value === routeUsername.value;
+    // This editor's site shows its live edits; the others what the list returned
+    const title = (current ? bioData.title : page.title) || page.value;
+    const src = (current ? bioData.avatarUrl : page.avatarUrl) || undefined;
+    return {
+      label: title,
+      description: `perlink.to/${page.value}`,
+      avatar: { src, alt: title, size: "md" as const, ui: { root: "bg-paper ring-1 ring-line" } },
+      // The open site is marked by its background
+      class: current ? "bg-sand" : undefined,
+      onSelect: () => onBioPageChange(page.value),
+    };
+  }),
   [{ label: t("dashboard.sites.title"), icon: "i-lucide-layout-grid", to: "/dashboard/site" }],
 ]);
 

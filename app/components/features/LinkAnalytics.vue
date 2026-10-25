@@ -20,7 +20,8 @@
     <div class="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-line ring-1 ring-line md:grid-cols-4">
       <div v-for="card in overviewCards" :key="card.label" class="bg-paper p-4 sm:p-5">
         <p class="text-xs text-ink-muted">{{ card.label }}</p>
-        <p class="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink sm:text-3xl">{{ compact(card.value) }}</p>
+        <USkeleton v-if="!loaded" class="mt-2 h-8 w-16" />
+        <p v-else class="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink sm:text-3xl">{{ compact(card.value) }}</p>
       </div>
     </div>
 
@@ -30,7 +31,11 @@
         <h4 class="text-sm font-medium text-ink">{{ t('analytics.overview.viewsOverTime') }}</h4>
         <p v-if="timeseries.length" class="text-xs text-ink-muted">{{ t('analytics.overview.peak', { value: compact(maxClicks) }) }}</p>
       </div>
-      <div v-if="timeseries.length === 0" class="py-10 text-center text-sm text-ink-muted">
+      <!-- Bars of different heights while the numbers load -->
+      <div v-if="!loaded" class="mt-4 flex h-40 items-end gap-1.5" aria-busy="true">
+        <USkeleton v-for="(h, i) in [35, 55, 40, 70, 50, 85, 60, 45, 75, 55, 65, 40]" :key="i" class="flex-1 rounded-t-[4px] rounded-b-none" :style="{ height: `${h}%` }" />
+      </div>
+      <div v-else-if="timeseries.length === 0" class="py-10 text-center text-sm text-ink-muted">
         {{ t('analytics.overview.noViews') }}
       </div>
       <div v-else class="mt-4">
@@ -62,7 +67,16 @@
     <div class="grid gap-4 md:grid-cols-2">
       <section v-for="panel in breakdowns" :key="panel.title" class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
         <h4 class="text-sm font-medium text-ink">{{ panel.title }}</h4>
-        <div v-if="panel.items.length === 0" class="py-8 text-center text-sm text-ink-muted">{{ t('analytics.overview.noData') }}</div>
+        <div v-if="!loaded" class="mt-4 space-y-4" aria-busy="true">
+          <div v-for="i in 4" :key="i" class="space-y-1.5">
+            <div class="flex justify-between gap-2">
+              <USkeleton class="h-3.5" :style="{ width: `${70 - i * 12}%` }" />
+              <USkeleton class="h-3.5 w-10" />
+            </div>
+            <USkeleton class="h-1 w-full rounded-full" />
+          </div>
+        </div>
+        <div v-else-if="panel.items.length === 0" class="py-8 text-center text-sm text-ink-muted">{{ t('analytics.overview.noData') }}</div>
         <ul v-else class="mt-4 space-y-3">
           <li v-for="item in panel.items.slice(0, 8)" :key="item.name">
             <div class="mb-1 flex items-baseline justify-between gap-2 text-sm">
@@ -139,6 +153,9 @@ const maxClicks = computed(() => Math.max(...timeseries.value.map((p) => p.click
 const compact = (value: number) =>
   new Intl.NumberFormat(intlLocale.value, { notation: value >= 10000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
 
+// False until the first numbers arrive, so nothing reads as "0 views" while loading
+const loaded = ref(false);
+
 const fetchAnalytics = async () => {
   if (!props.linkId) return;
 
@@ -162,6 +179,8 @@ const fetchAnalytics = async () => {
     if (geoRes.success) countries.value = geoRes.data.countries;
   } catch (e) {
     console.error("Failed to fetch analytics", e);
+  } finally {
+    loaded.value = true;
   }
 };
 

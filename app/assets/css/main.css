@@ -159,3 +159,32 @@ Must come after :root so it overrides the light --ui-bg above.
     font-size: max(16px, 1em);
   }
 }
+
+/* Loading placeholders: a soft band of light sweeping across the sand.
+   .shimmer-dark is the same on dark surfaces (3D room). */
+.shimmer,
+.shimmer-dark {
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+.shimmer {
+  background-color: var(--color-sand-strong);
+  background-image: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--color-paper) 75%, transparent) 50%, transparent 100%);
+}
+.dark .shimmer {
+  background-color: rgb(255 255 255 / 0.05);
+  background-image: linear-gradient(90deg, transparent 0%, rgb(255 255 255 / 0.07) 50%, transparent 100%);
+}
+.shimmer-dark {
+  background-color: rgb(255 255 255 / 0.06);
+  background-image: linear-gradient(90deg, transparent 0%, rgb(255 255 255 / 0.08) 50%, transparent 100%);
+}
+@keyframes shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer,
+  .shimmer-dark { animation: none; }
+}

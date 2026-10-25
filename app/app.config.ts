@@ -30,6 +30,10 @@ export default defineAppConfig({
         base: 'transition-all',
       },
     },
+    // Loading placeholders shimmer instead of pulsing (see .shimmer in main.css)
+    skeleton: {
+      base: 'shimmer rounded-md',
+    },
     modal: {
       slots: {
         content: `${glassOverlay} dark:divide-white/10`,

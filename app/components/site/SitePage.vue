@@ -39,11 +39,15 @@
 
     <div class="mx-auto">
       <!-- Loading -->
-      <div v-if="pending" class="flex justify-center py-20">
-        <UIcon
-          name="i-lucide-loader-circle"
-          class="w-12 h-12 text-white animate-spin"
-        />
+      <!-- A bio page's outline: photo, name, intro and a few buttons -->
+      <div v-if="pending" class="mx-auto flex max-w-md flex-col items-center gap-3 px-4 py-14" aria-busy="true">
+        <div class="shimmer size-24 rounded-full" />
+        <div class="shimmer mt-2 h-6 w-48 rounded-md" />
+        <div class="shimmer h-3.5 w-64 max-w-full rounded-md" />
+        <div class="shimmer h-3.5 w-52 max-w-full rounded-md" />
+        <div class="mt-6 w-full space-y-3">
+          <div v-for="i in 4" :key="i" class="shimmer h-14 w-full rounded-2xl" />
+        </div>
       </div>
 
       <!-- Error -->
@@ -70,9 +74,7 @@
           @switch2d="show2d = true"
         />
         <template #fallback>
-          <div class="fixed inset-0 flex items-center justify-center bg-slate-900">
-            <UIcon name="i-lucide-loader-circle" class="size-10 animate-spin text-white" />
-          </div>
+          <RoomLoadingShell />
         </template>
       </ClientOnly>
 

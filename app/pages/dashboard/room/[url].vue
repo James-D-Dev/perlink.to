@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div v-if="loading" class="fixed inset-0 flex items-center justify-center bg-slate-950">
-      <UIcon name="i-lucide-loader-circle" class="size-10 animate-spin text-white/70" />
-    </div>
+    <RoomLoadingShell v-if="loading" editor />
 
     <UEmpty
       v-else-if="!bioPage"

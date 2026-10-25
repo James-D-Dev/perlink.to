@@ -51,8 +51,17 @@
             />
           </div>
 
-          <div v-if="loading" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <USkeleton v-for="i in 2" :key="i" class="aspect-[4/5] rounded-3xl" />
+          <div v-if="loading" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+            <div v-for="i in 2" :key="i" class="relative aspect-[4/5] overflow-hidden rounded-3xl">
+              <USkeleton class="absolute inset-0 rounded-3xl" />
+              <div class="absolute inset-x-4 bottom-4 flex items-end gap-2">
+                <div class="flex-1 space-y-2">
+                  <USkeleton class="h-5 w-32 bg-paper/70" />
+                  <USkeleton class="h-3 w-24 bg-paper/70" />
+                </div>
+                <USkeleton class="h-10 w-16 rounded-full bg-paper/70" />
+              </div>
+            </div>
           </div>
 
           <div v-else-if="bioPages.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -91,6 +100,14 @@
           <p v-if="!loading && bioPages.length && !filteredBioPages.length" class="text-sm text-ink-muted">
             {{ t('dashboard.sites.noMatch', { query: searchQuery }) }}
           </p>
+        </section>
+
+        <section v-if="loading" class="space-y-4" aria-busy="true">
+          <USkeleton class="h-5 w-28" />
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <USkeleton class="h-56 rounded-3xl" />
+            <USkeleton class="h-56 rounded-3xl" />
+          </div>
         </section>
 
         <!-- The last seven days, across all sites -->
