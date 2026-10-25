@@ -76,6 +76,17 @@ const route = useRoute()
 const error = ref('')
 const isLoading = ref(false)
 
+// Already signed in: straight on to where the link was going, or the dashboard
+// (landing buttons all point here)
+const nextPath = computed(() => {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+  return redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
+})
+if (loggedIn.value) await navigateTo(nextPath.value, { replace: true })
+watch(loggedIn, (isIn) => {
+  if (isIn) navigateTo(nextPath.value, { replace: true })
+})
+
 onMounted(() => {
   if (route.query.error) {
     error.value = route.query.error === 'oauth_failed'

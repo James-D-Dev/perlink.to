@@ -347,6 +347,28 @@ export class BioRepository {
     await this.db.prepare('DELETE FROM bio_pages WHERE id = ?').bind(id).run()
   }
 
+  /**
+   * Gives a site a new address. Also drops the "temporary address" mark that
+   * sites created straight from a template carry, in the live theme and any draft.
+   */
+  async rename(id: string, username: string): Promise<void> {
+    const row = await this.db.prepare('SELECT theme_config, draft FROM bio_pages WHERE id = ?').bind(id).first<{ theme_config: string | null; draft: string | null }>()
+    const clearMark = (json: string | null, path: 'theme' | 'draft') => {
+      if (!json) return json
+      try {
+        const value = JSON.parse(json)
+        const theme = path === 'theme' ? value : value?.themeConfig
+        if (theme && 'tempAddress' in theme) delete theme.tempAddress
+        return JSON.stringify(value)
+      } catch {
+        return json
+      }
+    }
+    await this.db.prepare('UPDATE bio_pages SET username = ?, theme_config = ?, draft = ?, updated_at = ? WHERE id = ?')
+      .bind(username, clearMark(row?.theme_config ?? null, 'theme'), clearMark(row?.draft ?? null, 'draft'), new Date().toISOString(), id)
+      .run()
+  }
+
   async isUsernameAvailable(username: string): Promise<boolean> {
     const result = await this.db.prepare(
       'SELECT id FROM bio_pages WHERE username = ?'

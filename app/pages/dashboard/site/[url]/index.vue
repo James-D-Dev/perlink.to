@@ -118,7 +118,19 @@
       </template>
 
       <!-- Bio Editor (Step 2) -->
-      <div v-else-if="step === 'edit'" class="pb-20 lg:flex lg:gap-6 lg:pb-0">
+      <!-- Made from a template in one click: still on its temporary address -->
+      <div
+        v-if="step === 'edit' && tempAddress"
+        class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200"
+      >
+        <UIcon name="i-lucide-link-2" class="size-4 shrink-0" />
+        <p class="min-w-0 flex-1">
+          {{ t('dashboard.address.banner', { address: `perlink.to/${existingBio?.username}` }) }}
+        </p>
+        <UButton size="sm" :label="t('dashboard.address.choose')" @click="openAddress(false)" />
+      </div>
+
+      <div v-if="step === 'edit' && !loading" class="pb-20 lg:flex lg:gap-6 lg:pb-0">
         <!-- Sections: a labelled rail on desktop, chips on phones -->
         <nav class="sticky top-0 hidden h-fit w-16 shrink-0 flex-col items-center gap-3 pt-2 lg:flex" :aria-label="t('dashboard.editor.sections')">
           <button
@@ -322,13 +334,12 @@
             <p class="text-sm text-muted dark:text-neutral-400 mb-3">
               {{ t('dashboard.editor.settings.addressText') }}
             </p>
-            <div
-              class="flex items-center gap-2 bg-muted dark:bg-white/[0.03] border border-default dark:border-white/10 rounded-lg px-3 py-2"
-            >
-              <span class="text-muted dark:text-neutral-400 text-sm">perlink.to/</span>
-              <span class="font-medium text-highlighted dark:text-white text-sm">{{
-                existingBio?.username
-              }}</span>
+            <div class="flex items-center gap-2">
+              <div class="flex min-w-0 flex-1 items-center gap-1 rounded-lg border border-default bg-muted px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+                <span class="text-sm text-muted dark:text-neutral-400">perlink.to/</span>
+                <span class="truncate text-sm font-medium text-highlighted dark:text-white">{{ existingBio?.username }}</span>
+              </div>
+              <UButton color="neutral" variant="outline" :label="t('dashboard.address.change')" @click="openAddress(false)" />
             </div>
           </div>
 
@@ -432,6 +443,16 @@
           :username="existingBio.username"
           :published="!!existingBio.isPublished"
           @action="onOnboardingAction"
+        />
+
+        <SiteAddressDialog
+          v-if="existingBio?.username"
+          v-model:open="addressOpen"
+          :current="existingBio.username"
+          :temporary="tempAddress"
+          :published="!!existingBio.isPublished"
+          :confirm-text="publishAfterRename ? t('dashboard.address.saveAndPublish') : undefined"
+          @renamed="onRenamed"
         />
 
         <SiteQrModal
@@ -875,7 +896,47 @@ const saveBio = async ({ silent = false }: { silent?: boolean } = {}) => {
   }
 };
 
+// ---- Address ----
+// Sites made from a template in one click start on a temporary address
+const tempAddress = computed(() => !!(bioData.themeConfig as any).tempAddress);
+const addressOpen = ref(false);
+const publishAfterRename = ref(false);
+
+async function openAddress(thenPublish: boolean) {
+  publishAfterRename.value = thenPublish;
+  // Edits go to the current address before it changes
+  if (isDirty.value) await saveBio({ silent: true });
+  addressOpen.value = true;
+}
+watch(addressOpen, (isOpen) => {
+  if (!isOpen && !publishing.value) publishAfterRename.value = false;
+});
+
+async function onRenamed(username: string) {
+  savedSnapshot.value = currentSnapshot.value;
+  if (publishAfterRename.value) {
+    publishing.value = true;
+    try {
+      await $fetch(`/api/admin/bio/${username}/publish`, { method: "POST" as const });
+      toast.add({ title: t("dashboard.toast.published"), description: t("dashboard.editor.publishedText", { username }), color: "success" });
+    } catch (error: any) {
+      toast.add({ title: t("dashboard.toast.error"), description: error?.data?.statusMessage || t("dashboard.editor.publishFailed"), color: "error" });
+    } finally {
+      publishing.value = false;
+    }
+  } else {
+    toast.add({ title: t("dashboard.address.saved"), description: `perlink.to/${username}`, color: "success" });
+  }
+  // The editor reopens on the new address, same section
+  await navigateTo({ path: `/dashboard/site/${username}`, hash: activeTab.value === "content" ? "" : `#${activeTab.value}` }, { replace: true });
+}
+
 const publishBio = async () => {
+  // A real address first
+  if (tempAddress.value) {
+    openAddress(true);
+    return;
+  }
   if (!existingBio.value?.username) {
     toast.add({
       title: t("dashboard.toast.error"),
@@ -1074,7 +1135,8 @@ const loadBio = async () => {
           (acc as any)[key] = saved !== undefined ? saved : def;
         }
         return acc;
-      }, {} as ThemeConfig);
+        // Keys the defaults don't know (presetId, tempAddress, ...) are kept too
+      }, { ...(savedTheme as object) } as ThemeConfig);
       // 3D room settings are not part of DEFAULT_THEME, so copy them explicitly
       bioData.themeConfig.pageMode = (savedTheme as any).pageMode === "3d" ? "3d" : "2d";
       if ((savedTheme as any).room) {

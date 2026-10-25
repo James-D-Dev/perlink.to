@@ -14,7 +14,9 @@
     <template #body>
       <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-6">
         <!-- Hero -->
-        <section class="relative overflow-hidden rounded-2xl bg-elevated p-6 dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl sm:p-10">
+        <section class="relative isolate overflow-hidden rounded-2xl bg-elevated p-6 dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl sm:p-10">
+          <!-- Same living backdrop as the landing hero -->
+          <MarketingMkHeroBackdrop :fade="false" />
           <div class="pointer-events-none absolute inset-0 dark:bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgb(255_255_255/0.06),transparent)]" />
           <!-- Gradient orbs, echoing the 3D lands -->
           <div class="pointer-events-none absolute right-12 top-1/2 hidden -translate-y-1/2 lg:block" aria-hidden="true">
@@ -75,16 +77,27 @@
               role="button"
               tabindex="0"
               class="group cursor-pointer overflow-hidden rounded-xl border border-default bg-default text-left transition hover:-translate-y-0.5 hover:shadow-xl dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl dark:hover:border-white/20 dark:hover:shadow-black/40"
-              @click="openTemplate(template.id)"
-              @keydown.enter.prevent="openTemplate(template.id)"
-              @keydown.space.prevent="openTemplate(template.id)"
+              :class="creatingId && creatingId !== template.id ? 'pointer-events-none opacity-60' : ''"
+              :aria-busy="creatingId === template.id"
+              @click="useTemplate(template.id)"
+              @keydown.enter.prevent="useTemplate(template.id)"
+              @keydown.space.prevent="useTemplate(template.id)"
             >
               <div class="relative aspect-[3/4] overflow-hidden border-b border-default dark:border-white/[0.08]">
                 <SiteTemplateThumbnail :template="template" :scale="0.4" class="transition duration-500 group-hover:scale-[1.03]" />
-                <div class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/0 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
+                <div
+                  class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/0 to-transparent p-4 transition"
+                  :class="creatingId === template.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                >
                   <span class="inline-flex items-center gap-1.5 rounded-lg bg-default px-3 py-1.5 text-sm font-semibold text-highlighted shadow">
-                    {{ t('dashboard.home.useTemplate') }}
-                    <UIcon name="i-lucide-arrow-right" class="size-4" />
+                    <template v-if="creatingId === template.id">
+                      <UIcon name="i-lucide-loader-circle" class="size-4 animate-spin" />
+                      {{ t('dashboard.home.creating') }}
+                    </template>
+                    <template v-else>
+                      {{ t('dashboard.home.useTemplate') }}
+                      <UIcon name="i-lucide-arrow-right" class="size-4" />
+                    </template>
                   </span>
                 </div>
               </div>
@@ -104,44 +117,6 @@
         </section>
       </div>
 
-      <!-- Claim popup for a template -->
-      <UModal
-        v-model:open="modalOpen"
-        :ui="{ content: 'sm:max-w-3xl', body: 'p-0 sm:p-0' }"
-        :title="selectedTemplate ? templateName(selectedTemplate.id) : undefined"
-      >
-        <template #content>
-          <div v-if="selectedTemplate" class="grid grid-cols-1 sm:grid-cols-2">
-            <div class="relative hidden h-full min-h-96 border-r border-default dark:border-white/[0.08] sm:block">
-              <SiteTemplateThumbnail :template="selectedTemplate" :scale="0.62" class="absolute inset-0" />
-            </div>
-            <div class="flex min-w-0 flex-col p-5 sm:p-6">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-xs font-medium uppercase tracking-wide text-muted dark:text-neutral-500">
-                    {{ categoryLabel(selectedTemplate.category) }}
-                  </p>
-                  <h3 class="mt-1 text-xl font-semibold text-highlighted dark:text-white">{{ templateName(selectedTemplate.id) }}</h3>
-                </div>
-                <UButton icon="i-lucide-x" color="neutral" variant="ghost" :aria-label="t('common.close')" @click="modalOpen = false" />
-              </div>
-              <p class="mt-2 text-sm text-muted dark:text-neutral-400">{{ templateDescription(selectedTemplate.id) }}</p>
-
-              <ul class="mt-4 space-y-2 text-sm text-muted dark:text-neutral-300">
-                <li v-for="feature in templateFeatures" :key="feature" class="flex items-center gap-2">
-                  <UIcon name="i-lucide-check" class="size-4 text-emerald-500" />
-                  {{ feature }}
-                </li>
-              </ul>
-
-              <div class="mt-auto pt-6">
-                <p class="mb-2 text-sm font-medium text-highlighted dark:text-white">{{ t('dashboard.home.claimHeading') }}</p>
-                <SiteClaimForm :template-id="selectedTemplate.id" :initial-slug="initialSlug" autofocus />
-              </div>
-            </div>
-          </div>
-        </template>
-      </UModal>
     </template>
   </UDashboardPanel>
 </template>
@@ -163,8 +138,8 @@ const { t } = useI18n()
 const initialSlug = computed(() => (typeof route.query.input === 'string' ? route.query.input.toLowerCase() : ''))
 
 const category = ref<TemplateCategory | 'all'>('all')
-const modalOpen = ref(false)
-const selectedTemplateId = ref<string | null>(null)
+const toast = useToast()
+const { createSite } = useCreateSite()
 
 const chips = computed(() => [
   { id: 'all' as const, label: t('dashboard.home.all'), icon: 'i-lucide-layout-grid', count: PAGE_TEMPLATES.length },
@@ -175,14 +150,6 @@ const filteredTemplates = computed(() =>
   category.value === 'all' ? PAGE_TEMPLATES : PAGE_TEMPLATES.filter(t => t.category === category.value),
 )
 
-const selectedTemplate = computed(() => PAGE_TEMPLATES.find(t => t.id === selectedTemplateId.value) || null)
-
-const templateFeatures = computed(() => [
-  t('dashboard.home.features.sampleContent'),
-  t('dashboard.home.features.theme'),
-  t('dashboard.home.features.room'),
-  t('dashboard.home.features.changeAnytime'),
-])
 
 function categoryLabel(id: TemplateCategory) {
   return TEMPLATE_CATEGORIES.some(c => c.id === id) ? t(`dashboard.categories.${id}`) : ''
@@ -196,8 +163,18 @@ function templateDescription(id: string) {
   return t(`dashboard.templates.${id}.description`)
 }
 
-function openTemplate(id: string) {
-  selectedTemplateId.value = id
-  modalOpen.value = true
+// One click: the site is made with a temporary address and opens in the
+// editor, which asks for a real address before publishing
+const creatingId = ref<string | null>(null)
+async function useTemplate(id: string) {
+  if (creatingId.value) return
+  creatingId.value = id
+  try {
+    const username = await createSite({ templateId: id })
+    await navigateTo(`/dashboard/site/${username}`)
+  } catch (error: any) {
+    toast.add({ title: t('dashboard.claim.createFailed'), description: error?.data?.statusMessage || error?.message, color: 'error' })
+    creatingId.value = null
+  }
 }
 </script>

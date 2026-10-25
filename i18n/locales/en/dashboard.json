@@ -14,7 +14,7 @@
       "mySites": "My sites",
       "badge": "Templates · Drag-and-drop editor · 3D rooms",
       "heading": "Create your site",
-      "intro": "Pick your address, then start from a template or a blank page. You can change everything later.",
+      "intro": "Claim an address, or tap a template below to start right away. You can pick the address later and change anything.",
       "templatesHeading": "Start from a template",
       "templatesIntro": "{n} templates, each with sample content, a theme and a matching 3D room.",
       "all": "All",
@@ -25,7 +25,8 @@
         "theme": "Matching theme and fonts",
         "room": "A decorated 3D room included",
         "changeAnytime": "Change templates anytime"
-      }
+      },
+      "creating": "Creating your site…"
     },
     "sites": {
       "title": "My sites",
@@ -506,6 +507,21 @@
       "remove": "Remove domain",
       "removeTitle": "Remove this domain?",
       "removeText": "The site stays at its perlink.to address."
+    },
+    "address": {
+      "title": "Site address",
+      "text": "This is the address people use to visit your site.",
+      "textTemp": "Your site is on a temporary address. Pick one that’s easy to remember before sharing it.",
+      "placeholder": "your-name",
+      "save": "Save address",
+      "saveAndPublish": "Save and publish",
+      "later": "Later",
+      "change": "Change address",
+      "choose": "Choose address",
+      "banner": "Your site is on the temporary address {address}. Pick your own before publishing.",
+      "liveWarning": "This site is live: after the change, {old} stops working.",
+      "saved": "Address changed",
+      "failed": "Couldn’t change the address"
     }
   }
 }

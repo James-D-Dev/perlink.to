@@ -14,7 +14,7 @@
       "mySites": "Trang của tôi",
       "badge": "Mẫu có sẵn · Kéo thả dễ dàng · Phòng 3D",
       "heading": "Tạo trang của bạn",
-      "intro": "Chọn địa chỉ, rồi bắt đầu từ một mẫu hoặc trang trống. Bạn có thể thay đổi mọi thứ sau.",
+      "intro": "Giữ một địa chỉ, hoặc bấm vào một mẫu bên dưới để bắt đầu ngay. Địa chỉ có thể chọn sau, mọi thứ đều đổi được.",
       "templatesHeading": "Bắt đầu từ một mẫu",
       "templatesIntro": "{n} mẫu, mỗi mẫu có sẵn nội dung mẫu, giao diện và Phòng 3D đi kèm.",
       "all": "Tất cả",
@@ -25,7 +25,8 @@
         "theme": "Giao diện và phông chữ đồng bộ",
         "room": "Kèm Phòng 3D đã trang trí sẵn",
         "changeAnytime": "Đổi mẫu bất cứ lúc nào"
-      }
+      },
+      "creating": "Đang tạo trang…"
     },
     "sites": {
       "title": "Trang của tôi",
@@ -506,6 +507,21 @@
       "remove": "Gỡ tên miền",
       "removeTitle": "Gỡ tên miền này?",
       "removeText": "Trang vẫn ở địa chỉ perlink.to."
+    },
+    "address": {
+      "title": "Địa chỉ trang",
+      "text": "Đây là địa chỉ mọi người dùng để vào trang của bạn.",
+      "textTemp": "Trang đang dùng địa chỉ tạm. Chọn một địa chỉ dễ nhớ trước khi chia sẻ.",
+      "placeholder": "ten-cua-ban",
+      "save": "Lưu địa chỉ",
+      "saveAndPublish": "Lưu và xuất bản",
+      "later": "Để sau",
+      "change": "Đổi địa chỉ",
+      "choose": "Chọn địa chỉ",
+      "banner": "Trang đang dùng địa chỉ tạm {address}. Chọn địa chỉ riêng trước khi xuất bản.",
+      "liveWarning": "Trang đang hiển thị: sau khi đổi, {old} sẽ không còn hoạt động.",
+      "saved": "Đã đổi địa chỉ",
+      "failed": "Không đổi được địa chỉ"
     }
   }
 }

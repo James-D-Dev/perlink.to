@@ -42,7 +42,6 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
-import { localizeTemplateContent } from '~/data/templateCopyVi'
 
 const props = withDefaults(defineProps<{
   /** Template to apply after the site is created; none opens the editor's template picker */
@@ -60,7 +59,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ created: [username: string] }>()
 
 const toast = useToast()
-const { t, locale } = useI18n()
+const { t } = useI18n()
+const { createSite } = useCreateSite()
 const inputRef = ref<HTMLInputElement | null>(null)
 const slug = ref(props.initialSlug)
 const status = ref<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle')
@@ -127,23 +127,7 @@ async function submit() {
   creating.value = true
   const username = slug.value
   try {
-    await $fetch('/api/bio', { method: 'POST', body: { username } })
-
-    const template = props.templateId ? PAGE_TEMPLATES.find(t => t.id === props.templateId) : undefined
-    if (template) {
-      // Vietnamese users get Vietnamese sample content and site language
-      const content = localizeTemplateContent(template.build(), locale.value)
-      await $fetch(`/api/admin/bio/${username}`, {
-        method: 'PUT' as const,
-        body: {
-          title: content.title,
-          bio: content.bio,
-          avatarUrl: content.avatarUrl,
-          blocks: content.blocks,
-          themeConfig: { ...content.themeConfig, pageMode: '2d', room: content.room },
-        },
-      })
-    }
+    await createSite({ username, templateId: props.templateId })
 
     emit('created', username)
     toast.add({ title: t('dashboard.claim.ready'), description: `perlink.to/${username}`, color: 'success' })
