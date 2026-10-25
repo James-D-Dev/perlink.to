@@ -631,6 +631,21 @@
         "paid": "Đã thanh toán",
         "expired": "Hết hạn"
       }
+    },
+    "telegram": {
+      "title": "Thông báo qua Telegram",
+      "text": "Nhận đơn hàng và yêu cầu mới của mọi trang ngay trên Telegram, kèm nút mở Hộp thư.",
+      "connected": "Đã kết nối",
+      "connectedText": "Đơn hàng và yêu cầu mới sẽ được gửi tới Telegram của bạn.",
+      "waiting": "Mở Telegram và bấm Start (Bắt đầu) trong cuộc trò chuyện với bot Perlink.",
+      "connect": "Kết nối Telegram",
+      "reopen": "Mở lại Telegram",
+      "test": "Gửi thử",
+      "testSent": "Đã gửi tin nhắn thử",
+      "disconnect": "Ngắt kết nối",
+      "done": "Đã kết nối Telegram",
+      "failed": "Không thực hiện được",
+      "section": "Thông báo"
     }
   }
 }

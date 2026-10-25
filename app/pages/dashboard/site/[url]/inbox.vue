@@ -41,6 +41,9 @@
           </div>
         </div>
 
+        <!-- Get new requests on the phone -->
+        <TelegramConnect compact />
+
         <div v-if="loading" class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
           <div v-for="i in 3" :key="i" class="space-y-2 p-4">
             <USkeleton class="h-4 w-40" />

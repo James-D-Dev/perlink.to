@@ -631,6 +631,21 @@
         "paid": "Paid",
         "expired": "Expired"
       }
+    },
+    "telegram": {
+      "title": "Telegram notifications",
+      "text": "Get new orders and requests from all your sites on Telegram, with a button to your inbox.",
+      "connected": "Connected",
+      "connectedText": "New orders and requests will be sent to your Telegram.",
+      "waiting": "Open Telegram and press Start in the chat with the Perlink bot.",
+      "connect": "Connect Telegram",
+      "reopen": "Open Telegram again",
+      "test": "Send test",
+      "testSent": "Test message sent",
+      "disconnect": "Disconnect",
+      "done": "Telegram connected",
+      "failed": "Something went wrong",
+      "section": "Notifications"
     }
   }
 }

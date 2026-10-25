@@ -4,6 +4,7 @@ import { hashIP } from '../../../services/analytics'
 import { getDB } from '../../../utils/db'
 import { emailEnabled, runInBackground } from '../../../utils/email'
 import { notifyOwnerOfRequest } from '../../../utils/formNotification'
+import { notifyOwnerTelegram } from '../../../utils/telegram'
 import { generateVietQR, getBankByBIN } from '../../../utils/vietqr'
 import { formatVnd } from '#shared/plans'
 
@@ -87,6 +88,7 @@ export default defineEventHandler(async (event) => {
 
   runInBackground(event, new BioRepository(event).incrementAction(bioPage.id, 'order'))
   if (emailEnabled(event)) runInBackground(event, notifyOwnerOfRequest(event, bioPage, data))
+  runInBackground(event, notifyOwnerTelegram(event, bioPage, data))
 
   const transfer = body.payment === 'transfer' && bank && vietqr
     ? {

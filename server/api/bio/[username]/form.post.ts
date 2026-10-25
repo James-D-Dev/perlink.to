@@ -4,6 +4,7 @@ import { hashIP } from '../../../services/analytics'
 import { getDB } from '../../../utils/db'
 import { emailEnabled, runInBackground } from '../../../utils/email'
 import { notifyOwnerOfRequest } from '../../../utils/formNotification'
+import { notifyOwnerTelegram } from '../../../utils/telegram'
 
 // A visitor sends a site's form (booking or contact request)
 
@@ -81,6 +82,7 @@ export default defineEventHandler(async (event) => {
 
   // Email the owner after responding (skipped until Resend is configured)
   if (emailEnabled(event)) runInBackground(event, notifyOwnerOfRequest(event, bioPage, data))
+  runInBackground(event, notifyOwnerTelegram(event, bioPage, data))
 
   return { success: true }
 })

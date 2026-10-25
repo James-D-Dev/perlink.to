@@ -60,6 +60,13 @@ export default defineNuxtConfig({
       accountName: "",
       sepayApiKey: "",
     },
+    // Order and request alerts on Telegram (see docs/telegram-notifications.md).
+    // Empty token = the "Connect Telegram" option is hidden.
+    telegram: {
+      botToken: "",
+      botUsername: "",
+      webhookSecret: "",
+    },
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
       oauthGoogleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID || "",

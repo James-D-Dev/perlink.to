@@ -58,6 +58,9 @@
             </div>
           </section>
 
+          <!-- Notifications (shown once Telegram is set up) -->
+          <TelegramConnect />
+
           <!-- Security and data -->
           <section class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
             <div class="flex flex-wrap items-center justify-between gap-3 p-5">
