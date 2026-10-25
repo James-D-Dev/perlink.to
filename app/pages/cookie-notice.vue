@@ -4,7 +4,7 @@
       <h1 class="text-3xl font-bold text-gray-900 mb-8">Cookie Notice</h1>
       
       <div class="prose prose-gray max-w-none">
-        <p class="text-gray-600 mb-4">Last updated: {{ new Date().toLocaleDateString() }}</p>
+        <p class="text-gray-600 mb-4">Last updated: {{ LEGAL_UPDATED }}</p>
         
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">What Are Cookies?</h2>
@@ -157,7 +157,7 @@
           <h2 class="text-xl font-semibold text-gray-900 mb-4">Contact Us</h2>
           <p class="text-gray-700 mb-4">
             If you have any questions about our use of cookies or this notice, please contact us:
-            <br>Email: kimduc10a@gmail.com
+            <br>Email: {{ SUPPORT_EMAIL }}
           </p>
         </section>
 

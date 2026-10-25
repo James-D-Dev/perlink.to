@@ -39,5 +39,32 @@
     "proTitle": "Perlink Pro",
     "proText": "More sites, more 3D worlds and premium extras.",
     "seePlans": "See plans"
+  },
+  "report": {
+    "title": "Report a site",
+    "intro": "Seen a Perlink site that's a scam, fake, or breaks our rules? Tell us and we'll review it and take it down if it does.",
+    "site": "Site address",
+    "sitePlaceholder": "site-name",
+    "reason": "Reason",
+    "reasons": {
+      "scam": "Scam or fraud",
+      "phishing": "Phishing: fake bank/brand page, asks for passwords or codes",
+      "adult": "Adult content",
+      "violence": "Violence, hate or harassment",
+      "illegal": "Illegal goods or services (gambling, drugs…)",
+      "copyright": "Copyright infringement",
+      "impersonation": "Impersonation",
+      "spam": "Spam or misleading links",
+      "other": "Something else"
+    },
+    "details": "More details (optional)",
+    "detailsPlaceholder": "What's wrong with this site?",
+    "email": "Your email (optional)",
+    "emailHelp": "Only used to follow up if needed.",
+    "submit": "Send report",
+    "sent": "Report received",
+    "sentText": "Thank you. We'll review this site as soon as we can.",
+    "failed": "Couldn't send the report",
+    "terms": "Read the Terms of Service"
   }
 }

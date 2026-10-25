@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
 
-const SUPERADMIN_EMAIL = 'kimduc10a@gmail.com'
+export const SUPERADMIN_EMAIL = 'kimduc10a@gmail.com'
 
 export function requireSuperadmin(event: H3Event) {
   const user = event.context.user

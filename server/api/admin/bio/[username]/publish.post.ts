@@ -1,5 +1,6 @@
 import { BioRepository, type CreateBioPageInput } from '../../../../repositories/bioRepository'
 import { requireThemeAllowed } from '../../../../utils/plan'
+import { requireNotRemoved } from '../../../../utils/moderation'
 
 export default defineEventHandler(async (event) => {
   // Check auth
@@ -41,8 +42,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  await requireNotRemoved(event, bioPage.id)
   // What goes live is the draft's theme, or the current one
-  await requireThemeAllowed(event, user.id, (bioPage.draft?.themeConfig ?? bioPage.themeConfig) as { presetId?: string })
+  await requireThemeAllowed(event, user.id, (bioPage.draft?.themeConfig ?? bioPage.themeConfig) as { presetId?: string }, bioPage.isPublished ? bioPage.themeConfig as { presetId?: string } : null)
 
   try {
     // Publishing applies any saved draft to the live site

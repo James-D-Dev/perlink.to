@@ -69,7 +69,15 @@ export async function grantPlan(event: H3Event, userId: string, plan: PaidPlanId
   return expiresAt
 }
 
-/** Before publishing: a Pro theme needs a plan that includes Pro themes */
-export async function requireThemeAllowed(event: H3Event, userId: string, themeConfig: { presetId?: string } | null | undefined) {
-  if (themeConfig?.presetId && PRO_THEME_IDS.has(themeConfig.presetId)) await requirePlanFeature(event, userId, 'proThemes')
+type Themed = { presetId?: string } | null | undefined
+
+/**
+ * Before publishing: a Pro theme needs a plan that includes Pro themes. A
+ * site that is already live with that Pro theme keeps it (Pro themes were
+ * free at launch), so only switching to a Pro theme asks for a plan.
+ */
+export async function requireThemeAllowed(event: H3Event, userId: string, next: Themed, live?: Themed) {
+  const presetId = next?.presetId
+  if (!presetId || !PRO_THEME_IDS.has(presetId) || live?.presetId === presetId) return
+  await requirePlanFeature(event, userId, 'proThemes')
 }

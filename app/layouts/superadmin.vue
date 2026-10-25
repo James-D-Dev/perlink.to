@@ -78,6 +78,7 @@ const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [
       { label: "Bio Pages", icon: "i-lucide-id-card", to: "/superadmin/bio" },
       { label: "Short Links", icon: "i-lucide-link", to: "/superadmin/links" },
       { label: "QR Codes", icon: "i-lucide-qr-code", to: "/superadmin/qr-codes" },
+      { label: "Reports", icon: "i-lucide-flag", to: "/superadmin/reports" },
     ],
   },
   {

@@ -32,6 +32,9 @@ const en = {
     terms: 'Terms',
     privacy: 'Privacy',
     cookies: 'Cookies',
+    refund: 'Refunds',
+    report: 'Report a site',
+    contact: 'Contact',
     rights: 'All rights reserved.',
   },
   claim: {
@@ -156,6 +159,9 @@ const vi: MarketingCopy = {
     terms: 'Điều khoản',
     privacy: 'Quyền riêng tư',
     cookies: 'Cookie',
+    refund: 'Hoàn tiền',
+    report: 'Báo cáo vi phạm',
+    contact: 'Liên hệ',
     rights: 'Bảo lưu mọi quyền.',
   },
   claim: {

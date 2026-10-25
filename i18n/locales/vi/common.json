@@ -39,5 +39,32 @@
     "proTitle": "Perlink Pro",
     "proText": "Thêm trang, thêm thế giới 3D và nhiều tiện ích cao cấp.",
     "seePlans": "Xem các gói"
+  },
+  "report": {
+    "title": "Báo cáo trang vi phạm",
+    "intro": "Thấy một trang Perlink lừa đảo, giả mạo hay vi phạm điều khoản? Cho chúng tôi biết, chúng tôi sẽ xem xét và gỡ trang nếu vi phạm.",
+    "site": "Địa chỉ trang",
+    "sitePlaceholder": "ten-trang",
+    "reason": "Lý do",
+    "reasons": {
+      "scam": "Lừa đảo, chiếm đoạt tiền",
+      "phishing": "Giả mạo ngân hàng/thương hiệu, lấy mật khẩu hay mã OTP",
+      "adult": "Nội dung người lớn",
+      "violence": "Bạo lực, thù ghét, quấy rối",
+      "illegal": "Hàng hóa, dịch vụ phi pháp (cờ bạc, chất cấm…)",
+      "copyright": "Vi phạm bản quyền",
+      "impersonation": "Mạo danh người khác",
+      "spam": "Spam, link gây hiểu nhầm",
+      "other": "Lý do khác"
+    },
+    "details": "Mô tả thêm (không bắt buộc)",
+    "detailsPlaceholder": "Điều gì sai trên trang này?",
+    "email": "Email của bạn (không bắt buộc)",
+    "emailHelp": "Chỉ dùng để liên hệ lại nếu cần.",
+    "submit": "Gửi báo cáo",
+    "sent": "Đã nhận báo cáo",
+    "sentText": "Cảm ơn bạn. Chúng tôi sẽ xem xét trang này sớm nhất có thể.",
+    "failed": "Không gửi được báo cáo",
+    "terms": "Xem điều khoản sử dụng"
   }
 }

@@ -1,4 +1,5 @@
 import { BioRepository, DRAFT_FIELDS, editableBioPage, type BioDraft, type CreateBioPageInput } from '../../../repositories/bioRepository'
+import { requireThemeAllowed } from '../../../utils/plan'
 
 export default defineEventHandler(async (event) => {
   // Check auth
@@ -41,11 +42,17 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const content: BioDraft = {}
+  for (const field of DRAFT_FIELDS) {
+    if (body[field] !== undefined) (content as any)[field] = body[field]
+  }
+  // Saving straight to a live site is publishing, so it gets the same check
+  const writesLive = bioPage.isPublished && body.draft !== true
+  if (writesLive && content.themeConfig) {
+    await requireThemeAllowed(event, user.id, content.themeConfig as { presetId?: string }, bioPage.themeConfig as { presetId?: string })
+  }
+
   try {
-    const content: BioDraft = {}
-    for (const field of DRAFT_FIELDS) {
-      if (body[field] !== undefined) (content as any)[field] = body[field]
-    }
 
     // A live site keeps showing its published version: drafts are stored
     // aside until "Publish". Unpublished sites are edited directly.

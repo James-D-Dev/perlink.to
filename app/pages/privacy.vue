@@ -4,7 +4,7 @@
       <h1 class="text-3xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
       
       <div class="prose prose-gray max-w-none">
-        <p class="text-gray-600 mb-4">Last updated: {{ new Date().toLocaleDateString() }}</p>
+        <p class="text-gray-600 mb-4">Last updated: {{ LEGAL_UPDATED }}</p>
         
         <section class="mb-8">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
@@ -49,6 +49,19 @@
             <li>Operating system</li>
             <li>Access times and dates</li>
           </ul>
+
+          <h3 class="text-lg font-medium text-gray-900 mb-2">2.5 Payments</h3>
+          <p class="text-gray-700 mb-4">
+            Paid plans are paid by bank transfer. We keep the plan, amount, payment code and date of each payment. Your
+            bank and our payment-notification provider (SePay) process the transfer itself; we never see or store card
+            numbers or bank login details.
+          </p>
+
+          <h3 class="text-lg font-medium text-gray-900 mb-2">2.6 Reports</h3>
+          <p class="text-gray-700 mb-4">
+            When you report a site, we keep the reason, your message, the email address you give (optional) and a hashed
+            IP address used only to limit abuse of the report form.
+          </p>
         </section>
 
         <section class="mb-8">
@@ -82,7 +95,7 @@
             <li>With your consent</li>
             <li>To comply with legal requirements</li>
             <li>To protect our rights, property, or safety</li>
-            <li>With service providers who assist our operations (bound by confidentiality)</li>
+            <li>With service providers who assist our operations (bound by confidentiality): Cloudflare (hosting, database and storage), Google (sign-in), SePay (bank transfer notifications) and Resend (email)</li>
           </ul>
         </section>
 
@@ -107,7 +120,7 @@
             <li>Withdraw consent</li>
           </ul>
           <p class="text-gray-700 mb-4">
-            To exercise these rights, contact us at kimduc10a@gmail.com
+            To exercise these rights, contact us at {{ SUPPORT_EMAIL }}
           </p>
         </section>
 
@@ -159,7 +172,7 @@
           <h2 class="text-xl font-semibold text-gray-900 mb-4">13. Contact Us</h2>
           <p class="text-gray-700 mb-4">
             If you have questions or concerns about this Privacy Policy, please contact us at:
-            <br>Email: kimduc10a@gmail.com
+            <br>Email: {{ SUPPORT_EMAIL }}
           </p>
         </section>
       </div>
