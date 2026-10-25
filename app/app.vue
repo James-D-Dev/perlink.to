@@ -47,7 +47,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <UApp :locale="uiLocale">
+  <!-- Toasts drop in from the top like iOS notifications -->
+  <UApp :locale="uiLocale" :toaster="{ position: 'top-center', duration: 4000 }">
     <NuxtLoadingIndicator />
     <NuxtLayout>
       <NuxtPage />

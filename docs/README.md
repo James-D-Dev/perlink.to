@@ -45,3 +45,19 @@ blurred page, 28–30px corners, a centred title and a round close button.
 - Hand-built overlays use `.glass-backdrop`, `.glass-sheet` and `.glass-cell`
   from `app/assets/css/main.css` (order sheet, 3D room product, guestbook and
   message popups). Both have light and dark versions.
+
+## Design: controls, toasts and motion (iOS 26 style)
+
+All set once in `app/app.config.ts`, so every screen matches:
+
+- **Buttons** are capsules that press in slightly (`active:scale-[0.97]`).
+  Neutral outline/subtle buttons are frosted glass; neutral soft buttons a
+  light translucent fill; solid buttons get a faint top highlight.
+- **Fields** (input, textarea, select, select menu, input menu, number) use a
+  soft translucent fill instead of a border, 12px corners, turn white while
+  typing with a gentle accent ring; errors tint red.
+- **Toasts** are glass capsules at the top centre (`UApp :toaster` in
+  `app/app.vue`) that drop in with a small bounce and lift out.
+- **Alerts** are rounder, frosted when neutral, and fade up into place.
+- **Dialogs** spring open (`ios-sheet-in`). Keyframes `ios-*` live in
+  `app/assets/css/main.css`; reduced-motion users get no animation.
