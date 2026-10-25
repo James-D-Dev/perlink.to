@@ -1,5 +1,3 @@
-import { defineEventHandler, readBody, createError } from 'h3'
-
 interface LinkMetadata {
   title: string
   description: string
@@ -7,80 +5,108 @@ interface LinkMetadata {
   favicon: string
 }
 
-export default defineEventHandler(async (event): Promise<LinkMetadata> => {
-  const body = await readBody(event)
-  const { url } = body
+/** Most a page is read for its title and preview image */
+const MAX_BYTES = 1_000_000
+const MAX_REDIRECTS = 3
+const TIMEOUT_MS = 8000
 
-  if (!url) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'URL is required'
+// Fetches a link's title, description and image for the editor. Signed-in
+// users only, and only public web addresses: no internal hosts or IPs, on
+// every redirect too, so it can't be used to reach private services.
+export default defineEventHandler(async (event): Promise<LinkMetadata> => {
+  if (!event.context.user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+
+  const { url } = await readBody<{ url?: string }>(event)
+  let target = typeof url === 'string' ? publicUrl(url) : null
+  if (!target) throw createError({ statusCode: 400, statusMessage: 'Enter a public web address' })
+
+  const headers: Record<string, string> = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+  }
+  // TikTok needs a browser-like request
+  if (target.hostname.includes('tiktok.com')) {
+    Object.assign(headers, {
+      'Referer': 'https://www.tiktok.com/',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1',
     })
   }
 
+  let html: string
   try {
-    // Validate URL
-    const validatedUrl = new URL(url)
-    
-    // Fetch webpage with proper headers
-    const headers: Record<string, string> = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Connection': 'keep-alive',
+    // Follow redirects by hand so each hop is checked
+    let response: Response | null = null
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      response = await fetch(target.toString(), { headers, redirect: 'manual', signal: AbortSignal.timeout(TIMEOUT_MS) })
+      const location = response.status >= 300 && response.status < 400 ? response.headers.get('location') : null
+      if (!location) break
+      const next = publicUrl(new URL(location, target).toString())
+      if (!next) throw new Error('Redirect to a non-public address')
+      target = next
+      response = null
     }
-
-    // TikTok needs special handling
-    if (validatedUrl.hostname.includes('tiktok.com')) {
-      headers['Referer'] = 'https://www.tiktok.com/'
-      headers['Sec-Fetch-Dest'] = 'document'
-      headers['Sec-Fetch-Mode'] = 'navigate'
-      headers['Sec-Fetch-Site'] = 'none'
-      headers['Sec-Fetch-User'] = '?1'
-      headers['Upgrade-Insecure-Requests'] = '1'
-    }
-
-    console.log(`[crawl-link] Fetching: ${validatedUrl.toString()}`)
-
-    const response = await fetch(validatedUrl.toString(), { headers })
-
-    console.log(`[crawl-link] Response status: ${response.status}`)
-
-    if (!response.ok) {
-      throw createError({
-        statusCode: response.status,
-        statusMessage: `Failed to fetch: ${response.statusText}`
-      })
-    }
-
-    const html = await response.text()
-    console.log(`[crawl-link] HTML length: ${html}`)
-
-    // Parse metadata
-    let metadata: LinkMetadata
-
-    // Special handling for TikTok
-    if (validatedUrl.hostname.includes('tiktok.com')) {
-      metadata = extractTikTokMeta(html, validatedUrl)
-    } else {
-      metadata = {
-        title: extractMeta(html, 'og:title', 'title') ?? validatedUrl.hostname,
-        description: extractMeta(html, 'og:description', 'description') ?? '',
-        image: extractMeta(html, 'og:image', 'image') ?? '',
-        favicon: extractFavicon(html, validatedUrl) ?? ''
-      }
-    }
-
-    return metadata
+    if (!response?.ok) throw new Error(`Status ${response?.status ?? 'redirect loop'}`)
+    html = await readLimited(response, MAX_BYTES)
   } catch (error) {
-    console.error('Crawl error:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to crawl link'
-    })
+    console.warn('[crawl-link]', target.hostname, error instanceof Error ? error.message : error)
+    throw createError({ statusCode: 502, statusMessage: 'Could not read this link' })
+  }
+
+  if (target.hostname.includes('tiktok.com')) return extractTikTokMeta(html)
+  return {
+    title: extractMeta(html, 'og:title', 'title') ?? target.hostname,
+    description: extractMeta(html, 'og:description', 'description') ?? '',
+    image: extractMeta(html, 'og:image', 'image') ?? '',
+    favicon: extractFavicon(html, target) ?? '',
   }
 })
+
+/** The address if it's a public http(s) web address, otherwise null */
+function publicUrl(raw: string): URL | null {
+  let url: URL
+  try {
+    url = new URL(raw.trim())
+  } catch {
+    return null
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null
+  if (url.username || url.password) return null
+  if (url.port && url.port !== '80' && url.port !== '443') return null
+  const host = url.hostname.toLowerCase().replace(/\.$/, '')
+  // No bare IPs (v4 or v6) and no local or internal names
+  if (/^\d+(\.\d+){0,3}$/.test(host) || /^0x[0-9a-f]+$/i.test(host) || host.startsWith('[') || host.includes(':')) return null
+  if (!host.includes('.') || /(^|\.)(localhost|local|internal|intranet|lan|home|corp|localdomain)$/.test(host)) return null
+  return url
+}
+
+/** Reads the start of a response body, up to a size */
+async function readLimited(response: Response, maxBytes: number) {
+  const reader = response.body?.getReader()
+  if (!reader) return ''
+  const chunks: Uint8Array[] = []
+  let size = 0
+  while (size < maxBytes) {
+    const { done, value } = await reader.read()
+    if (done) break
+    chunks.push(value)
+    size += value.byteLength
+  }
+  await reader.cancel().catch(() => {})
+  const all = new Uint8Array(Math.min(size, maxBytes))
+  let offset = 0
+  for (const chunk of chunks) {
+    const part = chunk.subarray(0, all.length - offset)
+    all.set(part, offset)
+    offset += part.length
+    if (offset >= all.length) break
+  }
+  return new TextDecoder().decode(all)
+}
 
 function extractMeta(html: string, ogProperty: string, tagName: string): string | null {
   // Try Open Graph first
@@ -125,94 +151,34 @@ function extractFavicon(html: string, baseUrl: URL): string | null {
   return `${baseUrl.origin}/favicon.ico`
 }
 
-function extractTikTokMeta(html: string, baseUrl: URL): LinkMetadata {
-  console.log(`[crawl-link] TikTok HTML length: ${html.length}`)
-
-  // Try to parse TikTok's embedded JSON data
-  const tiktokDataRegex = /<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([\s\S]*?)<\/script>/
-  const match = html.match(tiktokDataRegex)
-
-  console.log(`[crawl-link] Found __UNIVERSAL_DATA_FOR_REHYDRATION__: ${!!match}`)
-
+function extractTikTokMeta(html: string): LinkMetadata {
+  // Profile data embedded in the page
+  const match = html.match(/<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([\s\S]*?)<\/script>/)
   if (match?.[1]) {
     try {
-      const jsonStr = match[1].trim()
-      console.log(`[crawl-link] JSON length: ${jsonStr.length}`)
-      const data = JSON.parse(jsonStr)
-
-      // Log keys to debug structure
-      console.log(`[crawl-link] Data keys: ${Object.keys(data).join(', ')}`)
-
-      // Log __DEFAULT_SCOPE__ keys
-      const defaultScope = data?.__DEFAULT_SCOPE__
-      if (defaultScope) {
-        console.log(`[crawl-link] __DEFAULT_SCOPE__ keys: ${Object.keys(defaultScope).join(', ')}`)
-
-        // Try webapp.app-context
-        const appContext = defaultScope['webapp.app-context']
-        if (appContext) {
-          console.log(`[crawl-link] webapp.app-context keys: ${Object.keys(appContext).join(', ')}`)
-          if (appContext.user) {
-            console.log(`[crawl-link] webapp.app-context.user:`, JSON.stringify(appContext.user).slice(0, 200))
-          } else {
-            console.log(`[crawl-link] webapp.app-context.user: undefined`)
-          }
-        }
-
-        // Try webapp.user-detail
-        const userDetail = defaultScope['webapp.user-detail']
-        if (userDetail) {
-          console.log(`[crawl-link] webapp.user-detail keys: ${Object.keys(userDetail).join(', ')}`)
-          if (userDetail.userInfo?.user) {
-            console.log(`[crawl-link] webapp.user-detail.userInfo.user:`, JSON.stringify(userDetail.userInfo.user).slice(0, 200))
-          } else if (userDetail.user) {
-            console.log(`[crawl-link] webapp.user-detail.user:`, JSON.stringify(userDetail.user).slice(0, 200))
-          }
-        }
-      }
-
-      // Try different paths for user data
-      // webapp.user-detail has userInfo.user for this profile
-      let user = data?.__DEFAULT_SCOPE__?.['webapp.user-detail']?.userInfo?.user
-
+      const user = JSON.parse(match[1].trim())?.__DEFAULT_SCOPE__?.['webapp.user-detail']?.userInfo?.user
       if (user) {
-        console.log(`[crawl-link] Found user: ${user.nickname || user.uniqueId}`)
         const avatarUrl = user.avatarLarger || user.avatarMedium || user.avatarThumb || ''
         return {
           title: user.nickname || user.uniqueId || 'TikTok',
           description: user.signature || '',
           image: avatarUrl ? avatarUrl.replace(/\\u002F/g, '/') : '',
-          favicon: 'https://www.tiktok.com/favicon.ico'
+          favicon: 'https://www.tiktok.com/favicon.ico',
         }
-      } else {
-        console.log(`[crawl-link] No user found in data structure`)
       }
-    } catch (e) {
-      console.log(`[crawl-link] JSON parse error: ${e}`)
+    } catch {
+      // Fall back to the meta tags
     }
   }
 
-  // Try og:meta tags as fallback
   const ogTitle = extractMeta(html, 'og:title', 'title')
-  const ogDesc = extractMeta(html, 'og:description', 'description')
-  const ogImage = extractMeta(html, 'og:image', 'image')
-
   if (ogTitle && ogTitle !== 'TikTok') {
-    console.log(`[crawl-link] Using OG meta: ${ogTitle}`)
     return {
       title: ogTitle,
-      description: ogDesc || '',
-      image: ogImage || '',
-      favicon: 'https://www.tiktok.com/favicon.ico'
+      description: extractMeta(html, 'og:description', 'description') || '',
+      image: extractMeta(html, 'og:image', 'image') || '',
+      favicon: 'https://www.tiktok.com/favicon.ico',
     }
   }
-
-  console.log(`[crawl-link] Fallback to default`)
-  // Fallback to default TikTok info
-  return {
-    title: 'TikTok',
-    description: '',
-    image: '',
-    favicon: 'https://www.tiktok.com/favicon.ico'
-  }
+  return { title: 'TikTok', description: '', image: '', favicon: 'https://www.tiktok.com/favicon.ico' }
 }
