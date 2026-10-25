@@ -265,7 +265,7 @@
             v-if="block.name === 'text' && (block.data?.content || block.data?.title)"
 :id="blockDomId(block)"
             :class="block.data.style === 'card' && 'p-5'"
-            :style="[{ textAlign: block.data.align || 'left' }, block.data.style === 'card' ? cardStyle : {}]"
+            :style="[{ textAlign: block.data.align || 'left' }, block.data.style === 'card' ? panelStyle : {}]"
           >
             <h2 v-if="block.data.title" class="mb-2 text-[17px]" :style="{ ...headingStyle, textAlign: block.data.align || 'left' }">{{ block.data.title }}</h2>
             <p v-if="block.data.content" class="whitespace-pre-line text-[15px] leading-relaxed opacity-85">{{ block.data.content }}</p>
@@ -276,7 +276,7 @@
             <h2 v-if="block.data?.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
             <BioImageAlbum
               :data="{ images: block.data.images, layout: block.data.layout || 'vertical' } as any"
-              :radius="cardStyle.borderRadius"
+              :radius="panelStyle.borderRadius"
             />
           </section>
 
@@ -309,7 +309,7 @@
             v-if="block.name === 'menu' && block.data?.sections?.length"
 :id="blockDomId(block)"
             :data="block.data"
-            :card-style="cardStyle"
+            :card-style="panelStyle"
             :heading-style="headingStyle"
           />
           <!-- Opening Hours Block -->
@@ -317,7 +317,7 @@
             v-if="block.name === 'hours' && block.data?.days?.length"
 :id="blockDomId(block)"
             :data="block.data"
-            :card-style="cardStyle"
+            :card-style="panelStyle"
             :heading-style="headingStyle"
           />
           <!-- Contact Block -->
@@ -325,7 +325,7 @@
             v-if="block.name === 'contact' && (block.data?.address || block.data?.phone || block.data?.email || block.data?.bookingUrl)"
 :id="blockDomId(block)"
             :data="block.data"
-            :card-style="cardStyle"
+            :card-style="panelStyle"
             :button-style="buttonStyle"
             :heading-style="headingStyle"
             :username="username"
@@ -337,7 +337,7 @@
             <div
               class="relative mx-auto w-full overflow-hidden bg-black"
               :class="videoEmbed(block.data.url)!.aspect < 1 && 'max-w-[340px]'"
-              :style="{ aspectRatio: String(videoEmbed(block.data.url)!.aspect), borderRadius: cardStyle.borderRadius }"
+              :style="{ aspectRatio: String(videoEmbed(block.data.url)!.aspect), borderRadius: panelStyle.borderRadius }"
             >
               <iframe
                 :src="videoEmbed(block.data.url)!.src"
@@ -356,7 +356,7 @@
           <section v-if="block.name === 'testimonials' && block.data?.items?.some((i) => i.quote)" :id="blockDomId(block)">
             <h2 v-if="block.data.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
             <div class="space-y-2.5">
-              <figure v-for="item in block.data.items.filter((i) => i.quote)" :key="item.id" class="p-4" :style="cardStyle">
+              <figure v-for="item in block.data.items.filter((i) => i.quote)" :key="item.id" class="p-4" :style="panelStyle">
                 <div v-if="item.rating" class="mb-1 flex text-sm tracking-[0.1em]" role="img" :aria-label="`${item.rating}/5`">
                   <span v-for="n in 5" :key="n" :class="n > item.rating && 'opacity-25'">★</span>
                 </div>
@@ -377,7 +377,7 @@
             :block-id="block.id"
             :username="username"
             :preview="isPreview"
-            :card-style="cardStyle"
+            :card-style="panelStyle"
             :button-style="solidButtonStyle"
             :heading-style="headingStyle"
           />
@@ -587,6 +587,13 @@ const avatarFallbackStyle = computed(() => ({
 // Previews (editor, template thumbnails) also show items that still need a
 // URL, so a fresh template looks complete; the public page hides them
 const isPreview = computed(() => props.mode === "preview");
+
+// Pill corners suit one-line link cards; menus, hours and other tall blocks
+// look clipped with them, so their radius stops at 24px
+const panelStyle = computed(() => ({
+  ...cardStyle.value,
+  borderRadius: `min(${cardStyle.value.borderRadius}, 24px)`,
+}));
 // Dashboard language, for editor-only hints
 const { t } = useI18n();
 

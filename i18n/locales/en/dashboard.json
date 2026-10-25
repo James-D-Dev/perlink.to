@@ -280,6 +280,70 @@
       "event": {
         "name": "Wedding & event",
         "description": "Schedule, venue, RSVP and photo gallery for your big day."
+      },
+      "spa": {
+        "name": "Spa & massage",
+        "description": "Treatments with prices, opening hours and online booking."
+      },
+      "nail": {
+        "name": "Nail salon",
+        "description": "Price list, nail art gallery and appointments."
+      },
+      "barber": {
+        "name": "Hair salon & barber",
+        "description": "Services, stylists’ work, hours and booking."
+      },
+      "gym": {
+        "name": "Gym & personal trainer",
+        "description": "Membership plans, results and a free trial sign-up."
+      },
+      "dental": {
+        "name": "Dental & clinic",
+        "description": "Treatments, prices, opening hours and appointments."
+      },
+      "tutor": {
+        "name": "Tutor & learning centre",
+        "description": "Courses, fees, parent reviews and sign-up."
+      },
+      "bakery": {
+        "name": "Bakery & cake shop",
+        "description": "Today’s bakes with photos, prices and pre-orders."
+      },
+      "street-food": {
+        "name": "Street food stall",
+        "description": "A short menu, evening hours and pay by bank QR."
+      },
+      "bar": {
+        "name": "Bar & lounge",
+        "description": "Cocktail list, night hours and table reservations."
+      },
+      "florist": {
+        "name": "Flower shop",
+        "description": "Bouquets with prices, a gallery and orders by date."
+      },
+      "online-shop": {
+        "name": "Online shop",
+        "description": "Links to your stores, best sellers and a lookbook."
+      },
+      "real-estate": {
+        "name": "Real estate agent",
+        "description": "Featured listings, photos and a viewing request form."
+      },
+      "wedding-photo": {
+        "name": "Wedding photographer",
+        "description": "Portfolio gallery, packages and date enquiries."
+      },
+      "musician": {
+        "name": "Musician & DJ",
+        "description": "Latest release, upcoming shows and booking."
+      },
+      "birthday": {
+        "name": "Birthday party",
+        "description": "Countdown, plan for the day, place and RSVP."
+      },
+      "charity": {
+        "name": "Fundraiser & charity",
+        "description": "Your cause, a bank QR for donations and updates."
       }
     },
     "categories": {
@@ -288,7 +352,12 @@
       "hospitality": "Hotel & travel",
       "business": "Business",
       "creative": "Creative",
-      "events": "Events"
+      "events": "Events",
+      "beauty": "Beauty",
+      "health": "Health & fitness",
+      "shop": "Shops",
+      "education": "Education",
+      "community": "Community"
     },
     "seo": {
       "heading": "Search & sharing",

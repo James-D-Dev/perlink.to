@@ -804,6 +804,8 @@ const applyTemplate = async (templateId: string) => {
     room: content.room,
   };
   templatePickerDismissed.value = true;
+  // Show the result: back to the content tab, first block open
+  activeTab.value = "content";
   activeBlock.value = bioData.blocks[0]?.id ?? "header";
   toast.add({
     title: t("dashboard.editor.templateApplied", { name: t(`dashboard.templates.${template.id}.name`) }),

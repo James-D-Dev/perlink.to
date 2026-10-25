@@ -1,8 +1,8 @@
-import { nanoid } from 'nanoid'
-import type { BioBlock, LinkCardLayout, MenuSection, ThemeConfig, ThemeHeaderLayout, ThemePage, ThemeSocial } from '~/types/bio'
+import type { BioBlock, ThemeConfig } from '~/types/bio'
 import { DEFAULT_OPENING_DAYS } from '~/types/bio'
-import type { RoomConfig, RoomObject, RoomStyle } from '~/types/room'
-import { DEFAULT_ROOM_ENVIRONMENT, DEFAULT_ROOM_STYLE } from '~/types/room'
+import type { RoomConfig } from '~/types/room'
+import { MORE_PAGE_TEMPLATES } from './pageTemplatesMore'
+import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, photo, room, social, withIndex } from './templateKit'
 
 // Starter pages by industry. Applying a template fills the page with sample
 // content, a matching theme and a matching 3D room (used if 3D mode is on).
@@ -17,15 +17,20 @@ export interface PageTemplateContent {
   room: RoomConfig
 }
 
-export type TemplateCategory = 'personal' | 'food' | 'hospitality' | 'business' | 'creative' | 'events'
+export type TemplateCategory = 'personal' | 'food' | 'beauty' | 'health' | 'shop' | 'education' | 'hospitality' | 'business' | 'creative' | 'events' | 'community'
 
 export const TEMPLATE_CATEGORIES: { id: TemplateCategory; label: string; icon: string }[] = [
   { id: 'personal', label: 'Personal', icon: 'i-lucide-user-round' },
   { id: 'food', label: 'Food & drink', icon: 'i-lucide-utensils' },
+  { id: 'beauty', label: 'Beauty', icon: 'i-lucide-sparkles' },
+  { id: 'health', label: 'Health & fitness', icon: 'i-lucide-heart-pulse' },
+  { id: 'shop', label: 'Shops', icon: 'i-lucide-shopping-bag' },
+  { id: 'education', label: 'Education', icon: 'i-lucide-graduation-cap' },
   { id: 'hospitality', label: 'Hotel & travel', icon: 'i-lucide-bed-double' },
   { id: 'business', label: 'Business', icon: 'i-lucide-briefcase' },
   { id: 'creative', label: 'Creative', icon: 'i-lucide-palette' },
   { id: 'events', label: 'Events', icon: 'i-lucide-party-popper' },
+  { id: 'community', label: 'Community', icon: 'i-lucide-hand-heart' },
 ]
 
 export interface PageTemplate {
@@ -39,124 +44,8 @@ export interface PageTemplate {
   build: () => PageTemplateContent
 }
 
-interface Look {
-  bg: string
-  /** Text on the page and on cards */
-  text: string
-  accent: string
-  /** Text on accent-coloured buttons */
-  onAccent: string
-  surface: string
-  /** Hairline around cards; omit for borderless cards */
-  border?: string
-  radius: number
-  shadow?: ThemeConfig['card']['shadow']
-  nameFont: string
-  nameWeight: string
-  nameSize: string
-  tracking?: string
-  headingFont?: string
-  bodyFont?: string
-  header: ThemeHeaderLayout
-  banner?: string
-  avatar?: ThemeConfig['avatar']['shape']
-  link: LinkCardLayout
-  social: ThemeSocial['style']
-  gap?: ThemePage['blockGap']
-  titleAlign?: ThemePage['titleAlign']
-}
 
-// Every value here maps to a control in the theme editor, so users can
-// rebuild or tweak any template by hand
-function look(l: Look): ThemeConfig {
-  const body = l.bodyFont ?? 'Inter, sans-serif'
-  return {
-    colors: { primary: l.accent, secondary: l.border ?? l.surface, third: l.bg },
-    background: { type: 'solid', color: l.bg },
-    card: {
-      style: l.border ? 'outline' : 'filled',
-      backgroundColor: l.surface,
-      outlineColor: l.border,
-      textColor: l.text,
-      cornerRadius: l.radius,
-      transparency: 1,
-      shadow: l.shadow ?? 'none',
-      animationAppear: 'fadeIn',
-      animationHover: 'none',
-    },
-    button: { style: 'filled', cornerRadius: l.radius, shadow: 'none', textColor: l.onAccent },
-    header: {
-      alignment: 'center',
-      spacing: 'spacious',
-      layout: l.header,
-      bannerUrl: l.banner,
-      fontFamily: l.nameFont,
-      fontSize: l.nameSize,
-      fontWeight: l.nameWeight,
-      letterSpacing: l.tracking,
-      textColor: l.text,
-    },
-    avatar: { shape: l.avatar ?? 'circle', size: 'lg', border: false, animationAppear: 'fadeIn', animationHover: 'none' },
-    link: { layout: l.link },
-    typography: {
-      nameFont: l.nameFont,
-      headingFont: l.headingFont ?? l.nameFont,
-      paragraphFont: body,
-      nameSize: 'lg',
-      paragraphSize: 'sm',
-      bioFontFamily: body,
-      bioFontSize: '1rem',
-      bioTextColor: l.text,
-      textColor: l.text,
-    },
-    social: { style: l.social },
-    page: { blockGap: l.gap ?? 'normal', titleAlign: l.titleAlign ?? 'center' },
-  }
-}
-
-// Sample photos from Pexels (free to use, no attribution required)
-const photo = (name: string) => `/images/templates/photos/${name}.jpg`
-
-function album(...names: string[]) {
-  return names.map((name, index) => ({ id: nanoid(6), url: photo(name), index }))
-}
-
-function room(style: Partial<RoomStyle>, objects: Omit<RoomObject, 'id' | 'scale'>[]): RoomConfig {
-  return {
-    version: 1,
-    style: { ...DEFAULT_ROOM_STYLE, ...style },
-    environment: { ...DEFAULT_ROOM_ENVIRONMENT },
-    objects: objects.map(o => ({ scale: 1, ...o, id: nanoid(8) })),
-  }
-}
-
-function withIndex(blocks: Omit<BioBlock, 'index' | 'hidden'>[]): BioBlock[] {
-  return blocks.map((b, index) => ({ ...b, id: nanoid(8), index, hidden: false }) as BioBlock)
-}
-
-function menu(sections: { name: string; items: [string, string, string?, string?][] }[]): MenuSection[] {
-  return sections.map(s => ({
-    id: nanoid(6),
-    name: s.name,
-    items: s.items.map(([name, price, description, tag]) => ({ id: nanoid(6), name, price, description, tag })),
-  }))
-}
-
-function social(...providers: string[]) {
-  return providers.map((provider, index) => ({ id: nanoid(6), provider, url: '', index }))
-}
-
-function links(...items: [string, string][]) {
-  return items.map(([title, url], order) => ({ id: nanoid(6), title, url, icon: 'link', order, isActive: true }))
-}
-
-const SAMPLE_ADDRESS = '12 Riverside Street, District 1'
-const SAMPLE_PHONE = '+84 90 123 4567'
-
-const COFFEE_TABLE_TOP = 0.43
-const DESK_TOP = 0.76
-
-export const PAGE_TEMPLATES: PageTemplate[] = [
+const BASE_TEMPLATES: PageTemplate[] = [
   {
     id: 'personal',
     name: 'Personal portfolio',
@@ -528,3 +417,5 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
     }),
   },
 ]
+
+export const PAGE_TEMPLATES: PageTemplate[] = [...BASE_TEMPLATES, ...MORE_PAGE_TEMPLATES]

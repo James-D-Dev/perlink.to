@@ -280,6 +280,70 @@
       "event": {
         "name": "Đám cưới & sự kiện",
         "description": "Lịch trình, địa điểm, xác nhận tham dự và album ảnh cho ngày trọng đại."
+      },
+      "spa": {
+        "name": "Spa & massage",
+        "description": "Liệu trình kèm giá, giờ mở cửa và đặt lịch online."
+      },
+      "nail": {
+        "name": "Tiệm nail",
+        "description": "Bảng giá, mẫu móng và đặt lịch."
+      },
+      "barber": {
+        "name": "Salon tóc & barber",
+        "description": "Dịch vụ, tác phẩm, giờ mở cửa và đặt lịch."
+      },
+      "gym": {
+        "name": "Phòng gym & PT",
+        "description": "Gói tập, kết quả hội viên và đăng ký tập thử."
+      },
+      "dental": {
+        "name": "Nha khoa & phòng khám",
+        "description": "Dịch vụ, bảng giá, giờ làm việc và đặt lịch khám."
+      },
+      "tutor": {
+        "name": "Gia sư & trung tâm",
+        "description": "Khóa học, học phí, đánh giá của phụ huynh và đăng ký."
+      },
+      "bakery": {
+        "name": "Tiệm bánh",
+        "description": "Bánh hôm nay kèm ảnh, giá và đặt bánh trước."
+      },
+      "street-food": {
+        "name": "Quán ăn vặt",
+        "description": "Thực đơn ngắn, giờ bán buổi tối và thanh toán VietQR."
+      },
+      "bar": {
+        "name": "Bar & lounge",
+        "description": "Danh sách cocktail, giờ mở cửa và đặt bàn."
+      },
+      "florist": {
+        "name": "Tiệm hoa",
+        "description": "Bó hoa kèm giá, ảnh và đặt hoa theo ngày."
+      },
+      "online-shop": {
+        "name": "Shop online",
+        "description": "Link gian hàng, sản phẩm bán chạy và lookbook."
+      },
+      "real-estate": {
+        "name": "Môi giới bất động sản",
+        "description": "Căn nổi bật, hình ảnh và form đặt lịch xem nhà."
+      },
+      "wedding-photo": {
+        "name": "Chụp ảnh cưới",
+        "description": "Tác phẩm, gói chụp và hỏi lịch trống."
+      },
+      "musician": {
+        "name": "Ca sĩ & DJ",
+        "description": "Bản phát hành mới, lịch diễn và mời biểu diễn."
+      },
+      "birthday": {
+        "name": "Tiệc sinh nhật",
+        "description": "Đếm ngược, lịch trình, địa điểm và xác nhận tham dự."
+      },
+      "charity": {
+        "name": "Quỹ từ thiện",
+        "description": "Mục tiêu, mã VietQR nhận ủng hộ và báo cáo."
       }
     },
     "categories": {
@@ -288,7 +352,12 @@
       "hospitality": "Khách sạn & du lịch",
       "business": "Kinh doanh",
       "creative": "Sáng tạo",
-      "events": "Sự kiện"
+      "events": "Sự kiện",
+      "beauty": "Làm đẹp",
+      "health": "Sức khỏe",
+      "shop": "Cửa hàng",
+      "education": "Giáo dục",
+      "community": "Cộng đồng"
     },
     "seo": {
       "heading": "Tìm kiếm & chia sẻ",
