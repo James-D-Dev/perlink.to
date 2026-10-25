@@ -388,7 +388,9 @@
           "title": "Chia sẻ liên kết",
           "text": "Gắn vào bio, gửi qua Zalo hoặc in mã QR để bàn."
         }
-      }
+      },
+      "cardTitle": "Hoàn tất thiết lập",
+      "cardAction": "Tiếp tục thiết lập"
     },
     "domain": {
       "heading": "Tên miền riêng",

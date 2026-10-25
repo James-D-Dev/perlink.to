@@ -126,17 +126,6 @@
         <div v-if="activeTab === 'content' || activeTab === 'design'" class="grid grid-cols-1 gap-6 pt-4 lg:grid-cols-12 lg:gap-8">
           <div class="lg:col-span-7">
             <template v-if="activeTab === 'content'">
-              <!-- First steps, one folded line (sits above the preview on desktop) -->
-              <SiteOnboarding
-                v-if="existingBio?.username && !showTemplatePicker"
-                ref="onboardingRef"
-                class="mb-4 lg:hidden"
-                :bio-data="bioData"
-                :username="existingBio.username"
-                :published="!!existingBio.isPublished"
-                @action="onOnboardingAction"
-              />
-
               <!-- Template picker for empty pages -->
               <div v-if="showTemplatePicker" class="mb-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                 <div class="mb-3 flex items-start justify-between gap-3">
@@ -203,14 +192,6 @@
 
           <div class="hidden lg:block lg:col-span-5">
             <div class="sticky top-4 space-y-4">
-              <SiteOnboarding
-                v-if="existingBio?.username && !showTemplatePicker"
-                ref="onboardingDesktopRef"
-                :bio-data="bioData"
-                :username="existingBio.username"
-                :published="!!existingBio.isPublished"
-                @action="onOnboardingAction"
-              />
               <BioPreviewPanel
                 ref="previewPanelRef"
                 :preview-data="bioData"
@@ -376,6 +357,16 @@
             <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
           </div>
         </div>
+
+        <!-- Setup checklist popup; the sidebar card opens it -->
+        <SiteOnboarding
+          v-if="existingBio?.username"
+          ref="onboardingRef"
+          :bio-data="bioData"
+          :username="existingBio.username"
+          :published="!!existingBio.isPublished"
+          @action="onOnboardingAction"
+        />
 
         <SiteQrModal
           v-if="existingBio?.username"
@@ -574,11 +565,7 @@ const onAddBlock = (blockType: string, atIndex?: number) => {
 
 // Onboarding checklist: each step takes the owner to the right place
 const onboardingRef = ref<{ markShared: () => void } | null>(null);
-const onboardingDesktopRef = ref<{ markShared: () => void } | null>(null);
-const markShared = () => {
-  onboardingRef.value?.markShared();
-  onboardingDesktopRef.value?.markShared();
-};
+const markShared = () => onboardingRef.value?.markShared();
 const editorRef = ref<{ openBlockModal: () => void } | null>(null);
 const onOnboardingAction = (step: string) => {
   if (step === "photo" || step === "bio") {

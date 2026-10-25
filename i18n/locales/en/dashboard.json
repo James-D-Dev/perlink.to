@@ -388,7 +388,9 @@
           "title": "Share your link",
           "text": "Put it in your bio, on Zalo or print a QR code for your tables."
         }
-      }
+      },
+      "cardTitle": "Finish setup",
+      "cardAction": "Continue setup"
     },
     "domain": {
       "heading": "Custom domain",

@@ -43,9 +43,12 @@
           }"
         />
 
-        <!-- Upgrade -->
+        <!-- Site setup progress, while a site editor is open -->
+        <SiteSetupCard :collapsed="collapsed" />
+
+        <!-- Upgrade (gives way to the setup card) -->
         <NuxtLink
-          v-if="!collapsed"
+          v-if="!collapsed && !setup?.visible.value"
           to="/dashboard/upgrade"
           class="group mt-4 block rounded-2xl bg-sand p-4 transition-colors hover:bg-sand-strong"
         >
@@ -93,6 +96,7 @@ const user = sessionUser as Ref<User | null>;
 const open = ref(false);
 
 const helpOpen = useHelpCenter();
+const { current: setup } = useSiteSetup();
 
 const { t } = useI18n();
 
