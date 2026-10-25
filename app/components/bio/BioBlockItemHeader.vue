@@ -29,8 +29,13 @@
     </div>
 
     <!-- Title -->
-    <span class="min-w-0 flex-1 truncate text-sm font-medium text-highlighted dark:text-white">
+    <span class="min-w-0 flex-1 truncate text-sm font-medium" :class="isHidden ? 'text-muted' : 'text-highlighted dark:text-white'">
       {{ title }}
+    </span>
+
+    <!-- Hidden blocks say so, instead of a greyed-out eye nobody notices -->
+    <span v-if="isHidden" class="shrink-0 rounded-full bg-elevated px-2 py-0.5 text-[11px] font-medium text-muted dark:bg-white/10">
+      {{ t('blocks.editor.hiddenBadge') }}
     </span>
 
     <!-- Badge/Count (optional) -->
@@ -48,23 +53,33 @@
       :icon="isActive ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
     />
 
-    <!-- Hidden Toggle Button -->
-    <UButton
-    v-if="!container"
-      variant="ghost"
-      color="neutral"
-      size="xs"
-      :icon="hidden ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-      @click.stop="$emit('toggleHidden')"
-    />
+    <template v-else>
+      <!-- Show / hide stays one tap away -->
+      <UTooltip :text="isHidden ? t('blocks.editor.menu.show') : t('blocks.editor.menu.hide')">
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="xs"
+          :icon="isHidden ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+          :aria-label="isHidden ? t('blocks.editor.menu.show') : t('blocks.editor.menu.hide')"
+          @click.stop="onToggleHidden"
+        />
+      </UTooltip>
 
-    <!-- More Menu (optional) -->
-    <slot name="actions" />
+      <!-- Everything else lives in one menu so the row stays calm -->
+      <UDropdownMenu v-if="item" :items="menuItems" :content="{ align: 'end' }" :ui="{ content: 'w-52' }">
+        <UButton variant="ghost" color="neutral" size="xs" icon="i-lucide-ellipsis" :aria-label="t('blocks.editor.menu.more')" @click.stop />
+      </UDropdownMenu>
+      <slot v-else name="actions" />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { BLOCK_ITEM_KEY } from '~/utils/blockItem'
+import { isRepeatableBlock } from '~/utils/blocks'
+
+const props = defineProps<{
   isActive: boolean;
   title: string;
   icon?: string;
@@ -73,8 +88,38 @@ defineProps<{
   container?: boolean;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   toggle: [];
   toggleHidden: [];
 }>();
+
+const { t } = useI18n()
+
+// Present when the header sits inside the block list of the editor
+const item = inject(BLOCK_ITEM_KEY, null)
+
+const isHidden = computed(() => item ? !!item.block.value.hidden : !!props.hidden)
+
+function onToggleHidden() {
+  if (item) item.toggleHidden()
+  else emit('toggleHidden')
+}
+
+const menuItems = computed(() => {
+  if (!item) return []
+  const repeatable = isRepeatableBlock(item.block.value.name)
+  return [
+    [
+      { label: t('blocks.editor.menu.up'), icon: 'i-lucide-arrow-up', disabled: !item.canMoveUp.value, onSelect: item.moveUp },
+      { label: t('blocks.editor.menu.down'), icon: 'i-lucide-arrow-down', disabled: !item.canMoveDown.value, onSelect: item.moveDown },
+    ],
+    [
+      ...(repeatable ? [{ label: t('blocks.editor.menu.duplicate'), icon: 'i-lucide-copy', onSelect: item.duplicate }] : []),
+      { label: t('blocks.editor.menu.addBelow'), icon: 'i-lucide-plus', onSelect: item.addBelow },
+    ],
+    [
+      { label: t('common.delete'), icon: 'i-lucide-trash-2', color: 'error' as const, onSelect: item.remove },
+    ],
+  ]
+})
 </script>

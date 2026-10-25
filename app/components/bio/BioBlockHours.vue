@@ -8,9 +8,6 @@
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('hours')"
     >
-      <template #actions>
-        <UButton variant="ghost" color="neutral" size="xs" icon="i-lucide-trash-2" @click.stop="$emit('remove')" />
-      </template>
     </BioBlockItemHeader>
 
     <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">

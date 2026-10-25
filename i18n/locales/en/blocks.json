@@ -3,7 +3,17 @@
     "editor": {
       "addBlock": "Add block",
       "unsavedChanges": "Unsaved changes",
-      "allSaved": "All changes saved"
+      "allSaved": "All changes saved",
+      "hiddenBadge": "Hidden",
+      "menu": {
+        "more": "More actions",
+        "show": "Show block",
+        "hide": "Hide block",
+        "up": "Move up",
+        "down": "Move down",
+        "duplicate": "Duplicate",
+        "addBelow": "Add block below"
+      }
     },
     "header": {
       "changePhoto": "Change photo",

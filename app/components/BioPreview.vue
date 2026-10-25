@@ -2,6 +2,7 @@
   <BioPageView
     :bio-data="bioData"
     :username="username"
+    :active-block-id="activeBlockId"
     :style="{
       width: `${RENDER_WIDTH}px`,
       height: `${renderHeight}px`,
@@ -10,6 +11,7 @@
       overflow: 'auto',
     }"
     mode="preview"
+    @select-block="$emit('selectBlock', $event)"
   />
 </template>
 
@@ -20,7 +22,10 @@ import type { BioData } from "~/types/bio";
 defineProps<{
   bioData: BioData;
   username: string;
+  activeBlockId?: string | null;
 }>();
+
+defineEmits<{ selectBlock: [blockId: string] }>();
 
 const RENDER_WIDTH = 375;
 const DISPLAY_WIDTH = 296;

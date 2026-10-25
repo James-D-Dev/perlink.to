@@ -1,41 +1,33 @@
 <template>
-  <div class="space-y-4">
+  <div class="space-y-3">
     <!-- Preview Header -->
-    <div class="flex items-center justify-between">
-      <h3 class="font-semibold text-gray-900 dark:text-white">{{ t('common.preview') }}</h3>
-      <div class="flex items-center gap-2">
-        <span class="text-xs text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-white/[0.06] px-2 py-1 rounded">{{ t('dashboard.previewPanel.mobile') }}</span>
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <h3 class="font-semibold text-gray-900 dark:text-white">{{ t('common.preview') }}</h3>
+        <p class="truncate text-xs text-muted">{{ t('dashboard.editor.previewHint') }}</p>
       </div>
+      <UButton
+        v-if="existingBio?.isPublished"
+        :to="`/${username}`"
+        target="_blank"
+        size="xs"
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-external-link"
+        :label="t('common.openSite')"
+      />
     </div>
 
     <!-- Phone Mockup -->
     <BioIPhone15ProMockup :width="320" :height="500">
-      <BioPreview v-if="previewData" :bio-data="previewData" :username="username" />
+      <BioPreview
+        v-if="previewData"
+        :bio-data="previewData"
+        :username="username"
+        :active-block-id="activeBlock"
+        @select-block="$emit('selectBlock', $event)"
+      />
     </BioIPhone15ProMockup>
-
-    <!-- Public URL Card -->
-    <UCard v-if="existingBio?.isPublished" class="mt-4"
-    :ui="{
-      body: '!px-4 !py-3'
-    }"
-    >
-      <div class="flex items-center gap-3">
-        <UIcon name="i-lucide-globe" class="w-5 h-5 text-green-500" />
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-            perlink.to/{{ username }}
-          </p>
-        </div>
-        <UButton
-          color="neutral"
-          variant="ghost"
-          size="sm"
-          icon="i-lucide-external-link"
-          :to="`/${username}`"
-          target="_blank"
-        />
-      </div>
-    </UCard>
   </div>
 </template>
 
@@ -44,33 +36,29 @@ const { t } = useI18n();
 
 // Method to scroll to a specific block in the preview
 const scrollToBlock = (blockId: string) => {
-  // Map blockId to the corresponding DOM element ID in BioPageView
   // The header keeps its fixed id; blocks use block-<id> (see BioPageView)
   const blockElementId = blockId === 'header' ? 'header-block' : `block-${blockId}`;
-  
-  // Find the preview container - it's the element with overflow auto that contains BioPageView
-  // BioPreview uses style with overflow: auto
+
+  // BioPreview is the scroll container (style overflow: auto)
   const previewElements = document.querySelectorAll('[style*="overflow: auto"]');
-  
+
   for (const container of previewElements) {
-    // Find the target block element within this container
     const targetBlock = container.querySelector(`#${CSS.escape(blockElementId)}`) as HTMLElement;
     if (targetBlock) {
-      // Scroll the target block into view with smooth animation
       targetBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
   }
 };
 
-// Expose the method so parent can call it
-defineExpose({
-  scrollToBlock
-});
+defineExpose({ scrollToBlock });
 
 defineProps<{
   previewData: any;
   existingBio: any;
   username: string;
+  activeBlock?: string | null;
 }>();
+
+defineEmits<{ selectBlock: [blockId: string] }>();
 </script>

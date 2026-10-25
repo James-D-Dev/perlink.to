@@ -3,7 +3,17 @@
     "editor": {
       "addBlock": "Thêm khối",
       "unsavedChanges": "Chưa lưu thay đổi",
-      "allSaved": "Đã lưu"
+      "allSaved": "Đã lưu",
+      "hiddenBadge": "Ẩn",
+      "menu": {
+        "more": "Thêm thao tác",
+        "show": "Hiện khối",
+        "hide": "Ẩn khối",
+        "up": "Chuyển lên",
+        "down": "Chuyển xuống",
+        "duplicate": "Nhân bản",
+        "addBelow": "Thêm khối bên dưới"
+      }
     },
     "header": {
       "changePhoto": "Đổi ảnh",

@@ -1,6 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
+  <div :class="standalone ? '' : 'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden'">
     <BioBlockItemHeader
+      v-if="!standalone"
       container
       :is-active="isActive"
       :title="t('theme.panelTitle')"
@@ -18,8 +19,9 @@
     </BioBlockItemHeader>
 
     <div
-      v-if="isActive"
-      class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-5"
+      v-if="isActive || standalone"
+      class="space-y-5"
+      :class="standalone ? '' : 'p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03]'"
     >
       <!-- Mode toggle -->
       <UTabs
@@ -278,9 +280,11 @@ import { useGoogleFonts } from "~/composables/useGoogleFonts";
 const { t } = useI18n();
 
 const props = defineProps<{
-  isActive: boolean;
-  templates: Template[];
-  selectedTemplate: string;
+  /** Shown on its own tab: no collapsible header around it */
+  standalone?: boolean;
+  isActive?: boolean;
+  templates?: Template[];
+  selectedTemplate?: string;
   themeConfig: ThemeConfig;
   avatarUrl?: string;
   title?: string;

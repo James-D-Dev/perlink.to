@@ -22,16 +22,6 @@
           </template>
         </div>
       </template>
-      <template #actions>
-        <UButton
-          variant="ghost"
-          color="neutral"
-          size="xs"
-          icon="i-lucide-trash-2"
-          :aria-label="t('common.delete')"
-          @click.stop="$emit('remove')"
-        />
-      </template>
     </BioBlockItemHeader>
 
     <!-- Social Edit Form -->

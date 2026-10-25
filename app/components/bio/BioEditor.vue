@@ -10,28 +10,41 @@
 
     <!-- Blocks List -->
     <div class="space-y-2">
-      <BioBlockHeader
-        :is-active="activeBlock === 'header'"
-        :title="bioData.title"
-        :bio="bioData.bio"
-        :avatar-url="bioData.avatarUrl"
-        :bio-page-id="bioPageId"
-        @toggle="$emit('toggleBlock', 'header')"
-        @update:title="$emit('updateData', 'title', $event)"
-        @update:bio="$emit('updateData', 'bio', $event)"
-        @update:avatar-url="$emit('updateData', 'avatarUrl', $event)"
-      />
+      <div id="edit-header" class="scroll-mt-24">
+        <BioBlockHeader
+          :is-active="activeBlock === 'header'"
+          :title="bioData.title"
+          :bio="bioData.bio"
+          :avatar-url="bioData.avatarUrl"
+          :bio-page-id="bioPageId"
+          @toggle="$emit('toggleBlock', 'header')"
+          @update:title="$emit('updateData', 'title', $event)"
+          @update:bio="$emit('updateData', 'bio', $event)"
+          @update:avatar-url="$emit('updateData', 'avatarUrl', $event)"
+        />
+      </div>
 
+      <!-- Each editor receives just its own block, so a page can hold several of one type.
+           The wrapper gives the block header its move / duplicate / delete menu.
+           (draggable wants exactly one node in the item slot, so no comments inside it) -->
       <draggable
         v-model="localBlocks"
         item-key="id"
         handle=".drag-handle"
         @end="onDragEnd"
       >
-        <template #item="{ element: block }">
-          <div class="relative group mb-2">
-            <!-- Each editor receives just its own block, so a page can hold several of one type.
-                 (Comments must stay inside this div: draggable needs exactly one child per item) -->
+        <template #item="{ element: block, index }">
+          <BioBlockItem
+            :block="block"
+            :index="index"
+            :count="localBlocks.length"
+            class="mb-2"
+            @move="(dir: -1 | 1) => moveBlock(block.id, dir)"
+            @duplicate="duplicateBlock(block.id)"
+            @remove="onRemoveBlock(block.id)"
+            @toggle-hidden="toggleHidden(block.id)"
+            @add-below="openBlockModal(block.id)"
+          >
             <BioBlockSocial
               v-if="block.name === 'social'"
               :is-active="activeBlock === block.id"
@@ -147,70 +160,19 @@
               @remove="onRemoveBlock(block.id)"
               @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
-          </div>
+          </BioBlockItem>
         </template>
       </draggable>
 
       <!-- Add Block Button -->
       <button
         type="button"
-        class="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-accented py-2.5 text-sm font-medium text-muted transition hover:border-inverted hover:bg-elevated hover:text-highlighted dark:border-white/15 dark:text-neutral-400 dark:hover:border-white/40 dark:hover:text-white"
-        @click="showBlockModal = true"
+        class="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-accented py-3 text-sm font-medium text-muted transition hover:border-inverted hover:bg-elevated hover:text-highlighted dark:border-white/15 dark:text-neutral-400 dark:hover:border-white/40 dark:hover:text-white"
+        @click="openBlockModal()"
       >
         <UIcon name="i-lucide-plus" class="size-4" />
         {{ t('blocks.editor.addBlock') }}
       </button>
-    </div>
-
-    <BioBlockTheme
-      :is-active="activeBlock === 'theme'"
-      :templates="templates"
-      :selected-template="selectedTemplate"
-      :theme-config="bioData.themeConfig"
-      :avatar-url="bioData.avatarUrl"
-      :title="bioData.title"
-      :bio="bioData.bio"
-      :social-links="socialLinks"
-      :bio-page-id="bioPageId"
-      @toggle="$emit('toggleBlock', 'theme')"
-      @select-template="$emit('selectTemplate', $event)"
-      @update-theme="$emit('updateTheme', $event)"
-    />
-
-    <!-- Action bar: stays at the bottom of the screen while editing -->
-    <div class="sticky bottom-0 z-20 -mx-4 border-t border-default bg-default/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-xl lg:border lg:px-3 dark:border-white/10">
-      <div class="flex items-center gap-2">
-        <UButton
-          icon="i-lucide-smartphone"
-          color="neutral"
-          variant="outline"
-          class="lg:hidden"
-          :aria-label="t('common.preview')"
-          @click="$emit('preview')"
-        >
-          <span class="hidden sm:inline">{{ t('common.preview') }}</span>
-        </UButton>
-        <p class="flex min-w-0 flex-1 items-center gap-1.5 truncate px-1 text-xs" :class="dirty ? 'text-highlighted' : 'text-muted'">
-          <span class="size-1.5 shrink-0 rounded-full" :class="dirty ? 'bg-amber-500' : 'bg-emerald-500'" />
-          <span class="truncate">{{ dirty ? t('blocks.editor.unsavedChanges') : t('blocks.editor.allSaved') }}</span>
-        </p>
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-save"
-          :loading="saving"
-          @click="$emit('save')"
-        >
-          {{ t('common.saveDraft') }}
-        </UButton>
-        <UButton
-          icon="i-lucide-globe"
-          :loading="publishing"
-          @click="$emit('publish')"
-        >
-          {{ t('common.publish') }}
-        </UButton>
-      </div>
     </div>
   </div>
 </template>
@@ -221,9 +183,7 @@ import draggable from "vuedraggable";
 import { nanoid } from "nanoid";
 import type {
   BioData,
-  Template,
   BioLink,
-  ThemeConfig,
   SocialLink,
   ImageAlbumLayout,
   BioBlock,
@@ -233,23 +193,14 @@ import type {
 const props = defineProps<{
   activeBlock: string | null;
   bioData: BioData;
-  templates: Template[];
-  selectedTemplate: string;
-  saving: boolean;
-  publishing: boolean;
   bioPageId: string;
-  /** There are edits that haven't been saved */
-  dirty?: boolean;
 }>();
 
 const { t } = useI18n();
 
 const showBlockModal = ref(false);
-
-// All social links on the page, for the header layout picker
-const socialLinks = computed<SocialLink[]>(() =>
-  props.bioData.blocks.flatMap((b) => (b.name === "social" ? b.data?.links ?? [] : [])),
-);
+// Where a block picked from the modal goes: after this block, or at the end
+const insertAfterId = ref<string | null>(null);
 
 // Local copy for drag-and-drop
 const localBlocks = ref<BioBlock[]>([]);
@@ -281,25 +232,30 @@ function onDragEnd() {
   emitBlockUpdate();
 }
 
+function openBlockModal(afterId: string | null = null) {
+  insertAfterId.value = afterId;
+  showBlockModal.value = true;
+}
+
 function selectBlock(blockType: string) {
-  emit("addBlock", blockType);
+  const after = insertAfterId.value;
+  const index = after ? localBlocks.value.findIndex((b) => b.id === after) : -1;
+  emit("addBlock", blockType, index === -1 ? undefined : index + 1);
+  insertAfterId.value = null;
 }
 
 const emit = defineEmits<{
-  addBlock: [blockType: string];
+  addBlock: [blockType: string, atIndex?: number];
   toggleBlock: [blockId: string];
   updateData: [key: keyof BioData, value: any];
   selectLinkImage: [index: number];
-  updateTheme: [patch: Partial<ThemeConfig>];
-  selectTemplate: [id: string];
   updateBlocks: [blocks: BioBlock[]];
-  save: [];
-  publish: [];
-  preview: [];
+  /** A block was added or duplicated and should open */
+  focusBlock: [blockId: string];
 }>();
 
 // Lets the page open the add-block popup (onboarding checklist)
-defineExpose({ openBlockModal: () => (showBlockModal.value = true) });
+defineExpose({ openBlockModal: () => openBlockModal() });
 
 function onSelectImage(index: number) {
   emit("selectLinkImage", index);
@@ -325,6 +281,36 @@ function onRemoveBlock(blockId: string) {
     localBlocks.value.splice(index, 1);
     emitBlockUpdate();
   }
+}
+
+function moveBlock(blockId: string, direction: -1 | 1) {
+  const index = localBlocks.value.findIndex((b) => b.id === blockId);
+  const target = index + direction;
+  if (index === -1 || target < 0 || target >= localBlocks.value.length) return;
+  const [block] = localBlocks.value.splice(index, 1);
+  localBlocks.value.splice(target, 0, block!);
+  emitBlockUpdate();
+}
+
+// A deep copy with fresh ids, placed right under the original
+function duplicateBlock(blockId: string) {
+  const index = localBlocks.value.findIndex((b) => b.id === blockId);
+  if (index === -1) return;
+  const source = localBlocks.value[index]!;
+  const data = JSON.parse(JSON.stringify(source.data ?? {}), (key, value) =>
+    key === "id" && typeof value === "string" ? nanoid(6) : value,
+  );
+  const copy = { ...source, id: nanoid(8), data } as BioBlock;
+  localBlocks.value.splice(index + 1, 0, copy);
+  emitBlockUpdate();
+  emit("focusBlock", copy.id!);
+}
+
+function toggleHidden(blockId: string) {
+  const index = localBlocks.value.findIndex((b) => b.id === blockId);
+  if (index === -1) return;
+  localBlocks.value[index] = { ...localBlocks.value[index]!, hidden: !localBlocks.value[index]!.hidden } as BioBlock;
+  emitBlockUpdate();
 }
 
 // Links keep an explicit order; editors work with the sorted list

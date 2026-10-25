@@ -1,5 +1,5 @@
 <template>
-  <section v-if="visible" class="mt-4 overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+  <section v-if="visible" class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
     <div class="flex items-center gap-3 px-4 py-3">
       <!-- Progress ring -->
       <svg viewBox="0 0 36 36" class="size-9 shrink-0 -rotate-90" aria-hidden="true">
@@ -63,21 +63,25 @@ const { t } = useI18n()
 const storageKey = computed(() => `perlink:onboarding:${props.username}`)
 const dismissed = ref(false)
 const shared = ref(false)
-const collapsed = ref(false)
+// Starts folded to one line; the page itself is what people came to edit
+const collapsed = ref(true)
 
 onMounted(() => {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey.value) || '{}')
     dismissed.value = !!saved.dismissed
     shared.value = !!saved.shared
+    if (typeof saved.collapsed === 'boolean') collapsed.value = saved.collapsed
   } catch {}
 })
 
 function remember() {
   try {
-    localStorage.setItem(storageKey.value, JSON.stringify({ dismissed: dismissed.value, shared: shared.value }))
+    localStorage.setItem(storageKey.value, JSON.stringify({ dismissed: dismissed.value, shared: shared.value, collapsed: collapsed.value }))
   } catch {}
 }
+
+watch(collapsed, remember)
 
 function dismiss() {
   dismissed.value = true

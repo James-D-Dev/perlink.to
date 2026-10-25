@@ -13,15 +13,6 @@
           {{ formatDate(data.birthDate) }}
         </div>
       </template>
-      <template #actions>
-        <UButton
-          variant="ghost"
-          color="neutral"
-          size="xs"
-          icon="i-lucide-trash-2"
-          @click="$emit('remove')"
-        />
-      </template>
     </BioBlockItemHeader>
 
     <!-- Birthday Countdown Edit Form -->

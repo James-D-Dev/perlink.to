@@ -59,7 +59,10 @@
       "closePreview": "Đóng xem trước",
       "tabs": {
         "site": "Trang",
-        "room": "Phòng 3D"
+        "room": "Phòng 3D",
+        "content": "Nội dung",
+        "design": "Giao diện",
+        "settings": "Cài đặt"
       },
       "room": {
         "heading": "Phòng 3D của bạn",
@@ -74,8 +77,8 @@
         "addressText": "Địa chỉ công khai của trang",
         "languageHeading": "Ngôn ngữ trang",
         "languageText": "Ngôn ngữ của các nút và nhãn khách nhìn thấy, như giờ mở cửa và “Đặt ngay”. Nội dung bạn tự viết vẫn giữ nguyên.",
-        "templateHeading": "Mẫu",
-        "templateText": "Thay nội dung trang, giao diện và Phòng 3D bằng một mẫu.",
+        "templateHeading": "Đổi mẫu",
+        "templateText": "Thay toàn bộ nội dung, giao diện và Phòng 3D hiện tại bằng một mẫu khác.",
         "shareHeading": "Nút chia sẻ",
         "shareText": "Hiện nút chia sẻ nổi trên trang của bạn",
         "visibilityHeading": "Chế độ hiển thị",
@@ -99,9 +102,9 @@
       "publishedText": "Trang của bạn đang hiển thị tại perlink.to/{username}",
       "publishFailed": "Không xuất bản được",
       "templateApplied": "Đã áp dụng mẫu {name}",
-      "templateAppliedText": "Sửa nội dung mẫu, rồi lưu hoặc xuất bản.",
+      "templateAppliedText": "Sửa nội dung mẫu theo ý bạn. Trang tự lưu khi bạn chỉnh.",
       "applyTitle": "Áp dụng mẫu \"{name}\"?",
-      "applyText": "Thao tác này sẽ thay các khối, giao diện và Phòng 3D hiện tại. Thay đổi chỉ được lưu khi bạn bấm Lưu.",
+      "applyText": "Toàn bộ khối, giao diện và Phòng 3D hiện tại sẽ bị thay thế. Nội dung bạn đã viết sẽ mất.",
       "applyConfirm": "Áp dụng mẫu",
       "unsaved": {
         "restoreTitle": "Có thay đổi chưa lưu",
@@ -118,7 +121,19 @@
         "discard": "Bỏ thay đổi",
         "discardTitle": "Bỏ các thay đổi chưa xuất bản?",
         "discardText": "Editor sẽ quay về bản mà khách đang thấy."
-      }
+      },
+      "status": {
+        "saving": "Đang lưu…",
+        "saved": "Đã lưu",
+        "savedAt": "Đã lưu lúc {time}",
+        "unsaved": "Chưa lưu",
+        "draftPending": "Đã lưu nháp · khách chưa thấy",
+        "error": "Không lưu được, sẽ thử lại"
+      },
+      "update": "Cập nhật trang",
+      "upToDate": "Khách đang thấy bản mới nhất",
+      "previewHint": "Bấm vào một phần trong điện thoại để sửa phần đó",
+      "templateReopen": "Bắt đầu từ một mẫu có sẵn"
     },
     "username": {
       "heading": "Chọn tên người dùng",

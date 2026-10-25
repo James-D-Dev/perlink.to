@@ -8,16 +8,6 @@
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('links')"
     >
-      <template #actions>
-        <UButton
-          variant="ghost"
-          color="neutral"
-          size="xs"
-          icon="i-lucide-trash-2"
-          :aria-label="t('common.delete')"
-          @click.stop="$emit('removeBlock')"
-        />
-      </template>
     </BioBlockItemHeader>
 
     <!-- Links Edit Form -->

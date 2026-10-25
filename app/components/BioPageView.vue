@@ -36,7 +36,11 @@
       :style="{ paddingTop: headerSpacing, paddingBottom: headerSpacing }"
     >
       <!-- Header -->
-      <div id="header-block">
+      <div
+        id="header-block"
+        :class="{ 'pv-active-self': isPreview && activeBlockId === 'header', 'cursor-pointer': isPreview }"
+        @click.capture="onPreviewClick($event, 'header')"
+      >
         <!-- layout: cover — full-width avatar with gradient overlay -->
       <template v-if="headerLayout === 'cover'">
         <div
@@ -211,7 +215,14 @@
 
       <!-- Blocks, evenly spaced -->
       <div class="flex flex-col px-4" :style="{ gap: blockGap }">
-        <template v-for="block in sortedBlocks" :key="block.id ?? block.name">
+        <!-- display: contents, so the wrapper adds no box of its own to the gap layout -->
+        <div
+          v-for="block in sortedBlocks"
+          :key="block.id ?? block.name"
+          class="contents"
+          :class="{ 'pv-active': isPreview && activeBlockId === block.id, 'pv-clickable': isPreview }"
+          @click.capture="onPreviewClick($event, block.id ?? block.name)"
+        >
           <!-- Social Links Block -->
           <BioSocialLinks
             v-if="block.name === 'social' && socialsOf(block).length > 0"
@@ -380,8 +391,7 @@
             <UIcon name="i-lucide-square-dashed" class="size-4" />
             {{ t('blocks.preview.empty', { name: t(`blocks.picker.items.${pickerKey(block.name)}.label`) }) }}
           </div>
-          <!-- more block -->
-        </template>
+        </div>
       </div>
 
       <!-- Footer -->
@@ -466,7 +476,18 @@ const props = defineProps<{
   username: string;
   themeOverride?: Partial<ThemeConfig>;
   mode: string;
+  /** Editor preview: the block being edited, drawn with an outline */
+  activeBlockId?: string | null;
 }>();
+
+const emit = defineEmits<{ selectBlock: [blockId: string] }>();
+
+// In the editor preview a tap picks the block to edit instead of following links
+function onPreviewClick(event: MouseEvent, blockId: string) {
+  if (props.mode !== "preview") return;
+  event.preventDefault();
+  emit("selectBlock", blockId);
+}
 
 const themeSource = computed(
   () => props.themeOverride ?? props.bioData?.themeConfig,
@@ -692,3 +713,14 @@ onMounted(() => {
   preloadBioFonts();
 });
 </script>
+
+<style>
+/* Editor preview: the block being edited, and a hand cursor over the rest */
+.pv-clickable > * { cursor: pointer; }
+.pv-active > *,
+.pv-active-self {
+  outline: 2px solid #3b82f6;
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+</style>
