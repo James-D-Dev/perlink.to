@@ -6,7 +6,7 @@
         <div class="flex items-center gap-3">
           <button
             type="button"
-            class="group relative size-14 shrink-0 overflow-hidden rounded-full bg-elevated ring-1 ring-default"
+            class="group relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-elevated ring-1 ring-default"
             :aria-label="t('blocks.header.changePhoto')"
             @click="triggerFileInput"
           >
