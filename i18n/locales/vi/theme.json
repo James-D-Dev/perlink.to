@@ -583,7 +583,9 @@
       "zalo": "Nhắn Zalo",
       "whatsapp": "Nhắn WhatsApp",
       "telegram": "Nhắn Telegram",
-      "email": "Email"
+      "email": "Email",
+      "order": "Đơn đặt hàng",
+      "store": "Bấm mua ở sàn"
     }
   }
 }

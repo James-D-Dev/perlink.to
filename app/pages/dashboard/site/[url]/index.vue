@@ -716,6 +716,7 @@ function seededData(name: BioBlock["name"], seed?: BlockSeed): BioBlock["data"] 
   if (!seed?.url) return data;
   if (name === "video") data.url = seed.url;
   if (name === "contact") data.mapUrl = seed.url;
+  if (name === "products") data.items = [{ id: nanoid(6), name: "", url: seed.url }];
   if (name === "social") data.links = [{ id: nanoid(6), provider: seed.provider, url: seed.url, index: 0 }];
   if (name === "links") {
     let title = seed.url;

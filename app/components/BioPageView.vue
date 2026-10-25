@@ -382,6 +382,19 @@
             :button-style="solidButtonStyle"
             :heading-style="headingStyle"
           />
+          <!-- Products Block -->
+          <BioProductsDisplay
+            v-if="block.name === 'products' && block.id && block.data?.items?.some((i) => i.name)"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :block-id="block.id"
+            :username="username"
+            :preview="isPreview"
+            :can-transfer="hasBankAccount"
+            :card-style="panelStyle"
+            :button-style="solidButtonStyle"
+            :heading-style="headingStyle"
+          />
           <!-- In the editor, a block with nothing to show yet still gets a spot -->
           <div
             v-if="isPreview && !hasContent(block)"
@@ -610,6 +623,11 @@ const avatarFallbackStyle = computed(() => ({
 // URL, so a fresh template looks complete; the public page hides them
 const isPreview = computed(() => props.mode === "preview");
 
+// Product orders can be paid by transfer to the page's VietQR account
+const hasBankAccount = computed(() =>
+  (props.bioData?.blocks ?? []).some((b) => b.name === "vietqr" && !b.hidden && !!(b.data as { bankId?: string })?.bankId && !!(b.data as { accountNumber?: string })?.accountNumber),
+);
+
 // Pill corners suit one-line link cards; menus, hours and other tall blocks
 // look clipped with them, so their radius stops at 24px
 const panelStyle = computed(() => ({
@@ -643,6 +661,7 @@ function hasContent(block: BioBlock): boolean {
     case "contact": return !!(d?.address || d?.phone || d?.email || d?.bookingUrl);
     case "video": return !!videoEmbed(d?.url);
     case "testimonials": return !!d?.items?.some((i: any) => i.quote);
+    case "products": return !!d?.items?.some((i: any) => i.name);
     default: return true;
   }
 }

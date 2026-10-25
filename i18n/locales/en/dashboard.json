@@ -409,7 +409,10 @@
       "deleteTitle": "Delete this request?",
       "deleteText": "It will be removed from your inbox.",
       "loadFailed": "Couldn’t load your inbox",
-      "open": "Inbox"
+      "open": "Inbox",
+      "order": "Order {code}",
+      "payCod": "Cash on delivery",
+      "payTransfer": "Bank transfer (check your bank account)"
     },
     "qr": {
       "open": "QR code",

@@ -409,7 +409,10 @@
       "deleteTitle": "Xóa yêu cầu này?",
       "deleteText": "Yêu cầu sẽ bị xóa khỏi Hộp thư.",
       "loadFailed": "Không tải được Hộp thư",
-      "open": "Hộp thư"
+      "open": "Hộp thư",
+      "order": "Đơn {code}",
+      "payCod": "Thanh toán khi nhận hàng",
+      "payTransfer": "Chuyển khoản (kiểm tra tài khoản ngân hàng)"
     },
     "qr": {
       "open": "Mã QR",

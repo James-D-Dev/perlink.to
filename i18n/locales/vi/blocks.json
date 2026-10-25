@@ -246,6 +246,10 @@
         "testimonials": {
           "label": "Đánh giá",
           "description": "Đánh giá và lời khen của khách, kèm số sao."
+        },
+        "products": {
+          "label": "Sản phẩm",
+          "description": "Bán hàng: khách đặt ngay trên trang hoặc mua qua Shopee, TikTok Shop."
         }
       },
       "searchPlaceholder": "Dán link hoặc tìm khối…",
@@ -258,7 +262,8 @@
         "video": "Thêm video này",
         "map": "Thêm địa chỉ từ Google Maps",
         "social": "Thêm {name} vào biểu tượng mạng xã hội",
-        "link": "Thêm thành nút liên kết"
+        "link": "Thêm thành nút liên kết",
+        "product": "Thêm sản phẩm từ {store}"
       }
     },
     "iconPicker": {
@@ -330,6 +335,43 @@
     },
     "preview": {
       "empty": "{name} — chưa có nội dung"
+    },
+    "products": {
+      "title": "Sản phẩm",
+      "itemCount": "{n} sản phẩm | {n} sản phẩm",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Sản phẩm, Cửa hàng, Bộ sưu tập...",
+      "layout": "Bố cục",
+      "layouts": {
+        "grid": "Lưới",
+        "list": "Danh sách"
+      },
+      "ordering": "Cho khách đặt hàng ngay trên trang",
+      "orderingHelp": "Sản phẩm không có link sàn sẽ có nút Đặt hàng. Đơn gửi về Hộp thư.",
+      "askAddress": "Hỏi địa chỉ giao hàng",
+      "payment": "Cách thanh toán",
+      "payments": {
+        "both": "COD và chuyển khoản",
+        "cod": "Chỉ COD (trả khi nhận hàng)",
+        "transfer": "Chỉ chuyển khoản"
+      },
+      "needBank": "Thêm khối VietQR với tài khoản ngân hàng của bạn để khách chuyển khoản (mã QR sẽ tự điền số tiền và mã đơn).",
+      "photo": "Ảnh sản phẩm",
+      "photoFailed": "Không tải được ảnh",
+      "namePlaceholder": "Tên sản phẩm",
+      "price": "Giá bán",
+      "comparePrice": "Giá gốc (nếu giảm giá)",
+      "descriptionPlaceholder": "Mô tả ngắn (không bắt buộc)",
+      "urlPlaceholder": "Link Shopee, TikTok Shop, Lazada... (không bắt buộc)",
+      "urlHelp": "Dán link sàn để khách mua ở đó.",
+      "urlHelpOrder": "Để trống để khách đặt hàng trên trang, hoặc dán link sàn để khách mua ở đó.",
+      "urlHelpStore": "Khách sẽ bấm “Mua” và được chuyển sang {store}.",
+      "website": "trang web của bạn",
+      "tagPlaceholder": "Nhãn, VD: Bán chạy",
+      "soldOut": "Hết hàng",
+      "moveUp": "Lên trên",
+      "moveDown": "Xuống dưới",
+      "add": "Thêm sản phẩm"
     }
   }
 }

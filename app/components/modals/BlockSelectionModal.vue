@@ -149,6 +149,7 @@ const BLOCKS: BlockOption[] = [
   { id: 'hours', key: 'hours', icon: 'i-lucide-clock', group: 'business', keywords: 'opening hours giờ mở cửa lịch' },
   { id: 'contact', key: 'contact', icon: 'i-lucide-map-pin', group: 'business', keywords: 'address phone map email địa chỉ điện thoại bản đồ liên hệ' },
   { id: 'form', key: 'form', icon: 'i-lucide-calendar-check', group: 'business', keywords: 'booking reservation appointment rsvp đặt lịch đặt bàn đặt chỗ form' },
+  { id: 'products', key: 'products', icon: 'i-lucide-shopping-bag', group: 'business', keywords: 'shop store product sell order shopee tiktok shop lazada sản phẩm bán hàng đặt hàng cửa hàng' },
   { id: 'testimonials', key: 'testimonials', icon: 'i-lucide-quote', group: 'business', keywords: 'reviews feedback đánh giá cảm nhận khách hàng' },
   { id: 'vietqr', key: 'vietqr', icon: 'i-lucide-qr-code', group: 'extras', keywords: 'bank transfer payment donate qr chuyển khoản thanh toán ủng hộ ngân hàng' },
   { id: 'birthday-countdown', key: 'birthdayCountdown', icon: 'i-lucide-cake', group: 'extras', keywords: 'countdown birthday event đếm ngược sinh nhật sự kiện' },
@@ -238,6 +239,11 @@ const pasted = computed<{ block: string; seed: BlockSeed; url: string; label: st
     return null
   }
   if (videoEmbed(url)) return { block: 'video', seed: { url }, url, label: t('blocks.picker.paste.video'), icon: 'i-lucide-clapperboard' }
+  // A product on Shopee, TikTok Shop, Lazada... (a TikTok profile stays a social link)
+  const store = productStore(url)
+  if (store && !(store.name === 'TikTok Shop' && !/\/(view\/product|product|shop)\b/.test(url))) {
+    return { block: 'products', seed: { url }, url, label: t('blocks.picker.paste.product', { store: store.name }), icon: store.icon }
+  }
   if (/(^|\.)google\.[a-z.]+$/.test(host) && url.includes('/maps') || host === 'maps.app.goo.gl' || host === 'goo.gl') {
     return { block: 'contact', seed: { url }, url, label: t('blocks.picker.paste.map'), icon: 'i-lucide-map-pin' }
   }

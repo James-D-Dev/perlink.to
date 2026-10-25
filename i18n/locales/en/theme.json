@@ -583,7 +583,9 @@
       "zalo": "Zalo chats",
       "whatsapp": "WhatsApp chats",
       "telegram": "Telegram chats",
-      "email": "Emails"
+      "email": "Emails",
+      "order": "Orders",
+      "store": "Store clicks"
     }
   }
 }

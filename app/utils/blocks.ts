@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid'
 import type { BioBlock, BlockName, FormFields } from '~/types/bio'
 
 /** Block types a page may hold more than once; the rest are one per page */
-export const REPEATABLE_BLOCKS: BlockName[] = ['links', 'text', 'image-album', 'menu', 'video']
+export const REPEATABLE_BLOCKS: BlockName[] = ['links', 'text', 'image-album', 'menu', 'video', 'products']
 
 export function isRepeatableBlock(name: string) {
   return (REPEATABLE_BLOCKS as string[]).includes(name)
@@ -40,6 +40,7 @@ export function emptyBlockData(name: BlockName): BioBlock['data'] {
     case 'form': return { kind: 'booking', fields: { ...FORM_PRESETS.booking } }
     case 'video': return { url: '' }
     case 'testimonials': return { items: [] }
+    case 'products': return { layout: 'grid', items: [], ordering: true, askAddress: true, payment: 'both' }
     default: return {} as BioBlock['data']
   }
 }
@@ -82,6 +83,27 @@ export function videoEmbed(url: string | undefined): VideoEmbed | null {
     return id ? { provider: 'tiktok', src: `https://www.tiktok.com/embed/v2/${id}`, aspect: 9 / 16 } : null
   }
   return null
+}
+
+/** Online stores a product link can point to, for "Buy on Shopee" buttons */
+const STORES: { host: RegExp; name: string; icon: string }[] = [
+  { host: /(^|\.)shopee\.vn$|(^|\.)shp\.ee$|(^|\.)shopee\./, name: 'Shopee', icon: 'i-simple-icons-shopee' },
+  { host: /(^|\.)tiktok\.com$|(^|\.)vt\.tiktok\.com$/, name: 'TikTok Shop', icon: 'i-simple-icons-tiktok' },
+  { host: /(^|\.)lazada\./, name: 'Lazada', icon: 'i-lucide-shopping-bag' },
+  { host: /(^|\.)tiki\.vn$/, name: 'Tiki', icon: 'i-lucide-shopping-bag' },
+  { host: /(^|\.)amazon\./, name: 'Amazon', icon: 'i-simple-icons-amazon' },
+  { host: /(^|\.)etsy\.com$/, name: 'Etsy', icon: 'i-simple-icons-etsy' },
+]
+
+/** The store a product link goes to, or null for any other website */
+export function productStore(url: string | undefined) {
+  if (!url) return null
+  try {
+    const host = new URL(url.trim().startsWith('http') ? url.trim() : `https://${url.trim()}`).hostname.replace(/^www\./, '')
+    return STORES.find(s => s.host.test(host)) ?? null
+  } catch {
+    return null
+  }
 }
 
 /** Count a visitor action (call, directions, chat, booking) for the owner's analytics */

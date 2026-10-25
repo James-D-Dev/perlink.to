@@ -65,10 +65,30 @@
               <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-ink'" />
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                  <p class="font-medium text-ink">{{ item.data.name }}</p>
+                  <p class="flex items-center gap-2 font-medium text-ink">
+                    {{ item.data.name }}
+                    <span v-if="item.data.kind === 'order'" class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
+                      <UIcon name="i-lucide-shopping-bag" class="size-3" />
+                      {{ t('dashboard.inbox.order', { code: item.data.code }) }}
+                    </span>
+                  </p>
                   <p class="text-xs text-ink-muted">{{ formatWhen(item.createdAt) }}</p>
                 </div>
 
+                <!-- Order -->
+                <div v-if="item.data.kind === 'order'" class="mt-2 rounded-lg bg-sand/60 px-3 py-2.5 text-sm">
+                  <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                    <p class="font-medium text-ink">{{ item.data.product }} <span class="text-ink-muted">× {{ item.data.quantity }}</span></p>
+                    <p v-if="item.data.total" class="font-semibold tabular-nums text-ink">{{ item.data.total }}</p>
+                  </div>
+                  <p class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-ink-soft">
+                    <span class="inline-flex items-center gap-1">
+                      <UIcon :name="item.data.payment === 'transfer' ? 'i-lucide-landmark' : 'i-lucide-truck'" class="size-3.5" />
+                      {{ item.data.payment === 'transfer' ? t('dashboard.inbox.payTransfer') : t('dashboard.inbox.payCod') }}
+                    </span>
+                    <span v-if="item.data.address" class="inline-flex items-start gap-1"><UIcon name="i-lucide-map-pin" class="mt-0.5 size-3.5 shrink-0" />{{ item.data.address }}</span>
+                  </p>
+                </div>
                 <!-- Booking details -->
                 <p v-if="item.data.date || item.data.time || item.data.guests" class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-soft">
                   <span v-if="item.data.date" class="inline-flex items-center gap-1"><UIcon name="i-lucide-calendar" class="size-3.5" />{{ formatDate(item.data.date) }}</span>

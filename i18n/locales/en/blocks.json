@@ -246,6 +246,10 @@
         "testimonials": {
           "label": "Testimonials",
           "description": "Reviews and kind words from your customers, with stars."
+        },
+        "products": {
+          "label": "Products",
+          "description": "Sell: take orders on the page or link to Shopee, TikTok Shop and more."
         }
       },
       "searchPlaceholder": "Paste a link or search blocks…",
@@ -258,7 +262,8 @@
         "video": "Add this video",
         "map": "Add this Google Maps place",
         "social": "Add {name} to your social icons",
-        "link": "Add as a link button"
+        "link": "Add as a link button",
+        "product": "Add a product from {store}"
       }
     },
     "iconPicker": {
@@ -330,6 +335,43 @@
     },
     "preview": {
       "empty": "{name} — nothing to show yet"
+    },
+    "products": {
+      "title": "Products",
+      "itemCount": "{n} product | {n} products",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Products, Shop, Collection...",
+      "layout": "Layout",
+      "layouts": {
+        "grid": "Grid",
+        "list": "List"
+      },
+      "ordering": "Take orders on the page",
+      "orderingHelp": "Products without a store link get an Order button. Orders go to your Inbox.",
+      "askAddress": "Ask for a delivery address",
+      "payment": "Payment",
+      "payments": {
+        "both": "Cash on delivery and bank transfer",
+        "cod": "Cash on delivery only",
+        "transfer": "Bank transfer only"
+      },
+      "needBank": "Add a VietQR block with your bank account so customers can pay by transfer (the QR fills in the amount and order code).",
+      "photo": "Product photo",
+      "photoFailed": "Couldn't upload the photo",
+      "namePlaceholder": "Product name",
+      "price": "Price",
+      "comparePrice": "Original price (if on sale)",
+      "descriptionPlaceholder": "Short description (optional)",
+      "urlPlaceholder": "Shopee, TikTok Shop, Lazada... link (optional)",
+      "urlHelp": "Paste a store link so customers buy there.",
+      "urlHelpOrder": "Leave empty to take orders on the page, or paste a store link so customers buy there.",
+      "urlHelpStore": "Customers tap “Buy” and go to {store}.",
+      "website": "your website",
+      "tagPlaceholder": "Label, e.g. Best seller",
+      "soldOut": "Sold out",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "add": "Add product"
     }
   }
 }

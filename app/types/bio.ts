@@ -284,7 +284,8 @@ export type BlockName =
   | 'contact'
   | 'form'
   | 'video'
-  | 'testimonials';
+  | 'testimonials'
+  | 'products';
 
 export interface BaseBlock {
   /** Unique per page, so a page can hold several blocks of one type. Older pages get one on load */
@@ -474,7 +475,43 @@ export interface TestimonialsBlock extends BaseBlock {
   };
 }
 
+// Things for sale: bought on another store (Shopee, TikTok Shop...) or
+// ordered right on the page (orders land in the site's inbox)
+export interface ProductItem {
+  id: string;
+  name: string;
+  /** VND */
+  price?: number;
+  /** Price before a discount, shown struck through */
+  comparePrice?: number;
+  imageUrl?: string;
+  description?: string;
+  /** Short label, e.g. "Best seller" */
+  tag?: string;
+  soldOut?: boolean;
+  /** Buy on another store instead of ordering here */
+  url?: string;
+}
+
+export type ProductPayment = 'cod' | 'transfer' | 'both';
+
+export interface ProductsBlock extends BaseBlock {
+  name: 'products';
+  data: {
+    title?: string;
+    layout: 'grid' | 'list';
+    items: ProductItem[];
+    /** Products without a store link can be ordered on the page */
+    ordering: boolean;
+    /** Ask for a delivery address */
+    askAddress: boolean;
+    /** Transfer uses the bank account of the site's VietQR block */
+    payment: ProductPayment;
+  };
+}
+
 export type BioBlock =
+  | ProductsBlock
   | LinksBlock
   | SocialBlock
   | ImageAlbumBlock

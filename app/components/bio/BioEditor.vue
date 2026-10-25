@@ -147,6 +147,17 @@
               @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
 
+            <BioBlockProducts
+              v-if="block.name === 'products'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              :bio-page-id="bioPageId"
+              :bank-ready="bankReady"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
             <BioBlockTestimonials
               v-if="block.name === 'testimonials'"
               :is-active="activeBlock === block.id"
@@ -241,6 +252,11 @@ function openBlockModal(afterId: string | null = null) {
   insertAfterId.value = afterId;
   showBlockModal.value = true;
 }
+
+// Orders paid by transfer use the bank account of the page's VietQR block
+const bankReady = computed(() =>
+  props.bioData.blocks.some((b) => b.name === "vietqr" && !b.hidden && !!(b.data as { bankId?: string; accountNumber?: string })?.bankId && !!(b.data as { accountNumber?: string })?.accountNumber),
+);
 
 function selectBlock(blockType: string, seed?: BlockSeed) {
   const after = insertAfterId.value;
