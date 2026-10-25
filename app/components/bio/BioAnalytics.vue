@@ -138,6 +138,7 @@ const actionTiles = computed(() => {
     { key: 'form', icon: 'i-lucide-inbox' },
     { key: 'order', icon: 'i-lucide-shopping-bag' },
     { key: 'store', icon: 'i-lucide-store' },
+    { key: 'guestbook', icon: 'i-lucide-book-heart' },
     { key: 'zalo', icon: 'i-lucide-message-circle' },
     { key: 'whatsapp', icon: 'i-simple-icons-whatsapp' },
     { key: 'telegram', icon: 'i-simple-icons-telegram' },

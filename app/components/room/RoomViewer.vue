@@ -1,11 +1,15 @@
 <template>
   <div class="fixed inset-0 bg-slate-900 [touch-action:pan-x_pan-y] max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base">
     <RoomCanvas
+      ref="canvasRef"
       :room="room"
       intro
       :force-mode="forceMode"
+      :guests="guestGifts"
       @hover="onHover"
       @activate="onActivate"
+      @guest-hover="onGuestHover"
+      @guest-activate="openNote"
     />
 
     <!-- Profile (tap to switch to the 2D page) + controls -->
@@ -33,6 +37,17 @@
       </UTooltip>
 
       <div class="pointer-events-auto flex items-center gap-2">
+        <!-- Guestbook -->
+        <button
+          v-if="guestbookOn"
+          type="button"
+          class="flex h-10 items-center gap-1.5 rounded-full bg-white/90 px-3.5 text-sm font-semibold text-gray-900 shadow-lg ring-1 ring-white/30 backdrop-blur-xl transition hover:bg-white"
+          @click="openGuestbook"
+        >
+          <span aria-hidden="true">💌</span>
+          <span class="max-sm:hidden">{{ t('guestbook') }}</span>
+          <span v-if="guestTotal" class="rounded-full bg-gray-900/10 px-1.5 text-xs tabular-nums">{{ guestTotal }}</span>
+        </button>
         <UTooltip v-if="track" :text="musicOn ? t('muteMusic') : t('playMusic', { title: track.title })">
           <button
             type="button"
@@ -101,6 +116,99 @@
       </div>
     </Transition>
 
+    <!-- A gift's message -->
+    <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-150" leave-to-class="opacity-0">
+      <div v-if="note" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" @click.self="note = null">
+        <div class="relative w-full max-w-sm rounded-3xl bg-[#fffaf3] p-6 text-center text-gray-900 shadow-2xl">
+          <div class="text-5xl" aria-hidden="true">{{ GUEST_GIFT_EMOJI[note.gift] }}</div>
+          <p class="mt-4 whitespace-pre-line text-[17px] leading-relaxed">{{ note.message }}</p>
+          <p class="mt-4 text-sm font-semibold text-gray-600">{{ t('guestbookFrom', { name: note.name }) }}</p>
+          <p class="mt-0.5 text-xs text-gray-400">{{ formatWhen(note.createdAt) }}</p>
+          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full text-gray-500 hover:bg-black/5" aria-label="Close" @click="note = null">
+            <UIcon name="i-lucide-x" class="size-4" />
+          </button>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Guestbook panel: write a message, read the others -->
+    <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="translate-y-full sm:translate-y-0 sm:translate-x-full" leave-active-class="transition duration-200 ease-in" leave-to-class="translate-y-full sm:translate-y-0 sm:translate-x-full">
+      <aside
+        v-if="guestbookPanel"
+        class="absolute inset-x-0 bottom-0 z-30 flex max-h-[85dvh] flex-col rounded-t-3xl bg-[#fffaf3] text-gray-900 shadow-2xl sm:inset-y-3 sm:left-auto sm:right-3 sm:max-h-none sm:w-[380px] sm:rounded-3xl"
+        :aria-label="t('guestbookTitle')"
+      >
+        <div class="flex items-start justify-between gap-3 px-5 pb-2 pt-5">
+          <div>
+            <h2 class="text-lg font-semibold">💌 {{ t('guestbookTitle') }}</h2>
+            <p class="mt-0.5 text-sm text-gray-500">{{ t('guestbookIntro') }}</p>
+          </div>
+          <button type="button" class="flex size-8 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-black/5" aria-label="Close" @click="guestbookPanel = false">
+            <UIcon name="i-lucide-x" class="size-4" />
+          </button>
+        </div>
+
+        <div class="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+          <!-- Write -->
+          <form class="space-y-3 rounded-2xl bg-white p-4 ring-1 ring-black/5" @submit.prevent="sendGuestbook">
+            <input v-model="guestForm.website" type="text" name="website" tabindex="-1" autocomplete="off" class="absolute -left-[9999px] h-0 w-0 opacity-0" aria-hidden="true">
+            <div>
+              <p class="mb-1.5 text-xs font-medium text-gray-500">{{ t('guestbookGift') }}</p>
+              <div class="grid grid-cols-6 gap-1.5">
+                <button
+                  v-for="gift in GUEST_GIFTS"
+                  :key="gift"
+                  type="button"
+                  class="flex aspect-square items-center justify-center rounded-xl text-2xl ring-1 transition"
+                  :class="guestForm.gift === gift ? 'bg-amber-50 ring-2 ring-amber-400' : 'ring-black/10 hover:bg-black/[0.03]'"
+                  :title="t(GIFT_LABEL[gift])"
+                  :aria-label="t(GIFT_LABEL[gift])"
+                  :aria-pressed="guestForm.gift === gift"
+                  @click="guestForm.gift = gift"
+                >
+                  {{ GUEST_GIFT_EMOJI[gift] }}
+                </button>
+              </div>
+            </div>
+            <input v-model="guestForm.name" required :maxlength="GUESTBOOK_LIMITS.name" autocomplete="name" :placeholder="t('guestbookName')" class="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-[15px] outline-none focus:border-black/30 focus:ring-2 focus:ring-black/5">
+            <div class="relative">
+              <textarea v-model="guestForm.message" required rows="3" :maxlength="GUESTBOOK_LIMITS.message" :placeholder="t('guestbookMessage')" class="w-full resize-none rounded-xl border border-black/10 bg-white px-3 py-2.5 text-[15px] outline-none focus:border-black/30 focus:ring-2 focus:ring-black/5" />
+              <span class="absolute bottom-2 right-3 text-[11px] tabular-nums text-gray-400">{{ guestForm.message.length }}/{{ GUESTBOOK_LIMITS.message }}</span>
+            </div>
+            <p v-if="guestError" class="text-sm text-red-600">{{ guestError }}</p>
+            <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-full bg-gray-900 px-4 py-3 text-[15px] font-semibold text-white disabled:opacity-50" :disabled="guestSending || !guestForm.name.trim() || !guestForm.message.trim()">
+              <UIcon v-if="guestSending" name="i-lucide-loader-circle" class="size-4 animate-spin" />
+              {{ t('guestbookSend') }} {{ GUEST_GIFT_EMOJI[guestForm.gift] }}
+            </button>
+          </form>
+
+          <!-- Read -->
+          <ul v-if="guestEntries.length" class="mt-4 space-y-2.5">
+            <li v-for="entry in guestEntries" :key="entry.id">
+              <button type="button" class="flex w-full gap-3 rounded-2xl bg-white p-3.5 text-left ring-1 ring-black/5 transition hover:ring-black/15" @click="openNote(entry.id)">
+                <span class="text-2xl" aria-hidden="true">{{ GUEST_GIFT_EMOJI[entry.gift] }}</span>
+                <span class="min-w-0 flex-1">
+                  <span class="flex items-baseline justify-between gap-2">
+                    <span class="truncate text-sm font-semibold">{{ entry.name }}</span>
+                    <span class="shrink-0 text-[11px] text-gray-400">{{ formatWhen(entry.createdAt) }}</span>
+                  </span>
+                  <span class="mt-0.5 line-clamp-3 block whitespace-pre-line text-sm text-gray-600">{{ entry.message }}</span>
+                </span>
+              </button>
+            </li>
+          </ul>
+          <p v-else class="mt-6 text-center text-sm text-gray-500">{{ t('guestbookEmpty') }}</p>
+        </div>
+      </aside>
+    </Transition>
+
+    <!-- Thanks after sending -->
+    <Transition enter-active-class="transition duration-200" enter-from-class="opacity-0 -translate-y-2" leave-active-class="transition duration-200" leave-to-class="opacity-0">
+      <div v-if="guestThanks" class="pointer-events-none absolute inset-x-0 top-20 z-30 flex justify-center px-4">
+        <p class="rounded-full bg-gray-900/90 px-4 py-2 text-sm font-medium text-white shadow-lg">{{ t('guestbookSent') }}</p>
+      </div>
+    </Transition>
+
     <!-- Hover tooltip -->
     <div
       v-if="hovered"
@@ -108,7 +216,7 @@
       :style="{ left: `${hovered.x}px`, top: `${hovered.y}px` }"
     >
       {{ hovered.label }}
-      <UIcon name="i-lucide-arrow-up-right" class="ml-1 inline size-3.5 align-[-2px]" />
+      <UIcon v-if="hovered.external" name="i-lucide-arrow-up-right" class="ml-1 inline size-3.5 align-[-2px]" />
     </div>
 
     <!-- Links in the room (also keyboard / screen-reader friendly) -->
@@ -143,12 +251,15 @@ import type { RoomConfig, RoomObject } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import { getDaylight } from '~/utils/room/daylight'
 import { MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
+import { GUEST_GIFTS, GUEST_GIFT_EMOJI, GUESTBOOK_LIMITS, type GuestbookEntry, type GuestGiftType } from '#shared/guestbook'
 
 // Pinch zooms the camera, never the page
 usePreventPageZoom()
 
 const props = defineProps<{
   room: RoomConfig
+  /** Site address, for the guestbook */
+  username?: string
   title: string
   bio?: string
   avatarUrl?: string
@@ -159,7 +270,7 @@ const emit = defineEmits<{ switch2d: [] }>()
 
 const t = (key: SiteMessageKey, params?: Record<string, string | number>) => siteT(props.lang ?? 'en', key, params)
 
-const hovered = ref<{ label: string; x: number; y: number } | null>(null)
+const hovered = ref<{ label: string; x: number; y: number; external?: boolean } | null>(null)
 
 // Visitors can flip between day and night; until they do, the room follows its own setting
 const forceMode = ref<'day' | 'night' | null>(null)
@@ -244,7 +355,7 @@ function safeUrl(url: string) {
 function onHover(id: string | null, x: number, y: number) {
   const obj = id ? props.room.objects.find(o => o.id === id) : undefined
   if (obj?.image) hovered.value = { label: t('viewPhoto'), x, y }
-  else hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y } : null
+  else hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y, external: true } : null
 }
 
 // Picture frames with a photo open it in a popup; other linked objects open their link
@@ -260,8 +371,92 @@ function onActivate(id: string) {
   if (obj?.link?.url) window.open(safeUrl(obj.link.url), '_blank', 'noopener,noreferrer')
 }
 
+// ---------- Guestbook ----------
+
+const GIFT_LABEL: Record<GuestGiftType, SiteMessageKey> = {
+  flower: 'giftFlower',
+  gift: 'giftGift',
+  cake: 'giftCake',
+  balloon: 'giftBalloon',
+  bear: 'giftBear',
+  star: 'giftStar',
+}
+
+const canvasRef = ref<{ focusGuest: (id: string) => void } | null>(null)
+const guestbookOn = computed(() => !!props.username && props.room.guestbook !== false)
+const guestEntries = ref<GuestbookEntry[]>([])
+const guestTotal = ref(0)
+const guestGifts = computed(() => guestEntries.value.map(e => ({ id: e.id, gift: e.gift })))
+const guestbookPanel = ref(false)
+const guestSending = ref(false)
+const guestError = ref('')
+const guestThanks = ref(false)
+const guestForm = reactive({ name: '', message: '', gift: 'flower' as GuestGiftType, website: '' })
+const note = ref<GuestbookEntry | null>(null)
+
+onMounted(async () => {
+  if (!guestbookOn.value) return
+  try {
+    const res = await $fetch<{ enabled: boolean; total: number; entries: GuestbookEntry[] }>(`/api/bio/${props.username}/guestbook`)
+    guestEntries.value = res.entries
+    guestTotal.value = res.total
+  } catch {
+    // The room works without it
+  }
+})
+
+function openGuestbook() {
+  note.value = null
+  guestbookPanel.value = true
+}
+
+function openNote(id: string) {
+  const entry = guestEntries.value.find(e => e.id === id)
+  if (!entry) return
+  hovered.value = null
+  note.value = entry
+}
+
+async function sendGuestbook() {
+  if (guestSending.value) return
+  guestSending.value = true
+  guestError.value = ''
+  try {
+    const { entry } = await $fetch<{ entry: GuestbookEntry }>(`/api/bio/${props.username}/guestbook`, {
+      method: 'POST',
+      body: { name: guestForm.name, message: guestForm.message, gift: guestForm.gift, website: guestForm.website },
+    })
+    guestEntries.value = [entry, ...guestEntries.value].slice(0, GUESTBOOK_LIMITS.shown)
+    guestTotal.value++
+    guestForm.message = ''
+    guestbookPanel.value = false
+    // Show the new gift landing in front of the room
+    nextTick(() => canvasRef.value?.focusGuest(entry.id))
+    guestThanks.value = true
+    setTimeout(() => (guestThanks.value = false), 3500)
+  } catch (error: any) {
+    guestError.value = error?.statusCode === 429 && error?.data?.statusMessage ? error.data.statusMessage : t('guestbookError')
+  } finally {
+    guestSending.value = false
+  }
+}
+
+function onGuestHover(id: string | null, x: number, y: number) {
+  const entry = id ? guestEntries.value.find(e => e.id === id) : undefined
+  hovered.value = entry ? { label: t('guestbookFrom', { name: entry.name }), x, y } : null
+}
+
+/** Stored as UTC "YYYY-MM-DD HH:MM:SS" */
+function formatWhen(value: string) {
+  const date = new Date(`${value.replace(' ', 'T')}Z`)
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString(props.lang ?? 'en', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') photo.value = null
+  if (event.key !== 'Escape') return
+  photo.value = null
+  note.value = null
+  guestbookPanel.value = false
 }
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))

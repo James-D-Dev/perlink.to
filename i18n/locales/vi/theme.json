@@ -585,7 +585,8 @@
       "telegram": "Nhắn Telegram",
       "email": "Email",
       "order": "Đơn đặt hàng",
-      "store": "Bấm mua ở sàn"
+      "store": "Bấm mua ở sàn",
+      "guestbook": "Lời chúc lưu bút"
     }
   }
 }

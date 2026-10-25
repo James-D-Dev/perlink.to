@@ -412,7 +412,8 @@
       "open": "Hộp thư",
       "order": "Đơn {code}",
       "payCod": "Thanh toán khi nhận hàng",
-      "payTransfer": "Chuyển khoản (kiểm tra tài khoản ngân hàng)"
+      "payTransfer": "Chuyển khoản (kiểm tra tài khoản ngân hàng)",
+      "requestsTab": "Yêu cầu & đơn hàng"
     },
     "qr": {
       "open": "Mã QR",
@@ -646,6 +647,19 @@
       "done": "Đã kết nối Telegram",
       "failed": "Không thực hiện được",
       "section": "Thông báo"
+    },
+    "guestbook": {
+      "tab": "Lưu bút",
+      "intro": "Lời chúc khách để lại trong phòng 3D. Lời chúc bị ẩn sẽ không hiện trong phòng.",
+      "emptyTitle": "Chưa có lời chúc nào",
+      "emptyText": "Khách vào phòng 3D có thể bấm “Lưu bút” để để lại lời chúc và một món quà trước cửa phòng.",
+      "openRoom": "Mở phòng 3D",
+      "hiddenBadge": "Đã ẩn",
+      "show": "Hiện",
+      "hide": "Ẩn",
+      "deleteTitle": "Xoá lời chúc này?",
+      "loadFailed": "Không tải được sổ lưu bút",
+      "saveFailed": "Không lưu được"
     }
   }
 }

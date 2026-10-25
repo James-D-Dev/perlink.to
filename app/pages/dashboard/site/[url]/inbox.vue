@@ -27,7 +27,7 @@
               perlink.to/{{ username }}<template v-if="!loading"> · {{ t('dashboard.inbox.unreadCount', { n: unread }, unread) }}</template>
             </p>
           </div>
-          <div v-if="submissions.length" class="inline-flex rounded-full bg-sand p-0.5">
+          <div v-if="view === 'requests' && submissions.length" class="inline-flex rounded-full bg-sand p-0.5">
             <button
               v-for="option in filters"
               :key="option.value"
@@ -41,10 +41,27 @@
           </div>
         </div>
 
+        <!-- Requests and orders, or the 3D room's guestbook -->
+        <div class="flex gap-1 border-b border-line">
+          <button
+            v-for="tab in views"
+            :key="tab.value"
+            type="button"
+            class="-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 pb-2.5 pt-1 text-sm transition-colors"
+            :class="view === tab.value ? 'border-ink font-medium text-ink' : 'border-transparent text-ink-muted hover:text-ink'"
+            @click="setView(tab.value)"
+          >
+            <UIcon :name="tab.icon" class="size-4" />
+            {{ tab.label }}
+          </button>
+        </div>
+
         <!-- Get new requests on the phone -->
         <TelegramConnect compact />
 
-        <div v-if="loading" class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+        <SiteGuestbook v-if="view === 'guestbook'" :username="username" />
+
+        <div v-else-if="loading" class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
           <div v-for="i in 3" :key="i" class="space-y-2 p-4">
             <USkeleton class="h-4 w-40" />
             <USkeleton class="h-3 w-64" />
@@ -163,6 +180,17 @@ const filters = computed(() => [
   { value: 'all' as const, label: t('dashboard.inbox.all') },
   { value: 'unread' as const, label: t('dashboard.inbox.unread') },
 ])
+// #guestbook opens the guestbook tab (links from Telegram)
+const view = ref<'requests' | 'guestbook'>(route.hash === '#guestbook' ? 'guestbook' : 'requests')
+const views = computed(() => [
+  { value: 'requests' as const, label: t('dashboard.inbox.requestsTab'), icon: 'i-lucide-inbox' },
+  { value: 'guestbook' as const, label: t('dashboard.guestbook.tab'), icon: 'i-lucide-book-heart' },
+])
+function setView(value: 'requests' | 'guestbook') {
+  view.value = value
+  history.replaceState(history.state, '', value === 'guestbook' ? '#guestbook' : location.pathname)
+}
+
 const visible = computed(() => (filter.value === 'unread' ? submissions.value.filter(s => !s.read) : submissions.value))
 
 const dateLocale = computed(() => (locale.value === 'vi' ? 'vi-VN' : 'en-GB'))

@@ -7,6 +7,8 @@ import { daylightAtHour, getDaylight, type DaylightState } from './daylight'
 import { buildLand, createStarSphere, type LandInstance } from './lands'
 import { buildRoomShell, FLOOR_THICKNESS } from './shell'
 import { flameFlicker, flameTime } from './flame'
+import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
+import type { GuestGiftType } from '#shared/guestbook'
 
 export { createFloorTexture } from './shell'
 
@@ -25,6 +27,10 @@ export interface RoomSceneOptions {
   onActivate?: (id: string) => void
   /** Called about once a second with rendering stats (editor FPS readout) */
   onStats?: (stats: RoomSceneStats) => void
+  /** A visitor's guestbook gift was clicked (live page) */
+  onGuestActivate?: (id: string) => void
+  /** The pointer is over a guestbook gift (null when it leaves) */
+  onGuestHover?: (id: string | null, x: number, y: number) => void
   /**
    * Video recording: best quality at a fixed 2x pixel ratio, no input, and
    * no frames of its own; the recorder draws each frame with renderTour()
@@ -73,6 +79,9 @@ const INTRO_DURATION = 3200
 /** Only this many lamps cast real light; the rest just glow (each light costs shading on every surface) */
 const MAX_POINT_LIGHTS = 8
 
+/** Guestbook gifts are drawn a bit larger than life so they read from the default view */
+const GIFT_SCALE = 1.3
+
 const SUN_COLOR = new THREE.Color('#ffeccb')
 const MOON_COLOR = new THREE.Color('#9fb4ff')
 
@@ -92,6 +101,11 @@ export class RoomScene {
   private shell = new THREE.Group()
   private objectsGroup = new THREE.Group()
   private outdoor = new THREE.Group()
+  /** Guestbook gifts on the lawn, newest first */
+  private guestsGroup = new THREE.Group()
+  private guests = new Map<string, { group: THREE.Group; seed: number; bornAt: number }>()
+  private guestOrder: string[] = []
+  private hoveredGuest: string | null = null
   private entries = new Map<string, ObjectEntry>()
   private style?: RoomStyle
   private styleSignature = ''
@@ -232,7 +246,7 @@ export class RoomScene {
       new THREE.SphereGeometry(1, 24, 16),
       new THREE.MeshBasicMaterial({ color: '#e8ecff', fog: false }),
     )
-    this.scene.add(this.sunDisc, this.moonDisc, this.stars.points, this.shell, this.objectsGroup, this.outdoor)
+    this.scene.add(this.sunDisc, this.moonDisc, this.stars.points, this.shell, this.objectsGroup, this.outdoor, this.guestsGroup)
     for (let i = 0; i < MAX_POINT_LIGHTS; i++) {
       const light = new THREE.PointLight('#ffffff', 0, 2, 1.6)
       this.lightPool.push(light)
@@ -317,6 +331,84 @@ export class RoomScene {
     small.getContext('2d')?.drawImage(source, 0, 0, small.width, small.height)
     this.selectionBox.visible = boxWasVisible
     return new Promise<Blob | null>(resolve => small.toBlob(resolve, 'image/webp', 0.82))
+  }
+
+  /**
+   * Guestbook gifts to show, newest first. New ones pop in (animate = true
+   * after the first load); ones no longer listed are removed.
+   */
+  setGuests(list: { id: string; gift: GuestGiftType }[], animate = false) {
+    const keep = new Set(list.map(g => g.id))
+    for (const [id, guest] of this.guests) {
+      if (keep.has(id)) continue
+      this.guestsGroup.remove(guest.group)
+      this.clearGroup(guest.group)
+      this.guests.delete(id)
+    }
+    for (const { id, gift } of list) {
+      if (this.guests.has(id)) continue
+      const seed = [...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
+      const group = buildGuestGift(gift, seed)
+      group.userData.guestId = id
+      group.scale.setScalar(GIFT_SCALE)
+      this.guestsGroup.add(group)
+      this.guests.set(id, { group, seed, bornAt: animate ? performance.now() : 0 })
+    }
+    this.guestOrder = list.map(g => g.id)
+    this.placeGuests()
+    this.markActive()
+  }
+
+  /** Glide the camera to a guestbook gift */
+  focusGuest(id: string) {
+    const guest = this.guests.get(id)
+    if (!guest) return
+    const target = guest.group.position.clone().setY(guest.group.position.y + 0.3)
+    const offset = this.camera.position.clone().sub(this.controls.target).setLength(6)
+    this.cameraGlide = { target, position: target.clone().add(offset) }
+    this.markActive()
+  }
+
+  /** Stand each gift on the ground at its spot (also after the land or room size changes) */
+  private placeGuests() {
+    if (!this.style) return
+    const down = new THREE.Raycaster()
+    const ground = this.land?.ground
+    this.guestOrder.forEach((id, index) => {
+      const guest = this.guests.get(id)
+      if (!guest) return
+      const spot = guestGiftSpot(index, this.style!)
+      let y = -FLOOR_THICKNESS
+      if (ground) {
+        down.set(new THREE.Vector3(spot.x, 30, spot.z), new THREE.Vector3(0, -1, 0))
+        const hit = down.intersectObject(ground, true)[0]
+        if (hit) y = hit.point.y
+      }
+      guest.group.position.set(spot.x, y, spot.z)
+      guest.group.rotation.y = spot.rotation + ((guest.seed % 60) - 30) * 0.01
+    })
+  }
+
+  private updateGuests(now: number, time: number) {
+    for (const guest of this.guests.values()) {
+      animateGuestGift(guest.group, time, guest.seed % 100)
+      if (!guest.bornAt) continue
+      const t = Math.min((now - guest.bornAt) / 700, 1)
+      // Pop in with a small overshoot
+      const scale = t >= 1 ? 1 : 1 + 2.2 * (t - 1) ** 3 + 1.2 * (t - 1) ** 2
+      guest.group.scale.setScalar(Math.max(scale, 0.001) * GIFT_SCALE)
+      if (t >= 1) guest.bornAt = 0
+      else this.markActive()
+    }
+  }
+
+  private pickGuest(clientX: number, clientY: number): string | null {
+    if (!this.guests.size) return null
+    this.setPointer(clientX, clientY)
+    const hit = this.raycaster.intersectObjects(this.guestsGroup.children, true)[0]
+    let obj: THREE.Object3D | null = hit?.object ?? null
+    while (obj && !obj.userData.guestId) obj = obj.parent
+    return (obj?.userData.guestId as string) ?? null
   }
 
   /** Objects or land still loading (a recording waits for them) */
@@ -474,6 +566,7 @@ export class RoomScene {
     this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS, detail: this.quality >= 2 ? 0.55 : 1 })
     this.outdoor.add(this.land.group)
     this.updateRoomFlowers()
+    this.placeGuests()
   }
 
   private lastAttractorCheck = 0
@@ -867,6 +960,13 @@ export class RoomScene {
     }
     // Ignore drags (orbiting or panning)
     if (Math.hypot(e.clientX - this.pointerDown.x, e.clientY - this.pointerDown.y) > 5) return
+    if (!this.options.editable) {
+      const guestId = this.pickGuest(e.clientX, e.clientY)
+      if (guestId) {
+        this.options.onGuestActivate?.(guestId)
+        return
+      }
+    }
     const id = this.pickObject(e.clientX, e.clientY)
     if (this.options.editable) {
       this.select(id)
@@ -896,8 +996,13 @@ export class RoomScene {
     const id = this.pickObject(e.clientX, e.clientY)
     const data = id ? this.entries.get(id)?.data : undefined
     const clickable = !!(data?.link?.url || data?.image)
-    this.renderer.domElement.style.cursor = clickable ? 'pointer' : 'grab'
     const rect = this.renderer.domElement.getBoundingClientRect()
+    const guestId = clickable ? null : this.pickGuest(e.clientX, e.clientY)
+    if (guestId !== this.hoveredGuest || guestId) {
+      this.hoveredGuest = guestId
+      this.options.onGuestHover?.(guestId, e.clientX - rect.left, e.clientY - rect.top)
+    }
+    this.renderer.domElement.style.cursor = clickable || guestId ? 'pointer' : 'grab'
     const nextId = clickable ? id : null
     if (nextId !== this.hoveredId || nextId) {
       this.hoveredId = nextId
@@ -911,6 +1016,10 @@ export class RoomScene {
 
   private handlePointerLeave = () => {
     this.land?.setAttractor?.(null)
+    if (this.hoveredGuest) {
+      this.hoveredGuest = null
+      this.options.onGuestHover?.(null, 0, 0)
+    }
     if (this.hoveredId) {
       this.hoveredId = null
       this.options.onHover?.(null, 0, 0)
@@ -1033,6 +1142,7 @@ export class RoomScene {
     if (this.intro) this.updateIntro(now)
     else if (!this.touring) this.controls.update()
     this.updateObjectEffects(now)
+    this.updateGuests(now, time)
     this.keepSkyAroundCamera()
     this.renderer.render(this.scene, this.camera)
     this.reportStats(now)

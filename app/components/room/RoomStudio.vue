@@ -32,6 +32,17 @@
         <UTooltip :text="previewLabel">
           <UButton :icon="previewIcon" color="neutral" variant="ghost" @click="cyclePreview" />
         </UTooltip>
+        <UTooltip :text="room.guestbook !== false ? t('room.guestbook.on') : t('room.guestbook.off')">
+          <UButton
+            icon="i-lucide-book-heart"
+            color="neutral"
+            :variant="room.guestbook !== false ? 'soft' : 'ghost'"
+            :class="room.guestbook === false && 'opacity-60'"
+            :aria-label="t('room.guestbook.label')"
+            :aria-pressed="room.guestbook !== false"
+            @click="room = { ...room, guestbook: room.guestbook === false }"
+          />
+        </UTooltip>
         <UTooltip v-if="username" :text="t('room.tour.button')">
           <UButton icon="i-lucide-clapperboard" color="neutral" variant="ghost" :aria-label="t('room.tour.button')" @click="tourOpen = true">
             <span class="hidden lg:inline">{{ t('room.tour.buttonShort') }}</span>

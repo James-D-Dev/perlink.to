@@ -80,6 +80,8 @@ export interface RoomConfig {
   objects: RoomObject[];
   music?: RoomMusic;
   land?: LandId;
+  /** Visitors can sign the guestbook and leave gifts; on unless set to false */
+  guestbook?: boolean;
 }
 
 export const DEFAULT_ROOM_STYLE: RoomStyle = {
@@ -125,6 +127,7 @@ export function normalizeRoom(room: Partial<RoomConfig> | null | undefined): Roo
     environment: { ...DEFAULT_ROOM_ENVIRONMENT, ...(room.environment || {}) },
     music: { trackId: room.music?.trackId ?? null, volume: room.music?.volume ?? 0.5, autoplay: room.music?.autoplay ?? false },
     land: room.land ?? 'island',
+    guestbook: room.guestbook !== false,
     objects: room.objects
       .filter(o => o && typeof o.type === 'string' && Array.isArray(o.position))
       .map(o => ({ ...o, rotation: o.rotation ?? 0, scale: o.scale ?? 1 })),

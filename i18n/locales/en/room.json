@@ -303,6 +303,11 @@
       "again": "Record again",
       "madeWith": "Made with Perlink",
       "visit": "Visit my 3D room 👇"
+    },
+    "guestbook": {
+      "label": "Guestbook",
+      "on": "Guestbook on: visitors leave messages and gifts in front of the room. Click to turn off.",
+      "off": "Guestbook off. Click to turn on."
     }
   }
 }

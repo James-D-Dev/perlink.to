@@ -585,7 +585,8 @@
       "telegram": "Telegram chats",
       "email": "Emails",
       "order": "Orders",
-      "store": "Store clicks"
+      "store": "Store clicks",
+      "guestbook": "Guestbook messages"
     }
   }
 }

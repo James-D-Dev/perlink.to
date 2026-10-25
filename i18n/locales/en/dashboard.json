@@ -412,7 +412,8 @@
       "open": "Inbox",
       "order": "Order {code}",
       "payCod": "Cash on delivery",
-      "payTransfer": "Bank transfer (check your bank account)"
+      "payTransfer": "Bank transfer (check your bank account)",
+      "requestsTab": "Requests & orders"
     },
     "qr": {
       "open": "QR code",
@@ -646,6 +647,19 @@
       "done": "Telegram connected",
       "failed": "Something went wrong",
       "section": "Notifications"
+    },
+    "guestbook": {
+      "tab": "Guestbook",
+      "intro": "Messages visitors left in your 3D room. Hidden messages don't show in the room.",
+      "emptyTitle": "No messages yet",
+      "emptyText": "Visitors to your 3D room can press “Guestbook” to leave a message and a gift in front of the room.",
+      "openRoom": "Open 3D room",
+      "hiddenBadge": "Hidden",
+      "show": "Show",
+      "hide": "Hide",
+      "deleteTitle": "Delete this message?",
+      "loadFailed": "Couldn't load the guestbook",
+      "saveFailed": "Couldn't save"
     }
   }
 }

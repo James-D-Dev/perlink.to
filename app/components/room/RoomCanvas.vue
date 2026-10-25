@@ -6,6 +6,7 @@
 import type { RoomConfig, WallSide } from '~/types/room'
 import { RoomScene, type ObjectPatch, type RoomSceneStats } from '~/utils/room/RoomScene'
 import { daylightAtHour, getDaylight } from '~/utils/room/daylight'
+import type { GuestGiftType } from '#shared/guestbook'
 
 const props = withDefaults(defineProps<{
   room: RoomConfig
@@ -19,6 +20,8 @@ const props = withDefaults(defineProps<{
   preview?: boolean
   /** Fly-in opening shot (live page) */
   intro?: boolean
+  /** Guestbook gifts in front of the room, newest first */
+  guests?: { id: string; gift: GuestGiftType }[]
 }>(), {
   editable: false,
   preview: false,
@@ -34,6 +37,8 @@ const emit = defineEmits<{
   hover: [id: string | null, x: number, y: number]
   activate: [id: string]
   stats: [stats: RoomSceneStats]
+  guestActivate: [id: string]
+  guestHover: [id: string | null, x: number, y: number]
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -50,8 +55,11 @@ onMounted(() => {
     onHover: (id, x, y) => emit('hover', id, x, y),
     onActivate: id => emit('activate', id),
     onStats: stats => emit('stats', stats),
+    onGuestActivate: id => emit('guestActivate', id),
+    onGuestHover: (id, x, y) => emit('guestHover', id, x, y),
   })
   scene.setRoom(props.room)
+  if (props.guests) scene.setGuests(props.guests)
   scene.select(props.selectedId)
   applyPreview()
 })
@@ -63,6 +71,8 @@ onBeforeUnmount(() => {
 
 watch(() => props.room, room => scene?.setRoom(room), { deep: true })
 watch(() => props.selectedId, id => scene?.select(id))
+// Gifts added after the room opened pop in
+watch(() => props.guests, guests => scene?.setGuests(guests ?? [], true))
 watch(() => [props.previewHour, props.forceMode], applyPreview)
 
 function applyPreview() {
@@ -88,6 +98,9 @@ defineExpose({
   },
   focusObject(id: string) {
     scene?.focusObject(id)
+  },
+  focusGuest(id: string) {
+    scene?.focusGuest(id)
   },
   getDropTarget(clientX: number, clientY: number, wallMounted: boolean): { position: [number, number, number]; wall?: WallSide } | null {
     return scene?.getDropTarget(clientX, clientY, wallMounted) ?? null

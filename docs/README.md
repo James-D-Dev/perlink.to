@@ -7,6 +7,7 @@ Short notes on how each part works and what has to be set up. Start here.
 | [billing.md](billing.md) | Plans and limits (`shared/plans.ts`), VND prices, VietQR checkout, SePay webhook, 7-day trial | SePay + 4 `NUXT_BILLING_*` secrets |
 | [telegram-notifications.md](telegram-notifications.md) | New orders and requests sent to owners on Telegram | Bot from @BotFather + 3 `NUXT_TELEGRAM_*` secrets, then Superadmin → Settings → Register webhook |
 | [products-and-orders.md](products-and-orders.md) | Products block: store links, ordering on the page, COD / transfer, Inbox | — (transfer needs a VietQR block on the site) |
+| [guestbook.md](guestbook.md) | Visitors leave messages and 3D gifts in front of the room; owner hides or deletes | — |
 | [room-tour-video.md](room-tour-video.md) | Vertical 3D room video for TikTok, made in the browser | — |
 | [reports-and-moderation.md](reports-and-moderation.md) | Report a site, Superadmin takedowns, legal pages layout | — |
 | [custom-domains.md](custom-domains.md) | Owners' own domains through Cloudflare for SaaS | Cloudflare for SaaS + domain-router Worker |

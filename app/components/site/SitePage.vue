@@ -67,6 +67,7 @@
       <ClientOnly v-else-if="bioPage && room && !show2d">
         <LazyRoomViewer
           :room="room"
+          :username="bioPage.username"
           :title="bioPage.title || bioPage.username"
           :bio="bioPage.bio || undefined"
           :avatar-url="bioPage.avatarUrl || undefined"

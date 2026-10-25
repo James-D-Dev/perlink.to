@@ -303,6 +303,11 @@
       "again": "Quay lại",
       "madeWith": "Tạo bằng Perlink",
       "visit": "Ghé phòng 3D của mình 👇"
+    },
+    "guestbook": {
+      "label": "Sổ lưu bút",
+      "on": "Sổ lưu bút đang bật: khách để lại lời chúc và quà trước phòng. Bấm để tắt.",
+      "off": "Sổ lưu bút đang tắt. Bấm để bật."
     }
   }
 }
