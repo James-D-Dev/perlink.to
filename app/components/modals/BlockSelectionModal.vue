@@ -6,7 +6,8 @@
     @update:open="$emit('update:open', $event)"
   >
     <template #body>
-      <div class="flex max-h-[75vh] flex-col">
+      <!-- Fixed height, so the popup doesn't jump while you search or switch category -->
+      <div class="flex h-[min(80vh,600px)] flex-col">
         <!-- One box: search the blocks, or paste a link and we'll pick the block -->
         <div class="border-b border-line p-4 sm:px-5">
           <UInput

@@ -134,7 +134,8 @@ async function goBack() {
     if (!leave) return
     savedSnapshot.value = JSON.stringify(room.value)
   }
-  navigateTo(`/dashboard/site/${username.value}`)
+  // Back to the 3D room section of the site editor
+  navigateTo(`/dashboard/site/${username.value}#room`)
 }
 
 // Warn before closing the tab with unsaved changes

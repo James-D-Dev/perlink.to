@@ -130,13 +130,12 @@
       "applyText": "Toàn bộ khối, giao diện và Phòng 3D hiện tại sẽ bị thay thế. Nội dung bạn đã viết sẽ mất.",
       "applyConfirm": "Áp dụng mẫu",
       "unsaved": {
-        "restoreTitle": "Có thay đổi chưa lưu",
-        "restoreText": "Bạn còn các chỉnh sửa từ lần trước chưa được lưu.",
-        "restoreAction": "Khôi phục",
-        "discardAction": "Bỏ qua",
         "leaveTitle": "Rời đi mà không lưu?",
         "leaveText": "Các thay đổi trên trang này chưa được lưu.",
-        "leaveAction": "Rời đi"
+        "leaveAction": "Rời đi",
+        "restoredTitle": "Đã khôi phục chỉnh sửa chưa lưu",
+        "restoredText": "Chỉnh sửa trên {site} lúc {time} chưa kịp lưu khi bạn rời đi, giờ đã được đưa lại và tự lưu.",
+        "undo": "Hoàn tác"
       },
       "draft": {
         "banner": "Bạn có thay đổi đã lưu nhưng khách chưa thấy. Bấm Xuất bản để cập nhật trang.",

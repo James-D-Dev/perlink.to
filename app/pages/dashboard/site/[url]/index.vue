@@ -534,7 +534,8 @@ const loadUserBioPages = async () => {
 // Handle bio page selection change
 const onBioPageChange = (username: string) => {
   if (username && username !== routeUsername.value) {
-    navigateTo(`/dashboard/site/${username}`);
+    // Same section on the other site
+    navigateTo({ path: `/dashboard/site/${username}`, hash: activeTab.value === "content" ? "" : `#${activeTab.value}` });
   }
 };
 
@@ -543,7 +544,19 @@ const previewOpen = ref(false);
 const qrOpen = ref(false);
 
 type EditorTab = "content" | "header" | "design" | "room" | "settings";
-const activeTab = ref<EditorTab>("content");
+const EDITOR_TABS: EditorTab[] = ["content", "header", "design", "room", "settings"];
+
+// The open section lives in the URL hash (…/site/james#header), so a reload
+// or a shared link lands on the same section
+const tabFromHash = (hash: string) => {
+  const name = hash.replace(/^#\/?/, "") as EditorTab;
+  return EDITOR_TABS.includes(name) ? name : "content";
+};
+const activeTab = ref<EditorTab>(tabFromHash(useRoute().hash));
+watch(activeTab, (tab) => {
+  const hash = tab === "content" ? "" : `#${tab}`;
+  if (location.hash !== hash) history.replaceState(history.state, "", `${location.pathname}${location.search}${hash}`);
+});
 const editorTabs = computed(() => [
   { value: "content", label: t("dashboard.editor.tabs.content"), icon: "i-lucide-layout-list" },
   { value: "header", label: t("dashboard.editor.tabs.header"), icon: "i-lucide-circle-user-round" },
@@ -1004,6 +1017,7 @@ const loadBio = async () => {
     const response = await $fetch(`/api/admin/bio/${routeUsername.value}`);
     if (response.success && response.bioPage) {
       existingBio.value = response.bioPage;
+      loadedUsername.value = response.bioPage.username;
       username.value = response.bioPage.username || "";
       selectedTemplate.value = response.bioPage.templateId || "modern";
 
@@ -1046,7 +1060,7 @@ const loadBio = async () => {
         useSiteSetup().open.value = true;
         navigateTo({ query: { ...route.query, setup: undefined } }, { replace: true });
       }
-      offerDraftRestore();
+      restoreLocalBackup(response.bioPage.draftUpdatedAt || response.bioPage.updatedAt);
     }
   } catch (error: any) {
     console.error("Failed to load bio:", error);
@@ -1094,7 +1108,10 @@ const currentSnapshot = computed(() =>
   }),
 );
 const isDirty = computed(() => savedSnapshot.value !== null && savedSnapshot.value !== currentSnapshot.value);
-const draftKey = computed(() => `perlink:draft:${routeUsername.value}`);
+// Keyed by the site this editor loaded, not the URL: when switching sites the
+// URL changes before this page closes, and its backup must not land on the next site
+const loadedUsername = ref("");
+const draftKey = computed(() => `perlink:draft:${loadedUsername.value}`);
 const saveError = ref(false);
 const lastSavedAt = ref<Date | null>(null);
 
@@ -1122,9 +1139,9 @@ const scheduleAutosave: () => void = useDebounceFn(() => {
 }, 1500);
 
 const backupDraft = useDebounceFn(() => {
-  if (!isDirty.value) return;
+  if (!isDirty.value || !loadedUsername.value) return;
   try {
-    localStorage.setItem(draftKey.value, currentSnapshot.value);
+    localStorage.setItem(draftKey.value, JSON.stringify({ v: 2, savedAt: Date.now(), content: currentSnapshot.value }));
   } catch {}
 }, 1000);
 watch(currentSnapshot, () => {
@@ -1151,35 +1168,40 @@ const publishDisabled = computed(
   () => !!existingBio.value?.isPublished && !existingBio.value?.hasDraft && !isDirty.value && !saving.value,
 );
 
-// Offer to bring back edits that were never saved (tab closed, crash...)
-function offerDraftRestore() {
-  let draft: string | null = null;
+// Edits that never reached the server (tab closed within the autosave delay)
+// come back on their own; older backups are dropped without asking
+function restoreLocalBackup(serverTime: string | null | undefined) {
+  let backup: { v?: number; savedAt?: number; content?: string } | null = null;
   try {
-    draft = localStorage.getItem(draftKey.value);
+    backup = JSON.parse(localStorage.getItem(draftKey.value) || "null");
   } catch {}
-  if (!draft || draft === savedSnapshot.value) return;
+  const forget = () => {
+    try {
+      localStorage.removeItem(draftKey.value);
+    } catch {}
+  };
+  if (!backup || backup.v !== 2 || !backup.content || backup.content === savedSnapshot.value) return forget();
+  const serverAt = serverTime ? Date.parse(serverTime.includes("T") ? serverTime : `${serverTime.replace(" ", "T")}Z`) : 0;
+  if (!backup.savedAt || (serverAt && backup.savedAt <= serverAt)) return forget();
+
+  const serverVersion = savedSnapshot.value;
+  try {
+    Object.assign(bioData, JSON.parse(backup.content));
+  } catch {
+    return forget();
+  }
+  const time = new Date(backup.savedAt).toLocaleTimeString(locale.value === "vi" ? "vi-VN" : "en-GB", { hour: "2-digit", minute: "2-digit" });
   toast.add({
-    title: t("dashboard.editor.unsaved.restoreTitle"),
-    description: t("dashboard.editor.unsaved.restoreText"),
-    duration: 0,
+    title: t("dashboard.editor.unsaved.restoredTitle"),
+    description: t("dashboard.editor.unsaved.restoredText", { site: `perlink.to/${loadedUsername.value}`, time }),
     actions: [
       {
-        label: t("dashboard.editor.unsaved.restoreAction"),
+        label: t("dashboard.editor.unsaved.undo"),
         color: "neutral",
+        variant: "outline",
         onClick: () => {
-          try {
-            Object.assign(bioData, JSON.parse(draft!));
-          } catch {}
-        },
-      },
-      {
-        label: t("dashboard.editor.unsaved.discardAction"),
-        color: "neutral",
-        variant: "ghost",
-        onClick: () => {
-          try {
-            localStorage.removeItem(draftKey.value);
-          } catch {}
+          if (serverVersion) Object.assign(bioData, JSON.parse(serverVersion));
+          forget();
         },
       },
     ],

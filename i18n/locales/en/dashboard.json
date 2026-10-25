@@ -130,13 +130,12 @@
       "applyText": "All current blocks, the theme and the 3D room will be replaced. Text you wrote will be lost.",
       "applyConfirm": "Apply template",
       "unsaved": {
-        "restoreTitle": "Unsaved changes found",
-        "restoreText": "You have edits from a previous session that were never saved.",
-        "restoreAction": "Restore",
-        "discardAction": "Discard",
         "leaveTitle": "Leave without saving?",
         "leaveText": "Your changes to this site haven't been saved yet.",
-        "leaveAction": "Leave"
+        "leaveAction": "Leave",
+        "restoredTitle": "Unsaved edits restored",
+        "restoredText": "Edits to {site} from {time} hadn’t been saved when you left. They’re back and saving now.",
+        "undo": "Undo"
       },
       "draft": {
         "banner": "You have saved changes that visitors can’t see yet. Publish to make them live.",
