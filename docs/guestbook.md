@@ -45,8 +45,22 @@ Owner
 | `server/api/bio/[username]/guestbook.*.ts` | Public read and post |
 | `server/api/admin/bio/[username]/guestbook/*` | Owner hide and delete |
 
+## Gift room templates
+
+Category **Gifts** in the template picker (`GIFT_TEMPLATES` in
+`app/data/pageTemplatesMore.ts`, built by `giftRoom()`):
+
+- **Birthday surprise room** (`gift-birthday`): pink room in the sakura land,
+  framed photos, playful music, countdown and a note.
+- **Love room** (`gift-love`): evening room with neon, framed photos, dreamy
+  music, a love letter and an anniversary countdown.
+
+Both open straight in 3D (`themeConfig.pageMode = '3d'`; `useCreateSite`
+keeps a template's page mode), play music on arrival and have the guestbook
+on. The idea: the organiser makes the room, friends sign it, then the link
+goes to the birthday person or partner, who usually films opening it.
+
 ## Ideas next
 
-- Gift room template for birthdays and couples (owner writes first, shares the link)
 - Seasonal gifts (lantern for Mid-Autumn, lì xì envelope for Tết)
 - Pro: more gift types, owner pins favourite messages

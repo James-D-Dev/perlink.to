@@ -52,7 +52,7 @@ export function useCreateSite() {
           bio: content.bio,
           avatarUrl: content.avatarUrl,
           blocks: content.blocks,
-          themeConfig: { ...content.themeConfig, pageMode: '2d', room: content.room, ...(tempAddress ? { tempAddress: true } : {}) },
+          themeConfig: { ...content.themeConfig, pageMode: content.themeConfig.pageMode ?? '2d', room: content.room, ...(tempAddress ? { tempAddress: true } : {}) },
         },
       })
     } else if (tempAddress) {

@@ -368,6 +368,14 @@
       "charity": {
         "name": "Quỹ từ thiện",
         "description": "Mục tiêu, mã VietQR nhận ủng hộ và báo cáo."
+      },
+      "gift-birthday": {
+        "name": "Phòng sinh nhật bất ngờ",
+        "description": "Phòng 3D đầy lời chúc và quà của bạn bè. Gửi link vào đúng ngày sinh nhật."
+      },
+      "gift-love": {
+        "name": "Phòng tặng người yêu",
+        "description": "Tạo bất ngờ cho người ấy: phòng 3D với ảnh hai bạn, nhạc và một lá thư tình."
       }
     },
     "categories": {
@@ -381,7 +389,8 @@
       "health": "Sức khỏe",
       "shop": "Cửa hàng",
       "education": "Giáo dục",
-      "community": "Cộng đồng"
+      "community": "Cộng đồng",
+      "gifts": "Quà tặng"
     },
     "seo": {
       "heading": "Tìm kiếm & chia sẻ",

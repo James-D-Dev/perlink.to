@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid'
 import type { BioBlock } from '~/types/bio'
-import type { RoomObject } from '~/types/room'
+import type { RoomConfig, RoomObject } from '~/types/room'
 import { DEFAULT_OPENING_DAYS } from '~/types/bio'
 import type { PageTemplate } from './pageTemplates'
 import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, photo, room, social, withIndex } from './templateKit'
@@ -100,7 +100,94 @@ function nightRoom(wall: string, accent: string, label: string, extra: Obj[] = [
   ])
 }
 
+/**
+ * A gift room: opens straight in 3D with music on, framed photos on the
+ * walls and the guestbook on, so friends leave wishes and gifts in front of it
+ */
+function giftRoom(wall: string, floor: string, accent: string, sign: string, photos: string[], mode: 'day' | 'night', trackId: string, extra: Obj[] = []): RoomConfig {
+  const base = room({ wallColor: wall, floorColor: floor, floorMaterial: 'wood', trimColor: '#ffffff' }, [
+    { type: 'neon-sign', position: [0.9, 2.05, -3], rotation: 0, wall: 'back', color: accent, link: { label: sign, url: '' } },
+    { type: 'string-lights', position: [0, 2.65, -3], rotation: 0, wall: 'back', color: '#ffe8a3' },
+    { type: 'string-lights', position: [-3, 2.65, 0], rotation: 0, wall: 'left', color: '#ffe8a3' },
+    ...photos.map((name, i): Obj => ({ type: 'picture-frame', position: i === 0 ? [-1.1, 1.55, -3] : [-3, 1.55, -1.2 + (i - 1) * 1.4], rotation: 0, wall: i === 0 ? 'back' : 'left', color: '#ffffff', image: photo(name) })),
+    { type: 'sofa', position: [0.6, 0, -2.3], rotation: 0, color: accent },
+    { type: 'coffee-table', position: [0.6, 0, -1.1], rotation: 0, color: '#fff7ed' },
+    { type: 'candle', position: [0.45, COFFEE_TABLE_TOP, -1.1], rotation: 0 },
+    { type: 'candle', position: [0.75, COFFEE_TABLE_TOP, -1.05], rotation: 0 },
+    { type: 'floor-lamp', position: [2.4, 0, -2.4], rotation: 0 },
+    { type: 'plant', position: [-2.5, 0, -2.5], rotation: 0 },
+    { type: 'plant', position: [2.5, 0, 1.6], rotation: 0 },
+    { type: 'rug', position: [0.4, 0, -0.4], rotation: 0, color: accent },
+    ...extra,
+  ])
+  return {
+    ...base,
+    land: 'sakura',
+    environment: { ...base.environment, mode },
+    music: { trackId, volume: 0.5, autoplay: true },
+    guestbook: true,
+  }
+}
+
+const GIFT_TEMPLATES: PageTemplate[] = [
+  {
+    id: 'gift-birthday',
+    name: 'Birthday surprise room',
+    category: 'gifts',
+    description: 'A 3D room full of wishes and gifts from friends. Share the link on the big day.',
+    icon: 'i-lucide-gift',
+    preview: { bg: '#FFE4EF', accent: '#E8457A' },
+    build: () => ({
+      title: s('Happy birthday, Linh! 🎂', 'Chúc mừng sinh nhật Linh! 🎂'),
+      bio: s('Your friends filled this room with wishes. Tap 💌 to add yours.', 'Bạn bè đã gửi lời chúc vào căn phòng này. Bấm 💌 để gửi lời chúc của bạn.'),
+      avatarUrl: photo('birthday-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#FFE4EF', text: '#5B1A3A', accent: '#E8457A', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 999, shadow: 'md',
+          nameFont: 'Pacifico, cursive', nameWeight: '400', nameSize: '2.1rem', bodyFont: 'Nunito, sans-serif',
+          header: 'banner-circle', banner: photo('birthday-cover'), link: 'centered', social: 'filled',
+        }),
+        pageMode: '3d',
+      },
+      blocks: withIndex([
+        { name: 'text', data: { title: s('A little note', 'Vài lời gửi bạn'), content: s('Happy birthday! We made you a little room on the internet. Walk around, open the photos, and read what everyone wrote for you. 💛', 'Chúc mừng sinh nhật! Tụi mình làm tặng bạn một căn phòng nhỏ trên mạng. Đi một vòng, xem ảnh và đọc lời chúc mọi người gửi nhé. 💛'), align: 'center', style: 'plain' } },
+        { name: 'birthday-countdown', data: { birthDate: '2027-03-15', theme: 'party', showAge: false, label: s('Birthday in', 'Còn bao lâu đến sinh nhật') } },
+        { name: 'image-album', data: { title: s('Memories', 'Kỷ niệm'), images: album('birthday-1', 'birthday-2'), layout: 'grid' } },
+      ] as Blocks),
+      room: giftRoom('#ffe4ef', '#e8c4a0', '#e8457a', s('Happy birthday!', 'Chúc mừng sinh nhật!'), ['birthday-avatar', 'birthday-1', 'birthday-2'], 'day', 'playful-kids'),
+    }),
+  },
+  {
+    id: 'gift-love',
+    name: 'Love room',
+    category: 'gifts',
+    description: 'Surprise your partner with a 3D room of your photos, music and a love letter.',
+    icon: 'i-lucide-heart',
+    preview: { bg: '#2A1220', accent: '#FF5C8A' },
+    build: () => ({
+      title: s('For you, Minh ❤️', 'Gửi Minh của em ❤️'),
+      bio: s('One year together, and many more to come.', 'Một năm bên nhau, và còn thật nhiều năm nữa.'),
+      avatarUrl: photo('event-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#2A1220', text: '#FFE9F0', accent: '#FF5C8A', onAccent: '#FFFFFF', surface: '#3A1A2C', radius: 16, shadow: 'md',
+          nameFont: 'Cormorant Garamond, serif', nameWeight: '600', nameSize: '2.25rem', bodyFont: 'Nunito, sans-serif',
+          header: 'banner-circle', banner: photo('event-cover'), link: 'centered', social: 'soft',
+        }),
+        pageMode: '3d',
+      },
+      blocks: withIndex([
+        { name: 'text', data: { title: s('A letter for you', 'Thư gửi anh'), content: s('Thank you for every ordinary day that felt special with you. I made this room to keep our favourite moments in one place. Look around, and leave me a message. ❤️', 'Cảm ơn anh vì những ngày bình thường mà ở bên anh lại thành đặc biệt. Em làm căn phòng này để giữ những khoảnh khắc mình thích nhất. Anh đi một vòng xem nhé, rồi để lại cho em một lời nhắn. ❤️'), align: 'center', style: 'plain' } },
+        { name: 'birthday-countdown', data: { birthDate: '2027-02-14', theme: 'elegant', showAge: false, label: s('Our anniversary in', 'Còn bao lâu đến ngày kỷ niệm') } },
+        { name: 'image-album', data: { title: s('Us', 'Chúng mình'), images: album('event-1', 'event-2', 'event-3', 'event-4'), layout: 'grid' } },
+      ] as Blocks),
+      room: giftRoom('#3a1a2c', '#8a5a44', '#ff5c8a', s('Love you', 'Yêu anh'), ['event-avatar', 'event-1', 'event-2'], 'night', 'fairytale-quest'),
+    }),
+  },
+]
+
 export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
+  ...GIFT_TEMPLATES,
   // ─── Beauty ───────────────────────────────────────────────────
   {
     id: 'spa',

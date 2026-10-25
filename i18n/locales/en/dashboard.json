@@ -368,6 +368,14 @@
       "charity": {
         "name": "Fundraiser & charity",
         "description": "Your cause, a bank QR for donations and updates."
+      },
+      "gift-birthday": {
+        "name": "Birthday surprise room",
+        "description": "A 3D room full of wishes and gifts from friends. Share the link on the big day."
+      },
+      "gift-love": {
+        "name": "Love room",
+        "description": "Surprise your partner with a 3D room of your photos, music and a love letter."
       }
     },
     "categories": {
@@ -381,7 +389,8 @@
       "health": "Health & fitness",
       "shop": "Shops",
       "education": "Education",
-      "community": "Community"
+      "community": "Community",
+      "gifts": "Gifts"
     },
     "seo": {
       "heading": "Search & sharing",
