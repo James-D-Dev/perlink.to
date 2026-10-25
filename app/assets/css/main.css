@@ -271,3 +271,11 @@ sheet, 3D room popups) use these classes:
   from { opacity: 1; transform: scale(1); }
   to { opacity: 0; transform: scale(0.94); }
 }
+@keyframes ios-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes ios-slide-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}

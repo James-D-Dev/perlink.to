@@ -63,5 +63,7 @@ All set once in `app/app.config.ts`, so every screen matches:
   with roomy rounded rows, hairline group dividers and a tick on the current
   choice. Tooltips are small dark capsules.
 - **Alerts** are rounder, frosted when neutral, and fade up into place.
-- **Dialogs** spring open (`ios-sheet-in`). Keyframes `ios-*` live in
+- **Dialogs** spring open (`ios-sheet-in`); on phones (< 640px) every `UModal`
+  is a bottom sheet across the screen with a grab handle, sliding up
+  (`ios-slide-up`) and clear of the home indicator. Keyframes `ios-*` live in
   `app/assets/css/main.css`; reduced-motion users get no animation.

@@ -6,7 +6,8 @@
 
       <div class="grid gap-6 sm:grid-cols-[240px_minmax(0,1fr)]">
         <!-- Phone-shaped preview of the video -->
-        <div class="relative mx-auto w-[220px] sm:w-[240px]">
+        <!-- On phones it shrinks with the screen height so the controls stay in view -->
+        <div class="relative mx-auto w-[min(220px,calc((100dvh-420px)*0.5625))] min-w-[150px] sm:w-[240px]">
           <div class="relative aspect-[9/16] overflow-hidden rounded-[28px] bg-black shadow-xl ring-4 ring-black">
             <video v-if="videoUrl" :src="videoUrl" class="size-full object-cover" controls autoplay loop playsinline />
             <canvas v-else ref="frameCanvas" :width="WIDTH" :height="HEIGHT" class="size-full" />

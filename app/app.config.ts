@@ -117,7 +117,8 @@ export default defineAppConfig({
       slots: {
         content: `${liquidGlass} divide-y-0 rounded-[28px]`,
         // Title centred like an iOS sheet, with room for the round close button
-        header: 'justify-center px-14 pt-5 pb-1 min-h-0 sm:px-14 text-center',
+        // A grab handle on top when it's a bottom sheet (phones)
+        header: 'relative justify-center px-14 pt-5 pb-1 min-h-0 sm:px-14 text-center max-sm:pt-6 max-sm:before:absolute max-sm:before:left-1/2 max-sm:before:top-2 max-sm:before:h-1 max-sm:before:w-9 max-sm:before:-translate-x-1/2 max-sm:before:rounded-full max-sm:before:bg-black/15 dark:max-sm:before:bg-white/20',
         title: 'text-[17px] font-semibold tracking-tight',
         description: 'mt-1 text-[13px] text-muted',
         body: 'p-5 sm:p-6',
@@ -127,7 +128,8 @@ export default defineAppConfig({
       variants: {
         fullscreen: {
           false: {
-            content: `w-[calc(100vw-1.5rem)] max-w-lg rounded-[28px] ${liquidGlass}`,
+            // Phones: a bottom sheet across the screen, clear of the home indicator
+            content: `w-[calc(100vw-1.5rem)] max-w-lg rounded-[28px] ${liquidGlass} max-sm:w-full max-sm:max-w-none max-sm:rounded-b-none max-sm:rounded-t-[28px] max-sm:pb-[env(safe-area-inset-bottom)]`,
           },
         },
         overlay: {
@@ -138,10 +140,17 @@ export default defineAppConfig({
         // Springs open like an iOS sheet (keyframes in main.css)
         transition: {
           true: {
-            content: 'data-[state=open]:animate-[ios-sheet-in_420ms_cubic-bezier(0.22,1.25,0.36,1)] data-[state=closed]:animate-[ios-sheet-out_180ms_ease-in]',
+            content: 'data-[state=open]:animate-[ios-sheet-in_420ms_cubic-bezier(0.22,1.25,0.36,1)] data-[state=closed]:animate-[ios-sheet-out_180ms_ease-in] max-sm:data-[state=open]:animate-[ios-slide-up_380ms_cubic-bezier(0.22,1,0.36,1)] max-sm:data-[state=closed]:animate-[ios-slide-down_220ms_ease-in]',
           },
         },
       },
+      compoundVariants: [
+        {
+          scrollable: false,
+          fullscreen: false,
+          class: { content: 'max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:max-h-[92dvh]' },
+        },
+      ],
     },
     // Notification banners: a glass capsule that drops in from the top with a little bounce
     toast: {

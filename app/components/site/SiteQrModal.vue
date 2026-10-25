@@ -1,14 +1,14 @@
 <template>
   <UModal v-model:open="open" :title="t('dashboard.qr.title')" :ui="{ content: 'sm:max-w-[680px]', body: 'p-5 sm:p-7' }">
     <template #body>
-      <div class="grid items-center gap-7 sm:grid-cols-[minmax(0,260px)_minmax(0,1fr)] sm:gap-9">
+      <div class="grid items-center gap-5 sm:grid-cols-[minmax(0,260px)_minmax(0,1fr)] sm:gap-9">
         <!-- The card, floating on a soft stage -->
-        <div class="rounded-[26px] bg-black/[0.04] p-6 dark:bg-white/[0.05]">
+        <div class="rounded-[26px] bg-black/[0.04] p-4 sm:p-6 dark:bg-white/[0.05]">
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <div class="mx-auto w-full max-w-[220px] overflow-hidden rounded-xl shadow-[0_18px_40px_-16px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.06]" v-html="previewSvg" />
+          <div class="mx-auto w-full max-w-[160px] overflow-hidden sm:max-w-[220px] rounded-xl shadow-[0_18px_40px_-16px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.06]" v-html="previewSvg" />
         </div>
 
-        <div class="flex min-w-0 flex-col gap-6">
+        <div class="flex min-w-0 flex-col gap-5 sm:gap-6">
           <!-- What the card says -->
           <div>
             <p class="mb-2.5 text-[13px] font-medium text-muted">{{ t('dashboard.qr.ctaLabel') }}</p>
