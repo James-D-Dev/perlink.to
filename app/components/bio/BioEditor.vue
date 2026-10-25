@@ -185,6 +185,7 @@
 import { ref, computed, watch, nextTick } from "vue";
 import draggable from "vuedraggable";
 import { nanoid } from "nanoid";
+import type { BlockSeed } from "~/components/modals/BlockSelectionModal.vue";
 import type {
   BioData,
   BioLink,
@@ -241,15 +242,15 @@ function openBlockModal(afterId: string | null = null) {
   showBlockModal.value = true;
 }
 
-function selectBlock(blockType: string) {
+function selectBlock(blockType: string, seed?: BlockSeed) {
   const after = insertAfterId.value;
   const index = after ? localBlocks.value.findIndex((b) => b.id === after) : -1;
-  emit("addBlock", blockType, index === -1 ? undefined : index + 1);
+  emit("addBlock", blockType, index === -1 ? undefined : index + 1, seed);
   insertAfterId.value = null;
 }
 
 const emit = defineEmits<{
-  addBlock: [blockType: string, atIndex?: number];
+  addBlock: [blockType: string, atIndex?: number, seed?: BlockSeed];
   toggleBlock: [blockId: string];
   updateData: [key: keyof BioData, value: any];
   selectLinkImage: [index: number];

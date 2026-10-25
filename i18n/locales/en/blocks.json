@@ -247,6 +247,18 @@
           "label": "Testimonials",
           "description": "Reviews and kind words from your customers, with stars."
         }
+      },
+      "searchPlaceholder": "Paste a link or search blocks…",
+      "suggested": "Suggested",
+      "more": "More for your page",
+      "results": "Results",
+      "noResults": "No block matches “{query}”.",
+      "pasteAdd": "Add",
+      "paste": {
+        "video": "Add this video",
+        "map": "Add this Google Maps place",
+        "social": "Add {name} to your social icons",
+        "link": "Add as a link button"
       }
     },
     "iconPicker": {

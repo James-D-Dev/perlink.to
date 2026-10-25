@@ -247,6 +247,18 @@
           "label": "Đánh giá",
           "description": "Đánh giá và lời khen của khách, kèm số sao."
         }
+      },
+      "searchPlaceholder": "Dán link hoặc tìm khối…",
+      "suggested": "Gợi ý",
+      "more": "Thêm cho trang của bạn",
+      "results": "Kết quả",
+      "noResults": "Không có khối nào khớp với “{query}”.",
+      "pasteAdd": "Thêm",
+      "paste": {
+        "video": "Thêm video này",
+        "map": "Thêm địa chỉ từ Google Maps",
+        "social": "Thêm {name} vào biểu tượng mạng xã hội",
+        "link": "Thêm thành nút liên kết"
       }
     },
     "iconPicker": {

@@ -2,8 +2,9 @@
   <div :id="`edit-${block.id}`" class="group/block relative scroll-mt-24">
     <slot />
 
-    <!-- Insert a block right after this one (hover on desktop, the ⋯ menu elsewhere) -->
-    <div class="pointer-events-none absolute -bottom-3 left-0 right-0 z-10 flex h-4 items-center justify-center opacity-0 transition-opacity [@media(hover:hover)]:group-hover/block:opacity-100">
+    <!-- Insert a block right after this one (hover on desktop, the ⋯ menu elsewhere);
+         the last block has the "Add block" button right below instead -->
+    <div v-if="index < count - 1" class="pointer-events-none absolute -bottom-3 left-0 right-0 z-10 flex h-4 items-center justify-center opacity-0 transition-opacity [@media(hover:hover)]:group-hover/block:opacity-100">
       <button
         type="button"
         class="pointer-events-auto flex size-6 items-center justify-center rounded-full border border-default bg-default text-muted shadow-sm transition hover:border-inverted hover:text-highlighted dark:border-white/15"

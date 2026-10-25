@@ -469,6 +469,7 @@ import { PAGE_TEMPLATES } from "~/data/pageTemplates";
 import { localizeTemplateContent } from "~/data/templateCopyVi";
 import { createDefaultRoom, normalizeRoom, type PageMode, type RoomConfig } from "~/types/room";
 import { useBioBlock } from "~/composables/useBioBlock";
+import type { BlockSeed } from "~/components/modals/BlockSelectionModal.vue";
 
 definePageMeta({
   colorMode: 'light',
@@ -614,10 +615,35 @@ const openBlock = (blockId: string) => {
   });
 };
 
-const onAddBlock = (blockType: string, atIndex?: number) => {
+// What a pasted link fills in on a new block
+function seededData(name: BioBlock["name"], seed?: BlockSeed): BioBlock["data"] {
+  const data = emptyBlockData(name) as any;
+  if (!seed?.url) return data;
+  if (name === "video") data.url = seed.url;
+  if (name === "contact") data.mapUrl = seed.url;
+  if (name === "social") data.links = [{ id: nanoid(6), provider: seed.provider, url: seed.url, index: 0 }];
+  if (name === "links") {
+    let title = seed.url;
+    try { title = new URL(seed.url).hostname.replace(/^www\./, ""); } catch {}
+    data.items = [{ id: nanoid(6), title, url: seed.url, icon: "link", order: 0, isActive: true }];
+  }
+  return data;
+}
+
+const onAddBlock = (blockType: string, atIndex?: number, seed?: BlockSeed) => {
   const name = blockType as BioBlock["name"];
-  // One-per-page blocks just open the existing one
   const existing = bioData.blocks.find((b) => b.name === name);
+  // A pasted social link joins the page's social icons
+  if (existing && name === "social" && seed?.url) {
+    const links = [...((existing.data as any).links ?? [])];
+    if (!links.some((l: any) => l.provider === seed.provider)) {
+      links.push({ id: nanoid(6), provider: seed.provider, url: seed.url, index: links.length });
+    }
+    bioData.blocks = bioData.blocks.map((b) => (b.id === existing.id ? ({ ...b, data: { ...(b.data as object), links } } as BioBlock) : b));
+    openBlock(existing.id!);
+    return;
+  }
+  // One-per-page blocks just open the existing one
   if (existing && !isRepeatableBlock(name)) {
     openBlock(existing.id!);
     return;
@@ -627,7 +653,7 @@ const onAddBlock = (blockType: string, atIndex?: number) => {
     name,
     index: 0,
     hidden: false,
-    data: emptyBlockData(name),
+    data: seededData(name, seed),
   } as BioBlock;
   const sorted = [...bioData.blocks].sort((a, b) => (a.index || 0) - (b.index || 0));
   sorted.splice(atIndex ?? sorted.length, 0, newBlock);
