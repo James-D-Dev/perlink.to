@@ -278,15 +278,13 @@
       "product-stand": "Product stand"
     },
     "tour": {
-      "button": "Make a TikTok video",
+      "button": "Make a video to share",
       "buttonShort": "Video",
-      "title": "3D room video for TikTok",
-      "description": "The camera flies through your room and makes a 1080×1920 vertical video with your name and link.",
+      "title": "3D room video",
       "caption": "Title on the video",
-      "time": "Time of day",
       "day": "Day",
       "night": "Night",
-      "length": "Length",
+      "length": "Video length",
       "music": "Room music",
       "watermark": "Videos on the Free plan carry a small “Made with Perlink”.",
       "removeWatermark": "Remove it",

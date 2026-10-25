@@ -278,15 +278,13 @@
       "product-stand": "Kệ sản phẩm"
     },
     "tour": {
-      "button": "Quay video TikTok",
+      "button": "Quay video chia sẻ",
       "buttonShort": "Video",
-      "title": "Video phòng 3D cho TikTok",
-      "description": "Máy quay tự bay quanh phòng, thành video dọc 1080×1920 kèm tên và đường link của bạn.",
+      "title": "Video phòng 3D",
       "caption": "Tiêu đề trên video",
-      "time": "Thời gian",
       "day": "Ban ngày",
       "night": "Ban đêm",
-      "length": "Độ dài",
+      "length": "Độ dài video",
       "music": "Nhạc của phòng",
       "watermark": "Video ở gói Miễn phí có dòng chữ nhỏ “Tạo bằng Perlink”.",
       "removeWatermark": "Bỏ chữ này",

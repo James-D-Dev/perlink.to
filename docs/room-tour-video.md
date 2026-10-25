@@ -5,7 +5,7 @@ sweeps through the room, the site's name and `perlink.to/<name>` stay on top,
 the room's music plays, and the last second and a half is a "visit my 3D room"
 card. Every video posted is an ad that points back to Perlink.
 
-Where: 3D room editor (`/dashboard/room/<name>`) → toolbar **Quay video TikTok**
+Where: 3D room editor (`/dashboard/room/<name>`) → toolbar **Quay video chia sẻ**
 (clapperboard icon).
 
 ## How it works
@@ -31,7 +31,7 @@ RoomTourRecorder.vue (modal)
   ratio, no adaptive downgrade, controls off, and the scene draws no frames of
   its own. The recorder draws each frame, so timing follows the recording.
 - **Before recording:** waits up to 6 s for objects still loading (`scene.loading`).
-- **Options:** title text, day or night, 8/12/15 s, music on or off.
+- **Options:** title text (no label, placeholder only) and three icon buttons at the bottom: day/night, length (8/12/15 s, tap to cycle), music on/off.
 - **Watermark:** a small "Tạo bằng Perlink" in the corner on plans without
   `removeBranding` (Free, Starter). Plus and Pro have none.
 - **Share:** on phones `navigator.share({ files })` opens the share sheet, so

@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :title="t('room.tour.title')" :description="t('room.tour.description')" :ui="{ content: 'sm:max-w-3xl' }">
+  <UModal v-model:open="open" :title="t('room.tour.title')" :ui="{ content: 'sm:max-w-2xl' }">
     <template #body>
       <!-- The scene renders here, out of sight, at 540x960 (1080x1920 pixels) -->
       <div ref="sceneBox" class="pointer-events-none fixed -left-[10000px] top-0 h-[960px] w-[540px]" aria-hidden="true" />
@@ -18,48 +18,7 @@
 
         <div class="flex min-w-0 flex-col gap-5">
           <template v-if="!videoUrl">
-            <UFormField :label="t('room.tour.caption')">
-              <UInput v-model="caption" maxlength="40" class="w-full" :disabled="recording" />
-            </UFormField>
-
-            <UFormField :label="t('room.tour.time')">
-              <div class="grid grid-cols-2 gap-2">
-                <UButton
-                  v-for="option in timeOptions"
-                  :key="option.value"
-                  :icon="option.icon"
-                  :label="option.label"
-                  :color="timeOfDay === option.value ? 'primary' : 'neutral'"
-                  :variant="timeOfDay === option.value ? 'solid' : 'outline'"
-                  :disabled="recording"
-                  block
-                  @click="timeOfDay = option.value"
-                />
-              </div>
-            </UFormField>
-
-            <UFormField :label="t('room.tour.length')">
-              <div class="grid grid-cols-3 gap-2">
-                <UButton
-                  v-for="seconds in [8, 12, 15]"
-                  :key="seconds"
-                  :label="`${seconds}s`"
-                  :color="duration === seconds ? 'primary' : 'neutral'"
-                  :variant="duration === seconds ? 'solid' : 'outline'"
-                  :disabled="recording"
-                  block
-                  @click="duration = seconds"
-                />
-              </div>
-            </UFormField>
-
-            <label v-if="track" class="flex cursor-pointer items-center justify-between gap-3 text-sm">
-              <span>
-                <span class="block font-medium text-highlighted">{{ t('room.tour.music') }}</span>
-                <span class="block text-xs text-muted">{{ track.title }} · {{ track.artist }}</span>
-              </span>
-              <USwitch v-model="withMusic" :disabled="recording" />
-            </label>
+            <UInput v-model="caption" maxlength="40" size="lg" class="w-full" :placeholder="t('room.tour.caption')" :aria-label="t('room.tour.caption')" :disabled="recording" />
 
             <p v-if="watermark" class="flex items-start gap-2 rounded-lg bg-elevated px-3 py-2 text-xs text-muted">
               <UIcon name="i-lucide-crown" class="mt-0.5 size-3.5 shrink-0 text-amber-500" />
@@ -67,15 +26,58 @@
             </p>
             <p v-if="!supported" class="text-sm text-red-500">{{ t('room.tour.unsupported') }}</p>
 
-            <UButton
-              size="lg"
-              icon="i-lucide-clapperboard"
-              :loading="preparing || recording"
-              :disabled="!supported"
-              :label="recording ? t('room.tour.recording', { n: Math.max(1, Math.ceil((1 - progress) * duration)) }) : preparing ? t('room.tour.preparing') : t('room.tour.record')"
-              block
-              @click="record"
-            />
+            <!-- Options as icons, then record -->
+            <div class="mt-auto space-y-3">
+              <div class="flex items-center gap-1.5">
+                <UTooltip :text="timeOfDay === 'day' ? t('room.tour.day') : t('room.tour.night')">
+                  <UButton
+                    :icon="timeOfDay === 'day' ? 'i-lucide-sun' : 'i-lucide-moon'"
+                    color="neutral"
+                    variant="soft"
+                    size="lg"
+                    :aria-label="timeOfDay === 'day' ? t('room.tour.day') : t('room.tour.night')"
+                    :disabled="recording"
+                    @click="timeOfDay = timeOfDay === 'day' ? 'night' : 'day'"
+                  />
+                </UTooltip>
+                <UTooltip :text="t('room.tour.length')">
+                  <UButton
+                    icon="i-lucide-timer"
+                    :label="`${duration}s`"
+                    color="neutral"
+                    variant="soft"
+                    size="lg"
+                    class="tabular-nums"
+                    :aria-label="`${t('room.tour.length')}: ${duration}s`"
+                    :disabled="recording"
+                    @click="cycleDuration"
+                  />
+                </UTooltip>
+                <UTooltip v-if="track" :text="withMusic ? `${track.title} · ${track.artist}` : t('room.tour.music')">
+                  <UButton
+                    :icon="withMusic ? 'i-lucide-music' : 'i-lucide-volume-x'"
+                    color="neutral"
+                    :variant="withMusic ? 'soft' : 'ghost'"
+                    size="lg"
+                    :class="!withMusic && 'opacity-60'"
+                    :aria-label="t('room.tour.music')"
+                    :aria-pressed="withMusic"
+                    :disabled="recording"
+                    @click="withMusic = !withMusic"
+                  />
+                </UTooltip>
+              </div>
+
+              <UButton
+                size="xl"
+                icon="i-lucide-clapperboard"
+                :loading="preparing || recording"
+                :disabled="!supported"
+                :label="recording ? t('room.tour.recording', { n: Math.max(1, Math.ceil((1 - progress) * duration)) }) : preparing ? t('room.tour.preparing') : t('room.tour.record')"
+                block
+                @click="record"
+              />
+            </div>
           </template>
 
           <!-- Done -->
@@ -145,10 +147,10 @@ const watermark = computed(() => !billing.value?.limits.removeBranding)
 const link = computed(() => `perlink.to/${props.username}`)
 const postText = computed(() => t('room.tour.postText', { link: link.value }))
 
-const timeOptions = computed(() => [
-  { value: 'day' as const, label: t('room.tour.day'), icon: 'i-lucide-sun' },
-  { value: 'night' as const, label: t('room.tour.night'), icon: 'i-lucide-moon' },
-])
+const DURATIONS = [8, 12, 15]
+function cycleDuration() {
+  duration.value = DURATIONS[(DURATIONS.indexOf(duration.value) + 1) % DURATIONS.length]!
+}
 
 /** The best format this browser records: MP4 where possible (TikTok, iPhone), else WebM */
 const mimeType = import.meta.client
