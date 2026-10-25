@@ -282,9 +282,9 @@
         <div v-else-if="activeTab === 'room'" class="max-w-3xl space-y-4 pt-4">
           <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
             <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
-              <!-- The picture saved by the room editor; the live scene only until there is one -->
-              <img v-if="existingBio?.roomThumbnailUrl" :src="existingBio.roomThumbnailUrl" :alt="t('dashboard.editor.room.heading')" class="absolute inset-0 size-full object-cover">
-              <LazyRoomCanvas v-else :room="roomModel" preview force-mode="day" class="pointer-events-none" />
+              <!-- The room itself, always in daylight (only drawn while this tab is open;
+                   lists use the saved picture instead) -->
+              <LazyRoomCanvas :room="roomModel" preview force-mode="day" class="pointer-events-none" />
             </div>
             <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
               <div>

@@ -37,10 +37,10 @@
           :collapsed="collapsed"
           :items="navigationLinks"
           orientation="vertical"
-          class="mt-2"
+          class="mt-3"
           :ui="{
-            link: 'rounded-lg py-2 text-ink-soft before:rounded-lg hover:text-ink data-active:text-ink data-active:before:bg-sand',
-            linkLeadingIcon: 'size-[18px] text-ink-muted group-data-active:text-ink',
+            link: 'min-h-11 gap-3 rounded-xl px-3 py-2.5 text-[15px] text-ink-soft before:rounded-xl hover:text-ink hover:before:bg-sand/60 data-active:font-medium data-active:text-ink data-active:before:bg-sand',
+            linkLeadingIcon: 'size-5 text-ink-muted group-data-active:text-ink',
           }"
         />
 
@@ -70,8 +70,8 @@
           orientation="vertical"
           class="mt-auto"
           :ui="{
-            link: 'rounded-lg py-2 text-ink-soft before:rounded-lg hover:text-ink data-active:text-ink data-active:before:bg-sand',
-            linkLeadingIcon: 'size-[18px] text-ink-muted',
+            link: 'min-h-11 gap-3 rounded-xl px-3 py-2.5 text-[15px] text-ink-soft before:rounded-xl hover:text-ink hover:before:bg-sand/60 data-active:font-medium data-active:text-ink data-active:before:bg-sand',
+            linkLeadingIcon: 'size-5 text-ink-muted',
           }"
         />
       </template>
@@ -97,26 +97,31 @@ const user = sessionUser as Ref<User | null>;
 const open = ref(false);
 
 // Focus mode: the site editor gets the room, so the menu folds to icons
-// there and comes back as it was elsewhere
+// there and comes back as it was elsewhere. The sidebar saves its state, so
+// a flag remembers that the fold was ours: a reload outside the editor (or
+// leaving it with a full page load) unfolds it again.
 const route = useRoute();
 const collapsed = ref(false);
 const isEditor = computed(() => /^\/dashboard\/site\/[^/]+\/?$/.test(route.path));
-let collapsedBefore = false;
+const AUTO_FOLD_KEY = "perlink:sidebar-auto-folded";
+
+function fold() {
+  if (collapsed.value) return;
+  collapsed.value = true;
+  try { localStorage.setItem(AUTO_FOLD_KEY, "1"); } catch {}
+}
+function unfold() {
+  let ours = false;
+  try { ours = localStorage.getItem(AUTO_FOLD_KEY) === "1"; localStorage.removeItem(AUTO_FOLD_KEY); } catch {}
+  if (ours) collapsed.value = false;
+}
+
 watch(isEditor, (editing, wasEditing) => {
-  if (editing && !wasEditing) {
-    collapsedBefore = collapsed.value;
-    collapsed.value = true;
-  } else if (!editing && wasEditing) {
-    collapsed.value = collapsedBefore;
-  }
+  if (editing && !wasEditing) fold();
+  else if (!editing && wasEditing) unfold();
 });
-// The sidebar restores its saved state on mount, so fold after that
-onMounted(() => nextTick(() => {
-  if (isEditor.value) {
-    collapsedBefore = collapsed.value;
-    collapsed.value = true;
-  }
-}));
+// The sidebar restores its saved state on mount, so decide after that
+onMounted(() => nextTick(() => (isEditor.value ? fold() : unfold())));
 
 const helpOpen = useHelpCenter();
 const { current: setup } = useSiteSetup();
