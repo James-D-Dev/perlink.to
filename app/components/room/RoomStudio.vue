@@ -32,6 +32,11 @@
         <UTooltip :text="previewLabel">
           <UButton :icon="previewIcon" color="neutral" variant="ghost" @click="cyclePreview" />
         </UTooltip>
+        <UTooltip v-if="username" :text="t('room.tour.button')">
+          <UButton icon="i-lucide-clapperboard" color="neutral" variant="ghost" :aria-label="t('room.tour.button')" @click="tourOpen = true">
+            <span class="hidden lg:inline">{{ t('room.tour.buttonShort') }}</span>
+          </UButton>
+        </UTooltip>
         <UTooltip :text="dirty ? t('room.toolbar.unsaved') : t('room.toolbar.allSaved')">
           <UButton icon="i-lucide-save" :loading="saving" color="neutral" variant="soft" class="relative" @click="emit('save')">
             <span class="hidden sm:inline">{{ t('common.save') }}</span>
@@ -524,6 +529,7 @@
     >
       {{ t('room.hint.firstRun') }}
     </p>
+    <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" />
   </div>
 </template>
 
@@ -546,7 +552,13 @@ defineProps<{
   saving?: boolean
   publishing?: boolean
   dirty?: boolean
+  /** For the room tour video's titles */
+  username?: string
+  siteName?: string
 }>()
+
+// Room tour video for TikTok (RoomTourRecorder)
+const tourOpen = ref(false)
 
 const emit = defineEmits<{
   back: []

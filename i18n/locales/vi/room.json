@@ -274,6 +274,35 @@
       "garden-mushrooms": "Nấm",
       "garden-rocks": "Đá sân vườn",
       "garden-pebble-tray": "Khay sỏi"
+    },
+    "tour": {
+      "button": "Quay video TikTok",
+      "buttonShort": "Video",
+      "title": "Video phòng 3D cho TikTok",
+      "description": "Máy quay tự bay quanh phòng, thành video dọc 1080×1920 kèm tên và đường link của bạn.",
+      "caption": "Tiêu đề trên video",
+      "time": "Thời gian",
+      "day": "Ban ngày",
+      "night": "Ban đêm",
+      "length": "Độ dài",
+      "music": "Nhạc của phòng",
+      "watermark": "Video ở gói Miễn phí có dòng chữ nhỏ “Tạo bằng Perlink”.",
+      "removeWatermark": "Bỏ chữ này",
+      "unsupported": "Trình duyệt này chưa quay được video. Hãy dùng Chrome, Edge hoặc Safari mới.",
+      "record": "Quay video",
+      "preparing": "Đang chuẩn bị…",
+      "recording": "Đang quay… còn {n} giây",
+      "ready": "Video đã sẵn sàng!",
+      "readyText": "Đăng lên TikTok, Reels hay Shorts và gắn link phòng của bạn.",
+      "share": "Chia sẻ (TikTok, Zalo…)",
+      "download": "Tải video",
+      "postCaption": "Nội dung gợi ý",
+      "postText": "Ghé thăm phòng 3D của mình nè ✨ {link}\n#perlink #phong3d #roomtour #aesthetic",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép",
+      "again": "Quay lại",
+      "madeWith": "Tạo bằng Perlink",
+      "visit": "Ghé phòng 3D của mình 👇"
     }
   }
 }

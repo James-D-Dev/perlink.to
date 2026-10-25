@@ -18,6 +18,8 @@
       :saving="saving"
       :publishing="publishing"
       :dirty="dirty"
+      :username="bioPage.username"
+      :site-name="bioPage.title || bioPage.username"
       @back="goBack"
       @save="save()"
       @publish="publish"
@@ -46,7 +48,7 @@ useHead({ title: () => t('room.page.title', { name: username.value }) })
 const loading = ref(true)
 const saving = ref(false)
 const publishing = ref(false)
-const bioPage = ref<{ username: string; themeConfig: Partial<ThemeConfig> } | null>(null)
+const bioPage = ref<{ username: string; title?: string | null; themeConfig: Partial<ThemeConfig> } | null>(null)
 const room = ref<RoomConfig>(createDefaultRoom())
 const savedSnapshot = ref('')
 
@@ -54,7 +56,7 @@ const dirty = computed(() => JSON.stringify(room.value) !== savedSnapshot.value)
 
 async function load() {
   try {
-    const response = await $fetch<{ success: boolean; bioPage: { username: string; themeConfig: Partial<ThemeConfig> } }>(
+    const response = await $fetch<{ success: boolean; bioPage: { username: string; title?: string | null; themeConfig: Partial<ThemeConfig> } }>(
       `/api/admin/bio/${username.value}`,
     )
     bioPage.value = response.bioPage

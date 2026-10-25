@@ -274,6 +274,35 @@
       "garden-mushrooms": "Mushrooms",
       "garden-rocks": "Garden rocks",
       "garden-pebble-tray": "Pebble tray"
+    },
+    "tour": {
+      "button": "Make a TikTok video",
+      "buttonShort": "Video",
+      "title": "3D room video for TikTok",
+      "description": "The camera flies through your room and makes a 1080×1920 vertical video with your name and link.",
+      "caption": "Title on the video",
+      "time": "Time of day",
+      "day": "Day",
+      "night": "Night",
+      "length": "Length",
+      "music": "Room music",
+      "watermark": "Videos on the Free plan carry a small “Made with Perlink”.",
+      "removeWatermark": "Remove it",
+      "unsupported": "This browser can't record video yet. Use a recent Chrome, Edge or Safari.",
+      "record": "Record video",
+      "preparing": "Getting ready…",
+      "recording": "Recording… {n}s left",
+      "ready": "Your video is ready!",
+      "readyText": "Post it on TikTok, Reels or Shorts and add your room's link.",
+      "share": "Share (TikTok, WhatsApp…)",
+      "download": "Download video",
+      "postCaption": "Suggested caption",
+      "postText": "Come visit my 3D room ✨ {link}\n#perlink #3droom #roomtour #aesthetic",
+      "copy": "Copy",
+      "copied": "Copied",
+      "again": "Record again",
+      "madeWith": "Made with Perlink",
+      "visit": "Visit my 3D room 👇"
     }
   }
 }

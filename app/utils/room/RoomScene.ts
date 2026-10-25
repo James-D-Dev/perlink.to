@@ -25,6 +25,11 @@ export interface RoomSceneOptions {
   onActivate?: (id: string) => void
   /** Called about once a second with rendering stats (editor FPS readout) */
   onStats?: (stats: RoomSceneStats) => void
+  /**
+   * Video recording: best quality at a fixed 2x pixel ratio, no input, and
+   * no frames of its own; the recorder draws each frame with renderTour()
+   */
+  capture?: boolean
 }
 
 export interface RoomSceneStats {
@@ -130,6 +135,8 @@ export class RoomScene {
   private cameraGlide: { target: THREE.Vector3; position: THREE.Vector3 } | null = null
   /** Fly-in opening shot (live page); start is set on the first frame */
   private intro: { start: number | null } | null = null
+  /** The camera follows renderTour() instead of the orbit controls */
+  private touring = false
   /** Daylight actually shown; eases toward the target for smooth day/night switches */
   private shownDaylight: number | null = null
   private skyColor = new THREE.Color()
@@ -249,12 +256,14 @@ export class RoomScene {
     // Phones, low-memory devices and previews start at a lighter quality level
     const coarse = window.matchMedia?.('(pointer: coarse)').matches
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
-    this.quality = options.preview ? 3 : coarse || memory < 4 ? 2 : 0
+    this.quality = options.capture ? 0 : options.preview ? 3 : coarse || memory < 4 ? 2 : 0
+    if (options.capture) this.controls.enabled = false
     this.applyQuality()
 
     // Stop rendering while the canvas is scrolled out of view
     this.visibilityObserver = new IntersectionObserver(([entry]) => {
-      this.onScreen = !!entry?.isIntersecting
+      // A recording renders off-screen
+      this.onScreen = !!entry?.isIntersecting || !!options.capture
       if (this.onScreen) this.markActive()
     })
     this.visibilityObserver.observe(container)
@@ -308,6 +317,34 @@ export class RoomScene {
     small.getContext('2d')?.drawImage(source, 0, 0, small.width, small.height)
     this.selectionBox.visible = boxWasVisible
     return new Promise<Blob | null>(resolve => small.toBlob(resolve, 'image/webp', 0.82))
+  }
+
+  /** Objects or land still loading (a recording waits for them) */
+  get loading() {
+    return this.loadingMarkers.size > 0
+  }
+
+  /**
+   * One frame of the room tour, progress 0..1: the camera sweeps across the
+   * open side of the room while moving in, then rises and pulls back to show
+   * the land. Returns the canvas with the frame on it, to copy right away.
+   */
+  renderTour(progress: number): HTMLCanvasElement {
+    this.touring = true
+    const p = THREE.MathUtils.clamp(progress, 0, 1)
+    const ease = (x: number) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
+    const size = Math.max(this.style?.width ?? 6, this.style?.depth ?? 6)
+    const height = this.style?.height ?? 3.2
+    const sweep = ease(Math.min(p / 0.78, 1))
+    const reveal = ease(Math.max((p - 0.78) / 0.22, 0))
+    const azimuth = THREE.MathUtils.lerp(0.18, Math.PI / 2 - 0.18, sweep)
+    const distance = Math.min(THREE.MathUtils.lerp(THREE.MathUtils.lerp(3.1, 2.15, sweep), 3.9, reveal) * size, MAX_ZOOM_DISTANCE - 1)
+    const polar = THREE.MathUtils.lerp(THREE.MathUtils.lerp(1.12, 1.0, sweep), 0.82, reveal)
+    this.controls.target.set(0, height * 0.32, 0)
+    this.camera.position.setFromSphericalCoords(distance, polar, azimuth).add(this.controls.target)
+    this.camera.lookAt(this.controls.target)
+    this.renderFrame(performance.now())
+    return this.renderer.domElement
   }
 
   select(id: string | null) {
@@ -931,7 +968,8 @@ export class RoomScene {
 
   private applyQuality() {
     const level = QUALITY_LEVELS[this.quality]!
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, level.pixelRatio))
+    // A recording is always full resolution (1080x1920 from a 540x960 box)
+    this.renderer.setPixelRatio(this.options.capture ? 2 : Math.min(window.devicePixelRatio, level.pixelRatio))
     this.renderer.shadowMap.enabled = level.shadows
     if (this.sun.shadow.mapSize.x !== level.shadowSize) {
       this.sun.shadow.mapSize.set(level.shadowSize, level.shadowSize)
@@ -947,7 +985,7 @@ export class RoomScene {
    */
   private trackPerformance(interval: number, target: number) {
     // Skip the first seconds: models and shaders loading cause hitches that aren't representative
-    if (this.quality >= QUALITY_LEVELS.length - 1 || performance.now() - this.startedAt < 5000) return
+    if (this.options.capture || this.quality >= QUALITY_LEVELS.length - 1 || performance.now() - this.startedAt < 5000) return
     this.frameRatios.push(interval / target)
     if (this.frameRatios.length < 120) return
     const sorted = [...this.frameRatios].sort((a, b) => a - b)
@@ -962,7 +1000,8 @@ export class RoomScene {
   private animate = (now: number = performance.now()) => {
     if (this.disposed) return
     this.frame = requestAnimationFrame(this.animate)
-    if (!this.onScreen) return
+    // A recording draws its own frames
+    if (!this.onScreen || this.options.capture) return
     // 60 fps while interacting, 30 fps for ambient motion, 15 fps for previews
     const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active || !!this.intro || this.loadingMarkers.size > 0
     const fps = this.options.preview ? 15 : active ? 60 : 30
@@ -992,7 +1031,7 @@ export class RoomScene {
       if (this.controls.target.distanceTo(this.cameraGlide.target) < 0.01) this.cameraGlide = null
     }
     if (this.intro) this.updateIntro(now)
-    else this.controls.update()
+    else if (!this.touring) this.controls.update()
     this.updateObjectEffects(now)
     this.keepSkyAroundCamera()
     this.renderer.render(this.scene, this.camera)
