@@ -1,55 +1,66 @@
 <template>
-  <UModal
-    v-model:open="open"
-    :title="t('dashboard.qr.title')"
-    :description="t('dashboard.qr.description')"
-    :ui="{ content: 'sm:max-w-3xl' }"
-  >
+  <UModal v-model:open="open" :title="t('dashboard.qr.title')" :ui="{ content: 'sm:max-w-[680px]', body: 'p-5 sm:p-7' }">
     <template #body>
-      <div class="grid gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        <!-- Card preview -->
-        <div class="mx-auto w-full max-w-[280px] overflow-hidden rounded-lg shadow-md ring-1 ring-default " v-html="previewSvg" />
+      <div class="grid items-center gap-7 sm:grid-cols-[minmax(0,260px)_minmax(0,1fr)] sm:gap-9">
+        <!-- The card, floating on a soft stage -->
+        <div class="rounded-[26px] bg-black/[0.04] p-6 dark:bg-white/[0.05]">
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div class="mx-auto w-full max-w-[220px] overflow-hidden rounded-xl shadow-[0_18px_40px_-16px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.06]" v-html="previewSvg" />
+        </div>
 
-        <div class="space-y-4">
-          <UFormField :label="t('dashboard.qr.ctaLabel')">
-            <div class="mb-2 flex flex-wrap gap-1.5">
-              <UButton
+        <div class="flex min-w-0 flex-col gap-6">
+          <!-- What the card says -->
+          <div>
+            <p class="mb-2.5 text-[13px] font-medium text-muted">{{ t('dashboard.qr.ctaLabel') }}</p>
+            <div class="flex flex-wrap gap-2">
+              <button
                 v-for="preset in ctaPresets"
                 :key="preset"
-                size="xs"
-                :color="cta === preset ? 'primary' : 'neutral'"
-                :variant="cta === preset ? 'solid' : 'outline'"
-                @click="cta = preset"
+                type="button"
+                class="chip"
+                :class="!customCta && cta === preset && 'chip-on'"
+                @click="pickCta(preset)"
               >
                 {{ preset }}
-              </UButton>
-            </div>
-            <UInput v-model="cta" maxlength="40" class="w-full" />
-          </UFormField>
-
-          <UFormField :label="t('dashboard.qr.styleLabel')">
-            <div class="flex gap-2">
-              <button
-                v-for="option in styles"
-                :key="option.value"
-                type="button"
-                class="flex flex-1 flex-col items-center gap-1.5 rounded-lg border p-2 text-xs transition"
-                :class="style === option.value ? 'border-inverted ring-1 ring-inverted text-highlighted' : 'border-default text-muted hover:border-accented'"
-                @click="style = option.value"
-              >
-                <span class="h-6 w-full rounded" :style="{ background: option.colors.background, boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.08)' }" />
-                {{ option.label }}
+              </button>
+              <button type="button" class="chip" :class="customCta && 'chip-on'" @click="startCustomCta">
+                <UIcon name="i-lucide-pencil" class="size-3.5" />
+                {{ t('dashboard.qr.custom') }}
               </button>
             </div>
-          </UFormField>
-
-          <p class="text-xs text-muted">{{ t('dashboard.qr.trackingNote') }}</p>
-
-          <div class="flex flex-wrap gap-2 pt-1">
-            <UButton icon="i-lucide-printer" :label="t('dashboard.qr.print')" @click="print" />
-            <UButton icon="i-lucide-image-down" color="neutral" variant="outline" :label="t('dashboard.qr.downloadPng')" :loading="exporting" @click="downloadPng" />
-            <UButton icon="i-lucide-file-down" color="neutral" variant="ghost" :label="t('dashboard.qr.downloadSvg')" @click="downloadSvg" />
+            <UInput v-if="customCta" ref="ctaInput" v-model="cta" maxlength="40" class="mt-2.5 w-full" :placeholder="t('dashboard.qr.customPlaceholder')" />
           </div>
+
+          <!-- Card colour -->
+          <div>
+            <p class="mb-2.5 text-[13px] font-medium text-muted">{{ t('dashboard.qr.styleLabel') }}</p>
+            <div class="flex items-center gap-3">
+              <UTooltip v-for="option in styles" :key="option.value" :text="option.label">
+                <button
+                  type="button"
+                  class="size-9 rounded-full ring-offset-2 ring-offset-transparent transition-[box-shadow,transform] active:scale-95"
+                  :class="style === option.value ? 'ring-2 ring-[var(--ui-text-highlighted)]' : 'ring-1 ring-black/10 dark:ring-white/15'"
+                  :style="{ background: option.colors.background }"
+                  :aria-label="option.label"
+                  :aria-pressed="style === option.value"
+                  @click="style = option.value"
+                />
+              </UTooltip>
+            </div>
+          </div>
+
+          <!-- Print or save -->
+          <div class="flex gap-2">
+            <UButton icon="i-lucide-printer" size="lg" class="flex-1 justify-center" :label="t('dashboard.qr.print')" @click="print" />
+            <UDropdownMenu :items="downloadItems" :content="{ align: 'end' }">
+              <UButton icon="i-lucide-download" size="lg" color="neutral" variant="outline" :loading="exporting" :label="t('dashboard.qr.download')" />
+            </UDropdownMenu>
+          </div>
+
+          <p class="flex items-center gap-1.5 text-xs text-muted">
+            <UIcon name="i-lucide-chart-column" class="size-3.5 shrink-0" />
+            {{ t('dashboard.qr.trackingNote') }}
+          </p>
         </div>
       </div>
     </template>
@@ -57,12 +68,14 @@
 </template>
 
 <script setup lang="ts">
-import type { ThemeConfig } from '~/types/bio'
+import type { BioBlock, ThemeConfig } from '~/types/bio'
 
 const props = defineProps<{
   username: string
   title: string
   themeConfig: ThemeConfig
+  /** The page's blocks, to suggest a message that fits it (menu, shop, booking) */
+  blocks?: BioBlock[]
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
@@ -71,9 +84,34 @@ const { t } = useI18n()
 
 // Visitors read the card, so its words follow the site language
 const siteLang = computed(() => normalizeSiteLanguage(props.themeConfig.language))
-const ctaPresets = computed(() => (['qrMenu', 'qrBook', 'qrScan'] as const).map(key => siteT(siteLang.value, key)))
+// General messages first, then ones that fit what the page offers
+const ctaPresets = computed(() => {
+  const has = (name: string) => (props.blocks ?? []).some(b => b.name === name && !b.hidden)
+  const keys: SiteMessageKey[] = ['qrScan', 'qrConnect']
+  if (has('products')) keys.push('qrShop')
+  if (has('menu')) keys.push('qrMenu')
+  if (has('form')) keys.push('qrBook')
+  return keys.map(key => siteT(siteLang.value, key))
+})
 const cta = ref('')
 watch(ctaPresets, presets => (cta.value = presets[0] ?? ''), { immediate: true })
+
+// Own words: a field appears under the choices
+const customCta = ref(false)
+const ctaInput = ref<{ inputRef?: HTMLInputElement } | null>(null)
+function pickCta(preset: string) {
+  customCta.value = false
+  cta.value = preset
+}
+function startCustomCta() {
+  customCta.value = true
+  nextTick(() => ctaInput.value?.inputRef?.select())
+}
+
+const downloadItems = computed(() => [[
+  { label: t('dashboard.qr.downloadPng'), description: t('dashboard.qr.pngHint'), icon: 'i-lucide-image', onSelect: () => downloadPng() },
+  { label: t('dashboard.qr.downloadSvg'), description: t('dashboard.qr.svgHint'), icon: 'i-lucide-file-code', onSelect: () => downloadSvg() },
+]])
 
 // Readable text on the site's own colour
 function isDark(hex: string) {
@@ -153,3 +191,32 @@ function print() {
   setTimeout(() => frame.remove(), 1000)
 }
 </script>
+
+<style scoped>
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 2.25rem;
+  padding: 0 0.9rem;
+  border-radius: 9999px;
+  font-size: 14px;
+  background: rgb(0 0 0 / 0.045);
+  color: var(--ui-text-toned);
+  transition: background-color 0.15s, color 0.15s, transform 0.15s;
+}
+.chip:hover {
+  background: rgb(0 0 0 / 0.07);
+}
+.chip:active {
+  transform: scale(0.97);
+}
+.chip-on,
+.chip-on:hover {
+  background: var(--ui-bg-inverted);
+  color: var(--ui-text-inverted);
+}
+:global(.dark) .chip {
+  background: rgb(255 255 255 / 0.07);
+}
+</style>

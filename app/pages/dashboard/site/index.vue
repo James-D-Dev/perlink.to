@@ -184,6 +184,7 @@
         :username="qrSite.username"
         :title="qrSite.title"
         :theme-config="qrSite.themeConfig"
+        :blocks="qrSite.blocks"
         @update:open="(v: boolean) => { if (!v) qrSite = null }"
       />
     </template>

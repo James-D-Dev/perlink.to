@@ -64,6 +64,8 @@ const en = {
   qrScan: 'Scan to visit',
   qrMenu: 'Scan for our menu',
   qrBook: 'Scan to book',
+  qrConnect: 'Scan to connect',
+  qrShop: 'Scan to shop',
   soldOut: 'Sold out',
   temporarilyClosed: 'Temporarily closed',
   closedUntil: 'Closed until {date}',
@@ -170,9 +172,11 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     formPreview: 'Form hoạt động trên trang đã xuất bản.',
     formBook: 'Gửi yêu cầu đặt chỗ',
 
-    qrScan: 'Quét để ghé trang',
+    qrScan: 'Quét để xem trang',
     qrMenu: 'Quét để xem thực đơn',
     qrBook: 'Quét để đặt chỗ',
+    qrConnect: 'Quét để kết nối',
+    qrShop: 'Quét để mua hàng',
 
     soldOut: 'Hết món',
 
@@ -279,6 +283,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Escanea para visitar',
     qrMenu: 'Escanea para ver la carta',
     qrBook: 'Escanea para reservar',
+    qrConnect: 'Escanea para conectar',
+    qrShop: 'Escanea para comprar',
 
     soldOut: 'Agotado',
 
@@ -385,6 +391,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Scannez pour visiter',
     qrMenu: 'Scannez pour voir la carte',
     qrBook: 'Scannez pour réserver',
+    qrConnect: 'Scannez pour nous suivre',
+    qrShop: 'Scannez pour acheter',
 
     soldOut: 'Épuisé',
 
@@ -491,6 +499,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Scannen und besuchen',
     qrMenu: 'Scannen für die Speisekarte',
     qrBook: 'Scannen zum Reservieren',
+    qrConnect: 'Scannen und verbinden',
+    qrShop: 'Scannen und einkaufen',
 
     soldOut: 'Ausverkauft',
 
@@ -597,6 +607,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Escaneie para visitar',
     qrMenu: 'Escaneie para ver o cardápio',
     qrBook: 'Escaneie para reservar',
+    qrConnect: 'Escaneie para conectar',
+    qrShop: 'Escaneie para comprar',
 
     soldOut: 'Esgotado',
 
@@ -703,6 +715,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'Pindai untuk berkunjung',
     qrMenu: 'Pindai untuk lihat menu',
     qrBook: 'Pindai untuk reservasi',
+    qrConnect: 'Pindai untuk terhubung',
+    qrShop: 'Pindai untuk belanja',
 
     soldOut: 'Habis',
 
@@ -809,6 +823,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'สแกนเพื่อเข้าชม',
     qrMenu: 'สแกนเพื่อดูเมนู',
     qrBook: 'สแกนเพื่อจอง',
+    qrConnect: 'สแกนเพื่อเชื่อมต่อ',
+    qrShop: 'สแกนเพื่อช้อป',
 
     soldOut: 'หมดแล้ว',
 
@@ -915,6 +931,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: 'スキャンしてアクセス',
     qrMenu: 'スキャンしてメニューを見る',
     qrBook: 'スキャンして予約',
+    qrConnect: 'スキャンしてつながる',
+    qrShop: 'スキャンしてお買い物',
 
     soldOut: '売り切れ',
 
@@ -1021,6 +1039,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: '스캔해서 방문하기',
     qrMenu: '스캔해서 메뉴 보기',
     qrBook: '스캔해서 예약하기',
+    qrConnect: '스캔하고 연결하기',
+    qrShop: '스캔하고 쇼핑하기',
 
     soldOut: '품절',
 
@@ -1127,6 +1147,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     qrScan: '扫码访问',
     qrMenu: '扫码查看菜单',
     qrBook: '扫码预订',
+    qrConnect: '扫码关注',
+    qrShop: '扫码购物',
 
     soldOut: '售罄',
 

@@ -428,19 +428,23 @@
     },
     "qr": {
       "open": "Mã QR",
-      "title": "Mã QR để bàn",
-      "description": "In để đặt trên bàn, quầy, thực đơn hoặc tờ rơi. Khách quét là mở trang của bạn.",
-      "ctaLabel": "Chữ trên thẻ",
-      "styleLabel": "Kiểu",
+      "title": "Mã QR",
+      "ctaLabel": "Lời nhắn trên thẻ",
+      "styleLabel": "Màu thẻ",
       "styles": {
         "light": "Sáng",
         "dark": "Tối",
         "brand": "Màu của trang"
       },
-      "trackingNote": "Lượt quét sẽ hiện là “QR” trong thống kê.",
-      "print": "In 4 thẻ mỗi trang",
-      "downloadPng": "Tải PNG",
-      "downloadSvg": "SVG"
+      "trackingNote": "Lượt quét được thống kê riêng với nguồn “QR”.",
+      "print": "In",
+      "downloadPng": "Ảnh PNG",
+      "downloadSvg": "File SVG",
+      "custom": "Tự viết",
+      "customPlaceholder": "VD: Quét để đặt bàn",
+      "download": "Tải xuống",
+      "pngHint": "Đăng mạng xã hội, gửi Zalo",
+      "svgHint": "Gửi nhà in, in khổ lớn"
     },
     "account": {
       "title": "Tài khoản",

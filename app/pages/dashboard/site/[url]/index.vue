@@ -461,6 +461,7 @@
           :username="existingBio.username"
           :title="bioData.title"
           :theme-config="bioData.themeConfig"
+          :blocks="bioData.blocks"
         />
 
         <!-- Phone preview (mobile and tablet; desktop shows it beside the editor) -->
