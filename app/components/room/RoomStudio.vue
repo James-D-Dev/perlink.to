@@ -8,6 +8,8 @@
         editable
         :selected-id="selectedId"
         :force-mode="previewMode === 'live' ? null : previewMode"
+        :products="products"
+        :shop-accent="shopAccent"
         @select="onCanvasSelect"
         @object-change="onObjectChange"
         @stats="stats = $event"
@@ -135,6 +137,24 @@
                   </div>
                 </div>
 
+                <!-- Product stand: which product it shows -->
+                <div v-if="selectedItem.productCard" class="space-y-2">
+                  <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
+                    <UIcon name="i-lucide-shopping-bag" class="size-3.5" />
+                    {{ t('room.shop.product') }}
+                  </span>
+                  <USelect
+                    v-if="products?.length"
+                    :model-value="selectedObject.productId"
+                    :items="productOptions"
+                    :placeholder="t('room.shop.pick')"
+                    size="sm"
+                    class="w-full"
+                    @update:model-value="updateSelected({ productId: String($event) })"
+                  />
+                  <p class="text-xs text-muted">{{ products?.length ? t('room.shop.hint') : t('room.shop.none') }}</p>
+                </div>
+
                 <div v-if="selectedItem.photo" class="space-y-2">
                   <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
                     <UIcon name="i-lucide-image" class="size-3.5" />
@@ -182,7 +202,8 @@
                   </div>
                 </div>
 
-                <div class="space-y-2">
+                <!-- Product stands open their product instead of a link -->
+                <div v-if="!selectedItem.productCard" class="space-y-2">
                   <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
                     <UIcon name="i-lucide-link" class="size-3.5" />
                     {{ t('room.detail.link') }}
@@ -548,6 +569,7 @@
 import { nanoid } from 'nanoid'
 import type { DayNightMode, FloorMaterial, RoomConfig, RoomObject, RoomObjectLink, RoomStyle, WallSide } from '~/types/room'
 import { ROOM_CATALOG, CATALOG_BY_TYPE, CATEGORY_LABELS, preloadDungeonModels, type CatalogCategory } from '~/utils/room/catalog'
+import type { ShopProduct } from '~/utils/room/productCard'
 import type { ObjectPatch } from '~/utils/room/RoomScene'
 import { createFloorTexture } from '~/utils/room/RoomScene'
 import { getDaylight } from '~/utils/room/daylight'
@@ -559,14 +581,19 @@ import type { RoomSceneStats } from '~/utils/room/RoomScene'
 // Pinch zooms the camera, never the page
 usePreventPageZoom()
 
-defineProps<{
+const props = defineProps<{
   saving?: boolean
   publishing?: boolean
   dirty?: boolean
   /** For the room tour video's titles */
   username?: string
   siteName?: string
+  /** Products from the site's products block, for product stands */
+  products?: ShopProduct[]
+  shopAccent?: string
 }>()
+
+const productOptions = computed(() => (props.products ?? []).map(p => ({ value: p.id, label: p.name })))
 
 // Room tour video for TikTok (RoomTourRecorder)
 const tourOpen = ref(false)
@@ -616,6 +643,7 @@ function isActivePreset(style: Partial<RoomStyle>) {
 }
 
 const CATEGORY_ICONS: Record<CatalogCategory, string> = {
+  shop: 'i-lucide-shopping-bag',
   furniture: 'i-lucide-sofa',
   lighting: 'i-lucide-lamp',
   decor: 'i-lucide-sprout',
@@ -889,8 +917,14 @@ function setObjects(objects: RoomObject[]) {
 }
 
 function addObject(type: string, position: [number, number, number], wall?: WallSide) {
-  if (!CATALOG_BY_TYPE[type]) return
+  const item = CATALOG_BY_TYPE[type]
+  if (!item) return
   const object: RoomObject = { id: nanoid(8), type, position, rotation: 0, scale: 1, ...(wall && { wall }) }
+  // A new product stand shows the next product not on display yet
+  if (item.productCard && props.products?.length) {
+    const shown = new Set(room.value.objects.map(o => o.productId).filter(Boolean))
+    object.productId = (props.products.find(p => !shown.has(p.id)) ?? props.products[0]!).id
+  }
   setObjects([...room.value.objects, object])
   selectedId.value = object.id
 }

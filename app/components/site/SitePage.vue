@@ -72,6 +72,8 @@
           :bio="bioPage.bio || undefined"
           :avatar-url="bioPage.avatarUrl || undefined"
           :lang="siteLang"
+          :blocks="bioPage.blocks"
+          :accent="bioPage.themeConfig?.colors?.primary"
           @switch2d="show2d = true"
         />
         <template #fallback>

@@ -7,7 +7,7 @@ import { attachNaturePieces, greenLeaves, type NaturePiece } from './natureModel
 // described by JSON (type + transform + color). Local origin is the center of
 // the object's base, facing +z. Wall-mounted models have their back on z = 0.
 
-export type CatalogCategory = 'furniture' | 'lighting' | 'decor' | 'wall' | 'tech' | 'dungeon'
+export type CatalogCategory = 'shop' | 'furniture' | 'lighting' | 'decor' | 'wall' | 'tech' | 'dungeon'
 
 export interface CatalogLight {
   color: string
@@ -35,6 +35,8 @@ export interface CatalogItem {
   light?: CatalogLight
   /** Area that shows an uploaded photo (local coordinates, meters); parts tagged `placeholder` hide when a photo is set */
   photo?: { width: number; height: number; center: [number, number, number] }
+  /** Area that shows a product card (photo, name, price) from the site's products block */
+  productCard?: { width: number; height: number; center: [number, number, number] }
   build: (color: string) => THREE.Group
 }
 
@@ -44,6 +46,7 @@ export const CATEGORY_LABELS: Record<CatalogCategory, string> = {
   decor: 'Decor',
   wall: 'Wall',
   tech: 'Tech',
+  shop: 'Shop',
   dungeon: 'Dungeon',
 }
 
@@ -175,6 +178,28 @@ const DUNGEON_ITEMS: CatalogItem[] = [
 // ---------- Catalog ----------
 
 export const ROOM_CATALOG: CatalogItem[] = [
+  {
+    // A plinth with a product card on top; clicking it opens the product
+    type: 'product-stand',
+    name: 'Product stand',
+    icon: 'i-lucide-shopping-bag',
+    category: 'shop',
+    defaultColor: '#f4f1ec',
+    productCard: { width: 0.44, height: 0.605, center: [0, 1.135, 0.026] },
+    build: (color) => {
+      const g = new THREE.Group()
+      g.add(box(0.5, 0.06, 0.42, mat('#2f2f36'), 0, 0))
+      g.add(box(0.46, 0.7, 0.38, mat(color), 0, 0.06))
+      g.add(box(0.5, 0.04, 0.42, mat('#2f2f36'), 0, 0.76))
+      // Card holder: a thin board with a frame
+      g.add(box(0.5, 0.66, 0.04, mat('#2f2f36'), 0, 0.8))
+      const card = box(0.44, 0.6, 0.012, mat(WHITE), 0, 0.832, 0.02)
+      card.userData.placeholder = true
+      g.add(card)
+      g.add(box(0.12, 0.02, 0.1, mat('#2f2f36'), 0, 0.78, 0.05))
+      return g
+    },
+  },
   // Furniture
   {
     type: 'bed',

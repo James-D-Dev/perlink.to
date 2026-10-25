@@ -8,6 +8,7 @@ import { buildLand, createStarSphere, type LandInstance } from './lands'
 import { buildRoomShell, FLOOR_THICKNESS } from './shell'
 import { flameFlicker, flameTime } from './flame'
 import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
+import { drawProductCard, productSignature, type ShopProduct } from './productCard'
 import type { GuestGiftType } from '#shared/guestbook'
 
 export { createFloorTexture } from './shell'
@@ -106,6 +107,10 @@ export class RoomScene {
   private guests = new Map<string, { group: THREE.Group; seed: number; bornAt: number }>()
   private guestOrder: string[] = []
   private hoveredGuest: string | null = null
+  /** Products shown on product stands, by id; accent colour of their price */
+  private products = new Map<string, ShopProduct>()
+  private shopAccent = '#e8457a'
+  private soldOutLabel = 'Sold out'
   private entries = new Map<string, ObjectEntry>()
   private style?: RoomStyle
   private styleSignature = ''
@@ -331,6 +336,16 @@ export class RoomScene {
     small.getContext('2d')?.drawImage(source, 0, 0, small.width, small.height)
     this.selectionBox.visible = boxWasVisible
     return new Promise<Blob | null>(resolve => small.toBlob(resolve, 'image/webp', 0.82))
+  }
+
+  /** Products the stands can show (from the site's products block) */
+  setProducts(products: ShopProduct[], accent?: string, soldOutLabel?: string) {
+    this.products = new Map(products.map(p => [p.id, p]))
+    if (accent) this.shopAccent = accent
+    if (soldOutLabel) this.soldOutLabel = soldOutLabel
+    // Stands whose product changed get redrawn
+    if (this.room) this.syncObjects(this.room.objects)
+    this.markActive()
   }
 
   /**
@@ -605,7 +620,8 @@ export class RoomScene {
       const item = CATALOG_BY_TYPE[data.type]
       if (!item) continue
       seen.add(data.id)
-      const signature = `${data.type}|${data.color || ''}|${data.image || ''}`
+      const product = item.productCard && data.productId ? this.products.get(data.productId) : undefined
+      const signature = `${data.type}|${data.color || ''}|${data.image || ''}|${data.productId || ''}|${productSignature(product)}`
       const existing = this.entries.get(data.id)
       if (existing && existing.signature === signature) {
         existing.data = data
@@ -642,6 +658,8 @@ export class RoomScene {
     }
     collectMaterials()
     if (item.photo && data.image) this.addPhoto(model, item.photo, data.image)
+    const product = item.productCard && data.productId ? this.products.get(data.productId) : undefined
+    if (item.productCard && product) this.addProductCard(model, item.productCard, product)
     // Model-based items load asynchronously; pick up their glowing parts when ready
     ;(model.userData.ready as Promise<void> | undefined)?.then(collectMaterials).catch(() => {})
 
@@ -770,6 +788,28 @@ export class RoomScene {
         if (obj.userData.placeholder) obj.visible = true
       })
     })
+  }
+
+  /** Draws the product's card (photo, name, price) onto a stand */
+  private addProductCard(model: THREE.Group, slot: NonNullable<CatalogItem['productCard']>, product: ShopProduct) {
+    const material = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.6 })
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(slot.width, slot.height), material)
+    plane.position.set(...slot.center)
+    plane.visible = false
+    model.add(plane)
+    drawProductCard(product, this.shopAccent, this.soldOutLabel).then((canvas) => {
+      if (this.disposed) return
+      const texture = new THREE.CanvasTexture(canvas)
+      texture.colorSpace = THREE.SRGBColorSpace
+      texture.anisotropy = this.renderer.capabilities.getMaxAnisotropy()
+      material.map = texture
+      material.needsUpdate = true
+      plane.visible = true
+      model.traverse((obj) => {
+        if (obj.userData.placeholder) obj.visible = false
+      })
+      this.markActive()
+    }).catch(() => {})
   }
 
   private removeEntry(id: string) {
@@ -995,7 +1035,7 @@ export class RoomScene {
     }
     const id = this.pickObject(e.clientX, e.clientY)
     const data = id ? this.entries.get(id)?.data : undefined
-    const clickable = !!(data?.link?.url || data?.image)
+    const clickable = !!(data?.link?.url || data?.image || (data?.productId && this.products.has(data.productId)))
     const rect = this.renderer.domElement.getBoundingClientRect()
     const guestId = clickable ? null : this.pickGuest(e.clientX, e.clientY)
     if (guestId !== this.hoveredGuest || guestId) {

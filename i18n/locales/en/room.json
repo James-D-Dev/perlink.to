@@ -174,7 +174,8 @@
       "decor": "Decor",
       "wall": "Wall",
       "tech": "Tech",
-      "dungeon": "Dungeon"
+      "dungeon": "Dungeon",
+      "shop": "Shop"
     },
     "styles": {
       "cozy-wood": "Cozy wood",
@@ -273,7 +274,8 @@
       "garden-tall-grass": "Tall grass",
       "garden-mushrooms": "Mushrooms",
       "garden-rocks": "Garden rocks",
-      "garden-pebble-tray": "Pebble tray"
+      "garden-pebble-tray": "Pebble tray",
+      "product-stand": "Product stand"
     },
     "tour": {
       "button": "Make a TikTok video",
@@ -308,6 +310,12 @@
       "label": "Guestbook",
       "on": "Guestbook on: visitors leave messages and gifts in front of the room. Click to turn off.",
       "off": "Guestbook off. Click to turn on."
+    },
+    "shop": {
+      "product": "Product on the stand",
+      "pick": "Choose a product",
+      "hint": "Visitors click the stand to see the product and order right in the room.",
+      "none": "This site has no products yet. Add a Products block to the page first."
     }
   }
 }

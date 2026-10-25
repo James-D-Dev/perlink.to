@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import type { BioBlock, BlockName, FormFields } from '~/types/bio'
+import type { BioBlock, BlockName, FormFields, ProductItem, ProductsBlock } from '~/types/bio'
 
 /** Block types a page may hold more than once; the rest are one per page */
 export const REPEATABLE_BLOCKS: BlockName[] = ['links', 'text', 'image-album', 'menu', 'video', 'products']
@@ -104,6 +104,19 @@ export function productStore(url: string | undefined) {
   } catch {
     return null
   }
+}
+
+/** Every named product on a page with the block it belongs to (for product stands in the 3D room) */
+export function pageProducts(blocks: BioBlock[] | undefined): { product: ProductItem; block: ProductsBlock }[] {
+  return (blocks ?? [])
+    .filter((b): b is ProductsBlock => b.name === 'products' && !b.hidden && !!b.id)
+    .flatMap(block => (block.data.items ?? []).filter(item => item.name).map(product => ({ product, block })))
+}
+
+/** How a product can be paid for: the block's choice, minus transfer when the page has no bank account */
+export function productPaymentOptions(payment: 'cod' | 'transfer' | 'both' | undefined, canTransfer?: boolean): ('cod' | 'transfer')[] {
+  const allowed = payment ?? 'both'
+  return (['cod', 'transfer'] as const).filter(m => (allowed === 'both' || m === allowed) && (m !== 'transfer' || canTransfer))
 }
 
 /** Count a visitor action (call, directions, chat, booking) for the owner's analytics */

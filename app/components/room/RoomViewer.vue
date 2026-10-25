@@ -6,6 +6,9 @@
       intro
       :force-mode="forceMode"
       :guests="guestGifts"
+      :products="shopProducts"
+      :shop-accent="accent"
+      :sold-out-label="t('soldOut')"
       @hover="onHover"
       @activate="onActivate"
       @guest-hover="onGuestHover"
@@ -115,6 +118,58 @@
         </div>
       </div>
     </Transition>
+
+    <!-- A product on a stand -->
+    <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-150" leave-to-class="opacity-0">
+      <div v-if="shopItem" class="absolute inset-0 z-30 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" @click.self="shopItem = null">
+        <div class="relative w-full max-w-sm overflow-hidden rounded-t-3xl bg-white text-gray-900 shadow-2xl sm:rounded-3xl">
+          <img v-if="shopItem.product.imageUrl" :src="shopItem.product.imageUrl" :alt="shopItem.product.name" class="aspect-square w-full object-cover">
+          <div class="space-y-2 p-5">
+            <span v-if="shopItem.product.tag && !shopItem.product.soldOut" class="inline-block rounded-full bg-gray-900/5 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">{{ shopItem.product.tag }}</span>
+            <p class="text-lg font-semibold leading-snug">{{ shopItem.product.name }}</p>
+            <p v-if="shopItem.product.description" class="text-sm text-gray-600">{{ shopItem.product.description }}</p>
+            <p v-if="shopItem.product.price" class="flex items-baseline gap-2 tabular-nums">
+              <span class="text-xl font-bold" :style="{ color: accent }">{{ formatVnd(shopItem.product.price) }}</span>
+              <span v-if="(shopItem.product.comparePrice ?? 0) > shopItem.product.price" class="text-sm text-gray-400 line-through">{{ formatVnd(shopItem.product.comparePrice!) }}</span>
+            </p>
+            <p v-if="shopItem.product.soldOut" class="text-sm font-semibold text-gray-500">{{ t('soldOut') }}</p>
+            <a
+              v-else-if="shopItem.product.url"
+              :href="safeUrl(shopItem.product.url)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-2 flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-[15px] font-semibold text-white"
+              :style="{ backgroundColor: accent }"
+              @click="trackVisitorAction(username ?? '', 'store', 'view')"
+            >
+              <UIcon :name="productStore(shopItem.product.url)?.icon ?? 'i-lucide-external-link'" class="size-4" />
+              {{ productStore(shopItem.product.url) ? t('shopBuyOn', { store: productStore(shopItem.product.url)!.name }) : t('shopBuy') }}
+            </a>
+            <button
+              v-else-if="shopItem.block.data.ordering && productPaymentOptions(shopItem.block.data.payment, canTransfer).length"
+              type="button"
+              class="mt-2 flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-[15px] font-semibold text-white"
+              :style="{ backgroundColor: accent }"
+              @click="orderFromStand"
+            >
+              <UIcon name="i-lucide-shopping-bag" class="size-4" />
+              {{ t('shopOrder') }}
+            </button>
+          </div>
+          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-white/80 text-gray-600 shadow backdrop-blur hover:bg-white" aria-label="Close" @click="shopItem = null">
+            <UIcon name="i-lucide-x" class="size-4" />
+          </button>
+        </div>
+      </div>
+    </Transition>
+    <BioOrderSheet
+      v-if="orderBlock && username"
+      v-model:product="ordering"
+      :data="orderBlock.data"
+      :block-id="orderBlock.id!"
+      :username="username"
+      :can-transfer="canTransfer"
+    />
 
     <!-- A gift's message -->
     <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-150" leave-to-class="opacity-0">
@@ -252,14 +307,20 @@ import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import { getDaylight } from '~/utils/room/daylight'
 import { MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 import { GUEST_GIFTS, GUEST_GIFT_EMOJI, GUESTBOOK_LIMITS, type GuestbookEntry, type GuestGiftType } from '#shared/guestbook'
+import type { BioBlock, ProductItem, ProductsBlock } from '~/types/bio'
+import { formatVnd } from '#shared/plans'
 
 // Pinch zooms the camera, never the page
 usePreventPageZoom()
 
 const props = defineProps<{
   room: RoomConfig
-  /** Site address, for the guestbook */
+  /** Site address, for the guestbook and orders */
   username?: string
+  /** The page's blocks: products for product stands, bank account for transfers */
+  blocks?: BioBlock[]
+  /** The site's accent colour (prices, buttons) */
+  accent?: string
   title: string
   bio?: string
   avatarUrl?: string
@@ -354,7 +415,9 @@ function safeUrl(url: string) {
 
 function onHover(id: string | null, x: number, y: number) {
   const obj = id ? props.room.objects.find(o => o.id === id) : undefined
-  if (obj?.image) hovered.value = { label: t('viewPhoto'), x, y }
+  const product = obj?.productId ? shopById.value.get(obj.productId)?.product : undefined
+  if (product) hovered.value = { label: product.price ? `${product.name} · ${formatVnd(product.price)}` : product.name, x, y }
+  else if (obj?.image) hovered.value = { label: t('viewPhoto'), x, y }
   else hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y, external: true } : null
 }
 
@@ -363,12 +426,41 @@ const photo = ref<RoomObject | null>(null)
 
 function onActivate(id: string) {
   const obj = props.room.objects.find(o => o.id === id)
+  const shop = obj?.productId ? shopById.value.get(obj.productId) : undefined
+  if (shop) {
+    shopItem.value = shop
+    hovered.value = null
+    return
+  }
   if (obj?.image) {
     photo.value = obj
     hovered.value = null
     return
   }
   if (obj?.link?.url) window.open(safeUrl(obj.link.url), '_blank', 'noopener,noreferrer')
+}
+
+// ---------- Shop (product stands) ----------
+
+// Shop texts follow the site's language (BioOrderSheet reads it)
+provide(SITE_LANG_KEY, computed(() => props.lang ?? 'en'))
+
+const accent = computed(() => props.accent || '#1c1a17')
+const shop = computed(() => pageProducts(props.blocks))
+const shopById = computed(() => new Map(shop.value.map(s => [s.product.id, s])))
+const shopProducts = computed(() => shop.value.map(s => s.product))
+const canTransfer = computed(() =>
+  (props.blocks ?? []).some(b => b.name === 'vietqr' && !b.hidden && !!(b.data as { bankId?: string })?.bankId && !!(b.data as { accountNumber?: string })?.accountNumber),
+)
+const shopItem = ref<{ product: ProductItem; block: ProductsBlock } | null>(null)
+const ordering = ref<ProductItem | null>(null)
+const orderBlock = ref<ProductsBlock | null>(null)
+
+function orderFromStand() {
+  if (!shopItem.value) return
+  orderBlock.value = shopItem.value.block
+  ordering.value = shopItem.value.product
+  shopItem.value = null
 }
 
 // ---------- Guestbook ----------
@@ -455,6 +547,7 @@ function formatWhen(value: string) {
 function onKeydown(event: KeyboardEvent) {
   if (event.key !== 'Escape') return
   photo.value = null
+  shopItem.value = null
   note.value = null
   guestbookPanel.value = false
 }

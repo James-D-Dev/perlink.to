@@ -7,6 +7,7 @@ import type { RoomConfig, WallSide } from '~/types/room'
 import { RoomScene, type ObjectPatch, type RoomSceneStats } from '~/utils/room/RoomScene'
 import { daylightAtHour, getDaylight } from '~/utils/room/daylight'
 import type { GuestGiftType } from '#shared/guestbook'
+import type { ShopProduct } from '~/utils/room/productCard'
 
 const props = withDefaults(defineProps<{
   room: RoomConfig
@@ -22,6 +23,10 @@ const props = withDefaults(defineProps<{
   intro?: boolean
   /** Guestbook gifts in front of the room, newest first */
   guests?: { id: string; gift: GuestGiftType }[]
+  /** Products the product stands show; accent colour for prices */
+  products?: ShopProduct[]
+  shopAccent?: string
+  soldOutLabel?: string
 }>(), {
   editable: false,
   preview: false,
@@ -58,6 +63,7 @@ onMounted(() => {
     onGuestActivate: id => emit('guestActivate', id),
     onGuestHover: (id, x, y) => emit('guestHover', id, x, y),
   })
+  if (props.products) scene.setProducts(props.products, props.shopAccent, props.soldOutLabel)
   scene.setRoom(props.room)
   if (props.guests) scene.setGuests(props.guests)
   scene.select(props.selectedId)
@@ -73,6 +79,7 @@ watch(() => props.room, room => scene?.setRoom(room), { deep: true })
 watch(() => props.selectedId, id => scene?.select(id))
 // Gifts added after the room opened pop in
 watch(() => props.guests, guests => scene?.setGuests(guests ?? [], true))
+watch(() => [props.products, props.shopAccent] as const, ([products, accent]) => scene?.setProducts(products ?? [], accent, props.soldOutLabel), { deep: true })
 watch(() => [props.previewHour, props.forceMode], applyPreview)
 
 function applyPreview() {

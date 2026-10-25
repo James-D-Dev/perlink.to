@@ -20,6 +20,8 @@
       :dirty="dirty"
       :username="bioPage.username"
       :site-name="bioPage.title || bioPage.username"
+      :products="products"
+      :shop-accent="bioPage.themeConfig.colors?.primary"
       @back="goBack"
       @save="save()"
       @publish="publish"
@@ -28,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ThemeConfig } from '~/types/bio'
+import type { BioBlock, ThemeConfig } from '~/types/bio'
 import { createDefaultRoom, normalizeRoom, type RoomConfig } from '~/types/room'
 
 definePageMeta({
@@ -48,7 +50,9 @@ useHead({ title: () => t('room.page.title', { name: username.value }) })
 const loading = ref(true)
 const saving = ref(false)
 const publishing = ref(false)
-const bioPage = ref<{ username: string; title?: string | null; themeConfig: Partial<ThemeConfig> } | null>(null)
+const bioPage = ref<{ username: string; title?: string | null; themeConfig: Partial<ThemeConfig>; blocks?: BioBlock[] } | null>(null)
+// Products the room's product stands can show
+const products = computed(() => pageProducts(bioPage.value?.blocks).map(p => p.product))
 const room = ref<RoomConfig>(createDefaultRoom())
 const savedSnapshot = ref('')
 
@@ -56,7 +60,7 @@ const dirty = computed(() => JSON.stringify(room.value) !== savedSnapshot.value)
 
 async function load() {
   try {
-    const response = await $fetch<{ success: boolean; bioPage: { username: string; title?: string | null; themeConfig: Partial<ThemeConfig> } }>(
+    const response = await $fetch<{ success: boolean; bioPage: { username: string; title?: string | null; themeConfig: Partial<ThemeConfig>; blocks?: BioBlock[] } }>(
       `/api/admin/bio/${username.value}`,
     )
     bioPage.value = response.bioPage

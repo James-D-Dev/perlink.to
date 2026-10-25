@@ -62,6 +62,8 @@ export interface RoomObject {
   link?: RoomObjectLink;
   /** Uploaded photo shown in a picture frame; visitors click it to view it large */
   image?: string;
+  /** Product stand: the product (from the site's products block) shown on it */
+  productId?: string;
 }
 
 export interface RoomMusic {

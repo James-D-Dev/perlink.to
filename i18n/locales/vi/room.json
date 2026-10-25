@@ -174,7 +174,8 @@
       "decor": "Trang trí",
       "wall": "Tường",
       "tech": "Công nghệ",
-      "dungeon": "Hầm ngục"
+      "dungeon": "Hầm ngục",
+      "shop": "Cửa hàng"
     },
     "styles": {
       "cozy-wood": "Gỗ ấm cúng",
@@ -273,7 +274,8 @@
       "garden-tall-grass": "Cỏ cao",
       "garden-mushrooms": "Nấm",
       "garden-rocks": "Đá sân vườn",
-      "garden-pebble-tray": "Khay sỏi"
+      "garden-pebble-tray": "Khay sỏi",
+      "product-stand": "Kệ sản phẩm"
     },
     "tour": {
       "button": "Quay video TikTok",
@@ -308,6 +310,12 @@
       "label": "Sổ lưu bút",
       "on": "Sổ lưu bút đang bật: khách để lại lời chúc và quà trước phòng. Bấm để tắt.",
       "off": "Sổ lưu bút đang tắt. Bấm để bật."
+    },
+    "shop": {
+      "product": "Sản phẩm trên kệ",
+      "pick": "Chọn sản phẩm",
+      "hint": "Khách bấm vào kệ để xem sản phẩm và đặt hàng ngay trong phòng.",
+      "none": "Trang chưa có sản phẩm. Thêm khối Sản phẩm ở phần Nội dung của trang trước."
     }
   }
 }
