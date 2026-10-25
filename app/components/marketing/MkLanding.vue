@@ -2,7 +2,8 @@
   <div class="bg-paper text-ink">
     <!-- ============ HERO ============ -->
     <MarketingMkSection :ruled="false" :padded="false">
-      <div class="px-5 pb-12 pt-16 sm:px-8 md:pb-16 md:pt-24">
+      <div class="relative isolate px-5 pb-12 pt-16 sm:px-8 md:pb-16 md:pt-24">
+        <MarketingMkHeroBackdrop />
         <div class="grid gap-10 md:grid-cols-[1.45fr_1fr] md:items-end">
           <div>
             <h1 class="mk-display text-[44px] sm:text-6xl md:text-[64px]">
