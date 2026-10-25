@@ -10,7 +10,7 @@
     </div>
 
     <!-- Phone Mockup -->
-    <BioIPhone15ProMockup ref="phoneRef" :width="320" :height="500">
+    <BioPreviewFrame ref="phoneRef">
       <BioPreview
         v-if="previewData"
         :bio-data="previewData"
@@ -18,7 +18,7 @@
         :active-block-id="activeBlock"
         @select-block="$emit('selectBlock', $event)"
       />
-    </BioIPhone15ProMockup>
+    </BioPreviewFrame>
   </div>
 </template>
 

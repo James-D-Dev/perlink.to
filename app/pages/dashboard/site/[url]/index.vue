@@ -88,7 +88,7 @@
           </div>
           <div class="hidden flex-col items-center gap-4 lg:col-span-5 lg:flex">
             <USkeleton class="h-4 w-24 self-start" />
-            <USkeleton class="h-[500px] w-[260px] rounded-[2.5rem]" />
+            <USkeleton class="h-[570px] w-[306px] rounded-[2rem]" />
           </div>
         </div>
       </div>
@@ -451,14 +451,14 @@
         >
           <template #content>
             <div class="relative">
-              <BioIPhone15ProMockup :width="320" :height="500">
+              <BioPreviewFrame>
                 <BioPreview
                   :bio-data="bioData"
                   :username="existingBio?.username || username"
                   :active-block-id="activeBlock"
                   @select-block="(id: string) => { previewOpen = false; openBlock(id) }"
                 />
-              </BioIPhone15ProMockup>
+              </BioPreviewFrame>
               <UButton
                 icon="i-lucide-x"
                 color="neutral"

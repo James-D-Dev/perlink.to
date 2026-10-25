@@ -29,7 +29,7 @@ defineEmits<{ selectBlock: [blockId: string] }>();
 
 const RENDER_WIDTH = 375;
 const DISPLAY_WIDTH = 296;
-const DISPLAY_HEIGHT = 500;
+const DISPLAY_HEIGHT = 560;
 
 const scale = computed(() => DISPLAY_WIDTH / RENDER_WIDTH);
 const renderHeight = computed(() => DISPLAY_HEIGHT / scale.value);
