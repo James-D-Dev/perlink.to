@@ -121,8 +121,8 @@
 
     <!-- A product on a stand -->
     <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-150" leave-to-class="opacity-0">
-      <div v-if="shopItem" class="absolute inset-0 z-30 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" @click.self="shopItem = null">
-        <div class="relative w-full max-w-sm overflow-hidden rounded-t-3xl bg-white text-gray-900 shadow-2xl sm:rounded-3xl">
+      <div v-if="shopItem" class="glass-backdrop absolute inset-0 z-30 flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true" @click.self="shopItem = null">
+        <div class="glass-sheet relative w-full max-w-sm overflow-hidden rounded-t-[30px] text-gray-900 sm:rounded-[30px]">
           <img v-if="shopItem.product.imageUrl" :src="shopItem.product.imageUrl" :alt="shopItem.product.name" class="aspect-square w-full object-cover">
           <div class="space-y-2 p-5">
             <span v-if="shopItem.product.tag && !shopItem.product.soldOut" class="inline-block rounded-full bg-gray-900/5 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">{{ shopItem.product.tag }}</span>
@@ -156,7 +156,7 @@
               {{ t('shopOrder') }}
             </button>
           </div>
-          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-white/80 text-gray-600 shadow backdrop-blur hover:bg-white" aria-label="Close" @click="shopItem = null">
+          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/[0.08] text-gray-700 backdrop-blur hover:bg-black/15" aria-label="Close" @click="shopItem = null">
             <UIcon name="i-lucide-x" class="size-4" />
           </button>
         </div>
@@ -174,13 +174,13 @@
 
     <!-- A gift's message -->
     <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-150" leave-to-class="opacity-0">
-      <div v-if="note" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" @click.self="note = null">
-        <div class="relative w-full max-w-sm rounded-3xl bg-[#fffaf3] p-6 text-center text-gray-900 shadow-2xl">
+      <div v-if="note" class="glass-backdrop absolute inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" @click.self="note = null">
+        <div class="glass-sheet relative w-full max-w-sm rounded-[30px] p-6 text-center text-gray-900">
           <div class="text-5xl" aria-hidden="true">{{ GUEST_GIFT_EMOJI[note.gift] }}</div>
           <p class="mt-4 whitespace-pre-line text-[17px] leading-relaxed">{{ note.message }}</p>
           <p class="mt-4 text-sm font-semibold text-gray-600">{{ t('guestbookFrom', { name: note.name }) }}</p>
           <p class="mt-0.5 text-xs text-gray-400">{{ formatWhen(note.createdAt) }}</p>
-          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full text-gray-500 hover:bg-black/5" aria-label="Close" @click="note = null">
+          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/[0.06] text-gray-600 hover:bg-black/10" aria-label="Close" @click="note = null">
             <UIcon name="i-lucide-x" class="size-4" />
           </button>
         </div>
@@ -191,7 +191,7 @@
     <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="translate-y-full sm:translate-y-0 sm:translate-x-full" leave-active-class="transition duration-200 ease-in" leave-to-class="translate-y-full sm:translate-y-0 sm:translate-x-full">
       <aside
         v-if="guestbookPanel"
-        class="absolute inset-x-0 bottom-0 z-30 flex max-h-[85dvh] flex-col rounded-t-3xl bg-[#fffaf3] text-gray-900 shadow-2xl sm:inset-y-3 sm:left-auto sm:right-3 sm:max-h-none sm:w-[380px] sm:rounded-3xl"
+        class="glass-sheet absolute inset-x-0 bottom-0 z-30 flex max-h-[85dvh] flex-col rounded-t-[30px] text-gray-900 sm:inset-y-3 sm:left-auto sm:right-3 sm:max-h-none sm:w-[380px] sm:rounded-[30px]"
         :aria-label="t('guestbookTitle')"
       >
         <div class="flex items-start justify-between gap-3 px-5 pb-2 pt-5">
@@ -199,14 +199,14 @@
             <h2 class="text-lg font-semibold">💌 {{ t('guestbookTitle') }}</h2>
             <p class="mt-0.5 text-sm text-gray-500">{{ t('guestbookIntro') }}</p>
           </div>
-          <button type="button" class="flex size-8 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-black/5" aria-label="Close" @click="guestbookPanel = false">
+          <button type="button" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/[0.06] text-gray-600 hover:bg-black/10" aria-label="Close" @click="guestbookPanel = false">
             <UIcon name="i-lucide-x" class="size-4" />
           </button>
         </div>
 
         <div class="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
           <!-- Write -->
-          <form class="space-y-3 rounded-2xl bg-white p-4 ring-1 ring-black/5" @submit.prevent="sendGuestbook">
+          <form class="glass-cell space-y-3 rounded-2xl p-4" @submit.prevent="sendGuestbook">
             <input v-model="guestForm.website" type="text" name="website" tabindex="-1" autocomplete="off" class="absolute -left-[9999px] h-0 w-0 opacity-0" aria-hidden="true">
             <div>
               <p class="mb-1.5 text-xs font-medium text-gray-500">{{ t('guestbookGift') }}</p>
@@ -241,7 +241,7 @@
           <!-- Read -->
           <ul v-if="guestEntries.length" class="mt-4 space-y-2.5">
             <li v-for="entry in guestEntries" :key="entry.id">
-              <button type="button" class="flex w-full gap-3 rounded-2xl bg-white p-3.5 text-left ring-1 ring-black/5 transition hover:ring-black/15" @click="openNote(entry.id)">
+              <button type="button" class="glass-cell flex w-full gap-3 rounded-2xl p-3.5 text-left transition hover:bg-white" @click="openNote(entry.id)">
                 <span class="text-2xl" aria-hidden="true">{{ GUEST_GIFT_EMOJI[entry.gift] }}</span>
                 <span class="min-w-0 flex-1">
                   <span class="flex items-baseline justify-between gap-2">

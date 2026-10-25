@@ -8,11 +8,11 @@
     >
       <div
         v-if="product"
-        class="fixed inset-0 z-[100] flex items-end justify-center bg-black/55 backdrop-blur-[3px] sm:items-center sm:p-6"
+        class="glass-backdrop fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-6"
         @click.self="closeOrder"
       >
         <div
-          class="order-sheet relative flex max-h-[94dvh] w-full max-w-[440px] flex-col overflow-hidden rounded-t-[28px] bg-[#fafaf9] text-[#1c1a17] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.45)] sm:rounded-[28px]"
+          class="order-sheet glass-sheet relative flex max-h-[94dvh] w-full max-w-[440px] flex-col overflow-hidden rounded-t-[30px] text-[#1c1a17] sm:rounded-[30px]"
           :style="{ '--accent': accentColor }"
           role="dialog"
           aria-modal="true"
@@ -24,7 +24,7 @@
           </div>
           <button
             type="button"
-            class="absolute right-3.5 top-3.5 z-20 flex size-9 items-center justify-center rounded-full bg-white/90 text-black/60 shadow-sm ring-1 ring-black/5 backdrop-blur transition hover:bg-white hover:text-black"
+            class="absolute right-3.5 top-3.5 z-20 flex size-8 items-center justify-center rounded-full bg-black/[0.06] text-black/55 transition hover:bg-black/10 hover:text-black"
             aria-label="Close"
             @click="closeOrder"
           >
@@ -41,7 +41,7 @@
               <p class="mt-1.5 text-[15px] text-black/55">{{ t('orderPlacedText') }}</p>
               <button
                 type="button"
-                class="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm shadow-sm ring-1 ring-black/[0.07] transition hover:ring-black/15"
+                class="glass-cell mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition hover:bg-white"
                 @click="copy(placed.code)"
               >
                 <span class="text-black/50">{{ t('orderCode') }}</span>
@@ -51,7 +51,7 @@
             </div>
 
             <!-- Transfer: QR and the details to type by hand -->
-            <section v-if="placed.transfer" class="mx-4 mt-5 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/[0.06]">
+            <section v-if="placed.transfer" class="mx-4 mt-5 overflow-hidden rounded-3xl glass-cell">
               <div class="flex items-center gap-2 border-b border-black/[0.06] px-5 py-3.5">
                 <UIcon name="i-lucide-landmark" class="size-[18px] text-[var(--accent)]" />
                 <h3 class="text-[15px] font-semibold">{{ t('orderPayTitle') }}</h3>
@@ -73,7 +73,7 @@
                     {{ t('orderSaveQr') }}
                   </a>
                 </div>
-                <dl class="mt-3 divide-y divide-black/[0.06] rounded-2xl bg-[#f5f4f2] text-sm">
+                <dl class="mt-3 divide-y divide-black/[0.06] rounded-2xl bg-black/[0.035] text-sm">
                   <div v-for="row in transferRows" :key="row.label" class="flex items-center gap-3 px-4 py-2.5">
                     <dt class="w-24 shrink-0 text-black/50">{{ row.label }}</dt>
                     <dd class="min-w-0 flex-1 truncate text-right font-semibold" :class="row.mono && 'font-mono tracking-wide'">{{ row.value }}</dd>
@@ -104,7 +104,7 @@
             </section>
             <p class="px-6 pb-4 pt-3 text-center text-xs text-black/40">{{ t('orderScreenshot') }}</p>
 
-            <div class="sticky bottom-0 border-t border-black/[0.06] bg-[#fafaf9]/95 p-4 backdrop-blur">
+            <div class="sticky bottom-0 border-t border-black/[0.06] bg-white/50 p-4 backdrop-blur-xl">
               <button type="button" class="cta" @click="closeOrder">{{ t('orderDone') }}</button>
             </div>
           </div>
@@ -144,7 +144,7 @@
               <!-- Contact -->
               <section class="px-5">
                 <h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-black/40">{{ t('orderContact') }}</h3>
-                <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-black/[0.06]">
+                <div class="overflow-hidden rounded-3xl glass-cell">
                   <label class="field">
                     <UIcon name="i-lucide-user-round" class="field-icon" />
                     <input v-model="form.name" required maxlength="120" autocomplete="name" :placeholder="`${t('orderName')} *`" class="field-input">
@@ -201,7 +201,7 @@
             </div>
 
             <!-- Total and order -->
-            <div class="border-t border-black/[0.06] bg-white px-5 pb-5 pt-4">
+            <div class="border-t border-black/[0.06] bg-white/50 px-5 pb-5 pt-4 backdrop-blur-xl">
               <div v-if="product.price" class="mb-3 flex items-baseline justify-between">
                 <span class="text-sm text-black/55">{{ t('orderTotal') }} · {{ form.quantity }} × {{ formatVnd(product.price) }}</span>
                 <span class="text-xl font-bold tabular-nums">{{ formatVnd(product.price * form.quantity) }}</span>

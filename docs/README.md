@@ -33,3 +33,15 @@ npx vue-tsc --noEmit -p .nuxt/tsconfig.app.json         # typecheck (some older 
 | `NUXT_CF_SAAS_ZONE_ID`, `NUXT_CF_SAAS_API_TOKEN`, `NUXT_DOMAIN_PROXY_SECRET` | Custom domains |
 
 Each feature stays hidden or falls back gracefully until its secrets are set.
+
+## Design: dialogs
+
+Every dialog uses the same "liquid glass" look (iOS 26 style): a frosted,
+translucent panel with a bright top edge and a long soft shadow over a dimmed,
+blurred page, 28–30px corners, a centred title and a round close button.
+
+- `UModal` and `USlideover` get it from `app/app.config.ts` (`liquidGlass`,
+  `glassBackdrop`), so any new modal looks right without extra classes.
+- Hand-built overlays use `.glass-backdrop`, `.glass-sheet` and `.glass-cell`
+  from `app/assets/css/main.css` (order sheet, 3D room product, guestbook and
+  message popups). Both have light and dark versions.
