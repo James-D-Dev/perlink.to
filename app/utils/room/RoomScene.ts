@@ -969,7 +969,11 @@ export class RoomScene {
     this.cameraGlide = null
   }
 
-  /** Editor: pressing on an object selects it and starts dragging it */
+  /**
+   * Editor: an object moves only once it's selected. Pressing an unselected
+   * object does nothing here (a click selects it on release, a drag orbits
+   * the camera); pressing the selected one starts dragging it.
+   */
   private handleEditPointerDown = (e: PointerEvent) => {
     // A second finger turns the gesture into pan/zoom
     if (this.drag) {
@@ -978,12 +982,10 @@ export class RoomScene {
     }
     if (e.button !== 0) return
     const id = this.pickObject(e.clientX, e.clientY)
-    if (!id) return
+    if (!id || id !== this.selectedId) return
     const entry = this.entries.get(id)
     if (!entry) return
     this.controls.enabled = false
-    this.select(id)
-    this.options.onSelect?.(id)
 
     const offset = new THREE.Vector3()
     if (!entry.item.wallMounted) {
@@ -1038,7 +1040,9 @@ export class RoomScene {
         return
       }
       if (e.buttons) return
-      this.renderer.domElement.style.cursor = this.pickObject(e.clientX, e.clientY) ? 'grab' : ''
+      // Pointer: click to select; grab: the selected object can be dragged
+      const hovered = this.pickObject(e.clientX, e.clientY)
+      this.renderer.domElement.style.cursor = !hovered ? '' : hovered === this.selectedId ? 'grab' : 'pointer'
       return
     }
     const id = this.pickObject(e.clientX, e.clientY)

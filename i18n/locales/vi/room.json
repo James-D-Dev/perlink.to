@@ -82,7 +82,7 @@
       "editObject": "Sửa {name}"
     },
     "hint": {
-      "navigation": "Kéo để xoay · Kéo chuột phải để di chuyển · Cuộn để thu phóng",
+      "navigation": "Bấm đồ vật để chọn, rồi kéo để di chuyển · Kéo để xoay · Cuộn để thu phóng",
       "firstRun": "Kéo nội thất từ thanh bên dưới vào phòng của bạn"
     },
     "stats": {

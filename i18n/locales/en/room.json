@@ -82,7 +82,7 @@
       "editObject": "Edit {name}"
     },
     "hint": {
-      "navigation": "Drag to rotate · Right-drag to pan · Scroll to zoom",
+      "navigation": "Click an object to select it, then drag to move · Drag to rotate · Scroll to zoom",
       "firstRun": "Drag furniture from the bar below into your room"
     },
     "stats": {
