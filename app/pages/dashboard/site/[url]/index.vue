@@ -164,12 +164,17 @@
         </nav>
 
         <div class="min-w-0 flex-1">
-        <!-- Phone tabs: a solid bar whose dark pill follows the swipe between
-             tabs (like Flutter's TabBar). The white labels are a copy clipped
-             to the pill, so text turns white exactly where the pill is. The
-             active tab is scrolled into view -->
-        <div ref="tabBar" class="-mx-4 mb-2 overflow-x-auto px-4 py-1.5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden">
-          <div ref="tabRow" class="relative flex w-max gap-0.5 rounded-full bg-paper p-1 shadow-sm ring-1 ring-line">
+        <!-- Phone tabs: a solid full-width bar stuck under the header (-top-4:
+             sticky offsets count from inside the page's 1rem padding), whose
+             dark pill follows the swipe between tabs (like Flutter's TabBar).
+             The white labels are a copy clipped to the pill, so text turns
+             white exactly where the pill is. The active tab is scrolled into view -->
+        <div
+          ref="tabBar"
+          class="sticky -top-4 z-20 -mx-4 mb-3 overflow-x-auto border-b border-line bg-paper px-3 py-1.5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
+          :class="!tempAddress && '-mt-4'"
+        >
+          <div ref="tabRow" class="relative flex w-max gap-0.5 p-1">
             <span class="absolute inset-y-1 rounded-full bg-ink shadow-sm" :style="pillStyle" aria-hidden="true" />
             <button
               v-for="tab in editorTabs"
@@ -314,7 +319,7 @@
           </template>
 
           <!-- 3D room Tab -->
-          <div v-if="paneMounted('room')" class="max-w-3xl space-y-4 pt-4" :class="paneClass('room')" :style="paneStyle('room')" :inert="activeTab !== 'room' || undefined">
+          <div v-if="paneMounted('room')" class="mx-auto max-w-3xl space-y-4 pt-4" :class="paneClass('room')" :style="paneStyle('room')" :inert="activeTab !== 'room' || undefined">
             <div class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line sm:flex">
               <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
                 <!-- The picture the 3D editor saves with each save or publish; until
