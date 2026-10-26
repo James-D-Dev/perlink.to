@@ -317,9 +317,9 @@
           <div v-if="paneMounted('room')" class="max-w-3xl space-y-4 pt-4" :class="paneClass('room')" :style="paneStyle('room')" :inert="activeTab !== 'room' || undefined">
             <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
               <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
-                <!-- The room itself, always in daylight (only drawn while this tab is open;
-                     lists use the saved picture instead) -->
-                <LazyRoomCanvas :room="roomModel" preview force-mode="day" class="pointer-events-none" />
+                <!-- The picture the 3D editor saves with each save or publish; until
+                     there is one, the picture of the room's land -->
+                <img :src="roomPicture" :alt="t('dashboard.editor.room.heading')" class="absolute inset-0 size-full object-cover" loading="lazy" decoding="async" @error="roomPictureFailed = true">
               </div>
               <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
                 <div>
@@ -569,6 +569,7 @@
 <script setup lang="ts">
 import { nanoid } from "nanoid";
 import { useDebounceFn, useMediaQuery, useResizeObserver } from "@vueuse/core";
+import { LANDS } from "~/utils/room/lands";
 import type {
   BioData,
   BioLink,
@@ -1228,6 +1229,15 @@ const openingRoom = ref<"edit" | "video" | null>(null);
 
 // Save the page first so the full-screen editor starts from the latest data.
 // "video" opens it straight into the room video dialog
+// The saved picture of the room, or its land's while there's none (or it
+// can't be loaded)
+const roomPictureFailed = ref(false);
+const roomPicture = computed(() =>
+  (!roomPictureFailed.value && existingBio.value?.roomThumbnailUrl) ||
+  (LANDS.find((land) => land.id === (roomModel.value.land ?? "island")) ?? LANDS[0])!.thumbnail,
+);
+watch(() => existingBio.value?.roomThumbnailUrl, () => (roomPictureFailed.value = false));
+
 const openRoomEditor = async (mode: "edit" | "video" = "edit") => {
   if (!existingBio.value?.username) return;
   openingRoom.value = mode;

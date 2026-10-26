@@ -39,9 +39,14 @@ RoomTourRecorder.vue (full-screen studio)
 
 - **Format:** MP4 (H.264/AAC) where the browser can record it (Chrome 126+,
   Safari), otherwise WebM. About 10 MB for 8 s at 10 Mbps.
-- **Camera path** (`RoomScene.renderTour`): for the first 78 % it sweeps across
-  the open side of the room (azimuth 0.18 → π/2−0.18) while moving in; then it
-  rises and pulls back to show the land. Distances scale with the room size.
+- **Camera styles** (`RoomScene.renderTour(progress, style)`, `TOUR_STYLES`),
+  picked in the studio. Distances scale with the room size; every path stays
+  on the room's open sides (azimuth 0 → π/2), where no wall is in the way:
+  - *Sweep* (default): across the open side while moving in, then up and back
+    to show the land.
+  - *Orbit*: an even, higher arc from one open side to the other.
+  - *Fly in*: a drone shot from high above the land down into the room.
+  - *Pull out*: close at eye level, then up and out to the whole land.
 - **Capture mode** (`RoomSceneOptions.capture`): best quality, fixed 2× pixel
   ratio, no adaptive downgrade, controls off, and the scene draws no frames of
   its own. The recorder draws each frame, so timing follows the recording.
@@ -66,9 +71,10 @@ RoomTourRecorder.vue (full-screen studio)
 - **Options:** title text (no label, placeholder only) and three icon buttons: day/night, length (8/12/15 s, tap to cycle), music on/off. Then [Back] [Record].
 - **Watermark:** a small "Tạo bằng Perlink" in the corner on plans without
   `removeBranding` (Free, Starter). Plus and Pro have none.
-- **Share:** on phones `navigator.share({ files })` opens the share sheet, so
-  the video goes straight to TikTok or Zalo. A suggested caption with
-  hashtags can be copied.
+- **Share:** on phones `navigator.share({ files, text })` opens the share
+  sheet with the video and a suggested caption (link and hashtags), so it
+  goes straight to TikTok or Zalo. The ready screen is one row: Back (to the
+  options), Share, Download.
 
 | File | Role |
 |---|---|
