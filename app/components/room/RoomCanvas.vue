@@ -109,6 +109,9 @@ defineExpose({
   focusGuest(id: string) {
     scene?.focusGuest(id)
   },
+  setPaused(paused: boolean) {
+    scene?.setPaused(paused)
+  },
   getDropTarget(clientX: number, clientY: number, wallMounted: boolean): { position: [number, number, number]; wall?: WallSide } | null {
     return scene?.getDropTarget(clientX, clientY, wallMounted) ?? null
   },

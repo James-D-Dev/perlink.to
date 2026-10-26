@@ -1,5 +1,6 @@
 <template>
-  <div class="fixed inset-0 select-none overflow-hidden bg-slate-900 [touch-action:pan-x_pan-y] max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base">
+  <!-- While a video records, every control above the scene is hidden -->
+  <div class="fixed inset-0 select-none overflow-hidden bg-slate-900 [touch-action:pan-x_pan-y] max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base" :class="recordingVideo && '[&>*:not(:first-child)]:invisible'">
     <!-- Scene -->
     <div class="absolute inset-0">
       <RoomCanvas
@@ -561,7 +562,7 @@
     >
       {{ t('room.hint.firstRun') }}
     </p>
-    <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" />
+    <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" @recording="onRecordingVideo" />
   </div>
 </template>
 
@@ -595,8 +596,14 @@ const props = defineProps<{
 
 const productOptions = computed(() => (props.products ?? []).map(p => ({ value: p.id, label: p.name })))
 
-// Room tour video for TikTok (RoomTourRecorder)
+// Room video (RoomTourRecorder). While it records, the editor's scene
+// pauses so the recording gets the whole GPU, and the controls hide
 const tourOpen = ref(false)
+const recordingVideo = ref(false)
+function onRecordingVideo(active: boolean) {
+  recordingVideo.value = active
+  canvasRef.value?.setPaused(active)
+}
 
 const emit = defineEmits<{
   back: []
@@ -614,7 +621,7 @@ const styleName = (name: string) => label(`room.styles.${name.toLowerCase().repl
 
 type Tab = CatalogCategory | 'room' | 'land' | 'time' | 'music'
 
-const canvasRef = ref<{ snapshot: () => Promise<Blob | null>; resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; ridersOf: (id: string) => string[]; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
+const canvasRef = ref<{ snapshot: () => Promise<Blob | null>; resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; setPaused: (paused: boolean) => void; ridersOf: (id: string) => string[]; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
 const barRef = ref<HTMLElement | null>(null)
 const selectedId = ref<string | null>(null)
 const activeTab = ref<Tab>('furniture')

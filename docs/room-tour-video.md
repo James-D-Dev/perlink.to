@@ -30,6 +30,17 @@ RoomTourRecorder.vue (modal)
 - **Capture mode** (`RoomSceneOptions.capture`): best quality, fixed 2× pixel
   ratio, no adaptive downgrade, controls off, and the scene draws no frames of
   its own. The recorder draws each frame, so timing follows the recording.
+- **While recording:** the dialog steps aside, the editor hides every
+  control (`recordingVideo` in RoomStudio) and pauses its own scene
+  (`RoomScene.setPaused`), and the frame being recorded shows full height with
+  a status bar (red dot, 0:05 / 0:12, progress, Cancel). When done the dialog
+  comes back with the video; Cancel returns to the options.
+- **Smoothness:** frames are drawn at 30 fps and pushed to the video with
+  `captureStream(0)` + `requestFrame()` (fixed-rate capture where that isn't
+  supported); the dialog preview stops while recording.
+- **Sound:** the track is fetched and decoded up front and played by Web Audio
+  (`AudioBufferSourceNode`), so main-thread hiccups can't make it skip; a quiet
+  intro is skipped and the fade-out is scheduled ahead.
 - **Before recording:** waits up to 6 s for objects still loading (`scene.loading`).
 - **Options:** title text (no label, placeholder only) and three icon buttons at the bottom: day/night, length (8/12/15 s, tap to cycle), music on/off.
 - **Watermark:** a small "Tạo bằng Perlink" in the corner on plans without

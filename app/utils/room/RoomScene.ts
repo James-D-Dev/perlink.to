@@ -156,6 +156,8 @@ export class RoomScene {
   private intro: { start: number | null } | null = null
   /** The camera follows renderTour() instead of the orbit controls */
   private touring = false
+  /** Stops drawing frames (e.g. the editor's scene while a video records) */
+  private paused = false
   /** Daylight actually shown; eases toward the target for smooth day/night switches */
   private shownDaylight: number | null = null
   private skyColor = new THREE.Color()
@@ -424,6 +426,12 @@ export class RoomScene {
     let obj: THREE.Object3D | null = hit?.object ?? null
     while (obj && !obj.userData.guestId) obj = obj.parent
     return (obj?.userData.guestId as string) ?? null
+  }
+
+  /** Pause drawing to free the GPU for something else, e.g. recording a video */
+  setPaused(paused: boolean) {
+    this.paused = paused
+    if (!paused) this.markActive()
   }
 
   /** Objects or land still loading (a recording waits for them) */
@@ -1150,7 +1158,7 @@ export class RoomScene {
     if (this.disposed) return
     this.frame = requestAnimationFrame(this.animate)
     // A recording draws its own frames
-    if (!this.onScreen || this.options.capture) return
+    if (!this.onScreen || this.options.capture || this.paused) return
     // 60 fps while interacting, 30 fps for ambient motion, 15 fps for previews
     const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active || !!this.intro || this.loadingMarkers.size > 0
     const fps = this.options.preview ? 15 : active ? 60 : 30
