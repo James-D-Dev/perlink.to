@@ -1378,6 +1378,9 @@ export function siteTime(lang: SiteLanguage, time: string) {
 
 export const SITE_LANG_KEY: InjectionKey<Ref<SiteLanguage>> = Symbol('site-language')
 
+/** Set by template thumbnails: blocks show sample content and don't load live data */
+export const TEMPLATE_PREVIEW_KEY: InjectionKey<boolean> = Symbol('template-preview')
+
 /** Translator for components inside a site page (BioPageView provides the language) */
 export function useSiteI18n() {
   const lang = inject(SITE_LANG_KEY, ref<SiteLanguage>('en'))

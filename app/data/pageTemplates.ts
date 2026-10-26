@@ -17,10 +17,11 @@ export interface PageTemplateContent {
   room: RoomConfig
 }
 
-export type TemplateCategory = 'gifts' | 'personal' | 'food' | 'beauty' | 'health' | 'shop' | 'education' | 'hospitality' | 'business' | 'creative' | 'events' | 'community'
+export type TemplateCategory = 'gifts' | 'blog' | 'personal' | 'food' | 'beauty' | 'health' | 'shop' | 'education' | 'hospitality' | 'business' | 'creative' | 'events' | 'community'
 
 export const TEMPLATE_CATEGORIES: { id: TemplateCategory; label: string; icon: string }[] = [
   { id: 'gifts', label: 'Gifts', icon: 'i-lucide-gift' },
+  { id: 'blog', label: 'Blog', icon: 'i-lucide-newspaper' },
   { id: 'personal', label: 'Personal', icon: 'i-lucide-user-round' },
   { id: 'food', label: 'Food & drink', icon: 'i-lucide-utensils' },
   { id: 'beauty', label: 'Beauty', icon: 'i-lucide-sparkles' },

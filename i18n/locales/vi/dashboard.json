@@ -387,6 +387,38 @@
       "blog": {
         "name": "Blog cá nhân",
         "description": "Bài viết của bạn là trọng tâm: lời giới thiệu, bài mới nhất và bảng tin blog trong phòng 3D."
+      },
+      "blog-travel": {
+        "name": "Blog du lịch",
+        "description": "Phong cảnh hùng vĩ, dải ảnh các chuyến đi và những câu chuyện mới nhất."
+      },
+      "blog-food": {
+        "name": "Blog ẩm thực",
+        "description": "Công thức và chuyện món ăn, mở đầu bằng những tấm ảnh hấp dẫn."
+      },
+      "blog-tech": {
+        "name": "Blog công nghệ & lập trình",
+        "description": "Tông tối, chất công nghệ: hướng dẫn, ghi chép và dự án cá nhân."
+      },
+      "blog-fashion": {
+        "name": "Blog thời trang & làm đẹp",
+        "description": "Mơ màng như tạp chí: lookbook, mẹo làm đẹp và nhật ký phối đồ."
+      },
+      "blog-wellness": {
+        "name": "Blog sống khỏe",
+        "description": "Nhẹ nhàng, tươi mát: yoga, sống chánh niệm và thói quen lành mạnh."
+      },
+      "blog-family": {
+        "name": "Blog gia đình & nuôi con",
+        "description": "Ấm áp, vui tươi: chuyện nhà, cột mốc của con và kinh nghiệm làm cha mẹ."
+      },
+      "blog-growth": {
+        "name": "Blog tài chính & phát triển bản thân",
+        "description": "Gọn gàng, đáng tin: tài chính cá nhân, năng suất và sách hay."
+      },
+      "blog-diary": {
+        "name": "Nhật ký ảnh",
+        "description": "Trầm và điện ảnh: ảnh đường phố và câu chuyện thành phố."
       }
     },
     "categories": {
@@ -401,7 +433,8 @@
       "shop": "Cửa hàng",
       "education": "Giáo dục",
       "community": "Cộng đồng",
-      "gifts": "Quà tặng"
+      "gifts": "Quà tặng",
+      "blog": "Blog"
     },
     "seo": {
       "heading": "Tìm kiếm & chia sẻ",

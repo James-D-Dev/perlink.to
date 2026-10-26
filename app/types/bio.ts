@@ -457,6 +457,8 @@ export interface BlogBlock extends BaseBlock {
     title?: string;
     /** How many posts to show */
     count?: number;
+    /** Example posts a template comes with: shown in previews until real posts exist */
+    samples?: { title: string; coverUrl?: string; minutes?: number }[];
   };
 }
 

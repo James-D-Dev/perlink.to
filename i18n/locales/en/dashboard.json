@@ -387,6 +387,38 @@
       "blog": {
         "name": "Personal blog",
         "description": "Your writing up front: an intro, your latest posts and a blog board in your 3D room."
+      },
+      "blog-travel": {
+        "name": "Travel blog",
+        "description": "Big landscapes, a photo strip of your trips and your latest stories."
+      },
+      "blog-food": {
+        "name": "Food blog",
+        "description": "Recipes and food stories, with mouth-watering photos up top."
+      },
+      "blog-tech": {
+        "name": "Tech & code blog",
+        "description": "Dark, techy and sharp: tutorials, notes and side projects."
+      },
+      "blog-fashion": {
+        "name": "Fashion & beauty blog",
+        "description": "Editorial and dreamy: lookbooks, beauty notes and outfit diaries."
+      },
+      "blog-wellness": {
+        "name": "Wellness blog",
+        "description": "Calm and fresh: yoga, mindful living and healthy habits."
+      },
+      "blog-family": {
+        "name": "Family & parenting blog",
+        "description": "Warm and playful: family life, milestones and honest parenting tips."
+      },
+      "blog-growth": {
+        "name": "Money & growth blog",
+        "description": "Clean and trustworthy: personal finance, productivity and books."
+      },
+      "blog-diary": {
+        "name": "Photo diary",
+        "description": "Moody and cinematic: street photography and stories from the city."
       }
     },
     "categories": {
@@ -401,7 +433,8 @@
       "shop": "Shops",
       "education": "Education",
       "community": "Community",
-      "gifts": "Gifts"
+      "gifts": "Gifts",
+      "blog": "Blog"
     },
     "seo": {
       "heading": "Search & sharing",

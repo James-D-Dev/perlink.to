@@ -51,7 +51,13 @@ The **Blog board** (catalog `blog-board`, Wall category, `opensBlog`) is a
 cork board with "BLOG" on it: hovering shows "Blog", clicking opens
 `/<site>/blog`, and a "Blog" chip appears under the room.
 
-## Template
+## Templates
 
-**Personal blog** (`blog`, Personal category): an intro, the latest 5 posts,
-socials, and a reading-nook room with the blog board on the wall.
+The **Blog** category of templates: Personal blog, Travel, Food, Tech & code,
+Fashion & beauty, Wellness, Family & parenting, Money & growth and Photo
+diary. Each has its own photos (see `template-photos.md`), type and
+background (photo banner, gradient, mesh, pattern or a moving effect), a
+"Latest posts" block with **sample posts** (`samples` on the block: shown in
+previews until the site has real posts, never on the live site), and a 3D
+room with the blog board. Template cards don't load live posts
+(`TEMPLATE_PREVIEW_KEY`).

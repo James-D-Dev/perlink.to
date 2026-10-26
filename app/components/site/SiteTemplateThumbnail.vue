@@ -17,6 +17,9 @@ import type { BioData } from '~/types/bio'
 import { localizeTemplateContent } from '~/data/templateCopyVi'
 import type { PageTemplate } from '~/data/pageTemplates'
 
+// Blocks inside show sample content instead of asking the server
+provide(TEMPLATE_PREVIEW_KEY, true)
+
 const props = withDefaults(defineProps<{
   template: PageTemplate
   scale?: number

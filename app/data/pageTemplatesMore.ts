@@ -190,7 +190,7 @@ const GIFT_TEMPLATES: PageTemplate[] = [
 const BLOG_TEMPLATE: PageTemplate = {
   id: 'blog',
   name: 'Personal blog',
-  category: 'personal',
+  category: 'blog',
   description: 'Your writing up front: an intro, your latest posts and a blog board in your 3D room.',
   icon: 'i-lucide-newspaper',
   preview: { bg: '#FBF8F3', accent: '#B5543B' },
@@ -206,7 +206,7 @@ const BLOG_TEMPLATE: PageTemplate = {
     }),
     blocks: withIndex([
       { name: 'text', data: { title: s('Hello, I\'m glad you\'re here', 'Chào bạn, rất vui vì bạn ghé'), content: s('I write about the books I read, the places I go and the small things that make a day good. New posts every week.', 'Mình viết về những cuốn sách đã đọc, những nơi đã đi và những điều nhỏ làm nên một ngày đẹp. Mỗi tuần một bài mới.'), align: 'center', style: 'plain' } },
-      { name: 'blog', data: { title: s('Latest posts', 'Bài viết mới'), count: 5 } },
+      { name: 'blog', data: { title: s('Latest posts', 'Bài viết mới'), count: 5, samples: [{ title: s('The books that got me through this year', 'Những cuốn sách đưa mình qua năm nay'), coverUrl: photo('personal-work-1'), minutes: 6 }, { title: s('Notes from a slow week in Da Lat', 'Ghi chép một tuần chậm ở Đà Lạt'), coverUrl: photo('personal-work-2'), minutes: 5 }, { title: s('Why I started writing again', 'Vì sao mình bắt đầu viết lại'), coverUrl: photo('personal-work-3'), minutes: 4 }] } },
       { name: 'social', data: { links: social('instagram', 'threads', 'facebook') } },
     ] as Blocks),
     room: room({ wallColor: '#efe6d8', floorColor: '#8a6a4a', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -226,9 +226,302 @@ const BLOG_TEMPLATE: PageTemplate = {
   }),
 }
 
+// ─── Blogger templates ───────────────────────────────────────────
+// One per kind of blog, each with its own photos, type and background
+// (photo banner, gradient, mesh or a moving effect) and a room with the
+// blog board on the wall.
+
+const BLOGGER_TEMPLATES: PageTemplate[] = [
+  // Travel: a lake at dawn, airy sky gradient, an elegant serif
+  {
+    id: 'blog-travel', name: 'Travel blog', category: 'blog',
+    description: 'Big landscapes, a photo strip of your trips and your latest stories.',
+    icon: 'i-lucide-plane', preview: { bg: '#E0F2FE', accent: '#0E7490' },
+    build: () => ({
+      title: s('Lan Anh · On the road', 'Lan Anh · Trên đường đi'),
+      bio: s('42 countries, one backpack. Honest guides, slow travel and the food I find on the way.', '42 quốc gia, một chiếc ba lô. Kinh nghiệm thật, du lịch chậm và những món ngon dọc đường.'),
+      avatarUrl: photo('blog-travel-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#F0F9FF', text: '#0F2A3D', accent: '#0E7490', onAccent: '#FFFFFF',
+          surface: '#FFFFFFD9', radius: 20, shadow: 'md',
+          nameFont: 'Playfair Display, serif', nameWeight: '700', nameSize: '2.25rem', tracking: '-0.01em',
+          header: 'banner-circle', banner: photo('blog-travel-cover'), link: 'centered', social: 'soft',
+        }),
+        background: { type: 'gradient', color: '#F0F9FF', gradient: { angle: 180, from: '#E0F2FE', via: '#FFF7ED', to: '#FDE68A' } },
+      },
+      blocks: withIndex([
+        { name: 'blog', data: { title: s('Latest from the road', 'Mới nhất từ những chuyến đi'), count: 5, samples: [{ title: s('Three days around Lago di Braies on a budget', '3 ngày quanh hồ Braies với chi phí tiết kiệm'), coverUrl: photo('blog-travel-1'), minutes: 6 }, { title: s('Sunrise balloons over Cappadocia: what to know', 'Ngắm khinh khí cầu ở Cappadocia: cần biết gì'), coverUrl: photo('blog-travel-2'), minutes: 5 }, { title: s('Machu Picchu without the crowds', 'Machu Picchu vắng người: đi lúc nào?'), coverUrl: photo('blog-travel-3'), minutes: 7 }] } },
+        { name: 'image-album', data: { images: album('blog-travel-1', 'blog-travel-2', 'blog-travel-3'), layout: 'carousel' } },
+        { name: 'links', data: { items: links([s('My packing list', 'Danh sách đồ mang theo'), ''], [s('Work with me', 'Hợp tác cùng mình'), '']) } },
+        { name: 'social', data: { links: social('instagram', 'youtube', 'tiktok') } },
+      ] as Blocks),
+      room: { ...room({ wallColor: '#e8f4fb', floorColor: '#b08968', floorMaterial: 'wood', trimColor: '#ffffff' }, [
+        { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#0E7490' },
+        { type: 'picture-frame', position: [-3, 1.6, -0.8], rotation: 0, wall: 'left', color: '#0E7490' },
+        { type: 'picture-frame', position: [-3, 1.6, 0.6], rotation: 0, wall: 'left', color: '#f59e0b' },
+        { type: 'sofa', position: [0.6, 0, 0.9], rotation: 180, color: '#e9d8a6' },
+        { type: 'rug', position: [0.4, 0, 0.2], rotation: 0, color: '#0E7490' },
+        { type: 'plant', position: [2.5, 0, -2.4], rotation: 0 },
+        { type: 'plant', position: [-2.4, 0, 2.2], rotation: 0 },
+        { type: 'floor-lamp', position: [2.5, 0, 1.4], rotation: 0 },
+      ]), land: 'island' },
+    }),
+  },
+  // Food: a feast from above, warm cream with dots, a bookish serif
+  {
+    id: 'blog-food', name: 'Food blog', category: 'blog',
+    description: 'Recipes and food stories, with mouth-watering photos up top.',
+    icon: 'i-lucide-chef-hat', preview: { bg: '#FFF8F0', accent: '#C2410C' },
+    build: () => ({
+      title: s('Mai\'s Kitchen', 'Bếp của Mai'),
+      bio: s('Home cooking, street food and the stories behind every dish.', 'Món nhà nấu, món ăn đường phố và câu chuyện sau mỗi món.'),
+      avatarUrl: photo('blog-food-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#FFF8F0', text: '#3B2416', accent: '#C2410C', onAccent: '#FFFFFF',
+          surface: '#FFFFFF', border: '#F3E3D3', radius: 18,
+          nameFont: 'Lora, serif', nameWeight: '700', nameSize: '2.25rem',
+          header: 'banner-circle', banner: photo('blog-food-cover'), link: 'centered', social: 'soft',
+        }),
+        background: { type: 'solid', color: '#FFF8F0', pattern: { id: 'dots', color: '#E9C9AE' } },
+      },
+      blocks: withIndex([
+        { name: 'blog', data: { title: s('New recipes', 'Công thức mới'), count: 5, samples: [{ title: s('Crispy banh xeo at home, step by step', 'Bánh xèo giòn tại nhà, từng bước một'), coverUrl: photo('street-2'), minutes: 8 }, { title: s('The croissant I baked 20 times', 'Chiếc croissant mình nướng 20 lần'), coverUrl: photo('bakery-1'), minutes: 6 }, { title: s('Saigon street snacks under 30k', 'Món ăn vặt Sài Gòn dưới 30 nghìn'), coverUrl: photo('street-1'), minutes: 4 }] } },
+        { name: 'image-album', data: { images: album('street-1', 'bakery-1', 'cafe-2', 'street-2'), layout: 'grid' } },
+        { name: 'text', data: { title: s('Cook along', 'Nấu cùng Mai'), content: s('Every Sunday a new recipe, tested three times in my small kitchen. Ask me anything in the comments.', 'Mỗi Chủ nhật một công thức mới, đã thử ba lần trong căn bếp nhỏ. Có gì thắc mắc cứ hỏi Mai nhé.'), align: 'center', style: 'plain' } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'facebook') } },
+      ] as Blocks),
+      room: room({ wallColor: '#f6e7d8', floorColor: '#9c6644', floorMaterial: 'tile', trimColor: '#ffffff' }, [
+        { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#C2410C' },
+        { type: 'cabinet', position: [-1.6, 0, -2.6], rotation: 0, color: '#e9c46a' },
+        { type: 'coffee-table', position: [0.6, 0, 0.2], rotation: 0, color: '#9c6644' },
+        { type: 'chair', position: [0.6, 0, 1.0], rotation: 180 },
+        { type: 'chair', position: [0.6, 0, -0.6], rotation: 0 },
+        { type: 'plant', position: [2.5, 0, -2.4], rotation: 0 },
+        { type: 'string-lights', position: [-3, 2.5, 0], rotation: 0, wall: 'left', color: '#fbbf24' },
+      ]),
+    }),
+  },
+  // Tech: dark with a flickering grid, neon cyan, a geometric sans
+  {
+    id: 'blog-tech', name: 'Tech & code blog', category: 'blog',
+    description: 'Dark, techy and sharp: tutorials, notes and side projects.',
+    icon: 'i-lucide-code-xml', preview: { bg: '#0B1020', accent: '#22D3EE' },
+    build: () => ({
+      title: s('Minh.dev', 'Minh.dev'),
+      bio: s('Notes on web development, AI tools and building things on weekends.', 'Ghi chép về lập trình web, công cụ AI và những dự án làm vào cuối tuần.'),
+      avatarUrl: photo('blog-tech-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#0B1020', text: '#E2E8F0', accent: '#22D3EE', onAccent: '#0B1020',
+          surface: '#111827E6', border: '#1F2A44', radius: 14,
+          nameFont: 'Space Grotesk, sans-serif', nameWeight: '700', nameSize: '2.25rem', tracking: '-0.03em',
+          header: 'banner-square', banner: photo('blog-tech-cover'), avatar: 'rounded', link: 'centered', social: 'outline',
+        }),
+        background: { type: 'effect', effectId: 'neural', color: '#0B1020' },
+      },
+      blocks: withIndex([
+        { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 5, samples: [{ title: s('Building a blog with Nuxt in a weekend', 'Dựng blog bằng Nuxt trong một cuối tuần'), coverUrl: photo('blog-tech-1'), minutes: 9 }, { title: s('My 2026 dev setup', 'Bộ đồ nghề lập trình 2026 của mình'), coverUrl: photo('blog-tech-2'), minutes: 5 }, { title: s('Prompting tips that actually save time', 'Mẹo dùng AI thật sự tiết kiệm thời gian'), coverUrl: photo('blog-tech-cover'), minutes: 6 }] } },
+        { name: 'links', data: { items: links(['GitHub', 'https://github.com'], [s('My dev setup', 'Bộ đồ nghề của mình'), ''], [s('Newsletter', 'Bản tin hàng tuần'), '']) } },
+        { name: 'image-album', data: { images: album('blog-tech-1', 'blog-tech-2'), layout: 'grid' } },
+        { name: 'social', data: { links: social('github', 'linkedin', 'youtube') } },
+      ] as Blocks),
+      room: { ...room({ wallColor: '#141a2e', floorColor: '#22283d', floorMaterial: 'concrete', trimColor: '#334155' }, [
+        { type: 'blog-board', position: [-0.6, 1.7, -3], rotation: 0, wall: 'back', color: '#22D3EE' },
+        { type: 'neon-sign', position: [1.6, 2.0, -3], rotation: 0, wall: 'back', color: '#22D3EE', link: { label: 'GitHub', url: 'https://github.com' } },
+        { type: 'desk', position: [1.4, 0, -2.6], rotation: 0, color: '#1f2937' },
+        { type: 'chair', position: [1.4, 0, -1.8], rotation: 180 },
+        { type: 'laptop', position: [1.25, DESK_TOP, -2.6], rotation: 0 },
+        { type: 'desk-lamp', position: [1.9, DESK_TOP, -2.7], rotation: 0, color: '#22D3EE' },
+        { type: 'string-lights', position: [-3, 2.5, 0], rotation: 0, wall: 'left', color: '#a78bfa' },
+        { type: 'rug', position: [0, 0, 0.4], rotation: 0, color: '#1e293b' },
+        { type: 'plant', position: [-2.4, 0, 2.2], rotation: 0 },
+      ]), land: 'city' },
+    }),
+  },
+  // Fashion: pink mesh, high-contrast serif, editorial photos
+  {
+    id: 'blog-fashion', name: 'Fashion & beauty blog', category: 'blog',
+    description: 'Editorial and dreamy: lookbooks, beauty notes and outfit diaries.',
+    icon: 'i-lucide-shirt', preview: { bg: '#FFE4EF', accent: '#BE185D' },
+    build: () => ({
+      title: s('Vy Muse', 'Vy Muse'),
+      bio: s('Outfits, skincare and the little rituals that make me feel like me.', 'Phối đồ, chăm da và những thói quen nhỏ giúp mình là chính mình.'),
+      avatarUrl: photo('blog-fashion-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#FFF5FA', text: '#2A1A1F', accent: '#BE185D', onAccent: '#FFFFFF',
+          surface: '#FFFFFFCC', radius: 24, shadow: 'sm',
+          nameFont: 'Cormorant Garamond, serif', nameWeight: '700', nameSize: '2.75rem', tracking: '-0.01em',
+          header: 'banner-circle', banner: photo('blog-fashion-cover'), link: 'centered', social: 'plain',
+        }),
+        background: { type: 'gradient', color: '#FFF5FA', gradient: { style: 'mesh', from: '#FFC6E0', via: '#E9D5FF', to: '#FFE4CC' } },
+      },
+      blocks: withIndex([
+        { name: 'image-album', data: { images: album('blog-fashion-1', 'blog-fashion-2', 'blog-fashion-3'), layout: 'carousel' } },
+        { name: 'blog', data: { title: s('Journal', 'Nhật ký'), count: 5, samples: [{ title: s('10 pieces, 30 outfits: my capsule wardrobe', '10 món đồ, 30 bộ: tủ đồ tối giản của mình'), coverUrl: photo('blog-fashion-1'), minutes: 5 }, { title: s('A 5-minute morning skincare routine', 'Chăm da buổi sáng chỉ 5 phút'), coverUrl: photo('blog-fashion-3'), minutes: 4 }, { title: s('Wearing red, without overthinking it', 'Mặc đồ đỏ mà không ngại'), coverUrl: photo('blog-fashion-2'), minutes: 3 }] } },
+        { name: 'links', data: { items: links([s('Shop my looks', 'Mua đồ mình mặc'), ''], [s('Collaborations', 'Hợp tác'), '']) } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'threads') } },
+      ] as Blocks),
+      room: { ...room({ wallColor: '#fde2ef', floorColor: '#f5e6ea', floorMaterial: 'carpet', trimColor: '#ffffff' }, [
+        { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#BE185D' },
+        { type: 'picture-frame', position: [-3, 1.6, -0.6], rotation: 0, wall: 'left', color: '#f9a8d4' },
+        { type: 'sofa', position: [0.6, 0, 0.9], rotation: 180, color: '#f9a8d4' },
+        { type: 'rug', position: [0.4, 0, 0.2], rotation: 0, color: '#fbcfe8' },
+        { type: 'floor-lamp', position: [2.5, 0, 1.4], rotation: 0 },
+        { type: 'plant', position: [2.5, 0, -2.4], rotation: 0 },
+        { type: 'string-lights', position: [-3, 2.5, 0], rotation: 0, wall: 'left', color: '#f9a8d4' },
+      ]), land: 'sakura' },
+    }),
+  },
+  // Wellness: soft aurora, sage green, a light rounded sans
+  {
+    id: 'blog-wellness', name: 'Wellness blog', category: 'blog',
+    description: 'Calm and fresh: yoga, mindful living and healthy habits.',
+    icon: 'i-lucide-leaf', preview: { bg: '#F1F7EE', accent: '#4D7C0F' },
+    build: () => ({
+      title: s('Slow Mornings', 'Buổi sáng chậm'),
+      bio: s('Yoga, breathing and gentle routines for a calmer life.', 'Yoga, hít thở và những thói quen nhẹ nhàng cho cuộc sống bình yên hơn.'),
+      avatarUrl: photo('blog-wellness-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#F7FBF4', text: '#22301C', accent: '#4D7C0F', onAccent: '#FFFFFF',
+          surface: '#FFFFFFCC', radius: 28,
+          nameFont: 'Josefin Sans, sans-serif', nameWeight: '600', nameSize: '2.25rem', tracking: '0.02em',
+          header: 'banner-circle', banner: photo('blog-wellness-cover'), link: 'centered', social: 'soft',
+        }),
+        background: { type: 'effect', effectId: 'aurora', color: '#F4FAF1' },
+      },
+      blocks: withIndex([
+        { name: 'text', data: { title: s('Breathe in', 'Hít một hơi thật sâu'), content: s('Short practices you can do before breakfast, and what I learned from ten years on the mat.', 'Những bài tập ngắn làm trước bữa sáng, và điều mình học được sau mười năm tập yoga.'), align: 'center', style: 'plain' } },
+        { name: 'blog', data: { title: s('From the journal', 'Từ nhật ký'), count: 5, samples: [{ title: s('A 10-minute yoga flow for busy mornings', 'Bài yoga 10 phút cho buổi sáng bận rộn'), coverUrl: photo('blog-wellness-2'), minutes: 4 }, { title: s('Breathing to fall asleep faster', 'Hít thở để ngủ ngon hơn'), coverUrl: photo('blog-wellness-1'), minutes: 3 }, { title: s('What a month without sugar taught me', 'Một tháng không đường dạy mình điều gì'), coverUrl: photo('blog-wellness-cover'), minutes: 6 }] } },
+        { name: 'image-album', data: { images: album('blog-wellness-1', 'blog-wellness-2'), layout: 'grid' } },
+        { name: 'social', data: { links: social('instagram', 'youtube', 'spotify') } },
+      ] as Blocks),
+      room: { ...room({ wallColor: '#eef5e9', floorColor: '#c9b28f', floorMaterial: 'wood', trimColor: '#ffffff' }, [
+        { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#4D7C0F' },
+        { type: 'rug', position: [0.2, 0, 0.2], rotation: 0, color: '#a3b18a' },
+        { type: 'plant', position: [-2.4, 0, -2.4], rotation: 0 },
+        { type: 'plant', position: [2.5, 0, -2.4], rotation: 0 },
+        { type: 'plant', position: [2.5, 0, 2.2], rotation: 0 },
+        { type: 'candle', position: [-0.4, 0, 0.6], rotation: 0 },
+        { type: 'window', position: [-3, 1.5, 0], rotation: 0, wall: 'left' },
+      ]), land: 'island' },
+    }),
+  },
+  // Family: pastel candy gradient, rounded friendly type
+  {
+    id: 'blog-family', name: 'Family & parenting blog', category: 'blog',
+    description: 'Warm and playful: family life, milestones and honest parenting tips.',
+    icon: 'i-lucide-baby', preview: { bg: '#FFF1F7', accent: '#EC4899' },
+    build: () => ({
+      title: s('Little Ones at Home', 'Nhà có em bé'),
+      bio: s('A mum of two writing about sleepless nights, first steps and everything in between.', 'Mẹ hai bé kể chuyện những đêm mất ngủ, bước đi đầu tiên và mọi thứ ở giữa.'),
+      avatarUrl: photo('blog-family-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#FFF7FB', text: '#3F2A3A', accent: '#EC4899', onAccent: '#FFFFFF',
+          surface: '#FFFFFFD9', radius: 26, shadow: 'sm',
+          nameFont: 'Comfortaa, sans-serif', nameWeight: '700', nameSize: '2.1rem',
+          header: 'banner-circle', banner: photo('blog-family-cover'), link: 'centered', social: 'soft',
+        }),
+        background: { type: 'gradient', color: '#FFF7FB', gradient: { style: 'mesh', from: '#FBCFE8', via: '#BAE6FD', to: '#FEF3C7' } },
+      },
+      blocks: withIndex([
+        { name: 'blog', data: { title: s('Our latest stories', 'Chuyện nhà mới nhất'), count: 5, samples: [{ title: s('Surviving the 4-month sleep regression', 'Vượt qua giai đoạn khủng hoảng ngủ 4 tháng'), coverUrl: photo('blog-family-1'), minutes: 7 }, { title: s('First foods: our baby-led weaning week', 'Tuần đầu ăn dặm tự chỉ huy của bé'), coverUrl: photo('blog-family-2'), minutes: 5 }, { title: s('Packing for a trip with two kids', 'Đi du lịch cùng hai bé cần mang gì'), coverUrl: photo('blog-family-cover'), minutes: 6 }] } },
+        { name: 'image-album', data: { images: album('blog-family-1', 'blog-family-2'), layout: 'grid' } },
+        { name: 'links', data: { items: links([s('Baby gear I love', 'Đồ cho bé mình tin dùng'), ''], [s('Join our parents group', 'Tham gia nhóm bố mẹ'), '']) } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok') } },
+      ] as Blocks),
+      room: room({ wallColor: '#fde7f1', floorColor: '#f1e4d3', floorMaterial: 'carpet', trimColor: '#ffffff' }, [
+        { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#EC4899' },
+        { type: 'bed', position: [-2, 0, -1.8], rotation: 90, color: '#bae6fd' },
+        { type: 'rug', position: [0.6, 0, 0.6], rotation: 0, color: '#fbcfe8' },
+        { type: 'sofa', position: [1.2, 0, 1.4], rotation: 180, color: '#fde68a' },
+        { type: 'plant', position: [2.5, 0, -2.4], rotation: 0 },
+        { type: 'string-lights', position: [-3, 2.5, 0.6], rotation: 0, wall: 'left', color: '#f9a8d4' },
+      ]),
+    }),
+  },
+  // Personal finance & growth: paper with a grid, deep green, a sturdy serif
+  {
+    id: 'blog-growth', name: 'Money & growth blog', category: 'blog',
+    description: 'Clean and trustworthy: personal finance, productivity and books.',
+    icon: 'i-lucide-trending-up', preview: { bg: '#F7F7F2', accent: '#166534' },
+    build: () => ({
+      title: s('Tuan · Notes on money', 'Tuấn · Ghi chép tài chính'),
+      bio: s('Saving, investing and building good habits, explained without jargon.', 'Tiết kiệm, đầu tư và xây thói quen tốt, giải thích không thuật ngữ.'),
+      avatarUrl: photo('blog-growth-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#F7F7F2', text: '#1C2B22', accent: '#166534', onAccent: '#FFFFFF',
+          surface: '#FFFFFF', border: '#E4E4DA', radius: 12,
+          nameFont: 'Merriweather, serif', nameWeight: '700', nameSize: '2rem',
+          header: 'banner-square', banner: photo('blog-growth-cover'), avatar: 'rounded', link: 'centered', social: 'outline', titleAlign: 'left',
+        }),
+        background: { type: 'solid', color: '#F7F7F2', pattern: { id: 'grid', color: '#DADACB' } },
+      },
+      blocks: withIndex([
+        { name: 'text', data: { title: s('Start here', 'Bắt đầu từ đây'), content: s('New to personal finance? Read these first: budgeting, an emergency fund and your first investment.', 'Mới tìm hiểu tài chính cá nhân? Đọc mấy bài này trước: lập ngân sách, quỹ dự phòng và khoản đầu tư đầu tiên.'), align: 'left', style: 'plain' } },
+        { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 10, samples: [{ title: s('The 50/30/20 budget, done the simple way', 'Quy tắc ngân sách 50/30/20 làm cho đơn giản'), coverUrl: photo('blog-growth-1'), minutes: 6 }, { title: s('How much should your emergency fund be?', 'Quỹ dự phòng nên có bao nhiêu?'), coverUrl: photo('blog-growth-cover'), minutes: 5 }, { title: s('5 books that changed how I spend', '5 cuốn sách thay đổi cách mình tiêu tiền'), coverUrl: photo('blog-growth-1'), minutes: 7 }] } },
+        { name: 'links', data: { items: links([s('Free budget template', 'Mẫu ngân sách miễn phí'), ''], [s('Books I recommend', 'Sách nên đọc'), '']) } },
+        { name: 'social', data: { links: social('linkedin', 'facebook', 'youtube') } },
+      ] as Blocks),
+      room: room({ wallColor: '#ecefe6', floorColor: '#7c5c45', floorMaterial: 'wood', trimColor: '#ffffff' }, [
+        { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#166534' },
+        { type: 'bookshelf', position: [-1.9, 0, -2.8], rotation: 0 },
+        { type: 'bookshelf', position: [2.2, 0, -2.8], rotation: 0 },
+        { type: 'desk', position: [-3, 0, 0.4], rotation: 90, color: '#3f4e3a' },
+        { type: 'laptop', position: [-3, DESK_TOP, 0.4], rotation: 90 },
+        { type: 'chair', position: [-2.2, 0, 0.4], rotation: 270 },
+        { type: 'plant', position: [2.5, 0, 1.6], rotation: 0 },
+        { type: 'wall-clock', position: [-3, 2.0, -1.4], rotation: 0, wall: 'left', color: '#166534' },
+      ]),
+    }),
+  },
+  // Photo diary: night-black with stars, amber accent, street photos
+  {
+    id: 'blog-diary', name: 'Photo diary', category: 'blog',
+    description: 'Moody and cinematic: street photography and stories from the city.',
+    icon: 'i-lucide-camera', preview: { bg: '#0F0F10', accent: '#F59E0B' },
+    build: () => ({
+      title: s('Streets & Film', 'Phố & Phim'),
+      bio: s('Film photos and short stories from the streets of Saigon and Hanoi.', 'Ảnh phim và những câu chuyện ngắn từ phố Sài Gòn, Hà Nội.'),
+      avatarUrl: photo('blog-diary-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#0F0F10', text: '#F5F5F4', accent: '#F59E0B', onAccent: '#0F0F10',
+          surface: '#1C1917E6', border: '#2A2622', radius: 6,
+          nameFont: 'Playfair Display, serif', nameWeight: '700', nameSize: '2.5rem', tracking: '0.01em',
+          header: 'banner-square', banner: photo('blog-diary-cover'), avatar: 'rounded', link: 'centered', social: 'plain',
+        }),
+        background: { type: 'effect', effectId: 'stars', color: '#0F0F10' },
+      },
+      blocks: withIndex([
+        { name: 'image-album', data: { images: album('blog-diary-1', 'blog-diary-2', 'blog-diary-3'), layout: 'grid' } },
+        { name: 'blog', data: { title: s('Stories', 'Câu chuyện'), count: 5, samples: [{ title: s('A rainy night on Bui Vien, on film', 'Một đêm mưa ở Bùi Viện, chụp phim'), coverUrl: photo('blog-diary-2'), minutes: 4 }, { title: s("The motorbikes of Hanoi's Old Quarter", 'Những chiếc xe máy phố cổ Hà Nội'), coverUrl: photo('blog-diary-1'), minutes: 5 }, { title: s('Plastic stools and late-night conversations', 'Ghế nhựa và những câu chuyện đêm khuya'), coverUrl: photo('blog-diary-3'), minutes: 4 }] } },
+        { name: 'links', data: { items: links([s('Prints for sale', 'Bán ảnh in'), ''], [s('Photo walks', 'Dạo phố chụp ảnh'), '']) } },
+        { name: 'social', data: { links: social('instagram', 'threads') } },
+      ] as Blocks),
+      room: { ...room({ wallColor: '#1c1917', floorColor: '#2a2420', floorMaterial: 'concrete', trimColor: '#44403c' }, [
+        { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#F59E0B' },
+        { type: 'picture-frame', position: [-3, 1.6, -1.2], rotation: 0, wall: 'left', color: '#78716c' },
+        { type: 'picture-frame', position: [-3, 1.6, 0], rotation: 0, wall: 'left', color: '#a8a29e' },
+        { type: 'picture-frame', position: [-3, 1.6, 1.2], rotation: 0, wall: 'left', color: '#57534e' },
+        { type: 'sofa', position: [0.8, 0, 1.0], rotation: 180, color: '#44403c' },
+        { type: 'floor-lamp', position: [2.5, 0, 1.6], rotation: 0 },
+        { type: 'string-lights', position: [0, 2.6, -3], rotation: 0, wall: 'back', color: '#fbbf24' },
+        { type: 'rug', position: [0.4, 0, 0.3], rotation: 0, color: '#78350f' },
+      ]), land: 'city' },
+    }),
+  },
+]
+
 export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
   ...GIFT_TEMPLATES,
   BLOG_TEMPLATE,
+  ...BLOGGER_TEMPLATES,
   // ─── Beauty ───────────────────────────────────────────────────
   {
     id: 'spa',
