@@ -87,6 +87,7 @@
     <slot />
     <NotificationsSlideover />
     <BillingUpgradeDialog />
+    <BillingCelebration />
     <HelpCenter />
   </UDashboardGroup>
 </template>

@@ -286,6 +286,8 @@ async function submit() {
     status.value = res.status
     check.value = res.check ?? null
     if (res.status === 'paid') await onPaid()
+    // The dashboard now knows a payment is waiting, and checks back for it
+    else refresh()
   } catch (error: any) {
     toast.add({ title: t('dashboard.billing.checkout.submitFailed'), description: error?.data?.statusMessage, color: 'error' })
   } finally {
@@ -293,11 +295,14 @@ async function submit() {
   }
 }
 
+// Paid: the dialog closes and the "you're upgraded" celebration takes over
+// (BillingCelebration, from the refreshed billing info)
 async function onPaid(expiresAt?: string) {
   paid.value = { expiresAt: expiresAt ?? new Date().toISOString() }
   stopPolling()
   await refresh()
   emit('paid')
+  if (info.value?.celebrate) open.value = false
 }
 
 async function poll() {
@@ -328,7 +333,7 @@ function stopPolling() {
 }
 function startPolling() {
   stopPolling()
-  timer = setInterval(() => poll().catch(() => {}), 6000)
+  timer = setInterval(() => poll().catch(() => {}), 5000)
 }
 
 // Switching between bank and crypto starts that kind of payment

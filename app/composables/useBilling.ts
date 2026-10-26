@@ -9,6 +9,8 @@ export interface BillingInfo {
   checkoutEnabled: boolean
   /** Ways to pay that are set up */
   paymentMethods?: { bank: boolean; crypto: boolean }
+  /** An approved payment whose "you're upgraded" screen hasn't been shown yet */
+  celebrate?: { paymentId: string; plan: PlanId } | null
   payments: { id: string; plan: string; period: string; amount: number; amountUsd?: number | null; method?: string; code: string; status: string; createdAt: string; paidAt: string | null }[]
 }
 

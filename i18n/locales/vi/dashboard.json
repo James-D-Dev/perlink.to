@@ -682,7 +682,14 @@
         "rejected": "Chưa xác nhận"
       },
       "comingSoon": "Sắp mở bán",
-      "usdNote": "Giá theo đô la Mỹ. Hiện thanh toán bằng chuyển khoản ngân hàng Việt Nam (VietQR), tính bằng VND."
+      "usdNote": "Giá theo đô la Mỹ. Hiện thanh toán bằng chuyển khoản ngân hàng Việt Nam (VietQR), tính bằng VND.",
+      "celebrate": {
+        "title": "Chúc mừng! 🎉",
+        "text": "Bạn đã nâng cấp lên gói {plan}.",
+        "until": "Gói có hiệu lực đến {date}.",
+        "unlocked": "Bạn vừa mở khoá",
+        "start": "Bắt đầu thôi"
+      }
     },
     "telegram": {
       "title": "Thông báo qua Telegram",

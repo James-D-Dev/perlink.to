@@ -682,7 +682,14 @@
         "rejected": "Not confirmed"
       },
       "comingSoon": "Coming soon",
-      "usdNote": "Prices in US dollars. For now payment is by Vietnamese bank transfer (VietQR), charged in VND."
+      "usdNote": "Prices in US dollars. For now payment is by Vietnamese bank transfer (VietQR), charged in VND.",
+      "celebrate": {
+        "title": "Congratulations! 🎉",
+        "text": "You’re now on the {plan} plan.",
+        "until": "Your plan runs until {date}.",
+        "unlocked": "You’ve unlocked",
+        "start": "Let’s go"
+      }
     },
     "telegram": {
       "title": "Telegram notifications",
