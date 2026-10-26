@@ -66,5 +66,31 @@
     "sentText": "Cảm ơn bạn. Chúng tôi sẽ xem xét trang này sớm nhất có thể.",
     "failed": "Không gửi được báo cáo",
     "terms": "Xem điều khoản sử dụng"
+  },
+  "pricingPage": {
+    "eyebrow": "Bảng giá",
+    "title": "Bắt đầu miễn phí. Nâng cấp khi cần.",
+    "intro": "Gói nào cũng có sẵn mẫu trang, trình chỉnh sửa kéo thả và một thế giới 3D cho trang của bạn.",
+    "faqTitle": "Câu hỏi về các gói",
+    "seoTitle": "Bảng giá — Perlink",
+    "seoDescription": "Các gói đơn giản cho trang cá nhân và thế giới 3D. Bắt đầu miễn phí, nâng cấp để có thêm trang, theme và tính năng.",
+    "faq": [
+      {
+        "q": "Perlink có thật sự miễn phí không?",
+        "a": "Có. Gói Miễn phí cho bạn tạo và xuất bản một trang cùng thế giới 3D của riêng nó."
+      },
+      {
+        "q": "Nâng cấp thế nào?",
+        "a": "Chọn gói và thanh toán bằng chuyển khoản hoặc quét mã VietQR, gói sẽ tự bật trong vài giây. Nếu thanh toán online chưa mở, hãy liên hệ để chúng tôi nâng cấp tài khoản cho bạn."
+      },
+      {
+        "q": "Sau này đổi gói được không?",
+        "a": "Được, bạn có thể nâng hoặc hạ gói bất cứ lúc nào."
+      },
+      {
+        "q": "Hạ gói thì trang của tôi có sao không?",
+        "a": "Trang vẫn hoạt động ở đúng địa chỉ cũ."
+      }
+    ]
   }
 }

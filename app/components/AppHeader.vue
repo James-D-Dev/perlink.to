@@ -20,10 +20,12 @@
       </nav>
 
       <div class="ml-auto flex items-center gap-2">
-        <!-- Language: the home page exists in English (/) and Vietnamese (/vi) -->
+        <!-- Language: the home page exists in English (/) and Vietnamese (/vi);
+             other pages switch in place -->
         <NuxtLink
-          :to="lang === 'vi' ? '/' : '/vi'"
+          :to="otherLanguage"
           :hreflang="lang === 'vi' ? 'en' : 'vi'"
+          @click="switchInPlace"
           class="hidden rounded-full px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-sand hover:text-ink sm:inline-flex"
           :aria-label="copy.header.language"
         >
@@ -61,7 +63,7 @@
         <UIcon name="i-lucide-arrow-up-right" class="size-4 text-ink-faint" />
       </NuxtLink>
       <MarketingMkButton v-if="!loggedIn" to="/login" variant="outline" block class="mt-5">{{ copy.header.login }}</MarketingMkButton>
-      <NuxtLink :to="lang === 'vi' ? '/' : '/vi'" class="mt-4 block text-center text-sm text-ink-muted" @click="menuOpen = false">
+      <NuxtLink :to="otherLanguage" class="mt-4 block text-center text-sm text-ink-muted" @click="(event: MouseEvent) => { menuOpen = false; switchInPlace(event) }">
         {{ lang === 'vi' ? 'English' : 'Tiếng Việt' }}
       </NuxtLink>
     </nav>
@@ -72,6 +74,17 @@
 const { loggedIn } = useUserSession()
 
 const { lang, copy, home, anchor } = useMarketingLang()
+
+// The other language: the other home page, or this page in that language
+const route = useRoute()
+const { setLocale } = useI18n()
+const onHome = computed(() => route.path === '/' || route.path === '/vi')
+const otherLanguage = computed(() => (onHome.value ? (lang.value === 'vi' ? '/' : '/vi') : route.fullPath))
+function switchInPlace(event: MouseEvent) {
+  if (onHome.value) return
+  event.preventDefault()
+  setLocale(lang.value === 'vi' ? 'en' : 'vi')
+}
 const nav = computed(() => [
   { label: copy.value.header.nav.templates, to: anchor('templates') },
   { label: copy.value.header.nav.worlds, to: anchor('3d') },

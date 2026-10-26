@@ -2,16 +2,16 @@
   <div class="bg-paper text-ink">
     <MarketingMkSection :ruled="false" center>
       <div class="mx-auto max-w-2xl text-center">
-        <p class="mk-eyebrow mb-4">Pricing</p>
-        <h1 class="mk-display text-[44px] sm:text-6xl">Start free. Grow when you need to.</h1>
-        <p class="mt-5 text-lg text-ink-muted">Every plan includes templates, the drag-and-drop editor and a 3D world for your page.</p>
+        <p class="mk-eyebrow mb-4">{{ t('pricingPage.eyebrow') }}</p>
+        <h1 class="mk-display text-[44px] sm:text-6xl">{{ t('pricingPage.title') }}</h1>
+        <p class="mt-5 text-lg text-ink-muted">{{ t('pricingPage.intro') }}</p>
       </div>
       <div class="mt-14">
         <MarketingMkPricing />
       </div>
     </MarketingMkSection>
 
-    <MarketingMkSection title="Questions about plans">
+    <MarketingMkSection :title="t('pricingPage.faqTitle')">
       <div class="divide-y divide-line border-y border-line">
         <details v-for="item in faq" :key="item.q" class="group py-5">
           <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-[15px] text-ink [&::-webkit-details-marker]:hidden">
@@ -28,8 +28,10 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default', colorMode: 'light' })
 
-const title = 'Pricing — Perlink'
-const description = 'Simple plans for personal websites and 3D worlds. Start free, upgrade for more pages, themes and extras.'
+const { t, tm, rt } = useI18n()
+
+const title = computed(() => t('pricingPage.seoTitle'))
+const description = computed(() => t('pricingPage.seoDescription'))
 useSeoMeta({
   title,
   description,
@@ -41,10 +43,8 @@ useSeoMeta({
 })
 useHead({ link: [{ rel: 'canonical', href: 'https://perlink.to/pricing' }] })
 
-const faq = [
-  { q: 'Can I really use Perlink for free?', a: 'Yes. The free plan lets you create and publish a page with its own 3D world.' },
-  { q: 'How do I upgrade?', a: 'Use “Contact us to upgrade” on the plan you want and we will switch your account over. Online checkout is on its way.' },
-  { q: 'Can I change plans later?', a: 'Yes, you can move up or down at any time.' },
-  { q: 'What happens to my page if I downgrade?', a: 'Your page stays online at the same address.' },
-]
+// Questions and answers in the visitor's language
+const faq = computed(() =>
+  (tm('pricingPage.faq') as unknown as { q: unknown; a: unknown }[]).map(item => ({ q: rt(item.q as any), a: rt(item.a as any) })),
+)
 </script>

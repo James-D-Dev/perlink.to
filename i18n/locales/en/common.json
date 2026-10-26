@@ -66,5 +66,31 @@
     "sentText": "Thank you. We'll review this site as soon as we can.",
     "failed": "Couldn't send the report",
     "terms": "Read the Terms of Service"
+  },
+  "pricingPage": {
+    "eyebrow": "Pricing",
+    "title": "Start free. Grow when you need to.",
+    "intro": "Every plan includes templates, the drag-and-drop editor and a 3D world for your page.",
+    "faqTitle": "Questions about plans",
+    "seoTitle": "Pricing — Perlink",
+    "seoDescription": "Simple plans for personal websites and 3D worlds. Start free, upgrade for more pages, themes and extras.",
+    "faq": [
+      {
+        "q": "Can I really use Perlink for free?",
+        "a": "Yes. The free plan lets you create and publish a page with its own 3D world."
+      },
+      {
+        "q": "How do I upgrade?",
+        "a": "Choose a plan and pay by bank transfer or VietQR; your plan turns on automatically within seconds. Where online payment isn’t open yet, contact us and we’ll switch your account over."
+      },
+      {
+        "q": "Can I change plans later?",
+        "a": "Yes, you can move up or down at any time."
+      },
+      {
+        "q": "What happens to my page if I downgrade?",
+        "a": "Your page stays online at the same address."
+      }
+    ]
   }
 }
