@@ -364,16 +364,20 @@ function toggleDayNight() {
   forceMode.value = isDayShown.value ? 'night' : 'day'
 }
 
-// Background music: off until the visitor turns it on, unless the owner enabled autoplay
+// Background music: starts with the visitor's first touch, click or key (or
+// straight away where the browser allows it), until they turn it off
 const track = computed(() => (ROOM_MUSIC_ENABLED && props.room.music?.trackId ? MUSIC_BY_ID[props.room.music.trackId] : undefined))
 const musicOn = ref(false)
 let audio: HTMLAudioElement | null = null
 
 let starting = false
+/** The visitor turned the music off themselves: don't start it again */
+let mutedByVisitor = false
 
 function toggleMusic() {
   if (!track.value) return
   if (musicOn.value) {
+    mutedByVisitor = true
     audio?.pause()
     musicOn.value = false
     return
@@ -384,6 +388,7 @@ function toggleMusic() {
     audio.addEventListener('error', () => (musicOn.value = false))
   }
   audio.volume = props.room.music?.volume ?? 0.5
+  audio.addEventListener('playing', removeUnlock, { once: true })
   starting = true
   audio.play()
     .then(() => (musicOn.value = true))
@@ -400,19 +405,19 @@ const unlockEvents = ['pointerup', 'touchend', 'click', 'keydown'] as const
 function startOnInteraction(event: Event) {
   // The music button handles its own click
   if ((event.target as Element | null)?.closest?.('[data-music-toggle]')) return removeUnlock()
-  if (!musicOn.value && !starting) toggleMusic()
+  if (!musicOn.value && !starting && !mutedByVisitor) toggleMusic()
 }
 function removeUnlock() {
   for (const event of unlockEvents) window.removeEventListener(event, startOnInteraction, true)
 }
 
 onMounted(() => {
-  if (!track.value || !props.room.music?.autoplay) return
-  // Plays straight away where the browser allows it (e.g. a visitor who
-  // already interacted with the site); otherwise on the first interaction
+  if (!track.value) return
   for (const event of unlockEvents) window.addEventListener(event, startOnInteraction, true)
-  toggleMusic()
-  audio?.addEventListener('playing', removeUnlock, { once: true })
+  // Straight away when the owner chose autoplay, or when the visitor has
+  // already tapped on the site (e.g. the "3D room" button), where the
+  // browser allows it; otherwise with the first interaction in the room
+  if (props.room.music?.autoplay || navigator.userActivation?.hasBeenActive) toggleMusic()
 })
 
 onBeforeUnmount(() => {
