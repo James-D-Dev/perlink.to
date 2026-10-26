@@ -13,19 +13,23 @@ export interface PlanLimits {
   /** How many sites the account can have */
   sites: number
   customDomain: boolean
+  /** How many custom domains the account can connect, across its sites
+   * (each one costs a Cloudflare for SaaS hostname) */
+  domains: number
   /** Publish a site that uses a Pro theme */
   proThemes: boolean
   /** No "Made with Perlink" badge at the bottom of the page */
   removeBranding: boolean
-  /** How far back analytics go */
+  /** How far back analytics go (what the pricing promises) */
   analyticsDays: number
 }
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
-  free: { sites: 1, customDomain: false, proThemes: false, removeBranding: false, analyticsDays: 30 },
-  starter: { sites: 3, customDomain: false, proThemes: true, removeBranding: false, analyticsDays: 90 },
-  plus: { sites: 10, customDomain: true, proThemes: true, removeBranding: true, analyticsDays: 365 },
-  pro: { sites: 1000, customDomain: true, proThemes: true, removeBranding: true, analyticsDays: 3650 },
+  free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30 },
+  starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90 },
+  plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365 },
+  // Fair limits, so one very large account can't cost more than it pays
+  pro: { sites: 100, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095 },
 }
 
 /**
@@ -37,6 +41,16 @@ export const BRANDING_FOR_ALL = true
 
 /** Whether a site on this plan shows the Perlink badge */
 export const showsBranding = (plan: PlanId | null | undefined) => BRANDING_FOR_ALL || !plan || !PLAN_LIMITS[plan].removeBranding
+
+/**
+ * Pro can be bought once what it promises works: custom domains connected
+ * (docs/custom-domains.md) and BRANDING_FOR_ALL off. Until then its card says
+ * "coming soon" and checkout refuses it.
+ */
+export const PRO_ON_SALE = false
+
+/** Whether a plan can be bought online right now */
+export const onSale = (plan: PaidPlanId) => plan !== 'pro' || PRO_ON_SALE
 
 /** Prices in VND; a year costs ten months */
 export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {

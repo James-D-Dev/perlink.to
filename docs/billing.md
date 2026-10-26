@@ -41,3 +41,13 @@ have no end date).
   Set it to `false` once buying plans works end to end, and Plus and Pro
   (`removeBranding`) hide it again. While it's on, the video studio doesn't
   offer to remove the watermark.
+- **Fair limits** (so one large account can't cost more than it pays):
+  Pro is 100 sites; custom domains are counted per account across all its
+  sites (`PLAN_LIMITS[plan].domains`: Plus 3, Pro 20), since each one is a
+  Cloudflare for SaaS hostname (100 included, then about $0.10 a month each).
+  Pro promises 3 years of analytics (`analyticsDays`, pricing text only;
+  nothing deletes older data yet).
+- **Pro isn't on sale yet** (`PRO_ON_SALE` in `shared/plans.ts`): its card
+  says "Coming soon" and checkout refuses it. Turn it on once custom domains
+  are connected and `BRANDING_FOR_ALL` is off. Plus promises the same two
+  things (custom domain, no badge) and is still on sale.

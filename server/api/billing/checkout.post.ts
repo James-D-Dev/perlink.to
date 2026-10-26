@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { getDB } from '../../utils/db'
 import { billingAccount, newPaymentCode, transferDetails } from '../../utils/billing'
-import { PAID_PLANS, PLAN_PRICES } from '#shared/plans'
+import { PAID_PLANS, PLAN_PRICES, onSale, type PaidPlanId } from '#shared/plans'
 
 const bodySchema = z.object({
   plan: z.enum(PAID_PLANS as [string, ...string[]]),
@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.safeParse(await readBody(event))
   if (!body.success) throw createError({ statusCode: 400, statusMessage: 'Choose a plan' })
   const { plan, period } = body.data
+  if (!onSale(plan as PaidPlanId)) throw createError({ statusCode: 403, statusMessage: 'This plan is coming soon' })
   const amount = PLAN_PRICES[plan as keyof typeof PLAN_PRICES][period]
 
   const db = getDB(event)

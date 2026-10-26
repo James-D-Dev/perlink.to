@@ -56,6 +56,10 @@
           <MarketingMkButton v-else-if="!loggedIn" :to="`/login?redirect=${encodeURIComponent(`/dashboard/upgrade?plan=${plan}`)}`" :variant="isPopular(plan) ? 'inverse' : 'solid'" block>
             {{ t('dashboard.billing.choose', { plan: t(`dashboard.billing.plans.${plan}.name`) }) }}
           </MarketingMkButton>
+          <!-- Not sold yet (see PRO_ON_SALE) -->
+          <MarketingMkButton v-else-if="!onSale(plan)" variant="outline" block disabled>
+            {{ t('dashboard.billing.comingSoon') }}
+          </MarketingMkButton>
           <MarketingMkButton v-else-if="checkoutEnabled" :variant="isPopular(plan) ? 'inverse' : 'solid'" block @click="buy(plan)">
             {{ currentPlan === plan ? t('dashboard.billing.renew') : t('dashboard.billing.choose', { plan: t(`dashboard.billing.plans.${plan}.name`) }) }}
           </MarketingMkButton>
@@ -74,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { PLAN_LIMITS, PLAN_ORDER, PLAN_PRICES, formatVnd, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
+import { PLAN_LIMITS, PLAN_ORDER, PLAN_PRICES, formatVnd, onSale, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
 
 // Plan cards for /pricing and the dashboard upgrade page. Signed in, a paid
 // plan opens the bank-transfer checkout.
@@ -113,14 +117,15 @@ function features(plan: PlanId) {
   const limits = PLAN_LIMITS[plan]
   const f = (key: string, params: Record<string, unknown> = {}, n?: number) => (n === undefined ? t(`dashboard.billing.features.${key}`, params) : t(`dashboard.billing.features.${key}`, params, n))
   const list = [
-    limits.sites >= 1000 ? f('sitesUnlimited') : f('sites', { n: limits.sites }, limits.sites),
+    f('sites', { n: limits.sites }, limits.sites),
     f('basics'),
     f('room'),
   ]
   if (limits.proThemes) list.push(f('proThemes'))
-  if (limits.customDomain) list.push(f('customDomain'))
+  if (limits.customDomain) list.push(f('customDomains', { n: limits.domains }, limits.domains))
   if (limits.removeBranding) list.push(f('removeBranding'))
-  list.push(limits.analyticsDays >= 3650 ? f('analyticsAll') : limits.analyticsDays >= 365 ? f('analyticsYear') : f('analytics', { n: limits.analyticsDays }))
+  const years = Math.round(limits.analyticsDays / 365)
+  list.push(years >= 2 ? f('analyticsYears', { n: years }) : years === 1 ? f('analyticsYear') : f('analytics', { n: limits.analyticsDays }))
   if (plan === 'pro') list.push(f('support'))
   return list
 }

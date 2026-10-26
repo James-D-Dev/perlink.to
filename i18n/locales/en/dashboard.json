@@ -568,16 +568,15 @@
       },
       "features": {
         "sites": "{n} site | {n} sites",
-        "sitesUnlimited": "Unlimited sites",
         "basics": "Every template and 50 themes",
         "room": "A 3D world for your page",
         "proThemes": "20 Pro themes (glass, luxe, bold)",
-        "customDomain": "Custom domain",
         "removeBranding": "Remove “Made with Perlink”",
         "analytics": "{n}-day analytics",
         "analyticsYear": "1 year of analytics",
-        "analyticsAll": "Full analytics history",
-        "support": "Priority support"
+        "support": "Priority support",
+        "customDomains": "{n} custom domain | {n} custom domains",
+        "analyticsYears": "{n} years of analytics"
       },
       "monthly": "Monthly",
       "annual": "Yearly",
@@ -651,7 +650,8 @@
         "pending": "Waiting for payment",
         "paid": "Paid",
         "expired": "Expired"
-      }
+      },
+      "comingSoon": "Coming soon"
     },
     "telegram": {
       "title": "Telegram notifications",

@@ -568,16 +568,15 @@
       },
       "features": {
         "sites": "{n} trang | {n} trang",
-        "sitesUnlimited": "Không giới hạn trang",
         "basics": "Mọi mẫu trang và 50 theme",
         "room": "Thế giới 3D cho trang",
         "proThemes": "20 theme Pro (kính, ánh kim, cá tính)",
-        "customDomain": "Tên miền riêng",
         "removeBranding": "Gỡ dòng “Tạo bằng Perlink”",
         "analytics": "Thống kê {n} ngày",
         "analyticsYear": "Thống kê 1 năm",
-        "analyticsAll": "Toàn bộ lịch sử thống kê",
-        "support": "Hỗ trợ ưu tiên qua Zalo"
+        "support": "Hỗ trợ ưu tiên qua Zalo",
+        "customDomains": "{n} tên miền riêng",
+        "analyticsYears": "Thống kê {n} năm"
       },
       "monthly": "Theo tháng",
       "annual": "Theo năm",
@@ -651,7 +650,8 @@
         "pending": "Chờ thanh toán",
         "paid": "Đã thanh toán",
         "expired": "Hết hạn"
-      }
+      },
+      "comingSoon": "Sắp mở bán"
     },
     "telegram": {
       "title": "Thông báo qua Telegram",
