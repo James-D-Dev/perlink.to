@@ -152,10 +152,13 @@
         </nav>
 
         <div class="min-w-0 flex-1">
-        <div class="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:hidden">
+        <!-- Phone tabs: padded inside the scroller so the pills' rings aren't
+             clipped; the active one is scrolled into view -->
+        <div ref="tabBar" class="relative -mx-4 mb-2 flex gap-1.5 overflow-x-auto px-4 py-1.5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden">
           <button
             v-for="tab in editorTabs"
             :key="tab.value"
+            :data-tab="tab.value"
             type="button"
             class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors"
             :class="activeTab === tab.value ? 'bg-ink text-paper' : 'bg-paper text-ink-soft ring-1 ring-line'"
@@ -614,6 +617,7 @@ const onBioPageChange = (username: string) => {
 
 // Editor tabs
 const previewOpen = ref(false);
+
 const qrOpen = ref(false);
 
 type EditorTab = "content" | "header" | "design" | "room" | "settings";
@@ -626,6 +630,16 @@ const tabFromHash = (hash: string) => {
   return EDITOR_TABS.includes(name) ? name : "content";
 };
 const activeTab = ref<EditorTab>(tabFromHash(useRoute().hash));
+
+// Keep the active phone tab in view, centred when it can be (only the tab bar scrolls)
+const tabBar = ref<HTMLElement | null>(null);
+watch([activeTab, tabBar], async () => {
+  await nextTick();
+  const bar = tabBar.value;
+  const tab = bar?.querySelector<HTMLElement>(`[data-tab="${activeTab.value}"]`);
+  if (!bar || !tab) return;
+  bar.scrollTo({ left: tab.offsetLeft - (bar.clientWidth - tab.offsetWidth) / 2, behavior: "smooth" });
+});
 watch(activeTab, (tab) => {
   const hash = tab === "content" ? "" : `#${tab}`;
   if (location.hash !== hash) history.replaceState(history.state, "", `${location.pathname}${location.search}${hash}`);
