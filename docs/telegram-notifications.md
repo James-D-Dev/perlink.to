@@ -63,3 +63,18 @@ curl -X POST localhost:3000/api/telegram/webhook \
 
 Sending fails with the fake token (logged as `[telegram]`), but linking and
 everything around it can be checked.
+
+## Language
+
+English is Perlink's main language. Everything Perlink sends someone (bot
+replies, order and request alerts, emails, payment review and payment
+results) uses the language of *their account* (`profiles.language`, set in
+Settings → Dashboard language, or the site header's EN/VI switch while
+signed in); no choice means English. A chat that isn't linked to an account
+yet gets English. Strings: `server/utils/botCopy.ts`, `COPY` in
+`server/utils/telegram.ts` and `formNotification.ts`, `REVIEW_COPY` in
+`server/utils/paymentReview.ts`.
+
+The dashboard itself starts in English too (the browser's language isn't
+used); the choice is kept in the `perlink_lang` cookie (`plugins/language.ts`)
+and signing in on another device restores the account's language.

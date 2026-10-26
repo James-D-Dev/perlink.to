@@ -21,12 +21,11 @@ export default defineNuxtConfig({
       { code: "en", language: "en-US", name: "English", files: ["en/common.json", "en/dashboard.json", "en/blocks.json", "en/theme.json", "en/room.json"] },
       { code: "vi", language: "vi-VN", name: "Tiếng Việt", files: ["vi/common.json", "vi/dashboard.json", "vi/blocks.json", "vi/theme.json", "vi/room.json"] },
     ],
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: "perlink_lang",
-      redirectOn: "root",
-      fallbackLocale: "en",
-    },
+    // English unless the visitor picked another language (Settings, the
+    // header switch); the browser's language isn't used. The choice is kept
+    // in the perlink_lang cookie by plugins/language.ts, and signing in
+    // brings the account's language with it.
+    detectBrowserLanguage: false,
   },
 
   // Public runtime config only (private secrets handled by nuxt-auth-utils)

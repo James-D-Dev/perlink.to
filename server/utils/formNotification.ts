@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3'
 import { getDB } from './db'
 import { escapeHtml, sendEmail } from './email'
+import { toAppLanguage } from '#shared/language'
 
 // "New request" email to a site owner when a visitor sends a form
 
@@ -33,13 +34,13 @@ export async function notifyOwnerOfRequest(
   data: Record<string, string>,
 ) {
   const owner = await getDB(event)
-    .prepare('SELECT email FROM profiles WHERE id = ?')
+    .prepare('SELECT email, language FROM profiles WHERE id = ?')
     .bind(site.userId)
-    .first<{ email: string | null }>()
+    .first<{ email: string | null; language: string | null }>()
   if (!owner?.email) return
 
-  // Owners of Vietnamese sites get the email in Vietnamese
-  const copy = (site.themeConfig as { language?: string } | undefined)?.language === 'vi' ? COPY.vi : COPY.en
+  // In the owner's language (Settings), English by default
+  const copy = COPY[toAppLanguage(owner.language)]
   const inboxUrl = `https://perlink.to/dashboard/site/${site.username}/inbox`
   const isOrder = data.kind === 'order'
   const shown = isOrder && data.payment ? { ...data, payment: copy.payments[data.payment] ?? data.payment } : data

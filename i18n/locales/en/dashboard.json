@@ -457,7 +457,7 @@
       "nameSaved": "Name saved",
       "memberSince": "Member since {date}",
       "language": "Dashboard language",
-      "languageText": "The language of this dashboard. Each site has its own language in its settings.",
+      "languageText": "Used in the dashboard and in everything Perlink sends you (Telegram, email). Your sites keep their own language in their settings.",
       "plan": "Plan",
       "sites": "{n} site | {n} site | {n} sites",
       "seePlans": "See plans",

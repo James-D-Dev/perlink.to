@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3'
 import { getDB } from './db'
 import { escapeHtml } from './email'
+import { toAppLanguage } from '#shared/language'
 
 // Messages from the Perlink Telegram bot. An owner links their account once
 // (see /api/account/telegram); new orders and form requests on any of their
@@ -80,13 +81,13 @@ export async function notifyOwnerTelegram(
 ) {
   if (!telegramConfig(event)) return
   const owner = await getDB(event)
-    .prepare('SELECT telegram_chat_id FROM profiles WHERE id = ?')
+    .prepare('SELECT telegram_chat_id, language FROM profiles WHERE id = ?')
     .bind(site.userId)
-    .first<{ telegram_chat_id: string | null }>()
+    .first<{ telegram_chat_id: string | null; language: string | null }>()
   if (!owner?.telegram_chat_id) return
 
-  // Vietnamese sites get Vietnamese messages
-  const copy = (site.themeConfig as { language?: string } | undefined)?.language === 'vi' ? COPY.vi : COPY.en
+  // In the owner's language (Settings), English by default
+  const copy = COPY[toAppLanguage(owner.language)]
   const isOrder = data.kind === 'order'
   const shown: Record<string, string> = { ...data, ...(isOrder && data.payment ? { payment: copy.payments[data.payment] ?? data.payment } : {}) }
   const lines = Object.keys(copy.labels)

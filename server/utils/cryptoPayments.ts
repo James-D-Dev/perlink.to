@@ -1,4 +1,5 @@
 import { CRYPTO_NETWORK_BY_ID, type CryptoToken } from '#shared/crypto'
+import type { AppLanguage } from '#shared/language'
 
 // Reads a stablecoin payment back from the chain, so the reviewer sees at a
 // glance whether it's real: the transaction succeeded, moved USDT/USDC on
@@ -72,16 +73,36 @@ export async function checkCryptoPayment(networkId: string, txHash: string, wall
   }
 }
 
-/** One line for the reviewer */
-export function describeCheck(check: CryptoCheck | null, expectedUsd: number) {
+const CHECK_COPY = {
+  en: {
+    ok: (amount: string, confirmations: number) => `✅ Valid: received ${amount}, ${confirmations} confirmations`,
+    short: (amount: string, expected: string) => `⚠️ Too little: received ${amount}, needs ${expected}`,
+    none: '❌ The transaction sent no USDT/USDC to our wallet',
+    failed: '❌ The transaction failed on chain',
+    pending: '⏳ Not on chain yet (still confirming, or another network)',
+    error: '❓ Couldn’t check it; look on the explorer',
+  },
+  vi: {
+    ok: (amount: string, confirmations: number) => `✅ Hợp lệ: nhận ${amount}, ${confirmations} xác nhận`,
+    short: (amount: string, expected: string) => `⚠️ Thiếu tiền: nhận ${amount}, cần ${expected}`,
+    none: '❌ Giao dịch không chuyển USDT/USDC vào ví nhận',
+    failed: '❌ Giao dịch thất bại trên chain',
+    pending: '⏳ Chưa thấy giao dịch trên chain (đang chờ hoặc sai mạng)',
+    error: '❓ Không kiểm tra được, hãy xem trên explorer',
+  },
+}
+
+/** One line for the reviewer, in their language */
+export function describeCheck(check: CryptoCheck | null, expectedUsd: number, lang: AppLanguage = 'en') {
   if (!check) return '—'
+  const copy = CHECK_COPY[lang]
   const amount = check.received !== undefined ? `$${check.received.toFixed(2)} ${check.token ?? ''}`.trim() : ''
   switch (check.verdict) {
-    case 'ok': return `✅ Hợp lệ: nhận ${amount}, ${check.confirmations} xác nhận`
-    case 'short': return `⚠️ Thiếu tiền: nhận ${amount}, cần $${expectedUsd.toFixed(2)}`
-    case 'none': return '❌ Giao dịch không chuyển USDT/USDC vào ví nhận'
-    case 'failed': return '❌ Giao dịch thất bại trên chain'
-    case 'pending': return '⏳ Chưa thấy giao dịch trên chain (đang chờ hoặc sai mạng)'
-    default: return '❓ Không kiểm tra được, hãy xem trên explorer'
+    case 'ok': return copy.ok(amount, check.confirmations ?? 0)
+    case 'short': return copy.short(amount, `$${expectedUsd.toFixed(2)}`)
+    case 'none': return copy.none
+    case 'failed': return copy.failed
+    case 'pending': return copy.pending
+    default: return copy.error
   }
 }

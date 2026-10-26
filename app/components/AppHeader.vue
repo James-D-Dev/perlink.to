@@ -83,7 +83,10 @@ const otherLanguage = computed(() => (onHome.value ? (lang.value === 'vi' ? '/' 
 function switchInPlace(event: MouseEvent) {
   if (onHome.value) return
   event.preventDefault()
-  setLocale(lang.value === 'vi' ? 'en' : 'vi')
+  const next = lang.value === 'vi' ? 'en' : 'vi'
+  setLocale(next)
+  // Signed in: the account remembers it too (dashboard, Telegram, email)
+  if (loggedIn.value) $fetch('/api/account', { method: 'PATCH', body: { language: next } }).catch(() => {})
 }
 const nav = computed(() => [
   { label: copy.value.header.nav.templates, to: anchor('templates') },

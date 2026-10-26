@@ -8,6 +8,7 @@ import { transferNote } from './billing'
 import { describeCheck, type CryptoCheck } from './cryptoPayments'
 import { CRYPTO_NETWORK_BY_ID } from '#shared/crypto'
 import { formatVnd, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { toAppLanguage, type AppLanguage } from '#shared/language'
 
 // Payments the payer marked as done ("submitted") wait for the superadmin:
 // a Telegram message with the details and Approve / Reject buttons, and the
@@ -87,32 +88,71 @@ export async function isAdminChat(event: H3Event, chatId: string) {
   return (await adminChatId(event)) === chatId
 }
 
-const PERIOD_LABEL: Record<BillingPeriod, string> = { monthly: '1 tháng', annual: '1 năm' }
+// What the reviewer and the payer read, in their own language (English by default)
+export const REVIEW_COPY = {
+  en: {
+    period: { monthly: '1 month', annual: '1 year' } as Record<BillingPeriod, string>,
+    title: '💳 <b>Payment waiting for review</b>',
+    method: { bank: 'Bank transfer', crypto: 'Crypto' },
+    account: 'Account', plan: 'Plan', amount: 'Amount', tx: 'Tx', check: 'Check', note: 'Transfer message', code: 'Code',
+    bankCheck: 'open your bank app and find a transfer with this amount and message.',
+    approve: '✅ Approve & upgrade', reject: '✖ Reject', reviewPage: 'Review page',
+    approved: (plan: string, until: string) => `✅ <b>Approved</b> · ${plan} until ${until}`,
+    rejected: '✖ <b>Rejected</b>',
+    answers: { unknown: 'Unknown request', notAdmin: 'Only the superadmin can review', notFound: 'Payment not found', alreadyPaid: 'Already approved', failed: 'Couldn’t approve', approved: 'Upgraded ✅', rejected: 'Rejected', decided: 'This payment was already decided' },
+    payerApproved: (plan: string, until: string) => `✅ <b>Your ${plan} plan is on</b>${until ? ` until ${until}` : ''}. Thank you!`,
+    payerRejected: (code: string, plan: string) => `⚠️ <b>We couldn’t confirm payment ${code}</b> (${plan} plan). If you did pay, contact support with this code and we’ll check again.`,
+    openPerlink: 'Open Perlink', seePayment: 'See the payment',
+    dateLocale: 'en-GB',
+  },
+  vi: {
+    period: { monthly: '1 tháng', annual: '1 năm' } as Record<BillingPeriod, string>,
+    title: '💳 <b>Thanh toán chờ duyệt</b>',
+    method: { bank: 'Chuyển khoản', crypto: 'Crypto' },
+    account: 'Tài khoản', plan: 'Gói', amount: 'Số tiền', tx: 'Tx', check: 'Kiểm tra', note: 'Nội dung CK', code: 'Mã',
+    bankCheck: 'mở app ngân hàng, tìm giao dịch đúng số tiền và nội dung trên.',
+    approve: '✅ Duyệt & nâng cấp', reject: '✖ Từ chối', reviewPage: 'Trang duyệt',
+    approved: (plan: string, until: string) => `✅ <b>Đã duyệt</b> · gói ${plan} tới ${until}`,
+    rejected: '✖ <b>Đã từ chối</b>',
+    answers: { unknown: 'Không hiểu yêu cầu', notAdmin: 'Chỉ superadmin được duyệt', notFound: 'Không tìm thấy thanh toán', alreadyPaid: 'Đã duyệt trước đó', failed: 'Không duyệt được', approved: 'Đã nâng cấp ✅', rejected: 'Đã từ chối', decided: 'Thanh toán này đã được xử lý' },
+    payerApproved: (plan: string, until: string) => `✅ <b>Gói ${plan} đã được bật</b>${until ? ` đến ${until}` : ''}. Cảm ơn bạn!`,
+    payerRejected: (code: string, plan: string) => `⚠️ <b>Chưa xác nhận được thanh toán ${code}</b> (gói ${plan}). Nếu bạn đã chuyển tiền, hãy liên hệ hỗ trợ kèm mã này để được kiểm tra lại.`,
+    openPerlink: 'Mở Perlink', seePayment: 'Xem thanh toán',
+    dateLocale: 'vi-VN',
+  },
+} satisfies Record<AppLanguage, unknown>
+
+/** The superadmin's language (their account setting), English by default */
+export async function adminLanguage(event: H3Event): Promise<AppLanguage> {
+  const row = await getDB(event).prepare('SELECT language FROM profiles WHERE email = ?').bind(SUPERADMIN_EMAIL).first<{ language: string | null }>().catch(() => null)
+  return toAppLanguage(row?.language)
+}
 
 /** The review message: who, which plan, how much, and how to check it */
-export function paymentSummary(payment: PaymentRow) {
+export function paymentSummary(payment: PaymentRow, lang: AppLanguage = 'en') {
+  const c = REVIEW_COPY[lang]
   const lines = [
-    `💳 <b>Thanh toán chờ duyệt</b> · ${payment.method === 'crypto' ? 'Crypto' : 'Chuyển khoản'}`,
+    `${c.title} · ${c.method[payment.method]}`,
     '',
-    `<b>Tài khoản:</b> ${escapeHtml(payment.email ?? payment.user_id)}`,
-    `<b>Gói:</b> ${payment.plan.toUpperCase()} · ${PERIOD_LABEL[payment.period]}`,
+    `<b>${c.account}:</b> ${escapeHtml(payment.email ?? payment.user_id)}`,
+    `<b>${c.plan}:</b> ${payment.plan.toUpperCase()} · ${c.period[payment.period]}`,
   ]
   if (payment.method === 'crypto') {
     const network = payment.network ? CRYPTO_NETWORK_BY_ID[payment.network] : undefined
     const expected = payment.amount_usd ?? 0
     lines.push(
-      `<b>Số tiền:</b> $${expected.toFixed(2)} ${payment.token ?? ''} · ${escapeHtml(network?.name ?? payment.network ?? '?')}`,
-      `<b>Tx:</b> <code>${escapeHtml(payment.tx_hash ?? '')}</code>`,
-      `<b>Kiểm tra:</b> ${describeCheck(parseCheck(payment), expected)}`,
+      `<b>${c.amount}:</b> $${expected.toFixed(2)} ${payment.token ?? ''} · ${escapeHtml(network?.name ?? payment.network ?? '?')}`,
+      `<b>${c.tx}:</b> <code>${escapeHtml(payment.tx_hash ?? '')}</code>`,
+      `<b>${c.check}:</b> ${describeCheck(parseCheck(payment), expected, lang)}`,
     )
   } else {
     lines.push(
-      `<b>Số tiền:</b> ${formatVnd(payment.amount)}`,
-      `<b>Nội dung CK:</b> <code>${transferNote(payment.code)}</code>`,
-      '<b>Kiểm tra:</b> mở app ngân hàng, tìm giao dịch đúng số tiền và nội dung trên.',
+      `<b>${c.amount}:</b> ${formatVnd(payment.amount)}`,
+      `<b>${c.note}:</b> <code>${transferNote(payment.code)}</code>`,
+      `<b>${c.check}:</b> ${c.bankCheck}`,
     )
   }
-  lines.push(`<b>Mã:</b> ${payment.code}`)
+  lines.push(`<b>${c.code}:</b> ${payment.code}`)
   return lines.join('\n')
 }
 
@@ -123,27 +163,29 @@ export async function notifyPaymentSubmitted(event: H3Event, payment: PaymentRow
     console.warn('[billing] payment submitted but the superadmin has no Telegram linked:', payment.code)
     return
   }
+  const lang = await adminLanguage(event)
+  const c = REVIEW_COPY[lang]
   const siteUrl = useRuntimeConfig(event).public.siteUrl
   const explorer = parseCheck(payment)?.explorer
-  await sendTelegram(event, chatId, paymentSummary(payment), [
-    [{ text: '✅ Duyệt & nâng cấp', callback: `pay:ok:${payment.id}` }, { text: '✖ Từ chối', callback: `pay:no:${payment.id}` }],
+  await sendTelegram(event, chatId, paymentSummary(payment, lang), [
+    [{ text: c.approve, callback: `pay:ok:${payment.id}` }, { text: c.reject, callback: `pay:no:${payment.id}` }],
     [
       ...(explorer ? [{ text: '🔎 Explorer', url: explorer }] : []),
-      { text: 'Trang duyệt', url: `${siteUrl}/superadmin/payments` },
+      { text: c.reviewPage, url: `${siteUrl}/superadmin/payments` },
     ],
   ])
 }
 
-/** Tells the payer on Telegram (if they connected it) what was decided */
+/** Tells the payer on Telegram (if they connected it) what was decided, in their language */
 export async function notifyPayer(event: H3Event, payment: PaymentRow, approved: boolean, expiresAt?: string) {
-  const row = await getDB(event).prepare('SELECT telegram_chat_id FROM profiles WHERE id = ?').bind(payment.user_id).first<{ telegram_chat_id: string | null }>()
+  const row = await getDB(event).prepare('SELECT telegram_chat_id, language FROM profiles WHERE id = ?').bind(payment.user_id).first<{ telegram_chat_id: string | null; language: string | null }>()
   if (!row?.telegram_chat_id) return
+  const c = REVIEW_COPY[toAppLanguage(row.language)]
   const siteUrl = useRuntimeConfig(event).public.siteUrl
   const plan = payment.plan.toUpperCase()
-  const html = approved
-    ? `✅ <b>Gói ${plan} đã được bật</b>${expiresAt ? ` đến ${new Date(expiresAt).toLocaleDateString('vi-VN')}` : ''}. Cảm ơn bạn!\n\n<b>Your ${plan} plan is on.</b> Thank you!`
-    : `⚠️ <b>Chưa xác nhận được thanh toán ${payment.code}</b> (gói ${plan}). Nếu bạn đã chuyển tiền, hãy trả lời email hỗ trợ kèm mã này để được kiểm tra lại.\n\n<b>We couldn't confirm payment ${payment.code}.</b> If you did pay, contact support with this code.`
-  await sendTelegram(event, row.telegram_chat_id, html, [{ text: approved ? 'Mở Perlink' : 'Xem thanh toán', url: `${siteUrl}/dashboard/upgrade` }])
+  const until = expiresAt ? new Date(expiresAt).toLocaleDateString(c.dateLocale) : ''
+  const html = approved ? c.payerApproved(plan, until) : c.payerRejected(payment.code, plan)
+  await sendTelegram(event, row.telegram_chat_id, html, [{ text: approved ? c.openPerlink : c.seePayment, url: `${siteUrl}/dashboard/upgrade` }])
 }
 
 /** After a decision in Telegram: the message says what happened, without the buttons */

@@ -1,5 +1,6 @@
 import type { H3Event } from 'h3'
 import { getDB } from './db'
+import { LANGUAGE_COOKIE, toAppLanguage } from '#shared/language'
 
 /** Logged-in cookies are re-issued (a fresh 30 days) at most this often, after re-checking the account */
 const RENEW_AFTER_MS = 24 * 60 * 60 * 1000
@@ -15,10 +16,10 @@ interface SessionUser {
 /** Current session version and status of a profile, or null if it no longer exists */
 async function accountState(event: H3Event, userId: string) {
   const row = await getDB(event)
-    .prepare('SELECT session_version, status FROM profiles WHERE id = ?')
+    .prepare('SELECT session_version, status, language FROM profiles WHERE id = ?')
     .bind(userId)
-    .first<{ session_version: number | null; status: string | null }>()
-  return row ? { version: row.session_version ?? 1, status: row.status ?? 'active' } : null
+    .first<{ session_version: number | null; status: string | null; language: string | null }>()
+  return row ? { version: row.session_version ?? 1, status: row.status ?? 'active', language: row.language } : null
 }
 
 /**
@@ -41,6 +42,8 @@ async function endSession(event: H3Event) {
 /** Start a login session for a user (replaces any previous session cookie) */
 export async function startUserSession(event: H3Event, user: SessionUser) {
   const state = await accountState(event, user.id)
+  // Signing in on a device brings the account's language with it
+  if (state?.language) setCookie(event, LANGUAGE_COOKIE, toAppLanguage(state.language), { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax', path: '/' })
   await replaceUserSession(event, {
     user: user as any,
     sessionVersion: state?.version ?? 1,

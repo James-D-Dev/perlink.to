@@ -45,7 +45,7 @@
                 :model-value="locale"
                 :items="locales.map((l) => ({ label: l.name, value: l.code }))"
                 class="mt-3 w-full"
-                @update:model-value="setLocale($event as any)"
+                @update:model-value="changeLanguage($event as string)"
               />
             </div>
             <div class="bg-paper p-5">
@@ -131,6 +131,12 @@ interface Account {
 }
 
 const { t, locale, locales, setLocale } = useI18n()
+
+// The language follows the account: the dashboard, Telegram and emails use it
+async function changeLanguage(language: string) {
+  await setLocale(language as typeof locale.value)
+  await $fetch('/api/account', { method: 'PATCH', body: { language } }).catch(() => {})
+}
 const toast = useToast()
 const confirm = useConfirm()
 const { clear } = useUserSession()

@@ -457,7 +457,7 @@
       "nameSaved": "Đã lưu tên",
       "memberSince": "Thành viên từ {date}",
       "language": "Ngôn ngữ dashboard",
-      "languageText": "Ngôn ngữ của bảng điều khiển này. Mỗi trang có ngôn ngữ riêng trong phần cài đặt của trang.",
+      "languageText": "Dùng cho dashboard và mọi thông báo Perlink gửi bạn (Telegram, email). Mỗi trang có ngôn ngữ riêng trong phần cài đặt của trang.",
       "plan": "Gói dịch vụ",
       "sites": "{n} trang | {n} trang | {n} trang",
       "seePlans": "Xem các gói",
