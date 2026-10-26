@@ -39,7 +39,7 @@
           <span class="text-sm" :class="muted(plan)">{{ t('dashboard.billing.perMonth') }}</span>
         </p>
         <p class="mt-1 h-4 text-xs" :class="isPopular(plan) ? 'text-paper/50' : 'text-ink-faint'">
-          <template v-if="plan !== 'free' && period === 'annual'">{{ t('dashboard.billing.billedYearly', { amount: formatVnd(PLAN_PRICES[plan].annual) }) }}</template>
+          <template v-if="plan !== 'free' && period === 'annual'">{{ t('dashboard.billing.billedYearly', { amount: usd ? formatUsd(PLAN_PRICES_USD[plan].annual) : formatVnd(PLAN_PRICES[plan].annual) }) }}</template>
         </p>
 
         <ul class="mt-6 flex-1 space-y-2.5">
@@ -71,6 +71,7 @@
     </div>
     <p class="mt-6 text-center text-xs text-ink-faint">
       {{ loggedIn && !checkoutEnabled && info ? t('dashboard.billing.contactNote') : t('dashboard.billing.payNote') }}
+      <template v-if="usd"><br>{{ t('dashboard.billing.usdNote') }}</template>
     </p>
 
     <BillingCheckoutDialog v-if="buying" v-model:open="checkoutOpen" :plan="buying" :period="period" />
@@ -78,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { PLAN_LIMITS, PLAN_ORDER, PLAN_PRICES, formatVnd, onSale, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
+import { PLAN_LIMITS, PLAN_ORDER, PLAN_PRICES, PLAN_PRICES_USD, formatUsd, formatVnd, onSale, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
 
 // Plan cards for /pricing and the dashboard upgrade page. Signed in, a paid
 // plan opens the bank-transfer checkout.
@@ -87,7 +88,7 @@ const props = defineProps<{
   highlight?: PlanId
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { loggedIn } = useUserSession()
 const { info, ensure } = useBilling()
 
@@ -107,7 +108,15 @@ const highlight = computed(() => props.highlight)
 const isPopular = (plan: PlanId) => plan === 'plus'
 const muted = (plan: PlanId) => (isPopular(plan) ? 'text-paper/60' : 'text-ink-muted')
 
+// English shows dollars; payment itself is still in VND (see PLAN_PRICES_USD)
+const usd = computed(() => locale.value === 'en')
+
 function monthlyPrice(plan: PlanId) {
+  if (usd.value) {
+    if (plan === 'free') return '$0'
+    const price = PLAN_PRICES_USD[plan]
+    return formatUsd(period.value === 'annual' ? Math.round((price.annual / 12) * 100) / 100 : price.monthly)
+  }
   if (plan === 'free') return '0đ'
   const price = PLAN_PRICES[plan]
   return formatVnd(period.value === 'annual' ? Math.round(price.annual / 12 / 1000) * 1000 : price.monthly)

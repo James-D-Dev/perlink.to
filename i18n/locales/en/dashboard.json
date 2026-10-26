@@ -651,7 +651,8 @@
         "paid": "Paid",
         "expired": "Expired"
       },
-      "comingSoon": "Coming soon"
+      "comingSoon": "Coming soon",
+      "usdNote": "Prices in US dollars. For now payment is by Vietnamese bank transfer (VietQR), charged in VND."
     },
     "telegram": {
       "title": "Telegram notifications",

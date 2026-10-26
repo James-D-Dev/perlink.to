@@ -651,7 +651,8 @@
         "paid": "Đã thanh toán",
         "expired": "Hết hạn"
       },
-      "comingSoon": "Sắp mở bán"
+      "comingSoon": "Sắp mở bán",
+      "usdNote": "Giá theo đô la Mỹ. Hiện thanh toán bằng chuyển khoản ngân hàng Việt Nam (VietQR), tính bằng VND."
     },
     "telegram": {
       "title": "Thông báo qua Telegram",
