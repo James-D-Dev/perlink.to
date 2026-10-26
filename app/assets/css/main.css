@@ -279,3 +279,31 @@ sheet, 3D room popups) use these classes:
   from { transform: translateY(0); }
   to { transform: translateY(100%); }
 }
+
+/* Horizontal scrollers (chip rows, tab bars) fade out on a side that has
+   more to scroll to, so it's clear they scroll. Driven by the scroll itself
+   (scroll-driven animation); nothing fades when everything fits, and
+   browsers without it simply show no fade. */
+@property --fade-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --fade-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@keyframes scroll-fade-x {
+  0% { --fade-start: 0px; --fade-end: 28px; }
+  8%, 92% { --fade-start: 28px; --fade-end: 28px; }
+  100% { --fade-start: 28px; --fade-end: 0px; }
+}
+.scroll-fade-x {
+  mask-image: linear-gradient(to right, transparent, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent);
+  animation: scroll-fade-x linear both;
+  animation-timeline: scroll(self inline);
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-fade-x { animation-duration: 1ms; }
+}

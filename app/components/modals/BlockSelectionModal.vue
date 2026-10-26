@@ -24,7 +24,7 @@
 
         <div class="flex min-h-0 flex-1 flex-col sm:flex-row">
           <!-- Categories -->
-          <nav v-if="!query" class="flex shrink-0 gap-1 overflow-x-auto border-b border-line p-3 sm:w-48 sm:flex-col sm:overflow-visible sm:border-b-0 sm:border-r">
+          <nav v-if="!query" class="flex shrink-0 gap-1 overflow-x-auto scroll-fade-x border-b border-line p-3 sm:w-48 sm:flex-col sm:overflow-visible sm:border-b-0 sm:border-r max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button
               v-for="cat in categories"
               :key="cat.key"

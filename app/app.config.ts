@@ -223,6 +223,24 @@ export default defineAppConfig({
         content: 'h-7 rounded-full px-3 text-[12px] font-medium bg-neutral-900/85 text-white ring-0 backdrop-blur-xl shadow-lg dark:bg-white/90 dark:text-neutral-900 data-[state=delayed-open]:animate-[ios-menu-in_180ms_cubic-bezier(0.22,1.25,0.36,1)]',
       },
     },
+    // "link" tabs are chips in a sideways-scrolling row, like the theme
+    // categories: full labels, a dark chip for the current one, faded edges
+    tabs: {
+      variants: {
+        variant: {
+          link: {
+            list: 'scroll-fade-x -mx-1 gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+            indicator: 'hidden',
+            trigger: 'shrink-0 rounded-full border border-default px-3 py-1 text-xs font-medium hover:border-accented data-[state=active]:border-inverted data-[state=active]:bg-inverted data-[state=active]:text-inverted dark:border-white/10',
+            label: 'overflow-visible text-clip',
+          },
+        },
+      },
+      compoundVariants: [
+        { orientation: 'horizontal', variant: 'link', class: { list: 'mb-0 border-b-0' } },
+        { variant: 'link', class: { trigger: 'data-[state=active]:text-inverted focus-visible:ring-2 focus-visible:ring-inverted' } },
+      ],
+    },
     dashboardNavbar: { slots: { root: 'dark:bg-[#0a0a0a]/70 dark:backdrop-blur-xl dark:border-white/[0.08]' } },
   },
 })

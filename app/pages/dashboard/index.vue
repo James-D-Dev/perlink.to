@@ -52,7 +52,7 @@
             </div>
           </div>
 
-          <div class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+          <div class="-mx-1 flex gap-2 overflow-x-auto scroll-fade-x px-1 pb-1 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button
               v-for="chip in chips"
               :key="chip.id"

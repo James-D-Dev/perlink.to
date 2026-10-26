@@ -34,7 +34,7 @@
     <!-- The other legal pages -->
     <nav class="border-b border-line" :aria-label="lang === 'vi' ? 'Trang pháp lý' : 'Legal pages'">
       <div class="mx-auto max-w-6xl border-x border-line">
-        <div ref="pillsEl" class="flex gap-1 overflow-x-auto px-3 py-2 sm:px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref="pillsEl" class="flex gap-1 overflow-x-auto scroll-fade-x px-3 py-2 sm:px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <NuxtLink
             v-for="item in pages"
             :key="item.to"

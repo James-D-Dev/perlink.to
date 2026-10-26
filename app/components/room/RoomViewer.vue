@@ -288,7 +288,7 @@
 
     <!-- Links in the room (also keyboard / screen-reader friendly) -->
     <div class="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-4">
-      <div v-if="linkedObjects.length" class="flex max-w-full gap-2 overflow-x-auto pb-1">
+      <div v-if="linkedObjects.length" class="flex max-w-full gap-2 overflow-x-auto scroll-fade-x pb-1 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
         <a
           v-for="obj in linkedObjects"
           :key="obj.id"

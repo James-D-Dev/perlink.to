@@ -6,7 +6,7 @@
     </div>
 
     <!-- Category chips scroll sideways on narrow screens; "Pro" gathers the premium looks -->
-    <div class="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
+    <div class="-mx-1 mb-3 flex gap-1.5 overflow-x-auto scroll-fade-x px-1 pb-1 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
       <button
         type="button"
         class="inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition"

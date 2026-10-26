@@ -326,7 +326,7 @@
         <!-- Tray -->
         <div v-show="trayOpen" class="border-b border-default">
           <!-- Catalog items -->
-          <div v-if="activeCategory" class="flex gap-2 overflow-x-auto p-3">
+          <div v-if="activeCategory" class="flex gap-2 overflow-x-auto scroll-fade-x p-3 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button
               v-for="item in activeItems"
               :key="item.type"
@@ -345,7 +345,7 @@
           </div>
 
           <!-- Room style -->
-          <div v-else-if="activeTab === 'room'" class="flex items-stretch gap-4 overflow-x-auto p-3">
+          <div v-else-if="activeTab === 'room'" class="flex items-stretch gap-4 overflow-x-auto scroll-fade-x p-3 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <div class="shrink-0">
               <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{{ t('room.roomStyle.style') }}</p>
               <div class="flex gap-2">
@@ -409,7 +409,7 @@
           </div>
 
           <!-- Land (scenery outside the room) -->
-          <div v-else-if="activeTab === 'land'" class="flex items-stretch gap-3 overflow-x-auto p-3">
+          <div v-else-if="activeTab === 'land'" class="flex items-stretch gap-3 overflow-x-auto scroll-fade-x p-3 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button
               v-for="land in LANDS"
               :key="land.id"
@@ -433,7 +433,7 @@
           </div>
 
           <!-- Music -->
-          <div v-else-if="activeTab === 'music'" class="flex items-stretch gap-2 overflow-x-auto p-3">
+          <div v-else-if="activeTab === 'music'" class="flex items-stretch gap-2 overflow-x-auto scroll-fade-x p-3 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button
               type="button"
               class="flex w-28 shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-2 text-center transition"
@@ -492,7 +492,7 @@
           </div>
 
           <!-- Day & night -->
-          <div v-else-if="activeTab === 'time'" class="flex items-stretch gap-3 overflow-x-auto p-3">
+          <div v-else-if="activeTab === 'time'" class="flex items-stretch gap-3 overflow-x-auto scroll-fade-x p-3 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button
               v-for="mode in dayNightModes"
               :key="mode.value"
@@ -519,7 +519,7 @@
         </div>
 
         <!-- Tabs -->
-        <div class="flex items-center gap-1 overflow-x-auto p-1.5">
+        <div class="flex items-center gap-1 overflow-x-auto scroll-fade-x p-1.5 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
           <button
             v-for="tab in tabs"
             :key="tab.value"

@@ -169,11 +169,8 @@
              dark pill follows the swipe between tabs (like Flutter's TabBar).
              The white labels are a copy clipped to the pill, so text turns
              white exactly where the pill is. The active tab is scrolled into view -->
-        <div
-          ref="tabBar"
-          class="sticky -top-4 z-20 -mx-4 mb-3 overflow-x-auto border-b border-line bg-paper px-3 py-1.5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
-          :class="!tempAddress && '-mt-4'"
-        >
+        <div class="sticky -top-4 z-20 -mx-4 mb-3 border-b border-line bg-paper lg:hidden" :class="!tempAddress && '-mt-4'">
+        <div ref="tabBar" class="scroll-fade-x overflow-x-auto px-3 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div ref="tabRow" class="relative flex w-max gap-0.5 p-1">
             <span class="absolute inset-y-1 rounded-full bg-ink shadow-sm" :style="pillStyle" aria-hidden="true" />
             <button
@@ -195,6 +192,7 @@
               </span>
             </div>
           </div>
+        </div>
         </div>
 
         <!-- Phones: swipe sideways to change tab (useTabSwipe). The outer box
