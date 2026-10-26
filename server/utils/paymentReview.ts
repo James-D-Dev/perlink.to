@@ -134,6 +134,18 @@ export async function notifyPaymentSubmitted(event: H3Event, payment: PaymentRow
   ])
 }
 
+/** Tells the payer on Telegram (if they connected it) what was decided */
+export async function notifyPayer(event: H3Event, payment: PaymentRow, approved: boolean, expiresAt?: string) {
+  const row = await getDB(event).prepare('SELECT telegram_chat_id FROM profiles WHERE id = ?').bind(payment.user_id).first<{ telegram_chat_id: string | null }>()
+  if (!row?.telegram_chat_id) return
+  const siteUrl = useRuntimeConfig(event).public.siteUrl
+  const plan = payment.plan.toUpperCase()
+  const html = approved
+    ? `✅ <b>Gói ${plan} đã được bật</b>${expiresAt ? ` đến ${new Date(expiresAt).toLocaleDateString('vi-VN')}` : ''}. Cảm ơn bạn!\n\n<b>Your ${plan} plan is on.</b> Thank you!`
+    : `⚠️ <b>Chưa xác nhận được thanh toán ${payment.code}</b> (gói ${plan}). Nếu bạn đã chuyển tiền, hãy trả lời email hỗ trợ kèm mã này để được kiểm tra lại.\n\n<b>We couldn't confirm payment ${payment.code}.</b> If you did pay, contact support with this code.`
+  await sendTelegram(event, row.telegram_chat_id, html, [{ text: approved ? 'Mở Perlink' : 'Xem thanh toán', url: `${siteUrl}/dashboard/upgrade` }])
+}
+
 /** After a decision in Telegram: the message says what happened, without the buttons */
 export async function markTelegramDecision(event: H3Event, chatId: string, messageId: number, html: string) {
   await telegramApi(event, 'editMessageText', { chat_id: chatId, message_id: messageId, text: html, parse_mode: 'HTML', link_preview_options: { is_disabled: true } })

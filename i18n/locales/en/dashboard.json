@@ -646,7 +646,11 @@
           "pending": "Not found yet; it may still be confirming",
           "error": "Couldn’t check the transaction yet"
         },
-        "copy": "Copy"
+        "copy": "Copy",
+        "rejectedTitle": "We couldn’t confirm this payment",
+        "rejectedText": "We couldn’t find this payment. If you did pay, contact support with the code below, or check the details and send it again.",
+        "contactSupport": "Contact support",
+        "tryAgain": "Send again"
       },
       "prompt": {
         "sites": {
@@ -673,7 +677,9 @@
       "paymentStatus": {
         "pending": "Waiting for payment",
         "paid": "Paid",
-        "expired": "Expired"
+        "expired": "Expired",
+        "submitted": "Waiting for review",
+        "rejected": "Not confirmed"
       },
       "comingSoon": "Coming soon",
       "usdNote": "Prices in US dollars. For now payment is by Vietnamese bank transfer (VietQR), charged in VND."

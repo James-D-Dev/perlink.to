@@ -57,8 +57,8 @@
                 <p class="text-xs text-ink-muted">{{ formatDate(p.paidAt || p.createdAt) }} · <span class="font-mono">{{ p.code }}</span></p>
               </div>
               <div class="flex items-center gap-3">
-                <span class="font-medium text-ink">{{ formatVnd(p.amount) }}</span>
-                <UBadge :color="p.status === 'paid' ? 'success' : 'neutral'" variant="soft" :label="t(`dashboard.billing.paymentStatus.${p.status}`)" />
+                <span class="font-medium text-ink">{{ p.method === 'crypto' && p.amountUsd ? `$${p.amountUsd}` : formatVnd(p.amount) }}</span>
+                <UBadge :color="STATUS_COLOR[p.status] ?? 'neutral'" variant="soft" :label="t(`dashboard.billing.paymentStatus.${p.status}`)" />
               </div>
             </div>
           </div>
@@ -70,6 +70,8 @@
 
 <script setup lang="ts">
 import { formatVnd, isPlanId } from '#shared/plans'
+
+const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = { paid: 'success', submitted: 'warning', rejected: 'error' }
 
 definePageMeta({
   layout: 'admin',

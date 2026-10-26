@@ -646,7 +646,11 @@
           "pending": "Chưa thấy giao dịch, có thể đang chờ xác nhận",
           "error": "Chưa kiểm tra được giao dịch"
         },
-        "copy": "Sao chép"
+        "copy": "Sao chép",
+        "rejectedTitle": "Chưa xác nhận được thanh toán",
+        "rejectedText": "Chúng tôi chưa thấy khoản thanh toán này. Nếu bạn đã chuyển tiền, hãy liên hệ hỗ trợ kèm mã dưới đây, hoặc kiểm tra lại rồi gửi lại.",
+        "contactSupport": "Liên hệ hỗ trợ",
+        "tryAgain": "Gửi lại"
       },
       "prompt": {
         "sites": {
@@ -673,7 +677,9 @@
       "paymentStatus": {
         "pending": "Chờ thanh toán",
         "paid": "Đã thanh toán",
-        "expired": "Hết hạn"
+        "expired": "Hết hạn",
+        "submitted": "Chờ duyệt",
+        "rejected": "Chưa xác nhận"
       },
       "comingSoon": "Sắp mở bán",
       "usdNote": "Giá theo đô la Mỹ. Hiện thanh toán bằng chuyển khoản ngân hàng Việt Nam (VietQR), tính bằng VND."

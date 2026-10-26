@@ -9,7 +9,7 @@ export interface BillingInfo {
   checkoutEnabled: boolean
   /** Ways to pay that are set up */
   paymentMethods?: { bank: boolean; crypto: boolean }
-  payments: { id: string; plan: string; period: string; amount: number; code: string; status: string; createdAt: string; paidAt: string | null }[]
+  payments: { id: string; plan: string; period: string; amount: number; amountUsd?: number | null; method?: string; code: string; status: string; createdAt: string; paidAt: string | null }[]
 }
 
 export interface UpgradeReason {

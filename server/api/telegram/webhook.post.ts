@@ -1,6 +1,6 @@
 import { getDB } from '../../utils/db'
 import { sendTelegram, telegramApi, telegramConfig } from '../../utils/telegram'
-import { approvePayment, isAdminChat, loadPayment, markTelegramDecision, paymentSummary, rejectPayment } from '../../utils/paymentReview'
+import { approvePayment, isAdminChat, loadPayment, markTelegramDecision, notifyPayer, paymentSummary, rejectPayment } from '../../utils/paymentReview'
 
 interface TelegramUpdate {
   message?: {
@@ -82,12 +82,14 @@ async function handlePaymentButton(event: Parameters<typeof telegramApi>[0], que
       await answer(result.reason === 'already-paid' ? 'Đã duyệt trước đó' : 'Không duyệt được')
     } else {
       await answer('Đã nâng cấp ✅')
+      await notifyPayer(event, payment, true, result.expiresAt)
       const until = new Date(result.expiresAt).toLocaleDateString('vi-VN')
       await markTelegramDecision(event, chatId, query.message.message_id, `${paymentSummary(payment)}\n\n✅ <b>Đã duyệt</b> · gói ${payment.plan.toUpperCase()} tới ${until}`)
     }
   } else {
     const rejected = await rejectPayment(event, id!)
     await answer(rejected ? 'Đã từ chối' : 'Thanh toán này đã được xử lý')
+    if (rejected) await notifyPayer(event, payment, false)
     if (rejected) await markTelegramDecision(event, chatId, query.message.message_id, `${paymentSummary(payment)}\n\n✖ <b>Đã từ chối</b>`)
   }
   return { ok: true }

@@ -2,7 +2,7 @@ import { getDB } from '../../../../utils/db'
 import { requireSuperadmin } from '../../../../utils/superadmin'
 import { cryptoWallet } from '../../../../utils/billing'
 import { checkCryptoPayment } from '../../../../utils/cryptoPayments'
-import { approvePayment, loadPayment, parseCheck, rejectPayment } from '../../../../utils/paymentReview'
+import { approvePayment, loadPayment, notifyPayer, parseCheck, rejectPayment } from '../../../../utils/paymentReview'
 
 // Superadmin decides on a payment: approve (puts the plan on the account),
 // reject, or read a crypto transaction from the chain again
@@ -14,10 +14,13 @@ export default defineEventHandler(async (event) => {
   if (action === 'approve') {
     const result = await approvePayment(event, id)
     if (!result.ok) throw createError({ statusCode: 409, statusMessage: result.reason === 'not-found' ? 'Payment not found' : 'Already approved' })
+    await notifyPayer(event, result.payment, true, result.expiresAt)
     return { ok: true, expiresAt: result.expiresAt }
   }
   if (action === 'reject') {
     if (!(await rejectPayment(event, id))) throw createError({ statusCode: 409, statusMessage: 'This payment was already decided' })
+    const payment = await loadPayment(event, id)
+    if (payment) await notifyPayer(event, payment, false)
     return { ok: true }
   }
   if (action === 'recheck') {

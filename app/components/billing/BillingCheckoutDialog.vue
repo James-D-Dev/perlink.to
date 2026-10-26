@@ -29,6 +29,17 @@
           <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin text-ink-muted" />
         </div>
 
+        <!-- Not confirmed: say so, with the code to quote and a way to send it again -->
+        <div v-else-if="status === 'rejected'" class="flex flex-col items-center py-4 text-center">
+          <div class="flex size-14 items-center justify-center rounded-full bg-red-100 text-red-600">
+            <UIcon name="i-lucide-circle-alert" class="size-7" />
+          </div>
+          <p class="mt-4 text-lg font-semibold text-ink">{{ t('dashboard.billing.checkout.rejectedTitle') }}</p>
+          <p class="mt-1 text-sm text-ink-muted">{{ t('dashboard.billing.checkout.rejectedText') }}</p>
+          <p class="mt-3 font-mono text-sm font-semibold tracking-wide text-ink">{{ paymentCode }}</p>
+          <UButton class="mt-3" size="sm" color="neutral" variant="soft" icon="i-lucide-mail" :label="t('dashboard.billing.checkout.contactSupport')" :href="`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`Perlink payment ${paymentCode}`)}`" />
+        </div>
+
         <!-- Waiting for review -->
         <div v-else-if="status === 'submitted'" class="flex flex-col items-center py-4 text-center">
           <div class="flex size-14 items-center justify-center rounded-full bg-amber-100 text-amber-600">
@@ -141,7 +152,14 @@
       <div v-else-if="!loading" class="flex w-full gap-2">
         <UButton color="neutral" variant="soft" icon="i-lucide-refresh-cw" :loading="refreshing" :label="t('dashboard.billing.checkout.refresh')" @click="refreshStatus" />
         <UButton
-          v-if="status !== 'submitted'"
+          v-if="status === 'rejected'"
+          class="flex-1 justify-center"
+          icon="i-lucide-rotate-ccw"
+          :label="t('dashboard.billing.checkout.tryAgain')"
+          @click="status = 'pending'"
+        />
+        <UButton
+          v-else-if="status !== 'submitted'"
           class="flex-1 justify-center"
           icon="i-lucide-check"
           :loading="submitting"
@@ -157,6 +175,7 @@
 <script setup lang="ts">
 import qrcode from 'qrcode-generator'
 import { formatVnd, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { SUPPORT_EMAIL } from '~/utils/legal'
 
 // Pay for a plan by bank transfer (VietQR, VND) or in USDT / USDC to the
 // crypto wallet. "Done" sends it for review; the plan turns on once the
@@ -187,6 +206,7 @@ const loading = ref(false)
 const submitting = ref(false)
 const refreshing = ref(false)
 const paymentId = ref<string | null>(null)
+const paymentCode = ref('')
 const status = ref('pending')
 const transfer = ref<Transfer | null>(null)
 const cryptoInfo = ref<CryptoInfo | null>(null)
@@ -238,11 +258,12 @@ async function start() {
   paid.value = null
   check.value = null
   try {
-    const res = await $fetch<{ id: string; status: string; transfer: Transfer | null; crypto: CryptoInfo | null }>('/api/billing/checkout', {
+    const res = await $fetch<{ id: string; code: string; status: string; transfer: Transfer | null; crypto: CryptoInfo | null }>('/api/billing/checkout', {
       method: 'POST',
       body: { plan: props.plan, period: props.period, method: method.value },
     })
     paymentId.value = res.id
+    paymentCode.value = res.code
     status.value = res.status
     transfer.value = res.transfer
     cryptoInfo.value = res.crypto
@@ -282,7 +303,8 @@ async function onPaid(expiresAt?: string) {
 async function poll() {
   if (!paymentId.value || paid.value) return
   const res = await $fetch<{ status: string; expiresAt?: string; check?: Check | null }>(`/api/billing/payments/${paymentId.value}`)
-  status.value = res.status === 'rejected' ? 'pending' : res.status
+  // A rejected payment stays shown as rejected until the payer chooses to try again
+  if (!(status.value === 'pending' && res.status === 'rejected')) status.value = res.status
   if (res.check) check.value = res.check
   if (res.status === 'paid') await onPaid(res.expiresAt)
 }
