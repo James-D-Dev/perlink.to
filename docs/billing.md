@@ -51,3 +51,35 @@ have no end date).
   says "Coming soon" and checkout refuses it. Turn it on once custom domains
   are connected and `BRANDING_FOR_ALL` is off. Plus promises the same two
   things (custom domain, no badge) and is still on sale.
+
+## Paying by bank transfer or crypto, reviewed by the superadmin
+
+The checkout offers what is set up (`paymentMethods` in `/api/billing`):
+
+- **Bank transfer** (VietQR, VND): `NUXT_BILLING_BANK_BIN` (Techcombank is
+  `970407`), `NUXT_BILLING_ACCOUNT_NUMBER`, `NUXT_BILLING_ACCOUNT_NAME`. The
+  transfer message is `PERLINK <code>` (e.g. `PERLINK PL7K2M9QXA`); with SePay
+  set up, a matching transfer still turns the plan on by itself.
+- **Crypto** (USDT / USDC at the USD price, `PLAN_PRICES_USD`):
+  `NUXT_BILLING_CRYPTO_ADDRESS` = the EVM wallet that receives it. Networks and
+  token contracts are in `shared/crypto.ts` (BNB Chain, Polygon, Arbitrum,
+  Base, Ethereum; checked on chain: symbol and decimals).
+
+Flow:
+
+1. The payer pays and presses **Done** (crypto: with the transaction hash).
+   The payment becomes `submitted`. A crypto transaction is read from the
+   chain (`server/utils/cryptoPayments.ts`): succeeded, USDT/USDC to our
+   wallet, how much, confirmations. One transaction can pay only one plan.
+2. The superadmin gets a Telegram message (their account must be connected:
+   Settings → Notifications) with the details, the check and **Approve /
+   Reject** buttons, plus links to the explorer and the review page.
+   Superadmin → Settings → Telegram → set up the webhook again once, so
+   Telegram sends button presses (`callback_query`). Only the superadmin's
+   own chat can decide.
+3. **Approve** (Telegram or Superadmin → Payments) puts the plan on the
+   account (`grantPlan`: time adds to what is left). **Reject** marks it
+   rejected; it can still be approved later from the page.
+4. **Refresh** in the checkout asks again; a waiting crypto payment is read
+   from the chain again (every 20 s at most), and the reviewer is told once
+   it shows as paid in full.

@@ -7,6 +7,8 @@ export interface BillingInfo {
   sites: number
   canTrial: boolean
   checkoutEnabled: boolean
+  /** Ways to pay that are set up */
+  paymentMethods?: { bank: boolean; crypto: boolean }
   payments: { id: string; plan: string; period: string; amount: number; code: string; status: string; createdAt: string; paidAt: string | null }[]
 }
 

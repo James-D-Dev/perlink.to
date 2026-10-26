@@ -79,6 +79,7 @@ const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [
       { label: "Short Links", icon: "i-lucide-link", to: "/superadmin/links" },
       { label: "QR Codes", icon: "i-lucide-qr-code", to: "/superadmin/qr-codes" },
       { label: "Reports", icon: "i-lucide-flag", to: "/superadmin/reports" },
+      { label: "Payments", icon: "i-lucide-wallet", to: "/superadmin/payments" },
     ],
   },
   {

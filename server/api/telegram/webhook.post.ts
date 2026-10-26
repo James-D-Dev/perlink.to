@@ -1,10 +1,17 @@
 import { getDB } from '../../utils/db'
-import { sendTelegram, telegramConfig } from '../../utils/telegram'
+import { sendTelegram, telegramApi, telegramConfig } from '../../utils/telegram'
+import { approvePayment, isAdminChat, loadPayment, markTelegramDecision, paymentSummary, rejectPayment } from '../../utils/paymentReview'
 
 interface TelegramUpdate {
   message?: {
     text?: string
     chat: { id: number; type: string }
+  }
+  /** A button under a payment review message was pressed */
+  callback_query?: {
+    id: string
+    data?: string
+    message?: { message_id: number; chat: { id: number } }
   }
 }
 
@@ -19,6 +26,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const update = await readBody<TelegramUpdate>(event)
+  if (update?.callback_query) return handlePaymentButton(event, update.callback_query)
   const message = update?.message
   // Only private chats with the bot; groups are ignored
   if (!message?.text || message.chat.type !== 'private') return { ok: true }
@@ -54,3 +62,33 @@ export default defineEventHandler(async (event) => {
   await sendTelegram(event, chatId, HELP)
   return { ok: true }
 })
+
+// "Approve" / "Reject" under a payment review message. Only the superadmin's
+// own chat can decide; the message is updated to say what happened.
+async function handlePaymentButton(event: Parameters<typeof telegramApi>[0], query: NonNullable<TelegramUpdate['callback_query']>) {
+  const answer = (text: string) => telegramApi(event, 'answerCallbackQuery', { callback_query_id: query.id, text })
+  const match = query.data?.match(/^pay:(ok|no):([\w-]+)$/)
+  const chatId = query.message ? String(query.message.chat.id) : ''
+  if (!match || !query.message) return answer('Không hiểu yêu cầu').then(() => ({ ok: true }))
+  if (!(await isAdminChat(event, chatId))) return answer('Chỉ superadmin được duyệt').then(() => ({ ok: true }))
+
+  const [, action, id] = match
+  const payment = await loadPayment(event, id!)
+  if (!payment) return answer('Không tìm thấy thanh toán').then(() => ({ ok: true }))
+
+  if (action === 'ok') {
+    const result = await approvePayment(event, id!)
+    if (!result.ok) {
+      await answer(result.reason === 'already-paid' ? 'Đã duyệt trước đó' : 'Không duyệt được')
+    } else {
+      await answer('Đã nâng cấp ✅')
+      const until = new Date(result.expiresAt).toLocaleDateString('vi-VN')
+      await markTelegramDecision(event, chatId, query.message.message_id, `${paymentSummary(payment)}\n\n✅ <b>Đã duyệt</b> · gói ${payment.plan.toUpperCase()} tới ${until}`)
+    }
+  } else {
+    const rejected = await rejectPayment(event, id!)
+    await answer(rejected ? 'Đã từ chối' : 'Thanh toán này đã được xử lý')
+    if (rejected) await markTelegramDecision(event, chatId, query.message.message_id, `${paymentSummary(payment)}\n\n✖ <b>Đã từ chối</b>`)
+  }
+  return { ok: true }
+}

@@ -10,48 +10,146 @@
         <p class="mt-1 text-sm text-ink-muted">{{ t('dashboard.billing.checkout.paidText', { plan: planName, date: formatDate(paid.expiresAt) }) }}</p>
       </div>
 
-      <div v-else-if="loading" class="flex justify-center py-16">
-        <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin text-ink-muted" />
-      </div>
-
-      <div v-else-if="transfer" class="space-y-4">
-        <!-- QR -->
-        <div class="flex flex-col items-center">
-          <div class="rounded-2xl bg-white p-3 ring-1 ring-line">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div class="size-52" v-html="qrSvg" />
-          </div>
-          <p class="mt-2 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.scan') }}</p>
+      <template v-else>
+        <!-- Bank transfer or crypto, when both are set up -->
+        <div v-if="methods.length > 1" class="mb-4 grid grid-cols-2 gap-1 rounded-full bg-sand/70 p-1">
+          <button
+            v-for="m in methods"
+            :key="m"
+            type="button"
+            class="rounded-full px-3 py-2 text-sm font-medium transition"
+            :class="method === m ? 'bg-paper text-ink shadow-sm' : 'text-ink-muted hover:text-ink'"
+            @click="method = m"
+          >
+            {{ m === 'bank' ? t('dashboard.billing.checkout.methodBank') : t('dashboard.billing.checkout.methodCrypto') }}
+          </button>
         </div>
 
-        <!-- Manual transfer -->
-        <div>
-          <p class="mb-2 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.manual') }}</p>
-          <dl class="divide-y divide-line overflow-hidden rounded-xl bg-sand/50 text-sm ring-1 ring-line">
-            <div v-for="row in rows" :key="row.label" class="flex items-center justify-between gap-3 px-3 py-2">
-              <dt class="text-ink-muted">{{ row.label }}</dt>
-              <dd class="flex min-w-0 items-center gap-1.5 font-medium text-ink">
-                <span class="truncate" :class="row.strong && 'font-mono text-base tracking-wide'">{{ row.value }}</span>
-                <UButton v-if="row.copy" size="xs" color="neutral" variant="ghost" icon="i-lucide-copy" :aria-label="row.label" @click="copy(row.copy)" />
-              </dd>
+        <div v-if="loading" class="flex justify-center py-16">
+          <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin text-ink-muted" />
+        </div>
+
+        <!-- Waiting for review -->
+        <div v-else-if="status === 'submitted'" class="flex flex-col items-center py-4 text-center">
+          <div class="flex size-14 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+            <UIcon name="i-lucide-hourglass" class="size-7" />
+          </div>
+          <p class="mt-4 text-lg font-semibold text-ink">{{ t('dashboard.billing.checkout.submittedTitle') }}</p>
+          <p class="mt-1 text-sm text-ink-muted">{{ t('dashboard.billing.checkout.submittedText') }}</p>
+          <p v-if="check" class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium" :class="check.verdict === 'ok' ? 'bg-emerald-50 text-emerald-700' : 'bg-sand text-ink-soft'">
+            <UIcon :name="check.verdict === 'ok' ? 'i-lucide-badge-check' : 'i-lucide-info'" class="size-3.5" />
+            {{ t(`dashboard.billing.checkout.check.${check.verdict}`) }}
+          </p>
+        </div>
+
+        <!-- Bank transfer -->
+        <div v-else-if="method === 'bank' && transfer" class="space-y-4">
+          <div class="flex flex-col items-center">
+            <div class="rounded-2xl bg-white p-3 ring-1 ring-line">
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div class="size-52" v-html="qrSvg(transfer.qrString)" />
             </div>
-          </dl>
-          <p class="mt-2 text-xs text-amber-700">{{ t('dashboard.billing.checkout.noteHint') }}</p>
-        </div>
-
-        <!-- Waiting -->
-        <div class="flex items-start gap-2.5 rounded-xl bg-paper px-3 py-2.5 ring-1 ring-line">
-          <UIcon name="i-lucide-loader-circle" class="mt-0.5 size-4 shrink-0 animate-spin text-ink-muted" />
-          <div class="text-xs">
-            <p class="font-medium text-ink">{{ t('dashboard.billing.checkout.waiting') }}</p>
-            <p class="mt-0.5 text-ink-muted">{{ t('dashboard.billing.checkout.waitingHint') }}</p>
+            <p class="mt-2 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.scan') }}</p>
+          </div>
+          <div>
+            <p class="mb-2 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.manual') }}</p>
+            <dl class="divide-y divide-line overflow-hidden rounded-xl bg-sand/50 text-sm ring-1 ring-line">
+              <div v-for="row in bankRows" :key="row.label" class="flex items-center justify-between gap-3 px-3 py-2">
+                <dt class="text-ink-muted">{{ row.label }}</dt>
+                <dd class="flex min-w-0 items-center gap-1.5 font-medium text-ink">
+                  <span class="truncate" :class="row.strong && 'font-mono text-base tracking-wide'">{{ row.value }}</span>
+                  <UButton v-if="row.copy" size="xs" color="neutral" variant="ghost" icon="i-lucide-copy" :aria-label="row.label" @click="copy(row.copy)" />
+                </dd>
+              </div>
+            </dl>
+            <p class="mt-2 text-xs text-amber-700">{{ t('dashboard.billing.checkout.noteHint') }}</p>
+          </div>
+          <div class="flex items-start gap-2.5 rounded-xl bg-paper px-3 py-2.5 ring-1 ring-line">
+            <UIcon name="i-lucide-info" class="mt-0.5 size-4 shrink-0 text-ink-muted" />
+            <div class="text-xs">
+              <p class="font-medium text-ink">{{ t('dashboard.billing.checkout.waiting') }}</p>
+              <p class="mt-0.5 text-ink-muted">{{ t('dashboard.billing.checkout.waitingHint') }}</p>
+            </div>
           </div>
         </div>
-      </div>
+
+        <!-- Crypto: USDT / USDC to the wallet, then the transaction hash -->
+        <div v-else-if="method === 'crypto' && cryptoInfo" class="space-y-4">
+          <div class="rounded-2xl bg-sand/50 px-4 py-3 text-center ring-1 ring-line">
+            <p class="text-xs text-ink-muted">{{ t('dashboard.billing.checkout.cryptoAmount') }}</p>
+            <p class="mt-0.5 flex items-center justify-center gap-2 text-2xl font-semibold tabular-nums text-ink">
+              {{ cryptoInfo.amountUsd }} {{ token }}
+              <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-copy" :aria-label="t('dashboard.billing.checkout.amount')" @click="copy(String(cryptoInfo.amountUsd))" />
+            </p>
+          </div>
+
+          <div>
+            <p class="mb-1.5 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.network') }}</p>
+            <div class="flex flex-wrap gap-1.5">
+              <button
+                v-for="n in cryptoInfo.networks"
+                :key="n.id"
+                type="button"
+                class="rounded-full border px-3 py-1 text-xs font-medium transition"
+                :class="network === n.id ? 'border-ink bg-ink text-paper' : 'border-line text-ink-soft hover:border-ink-faint'"
+                @click="network = n.id"
+              >
+                {{ n.name }}
+              </button>
+            </div>
+          </div>
+          <div>
+            <p class="mb-1.5 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.token') }}</p>
+            <div class="flex gap-1.5">
+              <button
+                v-for="tk in networkTokens"
+                :key="tk"
+                type="button"
+                class="rounded-full border px-3 py-1 text-xs font-medium transition"
+                :class="token === tk ? 'border-ink bg-ink text-paper' : 'border-line text-ink-soft hover:border-ink-faint'"
+                @click="token = tk"
+              >
+                {{ tk }}
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div class="size-24 shrink-0 rounded-lg bg-white p-1.5 ring-1 ring-line" v-html="qrSvg(cryptoInfo.address)" />
+            <div class="min-w-0">
+              <p class="text-xs text-ink-muted">{{ t('dashboard.billing.checkout.address') }}</p>
+              <p class="mt-0.5 break-all font-mono text-xs text-ink">{{ cryptoInfo.address }}</p>
+              <UButton class="mt-1.5" size="xs" color="neutral" variant="soft" icon="i-lucide-copy" :label="t('dashboard.billing.checkout.copy')" @click="copy(cryptoInfo.address)" />
+            </div>
+          </div>
+          <p class="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-amber-100">
+            {{ t('dashboard.billing.checkout.cryptoWarning', { token, network: networkName }) }}
+          </p>
+
+          <div>
+            <label class="mb-1.5 block text-xs font-medium text-ink-muted" for="tx-hash">{{ t('dashboard.billing.checkout.txHash') }}</label>
+            <UInput id="tx-hash" v-model="txHash" class="w-full font-mono" :placeholder="t('dashboard.billing.checkout.txHashPlaceholder')" autocomplete="off" spellcheck="false" />
+            <p class="mt-1.5 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.txHashHint') }}</p>
+          </div>
+        </div>
+      </template>
     </template>
 
-    <template v-if="paid" #footer>
-      <UButton block :label="t('dashboard.billing.checkout.done')" @click="open = false" />
+    <template #footer>
+      <UButton v-if="paid" block :label="t('dashboard.billing.checkout.done')" @click="open = false" />
+      <div v-else-if="!loading" class="flex w-full gap-2">
+        <UButton color="neutral" variant="soft" icon="i-lucide-refresh-cw" :loading="refreshing" :label="t('dashboard.billing.checkout.refresh')" @click="refreshStatus" />
+        <UButton
+          v-if="status !== 'submitted'"
+          class="flex-1 justify-center"
+          icon="i-lucide-check"
+          :loading="submitting"
+          :disabled="method === 'crypto' && !txHash.trim()"
+          :label="t('dashboard.billing.checkout.submit')"
+          @click="submit"
+        />
+      </div>
     </template>
   </AppSheet>
 </template>
@@ -60,8 +158,9 @@
 import qrcode from 'qrcode-generator'
 import { formatVnd, type BillingPeriod, type PaidPlanId } from '#shared/plans'
 
-// Pay for a plan by bank transfer: VietQR plus the details to type by hand,
-// then wait for the bank webhook to mark it paid
+// Pay for a plan by bank transfer (VietQR, VND) or in USDT / USDC to the
+// crypto wallet. "Done" sends it for review; the plan turns on once the
+// superadmin approves (or a bank webhook matches the transfer).
 const props = defineProps<{
   plan: PaidPlanId
   period: BillingPeriod
@@ -71,29 +170,51 @@ const open = defineModel<boolean>('open', { default: false })
 
 const { t, locale } = useI18n()
 const toast = useToast()
-const { refresh } = useBilling()
+const { info, refresh } = useBilling()
 
+type Method = 'bank' | 'crypto'
 interface Transfer { qrString: string; bankName: string; accountNumber: string; accountName: string; amount: number; note: string }
+interface CryptoInfo { address: string; amountUsd: number; networks: { id: string; name: string; tokens: string[] }[] }
+interface Check { verdict: 'ok' | 'short' | 'none' | 'failed' | 'pending' | 'error' }
+
+const methods = computed<Method[]>(() => {
+  const available = info.value?.paymentMethods ?? { bank: true, crypto: false }
+  return (['bank', 'crypto'] as Method[]).filter(m => available[m])
+})
+const method = ref<Method>('bank')
 
 const loading = ref(false)
+const submitting = ref(false)
+const refreshing = ref(false)
 const paymentId = ref<string | null>(null)
+const status = ref('pending')
 const transfer = ref<Transfer | null>(null)
+const cryptoInfo = ref<CryptoInfo | null>(null)
+const check = ref<Check | null>(null)
 const paid = ref<{ expiresAt: string } | null>(null)
+
+const network = ref('bsc')
+const token = ref('USDT')
+const txHash = ref('')
+const networkTokens = computed(() => cryptoInfo.value?.networks.find(n => n.id === network.value)?.tokens ?? [])
+const networkName = computed(() => cryptoInfo.value?.networks.find(n => n.id === network.value)?.name ?? '')
+watch(networkTokens, (tokens) => {
+  if (!tokens.includes(token.value)) token.value = tokens[0] ?? 'USDT'
+})
 
 const planName = computed(() => t(`dashboard.billing.plans.${props.plan}.name`))
 const title = computed(() =>
   `${t('dashboard.billing.checkout.title', { plan: planName.value })} · ${t(props.period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly')}`,
 )
 
-const qrSvg = computed(() => {
-  if (!transfer.value) return ''
+function qrSvg(text: string) {
   const qr = qrcode(0, 'M')
-  qr.addData(transfer.value.qrString)
+  qr.addData(text)
   qr.make()
   return qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true })
-})
+}
 
-const rows = computed(() => {
+const bankRows = computed(() => {
   const tr = transfer.value
   if (!tr) return []
   return [
@@ -115,19 +236,65 @@ function copy(text: string) {
 async function start() {
   loading.value = true
   paid.value = null
-  transfer.value = null
+  check.value = null
   try {
-    const res = await $fetch<{ id: string; transfer: Transfer | null }>('/api/billing/checkout', {
+    const res = await $fetch<{ id: string; status: string; transfer: Transfer | null; crypto: CryptoInfo | null }>('/api/billing/checkout', {
       method: 'POST',
-      body: { plan: props.plan, period: props.period },
+      body: { plan: props.plan, period: props.period, method: method.value },
     })
     paymentId.value = res.id
+    status.value = res.status
     transfer.value = res.transfer
+    cryptoInfo.value = res.crypto
   } catch (error: any) {
     toast.add({ title: t('dashboard.billing.checkout.failed'), description: error?.data?.statusMessage, color: 'error' })
     open.value = false
   } finally {
     loading.value = false
+  }
+}
+
+async function submit() {
+  if (!paymentId.value) return
+  submitting.value = true
+  try {
+    const res = await $fetch<{ status: string; check?: Check | null }>(`/api/billing/payments/${paymentId.value}/submit`, {
+      method: 'POST',
+      body: method.value === 'crypto' ? { network: network.value, token: token.value, txHash: txHash.value.trim() } : {},
+    })
+    status.value = res.status
+    check.value = res.check ?? null
+    if (res.status === 'paid') await onPaid()
+  } catch (error: any) {
+    toast.add({ title: t('dashboard.billing.checkout.submitFailed'), description: error?.data?.statusMessage, color: 'error' })
+  } finally {
+    submitting.value = false
+  }
+}
+
+async function onPaid(expiresAt?: string) {
+  paid.value = { expiresAt: expiresAt ?? new Date().toISOString() }
+  stopPolling()
+  await refresh()
+  emit('paid')
+}
+
+async function poll() {
+  if (!paymentId.value || paid.value) return
+  const res = await $fetch<{ status: string; expiresAt?: string; check?: Check | null }>(`/api/billing/payments/${paymentId.value}`)
+  status.value = res.status === 'rejected' ? 'pending' : res.status
+  if (res.check) check.value = res.check
+  if (res.status === 'paid') await onPaid(res.expiresAt)
+}
+
+async function refreshStatus() {
+  refreshing.value = true
+  try {
+    await poll()
+  } catch {
+    // Shown again on the next try
+  } finally {
+    refreshing.value = false
   }
 }
 
@@ -139,25 +306,19 @@ function stopPolling() {
 }
 function startPolling() {
   stopPolling()
-  timer = setInterval(async () => {
-    if (!paymentId.value || paid.value) return
-    try {
-      const res = await $fetch<{ status: string; expiresAt?: string }>(`/api/billing/payments/${paymentId.value}`)
-      if (res.status === 'paid') {
-        paid.value = { expiresAt: res.expiresAt ?? new Date().toISOString() }
-        stopPolling()
-        await refresh()
-        emit('paid')
-      }
-    } catch {
-      // Try again on the next tick
-    }
-  }, 4000)
+  timer = setInterval(() => poll().catch(() => {}), 6000)
 }
 
+// Switching between bank and crypto starts that kind of payment
+watch(method, () => {
+  if (open.value) start()
+})
 watch(open, (isOpen) => {
   if (isOpen) {
-    start()
+    const first = methods.value[0] ?? 'bank'
+    // A different method starts through the watcher below
+    if (method.value !== first) method.value = first
+    else start()
     startPolling()
   } else {
     stopPolling()

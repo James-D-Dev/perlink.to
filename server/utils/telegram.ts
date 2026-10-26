@@ -34,19 +34,20 @@ export async function telegramApi<T = unknown>(event: H3Event, method: string, b
   }
 }
 
-export interface TelegramButton {
-  text: string
-  url: string
-}
+/** A link button, or one that sends `callback` back to the webhook */
+export type TelegramButton = { text: string; url: string } | { text: string; callback: string }
 
-/** Sends an HTML-formatted message, with link buttons under it */
-export function sendTelegram(event: H3Event, chatId: string, html: string, buttons: TelegramButton[] = []) {
+const toInlineButton = (b: TelegramButton) => ('url' in b ? { text: b.text, url: b.url } : { text: b.text, callback_data: b.callback })
+
+/** Sends an HTML-formatted message, with buttons under it (one row, or rows) */
+export function sendTelegram(event: H3Event, chatId: string, html: string, buttons: TelegramButton[] | TelegramButton[][] = []) {
+  const rows = (buttons.length && Array.isArray(buttons[0]) ? buttons : [buttons]) as TelegramButton[][]
   return telegramApi(event, 'sendMessage', {
     chat_id: chatId,
     text: html,
     parse_mode: 'HTML',
     link_preview_options: { is_disabled: true },
-    ...(buttons.length ? { reply_markup: { inline_keyboard: [buttons.map(b => ({ text: b.text, url: b.url }))] } } : {}),
+    ...(buttons.length ? { reply_markup: { inline_keyboard: rows.map(row => row.map(toInlineButton)) } } : {}),
   })
 }
 

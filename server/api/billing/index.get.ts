@@ -1,6 +1,6 @@
 import { getDB } from '../../utils/db'
 import { getAccountPlan } from '../../utils/plan'
-import { billingAccount } from '../../utils/billing'
+import { paymentMethods } from '../../utils/billing'
 import { PLAN_LIMITS } from '#shared/plans'
 
 // The signed-in user's plan, what it allows, and their recent payments
@@ -21,7 +21,8 @@ export default defineEventHandler(async (event) => {
     limits: PLAN_LIMITS[account.plan],
     sites: sites?.n ?? 0,
     canTrial: !account.trialUsed && account.plan === 'free',
-    checkoutEnabled: !!billingAccount(event),
+    checkoutEnabled: Object.values(paymentMethods(event)).some(Boolean),
+    paymentMethods: paymentMethods(event),
     payments: (payments.results ?? []).map(p => ({
       id: p.id, plan: p.plan, period: p.period, amount: p.amount, code: p.code, status: p.status, createdAt: p.created_at, paidAt: p.paid_at,
     })),

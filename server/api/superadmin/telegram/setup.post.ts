@@ -10,7 +10,8 @@ export default defineEventHandler(async (event) => {
   const ok = await telegramApi<boolean>(event, 'setWebhook', {
     url,
     secret_token: config.webhookSecret,
-    allowed_updates: ['message'],
+    // callback_query: the Approve / Reject buttons on payment reviews
+    allowed_updates: ['message', 'callback_query'],
     drop_pending_updates: true,
   })
   if (!ok) throw createError({ statusCode: 502, statusMessage: 'Telegram refused the webhook' })

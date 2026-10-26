@@ -97,12 +97,17 @@ const period = ref<BillingPeriod>('monthly')
 const buying = ref<PaidPlanId | null>(null)
 const checkoutOpen = ref(false)
 
+// The account's billing info arrives after the server has drawn the cards,
+// so anything that depends on it waits for the browser; otherwise the page
+// would keep the server's "contact us" buttons after it starts
+const mounted = ref(false)
 onMounted(() => {
+  mounted.value = true
   if (loggedIn.value) ensure()
 })
 
-const currentPlan = computed(() => (loggedIn.value ? info.value?.plan : undefined))
-const checkoutEnabled = computed(() => !!info.value?.checkoutEnabled)
+const currentPlan = computed(() => (mounted.value && loggedIn.value ? info.value?.plan : undefined))
+const checkoutEnabled = computed(() => mounted.value && !!info.value?.checkoutEnabled)
 const highlight = computed(() => props.highlight)
 
 const isPopular = (plan: PlanId) => plan === 'plus'

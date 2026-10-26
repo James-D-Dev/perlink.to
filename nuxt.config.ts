@@ -59,6 +59,8 @@ export default defineNuxtConfig({
       accountNumber: "",
       accountName: "",
       sepayApiKey: "",
+      // EVM wallet that receives USDT / USDC (NUXT_BILLING_CRYPTO_ADDRESS)
+      cryptoAddress: "",
     },
     // Order and request alerts on Telegram (see docs/telegram-notifications.md).
     // Empty token = the "Connect Telegram" option is hidden.
