@@ -1,7 +1,7 @@
 import { BioRepository, publicBioPage } from '../../repositories/bioRepository'
 import { AnalyticsRepository } from '../../repositories/analyticsRepository'
 import { getAccountPlan } from '../../utils/plan'
-import { PLAN_LIMITS } from '#shared/plans'
+import { showsBranding } from '#shared/plans'
 import { isBot, parseDevice, hashIP, parseReferrer, parseUTMParams, detectSourceType } from '../../services/analytics'
 
 export default defineEventHandler(async (event) => {
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
 
   // Free sites carry the "Made with Perlink" badge
   const ownerPlan = await getAccountPlan(event, bioPage.userId).catch(() => null)
-  const page = { ...publicBioPage(bioPage), showBranding: !ownerPlan || !PLAN_LIMITS[ownerPlan.plan].removeBranding }
+  const page = { ...publicBioPage(bioPage), showBranding: showsBranding(ownerPlan?.plan) }
 
   // For bots: track as bot view (deduplicated per bot per day), then return data
   if (isBot(userAgent)) {

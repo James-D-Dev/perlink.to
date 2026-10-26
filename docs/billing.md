@@ -36,3 +36,8 @@ have no end date).
 - Each account can try Plus free for 7 days once (`profiles.trial_used`).
 - A transfer below the price is not applied (logged as `[billing]`); set the
   plan by hand in Superadmin if needed.
+- **For now every site shows the "Made with Perlink" badge** (and room videos
+  the watermark), whatever the plan: `BRANDING_FOR_ALL` in `shared/plans.ts`.
+  Set it to `false` once buying plans works end to end, and Plus and Pro
+  (`removeBranding`) hide it again. While it's on, the video studio doesn't
+  offer to remove the watermark.

@@ -339,7 +339,7 @@ const props = defineProps<{
   bio?: string
   avatarUrl?: string
   lang?: SiteLanguage
-  /** The "Made with Perlink" badge (plans without removeBranding) */
+  /** The "Made with Perlink" badge (see showsBranding) */
   branding?: boolean
 }>()
 

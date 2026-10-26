@@ -28,6 +28,16 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   pro: { sites: 1000, customDomain: true, proThemes: true, removeBranding: true, analyticsDays: 3650 },
 }
 
+/**
+ * Every site shows the "Made with Perlink" badge (and room videos the
+ * watermark), whatever the plan, until buying plans and paying work end to
+ * end. Set to false to let Plus and Pro remove it again (removeBranding).
+ */
+export const BRANDING_FOR_ALL = true
+
+/** Whether a site on this plan shows the Perlink badge */
+export const showsBranding = (plan: PlanId | null | undefined) => BRANDING_FOR_ALL || !plan || !PLAN_LIMITS[plan].removeBranding
+
 /** Prices in VND; a year costs ten months */
 export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
   starter: { monthly: 49_000, annual: 490_000 },

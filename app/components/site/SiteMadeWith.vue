@@ -1,5 +1,5 @@
 <template>
-  <!-- "Made with Perlink" on live sites (plans without removeBranding): every
+  <!-- "Made with Perlink" on live sites (see showsBranding): every
        visitor is a chance to make their own. Absolute link, so it also works
        on custom domains; tagged so these visits can be counted -->
   <a
