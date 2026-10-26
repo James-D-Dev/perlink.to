@@ -60,14 +60,15 @@ export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
 }
 
 /**
- * Prices shown in USD to English-speaking visitors (round prices close to
- * the VND ones). Display only for now: payment is a Vietnamese bank transfer
- * in VND (PLAN_PRICES) until an international payment method is added.
+ * Prices shown in USD to English-speaking visitors: $2-5 a month below
+ * Linktree (Starter $8, Pro $15, Premium $35 in 2026); a year is ten months.
+ * Display only for now: payment is a Vietnamese bank transfer in VND
+ * (PLAN_PRICES) until an international payment method is added.
  */
 export const PLAN_PRICES_USD: Record<PaidPlanId, Record<BillingPeriod, number>> = {
-  starter: { monthly: 1.99, annual: 19.9 },
-  plus: { monthly: 3.99, annual: 39.9 },
-  pro: { monthly: 9.99, annual: 99.9 },
+  starter: { monthly: 5.99, annual: 59.9 },
+  plus: { monthly: 11.99, annual: 119.9 },
+  pro: { monthly: 29.99, annual: 299.9 },
 }
 
 export const formatUsd = (amount: number) => `$${amount.toFixed(2)}`
