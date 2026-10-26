@@ -369,6 +369,8 @@ const track = computed(() => (ROOM_MUSIC_ENABLED && props.room.music?.trackId ? 
 const musicOn = ref(false)
 let audio: HTMLAudioElement | null = null
 
+let starting = false
+
 function toggleMusic() {
   if (!track.value) return
   if (musicOn.value) {
@@ -382,16 +384,23 @@ function toggleMusic() {
     audio.addEventListener('error', () => (musicOn.value = false))
   }
   audio.volume = props.room.music?.volume ?? 0.5
-  audio.play().then(() => (musicOn.value = true)).catch(() => (musicOn.value = false))
+  starting = true
+  audio.play()
+    .then(() => (musicOn.value = true))
+    .catch(() => (musicOn.value = false))
+    .finally(() => (starting = false))
 }
 
-// Browsers block sound before the first interaction, so autoplay waits for it if needed
-const unlockEvents = ['pointerdown', 'keydown', 'touchstart'] as const
+// Browsers block sound until the visitor interacts, and only some events
+// count: a click, a key, or lifting a finger (pointerup / touchend). Touching
+// down (touchstart, pointerdown with a finger) doesn't, so on phones the
+// music waits for the end of the first tap or drag. It keeps listening until
+// the music actually plays.
+const unlockEvents = ['pointerup', 'touchend', 'click', 'keydown'] as const
 function startOnInteraction(event: Event) {
-  removeUnlock()
   // The music button handles its own click
-  if ((event.target as Element | null)?.closest?.('[data-music-toggle]')) return
-  if (!musicOn.value) toggleMusic()
+  if ((event.target as Element | null)?.closest?.('[data-music-toggle]')) return removeUnlock()
+  if (!musicOn.value && !starting) toggleMusic()
 }
 function removeUnlock() {
   for (const event of unlockEvents) window.removeEventListener(event, startOnInteraction, true)
@@ -399,9 +408,10 @@ function removeUnlock() {
 
 onMounted(() => {
   if (!track.value || !props.room.music?.autoplay) return
-  toggleMusic()
-  // If play() was blocked, start on the first tap, click or key press instead
+  // Plays straight away where the browser allows it (e.g. a visitor who
+  // already interacted with the site); otherwise on the first interaction
   for (const event of unlockEvents) window.addEventListener(event, startOnInteraction, true)
+  toggleMusic()
   audio?.addEventListener('playing', removeUnlock, { once: true })
 })
 
