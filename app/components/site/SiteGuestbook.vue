@@ -2,7 +2,7 @@
   <div class="space-y-3">
     <p class="text-sm text-ink-muted">{{ t('dashboard.guestbook.intro') }}</p>
 
-    <div v-if="loading" class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+    <div v-if="loading" class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
       <div v-for="i in 3" :key="i" class="space-y-2 p-4">
         <USkeleton class="h-4 w-40" />
         <USkeleton class="h-3 w-64" />
@@ -16,7 +16,7 @@
       <UButton :to="`/dashboard/room/${username}`" class="mt-5" size="sm" icon="i-lucide-box" :label="t('dashboard.guestbook.openRoom')" />
     </div>
 
-    <ul v-else class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+    <ul v-else class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
       <li v-for="entry in entries" :key="entry.id" class="flex gap-3 p-4" :class="entry.hidden && 'opacity-55'">
         <span class="text-2xl" aria-hidden="true">{{ GUEST_GIFT_EMOJI[entry.gift as GuestGiftType] ?? '🎁' }}</span>
         <div class="min-w-0 flex-1">

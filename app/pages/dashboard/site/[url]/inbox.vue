@@ -61,7 +61,7 @@
 
         <SiteGuestbook v-if="view === 'guestbook'" :username="username" />
 
-        <div v-else-if="loading" class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+        <div v-else-if="loading" class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
           <div v-for="i in 3" :key="i" class="space-y-2 p-4">
             <USkeleton class="h-4 w-40" />
             <USkeleton class="h-3 w-64" />
@@ -78,7 +78,7 @@
           <UButton :to="`/dashboard/site/${username}`" class="mt-5" size="sm" icon="i-lucide-plus" :label="t('dashboard.inbox.addForm')" />
         </div>
 
-        <ul v-else class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+        <ul v-else class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
           <li v-if="!visible.length" class="p-6 text-center text-sm text-ink-muted">{{ t('dashboard.inbox.noUnread') }}</li>
           <li v-for="item in visible" :key="item.id" class="p-4" :class="!item.read && 'bg-sand/40'">
             <div class="flex items-start gap-3">

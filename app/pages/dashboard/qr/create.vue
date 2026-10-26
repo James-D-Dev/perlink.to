@@ -171,7 +171,7 @@
                 <div class="text-sm font-medium text-toned dark:text-neutral-200">Preview</div>
 
                 <div
-                  class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-lg shadow-sm border border-default dark:border-white/10 p-6"
+                  class="rounded-3xl bg-paper ring-1 ring-line p-6"
                 >
                   <!-- QR Preview -->
                   <div

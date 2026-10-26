@@ -75,7 +75,8 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        root: `rounded-xl ${glassPanel} dark:divide-white/10 dark:shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]`,
+        // Same shape as the editor's cards (rounded-3xl, paper on a hairline ring)
+        root: `rounded-3xl bg-paper ring-line divide-line ${glassPanel} dark:divide-white/10 dark:shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]`,
       },
     },
     input: iosField,

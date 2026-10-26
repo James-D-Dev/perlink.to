@@ -32,7 +32,7 @@
 
         <template v-else>
           <!-- Link Header Card -->
-          <div class="sm:bg-white rounded-2xl sm:border border-default dark:border-white/10">
+          <div class="rounded-3xl sm:bg-paper sm:ring-1 sm:ring-line">
             <div class="p-0 sm:p-6 space-y-6">
               <!-- Title Row -->
               <div
@@ -270,7 +270,7 @@
               <!-- QR Preview -->
               <div class="space-y-4">
                 <div
-                  class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-8 border border-default dark:border-white/10 flex items-center justify-center"
+                  class="rounded-3xl bg-paper ring-1 ring-line p-8 flex items-center justify-center"
                 >
                   <div class="w-[280px] h-[280px]">
                     <ClientOnly>
@@ -307,7 +307,7 @@
 
               <!-- QR Customization -->
               <div
-                class="space-y-6 bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl p-4 sm:p-6 border border-default dark:border-white/10"
+                class="space-y-6 rounded-3xl bg-paper ring-1 ring-line p-4 sm:p-6"
               >
                 <h3 class="text-lg font-semibold">Customize QR Code</h3>
 

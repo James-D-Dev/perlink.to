@@ -18,7 +18,7 @@
 
         <template v-else-if="account">
           <!-- Profile -->
-          <section class="rounded-xl bg-paper p-5 ring-1 ring-line">
+          <section class="rounded-3xl bg-paper ring-1 ring-line p-5">
             <h2 class="text-sm font-medium text-ink">{{ t('dashboard.account.profile') }}</h2>
             <div class="mt-4 flex items-center gap-4">
               <img v-if="account.avatar" :src="account.avatar" alt="" class="size-14 rounded-full object-cover ring-1 ring-line">
@@ -37,7 +37,7 @@
           </section>
 
           <!-- Language and plan -->
-          <section class="grid gap-px overflow-hidden rounded-xl bg-line ring-1 ring-line sm:grid-cols-2">
+          <section class="grid gap-px overflow-hidden rounded-3xl bg-line ring-1 ring-line sm:grid-cols-2">
             <div class="bg-paper p-5">
               <h2 class="text-sm font-medium text-ink">{{ t('dashboard.account.language') }}</h2>
               <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.account.languageText') }}</p>
@@ -62,7 +62,7 @@
           <TelegramConnect />
 
           <!-- Security and data -->
-          <section class="divide-y divide-line overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+          <section class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
             <div class="flex flex-wrap items-center justify-between gap-3 p-5">
               <div class="min-w-0">
                 <h2 class="text-sm font-medium text-ink">{{ t('dashboard.account.signOutAll') }}</h2>

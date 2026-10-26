@@ -27,7 +27,7 @@
             <USkeleton v-for="i in 2" :key="i" class="h-5 w-24" />
           </div>
           <USkeleton class="h-8 w-56 rounded-full" />
-          <div class="grid grid-cols-2 gap-px overflow-hidden rounded-xl ring-1 ring-line md:grid-cols-4">
+          <div class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl ring-1 ring-line md:grid-cols-4">
             <div v-for="i in 4" :key="i" class="space-y-2 bg-paper p-4 sm:p-5">
               <USkeleton class="h-3 w-20" />
               <USkeleton class="h-8 w-16" />

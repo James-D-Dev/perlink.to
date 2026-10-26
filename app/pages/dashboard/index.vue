@@ -76,7 +76,7 @@
               :key="template.id"
               role="button"
               tabindex="0"
-              class="group cursor-pointer overflow-hidden rounded-xl border border-default bg-default text-left transition hover:-translate-y-0.5 hover:shadow-xl dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl dark:hover:border-white/20 dark:hover:shadow-black/40"
+              class="group cursor-pointer overflow-hidden rounded-3xl bg-paper text-left ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl"
               :class="creatingId && creatingId !== template.id ? 'pointer-events-none opacity-60' : ''"
               :aria-busy="creatingId === template.id"
               @click="useTemplate(template.id)"

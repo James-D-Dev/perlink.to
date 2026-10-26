@@ -315,7 +315,7 @@
 
           <!-- 3D room Tab -->
           <div v-if="paneMounted('room')" class="max-w-3xl space-y-4 pt-4" :class="paneClass('room')" :style="paneStyle('room')" :inert="activeTab !== 'room' || undefined">
-            <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
+            <div class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line sm:flex">
               <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
                 <!-- The picture the 3D editor saves with each save or publish; until
                      there is one, the picture of the room's land -->
@@ -350,7 +350,7 @@
               </div>
             </div>
 
-            <div class="flex items-start justify-between gap-4 rounded-xl border border-default bg-default p-4 dark:border-white/10">
+            <div class="flex items-start justify-between gap-4 rounded-3xl bg-paper ring-1 ring-line p-4 sm:p-5">
               <div>
                 <p class="text-sm font-medium text-highlighted">{{ t('dashboard.editor.room.showFirst') }}</p>
                 <p class="mt-0.5 text-sm text-muted">
@@ -381,7 +381,7 @@
 
           <!-- Settings Tab -->
           <div v-if="paneMounted('settings')" class="pt-4 max-w-lg mx-auto space-y-6" :class="paneClass('settings')" :style="paneStyle('settings')" :inert="activeTab !== 'settings' || undefined">
-            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.addressHeading') }}</h3>
               <p class="text-sm text-muted dark:text-neutral-400 mb-3">
                 {{ t('dashboard.editor.settings.addressText') }}
@@ -396,7 +396,7 @@
             </div>
 
             <!-- Site language -->
-            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.languageHeading') }}</h3>
               <p class="text-sm text-muted dark:text-neutral-400 mb-3">
                 {{ t('dashboard.editor.settings.languageText') }}
@@ -410,14 +410,14 @@
             </div>
 
             <!-- Custom domain -->
-            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.domain.heading') }}</h3>
               <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.domain.text') }}</p>
               <SiteDomainSettings v-if="existingBio?.username" :username="existingBio.username" />
             </div>
 
             <!-- Search & sharing -->
-            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.seo.heading') }}</h3>
               <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.seo.text') }}</p>
               <SiteSeoSettings
@@ -428,7 +428,7 @@
             </div>
 
             <!-- Share Button Toggle -->
-            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <div class="flex items-center justify-between">
                 <div>
                   <h3 class="font-semibold text-highlighted dark:text-white mb-1">
@@ -448,7 +448,7 @@
               </div>
             </div>
 
-            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.visibilityHeading') }}</h3>
               <p class="text-sm text-muted dark:text-neutral-400 mb-3">
                 {{ t('dashboard.editor.settings.visibilityText') }}

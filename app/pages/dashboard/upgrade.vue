@@ -17,7 +17,7 @@
 
         <!-- Where the account stands -->
         <div v-if="info" class="mb-8 grid gap-3 lg:grid-cols-2">
-          <div class="flex items-center gap-4 rounded-2xl bg-paper p-5 ring-1 ring-line">
+          <div class="flex items-center gap-4 rounded-3xl bg-paper ring-1 ring-line p-5">
             <div class="flex size-11 shrink-0 items-center justify-center rounded-xl" :class="info.plan === 'free' ? 'bg-sand text-ink-muted' : 'bg-gradient-to-br from-amber-400 to-pink-500 text-white'">
               <UIcon :name="info.plan === 'free' ? 'i-lucide-user' : 'i-lucide-crown'" class="size-5" />
             </div>
@@ -33,7 +33,7 @@
           </div>
 
           <!-- One free trial for free accounts -->
-          <div v-if="info.canTrial" class="relative isolate flex flex-wrap items-center gap-4 overflow-hidden rounded-2xl bg-paper p-5 ring-1 ring-line">
+          <div v-if="info.canTrial" class="relative isolate flex flex-wrap items-center gap-4 overflow-hidden rounded-3xl bg-paper ring-1 ring-line p-5">
             <MarketingMkHeroBackdrop :fade="false" />
             <div class="min-w-0 flex-1">
               <p class="font-medium text-ink">{{ t('dashboard.billing.trial.title') }}</p>
@@ -48,7 +48,7 @@
         <!-- Payments -->
         <section v-if="info?.payments.length" class="mt-12">
           <h2 class="mb-3 text-sm font-medium text-ink">{{ t('dashboard.billing.history') }}</h2>
-          <div class="divide-y divide-line overflow-hidden rounded-xl bg-paper text-sm ring-1 ring-line">
+          <div class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line text-sm">
             <div v-for="p in info.payments" :key="p.id" class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
               <div class="min-w-0">
                 <p class="font-medium text-ink">
