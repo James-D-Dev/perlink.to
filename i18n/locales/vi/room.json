@@ -29,9 +29,8 @@
       "allSaved": "Đã lưu mọi thay đổi"
     },
     "preview": {
-      "live": "Xem trước: theo giờ thật (bấm để xem ban ngày)",
       "day": "Xem trước: ban ngày (bấm để xem ban đêm)",
-      "night": "Xem trước: ban đêm (bấm để xem theo giờ thật)"
+      "night": "Xem trước: ban đêm (bấm để xem ban ngày)"
     },
     "panel": {
       "showObjects": "Hiện đồ vật ({n})",

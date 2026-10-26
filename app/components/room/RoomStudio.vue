@@ -8,7 +8,7 @@
         :room="room"
         editable
         :selected-id="selectedId"
-        :force-mode="previewMode === 'live' ? null : previewMode"
+        :force-mode="previewMode"
         :products="products"
         :shop-accent="shopAccent"
         @select="onCanvasSelect"
@@ -33,7 +33,7 @@
           <UButton icon="i-lucide-redo-2" color="neutral" variant="ghost" :disabled="!canRedo" @click="redo" />
         </UTooltip>
         <UTooltip :text="previewLabel">
-          <UButton :icon="previewIcon" color="neutral" variant="ghost" @click="cyclePreview" />
+          <UButton :icon="previewMode === 'day' ? 'i-lucide-sun' : 'i-lucide-moon'" color="neutral" variant="ghost" :aria-label="previewLabel" @click="toggleDayNight" />
         </UTooltip>
         <UTooltip :text="room.guestbook !== false ? t('room.guestbook.on') : t('room.guestbook.off')">
           <UButton
@@ -633,7 +633,8 @@ const barRef = ref<HTMLElement | null>(null)
 const selectedId = ref<string | null>(null)
 const activeTab = ref<Tab>('furniture')
 const trayOpen = ref(true)
-const previewMode = ref<'live' | 'day' | 'night'>('live')
+// The editor shows the room by day or by night; it starts as it is right now
+const previewMode = ref<'day' | 'night'>(getDaylight(room.value.environment).isDay ? 'day' : 'night')
 /** Rendering stats from the scene, for the FPS readout */
 const stats = ref<RoomSceneStats | null>(null)
 const fpsColor = computed(() => {
@@ -791,19 +792,10 @@ watch([selectedId, panelOpen, panelView], async () => {
 
 // ---------- Day/night preview ----------
 
-const now = ref(new Date())
-let clock: ReturnType<typeof setInterval> | undefined
-
-const previewIcon = computed(() => {
-  if (previewMode.value === 'day') return 'i-lucide-sun'
-  if (previewMode.value === 'night') return 'i-lucide-moon'
-  return getDaylight(room.value.environment, now.value).isDay ? 'i-lucide-sun-dim' : 'i-lucide-moon-star'
-})
-
 const previewLabel = computed(() => t(`room.preview.${previewMode.value}`))
 
-function cyclePreview() {
-  previewMode.value = previewMode.value === 'live' ? 'day' : previewMode.value === 'day' ? 'night' : 'live'
+function toggleDayNight() {
+  previewMode.value = previewMode.value === 'day' ? 'night' : 'day'
 }
 
 // On small screens give the room more space while an object is being edited
@@ -1175,12 +1167,10 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 onMounted(() => {
-  clock = setInterval(() => (now.value = new Date()), 1000)
   window.addEventListener('keydown', onKeydown)
 })
 
 onBeforeUnmount(() => {
-  clearInterval(clock)
   window.removeEventListener('keydown', onKeydown)
   cancelDrag()
   stopPreview()

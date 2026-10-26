@@ -29,9 +29,8 @@
       "allSaved": "All changes saved"
     },
     "preview": {
-      "live": "Preview: live (click for day)",
       "day": "Preview: day (click for night)",
-      "night": "Preview: night (click for live)"
+      "night": "Preview: night (click for day)"
     },
     "panel": {
       "showObjects": "Show objects ({n})",
