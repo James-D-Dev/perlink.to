@@ -413,21 +413,27 @@
       </div>
 
       <!-- Footer: the "Made with Perlink" card (free plans) and, on every live page, a way to report it -->
-      <div v-if="mode !== 'preview' && mode !== 'thumbnail'" class="mt-14 flex flex-col items-center gap-3 px-4" :class="footerSpace && 'pb-20'">
+      <!-- Space below the last link, clear of the phone's bottom edge (Safari's
+           toolbar and the home bar catch taps right at the bottom) -->
+      <div
+        v-if="mode !== 'preview' && mode !== 'thumbnail'"
+        class="mt-14 flex flex-col items-center gap-1 px-4"
+        :class="quickActions.length ? '' : footerSpace ? 'pb-[calc(6rem+env(safe-area-inset-bottom))]' : 'pb-[calc(2.5rem+env(safe-area-inset-bottom))]'"
+      >
         <SiteMadeWith v-if="bioData?.showBranding !== false" :username="username" :lang="siteLang" />
         <a
           :href="`https://perlink.to/report?site=${encodeURIComponent(username)}`"
           target="_blank"
           rel="noopener nofollow"
-          class="inline-flex items-center gap-1 text-[11px] opacity-50 transition hover:opacity-90"
+          class="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-xs opacity-60 transition hover:bg-black/5 hover:opacity-100"
         >
-          <UIcon name="i-lucide-flag" class="size-3" />
+          <UIcon name="i-lucide-flag" class="size-3.5" />
           {{ siteT(siteLang, 'report') }}
         </a>
       </div>
 
       <!-- Quick contact buttons, stuck to the bottom of the screen -->
-      <div v-if="quickActions.length" class="sticky bottom-0 z-40 mt-8 px-4 pb-4 pt-2">
+      <div v-if="quickActions.length" class="sticky bottom-0 z-40 mt-8 px-4 pt-2" :class="footerSpace ? 'pb-[calc(5rem+env(safe-area-inset-bottom))]' : 'pb-[calc(1rem+env(safe-area-inset-bottom))]'">
         <div class="mx-auto flex max-w-md gap-2 rounded-2xl bg-white/85 p-1.5 shadow-lg ring-1 ring-black/5 backdrop-blur">
           <a
             v-for="action in quickActions"
