@@ -5,9 +5,11 @@ sweeps through the room, the site's name and `perlink.to/<name>` stay on top,
 the room's music plays, and the last second and a half is a "visit my 3D room"
 card. Every video posted is an ad that points back to Perlink.
 
-Where: site editor → **3D room** tab → **Chia sẻ video phòng** on the "Your 3D
-room" card (a gradient button whose icon cycles through the Facebook, TikTok,
-YouTube, Instagram and X logos — `SocialCycleIcon.vue`). It saves the page and
+Where: site editor → **3D room** tab → **Chia sẻ phòng của bạn** ("Share
+your room") on the "Your 3D room" card, next to **Trang trí phòng**. It's a
+gradient button whose icon cycles through the Facebook, TikTok, YouTube,
+Instagram and X logos, each a solid circle in its brand colour
+(`SocialCycleIcon.vue`). It saves the page and
 opens the 3D room editor with `?record=1`, which opens the video studio
 straight away (`autoRecord` on RoomStudio; the flag is removed from the
 address).

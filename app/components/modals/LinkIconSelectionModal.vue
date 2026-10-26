@@ -1,5 +1,5 @@
 <template>
-  <UModal
+  <AppSheet
     :open="open"
     :title="t('blocks.iconPicker.title')"
     :close="{ color: 'neutral', variant: 'ghost' }"
@@ -23,7 +23,7 @@
         </div>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

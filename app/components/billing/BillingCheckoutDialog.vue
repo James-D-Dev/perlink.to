@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :title="title" :ui="{ content: 'max-w-md' }">
+  <AppSheet v-model:open="open" :title="title" :ui="{ content: 'max-w-md' }">
     <template #body>
       <!-- Paid -->
       <div v-if="paid" class="flex flex-col items-center py-4 text-center">
@@ -53,7 +53,7 @@
     <template v-if="paid" #footer>
       <UButton block :label="t('dashboard.billing.checkout.done')" @click="open = false" />
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <UModal
+  <AppSheet
     :open="open"
     @update:open="$emit('update:open', false)"
     :title="t('blocks.deleteLink.title')"
@@ -21,7 +21,7 @@
         </Button>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

@@ -187,6 +187,24 @@ export default defineAppConfig({
         { variant: ['soft', 'subtle'], class: { root: 'backdrop-blur-xl' } },
       ],
     },
+    // Bottom sheets on phones (AppSheet → UDrawer/vaul): the same glass as
+    // dialogs, a grab handle, title centred like iOS, clear of the home bar
+    drawer: {
+      slots: {
+        overlay: glassBackdrop,
+        content: `${liquidGlass} rounded-t-[28px] ring-1 pb-[env(safe-area-inset-bottom)]`,
+        handle: '!bg-black/15 dark:!bg-white/25 transition-opacity',
+        container: 'gap-0 p-0',
+        header: 'px-5 pt-3 pb-1 text-center',
+        title: 'text-[17px] font-semibold tracking-tight',
+        description: 'mt-1 text-[13px] text-muted',
+        body: 'p-5',
+        footer: 'flex-row justify-end gap-2 px-5 pb-5 pt-1',
+      },
+      compoundVariants: [
+        { direction: 'bottom', class: { content: 'mt-16 max-h-[94dvh]', handle: '!w-9 !h-1 mt-2' } },
+      ],
+    },
     slideover: {
       slots: { content: `${liquidGlass} divide-y-0` },
       variants: { overlay: { true: { overlay: glassBackdrop } } },

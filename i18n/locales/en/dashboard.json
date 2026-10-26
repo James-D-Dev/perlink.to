@@ -90,12 +90,12 @@
       },
       "room": {
         "heading": "Your 3D room",
-        "objects": "{n} objects. Furnish it and pick a land in the full-screen editor.",
-        "openEditor": "Open 3D editor",
+        "objects": "{n} objects. Furnish it and pick the scenery around it.",
+        "openEditor": "Decorate your room",
         "showFirst": "Show the 3D room first",
         "modeOn": "Visitors land in your 3D room and can switch to the site with one tap.",
         "modeOff": "Visitors see your site. The 3D room stays hidden until you turn this on.",
-        "shareVideo": "Share a room video"
+        "shareVideo": "Share your room"
       },
       "settings": {
         "addressHeading": "Site address",
@@ -255,7 +255,7 @@
         },
         "room": {
           "q": "How do I turn on the 3D world?",
-          "a": "Open your site in the editor and switch on “3D room”. Then open the 3D editor to furnish the room and pick a land."
+          "a": "Open your site in the editor and switch on “3D room”. Then tap “Decorate your room” to furnish it and pick a land."
         },
         "publish": {
           "q": "How do I publish?",

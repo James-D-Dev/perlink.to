@@ -1,5 +1,5 @@
 <template>
-  <UModal :open="!!reason" :ui="{ content: 'max-w-md' }" @update:open="(value: boolean) => { if (!value) close() }">
+  <AppSheet :open="!!reason" :ui="{ content: 'max-w-md' }" @update:open="(value: boolean) => { if (!value) close() }">
     <template #content>
       <div v-if="reason" class="overflow-hidden rounded-[inherit]">
         <!-- Colour light behind the crown -->
@@ -37,7 +37,7 @@
         </div>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

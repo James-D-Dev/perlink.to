@@ -119,34 +119,34 @@
       </div>
     </Transition>
 
-    <!-- A product on a stand -->
-    <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-150" leave-to-class="opacity-0">
-      <div v-if="shopItem" class="glass-backdrop absolute inset-0 z-30 flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true" @click.self="shopItem = null">
-        <div class="glass-sheet relative w-full max-w-sm overflow-hidden rounded-t-[30px] text-gray-900 sm:rounded-[30px]">
-          <img v-if="shopItem.product.imageUrl" :src="shopItem.product.imageUrl" :alt="shopItem.product.name" class="aspect-square w-full object-cover">
+    <!-- A product on a stand: a bottom sheet you can drag down on phones -->
+    <AppSheet v-model:open="shopOpen" :title="shopShown?.product.name" :ui="{ content: 'sm:max-w-sm overflow-hidden' }">
+      <template #content>
+        <div v-if="shopShown" class="relative min-h-0 flex-1 overflow-y-auto text-gray-900">
+          <img v-if="shopShown.product.imageUrl" :src="shopShown.product.imageUrl" :alt="shopShown.product.name" class="aspect-square w-full object-cover">
           <div class="space-y-2 p-5">
-            <span v-if="shopItem.product.tag && !shopItem.product.soldOut" class="inline-block rounded-full bg-gray-900/5 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">{{ shopItem.product.tag }}</span>
-            <p class="text-lg font-semibold leading-snug">{{ shopItem.product.name }}</p>
-            <p v-if="shopItem.product.description" class="text-sm text-gray-600">{{ shopItem.product.description }}</p>
-            <p v-if="shopItem.product.price" class="flex items-baseline gap-2 tabular-nums">
-              <span class="text-xl font-bold" :style="{ color: accent }">{{ formatVnd(shopItem.product.price) }}</span>
-              <span v-if="(shopItem.product.comparePrice ?? 0) > shopItem.product.price" class="text-sm text-gray-400 line-through">{{ formatVnd(shopItem.product.comparePrice!) }}</span>
+            <span v-if="shopShown.product.tag && !shopShown.product.soldOut" class="inline-block rounded-full bg-gray-900/5 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">{{ shopShown.product.tag }}</span>
+            <p class="text-lg font-semibold leading-snug">{{ shopShown.product.name }}</p>
+            <p v-if="shopShown.product.description" class="text-sm text-gray-600">{{ shopShown.product.description }}</p>
+            <p v-if="shopShown.product.price" class="flex items-baseline gap-2 tabular-nums">
+              <span class="text-xl font-bold" :style="{ color: accent }">{{ formatVnd(shopShown.product.price) }}</span>
+              <span v-if="(shopShown.product.comparePrice ?? 0) > shopShown.product.price" class="text-sm text-gray-400 line-through">{{ formatVnd(shopShown.product.comparePrice!) }}</span>
             </p>
-            <p v-if="shopItem.product.soldOut" class="text-sm font-semibold text-gray-500">{{ t('soldOut') }}</p>
+            <p v-if="shopShown.product.soldOut" class="text-sm font-semibold text-gray-500">{{ t('soldOut') }}</p>
             <a
-              v-else-if="shopItem.product.url"
-              :href="safeUrl(shopItem.product.url)"
+              v-else-if="shopShown.product.url"
+              :href="safeUrl(shopShown.product.url)"
               target="_blank"
               rel="noopener noreferrer"
               class="mt-2 flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-[15px] font-semibold text-white"
               :style="{ backgroundColor: accent }"
               @click="trackVisitorAction(username ?? '', 'store', 'view')"
             >
-              <UIcon :name="productStore(shopItem.product.url)?.icon ?? 'i-lucide-external-link'" class="size-4" />
-              {{ productStore(shopItem.product.url) ? t('shopBuyOn', { store: productStore(shopItem.product.url)!.name }) : t('shopBuy') }}
+              <UIcon :name="productStore(shopShown.product.url)?.icon ?? 'i-lucide-external-link'" class="size-4" />
+              {{ productStore(shopShown.product.url) ? t('shopBuyOn', { store: productStore(shopShown.product.url)!.name }) : t('shopBuy') }}
             </a>
             <button
-              v-else-if="shopItem.block.data.ordering && productPaymentOptions(shopItem.block.data.payment, canTransfer).length"
+              v-else-if="shopShown.block.data.ordering && productPaymentOptions(shopShown.block.data.payment, canTransfer).length"
               type="button"
               class="mt-2 flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-[15px] font-semibold text-white"
               :style="{ backgroundColor: accent }"
@@ -156,12 +156,12 @@
               {{ t('shopOrder') }}
             </button>
           </div>
-          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/[0.08] text-gray-700 backdrop-blur hover:bg-black/15" aria-label="Close" @click="shopItem = null">
+          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/[0.08] text-gray-700 backdrop-blur hover:bg-black/15" aria-label="Close" @click="shopOpen = false">
             <UIcon name="i-lucide-x" class="size-4" />
           </button>
         </div>
-      </div>
-    </Transition>
+      </template>
+    </AppSheet>
     <BioOrderSheet
       v-if="orderBlock && username"
       v-model:product="ordering"
@@ -173,27 +173,23 @@
     />
 
     <!-- A gift's message -->
-    <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95" leave-active-class="transition duration-150" leave-to-class="opacity-0">
-      <div v-if="note" class="glass-backdrop absolute inset-0 z-30 flex items-center justify-center p-4" role="dialog" aria-modal="true" @click.self="note = null">
-        <div class="glass-sheet relative w-full max-w-sm rounded-[30px] p-6 text-center text-gray-900">
-          <div class="text-5xl" aria-hidden="true">{{ GUEST_GIFT_EMOJI[note.gift] }}</div>
-          <p class="mt-4 whitespace-pre-line text-[17px] leading-relaxed">{{ note.message }}</p>
-          <p class="mt-4 text-sm font-semibold text-gray-600">{{ t('guestbookFrom', { name: note.name }) }}</p>
-          <p class="mt-0.5 text-xs text-gray-400">{{ formatWhen(note.createdAt) }}</p>
-          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/[0.06] text-gray-600 hover:bg-black/10" aria-label="Close" @click="note = null">
+    <AppSheet v-model:open="noteOpen" :title="noteShown ? t('guestbookFrom', { name: noteShown.name }) : undefined" :ui="{ content: 'sm:max-w-sm' }">
+      <template #content>
+        <div v-if="noteShown" class="relative p-6 text-center text-gray-900">
+          <div class="text-5xl" aria-hidden="true">{{ GUEST_GIFT_EMOJI[noteShown.gift] }}</div>
+          <p class="mt-4 whitespace-pre-line text-[17px] leading-relaxed">{{ noteShown.message }}</p>
+          <p class="mt-4 text-sm font-semibold text-gray-600">{{ t('guestbookFrom', { name: noteShown.name }) }}</p>
+          <p class="mt-0.5 text-xs text-gray-400">{{ formatWhen(noteShown.createdAt) }}</p>
+          <button type="button" class="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/[0.06] text-gray-600 hover:bg-black/10" aria-label="Close" @click="noteOpen = false">
             <UIcon name="i-lucide-x" class="size-4" />
           </button>
         </div>
-      </div>
-    </Transition>
+      </template>
+    </AppSheet>
 
-    <!-- Guestbook panel: write a message, read the others -->
-    <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="translate-y-full sm:translate-y-0 sm:translate-x-full" leave-active-class="transition duration-200 ease-in" leave-to-class="translate-y-full sm:translate-y-0 sm:translate-x-full">
-      <aside
-        v-if="guestbookPanel"
-        class="glass-sheet absolute inset-x-0 bottom-0 z-30 flex max-h-[85dvh] flex-col rounded-t-[30px] text-gray-900 sm:inset-y-3 sm:left-auto sm:right-3 sm:max-h-none sm:w-[380px] sm:rounded-[30px]"
-        :aria-label="t('guestbookTitle')"
-      >
+    <!-- Guestbook panel: write a message, read the others. A bottom sheet
+         on phones, a panel on the right elsewhere -->
+    <DefineGuestbook>
         <div class="flex items-start justify-between gap-3 px-5 pb-2 pt-5">
           <div>
             <h2 class="text-lg font-semibold">💌 {{ t('guestbookTitle') }}</h2>
@@ -255,6 +251,21 @@
           </ul>
           <p v-else class="mt-6 text-center text-sm text-gray-500">{{ t('guestbookEmpty') }}</p>
         </div>
+    </DefineGuestbook>
+    <UDrawer v-if="phone" v-model:open="guestbookPanel" :title="t('guestbookTitle')" :description="t('guestbookIntro')">
+      <template #content>
+        <div class="flex min-h-0 flex-1 flex-col text-gray-900">
+          <ReuseGuestbook />
+        </div>
+      </template>
+    </UDrawer>
+    <Transition v-else enter-active-class="transition duration-300 ease-out" enter-from-class="translate-x-full" leave-active-class="transition duration-200 ease-in" leave-to-class="translate-x-full">
+      <aside
+        v-if="guestbookPanel"
+        class="glass-sheet absolute inset-y-3 right-3 z-30 flex w-[380px] flex-col rounded-[30px] text-gray-900"
+        :aria-label="t('guestbookTitle')"
+      >
+        <ReuseGuestbook />
       </aside>
     </Transition>
 
@@ -310,6 +321,7 @@ import { MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 import { GUEST_GIFTS, GUEST_GIFT_EMOJI, GUESTBOOK_LIMITS, type GuestbookEntry, type GuestGiftType } from '#shared/guestbook'
 import type { BioBlock, ProductItem, ProductsBlock } from '~/types/bio'
 import { formatVnd } from '#shared/plans'
+import { createReusableTemplate, useMediaQuery } from '@vueuse/core'
 
 // Pinch zooms the camera, never the page
 usePreventPageZoom()
@@ -454,6 +466,7 @@ const canTransfer = computed(() =>
   (props.blocks ?? []).some(b => b.name === 'vietqr' && !b.hidden && !!(b.data as { bankId?: string })?.bankId && !!(b.data as { accountNumber?: string })?.accountNumber),
 )
 const shopItem = ref<{ product: ProductItem; block: ProductsBlock } | null>(null)
+const { open: shopOpen, shown: shopShown } = useSheetValue(shopItem)
 const ordering = ref<ProductItem | null>(null)
 const orderBlock = ref<ProductsBlock | null>(null)
 
@@ -486,6 +499,10 @@ const guestError = ref('')
 const guestThanks = ref(false)
 const guestForm = reactive({ name: '', message: '', gift: 'flower' as GuestGiftType, website: '' })
 const note = ref<GuestbookEntry | null>(null)
+const { open: noteOpen, shown: noteShown } = useSheetValue(note)
+// Phones get the guestbook as a draggable bottom sheet
+const phone = useMediaQuery('(max-width: 639px)')
+const [DefineGuestbook, ReuseGuestbook] = createReusableTemplate()
 
 onMounted(async () => {
   if (!guestbookOn.value) return

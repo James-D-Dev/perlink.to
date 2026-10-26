@@ -1,5 +1,5 @@
 <template>
-  <UModal
+  <AppSheet
     :title="title"
     :description="description"
     :close="false"
@@ -10,7 +10,7 @@
       <UButton color="neutral" variant="ghost" :label="t('common.cancel')" @click="emit('close', false)" />
       <UButton :color="color" :label="confirmLabel || t('common.confirm')" @click="emit('close', true)" />
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

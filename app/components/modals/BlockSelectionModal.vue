@@ -1,5 +1,5 @@
 <template>
-  <UModal
+  <AppSheet
     :open="open"
     :title="t('blocks.picker.title')"
     :ui="{ content: 'sm:max-w-3xl', body: 'p-0 sm:p-0' }"
@@ -104,7 +104,7 @@
         </div>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

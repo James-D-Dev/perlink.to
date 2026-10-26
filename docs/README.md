@@ -40,11 +40,24 @@ Every dialog uses the same "liquid glass" look (iOS 26 style): a frosted,
 translucent panel with a bright top edge and a long soft shadow over a dimmed,
 blurred page, 28–30px corners, a centred title and a round close button.
 
-- `UModal` and `USlideover` get it from `app/app.config.ts` (`liquidGlass`,
-  `glassBackdrop`), so any new modal looks right without extra classes.
-- Hand-built overlays use `.glass-backdrop`, `.glass-sheet` and `.glass-cell`
-  from `app/assets/css/main.css` (order sheet, 3D room product, guestbook and
-  message popups). Both have light and dark versions.
+- **Use `AppSheet` for dialogs** (`app/components/AppSheet.vue`, same props
+  and slots as `UModal`: `header`, `body`, `footer`, or `content`). On phones
+  (< 640px) it is a real bottom sheet, `UDrawer` built on vaul-vue (the web
+  counterpart of Flutter's smooth_sheets): it follows the finger, flicks
+  closed by speed, rubber-bands at the top, and its content scrolls without
+  fighting the drag. On larger screens it is the centred `UModal`.
+  `ui.content` styles the dialog, `ui.sheet` the phone sheet.
+- For a sheet that shows a value (a product, a message) use
+  `useSheetValue(ref)`: `open` clears the value on close and `shown` keeps
+  the last one so the sheet doesn't go blank while it slides away.
+- `UModal`, `UDrawer` and `USlideover` get the glass from `app/app.config.ts`
+  (`liquidGlass`, `glassBackdrop`), so any new one looks right without extra
+  classes. `UModal` is still used directly only for image lightboxes and the
+  full-size site preview.
+- `.glass-backdrop`, `.glass-sheet` and `.glass-cell` in
+  `app/assets/css/main.css` are for hand-built surfaces (the 3D room's
+  guestbook side panel on larger screens, cells inside sheets). Both have
+  light and dark versions.
 
 ## Design: controls, toasts and motion (iOS 26 style)
 
@@ -63,7 +76,8 @@ All set once in `app/app.config.ts`, so every screen matches:
   with roomy rounded rows, hairline group dividers and a tick on the current
   choice. Tooltips are small dark capsules.
 - **Alerts** are rounder, frosted when neutral, and fade up into place.
-- **Dialogs** spring open (`ios-sheet-in`); on phones (< 640px) every `UModal`
-  is a bottom sheet across the screen with a grab handle, sliding up
-  (`ios-slide-up`) and clear of the home indicator. Keyframes `ios-*` live in
+- **Dialogs** spring open (`ios-sheet-in`); on phones (< 640px) they are
+  draggable bottom sheets (`AppSheet` → `UDrawer`) with a grab handle, clear
+  of the home indicator. A plain `UModal` on a phone also docks to the
+  bottom, sliding up (`ios-slide-up`), but can't be dragged. Keyframes `ios-*` live in
   `app/assets/css/main.css`; reduced-motion users get no animation.

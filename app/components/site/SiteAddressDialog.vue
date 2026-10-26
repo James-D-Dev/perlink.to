@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :title="t('dashboard.address.title')" :description="description">
+  <AppSheet v-model:open="open" :title="t('dashboard.address.title')" :description="description">
     <template #body>
       <form class="space-y-3" @submit.prevent="save">
         <UInput
@@ -27,7 +27,7 @@
         <UButton :loading="saving" :disabled="status !== 'available'" :label="confirmLabel" @click="save" />
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

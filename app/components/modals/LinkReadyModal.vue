@@ -1,5 +1,5 @@
 <template>
-  <UModal
+  <AppSheet
     :open="open"
     @update:open="$emit('update:open', false)"
     title="Your link is ready!"
@@ -37,7 +37,7 @@
         </div>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

@@ -89,7 +89,7 @@
       </div>
 
       <!-- Type the email to confirm deletion -->
-      <UModal v-model:open="deleteOpen" :title="t('dashboard.account.deleteTitle')" :description="t('dashboard.account.deleteConfirmText')">
+      <AppSheet v-model:open="deleteOpen" :title="t('dashboard.account.deleteTitle')" :description="t('dashboard.account.deleteConfirmText')">
         <template #body>
           <div class="space-y-3">
             <p class="text-sm text-muted">{{ t('dashboard.account.deleteTypeEmail', { email: account?.email ?? '' }) }}</p>
@@ -108,7 +108,7 @@
             />
           </div>
         </template>
-      </UModal>
+      </AppSheet>
     </template>
   </UDashboardPanel>
 </template>

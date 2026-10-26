@@ -1,6 +1,6 @@
 <!-- Link Share Modal Component -->
 <template>
-  <UModal
+  <AppSheet
     :open="open"
     @update:open="$emit('update:open', false)"
     :title="title || 'Share your Perlink'"
@@ -36,7 +36,7 @@
         </UButton>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

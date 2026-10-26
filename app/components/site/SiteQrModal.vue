@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :title="t('dashboard.qr.title')" :ui="{ content: 'sm:max-w-[680px]', body: 'p-5 sm:p-7' }">
+  <AppSheet v-model:open="open" :title="t('dashboard.qr.title')" :ui="{ content: 'sm:max-w-[680px]', body: 'p-5 sm:p-7' }">
     <template #body>
       <div class="grid items-center gap-5 sm:grid-cols-[minmax(0,260px)_minmax(0,1fr)] sm:gap-9">
         <!-- The card, floating on a soft stage -->
@@ -64,7 +64,7 @@
         </div>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

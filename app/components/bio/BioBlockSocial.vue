@@ -116,7 +116,7 @@
     </div>
 
     <!-- Add Social Modal -->
-    <UModal v-model:open="isAddModalOpen" :title="t('blocks.social.modalTitle')">
+    <AppSheet v-model:open="isAddModalOpen" :title="t('blocks.social.modalTitle')">
       <template #body>
         <div >
           <UInput
@@ -150,7 +150,7 @@
           </div>
         </div>
       </template>
-    </UModal>
+    </AppSheet>
   </div>
 </template>
 

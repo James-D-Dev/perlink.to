@@ -74,7 +74,7 @@
           </UButton>
 
           <!-- Filter Modal -->
-          <UModal v-model:open="showFilterModal">
+          <AppSheet v-model:open="showFilterModal">
             <template #content>
               <div class="p-6 space-y-6">
                 <h2 class="text-xl font-bold">Filters</h2>
@@ -137,7 +137,7 @@
                 </div>
               </div>
             </template>
-          </UModal>
+          </AppSheet>
         </div>
 
         <!-- Selection bar -->

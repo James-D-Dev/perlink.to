@@ -1,6 +1,6 @@
 <template>
   <!-- The checklist itself; the sidebar card opens it (see SiteSetupCard) -->
-  <UModal v-model:open="open" :title="t('dashboard.onboarding.title')" :description="t('dashboard.onboarding.progress', { done, total: steps.length })">
+  <AppSheet v-model:open="open" :title="t('dashboard.onboarding.title')" :description="t('dashboard.onboarding.progress', { done, total: steps.length })">
     <template #body>
       <div class="space-y-4">
         <!-- Progress bar -->
@@ -36,7 +36,7 @@
         </div>
       </div>
     </template>
-  </UModal>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">

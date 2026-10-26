@@ -1,27 +1,8 @@
 <template>
-  <Teleport to="body">
-    <Transition
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-      enter-active-class="transition duration-200 ease-out"
-      leave-active-class="transition duration-150 ease-in"
-    >
-      <div
-        v-if="product"
-        class="glass-backdrop fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-6"
-        @click.self="closeOrder"
-      >
-        <div
-          class="order-sheet glass-sheet relative flex max-h-[94dvh] w-full max-w-[440px] flex-col overflow-hidden rounded-t-[30px] text-[#1c1a17] sm:rounded-[30px]"
-          :style="{ '--accent': accentColor }"
-          role="dialog"
-          aria-modal="true"
-          :aria-label="placed ? t('orderSuccess') : t('orderTitle')"
-        >
-          <!-- Grab handle (phones) and close -->
-          <div class="absolute inset-x-0 top-2 flex justify-center sm:hidden" aria-hidden="true">
-            <span class="h-1 w-10 rounded-full bg-black/15" />
-          </div>
+  <!-- A bottom sheet you can drag down on phones, a dialog on larger screens -->
+  <AppSheet v-model:open="open" :title="placed ? t('orderSuccess') : t('orderTitle')" :ui="{ content: 'sm:max-w-[440px] overflow-hidden' }" @after:leave="onClosed">
+    <template #content>
+      <div v-if="product" class="relative flex min-h-0 flex-1 flex-col overflow-hidden text-[#1c1a17]" :style="{ '--accent': accentColor }">
           <button
             type="button"
             class="absolute right-3.5 top-3.5 z-20 flex size-8 items-center justify-center rounded-full bg-black/[0.06] text-black/55 transition hover:bg-black/10 hover:text-black"
@@ -215,10 +196,9 @@
               </button>
             </div>
           </form>
-        </div>
       </div>
-    </Transition>
-  </Teleport>
+    </template>
+  </AppSheet>
 </template>
 
 <script setup lang="ts">
@@ -315,16 +295,18 @@ watch(product, (item) => {
   form.payment = paymentOptions.value[0]?.value ?? 'cod'
 })
 
+// The product stays until the sheet has slid away, so it doesn't empty mid-way
+const open = ref(false)
+watch(product, item => (open.value = !!item), { immediate: true })
+
 function closeOrder() {
+  open.value = false
+}
+
+function onClosed() {
   product.value = null
   placed.value = null
 }
-
-function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && product.value) closeOrder()
-}
-onMounted(() => window.addEventListener('keydown', onKeydown))
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 async function placeOrder() {
   phoneTouched.value = true
@@ -479,16 +461,7 @@ const qrImage = (text: string) => qrCode(text).createDataURL(8, 4)
   from { transform: scale(0.4); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
-@media (min-width: 640px) {
-  .order-sheet {
-    animation: rise 0.25s ease-out both;
-  }
-}
-@keyframes rise {
-  from { transform: translateY(12px); }
-  to { transform: translateY(0); }
-}
 @media (prefers-reduced-motion: reduce) {
-  .success-mark, .order-sheet { animation: none; }
+  .success-mark { animation: none; }
 }
 </style>

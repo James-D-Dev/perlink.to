@@ -160,7 +160,7 @@
     </UModal>
 
     <!-- Delete Confirmation Modal -->
-    <UModal
+    <AppSheet
       :open="showDeleteModal"
       :title="t('blocks.album.deleteTitle')"
       :close="{ color: 'neutral', variant: 'ghost' }"
@@ -192,7 +192,7 @@
           </UButton>
         </div>
       </template>
-    </UModal>
+    </AppSheet>
   </div>
 </template>
 
