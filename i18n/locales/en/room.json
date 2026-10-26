@@ -291,17 +291,20 @@
       "preparing": "Getting ready…",
       "ready": "Your video is ready!",
       "readyText": "Post it on TikTok, Reels or Shorts and add your room's link.",
-      "share": "Share (TikTok, WhatsApp…)",
+      "share": "Share",
       "download": "Download video",
-      "postCaption": "Suggested caption",
       "postText": "Come visit my 3D room ✨ {link}\n#perlink #3droom #roomtour #aesthetic",
-      "copy": "Copy",
-      "copied": "Copied",
-      "again": "Record again",
       "madeWith": "Made with Perlink",
       "visit": "Visit my 3D room 👇",
       "recordingNow": "Recording",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "style": "Camera style",
+      "styles": {
+        "sweep": "Sweep",
+        "orbit": "Orbit",
+        "dive": "Fly in",
+        "crane": "Pull out"
+      }
     },
     "guestbook": {
       "label": "Guestbook",

@@ -291,17 +291,20 @@
       "preparing": "Đang chuẩn bị…",
       "ready": "Video đã sẵn sàng!",
       "readyText": "Đăng lên TikTok, Reels hay Shorts và gắn link phòng của bạn.",
-      "share": "Chia sẻ (TikTok, Zalo…)",
+      "share": "Chia sẻ",
       "download": "Tải video",
-      "postCaption": "Nội dung gợi ý",
       "postText": "Ghé thăm phòng 3D của mình nè ✨ {link}\n#perlink #phong3d #roomtour #aesthetic",
-      "copy": "Sao chép",
-      "copied": "Đã sao chép",
-      "again": "Quay video khác",
       "madeWith": "Tạo bằng Perlink",
       "visit": "Ghé phòng 3D của mình 👇",
       "recordingNow": "Đang quay video",
-      "cancel": "Huỷ"
+      "cancel": "Huỷ",
+      "style": "Kiểu quay",
+      "styles": {
+        "sweep": "Lướt qua",
+        "orbit": "Xoay vòng",
+        "dive": "Bay vào",
+        "crane": "Từ trong ra"
+      }
     },
     "guestbook": {
       "label": "Sổ lưu bút",

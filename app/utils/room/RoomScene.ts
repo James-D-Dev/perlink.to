@@ -39,6 +39,10 @@ export interface RoomSceneOptions {
   capture?: boolean
 }
 
+/** Camera paths for the room video */
+export const TOUR_STYLES = ['sweep', 'orbit', 'dive', 'crane'] as const
+export type TourStyle = (typeof TOUR_STYLES)[number]
+
 export interface RoomSceneStats {
   /** Frames actually rendered in the last second */
   fps: number
@@ -443,23 +447,56 @@ export class RoomScene {
   }
 
   /**
-   * One frame of the room tour, progress 0..1: the camera sweeps across the
-   * open side of the room while moving in, then rises and pulls back to show
-   * the land. Returns the canvas with the frame on it, to copy right away.
+   * One frame of the room tour, progress 0..1, in one of the camera styles
+   * (TOUR_STYLES). Returns the canvas with the frame on it, to copy right away.
    */
-  renderTour(progress: number): HTMLCanvasElement {
+  renderTour(progress: number, style: TourStyle = 'sweep'): HTMLCanvasElement {
     this.touring = true
     const p = THREE.MathUtils.clamp(progress, 0, 1)
     const ease = (x: number) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
+    const smooth = (x: number) => x * x * (3 - 2 * x)
+    const lerp = THREE.MathUtils.lerp
     const size = Math.max(this.style?.width ?? 6, this.style?.depth ?? 6)
     const height = this.style?.height ?? 3.2
-    const sweep = ease(Math.min(p / 0.78, 1))
-    const reveal = ease(Math.max((p - 0.78) / 0.22, 0))
-    const azimuth = THREE.MathUtils.lerp(0.18, Math.PI / 2 - 0.18, sweep)
-    const distance = Math.min(THREE.MathUtils.lerp(THREE.MathUtils.lerp(3.1, 2.15, sweep), 3.9, reveal) * size, MAX_ZOOM_DISTANCE - 1)
-    const polar = THREE.MathUtils.lerp(THREE.MathUtils.lerp(1.12, 1.0, sweep), 0.82, reveal)
-    this.controls.target.set(0, height * 0.32, 0)
-    this.camera.position.setFromSphericalCoords(distance, polar, azimuth).add(this.controls.target)
+    // The room's open sides face azimuth 0..π/2; the middle looks straight in
+    const middle = Math.PI / 4
+    let distance: number
+    let polar: number
+    let azimuth: number
+    let lookHeight = 0.32
+
+    if (style === 'orbit') {
+      // An even arc from one open side to the other, higher up (any further
+      // round and a wall would be in the way)
+      const t = smooth(p)
+      azimuth = lerp(0.02, Math.PI / 2 - 0.02, t)
+      polar = 0.8
+      distance = lerp(2.9, 2.6, t) * size
+    } else if (style === 'dive') {
+      // A drone shot: high above the land, then down and in to the room
+      const t = ease(Math.min(p / 0.85, 1))
+      azimuth = lerp(middle - 0.6, middle + 0.15, t)
+      polar = lerp(0.32, 1.12, t)
+      distance = lerp(5.6, 1.95, t) * size
+    } else if (style === 'crane') {
+      // Close at eye level, then up and out to show the whole land
+      const hold = smooth(Math.min(p / 0.35, 1))
+      const out = ease(Math.max((p - 0.3) / 0.7, 0))
+      azimuth = lerp(middle + 0.35, middle - 0.35, hold * 0.4 + out * 0.6)
+      polar = lerp(1.28, 0.62, out)
+      distance = lerp(lerp(1.55, 1.4, hold), 4.4, out) * size
+      lookHeight = lerp(0.42, 0.25, out)
+    } else {
+      // Sweep: across the open side while moving in, then rise and pull back
+      const sweep = ease(Math.min(p / 0.78, 1))
+      const reveal = ease(Math.max((p - 0.78) / 0.22, 0))
+      azimuth = lerp(0.18, Math.PI / 2 - 0.18, sweep)
+      distance = lerp(lerp(3.1, 2.15, sweep), 3.9, reveal) * size
+      polar = lerp(lerp(1.12, 1.0, sweep), 0.82, reveal)
+    }
+
+    this.controls.target.set(0, height * lookHeight, 0)
+    this.camera.position.setFromSphericalCoords(Math.min(distance, MAX_ZOOM_DISTANCE - 1), polar, azimuth).add(this.controls.target)
     this.camera.lookAt(this.controls.target)
     this.renderFrame(performance.now())
     return this.renderer.domElement

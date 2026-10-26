@@ -57,6 +57,10 @@
                 <UTooltip :text="t('room.tour.length')">
                   <UButton icon="i-lucide-timer" :label="`${duration}s`" color="neutral" variant="soft" size="lg" class="tabular-nums" :aria-label="`${t('room.tour.length')}: ${duration}s`" @click="cycleDuration" />
                 </UTooltip>
+                <!-- How the camera moves -->
+                <UDropdownMenu :items="styleItems" :content="{ align: 'start' }" :ui="{ content: 'z-[160]' }">
+                  <UButton :icon="STYLE_ICONS[tourStyle]" :label="t(`room.tour.styles.${tourStyle}`)" trailing-icon="i-lucide-chevron-down" color="neutral" variant="soft" size="lg" :aria-label="`${t('room.tour.style')}: ${t(`room.tour.styles.${tourStyle}`)}`" />
+                </UDropdownMenu>
                 <UTooltip v-if="track" :text="withMusic ? `${track.title} · ${track.artist}` : t('room.tour.music')">
                   <UButton :icon="withMusic ? 'i-lucide-music' : 'i-lucide-volume-x'" color="neutral" :variant="withMusic ? 'soft' : 'ghost'" size="lg" :class="!withMusic && 'opacity-60'" :aria-label="t('room.tour.music')" :aria-pressed="withMusic" @click="withMusic = !withMusic" />
                 </UTooltip>
@@ -76,19 +80,23 @@
               <UButton size="xl" color="neutral" variant="soft" icon="i-lucide-square" class="justify-center" :label="t('room.tour.cancel')" @click="cancelRecording" />
             </template>
 
+            <!-- Done: back to the options, share (the post text and link go
+                 with it), download -->
             <template v-else>
               <p class="text-sm text-white/70">{{ t('room.tour.readyText') }}</p>
-              <div class="flex flex-col gap-2">
-                <UButton v-if="canShare" size="xl" icon="i-lucide-share" class="justify-center" :label="t('room.tour.share')" @click="share" />
-                <UButton size="xl" :color="canShare ? 'neutral' : 'primary'" :variant="canShare ? 'soft' : 'solid'" icon="i-lucide-download" class="justify-center" :label="t('room.tour.download')" @click="download" />
-              </div>
-              <div class="relative">
-                <UTextarea :model-value="postText" readonly :rows="3" class="w-full" :aria-label="t('room.tour.postCaption')" />
-                <UButton icon="i-lucide-copy" color="neutral" variant="ghost" size="sm" class="absolute right-1.5 top-1.5" :aria-label="t('room.tour.copy')" @click="copyPostText" />
-              </div>
               <div class="flex gap-2">
-                <UButton size="lg" color="neutral" variant="soft" icon="i-lucide-arrow-left" :label="t('room.tour.back')" @click="close" />
-                <UButton size="lg" color="neutral" variant="ghost" icon="i-lucide-rotate-ccw" :label="t('room.tour.again')" @click="reset" />
+                <UButton size="xl" color="neutral" variant="soft" icon="i-lucide-arrow-left" :label="t('room.tour.back')" @click="reset" />
+                <UButton v-if="canShare" size="xl" icon="i-lucide-share" class="flex-1 justify-center" :label="t('room.tour.share')" @click="share" />
+                <UButton
+                  size="xl"
+                  icon="i-lucide-download"
+                  :color="canShare ? 'neutral' : 'primary'"
+                  :variant="canShare ? 'soft' : 'solid'"
+                  :class="!canShare && 'flex-1 justify-center'"
+                  :label="canShare ? undefined : t('room.tour.download')"
+                  :aria-label="t('room.tour.download')"
+                  @click="download"
+                />
               </div>
             </template>
           </div>
@@ -100,7 +108,7 @@
 
 <script setup lang="ts">
 import type { RoomConfig } from '~/types/room'
-import { RoomScene } from '~/utils/room/RoomScene'
+import { RoomScene, TOUR_STYLES, type TourStyle } from '~/utils/room/RoomScene'
 import { getDaylight, type DaylightState } from '~/utils/room/daylight'
 import { MUSIC_BY_ID } from '~/data/roomMusic'
 
@@ -119,7 +127,6 @@ const props = defineProps<{
 const open = defineModel<boolean>('open', { default: false })
 
 const { t } = useI18n()
-const toast = useToast()
 const { info: billing, ensure: ensureBilling } = useBilling()
 
 const WIDTH = 1080
@@ -131,6 +138,20 @@ const frameCanvas = ref<HTMLCanvasElement | null>(null)
 const caption = ref('')
 const timeOfDay = ref<'day' | 'night'>('day')
 const duration = ref(12)
+const tourStyle = ref<TourStyle>('sweep')
+const STYLE_ICONS: Record<TourStyle, string> = {
+  sweep: 'i-lucide-move-horizontal',
+  orbit: 'i-lucide-rotate-3d',
+  dive: 'i-lucide-plane-landing',
+  crane: 'i-lucide-move-diagonal',
+}
+const styleItems = computed(() => TOUR_STYLES.map(style => ({
+  label: t(`room.tour.styles.${style}`),
+  icon: STYLE_ICONS[style],
+  type: 'checkbox' as const,
+  checked: tourStyle.value === style,
+  onUpdateChecked: () => (tourStyle.value = style),
+})))
 const withMusic = ref(true)
 // setup: choosing options; recording: dialog hidden, recording; done: the video
 const phase = ref<'setup' | 'recording' | 'done'>('setup')
@@ -244,7 +265,7 @@ watch(timeOfDay, applyTime)
 function drawFrame(target: HTMLCanvasElement, p: number) {
   const ctx = target.getContext('2d')
   if (!scene || !ctx) return
-  ctx.drawImage(scene.renderTour(p), 0, 0, WIDTH, HEIGHT)
+  ctx.drawImage(scene.renderTour(p, tourStyle.value), 0, 0, WIDTH, HEIGHT)
   drawTitles(ctx, p)
 }
 
@@ -458,10 +479,6 @@ async function share() {
   }
 }
 
-function copyPostText() {
-  navigator.clipboard.writeText(postText.value)
-  toast.add({ title: t('room.tour.copied') })
-}
 
 function reset() {
   if (videoUrl.value) URL.revokeObjectURL(videoUrl.value)
