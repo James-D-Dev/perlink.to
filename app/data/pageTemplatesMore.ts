@@ -138,7 +138,7 @@ const GIFT_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-gift',
     preview: { bg: '#FFE4EF', accent: '#E8457A' },
     build: () => ({
-      title: s('Happy birthday, Linh! 🎂', 'Chúc mừng sinh nhật Linh! 🎂'),
+      title: s('Happy birthday, Lily! 🎂', 'Chúc mừng sinh nhật Lily! 🎂'),
       bio: s('Your friends filled this room with wishes. Tap 💌 to add yours.', 'Bạn bè đã gửi lời chúc vào căn phòng này. Bấm 💌 để gửi lời chúc của bạn.'),
       avatarUrl: photo('birthday-avatar'),
       themeConfig: {
@@ -165,7 +165,7 @@ const GIFT_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-heart',
     preview: { bg: '#2A1220', accent: '#FF5C8A' },
     build: () => ({
-      title: s('For you, Minh ❤️', 'Gửi Minh của em ❤️'),
+      title: s('For you, Ethan ❤️', 'Gửi Ethan của em ❤️'),
       bio: s('One year together, and many more to come.', 'Một năm bên nhau, và còn thật nhiều năm nữa.'),
       avatarUrl: photo('event-avatar'),
       themeConfig: {
@@ -238,7 +238,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
     description: 'Big landscapes, a photo strip of your trips and your latest stories.',
     icon: 'i-lucide-plane', preview: { bg: '#E0F2FE', accent: '#0E7490' },
     build: () => ({
-      title: s('Lan Anh · On the road', 'Lan Anh · Trên đường đi'),
+      title: s('Emma · On the road', 'Emma · Trên đường đi'),
       bio: s('42 countries, one backpack. Honest guides, slow travel and the food I find on the way.', '42 quốc gia, một chiếc ba lô. Kinh nghiệm thật, du lịch chậm và những món ngon dọc đường.'),
       avatarUrl: photo('blog-travel-avatar'),
       themeConfig: {
@@ -274,7 +274,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
     description: 'Recipes and food stories, with mouth-watering photos up top.',
     icon: 'i-lucide-chef-hat', preview: { bg: '#FFF8F0', accent: '#C2410C' },
     build: () => ({
-      title: s('Mai\'s Kitchen', 'Bếp của Mai'),
+      title: s('Mia\'s Kitchen', 'Bếp của Mia'),
       bio: s('Home cooking, street food and the stories behind every dish.', 'Món nhà nấu, món ăn đường phố và câu chuyện sau mỗi món.'),
       avatarUrl: photo('blog-food-avatar'),
       themeConfig: {
@@ -289,7 +289,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
       blocks: withIndex([
         { name: 'blog', data: { title: s('New recipes', 'Công thức mới'), count: 5, samples: [{ title: s('Crispy banh xeo at home, step by step', 'Bánh xèo giòn tại nhà, từng bước một'), coverUrl: photo('street-2'), minutes: 8 }, { title: s('The croissant I baked 20 times', 'Chiếc croissant mình nướng 20 lần'), coverUrl: photo('bakery-1'), minutes: 6 }, { title: s('Saigon street snacks under 30k', 'Món ăn vặt Sài Gòn dưới 30 nghìn'), coverUrl: photo('street-1'), minutes: 4 }] } },
         { name: 'image-album', data: { images: album('street-1', 'bakery-1', 'cafe-2', 'street-2'), layout: 'grid' } },
-        { name: 'text', data: { title: s('Cook along', 'Nấu cùng Mai'), content: s('Every Sunday a new recipe, tested three times in my small kitchen. Ask me anything in the comments.', 'Mỗi Chủ nhật một công thức mới, đã thử ba lần trong căn bếp nhỏ. Có gì thắc mắc cứ hỏi Mai nhé.'), align: 'center', style: 'plain' } },
+        { name: 'text', data: { title: s('Cook along', 'Nấu cùng Mia'), content: s('Every Sunday a new recipe, tested three times in my small kitchen. Ask me anything in the comments.', 'Mỗi Chủ nhật một công thức mới, đã thử ba lần trong căn bếp nhỏ. Có gì thắc mắc cứ hỏi Mia nhé.'), align: 'center', style: 'plain' } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'facebook') } },
       ] as Blocks),
       room: room({ wallColor: '#f6e7d8', floorColor: '#9c6644', floorMaterial: 'tile', trimColor: '#ffffff' }, [
@@ -309,7 +309,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
     description: 'Dark, techy and sharp: tutorials, notes and side projects.',
     icon: 'i-lucide-code-xml', preview: { bg: '#0B1020', accent: '#22D3EE' },
     build: () => ({
-      title: s('Minh.dev', 'Minh.dev'),
+      title: s('Alex.dev', 'Alex.dev'),
       bio: s('Notes on web development, AI tools and building things on weekends.', 'Ghi chép về lập trình web, công cụ AI và những dự án làm vào cuối tuần.'),
       avatarUrl: photo('blog-tech-avatar'),
       themeConfig: {
@@ -346,7 +346,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
     description: 'Editorial and dreamy: lookbooks, beauty notes and outfit diaries.',
     icon: 'i-lucide-shirt', preview: { bg: '#FFE4EF', accent: '#BE185D' },
     build: () => ({
-      title: s('Vy Muse', 'Vy Muse'),
+      title: s('Chloe Muse', 'Chloe Muse'),
       bio: s('Outfits, skincare and the little rituals that make me feel like me.', 'Phối đồ, chăm da và những thói quen nhỏ giúp mình là chính mình.'),
       avatarUrl: photo('blog-fashion-avatar'),
       themeConfig: {
@@ -450,7 +450,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
     description: 'Clean and trustworthy: personal finance, productivity and books.',
     icon: 'i-lucide-trending-up', preview: { bg: '#F7F7F2', accent: '#166534' },
     build: () => ({
-      title: s('Tuan · Notes on money', 'Tuấn · Ghi chép tài chính'),
+      title: s('Daniel · Notes on money', 'Daniel · Ghi chép tài chính'),
       bio: s('Saving, investing and building good habits, explained without jargon.', 'Tiết kiệm, đầu tư và xây thói quen tốt, giải thích không thuật ngữ.'),
       avatarUrl: photo('blog-growth-avatar'),
       themeConfig: {
@@ -553,8 +553,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('09:00', '21:00'), note: s('Last booking one hour before closing.', 'Nhận khách cuối trước giờ đóng cửa một tiếng.') } },
         { name: 'form', data: { title: s('Book a treatment', 'Đặt lịch'), description: s('We’ll confirm your time by phone.', 'Chúng tôi sẽ gọi xác nhận giờ hẹn.'), kind: 'booking', fields: booking(true, true, true) } },
         { name: 'testimonials', data: { title: s('From our guests', 'Khách nói gì'), items: reviews(
-          [s('The calmest hour of my month. Lovely staff.', 'Một tiếng thư thái nhất trong tháng. Nhân viên rất dễ thương.'), 'Thu Hà', s('Google review', 'Đánh giá Google')],
-          [s('Best hot stone massage in town.', 'Massage đá nóng ngon nhất thành phố.'), 'Minh Anh'],
+          [s('The calmest hour of my month. Lovely staff.', 'Một tiếng thư thái nhất trong tháng. Nhân viên rất dễ thương.'), 'Sarah K.', s('Google review', 'Đánh giá Google')],
+          [s('Best hot stone massage in town.', 'Massage đá nóng ngon nhất thành phố.'), 'Anna L.'],
         ) } },
         { name: 'contact', data: { title: s('Visit the spa', 'Ghé spa'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'zalo') } },
@@ -655,8 +655,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Book a free trial', 'Đăng ký tập thử miễn phí'), description: s('One free session, no card needed.', 'Một buổi miễn phí, không cần trả trước.'), kind: 'booking', fields: booking(true, true), submitLabel: s('Claim my trial', 'Nhận buổi tập thử') } },
         { name: 'image-album', data: { images: album('gym-1', 'gym-2', 'gym-3'), layout: 'carousel' } },
         { name: 'testimonials', data: { title: s('Member results', 'Kết quả hội viên'), items: reviews(
-          [s('Lost 8 kg in four months with my coach. Never felt stronger.', 'Giảm 8 kg sau bốn tháng tập với HLV. Chưa bao giờ thấy khỏe như vậy.'), 'Quang Huy'],
-          [s('Clean, friendly and open early.', 'Sạch sẽ, thân thiện và mở cửa sớm.'), 'Lan Phương'],
+          [s('Lost 8 kg in four months with my coach. Never felt stronger.', 'Giảm 8 kg sau bốn tháng tập với HLV. Chưa bao giờ thấy khỏe như vậy.'), 'Ryan M.'],
+          [s('Clean, friendly and open early.', 'Sạch sẽ, thân thiện và mở cửa sớm.'), 'Grace T.'],
         ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('06:00', '22:00') } },
         { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
@@ -695,7 +695,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'hours', data: { title: s('Clinic hours', 'Giờ làm việc'), days: hours('08:00', '19:00', [0]) } },
         { name: 'image-album', data: { images: album('dental-1', 'dental-2'), layout: 'grid' } },
         { name: 'testimonials', data: { items: reviews(
-          [s('Painless and very clear about costs.', 'Không đau và báo giá rất rõ ràng.'), 'Hoàng Nam', s('Google review', 'Đánh giá Google')],
+          [s('Painless and very clear about costs.', 'Không đau và báo giá rất rõ ràng.'), 'James P.', s('Google review', 'Đánh giá Google')],
         ) } },
         { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
         { name: 'social', data: { links: social('facebook', 'zalo') } },
@@ -730,8 +730,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
           ] },
         ]) } },
         { name: 'testimonials', data: { title: s('What parents say', 'Phụ huynh nói gì'), items: reviews(
-          [s('My son went from shy to confident in one term.', 'Con tôi từ rụt rè trở nên tự tin chỉ sau một khóa.'), s('Ms Hạnh', 'Chị Hạnh'), s('Parent', 'Phụ huynh')],
-          [s('Teachers send notes after every class.', 'Giáo viên gửi nhận xét sau mỗi buổi học.'), s('Mr Tuấn', 'Anh Tuấn'), s('Parent', 'Phụ huynh')],
+          [s('My son went from shy to confident in one term.', 'Con tôi từ rụt rè trở nên tự tin chỉ sau một khóa.'), s('Ms Laura', 'Chị Laura'), s('Parent', 'Phụ huynh')],
+          [s('Teachers send notes after every class.', 'Giáo viên gửi nhận xét sau mỗi buổi học.'), s('Mr David', 'Anh David'), s('Parent', 'Phụ huynh')],
         ) } },
         { name: 'form', data: { title: s('Book a free placement test', 'Đăng ký kiểm tra đầu vào miễn phí'), kind: 'contact', fields: { phone: true, email: false, date: false, time: false, guests: false, message: true }, submitLabel: s('Send', 'Gửi đăng ký') } },
         { name: 'image-album', data: { images: album('tutor-1', 'tutor-2'), layout: 'grid' } },
@@ -979,7 +979,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
           ] },
         ]) } },
         { name: 'testimonials', data: { title: s('Kind words', 'Lời cảm ơn'), items: reviews(
-          [s('We cried looking at the photos. Thank you!', 'Hai đứa đã khóc khi xem ảnh. Cảm ơn bạn rất nhiều!'), 'Linh & Đức'],
+          [s('We cried looking at the photos. Thank you!', 'Hai đứa đã khóc khi xem ảnh. Cảm ơn bạn rất nhiều!'), 'Lily & Ben'],
         ) } },
         { name: 'form', data: { title: s('Check your date', 'Hỏi lịch trống'), kind: 'booking', fields: { phone: true, email: true, date: true, time: false, guests: false, message: true }, submitLabel: s('Ask about my date', 'Gửi câu hỏi') } },
         { name: 'social', data: { links: social('instagram', 'facebook', 'tiktok') } },
@@ -1029,7 +1029,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-cake',
     preview: { bg: '#FFF1C1', accent: '#F43F5E' },
     build: () => ({
-      title: s('Mai turns 30!', 'Mai tròn 30 tuổi!'),
+      title: s('Mia turns 30!', 'Mia tròn 30 tuổi!'),
       bio: s('Come celebrate with cake, games and good friends.', 'Đến chung vui cùng bánh kem, trò chơi và bạn bè nhé.'),
       avatarUrl: photo('birthday-avatar'),
       themeConfig: look({

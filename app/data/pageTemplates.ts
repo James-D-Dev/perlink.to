@@ -378,7 +378,7 @@ const BASE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-heart',
     preview: { bg: '#FBF4F0', accent: '#8C4A62' },
     build: () => ({
-      title: 'Anna & Minh',
+      title: 'Anna & Mark',
       bio: 'We’re getting married! Saturday, 12 June 2027.',
       avatarUrl: photo('event-avatar'),
       themeConfig: look({
