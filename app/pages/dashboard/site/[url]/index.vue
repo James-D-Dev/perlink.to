@@ -484,14 +484,17 @@
         />
 
         <!-- Phone preview (mobile and tablet; desktop shows it beside the editor) -->
-        <!-- The phone frame is the card, so no modal chrome around it -->
+        <!-- The phone frame is the card: centred on a plain dim screen (no
+             blur), close button in the top-right corner, tap around to close -->
         <UModal
           v-model:open="previewOpen"
+          fullscreen
+          :overlay="false"
           :title="t('common.preview')"
-          :ui="{ content: 'w-auto max-w-none bg-transparent shadow-none ring-0 divide-y-0 overflow-visible' }"
+          :ui="{ content: 'rounded-none bg-black/70 ring-0 shadow-none backdrop-blur-none backdrop-saturate-100 dark:bg-black/70 dark:shadow-none' }"
         >
           <template #content>
-            <div class="relative">
+            <div class="flex size-full items-center justify-center overflow-y-auto p-4" @click.self="previewOpen = false">
               <BioPreviewFrame>
                 <BioPreview
                   :bio-data="bioData"
@@ -500,29 +503,28 @@
                   @select-block="(id: string) => { previewOpen = false; openBlock(id) }"
                 />
               </BioPreviewFrame>
-              <UButton
-                icon="i-lucide-x"
-                color="neutral"
-                variant="solid"
-                class="absolute -right-3 -top-3 rounded-full shadow-lg"
-                :aria-label="t('dashboard.editor.closePreview')"
-                @click="previewOpen = false"
-              />
             </div>
+            <UButton
+              icon="i-lucide-x"
+              color="neutral"
+              variant="solid"
+              size="lg"
+              class="absolute right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] rounded-full bg-white text-black shadow-lg hover:bg-white/90"
+              :aria-label="t('dashboard.editor.closePreview')"
+              @click="previewOpen = false"
+            />
           </template>
         </UModal>
 
-        <!-- Floating shortcut to the 3D room (where the help button sits on
-             other pages; help is still in the sidebar) -->
+        <!-- Floating shortcut to the 3D room tab (where the help button sits
+             on other pages; help is still in the sidebar). Hidden on that tab -->
         <UButton
-          v-if="existingBio?.username"
+          v-if="existingBio?.username && !previewOpen && activeTab !== 'room'"
           icon="i-lucide-box"
           size="lg"
           :label="t('dashboard.editor.room.fab')"
-          :loading="openingRoom === 'edit'"
-          :disabled="!!openingRoom"
           class="fixed bottom-20 right-5 z-50 bg-ink pr-4 text-paper shadow-[0_8px_24px_-6px_rgba(12,11,10,0.35)] hover:bg-ink/90 hover:scale-105 lg:bottom-5 print:hidden"
-          @click="openRoomEditor()"
+          @click="activeTab = 'room'"
         />
       </div>
     </template>

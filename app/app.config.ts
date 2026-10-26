@@ -187,12 +187,14 @@ export default defineAppConfig({
         { variant: ['soft', 'subtle'], class: { root: 'backdrop-blur-xl' } },
       ],
     },
-    // Bottom sheets on phones (AppSheet → UDrawer/vaul): the same glass as
-    // dialogs, a grab handle, title centred like iOS, clear of the home bar
+    // Draggable sheets (UDrawer/vaul): bottom sheets on phones (AppSheet)
+    // and the dashboard's phone menu from the left. Same glass as dialogs; the
+    // bottom one has a grab handle and an iOS-style centred title, clear of
+    // the home bar
     drawer: {
       slots: {
         overlay: glassBackdrop,
-        content: `${liquidGlass} rounded-t-[28px] ring-1 pb-[env(safe-area-inset-bottom)]`,
+        content: `${liquidGlass} ring-1`,
         handle: '!bg-black/15 dark:!bg-white/25 transition-opacity',
         container: 'gap-0 p-0',
         header: 'px-5 pt-3 pb-1 text-center',
@@ -202,7 +204,8 @@ export default defineAppConfig({
         footer: 'flex-row justify-end gap-2 px-5 pb-5 pt-1',
       },
       compoundVariants: [
-        { direction: 'bottom', class: { content: 'mt-16 max-h-[94dvh]', handle: '!w-9 !h-1 mt-2' } },
+        { direction: 'bottom', class: { content: 'mt-16 max-h-[94dvh] rounded-t-[28px] pb-[env(safe-area-inset-bottom)]', handle: '!w-9 !h-1 mt-2' } },
+        { direction: 'left', class: { content: 'inset-y-0 left-0 w-[min(18rem,85vw)] rounded-r-[28px] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]' } },
       ],
     },
     slideover: {

@@ -5,6 +5,8 @@
       v-model:open="open"
       v-model:collapsed="collapsed"
       collapsible
+      mode="drawer"
+      :menu="{ direction: 'left', handle: false }"
       resizable
       :min-size="16"
       :max-size="16"
@@ -13,7 +15,7 @@
         root: 'bg-paper border-r border-line',
         header: 'h-16',
         footer: 'border-t border-line',
-        content: 'max-w-72',
+        content: 'flex-col',
       }"
     >
       <template #header="{ collapsed }">
