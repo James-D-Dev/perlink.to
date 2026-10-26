@@ -13,16 +13,18 @@ export interface LandMeta {
   name: string
   description: string
   icon: string
-  /** CSS gradient for the picker card: sky -> ground */
+  /** CSS gradient for the picker card: sky -> ground (shown while the picture loads) */
   preview: string
+  /** Picture of the land for the picker (rendered from the scene, 480×288) */
+  thumbnail: string
 }
 
 export const LANDS: LandMeta[] = [
-  { id: 'island', name: 'Sky island', description: 'Floating island above the clouds, flowers and butterflies', icon: 'i-lucide-cloud-sun', preview: 'linear-gradient(180deg,#8fd0f5 0%,#cfeaff 55%,#6fbf5a 56%,#4f8a3a 100%)' },
-  { id: 'mars', name: 'Mars', description: 'Red planet surface floating in space, planets all around', icon: 'i-lucide-orbit', preview: 'linear-gradient(180deg,#0b0614 0%,#2a1440 55%,#c4572d 56%,#7a2f18 100%)' },
-  { id: 'sakura', name: 'Sakura', description: 'Cherry blossoms, falling petals, butterflies and a pond', icon: 'i-lucide-flower-2', preview: 'linear-gradient(180deg,#bfe3ff 0%,#ffd6e8 55%,#9fd88a 56%,#6fb35a 100%)' },
-  { id: 'city', name: 'City', description: 'Downtown block: streets, traffic, street lamps and lit windows at night', icon: 'i-lucide-building-2', preview: 'linear-gradient(180deg,#9fcdf0 0%,#d9e6f2 55%,#8d8f95 56%,#55585e 100%)' },
-  { id: 'winter', name: 'Winter', description: 'Snowfall, snowy pines and a snowman with a Santa hat', icon: 'i-lucide-snowflake', preview: 'linear-gradient(180deg,#9fb8d1 0%,#dce8f3 55%,#f4f8ff 56%,#d6e2ef 100%)' },
+  { id: 'island', name: 'Sky island', description: 'Floating island above the clouds, flowers and butterflies', icon: 'i-lucide-cloud-sun', preview: 'linear-gradient(180deg,#8fd0f5 0%,#cfeaff 55%,#6fbf5a 56%,#4f8a3a 100%)', thumbnail: '/images/lands/island.webp' },
+  { id: 'mars', name: 'Mars', description: 'Red planet surface floating in space, planets all around', icon: 'i-lucide-orbit', preview: 'linear-gradient(180deg,#0b0614 0%,#2a1440 55%,#c4572d 56%,#7a2f18 100%)', thumbnail: '/images/lands/mars.webp' },
+  { id: 'sakura', name: 'Sakura', description: 'Cherry blossoms, falling petals, butterflies and a pond', icon: 'i-lucide-flower-2', preview: 'linear-gradient(180deg,#bfe3ff 0%,#ffd6e8 55%,#9fd88a 56%,#6fb35a 100%)', thumbnail: '/images/lands/sakura.webp' },
+  { id: 'city', name: 'City', description: 'Downtown block: streets, traffic, street lamps and lit windows at night', icon: 'i-lucide-building-2', preview: 'linear-gradient(180deg,#9fcdf0 0%,#d9e6f2 55%,#8d8f95 56%,#55585e 100%)', thumbnail: '/images/lands/city.webp' },
+  { id: 'winter', name: 'Winter', description: 'Snowfall, snowy pines and a snowman with a Santa hat', icon: 'i-lucide-snowflake', preview: 'linear-gradient(180deg,#9fb8d1 0%,#dce8f3 55%,#f4f8ff 56%,#d6e2ef 100%)', thumbnail: '/images/lands/winter.webp' },
 ]
 
 export interface SkyPalette {

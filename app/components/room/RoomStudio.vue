@@ -414,13 +414,16 @@
               v-for="land in LANDS"
               :key="land.id"
               type="button"
-              class="w-40 shrink-0 overflow-hidden rounded-xl border-2 text-left transition"
+              class="group w-44 shrink-0 overflow-hidden rounded-xl border-2 text-left transition"
               :class="(room.land ?? 'island') === land.id ? 'border-perlink-blue' : 'border-default hover:border-accented'"
               @click="room = { ...room, land: land.id }"
             >
-              <div class="relative flex h-16 items-center justify-center" :style="{ background: land.preview }">
-                <UIcon :name="land.icon" class="size-7 text-white drop-shadow" />
-                <UIcon v-if="(room.land ?? 'island') === land.id" name="i-lucide-circle-check" class="absolute right-1.5 top-1.5 size-4 text-white drop-shadow" />
+              <!-- What the land looks like around a room -->
+              <div class="relative aspect-[5/3] overflow-hidden" :style="{ background: land.preview }">
+                <img :src="land.thumbnail" :alt="label(`room.lands.${land.id}.name`, land.name)" loading="lazy" decoding="async" class="size-full object-cover transition duration-300 group-hover:scale-105">
+                <span v-if="(room.land ?? 'island') === land.id" class="absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full bg-perlink-blue text-white shadow">
+                  <UIcon name="i-lucide-check" class="size-3.5" />
+                </span>
               </div>
               <div class="p-2">
                 <p class="text-sm font-semibold text-highlighted">{{ label(`room.lands.${land.id}.name`, land.name) }}</p>
