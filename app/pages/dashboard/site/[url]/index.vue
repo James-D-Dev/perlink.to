@@ -295,19 +295,22 @@
               </div>
               <div class="flex flex-wrap gap-2">
                 <UButton icon="i-lucide-box" :label="t('dashboard.editor.room.openEditor')" size="sm" :loading="openingRoom === 'edit'" :disabled="!!openingRoom" @click="openRoomEditor()" />
-                <!-- Stands out: every room video posted brings people back -->
-                <UButton
-                  size="sm"
-                  :loading="openingRoom === 'video'"
-                  :disabled="!!openingRoom"
-                  class="bg-gradient-to-r from-pink-500 via-red-500 to-amber-400 pl-1.5 font-semibold text-white shadow-[0_6px_20px_-6px_rgb(239_68_68/0.7)] hover:brightness-110 disabled:opacity-60"
-                  @click="openRoomEditor('video')"
-                >
-                  <template #leading>
-                    <RoomSocialCycleIcon />
-                  </template>
-                  {{ t('dashboard.editor.room.shareVideo') }}
-                </UButton>
+                <!-- Stands out: every room video posted brings people back.
+                     Likes and hearts float up from it -->
+                <ReactionBurst>
+                  <UButton
+                    size="sm"
+                    :loading="openingRoom === 'video'"
+                    :disabled="!!openingRoom"
+                    class="bg-gradient-to-r from-pink-500 via-red-500 to-amber-400 pl-1.5 font-semibold text-white shadow-[0_6px_20px_-6px_rgb(239_68_68/0.7)] hover:brightness-110 disabled:opacity-60"
+                    @click="openRoomEditor('video')"
+                  >
+                    <template #leading>
+                      <RoomSocialCycleIcon />
+                    </template>
+                    {{ t('dashboard.editor.room.shareVideo') }}
+                  </UButton>
+                </ReactionBurst>
               </div>
             </div>
           </div>

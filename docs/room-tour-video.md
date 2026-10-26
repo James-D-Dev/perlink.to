@@ -9,7 +9,9 @@ Where: site editor → **3D room** tab → **Chia sẻ phòng của bạn** ("Sh
 your room") on the "Your 3D room" card, next to **Trang trí phòng**. It's a
 gradient button whose icon cycles through the Facebook, TikTok, YouTube,
 Instagram and X logos, each a solid circle in its brand colour
-(`SocialCycleIcon.vue`). It saves the page and
+(`SocialCycleIcon.vue`), with like and heart reactions floating up from it
+as on a live video (`ReactionBurst.vue`; busier on hover, off for reduced
+motion). It saves the page and
 opens the 3D room editor with `?record=1`, which opens the video studio
 straight away (`autoRecord` on RoomStudio; the flag is removed from the
 address).
