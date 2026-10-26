@@ -1,10 +1,11 @@
 import type { Ref } from 'vue'
 
 /**
- * Swipe sideways between tabs, like Flutter's PageView: the page follows the
- * finger (with resistance at the ends), and a long or quick swipe slides to
- * the next or previous tab. Only the current tab is mounted, so nothing heavy
- * (a 3D preview) runs off-screen.
+ * Swipe sideways between tabs, like Flutter's PageView: the strip of tabs
+ * follows the finger (with resistance at the ends), and a long or quick swipe
+ * slides to the next or previous tab. The page renders the tabs either side
+ * of the current one off screen, `gap` px beyond its edge, so they're already
+ * there when they slide in.
  *
  * Swipes that start on something that handles its own sideways gestures are
  * left alone: fields, sliders, horizontal scrollers, drag handles, or
@@ -15,6 +16,7 @@ export function useTabSwipe<T extends string>(
   tabs: Ref<readonly T[]>,
   active: Ref<T>,
   enabled: Ref<boolean>,
+  gap = 0,
 ) {
   let startX = 0
   let startY = 0
@@ -89,15 +91,14 @@ export function useTabSwipe<T extends string>(
       setOffset(0, true)
       return
     }
-    // Out one side, in from the other
+    // Slide the next tab fully in, then make it the current one; it is then
+    // laid out where it already is, so dropping the offset doesn't move it
     const direction = dx < 0 ? -1 : 1
-    setOffset(direction * width, true)
-    await new Promise(resolve => setTimeout(resolve, 180))
+    setOffset(direction * (width + gap), true)
+    await new Promise(resolve => setTimeout(resolve, 230))
     active.value = next
     await nextTick()
-    setOffset(-direction * width * 0.35, false)
-    el.getBoundingClientRect()
-    setOffset(0, true)
+    setOffset(0, false)
     // Start the new tab at its top if the page had scrolled past it
     if (el.getBoundingClientRect().top < 0) el.scrollIntoView({ block: 'start', behavior: 'smooth' })
   }

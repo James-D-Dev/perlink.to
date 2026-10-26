@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="contactBlock?.hidden"
       :title="data.title || t('blocks.contact.title')"
-      icon="i-lucide-map-pin"
+      block="contact"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('contact')"
     >

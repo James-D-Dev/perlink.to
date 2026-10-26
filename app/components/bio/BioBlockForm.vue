@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="formBlock?.hidden"
       :title="data.title || t('blocks.form.defaultTitle')"
-      icon="i-lucide-calendar-check"
+      block="form"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('form')"
     >

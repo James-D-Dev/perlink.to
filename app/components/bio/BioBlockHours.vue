@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="hoursBlock?.hidden"
       :title="data.title || t('blocks.hours.title')"
-      icon="i-lucide-clock"
+      block="hours"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('hours')"
     >

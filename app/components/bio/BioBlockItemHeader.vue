@@ -8,9 +8,18 @@
       <UIcon name="i-lucide-grip-vertical" class="size-4" />
     </div>
 
-    <!-- Icon (hidden on mobile) -->
+    <!-- The block's coloured icon, as in the "Add block" picker -->
     <div
-      v-if="icon"
+      v-if="look"
+      class="flex size-7 shrink-0 items-center justify-center rounded-lg"
+      :class="look.tint"
+    >
+      <UIcon :name="look.icon" class="size-4" />
+    </div>
+
+    <!-- Icon (blocks without a catalog entry) -->
+    <div
+      v-else-if="icon"
       class="flex size-7 shrink-0 rounded-md bg-elevated dark:bg-white/[0.06] items-center justify-center"
     >
       <slot name="icon">
@@ -82,6 +91,8 @@ import { isRepeatableBlock } from '~/utils/blocks'
 const props = defineProps<{
   isActive: boolean;
   title: string;
+  /** Block name: its icon and colour come from the block catalog */
+  block?: string;
   icon?: string;
   iconImage?: string;
   hidden?: boolean;
@@ -94,6 +105,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n()
+const look = computed(() => (props.block ? blockLook(props.block) : null))
 
 // Present when the header sits inside the block list of the editor
 const item = inject(BLOCK_ITEM_KEY, null)

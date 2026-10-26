@@ -115,7 +115,8 @@ export default defineAppConfig({
     },
     modal: {
       slots: {
-        content: `${liquidGlass} divide-y-0 rounded-[28px]`,
+        overlay: 'z-50',
+        content: `${liquidGlass} divide-y-0 rounded-[28px] z-50`,
         // Title centred like an iOS sheet, with room for the round close button
         // A grab handle on top when it's a bottom sheet (phones)
         header: 'relative justify-center px-14 pt-5 pb-1 min-h-0 sm:px-14 text-center max-sm:pt-6 max-sm:before:absolute max-sm:before:left-1/2 max-sm:before:top-2 max-sm:before:h-1 max-sm:before:w-9 max-sm:before:-translate-x-1/2 max-sm:before:rounded-full max-sm:before:bg-black/15 dark:max-sm:before:bg-white/20',
@@ -193,8 +194,9 @@ export default defineAppConfig({
     // the home bar
     drawer: {
       slots: {
-        overlay: glassBackdrop,
-        content: `${liquidGlass} ring-1`,
+        // Above the editor's teleported phone action bar (z-20)
+        overlay: `${glassBackdrop} z-50`,
+        content: `${liquidGlass} ring-1 z-50`,
         handle: '!bg-black/15 dark:!bg-white/25 transition-opacity',
         container: 'gap-0 p-0',
         header: 'px-5 pt-3 pb-1 text-center',
@@ -209,7 +211,7 @@ export default defineAppConfig({
       ],
     },
     slideover: {
-      slots: { content: `${liquidGlass} divide-y-0` },
+      slots: { overlay: 'z-50', content: `${liquidGlass} divide-y-0 z-50` },
       variants: { overlay: { true: { overlay: glassBackdrop } } },
     },
     popover: { slots: { content: glassMenu } },

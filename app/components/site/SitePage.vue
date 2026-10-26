@@ -74,6 +74,7 @@
           :lang="siteLang"
           :blocks="bioPage.blocks"
           :accent="bioPage.themeConfig?.colors?.primary"
+          :branding="bioPage.showBranding !== false"
           @switch2d="show2d = true"
         />
         <template #fallback>

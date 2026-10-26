@@ -3,7 +3,7 @@
     <BioBlockItemHeader
       :is-active="isActive"
       :title="t('blocks.social.title')"
-      icon="i-lucide-share-2"
+      block="social"
       :hidden="socialBlock?.hidden"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('social')"

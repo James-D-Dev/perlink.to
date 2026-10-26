@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="textBlock?.hidden"
       :title="data.title || t('blocks.text.title')"
-      icon="i-lucide-text"
+      block="text"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('text')"
     >

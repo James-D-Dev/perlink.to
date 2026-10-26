@@ -8,6 +8,7 @@
     :description="description"
     :dismissible="dismissible"
     :handle="true"
+    :content="{ onOpenAutoFocus: (event: Event) => event.preventDefault() }"
     :ui="{ header: ui?.header, body: ui?.body, footer: ui?.footer, title: ui?.title, description: ui?.description, content: ui?.sheet }"
     @animation-end="(isOpen: boolean) => !isOpen && emit('after:leave')"
   >
@@ -24,6 +25,7 @@
     :description="description"
     :dismissible="dismissible"
     :close="close"
+    :content="noAutofocus ? { onOpenAutoFocus: (event: Event) => event.preventDefault() } : undefined"
     :ui="{ header: ui?.header, body: ui?.body, footer: ui?.footer, title: ui?.title, description: ui?.description, content: ui?.content }"
     @after:leave="emit('after:leave')"
   >
@@ -47,6 +49,9 @@ withDefaults(defineProps<{
   dismissible?: boolean
   /** The dialog's close button (larger screens; phones swipe down instead) */
   close?: boolean | Record<string, unknown>
+  /** Don't put the cursor in the first field on open (phones never do: it
+   * would pop the keyboard up over the sheet) */
+  noAutofocus?: boolean
   /** content: the dialog box; sheet: the phone sheet */
   ui?: { content?: string; sheet?: string; header?: string; body?: string; footer?: string; title?: string; description?: string }
 }>(), {

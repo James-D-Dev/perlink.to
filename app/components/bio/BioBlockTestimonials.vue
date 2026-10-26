@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="testimonialsBlock?.hidden"
       :title="data.title || t('blocks.testimonials.title')"
-      icon="i-lucide-quote"
+      block="testimonials"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('testimonials')"
     >

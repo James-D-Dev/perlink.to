@@ -409,16 +409,9 @@
         </div>
       </div>
 
-      <!-- Footer: the Perlink badge (free plans) and, on every live page, a way to report it -->
+      <!-- Footer: the "Made with Perlink" card (free plans) and, on every live page, a way to report it -->
       <div v-if="mode !== 'preview' && mode !== 'thumbnail'" class="mt-14 flex flex-col items-center gap-3 px-4">
-        <NuxtLink
-          v-if="bioData?.showBranding !== false"
-          to="/"
-          class="inline-flex items-center gap-2 rounded-full bg-white/90 py-2 pl-3 pr-4 text-xs font-medium text-[#0c0b0a] shadow-sm ring-1 ring-black/5 backdrop-blur transition hover:bg-white"
-        >
-          <AppLogo variant="mark" :size="16" />
-          {{ siteT(siteLang, 'madeWith') }}
-        </NuxtLink>
+        <SiteMadeWith v-if="bioData?.showBranding !== false" :username="username" :lang="siteLang" />
         <a
           :href="`https://perlink.to/report?site=${encodeURIComponent(username)}`"
           target="_blank"

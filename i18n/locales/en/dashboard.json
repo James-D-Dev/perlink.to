@@ -152,7 +152,7 @@
         "saved": "Saved",
         "savedAt": "Saved at {time}",
         "unsaved": "Unsaved",
-        "draftPending": "Draft saved · not live yet",
+        "draftPending": "Draft saved",
         "error": "Could not save, retrying"
       },
       "update": "Update site",

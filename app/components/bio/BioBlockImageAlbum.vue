@@ -4,7 +4,7 @@
     <BioBlockItemHeader
       :is-active="isActive"
       :title="t('blocks.album.title')"
-      icon="i-lucide-images"
+      block="image-album"
       :hidden="imageAlbumBlock?.hidden"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('image-album')"

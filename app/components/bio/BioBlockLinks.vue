@@ -3,7 +3,7 @@
     <BioBlockItemHeader
       :is-active="isActive"
       :title="t('blocks.links.title')"
-      icon="i-lucide-link"
+      block="links"
       :hidden="linksBlock?.hidden"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('links')"

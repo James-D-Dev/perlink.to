@@ -184,12 +184,15 @@
         <!-- Phones: swipe sideways to change tab (useTabSwipe). The outer box
              clips the page while it slides, at the screen edges -->
         <div class="-mx-4 overflow-x-clip px-4 lg:mx-0 lg:overflow-x-visible lg:px-0">
-        <div ref="swipeArea" class="touch-pan-y">
-          <!-- Content and design, with the preview beside them -->
-          <div v-if="activeTab === 'content' || activeTab === 'header' || activeTab === 'design'" class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+        <div ref="swipeArea" class="relative touch-pan-y">
+          <!-- Content, header and design, with the preview beside them. Each tab
+               is a page; on phones the ones either side wait just off screen
+               (paneMounted / paneClass) so a swipe shows them straight away -->
+          <template v-for="pane in GRID_PANES" :key="pane">
+          <div v-if="paneMounted(pane)" class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8" :class="paneClass(pane)" :style="paneStyle(pane)" :inert="pane !== activeTab || undefined">
             <div class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-6 lg:col-span-7">
-              <h2 class="mb-5 hidden text-xl font-semibold text-ink lg:block">{{ editorTabs.find((tab) => tab.value === activeTab)?.label }}</h2>
-              <template v-if="activeTab === 'content'">
+              <h2 class="mb-5 hidden text-xl font-semibold text-ink lg:block">{{ editorTabs.find((tab) => tab.value === pane)?.label }}</h2>
+              <template v-if="pane === 'content'">
                 <!-- Template picker for empty pages -->
                 <div v-if="showTemplatePicker" class="mb-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                   <div class="mb-3 flex items-start justify-between gap-3">
@@ -214,7 +217,7 @@
                 </button>
 
                 <BioEditor
-                  ref="editorRef"
+                  :ref="(el: any) => (editorRef = el)"
                   @edit-header="activeTab = 'header'"
                   :active-block="activeBlock"
                   :bio-data="bioData"
@@ -228,7 +231,7 @@
               </template>
 
               <!-- Photo, name, intro and the header layout -->
-              <div v-else-if="activeTab === 'header'" class="space-y-8">
+              <div v-else-if="pane === 'header'" class="space-y-8">
                 <BioBlockHeader
                   :is-active="true"
                   :title="bioData.title"
@@ -268,6 +271,7 @@
               />
 
               <SiteEditorActions
+                v-if="pane === activeTab"
                 :tab="activeTab"
                 :status="saveStatus"
                 :saving="saving"
@@ -283,10 +287,10 @@
               />
             </div>
 
-            <div class="hidden lg:block lg:col-span-5">
+            <div v-if="pane === activeTab" class="hidden lg:block lg:col-span-5">
               <div class="sticky top-0 space-y-4">
                 <BioPreviewPanel
-                  ref="previewPanelRef"
+                  :ref="(el: any) => (previewPanelRef = el)"
                   :preview-data="bioData"
                   :existing-bio="existingBio"
                   :username="existingBio?.username || username"
@@ -296,9 +300,10 @@
               </div>
             </div>
           </div>
+          </template>
 
           <!-- 3D room Tab -->
-          <div v-else-if="activeTab === 'room'" class="max-w-3xl space-y-4 pt-4">
+          <div v-if="paneMounted('room')" class="max-w-3xl space-y-4 pt-4" :class="paneClass('room')" :style="paneStyle('room')" :inert="activeTab !== 'room' || undefined">
             <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
               <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
                 <!-- The room itself, always in daylight (only drawn while this tab is open;
@@ -347,6 +352,7 @@
             </div>
 
             <SiteEditorActions
+              v-if="activeTab === 'room'"
               :tab="activeTab"
               :status="saveStatus"
               :saving="saving"
@@ -363,7 +369,7 @@
           </div>
 
           <!-- Settings Tab -->
-          <div v-else-if="activeTab === 'settings'" class="pt-4 max-w-lg mx-auto space-y-6">
+          <div v-if="paneMounted('settings')" class="pt-4 max-w-lg mx-auto space-y-6" :class="paneClass('settings')" :style="paneStyle('settings')" :inert="activeTab !== 'settings' || undefined">
             <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
               <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.addressHeading') }}</h3>
               <p class="text-sm text-muted dark:text-neutral-400 mb-3">
@@ -664,10 +670,20 @@ watch(activeTab, (tab) => {
   const hash = tab === "content" ? "" : `#${tab}`;
   if (location.hash !== hash) history.replaceState(history.state, "", `${location.pathname}${location.search}${hash}`);
 });
-// Phones and tablets swipe between the tabs, in the order of the tab bar
+// Phones and tablets swipe between the tabs, in the order of the tab bar,
+// like pages side by side: the tabs either side of this one are kept ready
+// just off screen (outside the page's padding) so they show while swiping
 const swipeArea = ref<HTMLElement | null>(null);
 const swipeable = useMediaQuery("(max-width: 1023px)");
-useTabSwipe(swipeArea, computed(() => EDITOR_TABS), activeTab, swipeable);
+const PANE_GAP = 32;
+useTabSwipe(swipeArea, computed(() => EDITOR_TABS), activeTab, swipeable, PANE_GAP);
+const GRID_PANES = ["content", "header", "design"] as const;
+const paneOffset = (pane: EditorTab) => EDITOR_TABS.indexOf(pane) - EDITOR_TABS.indexOf(activeTab.value);
+const paneMounted = (pane: EditorTab) => pane === activeTab.value || (swipeable.value && Math.abs(paneOffset(pane)) === 1);
+// Off-screen tabs don't add to the page's height or catch taps
+const paneClass = (pane: EditorTab) => (pane === activeTab.value ? "" : "absolute inset-x-0 top-0 h-full overflow-hidden");
+const paneStyle = (pane: EditorTab) =>
+  pane === activeTab.value ? undefined : { transform: `translateX(calc(${paneOffset(pane)} * (100% + ${PANE_GAP}px)))` };
 const editorTabs = computed(() => [
   { value: "content", label: t("dashboard.editor.tabs.content"), icon: "i-lucide-layout-list" },
   { value: "header", label: t("dashboard.editor.tabs.header"), icon: "i-lucide-circle-user-round" },

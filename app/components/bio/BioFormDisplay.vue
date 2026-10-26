@@ -16,38 +16,40 @@
 
       <label class="block">
         <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formName') }} *</span>
-        <input v-model="values.name" required maxlength="120" autocomplete="name" :class="inputClass">
+        <input v-model="values.name" required maxlength="120" autocomplete="name" :placeholder="t('formNameHint')" :class="inputClass">
       </label>
 
       <div v-if="fields.phone || fields.email" class="grid gap-3" :class="fields.phone && fields.email && 'sm:grid-cols-2'">
         <label v-if="fields.phone" class="block">
           <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formPhone') }}</span>
-          <input v-model="values.phone" type="tel" maxlength="40" autocomplete="tel" :class="inputClass">
+          <input v-model="values.phone" type="tel" maxlength="40" autocomplete="tel" :placeholder="t('formPhoneHint')" :class="inputClass">
         </label>
         <label v-if="fields.email" class="block">
           <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formEmail') }}</span>
-          <input v-model="values.email" type="email" maxlength="120" autocomplete="email" :class="inputClass">
+          <input v-model="values.email" type="email" maxlength="120" autocomplete="email" :placeholder="t('formEmailHint')" :class="inputClass">
         </label>
       </div>
 
-      <div v-if="fields.date || fields.time || fields.guests" class="grid grid-cols-3 gap-3">
-        <label v-if="fields.date" class="block" :class="!fields.time && !fields.guests && 'col-span-3'">
-          <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formDate') }}</span>
-          <input v-model="values.date" type="date" :min="today" :class="inputClass">
-        </label>
-        <label v-if="fields.time" class="block">
+      <!-- Date on its own row; time and guests side by side. Native date and
+           time pickers have a minimum width, so they can't share a narrow row -->
+      <label v-if="fields.date" class="block">
+        <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formDate') }}</span>
+        <input v-model="values.date" type="date" :min="today" :class="[inputClass, pickerClass]">
+      </label>
+      <div v-if="fields.time || fields.guests" class="grid gap-3" :class="fields.time && fields.guests && 'grid-cols-2'">
+        <label v-if="fields.time" class="block min-w-0">
           <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formTime') }}</span>
-          <input v-model="values.time" type="time" :class="inputClass">
+          <input v-model="values.time" type="time" :class="[inputClass, pickerClass]">
         </label>
-        <label v-if="fields.guests" class="block">
+        <label v-if="fields.guests" class="block min-w-0">
           <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formGuests') }}</span>
-          <input v-model="values.guests" type="number" min="1" max="999" inputmode="numeric" :class="inputClass">
+          <input v-model="values.guests" type="number" min="1" max="999" inputmode="numeric" placeholder="2" :class="inputClass">
         </label>
       </div>
 
       <label v-if="fields.message" class="block">
         <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formMessage') }}</span>
-        <textarea v-model="values.message" rows="3" maxlength="2000" :class="inputClass" />
+        <textarea v-model="values.message" rows="3" maxlength="2000" :placeholder="t('formMessageHint')" :class="[inputClass, 'resize-none']" />
       </label>
 
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
@@ -92,7 +94,9 @@ const error = ref('')
 const today = new Date().toISOString().slice(0, 10)
 
 // Neutral fields that sit on any card colour
-const inputClass = 'w-full rounded-md border border-black/10 bg-white/90 px-3 py-2 text-[15px] text-[#1c1a17] outline-none focus:border-black/30 focus:ring-2 focus:ring-black/5'
+const inputClass = 'block w-full min-w-0 rounded-md border border-black/10 bg-white/90 px-3 py-2 text-[15px] text-[#1c1a17] outline-none placeholder:text-black/35 focus:border-black/30 focus:ring-2 focus:ring-black/5'
+// iOS draws date and time fields centred and taller; keep them like the others
+const pickerClass = 'h-[42px] appearance-none text-left [&::-webkit-date-and-time-value]:text-left'
 
 async function submit() {
   if (props.preview || sending.value) return

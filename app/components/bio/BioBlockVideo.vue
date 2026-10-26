@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="videoBlock?.hidden"
       :title="data.title || t('blocks.video.title')"
-      icon="i-lucide-clapperboard"
+      block="video"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('video')"
     >

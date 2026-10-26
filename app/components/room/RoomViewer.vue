@@ -304,6 +304,7 @@
       <p class="rounded-full bg-black/30 px-3 py-1 text-xs text-white/90 backdrop-blur">
         Drag to look around · click objects to open
       </p>
+      <SiteMadeWith v-if="branding && username" :username="username" :lang="lang" variant="pill" />
       <p v-if="track && musicOn" class="text-[10px] text-white/60">
         Music: {{ track.title }} by {{ track.artist }} ·
         <a :href="track.sourceUrl" target="_blank" rel="noopener noreferrer" class="underline">Pixabay</a>
@@ -338,6 +339,8 @@ const props = defineProps<{
   bio?: string
   avatarUrl?: string
   lang?: SiteLanguage
+  /** The "Made with Perlink" badge (plans without removeBranding) */
+  branding?: boolean
 }>()
 
 const emit = defineEmits<{ switch2d: [] }>()

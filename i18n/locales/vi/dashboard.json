@@ -152,7 +152,7 @@
         "saved": "Đã lưu",
         "savedAt": "Đã lưu lúc {time}",
         "unsaved": "Chưa lưu",
-        "draftPending": "Đã lưu nháp · khách chưa thấy",
+        "draftPending": "Đã lưu nháp",
         "error": "Không lưu được, sẽ thử lại"
       },
       "update": "Cập nhật trang",

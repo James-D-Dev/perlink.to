@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="countdownBlock?.hidden"
       :title="t('blocks.birthday.title')"
-      icon="i-lucide-cake"
+      block="birthday-countdown"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('birthday-countdown')"
     >

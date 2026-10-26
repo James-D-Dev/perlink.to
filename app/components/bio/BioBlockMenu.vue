@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="menuBlock?.hidden"
       :title="data.title || t('blocks.menu.title')"
-      icon="i-lucide-utensils"
+      block="menu"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('menu')"
     >

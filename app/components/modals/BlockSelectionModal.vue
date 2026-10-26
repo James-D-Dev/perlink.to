@@ -1,5 +1,6 @@
 <template>
   <AppSheet
+    no-autofocus
     :open="open"
     :title="t('blocks.picker.title')"
     :ui="{ content: 'sm:max-w-3xl', body: 'p-0 sm:p-0' }"
@@ -11,7 +12,6 @@
         <!-- One box: search the blocks, or paste a link and we'll pick the block -->
         <div class="border-b border-line p-4 sm:px-5">
           <UInput
-            ref="searchRef"
             v-model="query"
             icon="i-lucide-search"
             size="xl"
@@ -67,7 +67,9 @@
                 @click="selectBlock(block.id)"
               >
                 <span class="text-sm font-medium text-ink">{{ block.label }}</span>
-                <UIcon :name="block.icon" class="size-5 text-ink-soft" />
+                <span class="flex size-9 items-center justify-center rounded-xl" :class="block.tint">
+                  <UIcon :name="block.icon" class="size-5" />
+                </span>
               </button>
             </div>
 
@@ -116,14 +118,6 @@ export interface BlockSeed {
   provider?: string
 }
 
-interface BlockOption {
-  id: string
-  key: string
-  icon: string
-  group: 'content' | 'business' | 'extras'
-  /** Extra words people may search for */
-  keywords: string
-}
 
 const props = withDefaults(defineProps<{
   open: boolean
@@ -139,34 +133,13 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const BLOCKS: BlockOption[] = [
-  { id: 'links', key: 'links', icon: 'i-lucide-link', group: 'content', keywords: 'link url website button liên kết nút' },
-  { id: 'social', key: 'social', icon: 'i-lucide-at-sign', group: 'content', keywords: 'instagram facebook tiktok zalo youtube mạng xã hội' },
-  { id: 'text', key: 'text', icon: 'i-lucide-text', group: 'content', keywords: 'about intro paragraph giới thiệu văn bản đoạn' },
-  { id: 'image-album', key: 'imageAlbum', icon: 'i-lucide-images', group: 'content', keywords: 'photo gallery picture ảnh hình album' },
-  { id: 'video', key: 'video', icon: 'i-lucide-clapperboard', group: 'content', keywords: 'youtube tiktok vimeo video clip' },
-  { id: 'menu', key: 'menu', icon: 'i-lucide-utensils', group: 'business', keywords: 'price list services rooms thực đơn bảng giá dịch vụ phòng món' },
-  { id: 'hours', key: 'hours', icon: 'i-lucide-clock', group: 'business', keywords: 'opening hours giờ mở cửa lịch' },
-  { id: 'contact', key: 'contact', icon: 'i-lucide-map-pin', group: 'business', keywords: 'address phone map email địa chỉ điện thoại bản đồ liên hệ' },
-  { id: 'form', key: 'form', icon: 'i-lucide-calendar-check', group: 'business', keywords: 'booking reservation appointment rsvp đặt lịch đặt bàn đặt chỗ form' },
-  { id: 'products', key: 'products', icon: 'i-lucide-shopping-bag', group: 'business', keywords: 'shop store product sell order shopee tiktok shop lazada sản phẩm bán hàng đặt hàng cửa hàng' },
-  { id: 'testimonials', key: 'testimonials', icon: 'i-lucide-quote', group: 'business', keywords: 'reviews feedback đánh giá cảm nhận khách hàng' },
-  { id: 'vietqr', key: 'vietqr', icon: 'i-lucide-qr-code', group: 'extras', keywords: 'bank transfer payment donate qr chuyển khoản thanh toán ủng hộ ngân hàng' },
-  { id: 'birthday-countdown', key: 'birthdayCountdown', icon: 'i-lucide-cake', group: 'extras', keywords: 'countdown birthday event đếm ngược sinh nhật sự kiện' },
-]
 
-const TINT = {
-  content: 'bg-sky-50 text-sky-700',
-  business: 'bg-amber-50 text-amber-700',
-  extras: 'bg-rose-50 text-rose-700',
-} as const
 
 const QUICK = ['links', 'text', 'image-album', 'form']
 
 type Category = 'suggested' | 'content' | 'business' | 'extras'
 const category = ref<Category>('suggested')
 const query = ref('')
-const searchRef = ref<{ inputRef?: HTMLInputElement } | null>(null)
 
 const categories = computed(() => [
   { key: 'suggested' as const, label: t('blocks.picker.suggested'), icon: 'i-lucide-sparkles' },
@@ -175,9 +148,9 @@ const categories = computed(() => [
   { key: 'extras' as const, label: t('blocks.picker.groups.extras'), icon: 'i-lucide-gift' },
 ])
 
-const options = computed(() => BLOCKS.map(b => ({
+const options = computed(() => BLOCK_CATALOG.map(b => ({
   ...b,
-  tint: TINT[b.group],
+  tint: BLOCK_TINT[b.group],
   label: t(`blocks.picker.items.${b.key}.label`),
   description: t(`blocks.picker.items.${b.key}.description`),
 })))
@@ -281,11 +254,11 @@ function close() {
   emit('update:open', false)
 }
 
-// Fresh each time, with the cursor in the box
+// Fresh each time. The search box isn't focused, so phones don't open the
+// keyboard over the list
 watch(() => props.open, (open) => {
   if (!open) return
   query.value = ''
   category.value = 'suggested'
-  nextTick(() => searchRef.value?.inputRef?.focus())
 })
 </script>

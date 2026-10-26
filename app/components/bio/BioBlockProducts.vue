@@ -4,7 +4,7 @@
       :is-active="isActive"
       :hidden="productsBlock?.hidden"
       :title="data.title || t('blocks.products.title')"
-      icon="i-lucide-shopping-bag"
+      block="products"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('products')"
     >

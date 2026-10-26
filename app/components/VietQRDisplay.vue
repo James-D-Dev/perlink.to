@@ -4,14 +4,11 @@
     <BioBlockItemHeader
       :is-active="isActive"
       :title="t('blocks.vietqr.title')"
-      iconImage="_"
+      block="vietqr"
       :hidden="vietQRBlock?.hidden"
       @toggle="$emit('toggle')"
       @toggle-hidden="toggleBlockHidden('vietqr')"
     >
-      <template #icon-image>
-        <img src="@/assets/images/vietqr.png" class="h-5" />
-      </template>
     </BioBlockItemHeader>
 
     <!-- QR Content -->
