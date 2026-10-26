@@ -164,21 +164,32 @@
         </nav>
 
         <div class="min-w-0 flex-1">
-        <!-- Phone tabs: padded inside the scroller so the pills' rings aren't
-             clipped; the active one is scrolled into view -->
-        <div ref="tabBar" class="relative -mx-4 mb-2 flex gap-1.5 overflow-x-auto px-4 py-1.5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden">
-          <button
-            v-for="tab in editorTabs"
-            :key="tab.value"
-            :data-tab="tab.value"
-            type="button"
-            class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors"
-            :class="activeTab === tab.value ? 'bg-ink text-paper' : 'bg-paper text-ink-soft ring-1 ring-line'"
-            @click="activeTab = tab.value as EditorTab"
-          >
-            <UIcon :name="tab.icon" class="size-4" />
-            {{ tab.label }}
-          </button>
+        <!-- Phone tabs: a solid bar whose dark pill follows the swipe between
+             tabs (like Flutter's TabBar). The white labels are a copy clipped
+             to the pill, so text turns white exactly where the pill is. The
+             active tab is scrolled into view -->
+        <div ref="tabBar" class="-mx-4 mb-2 overflow-x-auto px-4 py-1.5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden">
+          <div ref="tabRow" class="relative flex w-max gap-0.5 rounded-full bg-paper p-1 shadow-sm ring-1 ring-line">
+            <span class="absolute inset-y-1 rounded-full bg-ink shadow-sm" :style="pillStyle" aria-hidden="true" />
+            <button
+              v-for="tab in editorTabs"
+              :key="tab.value"
+              :data-tab="tab.value"
+              type="button"
+              class="relative inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium text-ink-soft"
+              :aria-current="activeTab === tab.value ? 'page' : undefined"
+              @click="activeTab = tab.value as EditorTab"
+            >
+              <UIcon :name="tab.icon" class="size-4" />
+              {{ tab.label }}
+            </button>
+            <div class="pointer-events-none absolute inset-0 flex gap-0.5 p-1 text-paper" :style="labelClipStyle" aria-hidden="true">
+              <span v-for="tab in editorTabs" :key="tab.value" class="inline-flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium">
+                <UIcon :name="tab.icon" class="size-4" />
+                {{ tab.label }}
+              </span>
+            </div>
+          </div>
         </div>
 
         <!-- Phones: swipe sideways to change tab (useTabSwipe). The outer box
@@ -557,7 +568,7 @@
 
 <script setup lang="ts">
 import { nanoid } from "nanoid";
-import { useDebounceFn, useMediaQuery } from "@vueuse/core";
+import { useDebounceFn, useMediaQuery, useResizeObserver } from "@vueuse/core";
 import type {
   BioData,
   BioLink,
@@ -664,7 +675,8 @@ watch([activeTab, tabBar], async () => {
   const bar = tabBar.value;
   const tab = bar?.querySelector<HTMLElement>(`[data-tab="${activeTab.value}"]`);
   if (!bar || !tab) return;
-  bar.scrollTo({ left: tab.offsetLeft - (bar.clientWidth - tab.offsetWidth) / 2, behavior: "smooth" });
+  const left = tab.getBoundingClientRect().left - bar.getBoundingClientRect().left + bar.scrollLeft;
+  bar.scrollTo({ left: left - (bar.clientWidth - tab.offsetWidth) / 2, behavior: "smooth" });
 });
 watch(activeTab, (tab) => {
   const hash = tab === "content" ? "" : `#${tab}`;
@@ -676,7 +688,41 @@ watch(activeTab, (tab) => {
 const swipeArea = ref<HTMLElement | null>(null);
 const swipeable = useMediaQuery("(max-width: 1023px)");
 const PANE_GAP = 32;
-useTabSwipe(swipeArea, computed(() => EDITOR_TABS), activeTab, swipeable, PANE_GAP);
+const swipe = useTabSwipe(swipeArea, computed(() => EDITOR_TABS), activeTab, swipeable, PANE_GAP);
+
+// The tab bar's pill: between the active tab and the one the swipe is
+// heading to, as far along as the swipe is
+const tabRow = ref<HTMLElement | null>(null);
+const tabRects = ref<{ left: number; width: number }[]>([]);
+const tabRowWidth = ref(0);
+function measureTabs() {
+  const row = tabRow.value;
+  if (!row) return;
+  tabRowWidth.value = row.offsetWidth;
+  tabRects.value = [...row.querySelectorAll<HTMLElement>("button[data-tab]")].map((b) => ({ left: b.offsetLeft, width: b.offsetWidth }));
+}
+useResizeObserver(tabRow, measureTabs);
+const pill = computed(() => {
+  const i = EDITOR_TABS.indexOf(activeTab.value);
+  const from = tabRects.value[i];
+  if (!from) return null;
+  const p = swipe.progress.value;
+  const to = tabRects.value[i + (p > 0 ? 1 : -1)];
+  const k = to ? Math.min(Math.abs(p), 1) : 0;
+  return { left: from.left + ((to?.left ?? 0) - from.left) * k, width: from.width + ((to?.width ?? 0) - from.width) * k };
+});
+// Eases with the page; follows the finger exactly while dragging
+const pillTransition = computed(() =>
+  swipe.progress.value !== 0 && !swipe.easing.value ? "none" : `left ${swipe.transition}, width ${swipe.transition}, clip-path ${swipe.transition}`,
+);
+const pillStyle = computed(() =>
+  pill.value ? { left: `${pill.value.left}px`, width: `${pill.value.width}px`, transition: pillTransition.value } : { display: "none" },
+);
+const labelClipStyle = computed(() =>
+  pill.value
+    ? { clipPath: `inset(4px ${tabRowWidth.value - pill.value.left - pill.value.width}px 4px ${pill.value.left}px round 999px)`, transition: pillTransition.value }
+    : { display: "none" },
+);
 const GRID_PANES = ["content", "header", "design"] as const;
 const paneOffset = (pane: EditorTab) => EDITOR_TABS.indexOf(pane) - EDITOR_TABS.indexOf(activeTab.value);
 const paneMounted = (pane: EditorTab) => pane === activeTab.value || (swipeable.value && Math.abs(paneOffset(pane)) === 1);

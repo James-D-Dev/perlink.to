@@ -25,6 +25,7 @@ export function useTabSwipe<T extends string>(
   let tracking = false
   let dx = 0
 
+  const SLIDE = '220ms cubic-bezier(0.22, 1, 0.36, 1)'
   const IGNORE = 'input, textarea, select, [contenteditable="true"], [data-no-swipe], .drag-handle, [role="slider"]'
 
   function scrollsSideways(target: Element, root: HTMLElement) {
@@ -39,11 +40,20 @@ export function useTabSwipe<T extends string>(
 
   const neighbour = (step: 1 | -1) => tabs.value[tabs.value.indexOf(active.value) + step]
 
+  /**
+   * How far the strip is towards the next tab (1) or the previous one (-1),
+   * and whether it is easing there: a tab bar indicator follows this
+   */
+  const progress = ref(0)
+  const easing = ref(false)
+
   function setOffset(x: number, animate: boolean) {
     const el = area.value
     if (!el) return
-    el.style.transition = animate ? 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none'
+    el.style.transition = animate ? `transform ${SLIDE}` : 'none'
     el.style.transform = x ? `translate3d(${x}px, 0, 0)` : ''
+    easing.value = animate
+    progress.value = -x / (el.clientWidth + gap)
   }
 
   function onStart(event: TouchEvent) {
@@ -119,4 +129,6 @@ export function useTabSwipe<T extends string>(
     area.value?.removeEventListener('touchend', onEnd)
     area.value?.removeEventListener('touchcancel', onEnd)
   })
+
+  return { progress, easing, transition: SLIDE }
 }
