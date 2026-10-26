@@ -86,7 +86,8 @@
         "content": "Content",
         "design": "Design",
         "settings": "Settings",
-        "header": "Header"
+        "header": "Header",
+        "blog": "Blog"
       },
       "room": {
         "heading": "Your 3D room",
@@ -576,7 +577,9 @@
         "analyticsYear": "1 year of analytics",
         "support": "Priority support",
         "customDomains": "{n} custom domain | {n} custom domains",
-        "analyticsYears": "{n} years of analytics"
+        "analyticsYears": "{n} years of analytics",
+        "posts": "{n} blog posts",
+        "postsUnlimited": "Unlimited blog posts"
       },
       "monthly": "Monthly",
       "annual": "Yearly",
@@ -671,7 +674,11 @@
         },
         "seePlans": "See plans",
         "later": "Not now",
-        "trial": "Try Plus free for 7 days"
+        "trial": "Try Plus free for 7 days",
+        "posts": {
+          "title": "You’ve used your posts",
+          "text": "The {plan} plan publishes more posts, with Pro themes and more."
+        }
       },
       "history": "Payment history",
       "paymentStatus": {
@@ -718,6 +725,50 @@
       "deleteTitle": "Delete this message?",
       "loadFailed": "Couldn't load the guestbook",
       "saveFailed": "Couldn't save"
+    },
+    "blog": {
+      "heading": "Blog",
+      "intro": "Write posts for your site. Readers find them at",
+      "usage": "{n}/{max} posts published (your plan)",
+      "write": "Write a post",
+      "emptyTitle": "No posts yet",
+      "emptyText": "Share news, stories or guides. Each post gets its own page, ready for Google and for sharing.",
+      "untitled": "Untitled",
+      "status": {
+        "draft": "Draft",
+        "published": "Published"
+      },
+      "minutes": "{n} min read",
+      "more": "More",
+      "edit": "Edit",
+      "view": "View",
+      "delete": "Delete",
+      "deleteTitle": "Delete this post?",
+      "deleteText": "\"{title}\" will be removed for good.",
+      "failed": "Something went wrong",
+      "back": "Back to the site",
+      "saving": "Saving…",
+      "saveFailed": "Couldn’t save, will try again",
+      "savedDraft": "Draft saved",
+      "settings": "Post settings",
+      "slug": "Address",
+      "excerpt": "Summary",
+      "excerptHint": "Shown in lists, on Google and in link previews",
+      "unpublish": "Unpublish",
+      "publish": "Publish",
+      "published": "Post published",
+      "unpublished": "Post unpublished",
+      "changeCover": "Change",
+      "removeCover": "Remove cover",
+      "addCover": "Add a cover image",
+      "titlePlaceholder": "Post title",
+      "bodyPlaceholder": "Start writing…",
+      "linkTitle": "Link",
+      "addLink": "Add link",
+      "removeLink": "Remove",
+      "addImage": "Add an image",
+      "uploadFailed": "Couldn’t upload the image",
+      "notFound": "Post not found"
     }
   }
 }

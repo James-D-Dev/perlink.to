@@ -86,7 +86,8 @@
         "content": "Nội dung",
         "design": "Giao diện",
         "settings": "Cài đặt",
-        "header": "Đầu trang"
+        "header": "Đầu trang",
+        "blog": "Blog"
       },
       "room": {
         "heading": "Phòng 3D của bạn",
@@ -576,7 +577,9 @@
         "analyticsYear": "Thống kê 1 năm",
         "support": "Hỗ trợ ưu tiên qua Zalo",
         "customDomains": "{n} tên miền riêng",
-        "analyticsYears": "Thống kê {n} năm"
+        "analyticsYears": "Thống kê {n} năm",
+        "posts": "{n} bài blog",
+        "postsUnlimited": "Blog không giới hạn bài"
       },
       "monthly": "Theo tháng",
       "annual": "Theo năm",
@@ -671,7 +674,11 @@
         },
         "seePlans": "Xem các gói",
         "later": "Để sau",
-        "trial": "Dùng thử Plus 7 ngày miễn phí"
+        "trial": "Dùng thử Plus 7 ngày miễn phí",
+        "posts": {
+          "title": "Bạn đã dùng hết số bài đăng",
+          "text": "Gói {plan} cho bạn đăng nhiều bài hơn, kèm theme Pro và nhiều hơn nữa."
+        }
       },
       "history": "Lịch sử thanh toán",
       "paymentStatus": {
@@ -718,6 +725,50 @@
       "deleteTitle": "Xoá lời chúc này?",
       "loadFailed": "Không tải được sổ lưu bút",
       "saveFailed": "Không lưu được"
+    },
+    "blog": {
+      "heading": "Blog",
+      "intro": "Viết bài cho trang của bạn. Người đọc xem tại",
+      "usage": "Đã đăng {n}/{max} bài (theo gói của bạn)",
+      "write": "Viết bài mới",
+      "emptyTitle": "Chưa có bài viết",
+      "emptyText": "Chia sẻ tin tức, câu chuyện hay hướng dẫn. Mỗi bài có trang riêng, sẵn sàng cho Google và để chia sẻ.",
+      "untitled": "Chưa có tiêu đề",
+      "status": {
+        "draft": "Bản nháp",
+        "published": "Đã đăng"
+      },
+      "minutes": "{n} phút đọc",
+      "more": "Thêm",
+      "edit": "Sửa",
+      "view": "Xem",
+      "delete": "Xoá",
+      "deleteTitle": "Xoá bài viết này?",
+      "deleteText": "\"{title}\" sẽ bị xoá vĩnh viễn.",
+      "failed": "Có lỗi xảy ra",
+      "back": "Về trang",
+      "saving": "Đang lưu…",
+      "saveFailed": "Chưa lưu được, sẽ thử lại",
+      "savedDraft": "Đã lưu nháp",
+      "settings": "Cài đặt bài viết",
+      "slug": "Đường dẫn",
+      "excerpt": "Tóm tắt",
+      "excerptHint": "Hiện trong danh sách bài, trên Google và khi chia sẻ link",
+      "unpublish": "Gỡ bài",
+      "publish": "Đăng bài",
+      "published": "Đã đăng bài",
+      "unpublished": "Đã gỡ bài",
+      "changeCover": "Đổi ảnh",
+      "removeCover": "Bỏ ảnh bìa",
+      "addCover": "Thêm ảnh bìa",
+      "titlePlaceholder": "Tiêu đề bài viết",
+      "bodyPlaceholder": "Bắt đầu viết…",
+      "linkTitle": "Liên kết",
+      "addLink": "Gắn liên kết",
+      "removeLink": "Bỏ",
+      "addImage": "Chèn ảnh",
+      "uploadFailed": "Không tải được ảnh lên",
+      "notFound": "Không tìm thấy bài viết"
     }
   }
 }

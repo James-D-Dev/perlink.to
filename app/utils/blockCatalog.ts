@@ -16,6 +16,7 @@ export const BLOCK_CATALOG: BlockOption[] = [
   { id: 'social', key: 'social', icon: 'i-lucide-at-sign', group: 'content', keywords: 'instagram facebook tiktok zalo youtube mạng xã hội' },
   { id: 'text', key: 'text', icon: 'i-lucide-text', group: 'content', keywords: 'about intro paragraph giới thiệu văn bản đoạn' },
   { id: 'image-album', key: 'imageAlbum', icon: 'i-lucide-images', group: 'content', keywords: 'photo gallery picture ảnh hình album' },
+  { id: 'blog', key: 'blog', icon: 'i-lucide-newspaper', group: 'content', keywords: 'blog post article news story bài viết tin tức nhật ký' },
   { id: 'video', key: 'video', icon: 'i-lucide-clapperboard', group: 'content', keywords: 'youtube tiktok vimeo video clip' },
   { id: 'menu', key: 'menu', icon: 'i-lucide-utensils', group: 'business', keywords: 'price list services rooms thực đơn bảng giá dịch vụ phòng món' },
   { id: 'hours', key: 'hours', icon: 'i-lucide-clock', group: 'business', keywords: 'opening hours giờ mở cửa lịch' },

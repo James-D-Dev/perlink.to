@@ -250,6 +250,10 @@
         "products": {
           "label": "Products",
           "description": "Sell: take orders on the page or link to Shopee, TikTok Shop and more."
+        },
+        "blog": {
+          "label": "Latest posts",
+          "description": "Your newest blog posts, linking to your blog."
         }
       },
       "searchPlaceholder": "Paste a link or search blocks…",
@@ -372,6 +376,14 @@
       "moveUp": "Move up",
       "moveDown": "Move down",
       "add": "Add product"
+    },
+    "blog": {
+      "title": "Latest posts",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. From the blog",
+      "countLabel": "Posts to show",
+      "hint": "Write posts in the Blog tab.",
+      "empty": "No published posts yet — write one in the Blog tab."
     }
   }
 }

@@ -39,6 +39,7 @@ export function emptyBlockData(name: BlockName): BioBlock['data'] {
     case 'text': return { content: '', align: 'left', style: 'plain' }
     case 'form': return { kind: 'booking', fields: { ...FORM_PRESETS.booking } }
     case 'video': return { url: '' }
+    case 'blog': return { count: 3 }
     case 'testimonials': return { items: [] }
     case 'products': return { layout: 'grid', items: [], ordering: true, askAddress: true, payment: 'both' }
     default: return {} as BioBlock['data']

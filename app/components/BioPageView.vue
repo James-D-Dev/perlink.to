@@ -373,6 +373,17 @@
             </div>
           </section>
 
+          <!-- Latest blog posts -->
+          <BioBlogDisplay
+            v-if="block.name === 'blog'"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :username="username"
+            :preview="isPreview"
+            :empty-text="t('blocks.blog.empty')"
+            :card-style="panelStyle"
+            :heading-style="headingStyle"
+          />
           <!-- Booking / contact form -->
           <BioFormDisplay
             v-if="block.name === 'form' && block.id"

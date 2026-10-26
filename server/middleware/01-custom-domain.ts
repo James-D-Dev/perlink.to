@@ -18,6 +18,10 @@ export default defineEventHandler(async (event) => {
   if (!site) {
     return sendRedirect(event, 'https://perlink.to/', 302)
   }
+  // The site's blog lives under its perlink.to address
+  if (path === '/blog' || path.startsWith('/blog/')) {
+    return sendRedirect(event, `https://perlink.to/${site.username}${path}`, 302)
+  }
   if (path !== '/') {
     return sendRedirect(event, `https://perlink.to${path}`, 302)
   }

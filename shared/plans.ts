@@ -22,14 +22,16 @@ export interface PlanLimits {
   removeBranding: boolean
   /** How far back analytics go (what the pricing promises) */
   analyticsDays: number
+  /** Published blog posts per account (Infinity: no limit) */
+  posts: number
 }
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
-  free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30 },
-  starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90 },
-  plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365 },
+  free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50 },
+  starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100 },
+  plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity },
   // Fair limits, so one very large account can't cost more than it pays
-  pro: { sites: 100, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095 },
+  pro: { sites: 100, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095, posts: Infinity },
 }
 
 /**

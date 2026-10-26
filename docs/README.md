@@ -8,6 +8,7 @@ Short notes on how each part works and what has to be set up. Start here.
 | [telegram-notifications.md](telegram-notifications.md) | New orders and requests sent to owners on Telegram | Bot from @BotFather + 3 `NUXT_TELEGRAM_*` secrets, then Superadmin → Settings → Register webhook |
 | [products-and-orders.md](products-and-orders.md) | Products block: store links, ordering on the page, COD / transfer, Inbox | — (transfer needs a VietQR block on the site) |
 | [guestbook.md](guestbook.md) | Visitors leave messages and 3D gifts in front of the room; owner hides or deletes | — |
+| [blog.md](blog.md) | Blog posts per site: Blog tab and editor, /blog pages in the site's look, SEO, RSS, latest-posts block, plan limits | — |
 | [room-tour-video.md](room-tour-video.md) | Vertical 3D room video for TikTok, made in the browser | — |
 | [reports-and-moderation.md](reports-and-moderation.md) | Report a site, Superadmin takedowns, legal pages layout | — |
 | [custom-domains.md](custom-domains.md) | Owners' own domains through Cloudflare for SaaS | Cloudflare for SaaS + domain-router Worker |

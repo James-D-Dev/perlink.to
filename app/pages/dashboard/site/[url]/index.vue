@@ -392,6 +392,11 @@
             />
           </div>
 
+          <!-- Blog Tab -->
+          <div v-if="paneMounted('blog')" class="mx-auto max-w-3xl space-y-4 pt-4" :class="paneClass('blog')" :style="paneStyle('blog')" :inert="activeTab !== 'blog' || undefined">
+            <SiteBlogPosts v-if="existingBio?.username" :username="existingBio.username" :published="!!existingBio.isPublished" />
+          </div>
+
           <!-- Settings Tab -->
           <div v-if="paneMounted('settings')" class="pt-4 max-w-lg mx-auto space-y-6" :class="paneClass('settings')" :style="paneStyle('settings')" :inert="activeTab !== 'settings' || undefined">
             <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
@@ -671,8 +676,8 @@ const previewOpen = ref(false);
 
 const qrOpen = ref(false);
 
-type EditorTab = "content" | "header" | "design" | "room" | "settings";
-const EDITOR_TABS: EditorTab[] = ["content", "header", "design", "room", "settings"];
+type EditorTab = "content" | "header" | "design" | "room" | "blog" | "settings";
+const EDITOR_TABS: EditorTab[] = ["content", "header", "design", "room", "blog", "settings"];
 
 // The open section lives in the URL hash (…/site/james#header), so a reload
 // or a shared link lands on the same section
@@ -749,6 +754,7 @@ const editorTabs = computed(() => [
   { value: "header", label: t("dashboard.editor.tabs.header"), icon: "i-lucide-circle-user-round" },
   { value: "design", label: t("dashboard.editor.tabs.design"), icon: "i-lucide-palette" },
   { value: "room", label: t("dashboard.editor.tabs.room"), icon: "i-lucide-box" },
+  { value: "blog", label: t("dashboard.editor.tabs.blog"), icon: "i-lucide-newspaper" },
   { value: "settings", label: t("dashboard.editor.tabs.settings"), icon: "i-lucide-settings" },
 ]);
 

@@ -12,6 +12,7 @@ export function planFeatures(plan: PlanId, t: Translate) {
     f('basics'),
     f('room'),
   ]
+  list.push(Number.isFinite(limits.posts) ? f('posts', { n: limits.posts }) : f('postsUnlimited'))
   if (limits.proThemes) list.push(f('proThemes'))
   if (limits.customDomain) list.push(f('customDomains', { n: limits.domains }, limits.domains))
   if (limits.removeBranding) list.push(f('removeBranding'))

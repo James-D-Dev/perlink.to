@@ -250,6 +250,10 @@
         "products": {
           "label": "Sản phẩm",
           "description": "Bán hàng: khách đặt ngay trên trang hoặc mua qua Shopee, TikTok Shop."
+        },
+        "blog": {
+          "label": "Bài viết mới",
+          "description": "Những bài blog mới nhất, dẫn tới trang blog của bạn."
         }
       },
       "searchPlaceholder": "Dán link hoặc tìm khối…",
@@ -372,6 +376,14 @@
       "moveUp": "Lên trên",
       "moveDown": "Xuống dưới",
       "add": "Thêm sản phẩm"
+    },
+    "blog": {
+      "title": "Bài viết mới",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "VD: Từ blog",
+      "countLabel": "Số bài hiển thị",
+      "hint": "Viết bài trong tab Blog.",
+      "empty": "Chưa có bài đã đăng — hãy viết bài trong tab Blog."
     }
   }
 }

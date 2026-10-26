@@ -287,7 +287,8 @@ export type BlockName =
   | 'form'
   | 'video'
   | 'testimonials'
-  | 'products';
+  | 'products'
+  | 'blog';
 
 export interface BaseBlock {
   /** Unique per page, so a page can hold several blocks of one type. Older pages get one on load */
@@ -449,6 +450,16 @@ export interface FormBlock extends BaseBlock {
   };
 }
 
+// The site's latest blog posts, linking to perlink.to/<site>/blog
+export interface BlogBlock extends BaseBlock {
+  name: 'blog';
+  data: {
+    title?: string;
+    /** How many posts to show */
+    count?: number;
+  };
+}
+
 // YouTube, Vimeo or TikTok video
 export interface VideoBlock extends BaseBlock {
   name: 'video';
@@ -525,6 +536,7 @@ export type BioBlock =
   | ContactBlock
   | FormBlock
   | VideoBlock
+  | BlogBlock
   | TestimonialsBlock;
 
 export const DEFAULT_OPENING_DAYS: OpeningDay[] = [1, 2, 3, 4, 5, 6, 0].map(day => ({
