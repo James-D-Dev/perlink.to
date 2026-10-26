@@ -95,7 +95,8 @@
         "showFirst": "Hiện Phòng 3D trước",
         "modeOn": "Khách sẽ vào Phòng 3D của bạn trước và có thể chuyển sang trang chỉ với một chạm.",
         "modeOff": "Khách sẽ thấy trang của bạn. Phòng 3D được ẩn cho đến khi bạn bật tùy chọn này.",
-        "shareVideo": "Chia sẻ phòng của bạn"
+        "shareVideo": "Chia sẻ phòng của bạn",
+        "fab": "Phòng 3D"
       },
       "settings": {
         "addressHeading": "Địa chỉ trang",

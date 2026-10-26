@@ -49,7 +49,9 @@
       </section>
     </Transition>
 
+    <!-- The site editor puts its 3D room button here; help opens from the sidebar -->
     <button
+      v-if="!aboveActionBar"
       type="button"
       class="inline-flex size-11 items-center justify-center rounded-full bg-ink text-paper shadow-[0_8px_24px_-6px_rgba(12,11,10,0.35)] transition-transform hover:scale-105"
       :aria-expanded="open"
@@ -62,7 +64,8 @@
 </template>
 
 <script setup lang="ts">
-// The site editor has a sticky action bar at the bottom on small screens
+// The site editor has a sticky action bar at the bottom on small screens,
+// and its own floating button (3D room) instead of this one
 const route = useRoute()
 const { t } = useI18n()
 const aboveActionBar = computed(() => /^\/dashboard\/site\/[^/]+\/?$/.test(route.path))

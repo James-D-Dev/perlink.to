@@ -508,6 +508,19 @@
             </div>
           </template>
         </UModal>
+
+        <!-- Floating shortcut to the 3D room (where the help button sits on
+             other pages; help is still in the sidebar) -->
+        <UButton
+          v-if="existingBio?.username"
+          icon="i-lucide-box"
+          size="lg"
+          :label="t('dashboard.editor.room.fab')"
+          :loading="openingRoom === 'edit'"
+          :disabled="!!openingRoom"
+          class="fixed bottom-20 right-5 z-50 bg-ink pr-4 text-paper shadow-[0_8px_24px_-6px_rgba(12,11,10,0.35)] hover:bg-ink/90 hover:scale-105 lg:bottom-5 print:hidden"
+          @click="openRoomEditor()"
+        />
       </div>
     </template>
   </UDashboardPanel>
