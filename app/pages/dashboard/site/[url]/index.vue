@@ -293,8 +293,9 @@
                   {{ t('dashboard.editor.room.objects', { n: roomModel.objects.length }) }}
                 </p>
               </div>
-              <div>
-                <UButton icon="i-lucide-box" :label="t('dashboard.editor.room.openEditor')" size="sm" :loading="openingRoom" @click="openRoomEditor" />
+              <div class="flex flex-wrap gap-2">
+                <UButton icon="i-lucide-box" :label="t('dashboard.editor.room.openEditor')" size="sm" :loading="openingRoom === 'edit'" :disabled="!!openingRoom" @click="openRoomEditor()" />
+                <UButton icon="i-lucide-clapperboard" color="neutral" variant="outline" :label="t('dashboard.editor.room.shareVideo')" size="sm" :loading="openingRoom === 'video'" :disabled="!!openingRoom" @click="openRoomEditor('video')" />
               </div>
             </div>
           </div>
@@ -1095,17 +1096,18 @@ const roomModel = computed<RoomConfig>({
   },
 });
 
-const openingRoom = ref(false);
+const openingRoom = ref<"edit" | "video" | null>(null);
 
-// Save the page first so the full-screen editor starts from the latest data
-const openRoomEditor = async () => {
+// Save the page first so the full-screen editor starts from the latest data.
+// "video" opens it straight into the room video dialog
+const openRoomEditor = async (mode: "edit" | "video" = "edit") => {
   if (!existingBio.value?.username) return;
-  openingRoom.value = true;
+  openingRoom.value = mode;
   // The room can be furnished before it's switched on for visitors
   if (!bioData.themeConfig.room) bioData.themeConfig = { ...bioData.themeConfig, room: createDefaultRoom() };
   await saveBio({ silent: true });
-  openingRoom.value = false;
-  navigateTo(`/dashboard/room/${existingBio.value.username}`);
+  openingRoom.value = null;
+  navigateTo({ path: `/dashboard/room/${existingBio.value.username}`, query: mode === "video" ? { record: "1" } : {} });
 };
 
 const setPageMode = (mode: PageMode) => {

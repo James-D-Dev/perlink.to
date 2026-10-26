@@ -94,7 +94,8 @@
         "openEditor": "Open 3D editor",
         "showFirst": "Show the 3D room first",
         "modeOn": "Visitors land in your 3D room and can switch to the site with one tap.",
-        "modeOff": "Visitors see your site. The 3D room stays hidden until you turn this on."
+        "modeOff": "Visitors see your site. The 3D room stays hidden until you turn this on.",
+        "shareVideo": "Share a room video"
       },
       "settings": {
         "addressHeading": "Site address",

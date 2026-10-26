@@ -5,8 +5,10 @@ sweeps through the room, the site's name and `perlink.to/<name>` stay on top,
 the room's music plays, and the last second and a half is a "visit my 3D room"
 card. Every video posted is an ad that points back to Perlink.
 
-Where: 3D room editor (`/dashboard/room/<name>`) → toolbar **Quay video chia sẻ**
-(clapperboard icon).
+Where: site editor → **3D room** tab → **Chia sẻ video phòng** on the "Your 3D
+room" card. It saves the page and opens the 3D room editor with
+`?record=1`, which opens the video dialog straight away (`autoRecord` on
+RoomStudio; the flag is removed from the address).
 
 ## How it works
 

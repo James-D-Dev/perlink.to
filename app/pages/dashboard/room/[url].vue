@@ -21,6 +21,7 @@
       :username="bioPage.username"
       :site-name="bioPage.title || bioPage.username"
       :products="products"
+      :auto-record="autoRecord"
       :shop-accent="bioPage.themeConfig.colors?.primary"
       @back="goBack"
       @save="save()"
@@ -44,6 +45,10 @@ const route = useRoute()
 const toast = useToast()
 const { t } = useI18n()
 const username = computed(() => route.params.url as string)
+// ?record=1 (from the site editor's "Share a room video") opens the video
+// dialog right away; the flag is dropped from the address so a reload doesn't
+const autoRecord = route.query.record === '1'
+if (autoRecord && import.meta.client) navigateTo({ path: route.path, query: {} }, { replace: true })
 
 useHead({ title: () => t('room.page.title', { name: username.value }) })
 

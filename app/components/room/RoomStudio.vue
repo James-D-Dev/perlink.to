@@ -46,11 +46,6 @@
             @click="room = { ...room, guestbook: room.guestbook === false }"
           />
         </UTooltip>
-        <UTooltip v-if="username" :text="t('room.tour.button')">
-          <UButton icon="i-lucide-clapperboard" color="neutral" variant="ghost" :aria-label="t('room.tour.button')" @click="tourOpen = true">
-            <span class="hidden lg:inline">{{ t('room.tour.buttonShort') }}</span>
-          </UButton>
-        </UTooltip>
         <UTooltip :text="dirty ? t('room.toolbar.unsaved') : t('room.toolbar.allSaved')">
           <UButton icon="i-lucide-save" :loading="saving" color="neutral" variant="soft" class="relative" @click="emit('save')">
             <span class="hidden sm:inline">{{ t('common.save') }}</span>
@@ -591,15 +586,21 @@ const props = defineProps<{
   siteName?: string
   /** Products from the site's products block, for product stands */
   products?: ShopProduct[]
+  /** Open the room video dialog as soon as the editor is up */
+  autoRecord?: boolean
   shopAccent?: string
 }>()
 
 const productOptions = computed(() => (props.products ?? []).map(p => ({ value: p.id, label: p.name })))
 
-// Room video (RoomTourRecorder). While it records, the editor's scene
+// Room video (RoomTourRecorder), opened from the site editor's "Share a room
+// video" (autoRecord). While it records, the editor's scene
 // pauses so the recording gets the whole GPU, and the controls hide
 const tourOpen = ref(false)
 const recordingVideo = ref(false)
+onMounted(() => {
+  if (props.autoRecord && props.username) tourOpen.value = true
+})
 function onRecordingVideo(active: boolean) {
   recordingVideo.value = active
   canvasRef.value?.setPaused(active)
