@@ -6,17 +6,26 @@ the room's music plays, and the last second and a half is a "visit my 3D room"
 card. Every video posted is an ad that points back to Perlink.
 
 Where: site editor → **3D room** tab → **Chia sẻ video phòng** on the "Your 3D
-room" card. It saves the page and opens the 3D room editor with
-`?record=1`, which opens the video dialog straight away (`autoRecord` on
-RoomStudio; the flag is removed from the address).
+room" card (a gradient button whose icon cycles through the Facebook, TikTok,
+YouTube, Instagram and X logos — `SocialCycleIcon.vue`). It saves the page and
+opens the 3D room editor with `?record=1`, which opens the video studio
+straight away (`autoRecord` on RoomStudio; the flag is removed from the
+address).
+
+The studio is a full-screen view over the paused editor, not a dialog: it
+can't be dismissed by tapping outside or Escape. **Quay lại** (Back) closes it
+and returns to the site editor (asking first if the room has unsaved
+changes).
 
 ## How it works
 
 Everything happens in the browser; nothing is uploaded.
 
 ```
-RoomTourRecorder.vue (modal)
+RoomTourRecorder.vue (full-screen studio)
+  ├─ setup: still = editor snapshot in the video's light, cropped to 9:16 + titles
   ├─ hidden 540×960 box ──► RoomScene({ capture: true })     pixel ratio 2 → 1080×1920
+  │                          made when recording starts, disposed when it ends
   │                          renderTour(progress) → WebGL canvas
   ├─ <canvas 1080×1920> ◄── drawFrame(p): copy the WebGL frame, then draw
   │                          title, perlink.to pill, watermark, end card
@@ -32,19 +41,25 @@ RoomTourRecorder.vue (modal)
 - **Capture mode** (`RoomSceneOptions.capture`): best quality, fixed 2× pixel
   ratio, no adaptive downgrade, controls off, and the scene draws no frames of
   its own. The recorder draws each frame, so timing follows the recording.
-- **While recording:** the dialog steps aside, the editor hides every
-  control (`recordingVideo` in RoomStudio) and pauses its own scene
-  (`RoomScene.setPaused`), and the frame being recorded shows full height with
-  a status bar (red dot, 0:05 / 0:12, progress, Cancel). When done the dialog
-  comes back with the video; Cancel returns to the options.
+- **Preview without a second 3D scene:** while setting up, the frame shows a
+  still of the editor's own view (`RoomCanvas.snapshot(light)`, taken in the
+  same day/night light the video uses) with the titles drawn over it. The
+  recording scene exists only while recording. The still can look a little
+  plainer than the video at night: the editor may run at a lower quality
+  tier, where fewer lamps cast real light.
+- **While the studio is open** the editor hides every control and pauses its
+  own scene (`RoomScene.setPaused`). While recording, the frame being
+  recorded shows with a status bar (red dot, 0:05 / 0:12, progress) and
+  Cancel; when done the video plays in the frame with Share, Download, the
+  caption, Back and Record again.
 - **Smoothness:** frames are drawn at 30 fps and pushed to the video with
   `captureStream(0)` + `requestFrame()` (fixed-rate capture where that isn't
-  supported); the dialog preview stops while recording.
+  supported).
 - **Sound:** the track is fetched and decoded up front and played by Web Audio
   (`AudioBufferSourceNode`), so main-thread hiccups can't make it skip; a quiet
   intro is skipped and the fade-out is scheduled ahead.
 - **Before recording:** waits up to 6 s for objects still loading (`scene.loading`).
-- **Options:** title text (no label, placeholder only) and three icon buttons at the bottom: day/night, length (8/12/15 s, tap to cycle), music on/off.
+- **Options:** title text (no label, placeholder only) and three icon buttons: day/night, length (8/12/15 s, tap to cycle), music on/off. Then [Back] [Record].
 - **Watermark:** a small "Tạo bằng Perlink" in the corner on plans without
   `removeBranding` (Free, Starter). Plus and Pro have none.
 - **Share:** on phones `navigator.share({ files })` opens the share sheet, so
@@ -53,9 +68,10 @@ RoomTourRecorder.vue (modal)
 
 | File | Role |
 |---|---|
-| `app/components/room/RoomTourRecorder.vue` | Modal, drawing, recording, download/share |
-| `app/utils/room/RoomScene.ts` | `capture` option, `renderTour()`, `loading` |
-| `app/components/room/RoomStudio.vue` | Toolbar button, mounts the recorder |
+| `app/components/room/RoomTourRecorder.vue` | Full-screen studio, drawing, recording, download/share |
+| `app/utils/room/RoomScene.ts` | `capture` option, `renderTour()`, `loading`, `snapshot(light)` |
+| `app/components/room/RoomStudio.vue` | Mounts the recorder, gives it the still, pauses the editor, goes back on close |
+| `app/components/room/SocialCycleIcon.vue` | Cycling social logos on the site editor's button |
 | `i18n/locales/*/room.json` → `room.tour` | Texts |
 
 ## Notes

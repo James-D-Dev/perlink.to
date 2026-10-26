@@ -1,6 +1,6 @@
 <template>
   <!-- While a video records, every control above the scene is hidden -->
-  <div class="fixed inset-0 select-none overflow-hidden bg-slate-900 [touch-action:pan-x_pan-y] max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base" :class="recordingVideo && '[&>*:not(:first-child)]:invisible'">
+  <div class="fixed inset-0 select-none overflow-hidden bg-slate-900 [touch-action:pan-x_pan-y] max-sm:[&_input]:text-base max-sm:[&_textarea]:text-base" :class="tourOpen && '[&>*:not(:first-child)]:invisible'">
     <!-- Scene -->
     <div class="absolute inset-0">
       <RoomCanvas
@@ -557,7 +557,7 @@
     >
       {{ t('room.hint.firstRun') }}
     </p>
-    <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" @recording="onRecordingVideo" />
+    <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" :still="videoStill" />
   </div>
 </template>
 
@@ -568,7 +568,7 @@ import { ROOM_CATALOG, CATALOG_BY_TYPE, CATEGORY_LABELS, preloadDungeonModels, t
 import type { ShopProduct } from '~/utils/room/productCard'
 import type { ObjectPatch } from '~/utils/room/RoomScene'
 import { createFloorTexture } from '~/utils/room/RoomScene'
-import { getDaylight } from '~/utils/room/daylight'
+import { getDaylight, type DaylightState } from '~/utils/room/daylight'
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
 import { ROOM_MUSIC, MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 import { LANDS } from '~/utils/room/lands'
@@ -594,16 +594,22 @@ const props = defineProps<{
 const productOptions = computed(() => (props.products ?? []).map(p => ({ value: p.id, label: p.name })))
 
 // Room video (RoomTourRecorder), opened from the site editor's "Share a room
-// video" (autoRecord). While it records, the editor's scene
-// pauses so the recording gets the whole GPU, and the controls hide
+// video" (autoRecord). While it's open the editor's scene pauses so the
+// recording gets the whole GPU, and the controls hide. Closing it goes back
+// to where it was opened from.
 const tourOpen = ref(false)
-const recordingVideo = ref(false)
 onMounted(() => {
   if (props.autoRecord && props.username) tourOpen.value = true
 })
-function onRecordingVideo(active: boolean) {
-  recordingVideo.value = active
-  canvasRef.value?.setPaused(active)
+watch(tourOpen, (open, wasOpen) => {
+  canvasRef.value?.setPaused(open)
+  if (wasOpen && !open && props.autoRecord) emit('back')
+})
+/** The video preview: a picture of the editor's view, once its models are in */
+async function videoStill(light: DaylightState) {
+  const until = performance.now() + 6000
+  while ((!canvasRef.value || canvasRef.value.isLoading()) && performance.now() < until) await new Promise(r => setTimeout(r, 150))
+  return canvasRef.value?.snapshot(light, 1400) ?? null
 }
 
 const emit = defineEmits<{
@@ -622,7 +628,7 @@ const styleName = (name: string) => label(`room.styles.${name.toLowerCase().repl
 
 type Tab = CatalogCategory | 'room' | 'land' | 'time' | 'music'
 
-const canvasRef = ref<{ snapshot: () => Promise<Blob | null>; resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; setPaused: (paused: boolean) => void; ridersOf: (id: string) => string[]; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
+const canvasRef = ref<{ snapshot: (light?: number | DaylightState, maxWidth?: number) => Promise<Blob | null>; isLoading: () => boolean; resetView: () => void; zoomBy: (factor: number) => void; focusObject: (id: string) => void; setPaused: (paused: boolean) => void; ridersOf: (id: string) => string[]; getDropTarget: (x: number, y: number, wall: boolean) => { position: [number, number, number]; wall?: WallSide } | null } | null>(null)
 const barRef = ref<HTMLElement | null>(null)
 const selectedId = ref<string | null>(null)
 const activeTab = ref<Tab>('furniture')

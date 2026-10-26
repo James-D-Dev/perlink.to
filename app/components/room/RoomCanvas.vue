@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import type { RoomConfig, WallSide } from '~/types/room'
 import { RoomScene, type ObjectPatch, type RoomSceneStats } from '~/utils/room/RoomScene'
-import { daylightAtHour, getDaylight } from '~/utils/room/daylight'
+import { daylightAtHour, getDaylight, type DaylightState } from '~/utils/room/daylight'
 import type { GuestGiftType } from '#shared/guestbook'
 import type { ShopProduct } from '~/utils/room/productCard'
 
@@ -91,8 +91,12 @@ function applyPreview() {
 }
 
 defineExpose({
-  snapshot() {
-    return scene?.snapshot() ?? Promise.resolve(null)
+  snapshot(light?: number | DaylightState, maxWidth?: number) {
+    return scene?.snapshot(light, maxWidth) ?? Promise.resolve(null)
+  },
+  /** true while models are still loading */
+  isLoading() {
+    return !!scene?.loading
   },
   resetView() {
     scene?.resetView()

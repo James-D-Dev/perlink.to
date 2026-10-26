@@ -278,6 +278,7 @@
       "product-stand": "Kệ sản phẩm"
     },
     "tour": {
+      "back": "Quay lại",
       "title": "Video phòng 3D",
       "caption": "Tiêu đề trên video",
       "day": "Ban ngày",
@@ -297,7 +298,7 @@
       "postText": "Ghé thăm phòng 3D của mình nè ✨ {link}\n#perlink #phong3d #roomtour #aesthetic",
       "copy": "Sao chép",
       "copied": "Đã sao chép",
-      "again": "Quay lại",
+      "again": "Quay video khác",
       "madeWith": "Tạo bằng Perlink",
       "visit": "Ghé phòng 3D của mình 👇",
       "recordingNow": "Đang quay video",

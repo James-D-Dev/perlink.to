@@ -317,21 +317,24 @@ export class RoomScene {
     this.syncObjects(room.objects)
   }
 
-  /** Picture of the current view for the site's thumbnail, without the selection box */
-  snapshot(): Promise<Blob | null> {
+  /**
+   * Picture of the current view (site thumbnail, room video preview), without
+   * the selection box, lit at the given hour or light (midday by default)
+   */
+  snapshot(light: number | DaylightState = 12, maxWidth = 960): Promise<Blob | null> {
     const boxWasVisible = this.selectionBox.visible
     this.selectionBox.visible = false
     // Always pictured at midday, whatever the time is now; the next frame
     // eases back from the light that was showing
     const shownBefore = this.shownDaylight
     this.shownDaylight = null
-    this.applyDaylight(daylightAtHour(12))
+    this.applyDaylight(typeof light === 'number' ? daylightAtHour(light) : light)
     this.land?.update(this.clock.elapsedTime, 0, this.shownDaylight ?? 1, this.lamps)
     this.renderer.render(this.scene, this.camera)
     this.shownDaylight = shownBefore
     // Copy the frame now, before the WebGL buffer is cleared, at thumbnail size
     const source = this.renderer.domElement
-    const width = Math.min(960, source.width)
+    const width = Math.min(maxWidth, source.width)
     const small = document.createElement('canvas')
     small.width = width
     small.height = Math.round(source.height * (width / source.width))
