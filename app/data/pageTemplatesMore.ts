@@ -186,8 +186,49 @@ const GIFT_TEMPLATES: PageTemplate[] = [
   },
 ]
 
+// ─── Personal blog ───────────────────────────────────────────────
+const BLOG_TEMPLATE: PageTemplate = {
+  id: 'blog',
+  name: 'Personal blog',
+  category: 'personal',
+  description: 'Your writing up front: an intro, your latest posts and a blog board in your 3D room.',
+  icon: 'i-lucide-newspaper',
+  preview: { bg: '#FBF8F3', accent: '#B5543B' },
+  build: () => ({
+    title: s('Your Name', 'Tên của bạn'),
+    bio: s('Notes on books, travel and slow living.', 'Ghi chép về sách, những chuyến đi và sống chậm.'),
+    avatarUrl: photo('personal-avatar'),
+    themeConfig: look({
+      bg: '#FBF8F3', text: '#1F1B16', accent: '#B5543B', onAccent: '#FFFFFF',
+      surface: '#FFFFFF', radius: 18,
+      nameFont: 'Cormorant Garamond, serif', nameWeight: '600', nameSize: '2.25rem', tracking: '-0.01em',
+      header: 'centered', link: 'centered', social: 'plain',
+    }),
+    blocks: withIndex([
+      { name: 'text', data: { title: s('Hello, I\'m glad you\'re here', 'Chào bạn, rất vui vì bạn ghé'), content: s('I write about the books I read, the places I go and the small things that make a day good. New posts every week.', 'Mình viết về những cuốn sách đã đọc, những nơi đã đi và những điều nhỏ làm nên một ngày đẹp. Mỗi tuần một bài mới.'), align: 'center', style: 'plain' } },
+      { name: 'blog', data: { title: s('Latest posts', 'Bài viết mới'), count: 5 } },
+      { name: 'social', data: { links: social('instagram', 'threads', 'facebook') } },
+    ] as Blocks),
+    room: room({ wallColor: '#efe6d8', floorColor: '#8a6a4a', floorMaterial: 'wood', trimColor: '#ffffff' }, [
+      { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#B5543B' },
+      { type: 'bookshelf', position: [-1.9, 0, -2.8], rotation: 0 },
+      { type: 'bookshelf', position: [2.2, 0, -2.8], rotation: 0 },
+      { type: 'desk', position: [-3, 0, 0.4], rotation: 90, color: '#6b4a32' },
+      { type: 'laptop', position: [-3, DESK_TOP, 0.4], rotation: 90 },
+      { type: 'desk-lamp', position: [-3.05, DESK_TOP, -0.2], rotation: 90, color: '#B5543B' },
+      { type: 'sofa', position: [0.6, 0, 0.9], rotation: 180, color: '#c9b79c' },
+      { type: 'rug', position: [0.4, 0, 0.2], rotation: 0, color: '#B5543B' },
+      { type: 'floor-lamp', position: [2.5, 0, 1.4], rotation: 0 },
+      { type: 'plant', position: [2.5, 0, -1.6], rotation: 0 },
+      { type: 'coffee-table', position: [0.4, 0, -0.3], rotation: 0, color: '#6b4a32' },
+      { type: 'mug', position: [0.4, COFFEE_TABLE_TOP, -0.3], rotation: 0 },
+    ]),
+  }),
+}
+
 export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
   ...GIFT_TEMPLATES,
+  BLOG_TEMPLATE,
   // ─── Beauty ───────────────────────────────────────────────────
   {
     id: 'spa',

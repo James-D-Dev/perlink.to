@@ -383,6 +383,10 @@
       "gift-love": {
         "name": "Love room",
         "description": "Surprise your partner with a 3D room of your photos, music and a love letter."
+      },
+      "blog": {
+        "name": "Personal blog",
+        "description": "Your writing up front: an intro, your latest posts and a blog board in your 3D room."
       }
     },
     "categories": {

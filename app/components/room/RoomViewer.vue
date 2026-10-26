@@ -288,7 +288,7 @@
 
     <!-- Links in the room (also keyboard / screen-reader friendly) -->
     <div class="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 p-4">
-      <div v-if="linkedObjects.length" class="flex max-w-full gap-2 overflow-x-auto scroll-fade-x pb-1 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
+      <div v-if="linkedObjects.length || hasBlogBoard" class="flex max-w-full gap-2 overflow-x-auto scroll-fade-x pb-1 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
         <a
           v-for="obj in linkedObjects"
           :key="obj.id"
@@ -300,9 +300,17 @@
           <UIcon :name="iconFor(obj.type)" class="size-4" />
           {{ obj.link!.label || hostOf(obj.link!.url) }}
         </a>
+        <NuxtLink
+          v-if="hasBlogBoard && username"
+          :to="`/${username}/blog`"
+          class="flex shrink-0 items-center gap-1.5 rounded-full bg-white/85 px-3 py-1.5 text-sm font-medium text-gray-800 shadow backdrop-blur transition hover:bg-white"
+        >
+          <UIcon name="i-lucide-newspaper" class="size-4" />
+          {{ t('blog') }}
+        </NuxtLink>
       </div>
       <p class="rounded-full bg-black/30 px-3 py-1 text-xs text-white/90 backdrop-blur">
-        Drag to look around · click objects to open
+        {{ t('roomHint') }}
       </p>
       <SiteMadeWith v-if="branding && username" :username="username" :lang="lang" variant="pill" />
       <p v-if="track && musicOn" class="text-[10px] text-white/60">
@@ -426,6 +434,8 @@ onBeforeUnmount(() => {
 })
 
 const linkedObjects = computed(() => props.room.objects.filter(o => o.link?.url))
+/** A blog board in the room: its blog is also one tap away below */
+const hasBlogBoard = computed(() => props.room.objects.some(o => CATALOG_BY_TYPE[o.type]?.opensBlog))
 
 function iconFor(type: string) {
   return CATALOG_BY_TYPE[type]?.icon || 'i-lucide-link'
@@ -449,6 +459,7 @@ function onHover(id: string | null, x: number, y: number) {
   const product = obj?.productId ? shopById.value.get(obj.productId)?.product : undefined
   if (product) hovered.value = { label: product.price ? `${product.name} · ${formatVnd(product.price)}` : product.name, x, y }
   else if (obj?.image) hovered.value = { label: t('viewPhoto'), x, y }
+  else if (obj && CATALOG_BY_TYPE[obj.type]?.opensBlog) hovered.value = { label: t('blog'), x, y }
   else hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y, external: true } : null
 }
 
@@ -466,6 +477,11 @@ function onActivate(id: string) {
   if (obj?.image) {
     photo.value = obj
     hovered.value = null
+    return
+  }
+  // The blog board opens the site's blog
+  if (obj && CATALOG_BY_TYPE[obj.type]?.opensBlog && props.username) {
+    navigateTo(`/${props.username}/blog`)
     return
   }
   if (obj?.link?.url) window.open(safeUrl(obj.link.url), '_blank', 'noopener,noreferrer')

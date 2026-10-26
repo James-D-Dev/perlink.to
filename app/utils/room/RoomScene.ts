@@ -1094,7 +1094,7 @@ export class RoomScene {
     }
     const id = this.pickObject(e.clientX, e.clientY)
     const data = id ? this.entries.get(id)?.data : undefined
-    const clickable = !!(data?.link?.url || data?.image || (data?.productId && this.products.has(data.productId)))
+    const clickable = !!(data?.link?.url || data?.image || (data?.productId && this.products.has(data.productId)) || (data && CATALOG_BY_TYPE[data.type]?.opensBlog))
     const rect = this.renderer.domElement.getBoundingClientRect()
     const guestId = clickable ? null : this.pickGuest(e.clientX, e.clientY)
     if (guestId !== this.hoveredGuest || guestId) {

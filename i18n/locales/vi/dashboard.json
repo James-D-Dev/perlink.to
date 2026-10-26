@@ -383,6 +383,10 @@
       "gift-love": {
         "name": "Phòng tặng người yêu",
         "description": "Tạo bất ngờ cho người ấy: phòng 3D với ảnh hai bạn, nhạc và một lá thư tình."
+      },
+      "blog": {
+        "name": "Blog cá nhân",
+        "description": "Bài viết của bạn là trọng tâm: lời giới thiệu, bài mới nhất và bảng tin blog trong phòng 3D."
       }
     },
     "categories": {

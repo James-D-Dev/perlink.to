@@ -45,7 +45,13 @@ Published posts per account (all its sites): Free 50, Starter 100, Plus and
 Pro unlimited (`PLAN_LIMITS[plan].posts`). Publishing past the limit shows
 the upgrade prompt.
 
-## Next
+## In the 3D room
 
-A bookshelf / notice board in the 3D room that opens the blog, and a
-"Personal blog" template.
+The **Blog board** (catalog `blog-board`, Wall category, `opensBlog`) is a
+cork board with "BLOG" on it: hovering shows "Blog", clicking opens
+`/<site>/blog`, and a "Blog" chip appears under the room.
+
+## Template
+
+**Personal blog** (`blog`, Personal category): an intro, the latest 5 posts,
+socials, and a reading-nook room with the blog board on the wall.

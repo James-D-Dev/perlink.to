@@ -37,6 +37,8 @@ export interface CatalogItem {
   photo?: { width: number; height: number; center: [number, number, number] }
   /** Area that shows a product card (photo, name, price) from the site's products block */
   productCard?: { width: number; height: number; center: [number, number, number] }
+  /** Clicking it in the room opens the site's blog */
+  opensBlog?: boolean
   build: (color: string) => THREE.Group
 }
 
@@ -492,6 +494,55 @@ export const ROOM_CATALOG: CatalogItem[] = [
       sun.userData.placeholder = true
       art.add(painting, sun)
       return art
+    },
+  },
+  {
+    // A notice board: clicking it in the room opens the site's blog
+    type: 'blog-board',
+    name: 'Blog board',
+    icon: 'i-lucide-newspaper',
+    category: 'wall',
+    defaultColor: '#e76f51',
+    wallMounted: true,
+    opensBlog: true,
+    build: (color) => {
+      const board = new THREE.Group()
+      board.add(box(1.0, 0.76, 0.04, mat('#6b4a32'), 0, -0.38))
+      board.add(box(0.9, 0.66, 0.02, mat('#c9a47c', { roughness: 0.95 }), 0, -0.33, 0.025))
+      // "BLOG" on a coloured header
+      const header = box(0.46, 0.13, 0.012, mat(color), 0, 0.12, 0.04)
+      board.add(header)
+      if (typeof document !== 'undefined') {
+        const canvas = document.createElement('canvas')
+        canvas.width = 256
+        canvas.height = 72
+        const ctx = canvas.getContext('2d')!
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 52px system-ui, sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText('BLOG', 128, 38)
+        const texture = new THREE.CanvasTexture(canvas)
+        texture.colorSpace = THREE.SRGBColorSpace
+        const label = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.118), new THREE.MeshBasicMaterial({ map: texture, transparent: true }))
+        label.position.set(0, 0.185, 0.047)
+        board.add(label)
+      }
+      // Pinned notes
+      const notes: [number, number, number, string][] = [
+        [-0.26, -0.2, 0.08, '#fff7cc'],
+        [0.02, -0.24, -0.05, '#ffffff'],
+        [0.28, -0.18, 0.1, '#dff3ff'],
+        [-0.12, -0.02, -0.06, '#ffe1e7'],
+        [0.2, 0.0, 0.04, '#fff7cc'],
+      ]
+      for (const [x, y, tilt, paper] of notes) {
+        const note = box(0.2, 0.17, 0.004, mat(paper), x, y - 0.085, 0.037)
+        note.rotation.z = tilt
+        board.add(note)
+        board.add(sphere(0.013, mat(color), x, y + 0.06, 0.043))
+      }
+      return board
     },
   },
   {
