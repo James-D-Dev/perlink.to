@@ -52,11 +52,11 @@ export const PRO_ON_SALE = false
 /** Whether a plan can be bought online right now */
 export const onSale = (plan: PaidPlanId) => plan !== 'pro' || PRO_ON_SALE
 
-/** Prices in VND; a year costs ten months */
+/** Prices in VND, in line with the USD ones (about 25,000đ a dollar); a year costs ten months */
 export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
-  starter: { monthly: 49_000, annual: 490_000 },
-  plus: { monthly: 99_000, annual: 990_000 },
-  pro: { monthly: 249_000, annual: 2_490_000 },
+  starter: { monthly: 150_000, annual: 1_500_000 },
+  plus: { monthly: 300_000, annual: 3_000_000 },
+  pro: { monthly: 750_000, annual: 7_500_000 },
 }
 
 /**
@@ -66,12 +66,13 @@ export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
  * (PLAN_PRICES) until an international payment method is added.
  */
 export const PLAN_PRICES_USD: Record<PaidPlanId, Record<BillingPeriod, number>> = {
-  starter: { monthly: 5.99, annual: 59.9 },
-  plus: { monthly: 11.99, annual: 119.9 },
-  pro: { monthly: 29.99, annual: 299.9 },
+  starter: { monthly: 6, annual: 60 },
+  plus: { monthly: 12, annual: 120 },
+  pro: { monthly: 30, annual: 300 },
 }
 
-export const formatUsd = (amount: number) => `$${amount.toFixed(2)}`
+/** Whole dollars as "$6", anything else with cents */
+export const formatUsd = (amount: number) => `$${Number.isInteger(amount) ? amount : amount.toFixed(2)}`
 
 export const PERIOD_MONTHS: Record<BillingPeriod, number> = { monthly: 1, annual: 12 }
 
