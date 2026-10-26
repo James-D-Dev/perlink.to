@@ -69,9 +69,15 @@ interface ObjectEntry {
 
 /** Quality steps used by the adaptive renderer, best first */
 const QUALITY_LEVELS = [
+  // Desktop
   { pixelRatio: 2, shadowSize: 2048, shadows: true },
-  { pixelRatio: 1.5, shadowSize: 2048, shadows: true },
+  // Phones start here: sharp on 3x screens at about half the pixels of 2x;
+  // smaller shadow maps pay for it
+  { pixelRatio: 1.75, shadowSize: 1024, shadows: true },
+  // Steps down gently on devices that can't keep up
+  { pixelRatio: 1.5, shadowSize: 1024, shadows: true },
   { pixelRatio: 1.25, shadowSize: 1024, shadows: true },
+  // Small previews
   { pixelRatio: 1, shadowSize: 1024, shadows: true },
 ]
 /** Widest zoom (camera distance from the room) */
@@ -278,10 +284,10 @@ export class RoomScene {
     this.renderer.domElement.addEventListener('pointerleave', this.handlePointerLeave)
     this.renderer.domElement.addEventListener('pointercancel', this.handlePointerCancel)
 
-    // Phones, low-memory devices and previews start at a lighter quality level
+    // Phones and low-memory devices start a step or two lighter, previews lightest
     const coarse = window.matchMedia?.('(pointer: coarse)').matches
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
-    this.quality = options.capture ? 0 : options.preview ? 3 : coarse || memory < 4 ? 2 : 0
+    this.quality = options.capture ? 0 : options.preview ? QUALITY_LEVELS.length - 1 : memory < 4 ? 2 : coarse ? 1 : 0
     if (options.capture) this.controls.enabled = false
     this.applyQuality()
 
@@ -625,8 +631,9 @@ export class RoomScene {
 
   private buildOutdoor(landId: LandId, style: RoomStyle) {
     this.clearGroup(this.outdoor)
-    // Lighter scenery on devices that start at a reduced quality level (phones, low memory)
-    this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS, detail: this.quality >= 2 ? 0.55 : 1 })
+    // Lighter scenery on devices that start at a reduced quality level: a
+    // little on phones, more on low-memory devices and previews
+    this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS, detail: this.quality >= 2 ? 0.55 : this.quality === 1 ? 0.8 : 1 })
     this.outdoor.add(this.land.group)
     this.updateRoomFlowers()
     this.placeGuests()
