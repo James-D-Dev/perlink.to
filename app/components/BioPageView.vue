@@ -1,16 +1,19 @@
 <template>
   <!-- Default text color matches the light site, so previews inside the dark dashboard read the same -->
   <div class="min-h-full relative" :style="[{ color: '#334155' }, pageStyle]">
-    <!-- Share Button (Fixed Top Right) -->
+    <!-- Share: a round glass button at the top right (iOS 26 style, like the
+         dashboard's buttons) -->
     <UButton
       v-if="theme.showShare"
+      color="neutral"
+      variant="outline"
+      size="xl"
+      icon="i-lucide-share"
+      square
+      class="fixed right-4 top-[calc(1rem+env(safe-area-inset-top))] z-50 text-[#1c1a17] shadow-[inset_0_1px_0_rgb(255_255_255/0.85),0_10px_30px_-8px_rgb(0_0_0/0.3)]"
+      :aria-label="siteT(siteLang, 'sharePage')"
       @click="sharePage"
-      class="fixed top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200"
-:aria-label="siteT(siteLang, 'sharePage')"
-      variant="soft"
-    >
-      <UIcon name="i-uil-share" class="w-5 h-5 text-gray-700" />
-    </UButton>
+    />
 
     <!-- Background layer (separate element so backdrop-filter on cards works) -->
     <!-- <div class="absolute inset-0" :style="bgLayerStyle" /> -->
@@ -410,7 +413,7 @@
       </div>
 
       <!-- Footer: the "Made with Perlink" card (free plans) and, on every live page, a way to report it -->
-      <div v-if="mode !== 'preview' && mode !== 'thumbnail'" class="mt-14 flex flex-col items-center gap-3 px-4">
+      <div v-if="mode !== 'preview' && mode !== 'thumbnail'" class="mt-14 flex flex-col items-center gap-3 px-4" :class="footerSpace && 'pb-20'">
         <SiteMadeWith v-if="bioData?.showBranding !== false" :username="username" :lang="siteLang" />
         <a
           :href="`https://perlink.to/report?site=${encodeURIComponent(username)}`"
@@ -499,6 +502,8 @@ const props = defineProps<{
   mode: string;
   /** Editor preview: the block being edited, drawn with an outline */
   activeBlockId?: string | null;
+  /** Room under the footer for a floating button (the live page's "3D room") */
+  footerSpace?: boolean;
 }>();
 
 const emit = defineEmits<{ selectBlock: [blockId: string] }>();

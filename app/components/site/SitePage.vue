@@ -88,11 +88,16 @@
         :bio-data="bioPageAsBioData"
         :username="bioPage.username"
         mode="view"
+        :footer-space="!!room && show2d"
       />
+      <!-- Back to the 3D room: a floating glass capsule (iOS 26 style, like
+           the dashboard's buttons), bottom right -->
       <UButton
         v-if="room && show2d"
-        class="fixed bottom-4 left-4 z-50 shadow-lg"
+        class="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 z-50 px-4 font-semibold text-[#1c1a17] shadow-[inset_0_1px_0_rgb(255_255_255/0.85),0_10px_30px_-8px_rgb(0_0_0/0.3)]"
         color="neutral"
+        variant="outline"
+        size="xl"
         icon="i-lucide-box"
         :label="siteT(siteLang, 'room3d')"
         @click="show2d = false"
