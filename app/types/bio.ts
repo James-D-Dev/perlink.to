@@ -268,6 +268,8 @@ export interface ThemeConfig {
   presetId?: string;
   /** '3d' shows the page as an interactive mini room */
   pageMode?: PageMode;
+  /** On a page that opens in 2D: a "3D room" button that opens the room */
+  roomButton?: boolean;
   room?: RoomConfig;
 }
 

@@ -94,9 +94,11 @@
         "openEditor": "Decorate your room",
         "showFirst": "Show the 3D room first",
         "modeOn": "Visitors land in your 3D room and can switch to the site with one tap.",
-        "modeOff": "Visitors see your site. The 3D room stays hidden until you turn this on.",
+        "modeOff": "Visitors see your page first.",
         "shareVideo": "Share your room",
-        "fab": "3D room"
+        "fab": "3D room",
+        "button": "\"3D room\" button on the page",
+        "buttonText": "A button in the corner that takes visitors into your 3D room."
       },
       "settings": {
         "addressHeading": "Site address",

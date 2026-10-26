@@ -365,6 +365,16 @@
               <USwitch :model-value="pageMode === '3d'" @update:model-value="setPageMode($event ? '3d' : '2d')" />
             </div>
 
+            <!-- Pages that open in 2D can still offer the room with a button
+                 (3D-first pages always have one, to come back from the page) -->
+            <div v-if="pageMode !== '3d'" class="flex items-start justify-between gap-4 rounded-3xl bg-paper ring-1 ring-line p-4 sm:p-5">
+              <div>
+                <p class="text-sm font-medium text-highlighted">{{ t('dashboard.editor.room.button') }}</p>
+                <p class="mt-0.5 text-sm text-muted">{{ t('dashboard.editor.room.buttonText') }}</p>
+              </div>
+              <USwitch :model-value="!!bioData.themeConfig.roomButton" @update:model-value="setRoomButton" />
+            </div>
+
             <SiteEditorActions
               v-if="activeTab === 'room'"
               :tab="activeTab"
@@ -1249,6 +1259,14 @@ const openRoomEditor = async (mode: "edit" | "video" = "edit") => {
   await saveBio({ silent: true });
   openingRoom.value = null;
   navigateTo({ path: `/dashboard/room/${existingBio.value.username}`, query: mode === "video" ? { record: "1" } : {} });
+};
+
+const setRoomButton = (on: boolean) => {
+  bioData.themeConfig = {
+    ...bioData.themeConfig,
+    roomButton: on,
+    room: on ? bioData.themeConfig.room || createDefaultRoom() : bioData.themeConfig.room,
+  };
 };
 
 const setPageMode = (mode: PageMode) => {

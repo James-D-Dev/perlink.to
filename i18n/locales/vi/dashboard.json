@@ -94,9 +94,11 @@
         "openEditor": "Trang trí phòng",
         "showFirst": "Hiện Phòng 3D trước",
         "modeOn": "Khách sẽ vào Phòng 3D của bạn trước và có thể chuyển sang trang chỉ với một chạm.",
-        "modeOff": "Khách sẽ thấy trang của bạn. Phòng 3D được ẩn cho đến khi bạn bật tùy chọn này.",
+        "modeOff": "Khách sẽ thấy trang của bạn trước.",
         "shareVideo": "Chia sẻ phòng của bạn",
-        "fab": "Phòng 3D"
+        "fab": "Phòng 3D",
+        "button": "Nút Phòng 3D trên trang",
+        "buttonText": "Một nút ở góc dưới để khách vào xem Phòng 3D của bạn."
       },
       "settings": {
         "addressHeading": "Địa chỉ trang",

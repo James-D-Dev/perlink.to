@@ -192,12 +192,14 @@ const bioPageAsBioData = computed<BioData | undefined>(() => {
 const siteLang = computed(() => normalizeSiteLanguage(bioPage.value?.themeConfig?.language));
 useHead({ htmlAttrs: { lang: siteLang } });
 
-// Pages in 3D mode open as a room; visitors can switch to the 2D page
+// Pages in 3D mode open as a room, and visitors can switch to the 2D page;
+// pages in 2D mode can offer the room with a "3D room" button (roomButton)
 const room = computed<RoomConfig | null>(() => {
   const theme = bioPage.value?.themeConfig;
-  return theme?.pageMode === "3d" ? normalizeRoom(theme.room) : null;
+  if (theme?.pageMode === "3d") return normalizeRoom(theme.room);
+  return theme?.roomButton && theme.room ? normalizeRoom(theme.room) : null;
 });
-const show2d = ref(false);
+const show2d = ref(bioPage.value?.themeConfig?.pageMode !== "3d");
 
 // Bio page view tracking is now handled server-side in /api/bio/[username].get.ts
 </script>
