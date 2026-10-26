@@ -539,7 +539,8 @@
       "later": "Later",
       "change": "Change address",
       "choose": "Choose address",
-      "banner": "Your site is on the temporary address {address}. Pick your own before publishing.",
+      "bannerTitle": "Your site is on a temporary address",
+      "bannerText": "Pick your own before publishing.",
       "liveWarning": "This site is live: after the change, {old} stops working.",
       "saved": "Address changed",
       "failed": "Couldn’t change the address"

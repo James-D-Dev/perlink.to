@@ -539,7 +539,8 @@
       "later": "Để sau",
       "change": "Đổi địa chỉ",
       "choose": "Chọn địa chỉ",
-      "banner": "Trang đang dùng địa chỉ tạm {address}. Chọn địa chỉ riêng trước khi xuất bản.",
+      "bannerTitle": "Trang đang dùng địa chỉ tạm",
+      "bannerText": "Chọn địa chỉ riêng trước khi xuất bản.",
       "liveWarning": "Trang đang hiển thị: sau khi đổi, {old} sẽ không còn hoạt động.",
       "saved": "Đã đổi địa chỉ",
       "failed": "Không đổi được địa chỉ"

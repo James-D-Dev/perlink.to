@@ -1,6 +1,8 @@
 <template>
   <!-- Saves happen on their own; publishing is the one decision left.
-       Phones and tablets only; on desktop these live in the editor bar. -->
+       Phones and tablets only; on desktop these live in the editor bar.
+       In <body> so it stays put while the tabs slide (useTabSwipe). -->
+  <Teleport to="body">
   <div class="fixed inset-x-0 bottom-0 z-20 border-t border-default bg-default/90 px-3 py-2.5 backdrop-blur sm:px-4 lg:hidden dark:border-white/10">
     <div class="flex items-center gap-2">
       <!-- Phone preview and the design switch, on screens without the side column -->
@@ -48,6 +50,7 @@
       </UTooltip>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

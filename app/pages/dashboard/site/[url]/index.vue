@@ -118,16 +118,28 @@
       </template>
 
       <!-- Bio Editor (Step 2) -->
-      <!-- Made from a template in one click: still on its temporary address -->
+      <!-- Made from a template in one click: still on its temporary address.
+           Phones: icon and text, the button full width underneath -->
       <div
         v-if="step === 'edit' && tempAddress"
-        class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200"
+        class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-3 rounded-2xl bg-amber-50 p-3.5 ring-1 ring-amber-200"
       >
-        <UIcon name="i-lucide-link-2" class="size-4 shrink-0" />
-        <p class="min-w-0 flex-1">
-          {{ t('dashboard.address.banner', { address: `perlink.to/${existingBio?.username}` }) }}
-        </p>
-        <UButton size="sm" :label="t('dashboard.address.choose')" @click="openAddress(false)" />
+        <span class="flex size-9 shrink-0 items-center justify-center self-start rounded-full bg-amber-100 text-amber-700 sm:self-center">
+          <UIcon name="i-lucide-link-2" class="size-[18px]" />
+        </span>
+        <div class="min-w-0 flex-1 basis-48">
+          <p class="text-sm font-semibold text-amber-950">{{ t('dashboard.address.bannerTitle') }}</p>
+          <p class="mt-0.5 text-[13px] leading-snug text-amber-900/80">
+            <span class="break-all font-medium text-amber-950">perlink.to/{{ existingBio?.username }}</span>
+            · {{ t('dashboard.address.bannerText') }}
+          </p>
+        </div>
+        <UButton
+          :label="t('dashboard.address.choose')"
+          icon="i-lucide-pencil"
+          class="w-full justify-center bg-amber-900 text-white hover:bg-amber-950 sm:w-auto"
+          @click="openAddress(false)"
+        />
       </div>
 
       <div v-if="step === 'edit' && !loading" class="pb-20 lg:flex lg:gap-6 lg:pb-0">
@@ -169,87 +181,170 @@
           </button>
         </div>
 
-        <!-- Content and design, with the preview beside them -->
-        <div v-if="activeTab === 'content' || activeTab === 'header' || activeTab === 'design'" class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
-          <div class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-6 lg:col-span-7">
-            <h2 class="mb-5 hidden text-xl font-semibold text-ink lg:block">{{ editorTabs.find((tab) => tab.value === activeTab)?.label }}</h2>
-            <template v-if="activeTab === 'content'">
-              <!-- Template picker for empty pages -->
-              <div v-if="showTemplatePicker" class="mb-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
-                <div class="mb-3 flex items-start justify-between gap-3">
-                  <div>
-                    <h3 class="font-semibold text-highlighted dark:text-white">{{ t('dashboard.editor.templateHeading') }}</h3>
-                    <p class="text-sm text-muted dark:text-neutral-400">{{ t('dashboard.editor.templateIntro') }}</p>
+        <!-- Phones: swipe sideways to change tab (useTabSwipe). The outer box
+             clips the page while it slides, at the screen edges -->
+        <div class="-mx-4 overflow-x-clip px-4 lg:mx-0 lg:overflow-x-visible lg:px-0">
+        <div ref="swipeArea" class="touch-pan-y">
+          <!-- Content and design, with the preview beside them -->
+          <div v-if="activeTab === 'content' || activeTab === 'header' || activeTab === 'design'" class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+            <div class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-6 lg:col-span-7">
+              <h2 class="mb-5 hidden text-xl font-semibold text-ink lg:block">{{ editorTabs.find((tab) => tab.value === activeTab)?.label }}</h2>
+              <template v-if="activeTab === 'content'">
+                <!-- Template picker for empty pages -->
+                <div v-if="showTemplatePicker" class="mb-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
+                  <div class="mb-3 flex items-start justify-between gap-3">
+                    <div>
+                      <h3 class="font-semibold text-highlighted dark:text-white">{{ t('dashboard.editor.templateHeading') }}</h3>
+                      <p class="text-sm text-muted dark:text-neutral-400">{{ t('dashboard.editor.templateIntro') }}</p>
+                    </div>
+                    <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" :aria-label="t('common.close')" @click="templatePickerDismissed = true" />
                   </div>
-                  <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" :aria-label="t('common.close')" @click="templatePickerDismissed = true" />
+                  <BioTemplatePicker @select="applyTemplate" />
                 </div>
-                <BioTemplatePicker @select="applyTemplate" />
-              </div>
-              <!-- Closed it, page still empty: one line brings it back -->
-              <button
-                v-else-if="isEmptyPage"
-                type="button"
-                class="mb-4 flex w-full items-center gap-2 rounded-xl border border-dashed border-perlink-blue/40 px-4 py-2.5 text-sm font-medium text-highlighted transition hover:bg-perlink-blue/5"
-                @click="templatePickerDismissed = false"
-              >
-                <UIcon name="i-lucide-layout-template" class="size-4" />
-                {{ t('dashboard.editor.templateReopen') }}
-                <UIcon name="i-lucide-chevron-right" class="ml-auto size-4 text-muted" />
-              </button>
+                <!-- Closed it, page still empty: one line brings it back -->
+                <button
+                  v-else-if="isEmptyPage"
+                  type="button"
+                  class="mb-4 flex w-full items-center gap-2 rounded-xl border border-dashed border-perlink-blue/40 px-4 py-2.5 text-sm font-medium text-highlighted transition hover:bg-perlink-blue/5"
+                  @click="templatePickerDismissed = false"
+                >
+                  <UIcon name="i-lucide-layout-template" class="size-4" />
+                  {{ t('dashboard.editor.templateReopen') }}
+                  <UIcon name="i-lucide-chevron-right" class="ml-auto size-4 text-muted" />
+                </button>
 
-              <BioEditor
-                ref="editorRef"
-                @edit-header="activeTab = 'header'"
-                :active-block="activeBlock"
-                :bio-data="bioData"
-                :bio-page-id="existingBio?.id ?? ''"
-                @add-block="onAddBlock"
-                @toggle-block="toggleBlock"
-                @update-data="updateBioData"
-                @update-blocks="bioData.blocks = $event"
-                @focus-block="openBlock"
-              />
-            </template>
+                <BioEditor
+                  ref="editorRef"
+                  @edit-header="activeTab = 'header'"
+                  :active-block="activeBlock"
+                  :bio-data="bioData"
+                  :bio-page-id="existingBio?.id ?? ''"
+                  @add-block="onAddBlock"
+                  @toggle-block="toggleBlock"
+                  @update-data="updateBioData"
+                  @update-blocks="bioData.blocks = $event"
+                  @focus-block="openBlock"
+                />
+              </template>
 
-            <!-- Photo, name, intro and the header layout -->
-            <div v-else-if="activeTab === 'header'" class="space-y-8">
-              <BioBlockHeader
-                :is-active="true"
-                :title="bioData.title"
-                :bio="bioData.bio"
-                :avatar-url="bioData.avatarUrl"
-                :bio-page-id="existingBio?.id ?? ''"
-                @update:title="updateBioData('title', $event)"
-                @update:bio="updateBioData('bio', $event)"
-                @update:avatar-url="updateBioData('avatarUrl', $event)"
-              />
-              <div>
-                <p class="mb-3 text-sm font-medium text-ink">{{ t('theme.headerLayout.label') }}</p>
-                <BioHeaderLayoutPicker
-                  :model-value="bioData.themeConfig.header.layout"
-                  :avatar-url="bioData.avatarUrl"
+              <!-- Photo, name, intro and the header layout -->
+              <div v-else-if="activeTab === 'header'" class="space-y-8">
+                <BioBlockHeader
+                  :is-active="true"
                   :title="bioData.title"
                   :bio="bioData.bio"
-                  :social-links="socialLinks"
-                  :banner-url="bioData.themeConfig.header.bannerUrl"
+                  :avatar-url="bioData.avatarUrl"
                   :bio-page-id="existingBio?.id ?? ''"
-                  @update:model-value="handleUpdateTheme({ header: { ...bioData.themeConfig.header, layout: $event } })"
-                  @update:banner-url="handleUpdateTheme({ header: { ...bioData.themeConfig.header, bannerUrl: $event } })"
+                  @update:title="updateBioData('title', $event)"
+                  @update:bio="updateBioData('bio', $event)"
+                  @update:avatar-url="updateBioData('avatarUrl', $event)"
+                />
+                <div>
+                  <p class="mb-3 text-sm font-medium text-ink">{{ t('theme.headerLayout.label') }}</p>
+                  <BioHeaderLayoutPicker
+                    :model-value="bioData.themeConfig.header.layout"
+                    :avatar-url="bioData.avatarUrl"
+                    :title="bioData.title"
+                    :bio="bioData.bio"
+                    :social-links="socialLinks"
+                    :banner-url="bioData.themeConfig.header.bannerUrl"
+                    :bio-page-id="existingBio?.id ?? ''"
+                    @update:model-value="handleUpdateTheme({ header: { ...bioData.themeConfig.header, layout: $event } })"
+                    @update:banner-url="handleUpdateTheme({ header: { ...bioData.themeConfig.header, bannerUrl: $event } })"
+                  />
+                </div>
+              </div>
+
+              <BioBlockTheme
+                v-else
+                standalone
+                :theme-config="bioData.themeConfig"
+                :avatar-url="bioData.avatarUrl"
+                :title="bioData.title"
+                :bio="bioData.bio"
+                :social-links="socialLinks"
+                :bio-page-id="existingBio?.id ?? ''"
+                @update-theme="handleUpdateTheme"
+              />
+
+              <SiteEditorActions
+                :tab="activeTab"
+                :status="saveStatus"
+                :saving="saving"
+                :publishing="publishing"
+                :publish-disabled="publishDisabled"
+                :published="!!existingBio?.isPublished"
+                :can-discard="!!existingBio?.isPublished && !!existingBio?.hasDraft"
+                :discarding="discarding"
+                @preview="previewOpen = true"
+                @switch-tab="activeTab = $event"
+                @publish="publishBio"
+                @discard="discardDraft"
+              />
+            </div>
+
+            <div class="hidden lg:block lg:col-span-5">
+              <div class="sticky top-0 space-y-4">
+                <BioPreviewPanel
+                  ref="previewPanelRef"
+                  :preview-data="bioData"
+                  :existing-bio="existingBio"
+                  :username="existingBio?.username || username"
+                  :active-block="activeBlock"
+                  @select-block="openBlock"
                 />
               </div>
             </div>
+          </div>
 
-            <BioBlockTheme
-              v-else
-              standalone
-              :theme-config="bioData.themeConfig"
-              :avatar-url="bioData.avatarUrl"
-              :title="bioData.title"
-              :bio="bioData.bio"
-              :social-links="socialLinks"
-              :bio-page-id="existingBio?.id ?? ''"
-              @update-theme="handleUpdateTheme"
-            />
+          <!-- 3D room Tab -->
+          <div v-else-if="activeTab === 'room'" class="max-w-3xl space-y-4 pt-4">
+            <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
+              <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
+                <!-- The room itself, always in daylight (only drawn while this tab is open;
+                     lists use the saved picture instead) -->
+                <LazyRoomCanvas :room="roomModel" preview force-mode="day" class="pointer-events-none" />
+              </div>
+              <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
+                <div>
+                  <h3 class="font-semibold text-highlighted">{{ t('dashboard.editor.room.heading') }}</h3>
+                  <p class="mt-1 text-sm text-muted">
+                    {{ t('dashboard.editor.room.objects', { n: roomModel.objects.length }) }}
+                  </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <UButton icon="i-lucide-box" :label="t('dashboard.editor.room.openEditor')" size="sm" :loading="openingRoom === 'edit'" :disabled="!!openingRoom" @click="openRoomEditor()" />
+                  <!-- Stands out: every room video posted brings people back.
+                       Likes and hearts float up from it -->
+                  <ReactionBurst>
+                    <UButton
+                      size="sm"
+                      :loading="openingRoom === 'video'"
+                      :disabled="!!openingRoom"
+                      class="bg-gradient-to-r from-pink-500 via-red-500 to-amber-400 pl-1.5 font-semibold text-white shadow-[0_6px_20px_-6px_rgb(239_68_68/0.7)] hover:brightness-110 disabled:opacity-60"
+                      @click="openRoomEditor('video')"
+                    >
+                      <template #leading>
+                        <RoomSocialCycleIcon />
+                      </template>
+                      {{ t('dashboard.editor.room.shareVideo') }}
+                    </UButton>
+                  </ReactionBurst>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-start justify-between gap-4 rounded-xl border border-default bg-default p-4 dark:border-white/10">
+              <div>
+                <p class="text-sm font-medium text-highlighted">{{ t('dashboard.editor.room.showFirst') }}</p>
+                <p class="mt-0.5 text-sm text-muted">
+                  {{ pageMode === '3d'
+                    ? t('dashboard.editor.room.modeOn')
+                    : t('dashboard.editor.room.modeOff') }}
+                </p>
+              </div>
+              <USwitch :model-value="pageMode === '3d'" @update:model-value="setPageMode($event ? '3d' : '2d')" />
+            </div>
 
             <SiteEditorActions
               :tab="activeTab"
@@ -267,189 +362,112 @@
             />
           </div>
 
-          <div class="hidden lg:block lg:col-span-5">
-            <div class="sticky top-0 space-y-4">
-              <BioPreviewPanel
-                ref="previewPanelRef"
-                :preview-data="bioData"
-                :existing-bio="existingBio"
-                :username="existingBio?.username || username"
-                :active-block="activeBlock"
-                @select-block="openBlock"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- 3D room Tab -->
-        <div v-else-if="activeTab === 'room'" class="max-w-3xl space-y-4 pt-4">
-          <div class="overflow-hidden rounded-xl border border-default bg-default sm:flex dark:border-white/10">
-            <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
-              <!-- The room itself, always in daylight (only drawn while this tab is open;
-                   lists use the saved picture instead) -->
-              <LazyRoomCanvas :room="roomModel" preview force-mode="day" class="pointer-events-none" />
-            </div>
-            <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
-              <div>
-                <h3 class="font-semibold text-highlighted">{{ t('dashboard.editor.room.heading') }}</h3>
-                <p class="mt-1 text-sm text-muted">
-                  {{ t('dashboard.editor.room.objects', { n: roomModel.objects.length }) }}
-                </p>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <UButton icon="i-lucide-box" :label="t('dashboard.editor.room.openEditor')" size="sm" :loading="openingRoom === 'edit'" :disabled="!!openingRoom" @click="openRoomEditor()" />
-                <!-- Stands out: every room video posted brings people back.
-                     Likes and hearts float up from it -->
-                <ReactionBurst>
-                  <UButton
-                    size="sm"
-                    :loading="openingRoom === 'video'"
-                    :disabled="!!openingRoom"
-                    class="bg-gradient-to-r from-pink-500 via-red-500 to-amber-400 pl-1.5 font-semibold text-white shadow-[0_6px_20px_-6px_rgb(239_68_68/0.7)] hover:brightness-110 disabled:opacity-60"
-                    @click="openRoomEditor('video')"
-                  >
-                    <template #leading>
-                      <RoomSocialCycleIcon />
-                    </template>
-                    {{ t('dashboard.editor.room.shareVideo') }}
-                  </UButton>
-                </ReactionBurst>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-start justify-between gap-4 rounded-xl border border-default bg-default p-4 dark:border-white/10">
-            <div>
-              <p class="text-sm font-medium text-highlighted">{{ t('dashboard.editor.room.showFirst') }}</p>
-              <p class="mt-0.5 text-sm text-muted">
-                {{ pageMode === '3d'
-                  ? t('dashboard.editor.room.modeOn')
-                  : t('dashboard.editor.room.modeOff') }}
+          <!-- Settings Tab -->
+          <div v-else-if="activeTab === 'settings'" class="pt-4 max-w-lg mx-auto space-y-6">
+            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+              <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.addressHeading') }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-400 mb-3">
+                {{ t('dashboard.editor.settings.addressText') }}
               </p>
-            </div>
-            <USwitch :model-value="pageMode === '3d'" @update:model-value="setPageMode($event ? '3d' : '2d')" />
-          </div>
-
-          <SiteEditorActions
-            :tab="activeTab"
-            :status="saveStatus"
-            :saving="saving"
-            :publishing="publishing"
-            :publish-disabled="publishDisabled"
-            :published="!!existingBio?.isPublished"
-            :can-discard="!!existingBio?.isPublished && !!existingBio?.hasDraft"
-            :discarding="discarding"
-            @preview="previewOpen = true"
-            @switch-tab="activeTab = $event"
-            @publish="publishBio"
-            @discard="discardDraft"
-          />
-        </div>
-
-        <!-- Settings Tab -->
-        <div v-else-if="activeTab === 'settings'" class="pt-4 max-w-lg mx-auto space-y-6">
-          <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-            <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.addressHeading') }}</h3>
-            <p class="text-sm text-muted dark:text-neutral-400 mb-3">
-              {{ t('dashboard.editor.settings.addressText') }}
-            </p>
-            <div class="flex items-center gap-2">
-              <div class="flex min-w-0 flex-1 items-center gap-1 rounded-lg border border-default bg-muted px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-                <span class="text-sm text-muted dark:text-neutral-400">perlink.to/</span>
-                <span class="truncate text-sm font-medium text-highlighted dark:text-white">{{ existingBio?.username }}</span>
+              <div class="flex items-center gap-2">
+                <div class="flex min-w-0 flex-1 items-center gap-1 rounded-lg border border-default bg-muted px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+                  <span class="text-sm text-muted dark:text-neutral-400">perlink.to/</span>
+                  <span class="truncate text-sm font-medium text-highlighted dark:text-white">{{ existingBio?.username }}</span>
+                </div>
+                <UButton color="neutral" variant="outline" :label="t('dashboard.address.change')" @click="openAddress(false)" />
               </div>
-              <UButton color="neutral" variant="outline" :label="t('dashboard.address.change')" @click="openAddress(false)" />
             </div>
-          </div>
 
-          <!-- Site language -->
-          <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-            <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.languageHeading') }}</h3>
-            <p class="text-sm text-muted dark:text-neutral-400 mb-3">
-              {{ t('dashboard.editor.settings.languageText') }}
-            </p>
-            <USelect
-              :model-value="normalizeSiteLanguage(bioData.themeConfig.language)"
-              :items="SITE_LANGUAGES.map((l) => ({ label: l.label, value: l.code }))"
-              class="w-full"
-              @update:model-value="handleUpdateTheme({ language: $event as string })"
-            />
-          </div>
-
-          <!-- Custom domain -->
-          <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-            <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.domain.heading') }}</h3>
-            <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.domain.text') }}</p>
-            <SiteDomainSettings v-if="existingBio?.username" :username="existingBio.username" />
-          </div>
-
-          <!-- Search & sharing -->
-          <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-            <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.seo.heading') }}</h3>
-            <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.seo.text') }}</p>
-            <SiteSeoSettings
-              :bio-data="bioData"
-              :username="existingBio?.username || username"
-              @update-theme="handleUpdateTheme"
-            />
-          </div>
-
-          <!-- Share Button Toggle -->
-          <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="font-semibold text-highlighted dark:text-white mb-1">
-                  {{ t('dashboard.editor.settings.shareHeading') }}
-                </h3>
-                <p class="text-sm text-muted dark:text-neutral-400">
-                  {{ t('dashboard.editor.settings.shareText') }}
-                </p>
-              </div>
-              <USwitch
-                :model-value="bioData.themeConfig.showShare ?? false"
-                @update:model-value="
-                  (val) =>
-                    handleUpdateTheme({ showShare: val as boolean })
-                "
+            <!-- Site language -->
+            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+              <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.languageHeading') }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-400 mb-3">
+                {{ t('dashboard.editor.settings.languageText') }}
+              </p>
+              <USelect
+                :model-value="normalizeSiteLanguage(bioData.themeConfig.language)"
+                :items="SITE_LANGUAGES.map((l) => ({ label: l.label, value: l.code }))"
+                class="w-full"
+                @update:model-value="handleUpdateTheme({ language: $event as string })"
               />
             </div>
-          </div>
 
-          <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
-            <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.visibilityHeading') }}</h3>
-            <p class="text-sm text-muted dark:text-neutral-400 mb-3">
-              {{ t('dashboard.editor.settings.visibilityText') }}
-            </p>
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-highlighted dark:text-white">
-                  {{ existingBio?.isPublished ? t('dashboard.editor.settings.published') : t('dashboard.editor.settings.draft') }}
-                </p>
-                <p class="text-xs text-muted dark:text-neutral-400">
-                  {{
-                    existingBio?.isPublished
-                      ? t('dashboard.editor.settings.publicText')
-                      : t('dashboard.editor.settings.privateText')
-                  }}
-                </p>
+            <!-- Custom domain -->
+            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+              <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.domain.heading') }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.domain.text') }}</p>
+              <SiteDomainSettings v-if="existingBio?.username" :username="existingBio.username" />
+            </div>
+
+            <!-- Search & sharing -->
+            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+              <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.seo.heading') }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.seo.text') }}</p>
+              <SiteSeoSettings
+                :bio-data="bioData"
+                :username="existingBio?.username || username"
+                @update-theme="handleUpdateTheme"
+              />
+            </div>
+
+            <!-- Share Button Toggle -->
+            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-semibold text-highlighted dark:text-white mb-1">
+                    {{ t('dashboard.editor.settings.shareHeading') }}
+                  </h3>
+                  <p class="text-sm text-muted dark:text-neutral-400">
+                    {{ t('dashboard.editor.settings.shareText') }}
+                  </p>
+                </div>
+                <USwitch
+                  :model-value="bioData.themeConfig.showShare ?? false"
+                  @update:model-value="
+                    (val) =>
+                      handleUpdateTheme({ showShare: val as boolean })
+                  "
+                />
               </div>
-              <UBadge
-                :color="existingBio?.isPublished ? 'success' : 'neutral'"
-                variant="soft"
-              >
-                {{ existingBio?.isPublished ? t('dashboard.editor.settings.live') : t('dashboard.editor.settings.draft') }}
-              </UBadge>
+            </div>
+
+            <div class="bg-default dark:bg-white/[0.04] dark:backdrop-blur-xl rounded-xl border border-default dark:border-white/10 p-6">
+              <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.visibilityHeading') }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-400 mb-3">
+                {{ t('dashboard.editor.settings.visibilityText') }}
+              </p>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-highlighted dark:text-white">
+                    {{ existingBio?.isPublished ? t('dashboard.editor.settings.published') : t('dashboard.editor.settings.draft') }}
+                  </p>
+                  <p class="text-xs text-muted dark:text-neutral-400">
+                    {{
+                      existingBio?.isPublished
+                        ? t('dashboard.editor.settings.publicText')
+                        : t('dashboard.editor.settings.privateText')
+                    }}
+                  </p>
+                </div>
+                <UBadge
+                  :color="existingBio?.isPublished ? 'success' : 'neutral'"
+                  variant="soft"
+                >
+                  {{ existingBio?.isPublished ? t('dashboard.editor.settings.live') : t('dashboard.editor.settings.draft') }}
+                </UBadge>
+              </div>
+            </div>
+
+            <!-- Replacing everything with a template is a big step, so it sits last and warns -->
+            <div class="rounded-xl border border-amber-200 bg-amber-50/40 p-6">
+              <h3 class="font-semibold text-amber-900 mb-1">{{ t('dashboard.editor.settings.templateHeading') }}</h3>
+              <p class="text-sm text-amber-900/80 mb-4">
+                {{ t('dashboard.editor.settings.templateText') }}
+              </p>
+              <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
             </div>
           </div>
-
-          <!-- Replacing everything with a template is a big step, so it sits last and warns -->
-          <div class="rounded-xl border border-amber-200 bg-amber-50/40 p-6">
-            <h3 class="font-semibold text-amber-900 mb-1">{{ t('dashboard.editor.settings.templateHeading') }}</h3>
-            <p class="text-sm text-amber-900/80 mb-4">
-              {{ t('dashboard.editor.settings.templateText') }}
-            </p>
-            <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
-          </div>
+        </div>
         </div>
 
         </div>
@@ -533,7 +551,7 @@
 
 <script setup lang="ts">
 import { nanoid } from "nanoid";
-import { useDebounceFn } from "@vueuse/core";
+import { useDebounceFn, useMediaQuery } from "@vueuse/core";
 import type {
   BioData,
   BioLink,
@@ -646,6 +664,10 @@ watch(activeTab, (tab) => {
   const hash = tab === "content" ? "" : `#${tab}`;
   if (location.hash !== hash) history.replaceState(history.state, "", `${location.pathname}${location.search}${hash}`);
 });
+// Phones and tablets swipe between the tabs, in the order of the tab bar
+const swipeArea = ref<HTMLElement | null>(null);
+const swipeable = useMediaQuery("(max-width: 1023px)");
+useTabSwipe(swipeArea, computed(() => EDITOR_TABS), activeTab, swipeable);
 const editorTabs = computed(() => [
   { value: "content", label: t("dashboard.editor.tabs.content"), icon: "i-lucide-layout-list" },
   { value: "header", label: t("dashboard.editor.tabs.header"), icon: "i-lucide-circle-user-round" },
