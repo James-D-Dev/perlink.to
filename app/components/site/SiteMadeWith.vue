@@ -13,9 +13,9 @@
       <AppLogo variant="mark" :size="24" />
     </span>
     <span class="min-w-0 flex-1">
-      <span class="flex items-center gap-[0.3em] text-sm font-semibold" :aria-label="siteT(lang, 'madeWith')">
+      <span class="flex items-baseline gap-[0.3em] text-sm font-semibold" :aria-label="siteT(lang, 'madeWith')">
         <span v-if="before">{{ before }}</span>
-        <AppLogo :size="20" class="translate-y-[0.5px]" />
+        <AppLogo :size="20" class="-translate-y-[1.5px]" />
         <span v-if="after">{{ after }}</span>
       </span>
       <span class="mt-0.5 block text-xs leading-snug text-black/55">{{ siteT(lang, 'madeWithCta') }}</span>
@@ -32,9 +32,13 @@
     :aria-label="siteT(lang, 'madeWith')"
     class="group pointer-events-auto inline-flex h-9 items-center gap-1.5 rounded-full bg-black/35 pl-3.5 pr-3 text-xs font-medium text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/50"
   >
-    <span v-if="before">{{ before }}</span>
-    <AppLogo :size="17" inverted class="translate-y-[0.5px]" />
-    <span v-if="after">{{ after }}</span>
+    <!-- Words and logo share a baseline; the logo sits a hair higher so its
+         p descender doesn't make it look low -->
+    <span class="inline-flex items-baseline gap-1.5">
+      <span v-if="before">{{ before }}</span>
+      <AppLogo :size="17" inverted class="-translate-y-px" />
+      <span v-if="after">{{ after }}</span>
+    </span>
     <UIcon name="i-lucide-arrow-up-right" class="size-3.5 text-white/60 transition group-hover:text-white" />
   </a>
 </template>
