@@ -30,6 +30,16 @@ export function transferDetails(event: H3Event, payment: { amount: number; code:
   const note = transferNote(payment.code)
   return {
     qrString: generateVietQR({ bankBIN: account.bank.BIN, accountNumber: account.accountNumber, amount: payment.amount, note }),
+    /** The VietQR image to scan (amount and note are in the code) */
+    qrImage: `https://vietqr.app/img?${new URLSearchParams({
+      bank: account.bank.ShortName,
+      acc: account.accountNumber,
+      template: 'compact',
+      amount: String(payment.amount),
+      des: note,
+      showinfo: 'false',
+      holder: account.accountName,
+    })}`,
     bankName: account.bank.ShortName,
     accountNumber: account.accountNumber,
     accountName: account.accountName,

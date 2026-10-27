@@ -62,35 +62,16 @@
           </p>
         </div>
 
-        <!-- Bank transfer -->
-        <div v-else-if="method === 'bank' && transfer" class="space-y-4">
-          <div class="flex flex-col items-center">
-            <div class="rounded-2xl bg-white p-3 ring-1 ring-line">
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <div class="size-52" v-html="qrSvg(transfer.qrString)" />
-            </div>
-            <p class="mt-2 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.scan') }}</p>
-          </div>
-          <div>
-            <p class="mb-2 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.manual') }}</p>
-            <dl class="divide-y divide-line overflow-hidden rounded-xl bg-sand/50 text-sm ring-1 ring-line">
-              <div v-for="row in bankRows" :key="row.label" class="flex items-center justify-between gap-3 px-3 py-2">
-                <dt class="text-ink-muted">{{ row.label }}</dt>
-                <dd class="flex min-w-0 items-center gap-1.5 font-medium text-ink">
-                  <span class="truncate" :class="row.strong && 'font-mono text-base tracking-wide'">{{ row.value }}</span>
-                  <UButton v-if="row.copy" size="xs" color="neutral" variant="ghost" icon="i-lucide-copy" :aria-label="row.label" @click="copy(row.copy)" />
-                </dd>
-              </div>
-            </dl>
-            <p class="mt-2 text-xs text-amber-700">{{ t('dashboard.billing.checkout.noteHint') }}</p>
-          </div>
-          <div class="flex items-start gap-2.5 rounded-xl bg-paper px-3 py-2.5 ring-1 ring-line">
-            <UIcon name="i-lucide-info" class="mt-0.5 size-4 shrink-0 text-ink-muted" />
-            <div class="text-xs">
-              <p class="font-medium text-ink">{{ t('dashboard.billing.checkout.waiting') }}</p>
-              <p class="mt-0.5 text-ink-muted">{{ t('dashboard.billing.checkout.waitingHint') }}</p>
-            </div>
-          </div>
+        <!-- Bank transfer: just the VietQR code (amount and note are in it) -->
+        <div v-else-if="method === 'bank' && transfer" class="flex flex-col items-center">
+          <img
+            :src="transfer.qrImage"
+            :alt="`${transfer.bankName} · ${transfer.accountNumber} · ${transfer.note}`"
+            width="540"
+            height="540"
+            class="w-full max-w-72 rounded-2xl bg-white ring-1 ring-line"
+          >
+          <p class="mt-2 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.scan') }}</p>
         </div>
 
         <!-- Crypto: USDT / USDC to the wallet, then the transaction hash -->
@@ -184,7 +165,7 @@
 <script setup lang="ts">
 import qrcode from 'qrcode-generator'
 import { CRYPTO_NETWORK_BY_ID, CRYPTO_TOKEN_ICONS, type CryptoToken } from '#shared/crypto'
-import { formatVnd, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import type { BillingPeriod, PaidPlanId } from '#shared/plans'
 import { SUPPORT_EMAIL } from '~/utils/legal'
 
 // Pay for a plan by bank transfer (VietQR, VND) or in USDT / USDC to the
@@ -202,7 +183,7 @@ const toast = useToast()
 const { info, refresh } = useBilling()
 
 type Method = 'bank' | 'crypto'
-interface Transfer { qrString: string; bankName: string; accountNumber: string; accountName: string; amount: number; note: string }
+interface Transfer { qrString: string; qrImage: string; bankName: string; accountNumber: string; accountName: string; amount: number; note: string }
 interface CryptoInfo { address: string; amountUsd: number; networks: { id: string; name: string; tokens: string[] }[] }
 interface Check { verdict: 'ok' | 'short' | 'none' | 'failed' | 'pending' | 'error' }
 
@@ -244,18 +225,6 @@ function qrSvg(text: string) {
   qr.make()
   return qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true })
 }
-
-const bankRows = computed(() => {
-  const tr = transfer.value
-  if (!tr) return []
-  return [
-    { label: t('dashboard.billing.checkout.bank'), value: tr.bankName },
-    { label: t('dashboard.billing.checkout.account'), value: tr.accountNumber, copy: tr.accountNumber },
-    ...(tr.accountName ? [{ label: t('dashboard.billing.checkout.accountName'), value: tr.accountName }] : []),
-    { label: t('dashboard.billing.checkout.amount'), value: formatVnd(tr.amount), copy: String(tr.amount) },
-    { label: t('dashboard.billing.checkout.note'), value: tr.note, copy: tr.note, strong: true },
-  ]
-})
 
 const formatDate = (iso: string) => new Date(iso).toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB')
 
