@@ -119,10 +119,11 @@ export default defineAppConfig({
         },
       },
       compoundVariants: [
-        // Filled: gloss on top, hairline light edge, swell on press
+        // Filled: gloss on top (an overlay, so a button's own background, e.g.
+        // a gradient, stays), hairline light edge, swell on press
         {
           variant: 'solid',
-          class: 'font-semibold bg-[linear-gradient(180deg,rgb(255_255_255/0.16),rgb(255_255_255/0)_55%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.28),inset_0_0_0_1px_rgb(255_255_255/0.08),0_1px_2px_rgb(0_0_0/0.1)] hover:brightness-[1.06] active:brightness-110 active:scale-[1.04] disabled:opacity-100 aria-disabled:opacity-100 disabled:bg-none disabled:bg-black/[0.06] disabled:text-black/30 disabled:shadow-none disabled:brightness-100 dark:disabled:bg-white/10 dark:disabled:text-white/30',
+          class: 'relative font-semibold after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-[linear-gradient(180deg,rgb(255_255_255/0.16),rgb(255_255_255/0)_55%)] disabled:after:hidden shadow-[inset_0_1px_0_rgb(255_255_255/0.28),inset_0_0_0_1px_rgb(255_255_255/0.08),0_1px_2px_rgb(0_0_0/0.1)] hover:brightness-[1.06] active:brightness-110 active:scale-[1.04] disabled:opacity-100 aria-disabled:opacity-100 disabled:bg-black/[0.06] disabled:text-black/30 disabled:shadow-none disabled:brightness-100 dark:disabled:bg-white/10 dark:disabled:text-white/30',
         },
         {
           color: 'primary',
