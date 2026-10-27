@@ -21,7 +21,7 @@
     >
       <template #header="{ collapsed }">
         <NuxtLink to="/superadmin" :aria-label="collapsed ? 'Perlink admin' : undefined" class="flex min-w-0 items-center gap-2" :class="collapsed && 'w-full justify-center'">
-          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="24" :inverted="theme === 'dark'" />
+          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="collapsed ? 28 : 30" :inverted="theme === 'dark'" />
           <span v-if="!collapsed" class="rounded-full bg-error/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-error">Admin</span>
         </NuxtLink>
       </template>

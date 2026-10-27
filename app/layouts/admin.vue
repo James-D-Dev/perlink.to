@@ -20,7 +20,7 @@
     >
       <template #header="{ collapsed }">
         <NuxtLink to="/" :aria-label="collapsed ? 'Perlink home' : undefined" class="flex items-center" :class="collapsed && 'w-full justify-center'">
-          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="24" />
+          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="collapsed ? 28 : 30" />
         </NuxtLink>
       </template>
 
