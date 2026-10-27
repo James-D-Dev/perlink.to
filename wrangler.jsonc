@@ -31,15 +31,6 @@
 			"bucket_name": "perlink-avatars",
 			"binding": "AVATARS_BUCKET"
 		}
-	],
-	/**
-	 * Cloudflare Email Sending (server/utils/email.ts)
-	 */
-	"send_email": [
-		{
-			"name": "EMAIL",
-			"remote": true
-		}
 	]
 	/**
 	 * Smart Placement

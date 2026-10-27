@@ -1,8 +1,8 @@
 import type { H3Event } from 'h3'
 
-// Transactional email through Cloudflare Email Sending: the EMAIL binding
-// (wrangler.jsonc) when the runtime has it, otherwise the REST API with
-// NUXT_CF_EMAIL_API_TOKEN. With neither, nothing is sent, so features that
+// Transactional email through Cloudflare Email Sending: its REST API with
+// NUXT_CF_EMAIL_API_TOKEN (Pages can't have the send_email binding; an EMAIL
+// binding is used if this ever runs as a Worker that has one). With neither, nothing is sent, so features that
 // email stay usable before it's set up.
 
 export interface EmailMessage {
