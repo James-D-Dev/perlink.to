@@ -29,7 +29,20 @@
                 <template v-if="info.expiresAt">{{ t('dashboard.billing.status.until', { date: formatDate(info.expiresAt) }) }} · </template>
                 {{ t('dashboard.billing.status.sites', { used: info.sites, max: info.limits.sites >= 1000 ? '∞' : info.limits.sites }) }}
               </p>
+              <!-- A card subscription: when it renews or ends, and where to manage it -->
+              <p v-if="subscriptionLine" class="mt-0.5 text-sm" :class="info.subscription?.status === 'past_due' ? 'text-error' : 'text-ink-muted'">{{ subscriptionLine }}</p>
             </div>
+            <UButton
+              v-if="info.subscription?.portalUrl"
+              class="ml-auto shrink-0"
+              size="sm"
+              color="neutral"
+              variant="outline"
+              icon="i-lucide-settings-2"
+              :to="info.subscription.portalUrl"
+              target="_blank"
+              :label="t('dashboard.billing.subscription.manage')"
+            />
           </div>
 
           <!-- One free trial for free accounts -->
@@ -57,7 +70,7 @@
                 <p class="text-xs text-ink-muted">{{ formatDate(p.paidAt || p.createdAt) }} · <span class="font-mono">{{ p.code }}</span></p>
               </div>
               <div class="flex items-center gap-3">
-                <span class="font-medium text-ink">{{ p.method === 'crypto' && p.amountUsd ? `$${p.amountUsd}` : formatVnd(p.amount) }}</span>
+                <span class="font-medium text-ink">{{ (p.method === 'crypto' || p.method === 'lemon') && p.amountUsd ? `$${p.amountUsd}` : formatVnd(p.amount) }}</span>
                 <UBadge :color="STATUS_COLOR[p.status] ?? 'neutral'" variant="soft" :label="t(`dashboard.billing.paymentStatus.${p.status}`)" />
               </div>
             </div>
@@ -85,6 +98,31 @@ useSeoMeta({ title: () => t('dashboard.upgrade.seoTitle'), robots: 'noindex' })
 
 const { info, refresh } = useBilling()
 onMounted(refresh)
+
+const subscriptionLine = computed(() => {
+  const sub = info.value?.subscription
+  if (!sub) return ''
+  if (sub.status === 'past_due' || sub.status === 'unpaid') return t('dashboard.billing.subscription.pastDue')
+  if (sub.status === 'cancelled' && sub.endsAt) return t('dashboard.billing.subscription.ends', { date: formatDate(sub.endsAt) })
+  if (sub.renewsAt) return t('dashboard.billing.subscription.renews', { date: formatDate(sub.renewsAt) })
+  return ''
+})
+
+// Back from Lemon Squeezy's checkout: the webhook turns the plan on within
+// seconds, so look again a few times (the "you're upgraded" screen follows)
+let paidTimer: ReturnType<typeof setInterval> | null = null
+onBeforeUnmount(() => { if (paidTimer) clearInterval(paidTimer) })
+onMounted(() => {
+  if (route.query.paid !== '1') return
+  toast.add({ title: t('dashboard.billing.checkout.returned'), description: t('dashboard.billing.checkout.returnedText'), color: 'success' })
+  navigateTo({ query: { ...route.query, paid: undefined } }, { replace: true })
+  let tries = 0
+  paidTimer = setInterval(async () => {
+    tries++
+    await refresh().catch(() => {})
+    if ((info.value?.plan !== 'free' || tries >= 12) && paidTimer) clearInterval(paidTimer)
+  }, 3000)
+})
 
 // The plan an upgrade prompt pointed to
 const highlight = computed(() => (isPlanId(route.query.plan) ? route.query.plan : undefined))

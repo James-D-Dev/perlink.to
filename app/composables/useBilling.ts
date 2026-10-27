@@ -8,9 +8,11 @@ export interface BillingInfo {
   canTrial: boolean
   checkoutEnabled: boolean
   /** Ways to pay that are set up */
-  paymentMethods?: { bank: boolean; crypto: boolean }
+  paymentMethods?: { card?: boolean; bank: boolean; crypto: boolean }
   /** An approved payment whose "you're upgraded" screen hasn't been shown yet */
   celebrate?: { paymentId: string; plan: PlanId } | null
+  /** The Lemon Squeezy subscription (card / PayPal), to manage or cancel it */
+  subscription?: { plan: PlanId; period: string; status: string; renewsAt: string | null; endsAt: string | null; portalUrl: string | null } | null
   payments: { id: string; plan: string; period: string; amount: number; amountUsd?: number | null; method?: string; code: string; status: string; createdAt: string; paidAt: string | null }[]
 }
 

@@ -1,5 +1,6 @@
 import type { H3Event } from 'h3'
 import { generateVietQR, getBankByBIN } from './vietqr'
+import { lemonEnabled } from './lemon'
 import { isEvmAddress } from '#shared/crypto'
 
 // Payment codes go in the transfer note: "PL" and 8 letters/digits that
@@ -60,5 +61,10 @@ export const CRYPTO_PAYMENTS_ON = false
 
 /** Ways to pay that are set up */
 export function paymentMethods(event: H3Event) {
-  return { bank: !!billingAccount(event), crypto: CRYPTO_PAYMENTS_ON && !!cryptoWallet(event) }
+  return {
+    // Card / PayPal through Lemon Squeezy
+    card: lemonEnabled(event),
+    bank: !!billingAccount(event),
+    crypto: CRYPTO_PAYMENTS_ON && !!cryptoWallet(event),
+  }
 }

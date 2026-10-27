@@ -83,3 +83,39 @@ Flow:
 4. **Refresh** in the checkout asks again; a waiting crypto payment is read
    from the chain again (every 20 s at most), and the reviewer is told once
    it shows as paid in full.
+
+## Card / PayPal: Lemon Squeezy
+
+Lemon Squeezy sells the plans as subscriptions and is the Merchant of Record
+(tax, invoices, refunds). Code: `server/utils/lemon.ts`,
+`server/api/billing/lemon-checkout.post.ts`, `server/api/billing/lemon-webhook.post.ts`,
+table `subscriptions` (migration 0032).
+
+1. **Products**: one subscription product per plan, named so it contains the
+   plan's name ("Perlink Starter", "Perlink Plus"), each with a monthly and a
+   yearly variant. Prices must match the pricing page ($6 / $12 a month,
+   10× a year). Don't create Pro while it's "Coming soon". The server finds the
+   store and the variants through the API (cached 10 minutes per worker).
+2. **API key**: Settings → API → new key. Then
+   `npx wrangler pages secret put NUXT_LEMON_API_KEY --project-name perlink-app`.
+   (Optional: `NUXT_LEMON_STORE_ID` if the key sees more than one store.)
+3. **Webhook**: Settings → Webhooks → add
+   - URL: `https://perlink.to/api/billing/lemon-webhook`
+   - Signing secret: a long random string, also saved as
+     `NUXT_LEMON_WEBHOOK_SECRET`
+   - Events: `subscription_created`, `subscription_updated`,
+     `subscription_cancelled`, `subscription_resumed`, `subscription_expired`,
+     `subscription_paused`, `subscription_unpaused`,
+     `subscription_payment_success`, `subscription_payment_refunded`
+4. **Customer portal** (Settings → General → Customer portal): turn it on and
+   allow switching between the plan variants, so subscribers change plan or
+   cancel there.
+5. Redeploy. The "Card" tab appears in the checkout once the API key is set.
+
+How the plan follows the subscription: active / on trial / past due → the
+plan runs to the next renewal plus 3 days' grace; cancelled → until its end
+date; expired, unpaid or paused → ends; a refunded charge → back to Free.
+Every successful charge is saved as a payment (method `lemon`, amount in
+`amount_usd`); only the first one shows the "you're upgraded" screen.
+Someone who already has a running subscription is sent to the customer portal
+instead of a second checkout.

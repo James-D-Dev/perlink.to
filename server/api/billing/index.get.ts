@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   const db = getDB(event)
   const account = await getAccountPlan(event, user.id)
-  const [sites, payments, celebrate] = await Promise.all([
+  const [sites, payments, celebrate, subscription] = await Promise.all([
     db.prepare('SELECT COUNT(*) AS n FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number }>(),
     db.prepare(`SELECT id, plan, period, amount, amount_usd, method, code, status, created_at, paid_at FROM payments WHERE user_id = ? AND status != 'pending' ORDER BY created_at DESC LIMIT 10`)
       .bind(user.id)
@@ -20,6 +20,11 @@ export default defineEventHandler(async (event) => {
     db.prepare(`SELECT id, plan FROM payments WHERE user_id = ? AND status = 'paid' AND celebrated_at IS NULL AND paid_at > datetime('now', '-30 days') ORDER BY paid_at DESC LIMIT 1`)
       .bind(user.id)
       .first<{ id: string; plan: string }>()
+      .catch(() => null),
+    // The latest Lemon Squeezy subscription, to manage it
+    db.prepare('SELECT plan, period, status, renews_at, ends_at, portal_url FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1')
+      .bind(user.id)
+      .first<{ plan: string; period: string; status: string; renews_at: string | null; ends_at: string | null; portal_url: string | null }>()
       .catch(() => null),
   ])
   return {
@@ -31,6 +36,9 @@ export default defineEventHandler(async (event) => {
     checkoutEnabled: Object.values(paymentMethods(event)).some(Boolean),
     paymentMethods: paymentMethods(event),
     celebrate: celebrate ? { paymentId: celebrate.id, plan: celebrate.plan } : null,
+    subscription: subscription && subscription.status !== 'expired'
+      ? { plan: subscription.plan, period: subscription.period, status: subscription.status, renewsAt: subscription.renews_at, endsAt: subscription.ends_at, portalUrl: subscription.portal_url }
+      : null,
     payments: (payments.results ?? []).map(p => ({
       id: p.id, plan: p.plan, period: p.period, amount: p.amount, amountUsd: p.amount_usd, method: p.method, code: p.code, status: p.status, createdAt: p.created_at, paidAt: p.paid_at,
     })),

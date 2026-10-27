@@ -23,10 +23,10 @@
             <div class="min-w-0 flex-1 space-y-1.5">
               <div class="flex flex-wrap items-center gap-2">
                 <UBadge :color="STATUS_COLOR[p.status] ?? 'neutral'" variant="soft" :label="STATUS_LABEL[p.status] ?? p.status" />
-                <UBadge color="neutral" variant="subtle" :icon="p.method === 'crypto' ? 'i-lucide-bitcoin' : 'i-lucide-landmark'" :label="p.method === 'crypto' ? 'Crypto' : 'Bank'" />
+                <UBadge color="neutral" variant="subtle" :icon="METHOD_ICON[p.method] ?? 'i-lucide-landmark'" :label="METHOD_LABEL[p.method] ?? 'Bank'" />
                 <span class="font-medium">{{ p.plan.toUpperCase() }} · {{ p.period === 'annual' ? '1 year' : '1 month' }}</span>
                 <span class="font-semibold tabular-nums">
-                  {{ p.method === 'crypto' ? `$${(p.amountUsd ?? 0).toFixed(2)} ${p.token ?? ''}` : formatVnd(p.amount) }}
+                  {{ p.method === 'crypto' ? `$${(p.amountUsd ?? 0).toFixed(2)} ${p.token ?? ''}` : p.method === 'lemon' ? `$${(p.amountUsd ?? 0).toFixed(2)}` : formatVnd(p.amount) }}
                 </span>
               </div>
               <p class="text-sm">{{ p.email ?? '—' }}</p>
@@ -39,6 +39,7 @@
                 </p>
                 <p v-if="p.checkText" class="text-sm">{{ p.checkText }}</p>
               </template>
+              <p v-else-if="p.method === 'lemon'" class="text-xs text-muted">Card / PayPal via Lemon Squeezy · {{ p.code }}</p>
               <p v-else class="text-xs text-muted">Transfer message: <span class="font-mono text-default">PERLINK {{ p.code }}</span></p>
 
               <p class="text-xs text-muted">
@@ -76,6 +77,9 @@
 import { superadminPanelUi } from '~/utils/superadmin'
 import { formatVnd } from '#shared/plans'
 
+const METHOD_LABEL: Record<string, string> = { bank: 'Bank', crypto: 'Crypto', lemon: 'Card' }
+const METHOD_ICON: Record<string, string> = { bank: 'i-lucide-landmark', crypto: 'i-lucide-bitcoin', lemon: 'i-lucide-credit-card' }
+
 // Payments people marked as done, waiting for a decision. Approving puts the
 // plan on their account (same as the Telegram button).
 definePageMeta({
@@ -89,7 +93,7 @@ interface Payment {
   email: string | null
   plan: string
   period: string
-  method: 'bank' | 'crypto'
+  method: 'bank' | 'crypto' | 'lemon'
   amount: number
   amountUsd: number | null
   code: string

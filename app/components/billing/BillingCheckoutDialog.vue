@@ -11,8 +11,8 @@
       </div>
 
       <template v-else>
-        <!-- Bank transfer or crypto, when both are set up -->
-        <div v-if="methods.length > 1" class="mb-4 grid grid-cols-2 gap-1 rounded-full bg-sand/70 p-1">
+        <!-- Card, bank transfer or crypto: the ways that are set up -->
+        <div v-if="methods.length > 1" class="mb-4 grid gap-1 rounded-full bg-sand/70 p-1" :class="methods.length > 2 ? 'grid-cols-3' : 'grid-cols-2'">
           <button
             v-for="m in methods"
             :key="m"
@@ -21,13 +21,14 @@
             :class="method === m ? 'bg-paper text-ink shadow-sm' : 'text-ink-muted hover:text-ink'"
             @click="method = m"
           >
-            <UIcon v-if="m === 'bank'" name="i-lucide-landmark" class="size-4 shrink-0" />
+            <UIcon v-if="m === 'card'" name="i-lucide-credit-card" class="size-4 shrink-0" />
+            <UIcon v-else-if="m === 'bank'" name="i-lucide-landmark" class="size-4 shrink-0" />
             <!-- USDC and USDT logos, stacked -->
             <span v-else class="flex shrink-0 -space-x-1.5">
               <UIcon :name="CRYPTO_TOKEN_ICONS.USDC" class="size-[18px] rounded-full ring-2 ring-paper" />
               <UIcon :name="CRYPTO_TOKEN_ICONS.USDT" class="size-[18px] rounded-full ring-2 ring-paper" />
             </span>
-            <span class="truncate">{{ m === 'bank' ? t('dashboard.billing.checkout.methodBank') : t('dashboard.billing.checkout.methodCrypto') }}</span>
+            <span class="truncate">{{ t(`dashboard.billing.checkout.${m === 'card' ? 'methodCard' : m === 'bank' ? 'methodBank' : 'methodCrypto'}`) }}</span>
           </button>
         </div>
 
@@ -72,6 +73,22 @@
             class="w-full max-w-72 rounded-2xl bg-white ring-1 ring-line"
           >
           <p class="mt-2 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.scan') }}</p>
+        </div>
+
+        <!-- Card / PayPal: Lemon Squeezy's hosted checkout -->
+        <div v-else-if="method === 'card'" class="flex h-full flex-col items-center justify-center text-center">
+          <div class="flex size-14 items-center justify-center rounded-2xl bg-sand text-ink">
+            <UIcon name="i-lucide-shield-check" class="size-7" />
+          </div>
+          <p class="mt-4 text-lg font-semibold text-ink">{{ t('dashboard.billing.checkout.cardTitle') }}</p>
+          <p class="mt-2 text-3xl font-semibold tabular-nums text-ink">
+            ${{ PLAN_PRICES_USD[plan][period] }}<span class="text-base font-normal text-ink-muted"> / {{ t(period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly') }}</span>
+          </p>
+          <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.cardRenews') }}</p>
+          <div class="mt-5 flex items-center gap-3 text-ink-muted" aria-hidden="true">
+            <UIcon v-for="brand in CARD_BRANDS" :key="brand" :name="brand" class="size-6" />
+          </div>
+          <p class="mt-5 max-w-xs text-sm text-ink-muted">{{ t('dashboard.billing.checkout.cardText') }}</p>
         </div>
 
         <!-- Crypto: USDT / USDC to the wallet, then the transaction hash -->
@@ -131,6 +148,15 @@
 
     <template #footer>
       <UButton v-if="paid" block :label="t('dashboard.billing.checkout.done')" @click="open = false" />
+      <UButton
+        v-else-if="method === 'card'"
+        block
+        size="lg"
+        icon="i-lucide-lock"
+        :loading="openingCard"
+        :label="t('dashboard.billing.checkout.cardButton')"
+        @click="payByCard"
+      />
       <div v-else-if="!loading" class="flex w-full gap-2">
         <UButton color="neutral" variant="soft" icon="i-lucide-refresh-cw" :loading="refreshing" :label="t('dashboard.billing.checkout.refresh')" @click="refreshStatus" />
         <UButton
@@ -157,7 +183,7 @@
 <script setup lang="ts">
 import qrcode from 'qrcode-generator'
 import { CRYPTO_NETWORK_BY_ID, CRYPTO_TOKEN_ICONS, type CryptoToken } from '#shared/crypto'
-import type { BillingPeriod, PaidPlanId } from '#shared/plans'
+import { PLAN_PRICES_USD, type BillingPeriod, type PaidPlanId } from '#shared/plans'
 import { SUPPORT_EMAIL } from '~/utils/legal'
 
 // Pay for a plan by bank transfer (VietQR, VND) or in USDT / USDC to the
@@ -174,14 +200,15 @@ const { t, locale } = useI18n()
 const toast = useToast()
 const { info, refresh } = useBilling()
 
-type Method = 'bank' | 'crypto'
+type Method = 'card' | 'bank' | 'crypto'
+const CARD_BRANDS = ['i-simple-icons-visa', 'i-simple-icons-mastercard', 'i-simple-icons-paypal', 'i-simple-icons-applepay', 'i-simple-icons-googlepay']
 interface Transfer { qrString: string; qrImage: string; bankName: string; accountNumber: string; accountName: string; amount: number; note: string }
 interface CryptoInfo { address: string; amountUsd: number; networks: { id: string; name: string; tokens: string[] }[] }
 interface Check { verdict: 'ok' | 'short' | 'none' | 'failed' | 'pending' | 'error' }
 
 const methods = computed<Method[]>(() => {
-  const available = info.value?.paymentMethods ?? { bank: true, crypto: false }
-  return (['bank', 'crypto'] as Method[]).filter(m => available[m])
+  const available: Partial<Record<Method, boolean>> = info.value?.paymentMethods ?? { bank: true, crypto: false }
+  return (['card', 'bank', 'crypto'] as Method[]).filter(m => available[m])
 })
 const method = ref<Method>('bank')
 
@@ -226,7 +253,37 @@ function copy(text: string) {
   toast.add({ title: t('dashboard.billing.checkout.copied'), description: text })
 }
 
+// Card: off to Lemon Squeezy's checkout, which brings them back to the plans
+// page; someone already subscribed changes plan in their subscription page
+const openingCard = ref(false)
+async function payByCard() {
+  openingCard.value = true
+  try {
+    const res = await $fetch<{ url?: string; portalUrl?: string }>('/api/billing/lemon-checkout', {
+      method: 'POST',
+      body: { plan: props.plan, period: props.period },
+    })
+    if (res.portalUrl) {
+      toast.add({ title: t('dashboard.billing.checkout.cardPortal') })
+      window.open(res.portalUrl, '_blank', 'noopener')
+      openingCard.value = false
+    } else if (res.url) {
+      window.location.href = res.url
+    }
+  } catch (error: any) {
+    toast.add({ title: t('dashboard.billing.checkout.failed'), description: error?.data?.statusMessage, color: 'error' })
+    openingCard.value = false
+  }
+}
+
 async function start() {
+  // Nothing to set up for card: the checkout opens from the button
+  if (method.value === 'card') {
+    paymentId.value = null
+    status.value = 'pending'
+    paid.value = null
+    return
+  }
   loading.value = true
   paid.value = null
   check.value = null

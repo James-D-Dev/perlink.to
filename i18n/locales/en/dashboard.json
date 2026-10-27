@@ -693,7 +693,15 @@
         "rejectedTitle": "We couldn’t confirm this payment",
         "rejectedText": "We couldn’t find this payment. If you did pay, contact support with the code below, or check the details and send it again.",
         "contactSupport": "Contact support",
-        "tryAgain": "Send again"
+        "tryAgain": "Send again",
+        "methodCard": "Card",
+        "cardTitle": "Pay securely by card",
+        "cardText": "Visa, Mastercard, PayPal, Apple Pay and Google Pay. You’ll finish on a secure checkout page from Lemon Squeezy, our reseller, then come back here.",
+        "cardRenews": "Renews automatically; cancel any time.",
+        "cardButton": "Continue to checkout",
+        "cardPortal": "You already have a subscription; change the plan from your subscription page.",
+        "returned": "Payment received",
+        "returnedText": "Your plan turns on in a few seconds."
       },
       "prompt": {
         "sites": {
@@ -726,7 +734,8 @@
         "paid": "Paid",
         "expired": "Expired",
         "submitted": "Waiting for review",
-        "rejected": "Not confirmed"
+        "rejected": "Not confirmed",
+        "refunded": "Refunded"
       },
       "comingSoon": "Coming soon",
       "usdNote": "Prices in US dollars; taxes may apply at checkout. In Vietnam you can also pay by bank transfer (VietQR) in VND.",
@@ -736,6 +745,12 @@
         "until": "Your plan runs until {date}.",
         "unlocked": "You’ve unlocked",
         "start": "Let’s go"
+      },
+      "subscription": {
+        "renews": "Renews on {date}",
+        "ends": "Cancelled · ends on {date}",
+        "pastDue": "Payment failed · update your card",
+        "manage": "Manage subscription"
       }
     },
     "telegram": {

@@ -61,6 +61,15 @@ export default defineNuxtConfig({
       // EVM wallet that receives USDT / USDC (NUXT_BILLING_CRYPTO_ADDRESS)
       cryptoAddress: "",
     },
+    // Lemon Squeezy (card / PayPal subscriptions, Merchant of Record):
+    // NUXT_LEMON_API_KEY and NUXT_LEMON_WEBHOOK_SECRET. The store and the
+    // plan variants are looked up through the API; NUXT_LEMON_STORE_ID can pin
+    // the store. Empty key = the card option is hidden.
+    lemon: {
+      apiKey: "",
+      webhookSecret: "",
+      storeId: "",
+    },
     // Order and request alerts on Telegram (see docs/telegram-notifications.md).
     // Empty token = the "Connect Telegram" option is hidden.
     telegram: {

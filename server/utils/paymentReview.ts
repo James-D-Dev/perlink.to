@@ -24,7 +24,7 @@ export interface PaymentRow {
   amount_usd: number | null
   code: string
   status: string
-  method: 'bank' | 'crypto'
+  method: 'bank' | 'crypto' | 'lemon'
   network: string | null
   token: string | null
   tx_hash: string | null
@@ -95,7 +95,7 @@ export const REVIEW_COPY = {
   en: {
     period: { monthly: '1 month', annual: '1 year' } as Record<BillingPeriod, string>,
     title: '💳 <b>Payment waiting for review</b>',
-    method: { bank: 'Bank transfer', crypto: 'Crypto' },
+    method: { bank: 'Bank transfer', crypto: 'Crypto', lemon: 'Card' },
     account: 'Account', plan: 'Plan', amount: 'Amount', tx: 'Tx', check: 'Check', note: 'Transfer message', code: 'Code',
     bankCheck: 'open your bank app and find a transfer with this amount and message.',
     approve: '✅ Approve & upgrade', reject: '✖ Reject', reviewPage: 'Review page',
@@ -110,7 +110,7 @@ export const REVIEW_COPY = {
   vi: {
     period: { monthly: '1 tháng', annual: '1 năm' } as Record<BillingPeriod, string>,
     title: '💳 <b>Thanh toán chờ duyệt</b>',
-    method: { bank: 'Chuyển khoản', crypto: 'Crypto' },
+    method: { bank: 'Chuyển khoản', crypto: 'Crypto', lemon: 'Thẻ' },
     account: 'Tài khoản', plan: 'Gói', amount: 'Số tiền', tx: 'Tx', check: 'Kiểm tra', note: 'Nội dung CK', code: 'Mã',
     bankCheck: 'mở app ngân hàng, tìm giao dịch đúng số tiền và nội dung trên.',
     approve: '✅ Duyệt & nâng cấp', reject: '✖ Từ chối', reviewPage: 'Trang duyệt',

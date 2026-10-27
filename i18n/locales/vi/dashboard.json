@@ -693,7 +693,15 @@
         "rejectedTitle": "Chưa xác nhận được thanh toán",
         "rejectedText": "Chúng tôi chưa thấy khoản thanh toán này. Nếu bạn đã chuyển tiền, hãy liên hệ hỗ trợ kèm mã dưới đây, hoặc kiểm tra lại rồi gửi lại.",
         "contactSupport": "Liên hệ hỗ trợ",
-        "tryAgain": "Gửi lại"
+        "tryAgain": "Gửi lại",
+        "methodCard": "Thẻ",
+        "cardTitle": "Thanh toán an toàn bằng thẻ",
+        "cardText": "Visa, Mastercard, PayPal, Apple Pay và Google Pay. Bạn sẽ hoàn tất trên trang thanh toán an toàn của Lemon Squeezy (đại lý bán lại của chúng tôi) rồi quay về đây.",
+        "cardRenews": "Tự gia hạn, huỷ bất cứ lúc nào.",
+        "cardButton": "Tiếp tục thanh toán",
+        "cardPortal": "Bạn đã có thuê bao; hãy đổi gói trong trang quản lý thuê bao.",
+        "returned": "Đã nhận thanh toán",
+        "returnedText": "Gói của bạn sẽ bật sau vài giây."
       },
       "prompt": {
         "sites": {
@@ -726,7 +734,8 @@
         "paid": "Đã thanh toán",
         "expired": "Hết hạn",
         "submitted": "Chờ duyệt",
-        "rejected": "Chưa xác nhận"
+        "rejected": "Chưa xác nhận",
+        "refunded": "Đã hoàn tiền"
       },
       "comingSoon": "Sắp mở bán",
       "usdNote": "Giá theo đô la Mỹ, có thể cộng thuế khi thanh toán. Tại Việt Nam bạn cũng có thể chuyển khoản (VietQR) bằng VND.",
@@ -736,6 +745,12 @@
         "until": "Gói có hiệu lực đến {date}.",
         "unlocked": "Bạn vừa mở khoá",
         "start": "Bắt đầu thôi"
+      },
+      "subscription": {
+        "renews": "Gia hạn ngày {date}",
+        "ends": "Đã huỷ · kết thúc ngày {date}",
+        "pastDue": "Thanh toán lỗi · hãy cập nhật thẻ",
+        "manage": "Quản lý thuê bao"
       }
     },
     "telegram": {
