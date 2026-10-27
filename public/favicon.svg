@@ -1,16 +1,8 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="orb" cx="0.35" cy="0.32" r="0.75">
-      <stop offset="0" stop-color="#ffe0b8"/>
-      <stop offset="0.45" stop-color="#ff8a4c"/>
-      <stop offset="1" stop-color="#c2410c"/>
-    </radialGradient>
-  </defs>
-  <style>
-    .ink { fill: #0c0b0a; } .ring { stroke: #0c0b0a; }
-    @media (prefers-color-scheme: dark) { .ink { fill: #fdfcfb; } .ring { stroke: #fdfcfb; } }
-  </style>
-  <rect class="ink" x="5" y="6" width="6" height="22" rx="3"/>
-  <circle class="ring" cx="17.5" cy="13.5" r="7.5" stroke-width="5.5"/>
-  <circle cx="17.5" cy="13.5" r="3.4" fill="url(#orb)"/>
+  <rect width="32" height="32" rx="7.4" fill="#0c0b0a"/>
+  <g transform="translate(16 16) scale(1) translate(-16 -16)">
+    <rect x="9.6" y="7.5" width="4" height="18.5" rx="2" fill="#fdfcfb"/>
+    <circle cx="17.6" cy="14.2" r="4.7" stroke="#fdfcfb" stroke-width="4"/>
+    <circle cx="17.6" cy="14.2" r="2.1" fill="#007aff"/>
+  </g>
 </svg>
