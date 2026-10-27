@@ -9,9 +9,9 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-3xl space-y-4">
+      <div class="mx-auto w-full max-w-3xl space-y-4 py-2 sm:py-4">
         <!-- Telegram bot for owners' order and request alerts -->
-        <UCard :ui="superadminCardUi">
+        <UCard :ui="superadminPanelUi">
           <template #header>
             <div class="flex items-center gap-2">
               <UIcon name="i-simple-icons-telegram" class="size-5 text-[#229ED9]" />
@@ -49,12 +49,12 @@
 </template>
 
 <script setup lang="ts">
-import { superadminCardUi } from '~/utils/superadmin'
+import { superadminPanelUi } from '~/utils/superadmin'
 
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'dark',
+  colorMode: 'light',
 });
 
 interface TelegramStatus {

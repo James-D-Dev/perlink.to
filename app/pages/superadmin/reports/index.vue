@@ -13,12 +13,12 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-5xl space-y-3">
+      <div class="mx-auto w-full max-w-5xl space-y-3 py-2 sm:py-4">
         <p v-if="!pending && !reports.length" class="py-16 text-center text-sm text-muted">
           {{ filter === 'open' ? 'No open reports.' : 'No reports yet.' }}
         </p>
 
-        <UCard v-for="report in reports" :key="report.id" :ui="superadminCardUi">
+        <UCard v-for="report in reports" :key="report.id" :ui="superadminPanelUi">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="min-w-0 flex-1 space-y-1.5">
               <div class="flex flex-wrap items-center gap-2">
@@ -61,12 +61,12 @@
 </template>
 
 <script setup lang="ts">
-import { superadminCardUi } from '~/utils/superadmin'
+import { superadminPanelUi } from '~/utils/superadmin'
 
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'dark',
+  colorMode: 'light',
 })
 useSeoMeta({ title: 'Reports — Superadmin', robots: 'noindex' })
 

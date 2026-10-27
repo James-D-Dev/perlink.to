@@ -23,7 +23,7 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-7xl space-y-6">
+      <div class="mx-auto w-full max-w-6xl space-y-6 py-2 sm:py-4">
 
       <!-- KPIs -->
       <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -101,9 +101,9 @@
               <UButton to="/superadmin/users" variant="link" color="neutral" size="sm" trailing-icon="i-lucide-arrow-right" label="View all" />
             </div>
           </template>
-          <ul class="divide-y divide-default">
+          <ul class="divide-y divide-line">
             <li v-for="u in recentUsers" :key="u.id">
-              <NuxtLink :to="`/superadmin/users/${u.id}`" class="flex items-center gap-3 px-4 py-3 hover:bg-elevated/50 transition-colors">
+              <NuxtLink :to="`/superadmin/users/${u.id}`" class="flex items-center gap-3 px-5 py-3.5 hover:bg-sand/40 transition-colors">
                 <UAvatar :src="u.avatar || undefined" :text="initial(u.name || u.email)" size="sm" />
                 <div class="min-w-0 flex-1">
                   <p class="truncate text-sm font-medium text-highlighted">{{ u.name || 'No name' }}</p>
@@ -113,7 +113,7 @@
                 <span class="hidden w-24 text-right text-xs text-dimmed sm:block">{{ timeAgo(u.createdAt) }}</span>
               </NuxtLink>
             </li>
-            <li v-if="loaded && recentUsers.length === 0" class="px-4 py-8 text-center text-sm text-muted">No users yet.</li>
+            <li v-if="loaded && recentUsers.length === 0" class="px-5 py-8 text-center text-sm text-muted">No users yet.</li>
           </ul>
         </UCard>
 
@@ -145,8 +145,8 @@
               <UButton to="/superadmin/links" variant="link" color="neutral" size="sm" trailing-icon="i-lucide-arrow-right" label="View all" />
             </div>
           </template>
-          <ul class="divide-y divide-default">
-            <li v-for="(l, i) in topLinks" :key="l.id" class="flex items-center gap-3 px-4 py-3">
+          <ul class="divide-y divide-line">
+            <li v-for="(l, i) in topLinks" :key="l.id" class="flex items-center gap-3 px-5 py-3.5">
               <span class="w-4 text-xs tabular-nums text-dimmed">{{ i + 1 }}</span>
               <div class="min-w-0 flex-1">
                 <a :href="`https://s.perlink.to/${l.shortCode}`" target="_blank" class="truncate text-sm font-medium text-highlighted hover:text-primary">
@@ -156,7 +156,7 @@
               </div>
               <span class="text-sm tabular-nums text-default">{{ l.clickCount.toLocaleString() }}</span>
             </li>
-            <li v-if="loaded && topLinks.length === 0" class="px-4 py-8 text-center text-sm text-muted">No short links yet.</li>
+            <li v-if="loaded && topLinks.length === 0" class="px-5 py-8 text-center text-sm text-muted">No short links yet.</li>
           </ul>
         </UCard>
 
@@ -167,8 +167,8 @@
               <UButton to="/superadmin/bio" variant="link" color="neutral" size="sm" trailing-icon="i-lucide-arrow-right" label="View all" />
             </div>
           </template>
-          <ul class="divide-y divide-default">
-            <li v-for="(b, i) in topBios" :key="b.id" class="flex items-center gap-3 px-4 py-3">
+          <ul class="divide-y divide-line">
+            <li v-for="(b, i) in topBios" :key="b.id" class="flex items-center gap-3 px-5 py-3.5">
               <span class="w-4 text-xs tabular-nums text-dimmed">{{ i + 1 }}</span>
               <UAvatar :src="b.avatarUrl || undefined" :text="initial(b.title || b.username)" size="xs" />
               <div class="min-w-0 flex-1">
@@ -179,7 +179,7 @@
               </div>
               <span class="text-sm tabular-nums text-default">{{ b.viewCount.toLocaleString() }}</span>
             </li>
-            <li v-if="loaded && topBios.length === 0" class="px-4 py-8 text-center text-sm text-muted">No bio pages yet.</li>
+            <li v-if="loaded && topBios.length === 0" class="px-5 py-8 text-center text-sm text-muted">No bio pages yet.</li>
           </ul>
         </UCard>
       </div>
@@ -210,13 +210,13 @@ interface Overview {
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'dark',
+  colorMode: 'light',
 });
 
 const toast = useToast();
 const { getPlanColor } = usePlans();
 
-const cardUi = { root: 'bg-elevated/40 ring-default', header: 'px-4 py-3 sm:px-4', body: 'p-4 sm:p-4' };
+const cardUi = { header: 'px-5 py-4 sm:px-5', body: 'p-5 sm:p-5' };
 
 // State
 const isLoading = ref(false);

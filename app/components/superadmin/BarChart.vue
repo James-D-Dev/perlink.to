@@ -3,9 +3,9 @@
     <!-- Plot -->
     <div class="relative" :style="{ height: `${height}px` }">
       <!-- Recessive grid: max + midpoint -->
-      <div class="absolute inset-x-0 top-0 border-t border-dashed border-default" />
-      <div class="absolute inset-x-0 top-1/2 border-t border-dashed border-default/60" />
-      <span class="absolute -top-2.5 right-0 bg-default pl-1 text-[10px] tabular-nums text-dimmed">
+      <div class="absolute inset-x-0 top-0 border-t border-dashed border-line" />
+      <div class="absolute inset-x-0 top-1/2 border-t border-dashed border-line/60" />
+      <span class="absolute -top-2.5 right-0 bg-paper pl-1 text-[10px] tabular-nums text-dimmed">
         {{ niceMax.toLocaleString() }}
       </span>
 
@@ -30,18 +30,18 @@
       <!-- Tooltip -->
       <div
         v-if="hovered !== null && data[hovered]"
-        class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-md border border-default bg-elevated px-2 py-1 text-xs shadow-lg whitespace-nowrap"
+        class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-xl bg-neutral-900/85 px-2.5 py-1.5 text-white backdrop-blur-xl text-xs shadow-lg whitespace-nowrap"
         :style="{ left: `${((hovered + 0.5) / data.length) * 100}%`, top: '-4px' }"
       >
-        <p class="text-muted">{{ formatDay(data[hovered]!.date, true) }}</p>
-        <p class="font-semibold tabular-nums text-highlighted">
+        <p class="text-white/60">{{ formatDay(data[hovered]!.date, true) }}</p>
+        <p class="font-semibold tabular-nums text-white">
           {{ data[hovered]!.value.toLocaleString() }} {{ unit }}
         </p>
       </div>
     </div>
 
     <!-- Baseline + x labels -->
-    <div class="border-t border-accented" />
+    <div class="border-t border-line" />
     <div class="mt-1.5 flex justify-between text-[10px] text-dimmed">
       <span>{{ formatDay(data[0]?.date) }}</span>
       <span>{{ formatDay(data[Math.floor(data.length / 2)]?.date) }}</span>

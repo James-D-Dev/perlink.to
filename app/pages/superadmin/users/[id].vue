@@ -10,7 +10,7 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-7xl">
+      <div class="mx-auto w-full max-w-6xl py-2 sm:py-4">
         <!-- Loading -->
         <div v-if="isLoading && !user" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <USkeleton class="h-96" />
@@ -126,8 +126,8 @@
               </template>
 
               <!-- Bio pages -->
-              <ul v-if="activeTab === 'bio'" class="divide-y divide-default">
-                <li v-for="b in bioPages" :key="b.id" class="flex items-center gap-3 px-4 py-3">
+              <ul v-if="activeTab === 'bio'" class="divide-y divide-line">
+                <li v-for="b in bioPages" :key="b.id" class="flex items-center gap-3 px-5 py-3.5">
                   <UAvatar :src="b.avatarUrl || undefined" :text="(b.title || b.username).charAt(0).toUpperCase()" size="sm" />
                   <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-medium text-highlighted">{{ b.title || 'Untitled' }}</p>
@@ -140,8 +140,8 @@
               </ul>
 
               <!-- Short links -->
-              <ul v-else-if="activeTab === 'links'" class="divide-y divide-default">
-                <li v-for="l in links" :key="l.id" class="flex items-center gap-3 px-4 py-3">
+              <ul v-else-if="activeTab === 'links'" class="divide-y divide-line">
+                <li v-for="l in links" :key="l.id" class="flex items-center gap-3 px-5 py-3.5">
                   <div class="min-w-0 flex-1">
                     <a :href="`https://s.perlink.to/${l.shortCode}`" target="_blank" class="truncate text-sm font-medium text-highlighted hover:text-primary">s.perlink.to/{{ l.shortCode }}</a>
                     <p class="truncate text-xs text-muted" :title="l.targetUrl || ''">{{ l.targetUrl || '-' }}</p>
@@ -153,8 +153,8 @@
               </ul>
 
               <!-- QR codes -->
-              <ul v-else class="divide-y divide-default">
-                <li v-for="q in qrCodes" :key="q.id" class="flex items-center gap-3 px-4 py-3">
+              <ul v-else class="divide-y divide-line">
+                <li v-for="q in qrCodes" :key="q.id" class="flex items-center gap-3 px-5 py-3.5">
                   <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-medium text-highlighted">{{ q.name || q.shortCode }}</p>
                     <p class="truncate text-xs text-muted" :title="q.destinationUrl">{{ q.destinationUrl }}</p>
@@ -215,7 +215,7 @@ interface QRCodeRow { id: string; shortCode: string; name: string | null; destin
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'dark',
+  colorMode: 'light',
 });
 
 const route = useRoute();
@@ -224,7 +224,7 @@ const toast = useToast();
 const confirm = useConfirm();
 const { getPlanColor } = usePlans();
 
-const cardUi = { root: 'bg-elevated/40 ring-default', header: 'px-4 py-3 sm:px-4', body: 'p-4 sm:p-4' };
+const cardUi = { header: 'px-5 py-4 sm:px-5', body: 'p-5 sm:p-5' };
 
 // State
 const isLoading = ref(true);

@@ -11,7 +11,7 @@
 
     <template #body>
       <div class="mx-auto w-full max-w-2xl">
-        <UCard :ui="{ root: 'bg-elevated/40 ring-default', header: 'px-6 py-4', body: 'p-6 sm:p-6' }">
+        <UCard :ui="{ header: 'px-6 py-4', body: 'p-6 sm:p-6' }">
           <template #header>
             <h2 class="font-medium text-highlighted">New user</h2>
             <p class="mt-1 text-sm text-muted">
@@ -55,7 +55,7 @@ import { PLAN_OPTIONS } from '~/composables/usePlans'
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'dark',
+  colorMode: 'light',
 });
 
 const toast = useToast();

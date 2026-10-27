@@ -9,7 +9,7 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-7xl space-y-6">
+      <div class="mx-auto w-full max-w-6xl space-y-6 py-2 sm:py-4">
 
       <!-- Stats -->
       <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -115,7 +115,7 @@ interface Stats {
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'dark',
+  colorMode: 'light',
 });
 
 const toast = useToast();

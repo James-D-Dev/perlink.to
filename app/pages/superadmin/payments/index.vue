@@ -6,19 +6,19 @@
           <UDashboardSidebarCollapse />
         </template>
         <template #right>
-          <USelect v-model="filter" :items="filterOptions" class="w-40" />
+          <USelect v-model="filter" :items="filterOptions" class="w-48" />
           <UButton variant="ghost" color="neutral" icon="i-lucide-refresh-cw" :loading="pending" @click="refresh()" />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-5xl space-y-3">
+      <div class="mx-auto w-full max-w-5xl space-y-3 py-2 sm:py-4">
         <p v-if="!pending && !payments.length" class="py-16 text-center text-sm text-muted">
           {{ filter === 'submitted' ? 'Nothing waiting for review.' : 'No payments yet.' }}
         </p>
 
-        <UCard v-for="p in payments" :key="p.id" :ui="superadminCardUi">
+        <UCard v-for="p in payments" :key="p.id" :ui="superadminPanelUi">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="min-w-0 flex-1 space-y-1.5">
               <div class="flex flex-wrap items-center gap-2">
@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { superadminCardUi } from '~/utils/superadmin'
+import { superadminPanelUi } from '~/utils/superadmin'
 import { formatVnd } from '#shared/plans'
 
 // Payments people marked as done, waiting for a decision. Approving puts the
@@ -81,7 +81,7 @@ import { formatVnd } from '#shared/plans'
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'dark',
+  colorMode: 'light',
 })
 useSeoMeta({ title: 'Payments — Superadmin', robots: 'noindex' })
 
