@@ -21,7 +21,7 @@
     >
       <template #header="{ collapsed }">
         <NuxtLink to="/superadmin" :aria-label="collapsed ? 'Perlink admin' : undefined" class="flex min-w-0 items-center gap-2" :class="collapsed && 'w-full justify-center'">
-          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="24" />
+          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="24" :inverted="theme === 'dark'" />
           <span v-if="!collapsed" class="rounded-full bg-error/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-error">Admin</span>
         </NuxtLink>
       </template>
@@ -47,7 +47,7 @@
 
         <UNavigationMenu
           :collapsed="collapsed"
-          :items="supportLinks"
+          :items="[themeLink, ...supportLinks]"
           orientation="vertical"
           tooltip
           class="mt-auto"
@@ -71,6 +71,25 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 const open = ref(false);
+
+// Admin colours (blue primary, dark-aware paper/ink) live under this class
+useHead({ htmlAttrs: { class: "admin-theme" } });
+
+// Light / dark switch, dark by default
+const route = useRoute();
+const colorMode = useColorMode();
+const theme = useAdminTheme();
+function toggleTheme() {
+  const next = theme.value === "dark" ? "light" : "dark";
+  theme.value = next;
+  route.meta.colorMode = next;
+  colorMode.value = next;
+}
+const themeLink = computed<NavigationMenuItem>(() => ({
+  label: theme.value === "dark" ? "Light mode" : "Dark mode",
+  icon: theme.value === "dark" ? "i-lucide-sun" : "i-lucide-moon",
+  onSelect: toggleTheme,
+}));
 
 // Same rows as the dashboard menu
 const navUi = {

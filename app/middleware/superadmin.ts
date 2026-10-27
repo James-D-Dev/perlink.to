@@ -12,4 +12,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     // Redirect to user dashboard if not superadmin
     return navigateTo('/dashboard')
   }
+
+  // The page's colour mode comes from the admin's own switch
+  to.meta.colorMode = useAdminTheme().value === 'light' ? 'light' : 'dark'
 })

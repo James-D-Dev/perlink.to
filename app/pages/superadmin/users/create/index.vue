@@ -55,7 +55,6 @@ import { PLAN_OPTIONS } from '~/composables/usePlans'
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'light',
 });
 
 const toast = useToast();

@@ -122,6 +122,28 @@ Must come after :root so it overrides the light --ui-bg above.
   --ui-color-neutral-950: #0a0a0a;
 }
 
+/*
+Superadmin: the dashboard's paper/sand/ink look with a blue primary, and a
+dark version of those surfaces for its dark mode (its own switch).
+*/
+.admin-theme {
+  --ui-primary: var(--color-perlink-blue);
+}
+.admin-theme.dark {
+  --color-paper: #0a0a0a;
+  --color-sand: #1a1a1a;
+  --color-sand-strong: #262626;
+  --color-line: rgb(255 255 255 / 0.09);
+  --color-ink: #fafafa;
+  --color-ink-soft: #d4d4d4;
+  --color-ink-muted: #a1a1a1;
+  --color-ink-faint: #6b6b6b;
+}
+/* White text on blue buttons and badges in both modes */
+.admin-theme .bg-primary.text-inverted {
+  color: #fff;
+}
+
 /* ---------- Public site primitives ---------- */
 
 /* Display headings: large, light and slightly tight */

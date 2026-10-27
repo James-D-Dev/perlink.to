@@ -81,7 +81,6 @@ import { formatVnd } from '#shared/plans'
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'light',
 })
 useSeoMeta({ title: 'Payments — Superadmin', robots: 'noindex' })
 

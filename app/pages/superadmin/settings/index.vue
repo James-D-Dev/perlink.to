@@ -54,7 +54,6 @@ import { superadminPanelUi } from '~/utils/superadmin'
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'light',
 });
 
 interface TelegramStatus {

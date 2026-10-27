@@ -118,7 +118,6 @@ interface Stats {
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'light',
 });
 
 const toast = useToast();

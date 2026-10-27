@@ -215,7 +215,6 @@ interface QRCodeRow { id: string; shortCode: string; name: string | null; destin
 definePageMeta({
   layout: 'superadmin',
   middleware: 'superadmin',
-  colorMode: 'light',
 });
 
 const route = useRoute();
