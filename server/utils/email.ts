@@ -12,6 +12,8 @@ export interface EmailMessage {
   html: string
   text: string
   replyTo?: string
+  /** Sender, e.g. "Perlink Support <support@perlink.to>" (default NUXT_EMAIL_FROM) */
+  from?: string
 }
 
 interface ServiceBinding {
@@ -31,8 +33,9 @@ export function emailEnabled(event: H3Event) {
 
 export async function sendEmail(event: H3Event, message: EmailMessage): Promise<boolean> {
   const config = useRuntimeConfig(event)
-  const from = String(config.emailFrom)
+  const from = message.from || String(config.emailFrom)
   const bare = from.match(/<([^>]+)>/)?.[1] ?? from
+  const fromName = from.match(/^\s*"?([^"<]+?)"?\s*</)?.[1]
 
   const worker = emailBinding(event)
   if (worker) {
@@ -40,7 +43,7 @@ export async function sendEmail(event: H3Event, message: EmailMessage): Promise<
       const response = await worker.fetch('https://perlink-email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: message.to, from: bare, subject: message.subject, html: message.html, text: message.text, replyTo: message.replyTo }),
+        body: JSON.stringify({ to: message.to, from: bare, fromName, subject: message.subject, html: message.html, text: message.text, replyTo: message.replyTo }),
       })
       const data = await response.json().catch(() => null) as { ok?: boolean; error?: string } | null
       if (data?.ok) return true

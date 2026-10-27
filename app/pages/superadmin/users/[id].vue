@@ -6,6 +6,9 @@
           <UDashboardSidebarCollapse />
           <UButton to="/superadmin/users" variant="ghost" color="neutral" icon="i-lucide-arrow-left" size="sm" />
         </template>
+        <template #right>
+          <UButton v-if="user?.email" :to="`/superadmin/emails?to=${encodeURIComponent(user.email)}`" icon="i-lucide-mail" label="Send email" size="sm" />
+        </template>
       </UDashboardNavbar>
     </template>
 

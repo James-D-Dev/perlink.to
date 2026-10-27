@@ -6,7 +6,7 @@
 // (perlink.to) must be onboarded in Email Sending. Setup: docs/email.md
 
 interface EmailBinding {
-  send(message: { to: string | string[]; from: string; subject: string; html?: string; text?: string; replyTo?: string }): Promise<{ messageId?: string }>
+  send(message: { to: string | string[]; from: string | { email: string; name: string }; subject: string; html?: string; text?: string; replyTo?: string }): Promise<{ messageId?: string }>
 }
 
 interface Env {
@@ -16,6 +16,8 @@ interface Env {
 interface SendRequest {
   to: string
   from: string
+  /** Shown as the sender's name, e.g. "Perlink Support" */
+  fromName?: string
   subject: string
   html: string
   text: string
@@ -31,15 +33,26 @@ export default {
     if (!message?.to || !message.from || !message.subject || !(message.html || message.text)) {
       return json({ ok: false, error: 'to, from, subject and html or text are required' }, 400)
     }
+    const send = (from: string | { email: string; name: string }) => env.EMAIL.send({
+      to: message.to,
+      from,
+      subject: message.subject,
+      html: message.html,
+      text: message.text,
+      replyTo: message.replyTo,
+    })
     try {
-      const result = await env.EMAIL.send({
-        to: message.to,
-        from: message.from,
-        subject: message.subject,
-        html: message.html,
-        text: message.text,
-        replyTo: message.replyTo,
-      })
+      // With a display name when given; the bare address if that isn't accepted
+      let result
+      if (message.fromName) {
+        try {
+          result = await send({ email: message.from, name: message.fromName })
+        } catch {
+          result = await send(message.from)
+        }
+      } else {
+        result = await send(message.from)
+      }
       return json({ ok: true, messageId: result?.messageId ?? null })
     } catch (error) {
       return json({ ok: false, error: error instanceof Error ? error.message : String(error) }, 502)
