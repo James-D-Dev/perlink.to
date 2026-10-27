@@ -69,7 +69,7 @@ export async function sendEmail(event: H3Event, message: EmailMessage): Promise<
     }),
   })
   try {
-    // "Perlink <notifications@perlink.to>"; if the name isn't accepted, the bare address
+    // "Perlink <notification@perlink.to>"; if the name isn't accepted, the bare address
     let response = await post(from)
     if (!response.ok && response.status === 400 && bare !== from) response = await post(bare)
     const data = await response.json().catch(() => null) as { success?: boolean; errors?: { message: string }[]; result?: { permanent_bounces?: string[] } } | null

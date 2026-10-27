@@ -52,7 +52,7 @@ export default defineNuxtConfig({
     domainProxySecret: "",
     // Where owners point their domain (CNAME target)
     domainCnameTarget: "sites.perlink.to",
-    emailFrom: "Perlink <notifications@perlink.to>",
+    emailFrom: "Perlink <notification@perlink.to>",
     // Plan payments by bank transfer (VietQR), confirmed by SePay's webhook
     // (see docs/billing.md). Empty account = checkout shows as not available.
     billing: {
