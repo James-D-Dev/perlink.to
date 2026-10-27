@@ -50,6 +50,10 @@ comes from imagery and the gradient orbs, not from the UI chrome.
      actions, warm neutrals for everything else */
   --ui-primary: var(--color-tint);
   --ui-secondary: var(--color-ink-soft);
+  /* iOS system colours for states */
+  --ui-success: #34c759;
+  --ui-warning: #ff9500;
+  --ui-error: #ff3b30;
   --ui-radius: 0.25rem;
 
   --ui-bg: var(--color-paper);
@@ -92,6 +96,9 @@ Must come after :root so it overrides the light --ui-bg above.
 .dark {
   --color-tint: #0a84ff;
   --ui-primary: var(--color-tint);
+  --ui-success: #30d158;
+  --ui-warning: #ff9f0a;
+  --ui-error: #ff453a;
   --ui-secondary: var(--color-perlink-cyan);
 
   --ui-bg: #0a0a0a;

@@ -99,15 +99,54 @@ export default defineAppConfig({
       variants: { ...iosField.variants, size: menuRows.variants.size },
       compoundVariants: [...iosField.compoundVariants, { transition: true, class: { content: menuMotion } }],
     },
+    // iOS 26 buttons: capsules with room either side of the label. Filled
+    // ones are the tint with a white semibold label, a soft top highlight and
+    // a coloured glow; pressing makes them swell and brighten with a little
+    // spring (Liquid Glass) instead of fading. Disabled is gray, not faded.
     button: {
       slots: {
-        base: 'rounded-full transition-[background-color,color,box-shadow,transform,opacity] duration-150 active:scale-[0.97] disabled:active:scale-100',
+        base: 'rounded-full transition-[background-color,color,box-shadow,transform,filter] duration-300 ease-[cubic-bezier(0.34,1.4,0.64,1)] disabled:active:scale-100 aria-disabled:active:scale-100',
+      },
+      variants: {
+        // Heights on the iOS scale (44 for touch, 50 for large actions)
+        size: {
+          xs: { base: 'h-7 px-3 py-0 text-xs gap-1' },
+          sm: { base: 'h-8 px-3.5 py-0 text-[13px] gap-1.5' },
+          md: { base: 'h-9 px-4 py-0 text-sm gap-1.5' },
+          lg: { base: 'h-11 px-5 py-0 text-[15px] gap-2' },
+          xl: { base: 'h-[50px] px-6 py-0 text-[17px] gap-2' },
+        },
       },
       compoundVariants: [
-        { color: 'neutral', variant: ['outline', 'subtle'], class: glassButton },
-        { color: 'neutral', variant: 'soft', class: 'bg-black/[0.05] hover:bg-black/[0.08] active:bg-black/[0.1] dark:bg-white/10 dark:hover:bg-white/15' },
+        // Filled: gloss on top, hairline light edge, swell on press
+        {
+          variant: 'solid',
+          class: 'font-semibold bg-[linear-gradient(180deg,rgb(255_255_255/0.16),rgb(255_255_255/0)_55%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.28),inset_0_0_0_1px_rgb(255_255_255/0.08),0_1px_2px_rgb(0_0_0/0.1)] hover:brightness-[1.06] active:brightness-110 active:scale-[1.04] disabled:opacity-100 aria-disabled:opacity-100 disabled:bg-none disabled:bg-black/[0.06] disabled:text-black/30 disabled:shadow-none disabled:brightness-100 dark:disabled:bg-white/10 dark:disabled:text-white/30',
+        },
+        {
+          color: 'primary',
+          variant: 'solid',
+          class: 'text-white hover:bg-primary active:bg-primary shadow-[inset_0_1px_0_rgb(255_255_255/0.3),inset_0_0_0_1px_rgb(255_255_255/0.1),0_1px_2px_rgb(0_0_0/0.08),0_4px_12px_-6px_var(--ui-primary)]',
+        },
+        { color: ['success', 'error', 'warning', 'info', 'secondary'], variant: 'solid', class: 'text-white' },
+        // A loading button keeps its colour (Nuxt UI disables it while loading)
+        { color: 'primary', variant: 'solid', loading: true, class: 'disabled:bg-primary disabled:text-white dark:disabled:bg-primary dark:disabled:text-white disabled:opacity-85' },
+        { color: 'neutral', variant: 'solid', loading: true, class: 'disabled:bg-inverted disabled:text-inverted dark:disabled:bg-inverted dark:disabled:text-inverted disabled:opacity-85' },
+        // Tinted (iOS "bordered"): a wash of the tint, label in the tint
+        { color: 'primary', variant: ['soft', 'subtle'], class: 'ring-0 bg-primary/12 hover:bg-primary/18 active:bg-primary/22 active:scale-[1.04] dark:bg-primary/22 dark:hover:bg-primary/28' },
+        // Glass with a tinted label (iOS .glass)
+        { color: 'primary', variant: 'outline', class: `${glassButton} text-primary ring-1 active:scale-[1.04]` },
+        { color: 'neutral', variant: ['outline', 'subtle'], class: `${glassButton} active:scale-[1.04]` },
+        { color: 'neutral', variant: 'soft', class: 'bg-black/[0.05] hover:bg-black/[0.08] active:bg-black/[0.1] active:scale-[1.04] dark:bg-white/10 dark:hover:bg-white/15' },
+        // Plain: just the label; a light press
+        { variant: ['ghost', 'link'], class: 'active:scale-[0.96]' },
         { color: 'neutral', variant: 'ghost', class: 'hover:bg-black/[0.05] dark:hover:bg-white/10' },
-        { variant: 'solid', class: 'shadow-[inset_0_1px_0_rgb(255_255_255/0.18)]' },
+        // Icon-only buttons are circles of the same height
+        { size: 'xs', square: true, class: 'size-7 p-0 justify-center' },
+        { size: 'sm', square: true, class: 'size-8 p-0 justify-center' },
+        { size: 'md', square: true, class: 'size-9 p-0 justify-center' },
+        { size: 'lg', square: true, class: 'size-11 p-0 justify-center' },
+        { size: 'xl', square: true, class: 'size-[50px] p-0 justify-center' },
       ],
     },
     // Loading placeholders shimmer instead of pulsing (see .shimmer in main.css)
