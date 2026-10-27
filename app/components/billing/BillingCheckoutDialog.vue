@@ -17,15 +17,24 @@
             v-for="m in methods"
             :key="m"
             type="button"
-            class="rounded-full px-3 py-2 text-sm font-medium transition"
+            class="flex items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition"
             :class="method === m ? 'bg-paper text-ink shadow-sm' : 'text-ink-muted hover:text-ink'"
             @click="method = m"
           >
-            {{ m === 'bank' ? t('dashboard.billing.checkout.methodBank') : t('dashboard.billing.checkout.methodCrypto') }}
+            <UIcon v-if="m === 'bank'" name="i-lucide-landmark" class="size-4 shrink-0" />
+            <!-- USDC and USDT logos, stacked -->
+            <span v-else class="flex shrink-0 -space-x-1.5">
+              <UIcon :name="CRYPTO_TOKEN_ICONS.USDC" class="size-[18px] rounded-full ring-2 ring-paper" />
+              <UIcon :name="CRYPTO_TOKEN_ICONS.USDT" class="size-[18px] rounded-full ring-2 ring-paper" />
+            </span>
+            <span class="truncate">{{ m === 'bank' ? t('dashboard.billing.checkout.methodBank') : t('dashboard.billing.checkout.methodCrypto') }}</span>
           </button>
         </div>
 
-        <div v-if="loading" class="flex justify-center py-16">
+        <!-- One fixed height for every tab and state, so switching doesn't
+             make the sheet jump; long content scrolls inside -->
+        <div class="-mx-1 h-[min(34rem,60dvh)] overflow-y-auto px-1">
+        <div v-if="loading" class="flex h-full items-center justify-center">
           <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin text-ink-muted" />
         </div>
 
@@ -89,6 +98,7 @@
           <div class="rounded-2xl bg-sand/50 px-4 py-3 text-center ring-1 ring-line">
             <p class="text-xs text-ink-muted">{{ t('dashboard.billing.checkout.cryptoAmount') }}</p>
             <p class="mt-0.5 flex items-center justify-center gap-2 text-2xl font-semibold tabular-nums text-ink">
+              <UIcon :name="CRYPTO_TOKEN_ICONS[token as CryptoToken]" class="size-6 shrink-0" />
               {{ cryptoInfo.amountUsd }} {{ token }}
               <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-copy" :aria-label="t('dashboard.billing.checkout.amount')" @click="copy(String(cryptoInfo.amountUsd))" />
             </p>
@@ -101,28 +111,26 @@
                 v-for="n in cryptoInfo.networks"
                 :key="n.id"
                 type="button"
-                class="rounded-full border px-3 py-1 text-xs font-medium transition"
+                class="flex items-center gap-1.5 rounded-full border py-1 pl-3 pr-1 text-xs font-medium transition"
                 :class="network === n.id ? 'border-ink bg-ink text-paper' : 'border-line text-ink-soft hover:border-ink-faint'"
                 @click="network = n.id"
               >
                 {{ n.name }}
+                <span v-if="CRYPTO_NETWORK_BY_ID[n.id]" class="flex size-5 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-black/5">
+                  <UIcon :name="CRYPTO_NETWORK_BY_ID[n.id]!.icon" class="size-3.5" />
+                </span>
               </button>
             </div>
           </div>
           <div>
             <p class="mb-1.5 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.token') }}</p>
-            <div class="flex gap-1.5">
-              <button
-                v-for="tk in networkTokens"
-                :key="tk"
-                type="button"
-                class="rounded-full border px-3 py-1 text-xs font-medium transition"
-                :class="token === tk ? 'border-ink bg-ink text-paper' : 'border-line text-ink-soft hover:border-ink-faint'"
-                @click="token = tk"
-              >
-                {{ tk }}
-              </button>
-            </div>
+            <USelect
+              v-model="token"
+              :items="tokenItems"
+              :icon="CRYPTO_TOKEN_ICONS[token as CryptoToken]"
+              class="w-full"
+              :ui="{ leadingIcon: 'size-5', itemLeadingIcon: 'size-5' }"
+            />
           </div>
 
           <div class="flex items-center gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line">
@@ -143,6 +151,7 @@
             <UInput id="tx-hash" v-model="txHash" class="w-full font-mono" :placeholder="t('dashboard.billing.checkout.txHashPlaceholder')" autocomplete="off" spellcheck="false" />
             <p class="mt-1.5 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.txHashHint') }}</p>
           </div>
+        </div>
         </div>
       </template>
     </template>
@@ -174,6 +183,7 @@
 
 <script setup lang="ts">
 import qrcode from 'qrcode-generator'
+import { CRYPTO_NETWORK_BY_ID, CRYPTO_TOKEN_ICONS, type CryptoToken } from '#shared/crypto'
 import { formatVnd, type BillingPeriod, type PaidPlanId } from '#shared/plans'
 import { SUPPORT_EMAIL } from '~/utils/legal'
 
@@ -217,6 +227,7 @@ const network = ref('bsc')
 const token = ref('USDT')
 const txHash = ref('')
 const networkTokens = computed(() => cryptoInfo.value?.networks.find(n => n.id === network.value)?.tokens ?? [])
+const tokenItems = computed(() => networkTokens.value.map(tk => ({ label: tk, value: tk, icon: CRYPTO_TOKEN_ICONS[tk as CryptoToken] })))
 const networkName = computed(() => cryptoInfo.value?.networks.find(n => n.id === network.value)?.name ?? '')
 watch(networkTokens, (tokens) => {
   if (!tokens.includes(token.value)) token.value = tokens[0] ?? 'USDT'

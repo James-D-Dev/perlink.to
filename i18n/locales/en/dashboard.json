@@ -664,7 +664,7 @@
         "failed": "Couldn't start the payment",
         "copied": "Copied",
         "methodBank": "Bank transfer",
-        "methodCrypto": "Crypto (USDT/USDC)",
+        "methodCrypto": "Crypto",
         "submit": "Done",
         "refresh": "Refresh",
         "submittedTitle": "Waiting for review",

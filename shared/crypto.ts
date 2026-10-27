@@ -6,6 +6,8 @@ export type CryptoToken = 'USDT' | 'USDC'
 export interface CryptoNetwork {
   id: string
   name: string
+  /** Chain logo (Iconify) */
+  icon: string
   /** Public JSON-RPC endpoint, used to read transactions back */
   rpc: string
   /** Block explorer link for a transaction */
@@ -17,6 +19,7 @@ export const CRYPTO_NETWORKS: CryptoNetwork[] = [
   {
     id: 'bsc',
     name: 'BNB Smart Chain (BEP-20)',
+    icon: 'token-branded:binance-smart-chain',
     rpc: 'https://bsc-rpc.publicnode.com',
     explorer: 'https://bscscan.com/tx/',
     tokens: {
@@ -27,6 +30,7 @@ export const CRYPTO_NETWORKS: CryptoNetwork[] = [
   {
     id: 'polygon',
     name: 'Polygon',
+    icon: 'token-branded:polygon',
     rpc: 'https://polygon-bor-rpc.publicnode.com',
     explorer: 'https://polygonscan.com/tx/',
     tokens: {
@@ -37,6 +41,7 @@ export const CRYPTO_NETWORKS: CryptoNetwork[] = [
   {
     id: 'arbitrum',
     name: 'Arbitrum One',
+    icon: 'token-branded:arbitrum-one',
     rpc: 'https://arbitrum-one-rpc.publicnode.com',
     explorer: 'https://arbiscan.io/tx/',
     tokens: {
@@ -47,6 +52,7 @@ export const CRYPTO_NETWORKS: CryptoNetwork[] = [
   {
     id: 'base',
     name: 'Base',
+    icon: 'token-branded:base',
     rpc: 'https://base-rpc.publicnode.com',
     explorer: 'https://basescan.org/tx/',
     tokens: {
@@ -56,6 +62,7 @@ export const CRYPTO_NETWORKS: CryptoNetwork[] = [
   {
     id: 'ethereum',
     name: 'Ethereum (ERC-20)',
+    icon: 'token-branded:ethereum',
     rpc: 'https://ethereum-rpc.publicnode.com',
     explorer: 'https://etherscan.io/tx/',
     tokens: {
@@ -64,6 +71,12 @@ export const CRYPTO_NETWORKS: CryptoNetwork[] = [
     },
   },
 ]
+
+/** Token logos (Iconify) */
+export const CRYPTO_TOKEN_ICONS: Record<CryptoToken, string> = {
+  USDT: 'cryptocurrency-color:usdt',
+  USDC: 'cryptocurrency-color:usdc',
+}
 
 export const CRYPTO_NETWORK_BY_ID = Object.fromEntries(CRYPTO_NETWORKS.map(n => [n.id, n])) as Record<string, CryptoNetwork>
 
