@@ -14,7 +14,7 @@
 
     <ul class="px-2 pb-2 pt-2">
       <li v-for="post in shown" :key="post.id">
-        <component :is="post.slug ? NuxtLink : 'div'" :to="post.slug ? `/${username}/blog/${post.slug}` : undefined" class="flex items-center gap-3 rounded-2xl p-3 transition hover:bg-black/[0.04]">
+        <component :is="post.href ? NuxtLink : 'div'" :to="post.href" class="flex items-center gap-3 rounded-2xl p-3 transition hover:bg-black/[0.04]">
           <img v-if="post.coverUrl" :src="post.coverUrl" alt="" class="size-16 shrink-0 rounded-xl object-cover" loading="lazy">
           <span class="min-w-0">
             <span class="line-clamp-2 block font-medium leading-snug">{{ post.title }}</span>
@@ -49,6 +49,7 @@ const { t, lang } = useSiteI18n()
 const templatePreview = inject(TEMPLATE_PREVIEW_KEY, false)
 
 interface PostSummary { id: string; slug: string; title: string; coverUrl: string | null; readingMinutes: number; publishedAt: string | null }
+interface ShownPost extends PostSummary { href?: string }
 
 const count = computed(() => Math.min(Math.max(props.data.count ?? 3, 1), 10))
 const { data: res } = await useFetch<{ posts: PostSummary[] }>(() => `/api/bio/${props.username}/posts`, {
@@ -61,11 +62,13 @@ const { data: res } = await useFetch<{ posts: PostSummary[] }>(() => `/api/bio/$
 })
 const posts = computed(() => res.value?.posts ?? [])
 // Previews of a site without posts yet show the template's example posts
-const shown = computed<PostSummary[]>(() => {
-  if (posts.value.length && !templatePreview) return posts.value
+const shown = computed<ShownPost[]>(() => {
+  if (posts.value.length && !templatePreview) return posts.value.map(post => ({ ...post, href: `/${props.username}/blog/${post.slug}` }))
   if (!props.preview && !templatePreview) return []
   return (props.data.samples ?? []).slice(0, count.value).map((sample, i) => ({
     id: `sample-${i}`, slug: '', title: sample.title, coverUrl: sample.coverUrl ?? null, readingMinutes: sample.minutes ?? 4, publishedAt: null,
+    // On a template's preview page each example opens as a sample post
+    href: templatePreview && !props.preview ? `/templates/${props.username}/blog/${i + 1}` : undefined,
   }))
 })
 

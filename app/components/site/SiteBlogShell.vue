@@ -2,21 +2,21 @@
   <!-- A site's blog pages, in the site's own look: its background, fonts and
        cards, with the site's name on top and the Perlink badge at the end -->
   <div class="min-h-screen" :style="[{ color: '#1c1a17' }, pageStyle]">
-    <div class="mx-auto max-w-2xl px-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))] pt-6 sm:pt-10">
+    <div class="mx-auto max-w-2xl px-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))]" :class="sample ? 'pt-24' : 'pt-6 sm:pt-10'">
       <header class="mb-8 flex items-center justify-between gap-3">
-        <NuxtLink :to="`/${site.username}`" class="flex min-w-0 items-center gap-2.5 rounded-full py-1 pl-1 pr-3 transition hover:bg-black/5">
+        <NuxtLink :to="homeHref ?? `/${site.username}`" class="flex min-w-0 items-center gap-2.5 rounded-full py-1 pl-1 pr-3 transition hover:bg-black/5">
           <img v-if="site.avatarUrl" :src="site.avatarUrl" :alt="site.title" class="size-9 shrink-0 rounded-full object-cover">
           <span v-else class="flex size-9 shrink-0 items-center justify-center rounded-full bg-black/10 text-sm font-semibold">{{ site.title.charAt(0).toUpperCase() }}</span>
           <span class="truncate text-[15px] font-semibold" :style="{ fontFamily: headingStyle.fontFamily }">{{ site.title }}</span>
         </NuxtLink>
-        <NuxtLink :to="`/${site.username}/blog`" class="shrink-0 rounded-full px-3 py-1.5 text-sm font-medium opacity-70 transition hover:bg-black/5 hover:opacity-100">
+        <NuxtLink v-if="blogHref !== null" :to="blogHref ?? `/${site.username}/blog`" class="shrink-0 rounded-full px-3 py-1.5 text-sm font-medium opacity-70 transition hover:bg-black/5 hover:opacity-100">
           {{ siteT(lang, 'blog') }}
         </NuxtLink>
       </header>
 
       <slot :lang="lang" :card-style="cardStyle" :heading-style="headingStyle" />
 
-      <footer class="mt-14 flex flex-col items-center gap-1">
+      <footer v-if="!sample" class="mt-14 flex flex-col items-center gap-1">
         <SiteMadeWith v-if="site.showBranding" :username="site.username" :lang="lang" />
         <a
           :href="`https://perlink.to/report?site=${encodeURIComponent(site.username)}`"
@@ -44,7 +44,15 @@ export interface BlogSite {
   showBranding: boolean
 }
 
-const props = defineProps<{ site: BlogSite }>()
+const props = defineProps<{
+  site: BlogSite
+  /** Where the site name leads (default: the site) */
+  homeHref?: string
+  /** Where "Blog" leads; null hides it (default: the site's blog) */
+  blogHref?: string | null
+  /** A template's sample post: no badge or report link */
+  sample?: boolean
+}>()
 
 const { theme, pageStyle, cardStyle, headingStyle } = useBioTheme(computed(() => props.site.themeConfig))
 const lang = computed(() => normalizeSiteLanguage(theme.value.language))

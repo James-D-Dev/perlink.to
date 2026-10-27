@@ -379,7 +379,7 @@
             :id="blockDomId(block)"
             :data="block.data"
             :username="username"
-            :preview="noSending"
+            :preview="isPreview"
             :empty-text="t('blocks.blog.empty')"
             :card-style="panelStyle"
             :heading-style="headingStyle"
