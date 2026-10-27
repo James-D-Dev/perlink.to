@@ -1,8 +1,9 @@
 import type { H3Event } from 'h3'
 
-// Transactional email through Cloudflare Email Sending: its REST API with
-// NUXT_CF_EMAIL_API_TOKEN (Pages can't have the send_email binding; an EMAIL
-// binding is used if this ever runs as a Worker that has one). With neither, nothing is sent, so features that
+// Transactional email through Cloudflare Email Sending. Pages can't have a
+// send_email binding, so emails go to the perlink-email Worker
+// (workers/email-sender) through the EMAIL_WORKER service binding; the REST
+// API with NUXT_CF_EMAIL_API_TOKEN is the fallback. With neither, nothing is sent, so features that
 // email stay usable before it's set up.
 
 export interface EmailMessage {
@@ -13,13 +14,13 @@ export interface EmailMessage {
   replyTo?: string
 }
 
-interface EmailBinding {
-  send(message: { to: string; from: string; subject: string; html: string; text: string; replyTo?: string }): Promise<{ messageId?: string }>
+interface ServiceBinding {
+  fetch(input: string, init?: RequestInit): Promise<Response>
 }
-const emailBinding = (event: H3Event) => (event.context.cloudflare?.env as { EMAIL?: EmailBinding } | undefined)?.EMAIL
+const emailBinding = (event: H3Event) => (event.context.cloudflare?.env as { EMAIL_WORKER?: ServiceBinding } | undefined)?.EMAIL_WORKER
 
 /** How mail goes out here, for the superadmin's check */
-export const emailTransport = (event: H3Event) => (emailBinding(event) ? 'binding' : useRuntimeConfig(event).cfEmailApiToken ? 'api' : null)
+export const emailTransport = (event: H3Event) => (emailBinding(event) ? 'worker' : useRuntimeConfig(event).cfEmailApiToken ? 'api' : null)
 
 /** Why the last send failed (this worker), for the superadmin's check */
 export let lastEmailError = ''
@@ -33,14 +34,22 @@ export async function sendEmail(event: H3Event, message: EmailMessage): Promise<
   const from = String(config.emailFrom)
   const bare = from.match(/<([^>]+)>/)?.[1] ?? from
 
-  const binding = emailBinding(event)
-  if (binding) {
+  const worker = emailBinding(event)
+  if (worker) {
     try {
-      await binding.send({ to: message.to, from: bare, subject: message.subject, html: message.html, text: message.text, replyTo: message.replyTo })
-      return true
+      const response = await worker.fetch('https://perlink-email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: message.to, from: bare, subject: message.subject, html: message.html, text: message.text, replyTo: message.replyTo }),
+      })
+      const data = await response.json().catch(() => null) as { ok?: boolean; error?: string } | null
+      if (data?.ok) return true
+      lastEmailError = data?.error || `Email worker HTTP ${response.status}`
+      console.error('[email] worker send failed', lastEmailError)
+      return false
     } catch (error) {
       lastEmailError = error instanceof Error ? error.message : String(error)
-      console.error('[email] binding send failed', error)
+      console.error('[email] worker unreachable', error)
       return false
     }
   }

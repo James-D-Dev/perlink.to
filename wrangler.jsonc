@@ -31,6 +31,16 @@
 			"bucket_name": "perlink-avatars",
 			"binding": "AVATARS_BUCKET"
 		}
+	],
+	/**
+	 * Emails go out through the perlink-email Worker (workers/email-sender),
+	 * since Pages can't have a send_email binding itself
+	 */
+	"services": [
+		{
+			"binding": "EMAIL_WORKER",
+			"service": "perlink-email"
+		}
 	]
 	/**
 	 * Smart Placement

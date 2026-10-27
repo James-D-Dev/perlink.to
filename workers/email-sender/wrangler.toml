@@ -1,0 +1,12 @@
+# Deploy: npx wrangler deploy --config workers/email-sender/wrangler.toml
+# Sends Perlink's emails through Cloudflare Email Sending. It has no public
+# URL: only the Pages app reaches it, through its EMAIL_WORKER service binding
+# (wrangler.jsonc). See docs/email.md.
+name = "perlink-email"
+main = "index.ts"
+compatibility_date = "2026-05-01"
+workers_dev = false
+preview_urls = false
+
+[[send_email]]
+name = "EMAIL"
