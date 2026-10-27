@@ -2,7 +2,7 @@ import type { LegalLang } from '~/data/legal/types'
 
 // Shown on the legal pages (terms, privacy, refunds, report)
 export const SUPPORT_EMAIL = 'kimduc10a@gmail.com'
-export const LEGAL_UPDATED_ISO = '2026-10-26'
+export const LEGAL_UPDATED_ISO = '2026-10-27'
 
 /** Legal pages follow the visitor's language (Vietnamese or English) */
 export function useLegalLang() {

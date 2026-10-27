@@ -54,7 +54,11 @@ export function cryptoWallet(event: H3Event) {
   return isEvmAddress(address) ? address : null
 }
 
+/** Paying in USDT / USDC is off (Lemon Squeezy doesn't accept crypto
+ * businesses); the wallet secret stays so it can be turned back on */
+export const CRYPTO_PAYMENTS_ON = false
+
 /** Ways to pay that are set up */
 export function paymentMethods(event: H3Event) {
-  return { bank: !!billingAccount(event), crypto: !!cryptoWallet(event) }
+  return { bank: !!billingAccount(event), crypto: CRYPTO_PAYMENTS_ON && !!cryptoWallet(event) }
 }

@@ -20,7 +20,7 @@
     </div>
     <div class="border-t border-line">
       <div class="mx-auto flex max-w-6xl flex-col gap-2 border-x border-line px-5 py-6 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <p>© {{ year }} Perlink. {{ copy.footer.rights }}</p>
+        <p>© {{ year }} Perlink. {{ copy.footer.rights }} {{ copy.footer.operator }}</p>
         <p>{{ copy.footer.contact }}: <a :href="`mailto:${SUPPORT_EMAIL}`" class="hover:text-ink">{{ SUPPORT_EMAIL }}</a></p>
       </div>
     </div>

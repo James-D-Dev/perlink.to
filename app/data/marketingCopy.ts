@@ -36,6 +36,7 @@ const en = {
     report: 'Report a site',
     contact: 'Contact',
     rights: 'All rights reserved.',
+    operator: 'Operated by Hoang Kim Duc, Vietnam.',
   },
   claim: {
     placeholder: 'yourname',
@@ -163,6 +164,7 @@ const vi: MarketingCopy = {
     report: 'Báo cáo vi phạm',
     contact: 'Liên hệ',
     rights: 'Bảo lưu mọi quyền.',
+    operator: 'Vận hành bởi Hoàng Kim Đức, Việt Nam.',
   },
   claim: {
     placeholder: 'ten-cua-ban',

@@ -173,7 +173,7 @@ async function sendEmail() {
   sending.value = true;
 
   // Create mailto link with pre-filled content
-  const mailtoLink = `mailto:kimduc10a@gmail.com?subject=${encodeURIComponent(
+  const mailtoLink = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
     `[Perlink Support] ${form.value.subject}`
   )}&body=${encodeURIComponent(
     `Name: ${form.value.name}\nEmail: ${form.value.email}\n\nMessage:\n${form.value.message}`

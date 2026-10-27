@@ -135,6 +135,6 @@ function buy(plan: Exclude<PlanId, 'free'>) {
 }
 
 function upgradeMail(plan: PlanId) {
-  return `mailto:kimduc10a@gmail.com?subject=${encodeURIComponent(`Upgrade to Perlink ${plan}`)}`
+  return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`Upgrade to Perlink ${plan}`)}`
 }
 </script>

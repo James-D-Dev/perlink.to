@@ -75,7 +75,7 @@ const aboveActionBar = computed(() => /^\/dashboard\/site\/[^/]+\/?$/.test(route
 const open = useHelpCenter()
 const { loggedIn } = useUserSession()
 
-const mailto = 'mailto:kimduc10a@gmail.com?subject=' + encodeURIComponent('Perlink help')
+const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Perlink help')}`
 
 const answers = computed(() =>
   ['create', 'room', 'publish', 'photos', 'phones', 'visitors'].map(id => ({
