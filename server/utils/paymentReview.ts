@@ -52,7 +52,9 @@ export const parseCheck = (row: { check_result: string | null }) => {
 }
 
 /** Puts the plan on the account; false if the payment was already decided */
-export async function approvePayment(event: H3Event, id: string) {
+/** Puts the plan on the account. providerRef records where the money was
+ * seen (a SePay transaction); otherwise the tx hash or "manual" */
+export async function approvePayment(event: H3Event, id: string, providerRef?: string) {
   const payment = await loadPayment(event, id)
   if (!payment) return { ok: false as const, reason: 'not-found' }
   if (payment.status === 'paid') return { ok: false as const, reason: 'already-paid' }
@@ -60,7 +62,7 @@ export async function approvePayment(event: H3Event, id: string) {
   const marked = await getDB(event)
     .prepare(`UPDATE payments SET status = 'paid', paid_at = datetime('now'), reviewed_at = datetime('now'),
       provider_ref = COALESCE(provider_ref, ?) WHERE id = ? AND status IN ('pending', 'submitted', 'rejected')`)
-    .bind(payment.tx_hash ? `tx:${payment.network}:${payment.tx_hash}` : `manual:${payment.id}`, id)
+    .bind(providerRef ?? (payment.tx_hash ? `tx:${payment.network}:${payment.tx_hash}` : `manual:${payment.id}`), id)
     .run()
   if (!(marked.meta as { changes?: number }).changes) return { ok: false as const, reason: 'already-paid' }
   const expiresAt = await grantPlan(event, payment.user_id, payment.plan, { period: payment.period })

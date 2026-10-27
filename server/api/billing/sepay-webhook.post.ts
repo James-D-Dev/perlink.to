@@ -1,7 +1,6 @@
 import { getDB } from '../../utils/db'
-import { grantPlan } from '../../utils/plan'
 import { PAYMENT_CODE_RE } from '../../utils/billing'
-import type { BillingPeriod, PaidPlanId } from '#shared/plans'
+import { approvePayment, notifyPayer } from '../../utils/paymentReview'
 
 interface SepayTransaction {
   id: number
@@ -13,8 +12,9 @@ interface SepayTransaction {
 }
 
 // SePay calls this for every transfer into the billing account. A transfer
-// whose note has a pending payment's code and at least its amount pays it and
-// puts the plan on the account. Anything else is acknowledged and ignored, so
+// whose note has an unpaid payment's code (waiting, sent for review, or even
+// rejected) and at least its amount approves it, like the superadmin would:
+// the plan goes on the account and the payer hears about it. Anything else is acknowledged and ignored, so
 // SePay doesn't keep resending it.
 export default defineEventHandler(async (event) => {
   const key = useRuntimeConfig(event).billing?.sepayApiKey
@@ -34,9 +34,9 @@ export default defineEventHandler(async (event) => {
   const db = getDB(event)
   for (const code of codes) {
     const payment = await db
-      .prepare('SELECT id, user_id, plan, period, amount, status FROM payments WHERE code = ?')
+      .prepare('SELECT id, amount, status FROM payments WHERE code = ?')
       .bind(code)
-      .first<{ id: string; user_id: string; plan: PaidPlanId; period: BillingPeriod; amount: number; status: string }>()
+      .first<{ id: string; amount: number; status: string }>()
     if (!payment) continue
     if (payment.status === 'paid') return { success: true }
     if (Number(tx.transferAmount) < payment.amount) {
@@ -44,13 +44,8 @@ export default defineEventHandler(async (event) => {
       return { success: true }
     }
     // Only the first delivery of this transaction gets through
-    const marked = await db
-      .prepare(`UPDATE payments SET status = 'paid', paid_at = datetime('now'), provider_ref = ? WHERE id = ? AND status = 'pending'`)
-      .bind(`sepay:${tx.id}`, payment.id)
-      .run()
-      .catch(() => null)
-    if (!(marked?.meta as { changes?: number } | undefined)?.changes) return { success: true }
-    await grantPlan(event, payment.user_id, payment.plan, { period: payment.period })
+    const result = await approvePayment(event, payment.id, `sepay:${tx.id}`).catch(() => null)
+    if (result?.ok) await notifyPayer(event, result.payment, true, result.expiresAt).catch(() => {})
     return { success: true }
   }
   return { success: true }

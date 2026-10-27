@@ -18,7 +18,7 @@ have no end date).
    receives payments.
 3. In SePay → Webhooks, add:
    - URL: `https://perlink.to/api/billing/sepay-webhook`
-   - Event: money in
+   - Event: money in (it also approves payments already sent for review)
    - Authentication: **API Key**; choose a long random key
 4. Add Cloudflare Pages secrets (Settings → Variables and Secrets):
    - `NUXT_BILLING_BANK_BIN`: the bank's BIN, e.g. `970422` (MB), `970436` (Vietcombank), `970407` (Techcombank)
