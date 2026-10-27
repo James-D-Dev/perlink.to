@@ -18,9 +18,9 @@
       </div>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-4 sm:grid-cols-2" :class="shownPlans.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'">
       <article
-        v-for="plan in PLAN_ORDER"
+        v-for="plan in shownPlans"
         :key="plan"
         class="relative flex flex-col rounded-2xl p-6 transition"
         :class="[
@@ -110,6 +110,8 @@ const currentPlan = computed(() => (mounted.value && loggedIn.value ? info.value
 const checkoutEnabled = computed(() => mounted.value && !!info.value?.checkoutEnabled)
 const highlight = computed(() => props.highlight)
 
+// Plans not on sale yet (Pro, see PRO_ON_SALE) stay off the page
+const shownPlans = PLAN_ORDER.filter(plan => plan === 'free' || onSale(plan as PaidPlanId))
 const isPopular = (plan: PlanId) => plan === 'plus'
 const muted = (plan: PlanId) => (isPopular(plan) ? 'text-paper/60' : 'text-ink-muted')
 
