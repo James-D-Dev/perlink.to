@@ -241,6 +241,8 @@ export default defineAppConfig({
         { variant: 'link', class: { trigger: 'data-[state=active]:text-inverted focus-visible:ring-2 focus-visible:ring-inverted' } },
       ],
     },
+    // iOS toggles are green when on
+    switch: { defaultVariants: { color: 'success' } },
     dashboardNavbar: { slots: { root: 'dark:bg-[#0a0a0a]/70 dark:backdrop-blur-xl dark:border-white/[0.08]' } },
   },
 })

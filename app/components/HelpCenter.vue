@@ -33,7 +33,7 @@
         </div>
 
         <footer class="grid grid-cols-2 gap-2 border-t border-line p-3">
-          <a :href="mailto" class="flex h-10 items-center justify-center gap-2 rounded-full bg-ink text-sm font-medium text-paper hover:bg-ink-soft">
+          <a :href="mailto" class="flex h-10 items-center justify-center gap-2 rounded-full bg-tint text-sm font-medium text-white hover:bg-tint/90">
             <UIcon name="i-lucide-mail" class="size-4" />
             {{ t('dashboard.help.contact') }}
           </a>
@@ -53,7 +53,7 @@
     <button
       v-if="!aboveActionBar"
       type="button"
-      class="inline-flex size-11 items-center justify-center rounded-full bg-ink text-paper shadow-[0_8px_24px_-6px_rgba(12,11,10,0.35)] transition-transform hover:scale-105"
+      class="inline-flex size-11 items-center justify-center rounded-full bg-tint text-white shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] transition-transform hover:scale-105"
       :aria-expanded="open"
       :aria-label="open ? t('dashboard.help.close') : t('dashboard.help.ariaLabel')"
       @click="open = !open"

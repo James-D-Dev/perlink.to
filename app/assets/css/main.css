@@ -37,6 +37,8 @@ comes from imagery and the gradient orbs, not from the UI chrome.
 
 @theme {
   --color-perlink-cyan: #00A8FF;
+  /* The action colour, like iOS systemBlue (a lighter step in dark mode) */
+  --color-tint: #007aff;
   --color-perlink-blue: #086bf5;
   --color-perlink-purple: #6C5CE7;
   --color-perlink-violet: #8E44AD;
@@ -44,8 +46,9 @@ comes from imagery and the gradient orbs, not from the UI chrome.
 }
 
 :root {
-  /* Light theme (public site and dashboard): ink primary, warm neutrals */
-  --ui-primary: var(--color-ink);
+  /* Light theme (public site and dashboard): iOS-style blue tint for
+     actions, warm neutrals for everything else */
+  --ui-primary: var(--color-tint);
   --ui-secondary: var(--color-ink-soft);
   --ui-radius: 0.25rem;
 
@@ -87,7 +90,8 @@ Neutral black/gray instead of the blue-tinted slate palette.
 Must come after :root so it overrides the light --ui-bg above.
 */
 .dark {
-  --ui-primary: var(--color-perlink-blue);
+  --color-tint: #0a84ff;
+  --ui-primary: var(--color-tint);
   --ui-secondary: var(--color-perlink-cyan);
 
   --ui-bg: #0a0a0a;
@@ -123,12 +127,17 @@ Must come after :root so it overrides the light --ui-bg above.
 }
 
 /*
-Superadmin: the dashboard's paper/sand/ink look with a blue primary, and a
-dark version of those surfaces for its dark mode (its own switch).
+iOS: a filled action button is the tint with a white label and icon, in
+both modes (Nuxt UI would put near-black text on it in dark mode)
 */
-.admin-theme {
-  --ui-primary: var(--color-perlink-blue);
+.bg-primary.text-inverted {
+  color: #fff;
 }
+
+/*
+Superadmin: the dashboard's paper/sand/ink look, with a dark version of
+those surfaces for its dark mode (its own switch)
+*/
 .admin-theme.dark {
   --color-paper: #0a0a0a;
   --color-sand: #1a1a1a;
@@ -139,11 +148,6 @@ dark version of those surfaces for its dark mode (its own switch).
   --color-ink-muted: #a1a1a1;
   --color-ink-faint: #6b6b6b;
 }
-/* White text on blue buttons and badges in both modes */
-.admin-theme .bg-primary.text-inverted {
-  color: #fff;
-}
-
 /* ---------- Public site primitives ---------- */
 
 /* Display headings: large, light and slightly tight */

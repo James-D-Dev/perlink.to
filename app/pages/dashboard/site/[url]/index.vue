@@ -155,7 +155,7 @@
           >
             <span
               class="flex size-11 items-center justify-center rounded-full transition-colors"
-              :class="activeTab === tab.value ? 'bg-ink text-paper' : 'bg-paper text-ink-soft ring-1 ring-line group-hover:bg-sand'"
+              :class="activeTab === tab.value ? 'bg-tint text-white' : 'bg-paper text-ink-soft ring-1 ring-line group-hover:bg-sand'"
             >
               <UIcon :name="tab.icon" class="size-5" />
             </span>
@@ -576,7 +576,7 @@
           icon="i-lucide-box"
           size="lg"
           :label="t('dashboard.editor.room.fab')"
-          class="fixed bottom-20 right-5 z-50 bg-ink pr-4 text-paper shadow-[0_8px_24px_-6px_rgba(12,11,10,0.35)] hover:bg-ink/90 hover:scale-105 lg:bottom-5 print:hidden"
+          class="fixed bottom-20 right-5 z-50 bg-tint pr-4 text-white shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] hover:bg-tint/90 hover:scale-105 lg:bottom-5 print:hidden"
           @click="activeTab = 'room'"
         />
       </div>

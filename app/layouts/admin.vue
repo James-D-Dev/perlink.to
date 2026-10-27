@@ -27,7 +27,7 @@
       <template #default="{ collapsed }">
         <NuxtLink
           to="/dashboard/create"
-          class="flex h-10 items-center justify-center gap-2 rounded-full bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
+          class="flex h-10 items-center justify-center gap-2 rounded-full bg-tint text-sm font-medium text-white transition-colors hover:bg-tint/90"
           :class="collapsed ? 'mx-auto w-10' : 'w-full'"
           :aria-label="collapsed ? t('nav.createSite') : undefined"
         >
@@ -42,7 +42,7 @@
           class="mt-3"
           :ui="{
             link: 'min-h-11 gap-3 rounded-xl px-3 py-2.5 text-[15px] text-ink-soft before:rounded-xl hover:text-ink hover:before:bg-sand/60 data-active:font-medium data-active:text-ink data-active:before:bg-sand',
-            linkLeadingIcon: 'size-5 text-ink-muted group-data-active:text-ink',
+            linkLeadingIcon: 'size-5 text-ink-muted group-data-active:text-tint',
           }"
         />
 

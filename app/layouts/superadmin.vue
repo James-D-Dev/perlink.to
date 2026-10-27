@@ -94,7 +94,7 @@ const themeLink = computed<NavigationMenuItem>(() => ({
 // Same rows as the dashboard menu
 const navUi = {
   link: "min-h-11 gap-3 rounded-xl px-3 py-2.5 text-[15px] text-ink-soft before:rounded-xl hover:text-ink hover:before:bg-sand/60 data-active:font-medium data-active:text-ink data-active:before:bg-sand",
-  linkLeadingIcon: "size-5 text-ink-muted group-data-active:text-ink",
+  linkLeadingIcon: "size-5 text-ink-muted group-data-active:text-tint",
 };
 
 const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [

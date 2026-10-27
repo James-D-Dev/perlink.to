@@ -5,7 +5,7 @@
       <div class="space-y-4">
         <!-- Progress bar -->
         <div class="h-1.5 overflow-hidden rounded-full bg-sand-strong">
-          <div class="h-full rounded-full bg-ink transition-all" :style="{ width: `${(done / steps.length) * 100}%` }" />
+          <div class="h-full rounded-full bg-tint transition-all" :style="{ width: `${(done / steps.length) * 100}%` }" />
         </div>
 
         <ol class="divide-y divide-line overflow-hidden rounded-xl ring-1 ring-line">
@@ -18,7 +18,7 @@
             >
               <span
                 class="flex size-5 shrink-0 items-center justify-center rounded-full"
-                :class="step.done ? 'bg-ink text-paper' : 'ring-1 ring-ink-faint'"
+                :class="step.done ? 'bg-tint text-white' : 'ring-1 ring-ink-faint'"
               >
                 <UIcon v-if="step.done" name="i-lucide-check" class="size-3" />
               </span>

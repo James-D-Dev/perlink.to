@@ -22,7 +22,7 @@
       </div>
       <button
         type="button"
-        class="mt-3 flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-ink text-xs font-medium text-paper transition-colors hover:bg-ink-soft"
+        class="mt-3 flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-tint text-xs font-medium text-white transition-colors hover:bg-tint/90"
         @click="openChecklist"
       >
         {{ t('dashboard.onboarding.cardAction') }}
