@@ -62,7 +62,8 @@ export async function lemonCatalog(event: H3Event, fresh = false): Promise<Catal
   for (const variant of variants.data) {
     const plan = planOfProduct.get(String(variant.attributes.product_id))
     const period: BillingPeriod | null = variant.attributes.interval === 'month' ? 'monthly' : variant.attributes.interval === 'year' ? 'annual' : null
-    if (!plan || !period || variant.attributes.status === 'draft') continue
+    // Only variants on sale: each product also keeps a hidden "Default" variant (pending)
+    if (!plan || !period || variant.attributes.status !== 'published') continue
     value.variants[`${plan}:${period}`] = variant.id
     value.plans[variant.id] = { plan, period }
   }
