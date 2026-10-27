@@ -3,7 +3,9 @@ import { getAccountPlan } from '../../utils/plan'
 import { paymentMethods } from '../../utils/billing'
 import { PLAN_LIMITS } from '#shared/plans'
 
-// The signed-in user's plan, what it allows, and their recent payments
+// The signed-in user's plan, what it allows, and their recent payments.
+// A 'pending' payment is only an opened checkout (e.g. a look at the crypto
+// tab), so history leaves those out; it's kept so a late transfer still matches.
 export default defineEventHandler(async (event) => {
   const user = event.context.user
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
@@ -11,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const account = await getAccountPlan(event, user.id)
   const [sites, payments, celebrate] = await Promise.all([
     db.prepare('SELECT COUNT(*) AS n FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number }>(),
-    db.prepare('SELECT id, plan, period, amount, amount_usd, method, code, status, created_at, paid_at FROM payments WHERE user_id = ? ORDER BY created_at DESC LIMIT 10')
+    db.prepare(`SELECT id, plan, period, amount, amount_usd, method, code, status, created_at, paid_at FROM payments WHERE user_id = ? AND status != 'pending' ORDER BY created_at DESC LIMIT 10`)
       .bind(user.id)
       .all<{ id: string; plan: string; period: string; amount: number; amount_usd: number | null; method: string; code: string; status: string; created_at: string; paid_at: string | null }>(),
     // An approved payment whose "you're upgraded" screen hasn't been shown yet
