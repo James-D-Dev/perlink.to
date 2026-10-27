@@ -633,7 +633,7 @@
       "startFree": "Bắt đầu miễn phí",
       "contact": "Liên hệ nâng cấp",
       "contactNote": "Thanh toán online sắp mở. Trong lúc chờ, hãy liên hệ để được nâng cấp.",
-      "payNote": "Thanh toán bằng chuyển khoản / quét mã VietQR, gói bật tự động trong vài giây.",
+      "payNote": "Thuê bao theo tháng hoặc năm, huỷ bất cứ lúc nào. Gói bật ngay khi thanh toán thành công.",
       "status": {
         "free": "Bạn đang dùng gói Miễn phí",
         "paid": "Bạn đang dùng gói {plan}",
@@ -729,7 +729,7 @@
         "rejected": "Chưa xác nhận"
       },
       "comingSoon": "Sắp mở bán",
-      "usdNote": "Giá theo đô la Mỹ. Hiện thanh toán bằng chuyển khoản ngân hàng Việt Nam (VietQR), tính bằng VND.",
+      "usdNote": "Giá theo đô la Mỹ, có thể cộng thuế khi thanh toán. Tại Việt Nam bạn cũng có thể chuyển khoản (VietQR) bằng VND.",
       "celebrate": {
         "title": "Chúc mừng! 🎉",
         "text": "Bạn đã nâng cấp lên gói {plan}.",

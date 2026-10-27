@@ -633,7 +633,7 @@
       "startFree": "Start free",
       "contact": "Contact us to upgrade",
       "contactNote": "Online checkout is coming soon. Until then, contact us and we will upgrade your account.",
-      "payNote": "Pay by bank transfer / VietQR; your plan turns on automatically within seconds.",
+      "payNote": "Monthly or yearly subscription, cancel any time. Your plan turns on as soon as the payment goes through.",
       "status": {
         "free": "You're on the Free plan",
         "paid": "You're on {plan}",
@@ -729,7 +729,7 @@
         "rejected": "Not confirmed"
       },
       "comingSoon": "Coming soon",
-      "usdNote": "Prices in US dollars. For now payment is by Vietnamese bank transfer (VietQR), charged in VND.",
+      "usdNote": "Prices in US dollars; taxes may apply at checkout. In Vietnam you can also pay by bank transfer (VietQR) in VND.",
       "celebrate": {
         "title": "Congratulations! 🎉",
         "text": "You’re now on the {plan} plan.",
