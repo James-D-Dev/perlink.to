@@ -8,7 +8,7 @@ languages) to `perlink.to/report?site=<name>`. Admins review reports in
 /report (app/pages/report.vue)
   → POST /api/report            reason (shared/reports.ts), details, optional email
       5 reports per visitor per day (daily-salted IP hash)
-      emails the admin when Resend is set up
+      emails the admin when email sending is set up
 Superadmin → Reports (app/pages/superadmin/reports/index.vue)
   → POST /api/superadmin/reports/<id>  { action: 'remove' | 'dismiss' | 'restore' }
       remove:  unpublish, set bio_pages.removed_at/removed_reason, close all open reports of the site

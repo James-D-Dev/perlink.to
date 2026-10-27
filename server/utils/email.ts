@@ -1,7 +1,8 @@
 import type { H3Event } from 'h3'
 
-// Transactional email through Resend's HTTP API. Without NUXT_RESEND_API_KEY
-// nothing is sent, so features that email stay usable before it's set up.
+// Transactional email through Cloudflare Email Sending's REST API. Without
+// NUXT_CF_EMAIL_API_TOKEN nothing is sent, so features that email stay usable
+// before it's set up.
 
 export interface EmailMessage {
   to: string
@@ -12,29 +13,37 @@ export interface EmailMessage {
 }
 
 export function emailEnabled(event: H3Event) {
-  return !!useRuntimeConfig(event).resendApiKey
+  return !!useRuntimeConfig(event).cfEmailApiToken
 }
 
 export async function sendEmail(event: H3Event, message: EmailMessage): Promise<boolean> {
   const config = useRuntimeConfig(event)
-  if (!config.resendApiKey) return false
+  if (!config.cfEmailApiToken || !config.cfAccountId) return false
+  const url = `https://api.cloudflare.com/client/v4/accounts/${config.cfAccountId}/email/sending/send`
+  const post = (from: string) => fetch(url, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${config.cfEmailApiToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from,
+      to: [message.to],
+      subject: message.subject,
+      html: message.html,
+      text: message.text,
+      reply_to: message.replyTo,
+    }),
+  })
   try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${config.resendApiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: config.emailFrom,
-        to: [message.to],
-        subject: message.subject,
-        html: message.html,
-        text: message.text,
-        reply_to: message.replyTo,
-      }),
-    })
-    if (!response.ok) {
-      console.error('[email] Resend rejected the message', response.status, await response.text())
+    // "Perlink <notifications@perlink.to>"; if the name isn't accepted, the bare address
+    const from = String(config.emailFrom)
+    let response = await post(from)
+    const bare = from.match(/<([^>]+)>/)?.[1]
+    if (!response.ok && response.status === 400 && bare) response = await post(bare)
+    const data = await response.json().catch(() => null) as { success?: boolean; errors?: { message: string }[]; result?: { permanent_bounces?: string[] } } | null
+    if (!response.ok || !data?.success) {
+      console.error('[email] Cloudflare rejected the message', response.status, data?.errors?.map(e => e.message).join('; '))
       return false
     }
+    if (data.result?.permanent_bounces?.length) console.warn('[email] bounced:', data.result.permanent_bounces.join(', '))
     return true
   } catch (error) {
     console.error('[email] send failed', error)

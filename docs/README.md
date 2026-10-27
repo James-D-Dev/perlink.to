@@ -28,7 +28,7 @@ npx vue-tsc --noEmit -p .nuxt/tsconfig.app.json         # typecheck (some older 
 
 | Variable | Used for |
 |---|---|
-| `NUXT_RESEND_API_KEY`, `NUXT_EMAIL_FROM` | Emails (form requests, orders, reports) |
+| `NUXT_CF_EMAIL_API_TOKEN`, `NUXT_EMAIL_FROM` | Emails through Cloudflare Email Sending (form requests, orders, reports) |
 | `NUXT_BILLING_BANK_BIN`, `NUXT_BILLING_ACCOUNT_NUMBER`, `NUXT_BILLING_ACCOUNT_NAME`, `NUXT_BILLING_SEPAY_API_KEY` | Plan payments |
 | `NUXT_TELEGRAM_BOT_TOKEN`, `NUXT_TELEGRAM_BOT_USERNAME`, `NUXT_TELEGRAM_WEBHOOK_SECRET` | Telegram notifications |
 | `NUXT_CF_SAAS_ZONE_ID`, `NUXT_CF_SAAS_API_TOKEN`, `NUXT_DOMAIN_PROXY_SECRET` | Custom domains |

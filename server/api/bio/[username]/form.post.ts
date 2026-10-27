@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
   // Count it among visitor actions in analytics
   runInBackground(event, new BioRepository(event).incrementAction(bioPage.id, 'form'))
 
-  // Email the owner after responding (skipped until Resend is configured)
+  // Email the owner after responding (skipped until email sending is set up)
   if (emailEnabled(event)) runInBackground(event, notifyOwnerOfRequest(event, bioPage, data))
   runInBackground(event, notifyOwnerTelegram(event, bioPage, data))
 

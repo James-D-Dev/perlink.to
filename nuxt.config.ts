@@ -39,9 +39,11 @@ export default defineNuxtConfig({
         secure: isProd,
       },
     },
-    // Email via Resend (https://resend.com). Empty key = emails are skipped.
-    // Set NUXT_RESEND_API_KEY (and optionally NUXT_EMAIL_FROM) as Cloudflare Pages secrets.
-    resendApiKey: "",
+    // Email through Cloudflare Email Sending (REST API). Empty token = emails
+    // are skipped. Set NUXT_CF_EMAIL_API_TOKEN (and optionally NUXT_EMAIL_FROM)
+    // as Cloudflare Pages secrets; the sending domain must be onboarded.
+    cfEmailApiToken: "",
+    cfAccountId: "e12f511fe723c064e1b971cc094a95fd",
     // Custom domains through Cloudflare for SaaS (see docs/custom-domains.md).
     // Empty token = the feature shows as not available yet.
     cfSaasZoneId: "",

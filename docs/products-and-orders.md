@@ -3,7 +3,7 @@
 A block for selling. Each product either links to another store (Shopee,
 TikTok Shop, Lazada, Tiki, Amazon, Etsy, any website) or can be ordered right
 on the page. Orders land in the site's Inbox and are sent to the owner by
-Telegram (see `telegram-notifications.md`) and email (when Resend is set up).
+Telegram (see `telegram-notifications.md`) and email (when email sending is set up).
 
 ## Data
 
