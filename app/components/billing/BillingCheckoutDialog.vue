@@ -87,21 +87,13 @@
 
           <div>
             <p class="mb-1.5 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.network') }}</p>
-            <div class="flex flex-wrap gap-1.5">
-              <button
-                v-for="n in cryptoInfo.networks"
-                :key="n.id"
-                type="button"
-                class="flex items-center gap-1.5 rounded-full border py-1 pl-3 pr-1 text-xs font-medium transition"
-                :class="network === n.id ? 'border-ink bg-ink text-paper' : 'border-line text-ink-soft hover:border-ink-faint'"
-                @click="network = n.id"
-              >
-                {{ n.name }}
-                <span v-if="CRYPTO_NETWORK_BY_ID[n.id]" class="flex size-5 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-black/5">
-                  <UIcon :name="CRYPTO_NETWORK_BY_ID[n.id]!.icon" class="size-3.5" />
-                </span>
-              </button>
-            </div>
+            <USelect
+              v-model="network"
+              :items="networkItems"
+              :icon="CRYPTO_NETWORK_BY_ID[network]?.icon"
+              class="w-full"
+              :ui="{ leadingIcon: 'size-5', itemLeadingIcon: 'size-5' }"
+            />
           </div>
           <div>
             <p class="mb-1.5 text-xs font-medium text-ink-muted">{{ t('dashboard.billing.checkout.token') }}</p>
@@ -204,10 +196,11 @@ const cryptoInfo = ref<CryptoInfo | null>(null)
 const check = ref<Check | null>(null)
 const paid = ref<{ expiresAt: string } | null>(null)
 
-const network = ref('bsc')
+const network = ref('base')
 const token = ref('USDT')
 const txHash = ref('')
 const networkTokens = computed(() => cryptoInfo.value?.networks.find(n => n.id === network.value)?.tokens ?? [])
+const networkItems = computed(() => (cryptoInfo.value?.networks ?? []).map(n => ({ label: n.name, value: n.id, icon: CRYPTO_NETWORK_BY_ID[n.id]?.icon })))
 const tokenItems = computed(() => networkTokens.value.map(tk => ({ label: tk, value: tk, icon: CRYPTO_TOKEN_ICONS[tk as CryptoToken] })))
 const networkName = computed(() => cryptoInfo.value?.networks.find(n => n.id === network.value)?.name ?? '')
 watch(networkTokens, (tokens) => {

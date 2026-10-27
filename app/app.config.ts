@@ -35,7 +35,8 @@ const iosField = {
 // iOS 26 menus (dropdowns, selects, popovers): a glass panel that springs
 // open from where it was opened, roomy rounded rows, hairline separators
 const menuMotion = 'data-[state=open]:animate-[ios-menu-in_240ms_cubic-bezier(0.22,1.25,0.36,1)] data-[state=closed]:animate-[ios-menu-out_120ms_ease-in]'
-const glassMenu = `${liquidGlass} rounded-[20px] ${menuMotion}`
+// z-[60]: above sheets and dialogs (z-50), so menus opened inside them show
+const glassMenu = `${liquidGlass} z-[60] rounded-[20px] ${menuMotion}`
 const menuRows = {
   slots: {
     content: `${glassMenu} p-1`,
@@ -259,7 +260,7 @@ export default defineAppConfig({
     contextMenu: menuRows,
     tooltip: {
       slots: {
-        content: 'h-7 rounded-full px-3 text-[12px] font-medium bg-neutral-900/85 text-white ring-0 backdrop-blur-xl shadow-lg dark:bg-white/90 dark:text-neutral-900 data-[state=delayed-open]:animate-[ios-menu-in_180ms_cubic-bezier(0.22,1.25,0.36,1)]',
+        content: 'z-[60] h-7 rounded-full px-3 text-[12px] font-medium bg-neutral-900/85 text-white ring-0 backdrop-blur-xl shadow-lg dark:bg-white/90 dark:text-neutral-900 data-[state=delayed-open]:animate-[ios-menu-in_180ms_cubic-bezier(0.22,1.25,0.36,1)]',
       },
     },
     // "link" tabs are chips in a sideways-scrolling row, like the theme

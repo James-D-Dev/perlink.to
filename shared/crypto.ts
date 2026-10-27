@@ -17,39 +17,6 @@ export interface CryptoNetwork {
 
 export const CRYPTO_NETWORKS: CryptoNetwork[] = [
   {
-    id: 'bsc',
-    name: 'BNB Smart Chain (BEP-20)',
-    icon: 'token-branded:binance-smart-chain',
-    rpc: 'https://bsc-rpc.publicnode.com',
-    explorer: 'https://bscscan.com/tx/',
-    tokens: {
-      USDT: { address: '0x55d398326f99059fF775485246999027B3197955', decimals: 18 },
-      USDC: { address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', decimals: 18 },
-    },
-  },
-  {
-    id: 'polygon',
-    name: 'Polygon',
-    icon: 'token-branded:polygon',
-    rpc: 'https://polygon-bor-rpc.publicnode.com',
-    explorer: 'https://polygonscan.com/tx/',
-    tokens: {
-      USDT: { address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals: 6 },
-      USDC: { address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', decimals: 6 },
-    },
-  },
-  {
-    id: 'arbitrum',
-    name: 'Arbitrum One',
-    icon: 'token-branded:arbitrum-one',
-    rpc: 'https://arbitrum-one-rpc.publicnode.com',
-    explorer: 'https://arbiscan.io/tx/',
-    tokens: {
-      USDT: { address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9', decimals: 6 },
-      USDC: { address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831', decimals: 6 },
-    },
-  },
-  {
     id: 'base',
     name: 'Base',
     icon: 'token-branded:base',
@@ -60,14 +27,14 @@ export const CRYPTO_NETWORKS: CryptoNetwork[] = [
     },
   },
   {
-    id: 'ethereum',
-    name: 'Ethereum (ERC-20)',
-    icon: 'token-branded:ethereum',
-    rpc: 'https://ethereum-rpc.publicnode.com',
-    explorer: 'https://etherscan.io/tx/',
+    id: 'bsc',
+    name: 'BNB Smart Chain (BEP-20)',
+    icon: 'token-branded:binance-smart-chain',
+    rpc: 'https://bsc-rpc.publicnode.com',
+    explorer: 'https://bscscan.com/tx/',
     tokens: {
-      USDT: { address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', decimals: 6 },
-      USDC: { address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', decimals: 6 },
+      USDT: { address: '0x55d398326f99059fF775485246999027B3197955', decimals: 18 },
+      USDC: { address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', decimals: 18 },
     },
   },
 ]

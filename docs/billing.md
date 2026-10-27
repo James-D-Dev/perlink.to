@@ -62,8 +62,8 @@ The checkout offers what is set up (`paymentMethods` in `/api/billing`):
   set up, a matching transfer still turns the plan on by itself.
 - **Crypto** (USDT / USDC at the USD price, `PLAN_PRICES_USD`):
   `NUXT_BILLING_CRYPTO_ADDRESS` = the EVM wallet that receives it. Networks and
-  token contracts are in `shared/crypto.ts` (BNB Chain, Polygon, Arbitrum,
-  Base, Ethereum; checked on chain: symbol and decimals).
+  token contracts are in `shared/crypto.ts` (Base: USDC; BNB Smart Chain:
+  USDT and USDC; checked on chain: symbol and decimals).
 
 Flow:
 
