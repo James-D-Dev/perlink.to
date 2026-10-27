@@ -796,6 +796,12 @@ useHead({
   outline-offset: 6px;
   border-radius: 12px;
 }
+/* The header runs the full width of the preview, so its outline goes on the
+   inside instead of being cut off at the sides */
+.pv-active-self {
+  outline-offset: -2px;
+  border-radius: 16px;
+}
 /* While the editor takes a snapshot for the thumbnail */
 .pv-capturing .pv-active > *,
 .pv-capturing.pv-active-self,
