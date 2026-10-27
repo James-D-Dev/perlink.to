@@ -13,7 +13,11 @@
       <AppLogo variant="mark" :size="24" />
     </span>
     <span class="min-w-0 flex-1">
-      <span class="block text-sm font-semibold">{{ siteT(lang, 'madeWith') }}</span>
+      <span class="flex items-center gap-[0.3em] text-sm font-semibold" :aria-label="siteT(lang, 'madeWith')">
+        <span v-if="before">{{ before }}</span>
+        <AppLogo :size="20" class="translate-y-[0.5px]" />
+        <span v-if="after">{{ after }}</span>
+      </span>
       <span class="mt-0.5 block text-xs leading-snug text-black/55">{{ siteT(lang, 'madeWithCta') }}</span>
     </span>
     <UIcon name="i-lucide-arrow-up-right" class="size-4 shrink-0 text-black/40 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black/70" />
@@ -25,12 +29,12 @@
     target="_blank"
     rel="noopener"
     :title="siteT(lang, 'madeWithCta')"
-    class="group pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-black/35 py-1.5 pl-1.5 pr-3 text-xs font-medium text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/50"
+    :aria-label="siteT(lang, 'madeWith')"
+    class="group pointer-events-auto inline-flex h-9 items-center gap-1.5 rounded-full bg-black/35 pl-3.5 pr-3 text-xs font-medium text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/50"
   >
-    <span class="flex size-6 items-center justify-center rounded-full bg-white">
-      <AppLogo variant="mark" :size="15" />
-    </span>
-    {{ siteT(lang, 'madeWith') }}
+    <span v-if="before">{{ before }}</span>
+    <AppLogo :size="17" inverted class="translate-y-[0.5px]" />
+    <span v-if="after">{{ after }}</span>
     <UIcon name="i-lucide-arrow-up-right" class="size-3.5 text-white/60 transition group-hover:text-white" />
   </a>
 </template>
@@ -47,6 +51,11 @@ const props = withDefaults(defineProps<{
   lang: 'en',
   variant: 'card',
 })
+
+// The brand name in the sentence is drawn as the logo
+const parts = computed(() => siteT(props.lang, 'madeWith').split('Perlink'))
+const before = computed(() => parts.value[0]?.trim() ?? '')
+const after = computed(() => parts.value.slice(1).join('Perlink').trim())
 
 const href = computed(() => `https://perlink.to/?utm_source=site&utm_medium=${props.variant === 'pill' ? 'room-badge' : 'badge'}&utm_campaign=${encodeURIComponent(props.username)}`)
 </script>
