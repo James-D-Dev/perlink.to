@@ -21,7 +21,7 @@ export const lemonEnabled = (event: H3Event) => !!lemonConfig(event).apiKey
 
 interface JsonApiItem<A> { id: string; type: string; attributes: A; relationships?: Record<string, { data?: { id: string; type: string } | null }> }
 
-async function lemonApi<T>(event: H3Event, path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+export async function lemonApi<T>(event: H3Event, path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
   const response = await fetch(`${API}${path}`, {
     method: init.method ?? 'GET',
     headers: {
@@ -43,8 +43,8 @@ interface Catalog { storeId: string; variants: Partial<Record<VariantKey, string
 // Looked up once per worker; a new deploy (or a cold start) looks again
 let catalog: { at: number; value: Catalog } | null = null
 
-export async function lemonCatalog(event: H3Event): Promise<Catalog> {
-  if (catalog && Date.now() - catalog.at < 10 * 60 * 1000) return catalog.value
+export async function lemonCatalog(event: H3Event, fresh = false): Promise<Catalog> {
+  if (!fresh && catalog && Date.now() - catalog.at < 10 * 60 * 1000) return catalog.value
   let storeId = lemonConfig(event).storeId
   if (!storeId) {
     const stores = await lemonApi<{ data: JsonApiItem<{ name: string }>[] }>(event, '/stores')
