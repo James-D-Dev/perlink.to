@@ -22,5 +22,5 @@ REST API when `NUXT_CF_EMAIL_API_TOKEN` is set and the binding isn't there.
 5. Superadmin → Settings → **Email sending → Send test email** sends one to
    the superadmin and shows the error if it fails.
 
-The sender is `NUXT_EMAIL_FROM` (default `Perlink <notification@perlink.to>`;
+The sender is `NUXT_EMAIL_FROM` (default `Perlink <notifications@perlink.to>`;
 the Worker sends from the address part). It must be on the onboarded domain.
