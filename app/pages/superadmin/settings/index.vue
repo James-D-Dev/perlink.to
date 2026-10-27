@@ -10,6 +10,23 @@
 
     <template #body>
       <div class="mx-auto w-full max-w-3xl space-y-4 py-2 sm:py-4">
+        <!-- Email: Cloudflare Email Sending -->
+        <UCard :ui="superadminPanelUi">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-mail" class="size-5 text-[#F38020]" />
+              <h2 class="font-medium">Email sending</h2>
+            </div>
+          </template>
+          <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <p class="text-muted">Sends a test email to the superadmin through Cloudflare Email Sending.</p>
+            <UButton size="sm" icon="i-lucide-send" label="Send test email" :loading="sendingTest" @click="sendTestEmail" />
+          </div>
+          <p v-if="emailTest" class="mt-3 text-sm" :class="emailTest.ok ? 'text-success' : 'text-error'">
+            {{ emailTest.ok ? `Sent to ${emailTest.to} (${emailTest.transport})` : `Failed${emailTest.transport ? ` (${emailTest.transport})` : ''}: ${emailTest.error}` }}
+          </p>
+        </UCard>
+
         <!-- Lemon Squeezy: card / PayPal subscriptions -->
         <UCard :ui="superadminPanelUi">
           <template #header>
@@ -123,6 +140,20 @@ interface LemonStatus {
 }
 
 const toast = useToast()
+
+const sendingTest = ref(false)
+const emailTest = ref<{ ok: boolean; transport: string | null; to?: string; error?: string | null } | null>(null)
+async function sendTestEmail() {
+  sendingTest.value = true
+  try {
+    emailTest.value = await $fetch('/api/superadmin/email/test', { method: 'POST' })
+  } catch (error: any) {
+    emailTest.value = { ok: false, transport: null, error: error?.data?.statusMessage || 'Request failed' }
+  } finally {
+    sendingTest.value = false
+  }
+}
+
 const { data: lemon, pending: lemonPending, refresh: refreshLemon } = useFetch<LemonStatus>('/api/superadmin/lemon', { server: false })
 const { data: telegram, pending, refresh } = await useFetch<TelegramStatus>('/api/superadmin/telegram')
 

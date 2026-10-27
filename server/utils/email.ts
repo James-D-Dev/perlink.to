@@ -1,8 +1,9 @@
 import type { H3Event } from 'h3'
 
-// Transactional email through Cloudflare Email Sending's REST API. Without
-// NUXT_CF_EMAIL_API_TOKEN nothing is sent, so features that email stay usable
-// before it's set up.
+// Transactional email through Cloudflare Email Sending: the EMAIL binding
+// (wrangler.jsonc) when the runtime has it, otherwise the REST API with
+// NUXT_CF_EMAIL_API_TOKEN. With neither, nothing is sent, so features that
+// email stay usable before it's set up.
 
 export interface EmailMessage {
   to: string
@@ -12,12 +13,38 @@ export interface EmailMessage {
   replyTo?: string
 }
 
+interface EmailBinding {
+  send(message: { to: string; from: string; subject: string; html: string; text: string; replyTo?: string }): Promise<{ messageId?: string }>
+}
+const emailBinding = (event: H3Event) => (event.context.cloudflare?.env as { EMAIL?: EmailBinding } | undefined)?.EMAIL
+
+/** How mail goes out here, for the superadmin's check */
+export const emailTransport = (event: H3Event) => (emailBinding(event) ? 'binding' : useRuntimeConfig(event).cfEmailApiToken ? 'api' : null)
+
+/** Why the last send failed (this worker), for the superadmin's check */
+export let lastEmailError = ''
+
 export function emailEnabled(event: H3Event) {
-  return !!useRuntimeConfig(event).cfEmailApiToken
+  return !!emailBinding(event) || !!useRuntimeConfig(event).cfEmailApiToken
 }
 
 export async function sendEmail(event: H3Event, message: EmailMessage): Promise<boolean> {
   const config = useRuntimeConfig(event)
+  const from = String(config.emailFrom)
+  const bare = from.match(/<([^>]+)>/)?.[1] ?? from
+
+  const binding = emailBinding(event)
+  if (binding) {
+    try {
+      await binding.send({ to: message.to, from: bare, subject: message.subject, html: message.html, text: message.text, replyTo: message.replyTo })
+      return true
+    } catch (error) {
+      lastEmailError = error instanceof Error ? error.message : String(error)
+      console.error('[email] binding send failed', error)
+      return false
+    }
+  }
+
   if (!config.cfEmailApiToken || !config.cfAccountId) return false
   const url = `https://api.cloudflare.com/client/v4/accounts/${config.cfAccountId}/email/sending/send`
   const post = (from: string) => fetch(url, {
@@ -34,12 +61,11 @@ export async function sendEmail(event: H3Event, message: EmailMessage): Promise<
   })
   try {
     // "Perlink <notifications@perlink.to>"; if the name isn't accepted, the bare address
-    const from = String(config.emailFrom)
     let response = await post(from)
-    const bare = from.match(/<([^>]+)>/)?.[1]
-    if (!response.ok && response.status === 400 && bare) response = await post(bare)
+    if (!response.ok && response.status === 400 && bare !== from) response = await post(bare)
     const data = await response.json().catch(() => null) as { success?: boolean; errors?: { message: string }[]; result?: { permanent_bounces?: string[] } } | null
     if (!response.ok || !data?.success) {
+      lastEmailError = data?.errors?.map(e => e.message).join('; ') || `HTTP ${response.status}`
       console.error('[email] Cloudflare rejected the message', response.status, data?.errors?.map(e => e.message).join('; '))
       return false
     }
