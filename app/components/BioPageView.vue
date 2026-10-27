@@ -379,7 +379,7 @@
             :id="blockDomId(block)"
             :data="block.data"
             :username="username"
-            :preview="isPreview"
+            :preview="noSending"
             :empty-text="t('blocks.blog.empty')"
             :card-style="panelStyle"
             :heading-style="headingStyle"
@@ -391,7 +391,7 @@
             :data="block.data"
             :block-id="block.id"
             :username="username"
-            :preview="isPreview"
+            :preview="noSending"
             :card-style="panelStyle"
             :button-style="solidButtonStyle"
             :heading-style="headingStyle"
@@ -403,7 +403,7 @@
             :data="block.data"
             :block-id="block.id"
             :username="username"
-            :preview="isPreview"
+            :preview="noSending"
             :can-transfer="hasBankAccount"
             :card-style="panelStyle"
             :button-style="solidButtonStyle"
@@ -427,7 +427,7 @@
       <!-- Space below the last link, clear of the phone's bottom edge (Safari's
            toolbar and the home bar catch taps right at the bottom) -->
       <div
-        v-if="mode !== 'preview' && mode !== 'thumbnail'"
+        v-if="mode !== 'preview' && mode !== 'thumbnail' && mode !== 'template'"
         class="mt-14 flex flex-col items-center gap-1 px-4"
         :class="quickActions.length ? '' : footerSpace ? 'pb-[calc(6rem+env(safe-area-inset-bottom))]' : 'pb-[calc(2.5rem+env(safe-area-inset-bottom))]'"
       >
@@ -637,6 +637,8 @@ const avatarFallbackStyle = computed(() => ({
 // Previews (editor, template thumbnails) also show items that still need a
 // URL, so a fresh template looks complete; the public page hides them
 const isPreview = computed(() => props.mode === "preview");
+// Editor previews and template previews never send orders or forms
+const noSending = computed(() => props.mode === "preview" || props.mode === "template");
 
 // Product orders can be paid by transfer to the page's VietQR account
 const hasBankAccount = computed(() =>

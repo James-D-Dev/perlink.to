@@ -11,8 +11,9 @@
       @keydown.enter.prevent="emit('select', template.id)"
       @keydown.space.prevent="emit('select', template.id)"
     >
-      <div class="h-40 border-b border-gray-200 dark:border-white/10">
+      <div class="relative h-40 border-b border-gray-200 dark:border-white/10">
         <SiteTemplateThumbnail :template="template" :scale="0.36" />
+        <SiteTemplatePreviewButton :template-id="template.id" />
       </div>
       <div class="space-y-1 p-3">
         <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ t(`dashboard.templates.${template.id}.name`) }}</p>

@@ -206,7 +206,7 @@ function getIconColorClass(iconId?: string): string {
 // Track bio link click (simple count only)
 const trackClick = async () => {
   if (!props.username || !props.link.id) return;
-  if (props.mode === 'preview') return;
+  if (props.mode === 'preview' || props.mode === 'template') return;
   
   try {
     await $fetch(`/api/bio/${props.username}/count`, {

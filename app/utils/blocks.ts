@@ -122,6 +122,6 @@ export function productPaymentOptions(payment: 'cod' | 'transfer' | 'both' | und
 
 /** Count a visitor action (call, directions, chat, booking) for the owner's analytics */
 export function trackVisitorAction(username: string, action: string, mode: string) {
-  if (mode === 'preview' || !username) return
+  if (mode === 'preview' || mode === 'template' || !username) return
   $fetch(`/api/bio/${username}/count`, { method: 'POST', body: { linkId: action, type: 'action' } }).catch(() => {})
 }

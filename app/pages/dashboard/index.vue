@@ -85,6 +85,7 @@
             >
               <div class="relative aspect-[3/4] overflow-hidden border-b border-default dark:border-white/[0.08]">
                 <SiteTemplateThumbnail :template="template" :scale="0.4" class="transition duration-500 group-hover:scale-[1.03]" />
+                <SiteTemplatePreviewButton :template-id="template.id" />
                 <div
                   class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/0 to-transparent p-4 transition"
                   :class="creatingId === template.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
@@ -178,4 +179,13 @@ async function useTemplate(id: string) {
     toast.add({ title: t('dashboard.claim.createFailed'), description: error?.data?.statusMessage || error?.message, color: 'error' })
   }
 }
+
+// "Use this template" on a template's preview page lands here
+onMounted(() => {
+  const id = typeof route.query.template === 'string' ? route.query.template : ''
+  if (!id || !PAGE_TEMPLATES.some(item => item.id === id)) return
+  // Off the address first, so coming back here doesn't make another site
+  navigateTo({ query: { ...route.query, template: undefined } }, { replace: true })
+  useTemplate(id)
+})
 </script>

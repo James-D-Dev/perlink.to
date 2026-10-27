@@ -19,6 +19,9 @@
       "templatesIntro": "{n} templates, each with sample content, a theme and a matching 3D room.",
       "all": "All",
       "useTemplate": "Use template",
+      "previewTemplate": "Preview",
+      "previewTitle": "Template preview",
+      "previewUse": "Use this template",
       "claimHeading": "Claim your site",
       "features": {
         "sampleContent": "Sample content you can edit",

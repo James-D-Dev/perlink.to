@@ -19,6 +19,9 @@
       "templatesIntro": "{n} mẫu, mỗi mẫu có sẵn nội dung mẫu, giao diện và Phòng 3D đi kèm.",
       "all": "Tất cả",
       "useTemplate": "Dùng mẫu này",
+      "previewTemplate": "Xem trước",
+      "previewTitle": "Xem trước mẫu",
+      "previewUse": "Dùng mẫu này",
       "claimHeading": "Chọn địa chỉ cho trang",
       "features": {
         "sampleContent": "Nội dung mẫu, sửa tùy ý",

@@ -77,7 +77,7 @@ function onMouseLeave() {}
 // Track social link click (simple count only)
 const trackSocialClick = async (socialId: string, url: string) => {
   if (!props.username) return;
-  if (props.mode === 'preview') return;
+  if (props.mode === 'preview' || props.mode === 'template') return;
 
   try {
     await $fetch(`/api/bio/${props.username}/count`, {
