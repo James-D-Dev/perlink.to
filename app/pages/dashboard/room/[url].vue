@@ -75,7 +75,8 @@ async function load() {
     console.error('Failed to load room:', error)
     bioPage.value = null
   } finally {
-    loading.value = false
+    // The loader finishes its intro and lands the pearl before the studio shows
+    setTimeout(() => (loading.value = false), loaderWaitMs())
   }
 }
 

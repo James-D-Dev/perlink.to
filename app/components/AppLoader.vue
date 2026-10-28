@@ -3,7 +3,7 @@
        then the window) and the pearl drops in and keeps bouncing on the
        floor, while a sheen crosses the tile. Pure CSS, so it plays from the
        server-rendered HTML before any script runs. -->
-  <div class="pl-loader" role="status" :aria-label="label" :style="{ '--s': `${size}px` }">
+  <div class="pl-loader" role="status" :aria-label="label" :style="{ '--pl-t': `${offset}ms` }">
     <svg :width="size" :height="size" viewBox="0 0 64 64" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="pl-loader-tile" x1="0" y1="0" x2="0" y2="1">
@@ -55,17 +55,29 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   /** Logo size in px */
   size?: number
   /** Optional line under the logo */
   text?: string
   /** For screen readers */
   label?: string
+  /** Join the page's loader clock (see below); false starts from the beginning */
+  sync?: boolean
 }>(), {
   size: 72,
   label: 'Loading',
+  sync: true,
 })
+
+// Every loader on the page runs on one clock that starts with the first
+// paint, so when one takes over from another (the server-rendered start
+// screen, the editor's loading template, the room editor's loader) the
+// animation carries on instead of starting again. Rendered on the server or
+// hydrated: the animation already started with the page, so no offset.
+const offset = import.meta.client && props.sync && !useNuxtApp().isHydrating
+  ? Math.max(0, Math.round(performance.now() - loaderClockStart()))
+  : 0
 </script>
 
 <style>
@@ -76,21 +88,21 @@ withDefaults(defineProps<{
   gap: 14px;
 }
 .pl-loader svg { overflow: visible; filter: drop-shadow(0 10px 24px rgb(0 95 214 / 0.28)); }
-.pl-loader .pl-tile { transform-origin: 32px 32px; animation: pl-tile-in 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.pl-loader .pl-tile { transform-origin: 32px 32px; animation: pl-tile-in 520ms calc(0ms - var(--pl-t, 0ms)) cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
 /* The room builds itself once */
-.pl-loader .pl-floor { transform-origin: 32px 47px; animation: pl-floor-in 420ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pl-loader .pl-floor { transform-origin: 32px 47px; animation: pl-floor-in 420ms calc(140ms - var(--pl-t, 0ms)) cubic-bezier(0.22, 1, 0.36, 1) both; }
 .pl-loader .pl-wall { transform-box: fill-box; transform-origin: bottom; animation: pl-wall-up 460ms cubic-bezier(0.22, 1.2, 0.36, 1) both; }
-.pl-loader .pl-wall-l { animation-delay: 300ms; }
-.pl-loader .pl-wall-r { animation-delay: 380ms; }
-.pl-loader .pl-window { animation: pl-fade 300ms 640ms ease-out both; }
+.pl-loader .pl-wall-l { animation-delay: calc(300ms - var(--pl-t, 0ms)); }
+.pl-loader .pl-wall-r { animation-delay: calc(380ms - var(--pl-t, 0ms)); }
+.pl-loader .pl-window { animation: pl-fade 300ms calc(640ms - var(--pl-t, 0ms)) ease-out both; }
 
 /* Then the pearl drops in and bounces for as long as it's loading */
-.pl-loader .pl-pearl { animation: pl-drop 560ms 700ms cubic-bezier(0.5, 0, 0.75, 0) both, pl-bounce 900ms 1260ms infinite; }
-.pl-loader .pl-shadow { transform-box: fill-box; transform-origin: center; animation: pl-shadow-in 360ms 900ms ease-out both, pl-squash 900ms 1260ms infinite; }
-.pl-loader .pl-sheen { animation: pl-sheen 2400ms 900ms ease-in-out infinite; }
+.pl-loader .pl-pearl { animation: pl-drop 560ms calc(700ms - var(--pl-t, 0ms)) cubic-bezier(0.5, 0, 0.75, 0) both, pl-bounce 900ms calc(1260ms - var(--pl-t, 0ms)) infinite; }
+.pl-loader .pl-shadow { transform-box: fill-box; transform-origin: center; animation: pl-shadow-in 360ms calc(900ms - var(--pl-t, 0ms)) ease-out both, pl-squash 900ms calc(1260ms - var(--pl-t, 0ms)) infinite; }
+.pl-loader .pl-sheen { animation: pl-sheen 2400ms calc(900ms - var(--pl-t, 0ms)) ease-in-out infinite; }
 
-.pl-loader .pl-text { font-size: 13px; font-weight: 500; color: var(--ui-text-muted, #6b655e); letter-spacing: -0.01em; animation: pl-fade 400ms 500ms ease-out both; }
+.pl-loader .pl-text { font-size: 13px; font-weight: 500; color: var(--ui-text-muted, #6b655e); letter-spacing: -0.01em; animation: pl-fade 400ms calc(500ms - var(--pl-t, 0ms)) ease-out both; }
 
 @keyframes pl-tile-in { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes pl-floor-in { from { transform: scale(0.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }

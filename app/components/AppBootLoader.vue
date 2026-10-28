@@ -18,20 +18,20 @@ const nuxtApp = useNuxtApp()
 // Only the app's own screens; visitors' sites and the marketing pages show
 // their content straight away
 const isApp = /^\/(dashboard|superadmin)(\/|$)/.test(route.path)
-const dark = route.path.startsWith('/superadmin') && useAdminTheme().value !== 'light'
+// Dark where the screen behind is dark: the room editor, and superadmin unless switched to light
+const dark = route.path.startsWith('/dashboard/room') || (route.path.startsWith('/superadmin') && useAdminTheme().value !== 'light')
 
 const shown = ref(isApp)
 const leaving = ref(false)
 
-// Long enough for the room to build (about 0.9 s from the first paint), then fade
-const MIN_MS = 900
+// Goes once the intro has played (the room built, the pearl landed), and
+// only as the pearl touches the floor, so it never cuts off mid-bounce
 function finish() {
   if (!shown.value || leaving.value) return
-  const wait = Math.max(0, MIN_MS - performance.now())
   setTimeout(() => {
     leaving.value = true
     setTimeout(() => (shown.value = false), 320)
-  }, wait)
+  }, loaderWaitMs())
 }
 
 if (import.meta.client && isApp) {
