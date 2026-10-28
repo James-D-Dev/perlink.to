@@ -178,6 +178,13 @@ real colours.
 .admin-theme.dark .text-amber-600:not(.pl-site *), .admin-theme.dark .text-amber-700:not(.pl-site *), .admin-theme.dark .text-amber-800:not(.pl-site *) {
   color: #fcd34d;
 }
+/* The notices' darkest text (titles, body) turns light */
+.admin-theme.dark .text-amber-900:not(.pl-site *), .admin-theme.dark .text-amber-950:not(.pl-site *) {
+  color: #fef3c7;
+}
+.admin-theme.dark .text-amber-900\/80:not(.pl-site *) {
+  color: rgb(254 243 199 / 0.75);
+}
 .admin-theme.dark .bg-emerald-50:not(.pl-site *), .admin-theme.dark .bg-emerald-100:not(.pl-site *), .admin-theme.dark .bg-emerald-50\/40:not(.pl-site *), .admin-theme.dark .bg-emerald-50\/90:not(.pl-site *) {
   background-color: rgb(16 185 129 / 0.13);
 }
