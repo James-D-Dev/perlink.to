@@ -11,9 +11,12 @@
       :min-size="16"
       :max-size="16"
       :default-size="16"
+      :collapsed-size="4.5"
       :ui="{
         root: 'bg-paper border-r border-line',
         header: 'h-16',
+        // Collapsed: room for the 44 px create button, centred, no sideways scroll
+        body: collapsed ? 'px-3 overflow-x-hidden' : undefined,
         footer: 'border-t border-line',
         content: 'flex-col',
       }"

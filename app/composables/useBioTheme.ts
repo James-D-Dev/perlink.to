@@ -127,7 +127,9 @@ export function useBioTheme(themeInput: Ref<Partial<ThemeConfig> | undefined | n
 
   const pageStyle = computed(() => ({
     fontFamily: theme.value.typography.paragraphFont,
-    color: theme.value.typography.textColor,
+    // A page without its own text colour keeps the default, rather than taking
+    // the surrounding app's (light text in the dark dashboard)
+    color: theme.value.typography.textColor || '#334155',
     ...bgLayerStyle.value
   }))
 

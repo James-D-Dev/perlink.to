@@ -443,7 +443,7 @@
 
           <!-- Tips Card -->
           <div
-            class="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-200/60 dark:border-amber-500/30 flex items-start gap-3"
+            class="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-500/15 dark:to-amber-500/5 rounded-xl p-4 border border-amber-200/60 dark:border-amber-500/30 flex items-start gap-3"
           >
             <div class="flex-1">
               <div class="flex items-center gap-2">

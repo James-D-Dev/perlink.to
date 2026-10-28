@@ -12,7 +12,7 @@
         class="inline-flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition"
         :class="activeCategory === 'pro'
           ? 'border-transparent bg-gradient-to-r from-amber-400 to-pink-500 text-white'
-          : 'border-amber-300 text-amber-700 hover:bg-amber-50'"
+          : 'border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-400/40 dark:hover:bg-amber-500/15'"
         @click="activeCategory = 'pro'"
       >
         <UIcon name="i-lucide-crown" class="size-3.5" />
@@ -80,7 +80,7 @@
     </div>
 
     <!-- Pro themes are open to everyone for now; say so, and where Pro lives -->
-    <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-gradient-to-r from-amber-50 to-pink-50 px-3 py-2.5 text-xs text-amber-900 ring-1 ring-amber-200/70">
+    <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-gradient-to-r from-amber-50 to-pink-50 px-3 py-2.5 text-xs text-amber-900 ring-1 ring-amber-200/70 dark:from-amber-500/15 dark:to-pink-500/10 dark:ring-amber-400/25">
       <UIcon name="i-lucide-crown" class="size-4 shrink-0 text-amber-500" />
       <span class="min-w-0 flex-1">{{ t('theme.presetActions.proNote') }}</span>
       <NuxtLink to="/dashboard/upgrade" class="font-semibold underline-offset-2 hover:underline">{{ t('theme.presetActions.seePlans') }}</NuxtLink>
