@@ -143,7 +143,8 @@ export class RoomScene {
   private loadingMarkerMaterial = new THREE.MeshBasicMaterial({ color: '#5aa9ff', transparent: true, opacity: 0.6, depthWrite: false, fog: false })
   private land?: LandInstance
   private landKey = ''
-  private clock = new THREE.Clock()
+  /** Frame clock (THREE.Clock is deprecated); advanced with each frame's timestamp */
+  private timer = new THREE.Timer()
   private lamps = 0
   /** Visible sky: gradient dome (the camera mostly sees below the horizon) */
   private skyDome = createSkyDome()
@@ -203,7 +204,8 @@ export class RoomScene {
     // MSAA stays on everywhere: without it the cut-out grass and leaves shimmer as they sway
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
     this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    // Newer three.js removed PCFSoftShadowMap (it fell back to this anyway)
+    this.renderer.shadowMap.type = THREE.PCFShadowMap
     // Neutral keeps colours saturated (ACES and AgX wash out this pastel scenery)
     this.renderer.toneMapping = THREE.NeutralToneMapping
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -339,7 +341,7 @@ export class RoomScene {
     const shownBefore = this.shownDaylight
     this.shownDaylight = null
     this.applyDaylight(typeof light === 'number' ? daylightAtHour(light) : light)
-    this.land?.update(this.clock.elapsedTime, 0, this.shownDaylight ?? 1, this.lamps)
+    this.land?.update(this.timer.getElapsed(), 0, this.shownDaylight ?? 1, this.lamps)
     this.renderer.render(this.scene, this.camera)
     this.shownDaylight = shownBefore
     // Copy the frame now, before the WebGL buffer is cleared, at thumbnail size
@@ -1223,8 +1225,9 @@ export class RoomScene {
   }
 
   private renderFrame(now: number) {
-    const dt = Math.min(this.clock.getDelta(), 0.1)
-    const time = this.clock.elapsedTime
+    this.timer.update(now)
+    const dt = Math.min(this.timer.getDelta(), 0.1)
+    const time = this.timer.getElapsed()
     if (this.room) {
       this.applyDaylight(this.daylightOverride ?? getDaylight(this.room.environment))
     }
