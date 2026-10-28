@@ -142,8 +142,8 @@ both modes (Nuxt UI would put near-black text on it in dark mode)
 }
 
 /*
-Superadmin: the dashboard's paper/sand/ink look, with a dark version of
-those surfaces for its dark mode (its own switch)
+Dashboard and superadmin (class on <html> from their layouts): the
+paper/sand/ink surfaces, with a dark version for their dark modes
 */
 .admin-theme.dark {
   --color-paper: #0a0a0a;
@@ -154,6 +154,10 @@ those surfaces for its dark mode (its own switch)
   --color-ink-soft: #d4d4d4;
   --color-ink-muted: #a1a1a1;
   --color-ink-faint: #6b6b6b;
+}
+/* The page itself is dark too, so no white shows behind see-through panels */
+html.admin-theme.dark {
+  background-color: #0a0a0a;
 }
 /* ---------- Public site primitives ---------- */
 

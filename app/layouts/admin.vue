@@ -20,7 +20,7 @@
     >
       <template #header="{ collapsed }">
         <NuxtLink to="/" :aria-label="collapsed ? 'Perlink home' : undefined" class="flex items-center" :class="collapsed && 'w-full justify-center'">
-          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="collapsed ? 28 : 30" />
+          <AppLogo :variant="collapsed ? 'mark' : 'full'" :size="collapsed ? 28 : 30" :inverted="theme === 'dark'" />
         </NuxtLink>
       </template>
 
@@ -143,7 +143,24 @@ const navigationLinks = computed<NavigationMenuItem[]>(() => [
   { label: t("nav.settings"), icon: "i-lucide-settings", to: "/dashboard/settings" },
 ]);
 
+// Light / dark switch for the dashboard (light by default); the paper/ink
+// surfaces have dark versions under this class (main.css)
+useHead({ htmlAttrs: { class: "admin-theme" } });
+const colorMode = useColorMode();
+const theme = useDashboardTheme();
+function toggleTheme() {
+  const next = theme.value === "dark" ? "light" : "dark";
+  theme.value = next;
+  route.meta.colorMode = next;
+  colorMode.value = next;
+}
+
 const supportLinks = computed<NavigationMenuItem[]>(() => [
+  {
+    label: theme.value === "dark" ? t("nav.lightMode") : t("nav.darkMode"),
+    icon: theme.value === "dark" ? "i-lucide-sun" : "i-lucide-moon",
+    onSelect: (event: Event) => { event.preventDefault(); toggleTheme(); },
+  },
   { label: t("nav.help"), icon: "i-lucide-circle-help", onSelect: () => (helpOpen.value = true) },
   { label: t("nav.feedback"), icon: "i-lucide-message-square-heart", to: "/dashboard/feedback" },
 ]);

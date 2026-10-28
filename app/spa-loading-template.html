@@ -52,8 +52,11 @@
   </div>
 </div>
 <script>
-  // The room editor is dark: match it, so the screen doesn't flash white
-  if (location.pathname.startsWith('/dashboard/room')) document.getElementById('pl-spa-loader').style.background = '#0a0a0a'
+  // Match the screen behind (the room editor, or the dashboard switched to
+  // dark), so it doesn't flash white
+  if (location.pathname.startsWith('/dashboard/room') || /(?:^|; )perlink_dashboard_theme=dark/.test(document.cookie)) {
+    document.getElementById('pl-spa-loader').style.background = '#0a0a0a'
+  }
 </script>
 <style>
 .pl-loader {

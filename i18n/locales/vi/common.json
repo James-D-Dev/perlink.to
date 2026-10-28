@@ -38,7 +38,9 @@
     "feedback": "Góp ý",
     "proTitle": "Perlink Pro",
     "proText": "Thêm trang, thêm thế giới 3D và nhiều tiện ích cao cấp.",
-    "seePlans": "Xem các gói"
+    "seePlans": "Xem các gói",
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng"
   },
   "report": {
     "title": "Báo cáo trang vi phạm",

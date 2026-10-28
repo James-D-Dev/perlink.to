@@ -18,8 +18,11 @@ const nuxtApp = useNuxtApp()
 // Only the app's own screens; visitors' sites and the marketing pages show
 // their content straight away
 const isApp = /^\/(dashboard|superadmin)(\/|$)/.test(route.path)
-// Dark where the screen behind is dark: the room editor, and superadmin unless switched to light
-const dark = route.path.startsWith('/dashboard/room') || (route.path.startsWith('/superadmin') && useAdminTheme().value !== 'light')
+// Dark where the screen behind is dark: the room editor, superadmin unless
+// switched to light, the dashboard when switched to dark
+const dark = route.path.startsWith('/dashboard/room')
+  || (route.path.startsWith('/superadmin') && useAdminTheme().value !== 'light')
+  || (route.path.startsWith('/dashboard') && useDashboardTheme().value === 'dark')
 
 const shown = ref(isApp)
 const leaving = ref(false)

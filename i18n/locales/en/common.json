@@ -38,7 +38,9 @@
     "feedback": "Feedback",
     "proTitle": "Perlink Pro",
     "proText": "More sites, more 3D worlds and premium extras.",
-    "seePlans": "See plans"
+    "seePlans": "See plans",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode"
   },
   "report": {
     "title": "Report a site",

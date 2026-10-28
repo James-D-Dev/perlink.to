@@ -22,7 +22,7 @@
     <!-- Status, top left -->
     <span
       class="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium shadow-sm backdrop-blur"
-      :class="site.isPublished ? 'bg-emerald-50/90 text-emerald-700' : 'bg-white/90 text-ink-muted'"
+      :class="site.isPublished ? 'bg-emerald-50/90 text-emerald-700' : 'bg-white/90 text-[#6b655e]'"
     >
       <span class="size-1.5 rounded-full" :class="site.isPublished ? 'bg-emerald-500' : 'bg-ink-faint'" />
       {{ site.isPublished ? t('dashboard.sites.live') : t('dashboard.sites.draft') }}
@@ -58,7 +58,7 @@
           </UDropdownMenu>
           <NuxtLink
             :to="editTo"
-            class="flex h-10 items-center rounded-full bg-white px-4 text-sm font-semibold text-ink transition hover:bg-white/90"
+            class="flex h-10 items-center rounded-full bg-white px-4 text-sm font-semibold text-[#0c0b0a] transition hover:bg-white/90"
           >
             {{ t('dashboard.sites.edit') }}
           </NuxtLink>
