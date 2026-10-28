@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="status?.enabled && !(compact && status.connected)"
-    :class="compact ? 'flex flex-wrap items-center gap-3 rounded-xl bg-sky-50 px-4 py-3 ring-1 ring-sky-100' : 'rounded-3xl bg-paper ring-1 ring-line p-5'"
+    :class="compact ? 'flex flex-wrap items-center gap-3 rounded-xl bg-sky-50 px-4 py-3 ring-1 ring-sky-100 dark:bg-sky-500/10 dark:ring-sky-400/20' : 'rounded-3xl bg-paper ring-1 ring-line p-5'"
   >
     <h2 v-if="!compact" class="mb-4 text-sm font-medium text-ink">{{ t('dashboard.telegram.section') }}</h2>
     <div class="flex min-w-0 flex-1 items-start gap-3">

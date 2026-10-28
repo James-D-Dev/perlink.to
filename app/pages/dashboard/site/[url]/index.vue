@@ -12,7 +12,7 @@
 
           <!-- Which site, and a quick switch to another -->
           <UDropdownMenu :items="siteMenu" :content="{ align: 'start', sideOffset: 8 }" :ui="{ content: 'w-72 max-h-[min(26rem,70dvh)]' }">
-            <button type="button" class="flex min-w-0 items-center gap-2 rounded-full bg-white/70 py-1 pl-1 pr-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-black/[0.06] backdrop-blur-xl transition-[background-color,transform] duration-150 hover:bg-white/90 active:scale-[0.98] data-[state=open]:bg-white">
+            <button type="button" class="flex min-w-0 items-center gap-2 rounded-full bg-white/70 py-1 pl-1 pr-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-black/[0.06] backdrop-blur-xl transition-[background-color,transform] duration-150 hover:bg-white/90 active:scale-[0.98] data-[state=open]:bg-white dark:bg-white/[0.07] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] dark:ring-white/10 dark:hover:bg-white/[0.12] dark:data-[state=open]:bg-white/[0.14]">
               <img v-if="bioData.avatarUrl" :src="bioData.avatarUrl" alt="" class="size-7 shrink-0 rounded-full object-cover">
               <span v-else class="flex size-7 shrink-0 items-center justify-center rounded-full bg-paper text-xs font-semibold text-ink-soft">{{ (bioData.title || existingBio.username).charAt(0).toUpperCase() }}</span>
               <span class="min-w-0 text-left leading-tight">

@@ -14,7 +14,7 @@
     <template #body>
       <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-6">
         <!-- Hero -->
-        <section class="relative isolate overflow-hidden rounded-2xl bg-elevated p-6 dark:border-white/[0.08] dark:bg-white/[0.03] dark:backdrop-blur-xl sm:p-10">
+        <section class="relative isolate overflow-hidden rounded-3xl bg-elevated p-6 ring-1 ring-line dark:bg-[#141414] dark:ring-white/[0.1] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] sm:p-10">
           <!-- Same living backdrop as the landing hero -->
           <MarketingMkHeroBackdrop :fade="false" />
           <div class="pointer-events-none absolute inset-0 dark:bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgb(255_255_255/0.06),transparent)]" />

@@ -65,6 +65,14 @@ withDefaults(defineProps<{
   background: linear-gradient(105deg, transparent 40%, rgb(255 255 255 / 0.55) 50%, transparent 60%);
   animation: mk-sheen 6s ease-in-out infinite;
 }
+/* On dark screens (the dashboard's dark mode) the band and the lights are
+   much softer: full strength reads as a flash against the dark */
+:root.dark .mk-sheen {
+  background: linear-gradient(105deg, transparent 40%, rgb(255 255 255 / 0.07) 50%, transparent 60%);
+}
+:root.dark .mk-light {
+  opacity: 0.55;
+}
 
 @keyframes mk-orbit-a {
   0%, 100% { transform: translate(0, 0) scale(1); }

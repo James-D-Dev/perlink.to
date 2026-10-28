@@ -159,6 +159,61 @@ paper/sand/ink surfaces, with a dark version for their dark modes
 html.admin-theme.dark {
   background-color: #0a0a0a;
 }
+
+/*
+Pale status fills (amber notices, emerald badges, red warnings, sky tips)
+read as glaring patches on the dark dashboard: there they become a soft wash
+of the colour with light text. Sites' own previews (.pl-site) keep their
+real colours.
+*/
+.admin-theme.dark .bg-amber-50:not(.pl-site *), .admin-theme.dark .bg-amber-100:not(.pl-site *), .admin-theme.dark .bg-amber-50\/40:not(.pl-site *), .admin-theme.dark .bg-amber-50\/90:not(.pl-site *) {
+  background-color: rgb(245 158 11 / 0.13);
+}
+.admin-theme.dark .ring-amber-100:not(.pl-site *), .admin-theme.dark .ring-amber-200:not(.pl-site *) {
+  --tw-ring-color: rgb(245 158 11 / 0.28);
+}
+.admin-theme.dark .border-amber-200:not(.pl-site *) {
+  border-color: rgb(245 158 11 / 0.3);
+}
+.admin-theme.dark .text-amber-600:not(.pl-site *), .admin-theme.dark .text-amber-700:not(.pl-site *), .admin-theme.dark .text-amber-800:not(.pl-site *) {
+  color: #fcd34d;
+}
+.admin-theme.dark .bg-emerald-50:not(.pl-site *), .admin-theme.dark .bg-emerald-100:not(.pl-site *), .admin-theme.dark .bg-emerald-50\/40:not(.pl-site *), .admin-theme.dark .bg-emerald-50\/90:not(.pl-site *) {
+  background-color: rgb(16 185 129 / 0.13);
+}
+.admin-theme.dark .ring-emerald-100:not(.pl-site *), .admin-theme.dark .ring-emerald-200:not(.pl-site *) {
+  --tw-ring-color: rgb(16 185 129 / 0.28);
+}
+.admin-theme.dark .border-emerald-200:not(.pl-site *) {
+  border-color: rgb(16 185 129 / 0.3);
+}
+.admin-theme.dark .text-emerald-600:not(.pl-site *), .admin-theme.dark .text-emerald-700:not(.pl-site *), .admin-theme.dark .text-emerald-800:not(.pl-site *) {
+  color: #6ee7b7;
+}
+.admin-theme.dark .bg-sky-50:not(.pl-site *), .admin-theme.dark .bg-sky-100:not(.pl-site *), .admin-theme.dark .bg-sky-50\/40:not(.pl-site *), .admin-theme.dark .bg-sky-50\/90:not(.pl-site *) {
+  background-color: rgb(14 165 233 / 0.13);
+}
+.admin-theme.dark .ring-sky-100:not(.pl-site *), .admin-theme.dark .ring-sky-200:not(.pl-site *) {
+  --tw-ring-color: rgb(14 165 233 / 0.28);
+}
+.admin-theme.dark .border-sky-200:not(.pl-site *) {
+  border-color: rgb(14 165 233 / 0.3);
+}
+.admin-theme.dark .text-sky-600:not(.pl-site *), .admin-theme.dark .text-sky-700:not(.pl-site *), .admin-theme.dark .text-sky-800:not(.pl-site *) {
+  color: #7dd3fc;
+}
+.admin-theme.dark .bg-red-50:not(.pl-site *), .admin-theme.dark .bg-red-100:not(.pl-site *), .admin-theme.dark .bg-red-50\/40:not(.pl-site *), .admin-theme.dark .bg-red-50\/90:not(.pl-site *) {
+  background-color: rgb(239 68 68 / 0.13);
+}
+.admin-theme.dark .ring-red-100:not(.pl-site *), .admin-theme.dark .ring-red-200:not(.pl-site *) {
+  --tw-ring-color: rgb(239 68 68 / 0.28);
+}
+.admin-theme.dark .border-red-200:not(.pl-site *) {
+  border-color: rgb(239 68 68 / 0.3);
+}
+.admin-theme.dark .text-red-600:not(.pl-site *), .admin-theme.dark .text-red-700:not(.pl-site *), .admin-theme.dark .text-red-800:not(.pl-site *) {
+  color: #fca5a5;
+}
 /* ---------- Public site primitives ---------- */
 
 /* Display headings: large, light and slightly tight */

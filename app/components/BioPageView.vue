@@ -1,6 +1,6 @@
 <template>
   <!-- Default text color matches the light site, so previews inside the dark dashboard read the same -->
-  <div class="min-h-full relative" :style="[{ color: '#334155' }, pageStyle]">
+  <div class="pl-site min-h-full relative" :style="[{ color: '#334155' }, pageStyle]">
     <!-- Share: a round glass button at the top right (iOS 26 style, like the
          dashboard's buttons) -->
     <UButton
