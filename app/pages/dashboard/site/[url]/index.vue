@@ -44,7 +44,7 @@
           />
 
           <UTooltip :text="t('common.openSite')">
-            <UButton :to="`/${existingBio.username}`" target="_blank" icon="i-lucide-external-link" color="neutral" variant="ghost" class="hidden sm:inline-flex" :aria-label="t('common.openSite')" />
+            <UButton :to="`/${existingBio.username}`" target="_blank" icon="i-lucide-external-link" color="neutral" variant="ghost" :aria-label="t('common.openSite')" />
           </UTooltip>
           <UDropdownMenu :items="shareMenu" :content="{ align: 'end' }" :ui="{ content: 'w-56' }">
             <UButton icon="i-lucide-share" color="neutral" variant="outline" :label="t('dashboard.editor.share')" class="max-sm:[&>span:last-child]:hidden" />
