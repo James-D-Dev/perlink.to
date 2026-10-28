@@ -25,15 +25,16 @@
       </template>
 
       <template #default="{ collapsed }">
-        <NuxtLink
+        <UButton
           to="/dashboard/create"
-          class="flex h-10 items-center justify-center gap-2 rounded-full bg-tint text-sm font-medium text-white transition-colors hover:bg-tint/90"
-          :class="collapsed ? 'mx-auto w-10' : 'w-full'"
+          size="lg"
+          icon="i-lucide-plus"
+          :label="collapsed ? undefined : t('nav.createSite')"
+          :square="collapsed"
+          :block="!collapsed"
+          :class="collapsed && 'mx-auto'"
           :aria-label="collapsed ? t('nav.createSite') : undefined"
-        >
-          <UIcon name="i-lucide-plus" class="size-4" />
-          <span v-if="!collapsed">{{ t('nav.createSite') }}</span>
-        </NuxtLink>
+        />
 
         <UNavigationMenu
           :collapsed="collapsed"
