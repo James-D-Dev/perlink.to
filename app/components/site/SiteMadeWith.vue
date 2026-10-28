@@ -9,9 +9,7 @@
     rel="noopener"
     class="group flex w-full max-w-sm items-center gap-3 rounded-2xl bg-white/90 p-3 pr-4 text-left text-[#0c0b0a] shadow-sm ring-1 ring-black/5 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
   >
-    <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#fff7ed] ring-1 ring-black/5">
-      <AppLogo variant="mark" :size="24" />
-    </span>
+    <AppLogo variant="mark" :size="44" class="shrink-0" />
     <span class="min-w-0 flex-1">
       <span class="flex items-baseline gap-[0.3em] text-sm font-semibold" :aria-label="siteT(lang, 'madeWith')">
         <span v-if="before">{{ before }}</span>

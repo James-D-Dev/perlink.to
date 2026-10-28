@@ -1,8 +1,19 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="7.4" fill="#0c0b0a"/>
-  <g transform="translate(16 16) scale(1) translate(-16 -16)">
-    <rect x="9.6" y="7.5" width="4" height="18.5" rx="2" fill="#fdfcfb"/>
-    <circle cx="17.6" cy="14.2" r="4.7" stroke="#fdfcfb" stroke-width="4"/>
-    <circle cx="17.6" cy="14.2" r="2.1" fill="#007aff"/>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f8fff"/><stop offset="1" stop-color="#005fd6"/></linearGradient>
+    <radialGradient id="pearl" cx=".36" cy=".3" r=".75"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#eef3ff"/><stop offset=".8" stop-color="#cfd9f3"/><stop offset="1" stop-color="#a9b8de"/></radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14.5" fill="url(#tile)"/>
+  <rect x=".75" y=".75" width="62.5" height="62.5" rx="13.8" stroke="#fff" stroke-opacity=".28" stroke-width="1.5"/>
+  <path d="M14.5 0h35A14.5 14.5 0 0 1 64 14.5V24C44 34 20 34 0 24v-9.5A14.5 14.5 0 0 1 14.5 0z" fill="#fff" opacity=".12"/>
+  <g transform="translate(32 32) scale(1) translate(-32 -32)">
+    <path d="M12 25 32 15v22L12 47z" fill="#d9e6ff"/>
+    <path d="M52 25 32 15v22L52 47z" fill="#bcd3ff"/>
+    <path d="M12 47 32 37l20 10-20 10z" fill="#fff"/>
+    <path d="M17 29.5 26 25v8l-9 4.5z" fill="#5aa6ff"/>
+    <path d="M17 29.5 26 25v1.8l-9 4.5z" fill="#fff" opacity=".5"/>
+    <ellipse cx="32" cy="50.6" rx="6.3" ry="2.3" fill="#003a8c" opacity=".35"/>
+    <circle cx="32" cy="45.5" r="6" fill="url(#pearl)"/>
+    <ellipse cx="29.9" cy="43" rx="1.9" ry="1.2" fill="#fff" opacity=".9" transform="rotate(-30 29.9 43)"/>
   </g>
 </svg>
