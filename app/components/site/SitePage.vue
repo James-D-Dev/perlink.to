@@ -63,7 +63,9 @@
         <UButton to="/" class="mt-6" color="primary"> Go Home </UButton>
       </div>
 
-      <!-- 3D room -->
+      <!-- 3D room. The loader covers it from the first paint (it's in the
+           server HTML) until the viewer has mounted and the loader's intro
+           has played out -->
       <ClientOnly v-else-if="bioPage && room && !show2d">
         <LazyRoomViewer
           :room="room"
@@ -76,10 +78,8 @@
           :accent="bioPage.themeConfig?.colors?.primary"
           :branding="bioPage.showBranding !== false"
           @switch2d="show2d = true"
+          @ready="onViewerMounted"
         />
-        <template #fallback>
-          <RoomLoadingShell />
-        </template>
       </ClientOnly>
 
       <!-- Bio Content -->
@@ -102,6 +102,11 @@
         :label="siteT(siteLang, 'room3d')"
         @click="show2d = false"
       />
+      <!-- The 3D room's loader (outside the branches above, so it can fade
+           out over the room) -->
+      <Transition leave-active-class="transition-opacity duration-300" leave-to-class="opacity-0">
+        <RoomLoadingShell v-if="!pending && !error && bioPage && room && !show2d && roomLoading" />
+      </Transition>
     </div>
   </div>
 </template>
@@ -200,6 +205,13 @@ const room = computed<RoomConfig | null>(() => {
   return theme?.roomButton && theme.room ? normalizeRoom(theme.room) : null;
 });
 const show2d = ref(bioPage.value?.themeConfig?.pageMode !== "3d");
+
+// The 3D room's loader stays until the viewer is mounted and the loader has
+// finished its intro (the pearl on the floor)
+const roomLoading = ref(true);
+function onViewerMounted() {
+  setTimeout(() => (roomLoading.value = false), loaderWaitMs());
+}
 
 // Bio page view tracking is now handled server-side in /api/bio/[username].get.ts
 </script>

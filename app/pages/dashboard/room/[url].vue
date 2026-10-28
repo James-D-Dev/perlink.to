@@ -1,6 +1,6 @@
 <template>
   <div>
-    <RoomLoadingShell v-if="loading" editor />
+    <RoomLoadingShell v-if="loading" />
 
     <UEmpty
       v-else-if="!bioPage"

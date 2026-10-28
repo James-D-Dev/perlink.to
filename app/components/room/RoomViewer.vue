@@ -351,7 +351,10 @@ const props = defineProps<{
   branding?: boolean
 }>()
 
-const emit = defineEmits<{ switch2d: [] }>()
+const emit = defineEmits<{ switch2d: []; ready: [] }>()
+
+// The page's loader waits for this: the viewer (and its 3D code) is here
+onMounted(() => emit('ready'))
 
 const t = (key: SiteMessageKey, params?: Record<string, string | number>) => siteT(props.lang ?? 'en', key, params)
 
