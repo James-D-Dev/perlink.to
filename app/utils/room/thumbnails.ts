@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { createRoomRenderer, loadGpuKit, type RoomRenderer } from './gpu'
 import { ROOM_CATALOG, type CatalogItem } from './catalog'
 import { buildRoomShell } from './shell'
 import type { RoomStyle } from '~/types/room'
@@ -31,7 +32,7 @@ function writeCache(cache: Record<string, string>) {
   }
 }
 
-async function renderItem(renderer: THREE.WebGLRenderer, item: CatalogItem): Promise<string> {
+async function renderItem(renderer: RoomRenderer, item: CatalogItem): Promise<string> {
   const scene = new THREE.Scene()
   scene.add(new THREE.HemisphereLight('#ffffff', '#b8a99a', 1.6))
   const key = new THREE.DirectionalLight('#ffffff', 2.2)
@@ -80,6 +81,8 @@ async function renderItem(renderer: THREE.WebGLRenderer, item: CatalogItem): Pro
  * available so the UI can fill in progressively.
  */
 export async function loadRoomThumbnails(onUpdate: (type: string, url: string) => void) {
+  // Decide WebGPU or WebGL before building anything (./gpu.ts)
+  await loadGpuKit()
   const cache = readCache()
   const missing: CatalogItem[] = []
   for (const item of ROOM_CATALOG) {
@@ -88,7 +91,11 @@ export async function loadRoomThumbnails(onUpdate: (type: string, url: string) =
   }
   if (!missing.length) return
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
+  // The same kind of renderer as the room (WebGPU or WebGL, ./gpu.ts), since
+  // items share materials with it
+  const created = createRoomRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
+  const renderer = created.renderer
+  await created.ready
   renderer.setPixelRatio(1)
   renderer.setSize(SIZE, SIZE, false)
   renderer.setClearColor(0x000000, 0)
@@ -122,6 +129,8 @@ const STYLE_CACHE_KEY = 'perlink-room-style-thumbs-v2'
 
 /** Render each room style as a small isometric room (cached per session and in localStorage) */
 export async function loadRoomStyleThumbnails(presets: { name: string; style: Partial<RoomStyle> }[], onUpdate: (name: string, url: string) => void) {
+  // Decide WebGPU or WebGL before building anything (./gpu.ts)
+  await loadGpuKit()
   let stored: Record<string, string> = {}
   try {
     stored = JSON.parse(localStorage.getItem(STYLE_CACHE_KEY) || '{}')
@@ -135,7 +144,9 @@ export async function loadRoomStyleThumbnails(presets: { name: string; style: Pa
   })
   if (!missing.length) return
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
+  const created = createRoomRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
+  const renderer = created.renderer
+  await created.ready
   renderer.setPixelRatio(1)
   renderer.setSize(256, 192, false)
   renderer.setClearColor(0x000000, 0)

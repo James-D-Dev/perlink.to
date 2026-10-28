@@ -7,6 +7,7 @@ import { daylightAtHour, getDaylight, type DaylightState } from './daylight'
 import { buildLand, createStarSphere, type LandInstance } from './lands'
 import { buildRoomShell, FLOOR_THICKNESS } from './shell'
 import { flameFlicker, flameTime } from './flame'
+import { createRoomRenderer, gpuKit, maxAnisotropy } from './gpu'
 import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
 import { drawProductCard, productSignature, type ShopProduct } from './productCard'
 import type { GuestGiftType } from '#shared/guestbook'
@@ -107,6 +108,9 @@ export class RoomScene {
   private pointer = new THREE.Vector2()
   private resizeObserver: ResizeObserver
   private frame = 0
+  /** False until the renderer can draw (WebGPU sets up asynchronously) */
+  private canRender = false
+  private rendererReady: Promise<void>
   private disposed = false
 
   private shell = new THREE.Group()
@@ -147,10 +151,11 @@ export class RoomScene {
   private timer = new THREE.Timer()
   private lamps = 0
   /** Visible sky: gradient dome (the camera mostly sees below the horizon) */
-  private skyDome = createSkyDome()
+  // TSL versions on WebGPU (./gpu.ts), GLSL otherwise
+  private skyDome = gpuKit()?.createSkyDome() ?? createSkyDome()
   /** Physical sky, used only to light the scene through the environment map */
   private envScene = new THREE.Scene()
-  private envSky = new Sky()
+  private envSky = gpuKit()?.createSky() ?? new Sky()
   private pmrem: THREE.PMREMGenerator
   private envTarget?: THREE.WebGLRenderTarget
   private envKey = ''
@@ -201,8 +206,16 @@ export class RoomScene {
     this.container = container
     this.options = options
 
-    // MSAA stays on everywhere: without it the cut-out grass and leaves shimmer as they sway
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
+    // MSAA stays on everywhere: without it the cut-out grass and leaves shimmer as they sway.
+    // WebGPURenderer when the rooms run on WebGPU (./gpu.ts); it sets up
+    // asynchronously, so frames wait for it
+    const created = createRoomRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
+    this.renderer = created.renderer
+    this.rendererReady = created.ready.then(() => {
+      this.canRender = true
+      if (gpuKit()) console.info(`[room] renderer: ${created.backend()}`)
+      this.markActive()
+    })
     this.renderer.shadowMap.enabled = true
     // Newer three.js removed PCFSoftShadowMap (it fell back to this anyway)
     this.renderer.shadowMap.type = THREE.PCFShadowMap
@@ -243,7 +256,9 @@ export class RoomScene {
     this.controls.addEventListener('change', this.markActive)
 
     this.scene.add(this.hemi, this.ambient, this.sun, this.sun.target)
-    this.pmrem = new THREE.PMREMGenerator(this.renderer)
+    this.pmrem = gpuKit()?.createPmrem(this.renderer) ?? new THREE.PMREMGenerator(this.renderer)
+    // Newer three.js skies have clouds by default; this one only lights the scene
+    this.envSky.material.uniforms.cloudCoverage!.value = 0
     this.scene.add(this.skyDome.mesh)
     this.envSky.scale.setScalar(50)
     this.envScene.add(this.envSky)
@@ -333,7 +348,8 @@ export class RoomScene {
    * Picture of the current view (site thumbnail, room video preview), without
    * the selection box, lit at the given hour or light (midday by default)
    */
-  snapshot(light: number | DaylightState = 12, maxWidth = 960): Promise<Blob | null> {
+  async snapshot(light: number | DaylightState = 12, maxWidth = 960): Promise<Blob | null> {
+    await this.rendererReady
     const boxWasVisible = this.selectionBox.visible
     this.selectionBox.visible = false
     // Always pictured at midday, whatever the time is now; the next frame
@@ -450,8 +466,9 @@ export class RoomScene {
   }
 
   /** Objects or land still loading (a recording waits for them) */
+  /** Models still loading, or the renderer not set up yet (WebGPU) */
   get loading() {
-    return this.loadingMarkers.size > 0
+    return this.loadingMarkers.size > 0 || !this.canRender
   }
 
   /**
@@ -813,7 +830,7 @@ export class RoomScene {
     new THREE.TextureLoader().load(url, (texture) => {
       if (this.disposed) return texture.dispose()
       texture.colorSpace = THREE.SRGBColorSpace
-      texture.anisotropy = this.renderer.capabilities.getMaxAnisotropy()
+      texture.anisotropy = maxAnisotropy(this.renderer)
       const image = texture.image as { width: number; height: number }
       const imageAspect = image.width / image.height
       // Turn the frame sideways for photos whose orientation doesn't match it
@@ -858,7 +875,7 @@ export class RoomScene {
       if (this.disposed) return
       const texture = new THREE.CanvasTexture(canvas)
       texture.colorSpace = THREE.SRGBColorSpace
-      texture.anisotropy = this.renderer.capabilities.getMaxAnisotropy()
+      texture.anisotropy = maxAnisotropy(this.renderer)
       material.map = texture
       material.needsUpdate = true
       plane.visible = true
@@ -1225,6 +1242,7 @@ export class RoomScene {
   }
 
   private renderFrame(now: number) {
+    if (!this.canRender) return
     this.timer.update(now)
     const dt = Math.min(this.timer.getDelta(), 0.1)
     const time = this.timer.getElapsed()
@@ -1378,24 +1396,48 @@ export class RoomScene {
 
   // ---------- Cleanup helpers ----------
 
+  /**
+   * Removes everything in a group and frees what only it used. Anything still
+   * drawn elsewhere in the scene is kept: WebGL quietly re-uploads a freed
+   * buffer, but WebGPU refuses to draw with it and drops the whole frame.
+   * Sprites all share one built-in geometry, which is never freed.
+   */
   private clearGroup(group: THREE.Object3D) {
+    const geometries = new Set<THREE.BufferGeometry>()
+    const materials = new Set<THREE.Material>()
     for (const child of [...group.children]) {
       child.traverse((obj) => {
         // Model geometry/materials are cached and shared between lands
         if (obj.userData.shared) return
         const mesh = obj as THREE.Mesh
-        mesh.geometry?.dispose()
+        if (mesh.geometry && !(obj as THREE.Sprite).isSprite) geometries.add(mesh.geometry)
         const material = mesh.material as THREE.Material | THREE.Material[] | undefined
-        if (Array.isArray(material)) material.forEach(m => this.disposeMaterial(m))
-        else if (material) this.disposeMaterial(material)
+        for (const m of Array.isArray(material) ? material : material ? [material] : []) materials.add(m)
       })
       group.remove(child)
     }
+    if (!geometries.size && !materials.size) return
+    // What the rest of the scene still draws with
+    const inUse = new Set<object>()
+    for (const root of [this.scene, this.envScene]) {
+      root.traverse((obj) => {
+        const mesh = obj as THREE.Mesh
+        if (mesh.geometry) inUse.add(mesh.geometry)
+        const material = mesh.material as THREE.Material | THREE.Material[] | undefined
+        for (const m of Array.isArray(material) ? material : material ? [material] : []) {
+          inUse.add(m)
+          const map = (m as THREE.MeshStandardMaterial).map
+          if (map) inUse.add(map)
+        }
+      })
+    }
+    for (const geometry of geometries) if (!inUse.has(geometry)) geometry.dispose()
+    for (const material of materials) if (!inUse.has(material)) this.disposeMaterial(material, inUse)
   }
 
-  private disposeMaterial(material: THREE.Material) {
+  private disposeMaterial(material: THREE.Material, inUse?: Set<object>) {
     const map = (material as THREE.MeshStandardMaterial).map
-    map?.dispose()
+    if (map && !inUse?.has(map)) map.dispose()
     material.dispose()
   }
 }

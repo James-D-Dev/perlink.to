@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { gpuKit } from './gpu'
 
 // Animated candle/torch flames: a camera-facing card with a procedural,
 // flickering teardrop flame. One shared material; each flame gets its own
@@ -7,7 +8,7 @@ import * as THREE from 'three'
 /** Shared flame clock in seconds, advanced by the scene every frame */
 export const flameTime = { value: 0 }
 
-const material = new THREE.ShaderMaterial({
+const glslMaterial = new THREE.ShaderMaterial({
   uniforms: { uTime: flameTime },
   transparent: true,
   depthWrite: false,
@@ -62,14 +63,26 @@ const material = new THREE.ShaderMaterial({
     }
   `,
 })
-material.userData.shared = true
+glslMaterial.userData.shared = true
+
+// On WebGPU the same flame is a node material (./nodeMaterials), made once
+let nodeMaterial: THREE.Material | null = null
+function flameMaterial() {
+  const kit = gpuKit()
+  if (!kit) return glslMaterial
+  if (!nodeMaterial) {
+    nodeMaterial = kit.createFlameMaterial(() => flameTime.value)
+    nodeMaterial.userData.shared = true
+  }
+  return nodeMaterial
+}
 
 // Unit card with its base at the origin
 const geometry = new THREE.PlaneGeometry(1, 1).translate(0, 0.5, 0)
 
 /** A flame with its base at `position`, sized in meters */
 export function createFlame(position: THREE.Vector3, height: number, width = height * 0.5) {
-  const flame = new THREE.Mesh(geometry, material)
+  const flame = new THREE.Mesh(geometry, flameMaterial())
   flame.position.copy(position)
   flame.scale.set(width, height, 1)
   flame.renderOrder = 2

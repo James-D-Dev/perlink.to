@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { gpuKit } from './gpu'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 // Low-poly nature models from Quaternius' Stylized Nature MegaKit (CC0),
@@ -50,6 +51,15 @@ function addWindSway(material: THREE.Material) {
         transformed.z += cos(uWindTime * 1.3 + seed * 1.3) * swayH * 0.025;`)
   }
   material.needsUpdate = true
+}
+
+/**
+ * The material to draw with: on WebGPU (./gpu.ts) a swaying foliage material
+ * becomes its node twin, since WebGPU skips onBeforeCompile
+ */
+function drawMaterial(material: THREE.Material) {
+  const kit = gpuKit()
+  return kit && material.userData.wind ? kit.windMaterial(material as THREE.MeshStandardMaterial, () => natureWind.value) : material
 }
 
 const loader = new GLTFLoader()
@@ -164,10 +174,12 @@ export async function scatterModel(
     else cells.set(key, [item])
   }
   for (const part of model.parts) {
-    const material = options.material ? options.material(part.material) : part.material
-    const std = material as THREE.MeshStandardMaterial
-    // Shadows follow the leaf cut-outs instead of solid cards
-    const depthMaterial = std.alphaTest > 0 && std.map
+    const source = options.material ? options.material(part.material) : part.material
+    const material = drawMaterial(source)
+    const std = source as THREE.MeshStandardMaterial
+    // Shadows follow the leaf cut-outs instead of solid cards (WebGPU does
+    // this from the material itself)
+    const depthMaterial = !gpuKit() && std.alphaTest > 0 && std.map
       ? new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: std.map, alphaTest: std.alphaTest })
       : undefined
     for (const cell of cells.values()) {
@@ -226,14 +238,14 @@ export async function attachNaturePieces(group: THREE.Group, pieces: NaturePiece
       new THREE.Vector3(s, s, s),
     )
     for (const part of model.parts) {
-      const material = piece.material ? piece.material(part.material) : part.material
+      const material = drawMaterial(piece.material ? piece.material(part.material) : part.material)
       const mesh = new THREE.Mesh(part.geometry, material)
       place.multiplyMatrices(base, part.matrix)
       place.decompose(mesh.position, mesh.quaternion, mesh.scale)
       mesh.castShadow = true
       mesh.receiveShadow = true
       const std = material as THREE.MeshStandardMaterial
-      if (std.alphaTest > 0 && std.map) {
+      if (!gpuKit() && std.alphaTest > 0 && std.map) {
         mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: std.map, alphaTest: std.alphaTest })
       }
       mesh.userData.shared = true

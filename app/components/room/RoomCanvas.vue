@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import type { RoomConfig, WallSide } from '~/types/room'
 import { RoomScene, type ObjectPatch, type RoomSceneStats } from '~/utils/room/RoomScene'
+import { loadGpuKit } from '~/utils/room/gpu'
 import { daylightAtHour, getDaylight, type DaylightState } from '~/utils/room/daylight'
 import type { GuestGiftType } from '#shared/guestbook'
 import type { ShopProduct } from '~/utils/room/productCard'
@@ -49,8 +50,11 @@ const emit = defineEmits<{
 const containerRef = ref<HTMLElement | null>(null)
 let scene: RoomScene | null = null
 
-onMounted(() => {
-  if (!containerRef.value) return
+let unmounted = false
+onMounted(async () => {
+  // WebGPU (with ?gpu=1) or WebGL: the renderer kit loads first (./gpu.ts)
+  await loadGpuKit()
+  if (!containerRef.value || unmounted) return
   scene = new RoomScene(containerRef.value, {
     editable: props.editable,
     preview: props.preview,
@@ -71,6 +75,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  unmounted = true
   scene?.dispose()
   scene = null
 })

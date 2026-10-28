@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { gpuKit } from './gpu'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { cherryLeaves, greenLeaves, natureWind, scatterModel, type ScatterItem } from './natureModels'
 import type { LandId, RoomStyle } from '~/types/room'
@@ -474,6 +475,25 @@ function softDotTexture() {
   return new THREE.CanvasTexture(c)
 }
 
+/**
+ * Sized, soft points whose positions change each frame. On WebGPU points are
+ * 1 pixel wide, so there they're instanced sprites (./gpu.ts)
+ */
+function sizedPoints(positions: Float32Array, params: THREE.PointsMaterialParameters) {
+  const kit = gpuKit()
+  if (kit) return kit.createPointSprites(positions, params)
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  const material = new THREE.PointsMaterial(params)
+  return {
+    object: new THREE.Points(geometry, material) as THREE.Object3D,
+    material,
+    markDirty: () => {
+      geometry.attributes.position!.needsUpdate = true
+    },
+  }
+}
+
 /** Glowing fireflies that wander near the ground at night */
 function createFireflies(count: number, ctx: LandContext, radius: number, rand: () => number) {
   const positions = new Float32Array(count * 3)
@@ -481,10 +501,7 @@ function createFireflies(count: number, ctx: LandContext, radius: number, rand: 
     const [x, z] = outdoorSpot(rand, ctx.style, radius, 0.8)
     return { x, z, y: ctx.groundY + 0.3 + rand() * 1.2, phase: rand() * 10 }
   })
-  const geometry = new THREE.BufferGeometry()
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-  const material = new THREE.PointsMaterial({ color: '#d9ff7a', size: 0.12, map: softDotTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })
-  const points = new THREE.Points(geometry, material)
+  const { object: points, material, markDirty } = sizedPoints(positions, { color: '#d9ff7a', size: 0.12, map: softDotTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })
   function update(time: number, lamps: number) {
     material.opacity = lamps * (0.6 + Math.sin(time * 2) * 0.2)
     base.forEach((b, i) => {
@@ -492,7 +509,7 @@ function createFireflies(count: number, ctx: LandContext, radius: number, rand: 
       positions[i * 3 + 1] = b.y + Math.sin(time * 0.8 + b.phase * 2) * 0.25
       positions[i * 3 + 2] = b.z + Math.cos(time * 0.4 + b.phase) * 0.4
     })
-    geometry.attributes.position!.needsUpdate = true
+    markDirty()
   }
   return { points, update }
 }
@@ -512,10 +529,7 @@ function createSnowfall(count: number, ctx: LandContext, radius: number, rand: (
     speeds[i] = 0.4 + rand() * 0.6
     phases[i] = rand() * 10
   }
-  const geometry = new THREE.BufferGeometry()
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-  const material = new THREE.PointsMaterial({ color: '#ffffff', size: 0.09, map: softDotTexture(), transparent: true, depthWrite: false, opacity: 0.9 })
-  const points = new THREE.Points(geometry, material)
+  const { object: points, material, markDirty } = sizedPoints(positions, { color: '#ffffff', size: 0.09, map: softDotTexture(), transparent: true, depthWrite: false, opacity: 0.9 })
   function update(time: number, dt: number, daylight: number) {
     material.color.setScalar(0.6 + 0.4 * daylight)
     for (let i = 0; i < count; i++) {
@@ -523,7 +537,7 @@ function createSnowfall(count: number, ctx: LandContext, radius: number, rand: (
       positions[i * 3]! += Math.sin(time + phases[i]!) * 0.15 * dt
       if (positions[i * 3 + 1]! < ctx.groundY) positions[i * 3 + 1] = top
     }
-    geometry.attributes.position!.needsUpdate = true
+    markDirty()
   }
   return { points, update }
 }
@@ -831,6 +845,9 @@ function skyClouds(group: THREE.Group, rand: () => number, material: THREE.Mater
 
 /** Animated water: deep center, light rim, moving ripples and sky sparkle */
 function createWater(radius: number) {
+  // TSL version on WebGPU (./gpu.ts)
+  const kit = gpuKit()
+  if (kit) return kit.createWater(radius)
   const uniforms = {
     time: { value: 0 },
     daylight: { value: 1 },
@@ -1909,6 +1926,9 @@ export function createStarSphere(count = 1400) {
   const geometry = new THREE.BufferGeometry()
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
+  // TSL version on WebGPU (./gpu.ts)
+  const kit = gpuKit()
+  if (kit) return kit.createStars(positions, sizes, phases)
   geometry.setAttribute('phase', new THREE.BufferAttribute(phases, 1))
   const material = new THREE.ShaderMaterial({
     uniforms: { time: { value: 0 }, opacity: { value: 0 }, pixelRatio: { value: Math.min(window.devicePixelRatio, 2) } },
