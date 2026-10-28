@@ -29,7 +29,9 @@
         "room": "A decorated 3D room included",
         "changeAnytime": "Change templates anytime"
       },
-      "creating": "Creating your site…"
+      "creating": "Creating your site…",
+      "yourSites": "Your sites",
+      "seeAllSites": "See all ({n})"
     },
     "sites": {
       "title": "My sites",
@@ -246,7 +248,9 @@
       "tooShort": "At least 3 characters",
       "checking": "Checking availability...",
       "ready": "Your site is ready",
-      "createFailed": "Could not create your site"
+      "createFailed": "Could not create your site",
+      "enterAddress": "Choose an address first",
+      "cantUse": "This address can’t be used"
     },
     "help": {
       "ariaLabel": "Help",

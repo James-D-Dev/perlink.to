@@ -41,6 +41,46 @@
           </div>
         </section>
 
+        <!-- The sites they already have (most recently edited first) -->
+        <section v-if="sites.length" class="space-y-5">
+          <div class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 class="mk-display text-2xl sm:text-3xl dark:text-white">{{ t('dashboard.home.yourSites') }}</h2>
+              <p class="mt-1 text-sm text-muted dark:text-neutral-400">{{ t('dashboard.sites.count', sites.length) }}</p>
+            </div>
+            <UButton
+              v-if="sites.length > recentSites.length"
+              to="/dashboard/site"
+              color="neutral"
+              variant="ghost"
+              trailing-icon="i-lucide-arrow-right"
+              :label="t('dashboard.home.seeAllSites', { n: sites.length })"
+            />
+          </div>
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <SiteCard
+              v-for="site in recentSites"
+              :key="site.id"
+              :site="site"
+              :pending="pendingSite === site.username"
+              @share="shareSite(site)"
+              @copy="copyUrl(site.username)"
+              @qr="qrSite = site"
+              @publish="publishSite(site.username)"
+              @unpublish="unpublishSite(site.username)"
+            />
+          </div>
+          <SiteQrModal
+            v-if="qrSite"
+            :open="!!qrSite"
+            :username="qrSite.username"
+            :title="qrSite.title"
+            :theme-config="qrSite.themeConfig"
+            :blocks="qrSite.blocks"
+            @update:open="(v: boolean) => { if (!v) qrSite = null }"
+          />
+        </section>
+
         <!-- Templates -->
         <section class="space-y-5">
           <div class="flex flex-wrap items-end justify-between gap-3">
@@ -163,6 +203,17 @@ function templateName(id: string) {
 function templateDescription(id: string) {
   return t(`dashboard.templates.${id}.description`)
 }
+
+// Their sites, newest edits first; the home shows the latest three
+const sites = ref<any[]>([])
+const recentSites = computed(() =>
+  [...sites.value].sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''))).slice(0, 3),
+)
+const { qrSite, pendingSite, copyUrl, shareSite, publishSite, unpublishSite } = useSiteActions(sites)
+onMounted(async () => {
+  const res = await $fetch<{ success: boolean; bioPages?: any[] }>('/api/admin/bios').catch(() => null)
+  if (res?.bioPages) sites.value = res.bioPages
+})
 
 // One click: the site is made with a temporary address and opens in the
 // editor, which asks for a real address before publishing

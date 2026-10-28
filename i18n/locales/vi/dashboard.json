@@ -29,7 +29,9 @@
         "room": "Kèm Phòng 3D đã trang trí sẵn",
         "changeAnytime": "Đổi mẫu bất cứ lúc nào"
       },
-      "creating": "Đang tạo trang…"
+      "creating": "Đang tạo trang…",
+      "yourSites": "Trang của bạn",
+      "seeAllSites": "Xem tất cả ({n})"
     },
     "sites": {
       "title": "Trang của tôi",
@@ -246,7 +248,9 @@
       "tooShort": "Ít nhất 3 ký tự",
       "checking": "Đang kiểm tra...",
       "ready": "Trang của bạn đã sẵn sàng",
-      "createFailed": "Không tạo được trang của bạn"
+      "createFailed": "Không tạo được trang của bạn",
+      "enterAddress": "Hãy nhập địa chỉ trước",
+      "cantUse": "Chưa dùng được địa chỉ này"
     },
     "help": {
       "ariaLabel": "Trợ giúp",

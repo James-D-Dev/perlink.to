@@ -275,16 +275,7 @@ const weekdayLabel = (i: number) => {
 const unreadSite = computed(() => bioPages.value.find((b) => b.unreadRequests > 0) ?? null);
 const unreadTotal = computed(() => bioPages.value.reduce((sum, b) => sum + (b.unreadRequests || 0), 0));
 
-const qrSite = ref<any | null>(null);
-
-const shareSite = async (bio: any) => {
-  const url = `https://perlink.to/${bio.username}`;
-  try {
-    await navigator.share({ title: bio.title || bio.username, url });
-  } catch {
-    await copyUrl(bio.username);
-  }
-};
+const { qrSite, pendingSite, copyUrl, shareSite, publishSite: publishBio, unpublishSite: unpublishBio } = useSiteActions(bioPages);
 
 // The sidebar's setup card, for the first site that still has steps left
 const registerSetup = () => {
@@ -308,77 +299,6 @@ onBeforeUnmount(() => {
   if (setup.value?.openChecklist) setup.value = null;
 });
 
-// Copy URL
-const copyUrl = async (username: string) => {
-  try {
-    const url = `https://perlink.to/${username}`;
-    await navigator.clipboard.writeText(url);
-    toast.add({
-      title: t("dashboard.toast.copied"),
-      description: url,
-    });
-  } catch {
-    toast.add({
-      title: t("dashboard.toast.copyFailed"),
-      color: "error",
-    });
-  }
-};
-
-// Update the row right away: re-reading the list just after the write can
-// still return the old state, so the badge looked stuck until a reload
-const pendingSite = ref<string | null>(null);
-const setPublished = (username: string, published: boolean) => {
-  const site = bioPages.value.find((bio) => bio.username === username);
-  if (site) site.isPublished = published;
-};
-
-// Publish bio
-const publishBio = async (username: string) => {
-  pendingSite.value = username;
-  try {
-    await $fetch(`/api/admin/bio/${username}/publish`, {
-      method: "POST" as const,
-    });
-    setPublished(username, true);
-    toast.add({
-      title: t("dashboard.toast.published"),
-      description: t("dashboard.sites.publishedText"),
-    });
-  } catch (error) {
-    if (useUpgradePrompt().fromError(error)) return;
-    toast.add({
-      title: t("dashboard.toast.error"),
-      description: t("dashboard.sites.publishFailed"),
-      color: "error",
-    });
-  } finally {
-    pendingSite.value = null;
-  }
-};
-
-// Unpublish bio
-const unpublishBio = async (username: string) => {
-  pendingSite.value = username;
-  try {
-    await $fetch(`/api/admin/bio/${username}/unpublish`, {
-      method: "POST" as const,
-    });
-    setPublished(username, false);
-    toast.add({
-      title: t("dashboard.toast.unpublished"),
-      description: t("dashboard.sites.unpublishedText"),
-    });
-  } catch (error) {
-    toast.add({
-      title: t("dashboard.toast.error"),
-      description: t("dashboard.sites.unpublishFailed"),
-      color: "error",
-    });
-  } finally {
-    pendingSite.value = null;
-  }
-};
 
 // Initial fetch
 onMounted(() => {

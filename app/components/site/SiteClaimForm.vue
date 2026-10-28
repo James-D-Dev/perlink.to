@@ -22,7 +22,6 @@
         type="submit"
         :size="size === 'lg' ? 'lg' : 'md'"
         :loading="creating"
-        :disabled="status !== 'available'"
         trailing-icon="i-lucide-arrow-right"
         class="shrink-0 rounded-full"
       >
@@ -122,8 +121,20 @@ onMounted(() => {
   if (props.autofocus) nextTick(() => inputRef.value?.focus())
 })
 
+// Always clickable: when the address isn't ready yet, say why
 async function submit() {
-  if (status.value !== 'available' || creating.value) return
+  if (creating.value) return
+  if (status.value !== 'available') {
+    if (status.value === 'checking') return
+    toast.add({
+      title: t(status.value === 'idle' ? 'dashboard.claim.enterAddress' : 'dashboard.claim.cantUse'),
+      description: message.value,
+      color: 'warning',
+      icon: 'i-lucide-circle-alert',
+    })
+    inputRef.value?.focus()
+    return
+  }
   creating.value = true
   const username = slug.value
   try {
