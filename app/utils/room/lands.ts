@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { gpuKit } from './gpu'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { cherryLeaves, greenLeaves, natureWind, scatterModel, type ScatterItem } from './natureModels'
 import type { LandId, RoomStyle } from '~/types/room'
 import { attachCityModel, beamMaterial, carMaterials, cityMaterials, createCar } from './cityModels'
@@ -233,22 +235,109 @@ function pineTree(rand: () => number, scale = 1, snow = false) {
 
 // ---------- Butterflies (fly from flower to flower) ----------
 
+// Butterfly: a low-poly, rigged monarch by Čestmír Dammer (CC0, from
+// OpenGameArt "Butterfly (animated)"), exported from Blender with its three
+// actions baked (Flying, Sitting1, Sitting2). Its wing texture is recoloured
+// to each land's palette.
+const BUTTERFLY_DIR = '/models/butterfly/'
+/** Wingspan in meters */
+const BUTTERFLY_SPAN = 0.34
+/** One wing beat of the Flying clip, in radians per second (10 frames at 24 fps) */
+const FLYING_BEAT = (2 * Math.PI * 24) / 10
+
+let butterflyAsset: Promise<{ scene: THREE.Object3D; clips: THREE.AnimationClip[]; skin: HTMLImageElement }> | null = null
+function loadButterfly() {
+  butterflyAsset ??= Promise.all([
+    new GLTFLoader().loadAsync(`${BUTTERFLY_DIR}butterfly.glb`),
+    new THREE.ImageLoader().loadAsync(`${BUTTERFLY_DIR}butterfly-skin.png`),
+  ]).then(([gltf, skin]) => ({ scene: gltf.scene, clips: gltf.animations, skin }))
+  return butterflyAsset
+}
+
+const butterflyMaterials = new Map<string, THREE.MeshStandardMaterial>()
+/** The monarch's orange and yellow turned to `color`; black veins and white spots stay */
+function butterflyMaterial(color: string, skin: HTMLImageElement) {
+  let material = butterflyMaterials.get(color)
+  if (material) return material
+  const canvas = document.createElement('canvas')
+  canvas.width = skin.width
+  canvas.height = skin.height
+  const g = canvas.getContext('2d')!
+  g.drawImage(skin, 0, 0)
+  const image = g.getImageData(0, 0, canvas.width, canvas.height)
+  const target = new THREE.Color(color).getHSL({ h: 0, s: 0, l: 0 })
+  const px = new THREE.Color()
+  const hsl = { h: 0, s: 0, l: 0 }
+  const d = image.data
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3]! < 8) continue
+    px.setRGB(d[i]! / 255, d[i + 1]! / 255, d[i + 2]! / 255, THREE.SRGBColorSpace).getHSL(hsl, THREE.SRGBColorSpace)
+    // Only the coloured parts of the wing
+    if (hsl.s < 0.35 || hsl.l < 0.15 || hsl.l > 0.92) continue
+    px.setHSL(target.h, Math.min(1, hsl.s * 0.5 + target.s * 0.6), hsl.l * 0.55 + target.l * 0.45, THREE.SRGBColorSpace)
+    const out = px.getStyle(THREE.SRGBColorSpace).match(/\d+/g)!
+    d[i] = Number(out[0]); d[i + 1] = Number(out[1]); d[i + 2] = Number(out[2])
+  }
+  g.putImageData(image, 0, 0)
+  const map = new THREE.CanvasTexture(canvas)
+  map.colorSpace = THREE.SRGBColorSpace
+  // glTF texture coordinates
+  map.flipY = false
+  material = new THREE.MeshStandardMaterial({ map, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.65 })
+  butterflyMaterials.set(color, material)
+  return material
+}
+
+/**
+ * One butterfly: an empty group right away, the animated model inside once it
+ * has loaded. `wings` sets the beat (radians per second, like the drawn
+ * butterflies before; 0 = perched) and `tick` advances the animation.
+ */
 function butterflyModel(color: string) {
-  const g = new THREE.Group()
-  const wingShape = new THREE.Shape()
-  wingShape.moveTo(0, 0)
-  wingShape.bezierCurveTo(0.08, 0.1, 0.18, 0.08, 0.16, -0.02)
-  wingShape.bezierCurveTo(0.14, -0.1, 0.05, -0.08, 0, 0)
-  const wingGeometry = new THREE.ShapeGeometry(wingShape)
-  wingGeometry.rotateX(-Math.PI / 2)
-  const wingMaterial = new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide, roughness: 0.5, emissive: color, emissiveIntensity: 0.15 })
-  const right = new THREE.Mesh(wingGeometry, wingMaterial)
-  const left = new THREE.Mesh(wingGeometry, wingMaterial)
-  left.scale.x = -1
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.12, 4), std('#2a2a2a'))
-  body.rotation.x = Math.PI / 2
-  g.add(right, left, body)
-  return { group: g, left, right }
+  const group = new THREE.Group()
+  let mixer: THREE.AnimationMixer | null = null
+  let fly: THREE.AnimationAction | null = null
+  let sit: THREE.AnimationAction | null = null
+  let flyWeight = 0
+  let target = { weight: 0.35, beat: 3 }
+  loadButterfly().then(({ scene, clips, skin }) => {
+    const model = cloneSkinned(scene)
+    const material = butterflyMaterial(color, skin)
+    model.traverse((obj) => {
+      if (!(obj as THREE.Mesh).isMesh) return
+      ;(obj as THREE.Mesh).material = material
+      // Geometry and material are shared by every butterfly
+      obj.userData.shared = true
+      obj.frustumCulled = false
+    })
+    // Wingspan 10.44 units, head towards +Z, body 0.85 up: centre the body
+    const scale = BUTTERFLY_SPAN / 10.44
+    model.scale.setScalar(scale)
+    model.position.set(0, -0.85 * scale, 0.48 * scale)
+    group.add(model)
+    mixer = new THREE.AnimationMixer(model)
+    const clip = (name: string) => clips.find(c => c.name === name)
+    const flying = clip('Flying')
+    const sitting = clip('Sitting1') ?? clip('Sitting2')
+    if (flying) {
+      fly = mixer.clipAction(flying).play()
+      fly.time = Math.random() * flying.duration
+    }
+    if (sitting) sit = mixer.clipAction(sitting).play()
+  }).catch(() => {})
+  return {
+    group,
+    wings(beat: number, perched: boolean) {
+      target = perched ? { weight: 0.35, beat: 3 } : { weight: 1, beat }
+    },
+    tick(dt: number) {
+      if (!mixer) return
+      flyWeight += (target.weight - flyWeight) * Math.min(1, dt * 6)
+      fly?.setEffectiveWeight(flyWeight).setEffectiveTimeScale(target.beat / FLYING_BEAT)
+      sit?.setEffectiveWeight(1 - flyWeight)
+      mixer.update(dt)
+    },
+  }
 }
 
 /**
@@ -359,10 +448,8 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
     f.group.lookAt(tmp.x, f.group.position.y, tmp.z)
   }
 
-  function flap(f: Fly, time: number, speed: number, amount: number) {
-    const a = Math.sin(time * speed + f.phase) * amount
-    f.right.rotation.z = a
-    f.left.rotation.z = -a
+  function flap(f: Fly, speed: number) {
+    f.wings(speed, false)
   }
 
   function update(time: number, dt: number) {
@@ -372,11 +459,11 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
       startChase(time)
     }
     for (const f of flies) {
+      f.tick(dt)
       if (f.mode === 'rest') {
         f.rest -= dt
-        // Resting: slow, gentle wing beat
-        f.right.rotation.z = 0.3 + Math.sin(time * 3 + f.phase) * 0.3
-        f.left.rotation.z = -f.right.rotation.z
+        // Resting: perched, with a slow, gentle wing beat
+        f.wings(3, true)
         if (f.rest <= 0) takeOff(f, destination(f))
         continue
       }
@@ -406,7 +493,7 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
         }
         f.group.position.addScaledVector(f.velocity, dt)
         face(f, f.velocity)
-        flap(f, time, 32, 1)
+        flap(f, 32)
         continue
       }
 
@@ -421,7 +508,7 @@ function createButterflies(count: number, spots: THREE.Vector3[], rand: () => nu
       desired.copy(tmp).sub(f.group.position)
       if (desired.lengthSq() > 1e-8) face(f, desired)
       f.group.position.copy(tmp)
-      flap(f, time, 28, 0.9)
+      flap(f, 28)
       if (f.t >= 1) {
         f.mode = 'rest'
         // Butterflies called by the cursor linger on the flower
