@@ -576,7 +576,7 @@
           icon="i-lucide-box"
           size="lg"
           :label="t('dashboard.editor.room.fab')"
-          class="fixed bottom-20 right-5 z-50 bg-tint pr-4 text-white shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] hover:bg-tint/90 hover:scale-105 lg:bottom-5 print:hidden"
+          class="fixed bottom-20 right-5 z-50 pr-4 shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] lg:bottom-5 print:hidden"
           @click="activeTab = 'room'"
         />
       </div>

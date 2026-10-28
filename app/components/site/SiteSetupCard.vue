@@ -20,14 +20,14 @@
           <p class="text-xs text-ink-muted">{{ t('dashboard.onboarding.progress', { done: setup.done.value, total }) }}</p>
         </div>
       </div>
-      <button
-        type="button"
-        class="mt-3 flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-tint text-xs font-medium text-white transition-colors hover:bg-tint/90"
+      <UButton
+        size="sm"
+        block
+        trailing-icon="i-lucide-arrow-right"
+        :label="t('dashboard.onboarding.cardAction')"
+        class="mt-3"
         @click="openChecklist"
-      >
-        {{ t('dashboard.onboarding.cardAction') }}
-        <UIcon name="i-lucide-arrow-right" class="size-3.5" />
-      </button>
+      />
     </div>
   </template>
 </template>

@@ -33,33 +33,31 @@
         </div>
 
         <footer class="grid grid-cols-2 gap-2 border-t border-line p-3">
-          <a :href="mailto" class="flex h-10 items-center justify-center gap-2 rounded-full bg-tint text-sm font-medium text-white hover:bg-tint/90">
-            <UIcon name="i-lucide-mail" class="size-4" />
-            {{ t('dashboard.help.contact') }}
-          </a>
-          <NuxtLink
+          <UButton :href="mailto" icon="i-lucide-mail" :label="t('dashboard.help.contact')" block />
+          <UButton
             :to="loggedIn ? '/dashboard/feedback' : '/login'"
-            class="flex h-10 items-center justify-center gap-2 rounded-full text-sm font-medium text-ink ring-1 ring-inset ring-line hover:bg-sand"
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-message-square-heart"
+            :label="t('dashboard.help.feedback')"
+            block
             @click="open = false"
-          >
-            <UIcon name="i-lucide-message-square-heart" class="size-4" />
-            {{ t('dashboard.help.feedback') }}
-          </NuxtLink>
+          />
         </footer>
       </section>
     </Transition>
 
     <!-- The site editor puts its 3D room button here; help opens from the sidebar -->
-    <button
+    <UButton
       v-if="!aboveActionBar"
-      type="button"
-      class="inline-flex size-11 items-center justify-center rounded-full bg-tint text-white shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] transition-transform hover:scale-105"
+      size="lg"
+      square
+      :icon="open ? 'i-lucide-x' : 'i-lucide-circle-help'"
+      class="shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)]"
       :aria-expanded="open"
       :aria-label="open ? t('dashboard.help.close') : t('dashboard.help.ariaLabel')"
       @click="open = !open"
-    >
-      <UIcon :name="open ? 'i-lucide-x' : 'i-lucide-circle-help'" class="size-5" />
-    </button>
+    />
   </div>
 </template>
 
