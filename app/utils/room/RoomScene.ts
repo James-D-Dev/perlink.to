@@ -1388,6 +1388,15 @@ export class RoomScene {
   private updateEnvironment(key: string) {
     if (key === this.envKey) return
     this.envKey = key
+    if (gpuKit()) {
+      // WebGPU: render into the same target every time. A new environment
+      // texture makes every node material rebuild its pipeline, which froze
+      // the page for seconds while day turned to night
+      const pmrem = this.pmrem as unknown as { fromScene: (scene: THREE.Scene, sigma: number, near: number, far: number, options: { renderTarget?: THREE.WebGLRenderTarget }) => THREE.WebGLRenderTarget }
+      this.envTarget = pmrem.fromScene(this.envScene, 0.04, 0.1, 100, { renderTarget: this.envTarget })
+      if (this.scene.environment !== this.envTarget.texture) this.scene.environment = this.envTarget.texture
+      return
+    }
     const target = this.pmrem.fromScene(this.envScene, 0.04)
     this.envTarget?.dispose()
     this.envTarget = target
