@@ -1,15 +1,16 @@
 import * as THREE from 'three'
 
-// WebGPU for the 3D rooms: on by default where the browser has WebGPU,
-// except on phones and tablets.
+// WebGPU for the 3D rooms: experimental, only with ?gpu=1. Everyone else
+// gets the classic WebGLRenderer (WebGPU lagged on phones and wasn't worth it
+// elsewhere yet).
 //
 // three.js' WebGPURenderer can't draw our hand-written GLSL materials, and the
 // classic WebGLRenderer can't draw its node (TSL) materials, so one switch picks
 // the whole set: once the kit is loaded, every room renderer (scene, video
 // recorder, thumbnails) is a WebGPURenderer and every custom material is made
-// in its TSL version (./nodeMaterials). Without WebGPU the rooms use the classic
-// WebGLRenderer, not WebGPURenderer's WebGL 2 fallback (much slower), and the
-// WebGPU code isn't even downloaded.
+// in its TSL version (./nodeMaterials). Without the switch, or without WebGPU,
+// the rooms use the classic WebGLRenderer (not WebGPURenderer's WebGL 2
+// fallback, much slower) and the WebGPU code isn't even downloaded.
 
 export type GpuKit = typeof import('./nodeMaterials')
 
@@ -21,29 +22,22 @@ const STORAGE_KEY = 'perlink:renderer'
 
 const hasWebGPU = () => typeof navigator !== 'undefined' && 'gpu' in navigator
 
-/** Phones and tablets: WebGPU ran noticeably worse there than classic WebGL */
-const isMobile = () =>
-  (navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile === true
-  || window.matchMedia('(pointer: coarse)').matches
-
 /**
- * WebGPU when the browser has it, except on mobile. ?gpu=0 turns it off (and
- * remembers it), ?gpu=1 turns it on even on mobile, ?gpu=auto goes back to
- * the default, ?gpu=webgl2 makes WebGPURenderer use its WebGL 2 fallback (to
- * test that path on a browser that has WebGPU)
+ * ?gpu=1 turns WebGPU on (and remembers it), ?gpu=webgl2 does too but makes
+ * WebGPURenderer use its WebGL 2 fallback (to test that path on a browser
+ * that has WebGPU), ?gpu=0 goes back to classic WebGL
  */
 export function gpuMode(): 'webgpu' | 'webgl2' | null {
   if (typeof window === 'undefined') return null
   const param = new URLSearchParams(window.location.search).get('gpu')
   let choice = param
   try {
-    if (param === '0' || param === '1' || param === 'webgl2') localStorage.setItem(STORAGE_KEY, param)
-    if (param === 'auto') localStorage.removeItem(STORAGE_KEY)
+    if (param === '1' || param === 'webgl2') localStorage.setItem(STORAGE_KEY, param)
+    if (param === '0') localStorage.removeItem(STORAGE_KEY)
     choice = localStorage.getItem(STORAGE_KEY)
   } catch {}
   if (choice === 'webgl2') return 'webgl2'
-  if (choice === '0' || !hasWebGPU()) return null
-  return choice === '1' || !isMobile() ? 'webgpu' : null
+  return choice === '1' && hasWebGPU() ? 'webgpu' : null
 }
 
 export const wantsWebGPU = () => gpuMode() !== null
