@@ -1,16 +1,19 @@
 # WebGPU for the 3D rooms
 
 The rooms render with three.js' `WebGPURenderer` on WebGPU wherever the
-browser has it (and a usable GPU adapter). Everywhere else they use the
+browser has it (and a usable GPU adapter), except on phones and tablets
+(`userAgentData.mobile` or a coarse pointer), where it ran noticeably worse.
+Everywhere else they use the
 classic `WebGLRenderer` with the GLSL materials, not `WebGPURenderer`'s own
 WebGL 2 fallback, which is several times slower on our scenes (it emulates
 WebGPU's pipelines and bind groups in JavaScript on top of WebGL).
 
 Overrides, on any page with a room (remembered in `localStorage`, key
-`perlink:gpu`):
+`perlink:renderer`):
 
 - `?gpu=0`: classic WebGL, even where WebGPU is available
-- `?gpu=1`: back to the default (WebGPU where available)
+- `?gpu=1`: WebGPU where available, mobile included
+- `?gpu=auto`: back to the default
 - `?gpu=webgl2`: `WebGPURenderer` forced onto its WebGL 2 fallback, to test it
 
 The console logs `[room] renderer: webgpu` (or `webgl2`) and the time of the
