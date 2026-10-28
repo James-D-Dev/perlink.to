@@ -62,6 +62,19 @@ function drawMaterial(material: THREE.Material) {
   return kit && material.userData.wind ? kit.windMaterial(material as THREE.MeshStandardMaterial, () => natureWind.value) : material
 }
 
+/**
+ * Set by the room: compiles freshly made scenery before it joins the scene,
+ * so the frame it appears in doesn't stall (most noticeable on WebGPU)
+ */
+let prepareScenery: ((object: THREE.Object3D) => Promise<unknown>) | null = null
+export function setSceneryPreparer(prepare: typeof prepareScenery) {
+  prepareScenery = prepare
+}
+/** Unset it when the room that set it goes away (unless another room took over) */
+export function clearSceneryPreparer(prepare: typeof prepareScenery) {
+  if (prepareScenery === prepare) prepareScenery = null
+}
+
 const loader = new GLTFLoader()
 const cache = new Map<string, Promise<LoadedModel>>()
 const textureCache = new Map<string, THREE.Texture>()
@@ -153,13 +166,15 @@ export function greenLeaves(material: THREE.Material): THREE.Material {
 const CHUNK_SIZE = 11
 
 export async function scatterModel(
-  group: THREE.Group,
+  target: THREE.Group,
   name: string,
   items: ScatterItem[],
   options: { castShadow?: boolean; material?: (m: THREE.Material) => THREE.Material } = {},
 ) {
   if (!items.length) return
   const model = await loadModel(name)
+  // Built off to the side, compiled, then moved into the land
+  const group = new THREE.Group()
   const place = new THREE.Matrix4()
   const quat = new THREE.Quaternion()
   const yAxis = new THREE.Vector3(0, 1, 0)
@@ -198,6 +213,8 @@ export async function scatterModel(
       group.add(mesh)
     }
   }
+  if (prepareScenery) await prepareScenery(group).catch(() => {})
+  target.add(...group.children)
 }
 
 export interface NaturePiece {

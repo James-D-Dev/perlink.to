@@ -7,7 +7,8 @@ import { daylightAtHour, getDaylight, type DaylightState } from './daylight'
 import { buildLand, createStarSphere, type LandInstance } from './lands'
 import { buildRoomShell, FLOOR_THICKNESS } from './shell'
 import { flameFlicker, flameTime } from './flame'
-import { createRoomRenderer, gpuKit, maxAnisotropy } from './gpu'
+import { compileOffscreen, createRoomRenderer, gpuKit, maxAnisotropy } from './gpu'
+import { clearSceneryPreparer, setSceneryPreparer } from './natureModels'
 import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
 import { drawProductCard, productSignature, type ShopProduct } from './productCard'
 import type { GuestGiftType } from '#shared/guestbook'
@@ -51,6 +52,8 @@ export interface RoomSceneStats {
   cap: number
   drawCalls: number
   triangles: number
+  /** 'webgl' (classic), 'webgpu', or 'webgl2' (WebGPURenderer's fallback) */
+  renderer: string
 }
 
 interface ObjectEntry {
@@ -110,7 +113,13 @@ export class RoomScene {
   private frame = 0
   /** False until the renderer can draw (WebGPU sets up asynchronously) */
   private canRender = false
+  private backend: () => string = () => 'webgl'
+  /** For the console: how long until the first frame was drawn */
+  private firstFrameLogged = false
   private rendererReady: Promise<void>
+  /** Compiles new scenery before it joins the scene (see natureModels) */
+  private prepareScenery = (object: THREE.Object3D) =>
+    this.rendererReady.then(() => compileOffscreen(this.renderer, object, this.camera, this.scene))
   private disposed = false
 
   private shell = new THREE.Group()
@@ -211,6 +220,9 @@ export class RoomScene {
     // asynchronously, so frames wait for it
     const created = createRoomRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
     this.renderer = created.renderer
+    this.backend = created.backend
+    // Scenery that loads later is compiled before it's added (./natureModels)
+    setSceneryPreparer(this.prepareScenery)
     this.rendererReady = created.ready.then(() => {
       this.canRender = true
       if (gpuKit()) console.info(`[room] renderer: ${created.backend()}`)
@@ -611,6 +623,7 @@ export class RoomScene {
 
   dispose() {
     this.disposed = true
+    clearSceneryPreparer(this.prepareScenery)
     this.loadingMarkerGeometry.dispose()
     this.loadingMarkerMaterial.dispose()
     cancelAnimationFrame(this.frame)
@@ -653,7 +666,17 @@ export class RoomScene {
     // Lighter scenery on devices that start at a reduced quality level: a
     // little on phones, more on low-memory devices and previews
     this.land = buildLand(landId, { style, groundY: -FLOOR_THICKNESS, detail: this.quality >= 2 ? 0.55 : this.quality === 1 ? 0.8 : 1 })
-    this.outdoor.add(this.land.group)
+    // Shown once its materials are compiled, so switching land doesn't stall
+    const land = this.land
+    land.group.visible = false
+    this.outdoor.add(land.group)
+    this.rendererReady
+      .then(() => compileOffscreen(this.renderer, land.group, this.camera, this.scene))
+      .catch(() => {})
+      .then(() => {
+        land.group.visible = true
+        this.markActive()
+      })
     this.updateRoomFlowers()
     this.placeGuests()
   }
@@ -760,7 +783,7 @@ export class RoomScene {
     const current = () => !this.disposed && this.entries.get(entry.data.id) === entry
     ready
       .catch(() => {})
-      .then(() => (current() ? this.renderer.compileAsync(entry.root, this.camera, this.scene) : undefined))
+      .then(() => (current() ? compileOffscreen(this.renderer, entry.root, this.camera, this.scene) : undefined))
       .catch(() => {})
       .then(() => {
         this.removeLoadingMarker(entry.data.id, marker)
@@ -1243,6 +1266,10 @@ export class RoomScene {
 
   private renderFrame(now: number) {
     if (!this.canRender) return
+    if (!this.firstFrameLogged) {
+      this.firstFrameLogged = true
+      console.info(`[room] first frame (${this.backend()}) at ${Math.round(performance.now())} ms`)
+    }
     this.timer.update(now)
     const dt = Math.min(this.timer.getDelta(), 0.1)
     const time = this.timer.getElapsed()
@@ -1279,6 +1306,7 @@ export class RoomScene {
       cap: this.statsCap,
       drawCalls: render.calls,
       triangles: render.triangles,
+      renderer: this.backend(),
     })
     this.statsFrames = 0
     this.statsSince = now

@@ -17,18 +17,25 @@ let loading: Promise<GpuKit | null> | null = null
 
 const STORAGE_KEY = 'perlink:gpu'
 
-/** ?gpu=1 turns it on (and remembers it), ?gpu=0 off again */
-export function wantsWebGPU() {
-  if (typeof window === 'undefined') return false
+/**
+ * ?gpu=1 turns it on (and remembers it), ?gpu=webgl2 does too but makes
+ * WebGPURenderer use its WebGL 2 fallback (to test that path on a browser
+ * that has WebGPU), ?gpu=0 turns it off again
+ */
+export function gpuMode(): 'webgpu' | 'webgl2' | null {
+  if (typeof window === 'undefined') return null
   const param = new URLSearchParams(window.location.search).get('gpu')
   try {
-    if (param === '1') localStorage.setItem(STORAGE_KEY, '1')
+    if (param === '1' || param === 'webgl2') localStorage.setItem(STORAGE_KEY, param)
     if (param === '0') localStorage.removeItem(STORAGE_KEY)
-    return localStorage.getItem(STORAGE_KEY) === '1'
+    const stored = localStorage.getItem(STORAGE_KEY)
+    return stored === 'webgl2' ? 'webgl2' : stored ? 'webgpu' : null
   } catch {
-    return param === '1'
+    return param === 'webgl2' ? 'webgl2' : param === '1' ? 'webgpu' : null
   }
 }
+
+export const wantsWebGPU = () => gpuMode() !== null
 
 /** Loads the WebGPU renderer and the TSL materials when wanted; null otherwise */
 export function loadGpuKit(): Promise<GpuKit | null> {
@@ -62,7 +69,7 @@ export interface CreatedRenderer {
 
 /** A renderer for the rooms: WebGPURenderer when the kit is loaded, else WebGLRenderer */
 export function createRoomRenderer(params: { antialias?: boolean; alpha?: boolean; preserveDrawingBuffer?: boolean; powerPreference?: WebGLPowerPreference }): CreatedRenderer {
-  if (kit) return kit.createGpuRenderer(params)
+  if (kit) return kit.createGpuRenderer({ ...params, forceWebGL: gpuMode() === 'webgl2' })
   const renderer = new THREE.WebGLRenderer(params)
   return { renderer, ready: Promise.resolve(), backend: () => 'webgl' }
 }
@@ -71,4 +78,26 @@ export function createRoomRenderer(params: { antialias?: boolean; alpha?: boolea
 export function maxAnisotropy(renderer: RoomRenderer) {
   const r = renderer as RoomRenderer & { getMaxAnisotropy?: () => number }
   return r.capabilities?.getMaxAnisotropy?.() ?? r.getMaxAnisotropy?.() ?? 1
+}
+
+/**
+ * Compile an object's materials ahead of drawing it, so it doesn't stall the
+ * frame it first appears in. WebGPU's compileAsync only picks up objects that
+ * are visible and inside the camera's view (it walks the scene like a render),
+ * so they're shown and unculled for that synchronous walk and put back right
+ * after; WebGL's compiles everything anyway. `scene` gives the lights.
+ */
+export function compileOffscreen(renderer: RoomRenderer, object: THREE.Object3D, camera: THREE.Camera, scene: THREE.Scene): Promise<unknown> {
+  const saved: [THREE.Object3D, boolean, boolean][] = []
+  object.traverse((obj) => {
+    saved.push([obj, obj.visible, obj.frustumCulled])
+    obj.visible = true
+    obj.frustumCulled = false
+  })
+  const done = renderer.compileAsync(object, camera, scene)
+  for (const [obj, visible, culled] of saved) {
+    obj.visible = visible
+    obj.frustumCulled = culled
+  }
+  return done
 }

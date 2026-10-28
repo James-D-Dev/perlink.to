@@ -19,8 +19,8 @@ import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 type Getter = () => number
 
 /** WebGPURenderer (WebGPU, or WebGL 2 where WebGPU isn't available) */
-export function createGpuRenderer(params: { antialias?: boolean; alpha?: boolean; powerPreference?: WebGLPowerPreference }) {
-  const renderer = new THREE.WebGPURenderer({ antialias: params.antialias, alpha: params.alpha, powerPreference: params.powerPreference as GPUPowerPreference })
+export function createGpuRenderer(params: { antialias?: boolean; alpha?: boolean; powerPreference?: WebGLPowerPreference; forceWebGL?: boolean }) {
+  const renderer = new THREE.WebGPURenderer({ antialias: params.antialias, alpha: params.alpha, powerPreference: params.powerPreference as GPUPowerPreference, forceWebGL: params.forceWebGL })
   const ready = renderer.init().then(() => undefined)
   const backend = () => ((renderer.backend as { isWebGPUBackend?: boolean }).isWebGPUBackend ? 'webgpu' : 'webgl2')
   return { renderer: renderer as unknown as import('three').WebGLRenderer, ready, backend }

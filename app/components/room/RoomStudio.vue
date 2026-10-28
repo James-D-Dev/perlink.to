@@ -317,6 +317,7 @@
         >
           <span class="size-1.5 rounded-full" :class="fpsColor" />
           {{ t('room.stats.fps', { fps: stats.fps }) }}
+          <span class="text-white/50">· {{ RENDERER_LABEL[stats.renderer] ?? stats.renderer }}</span>
           <span v-if="stats.cap < 60" class="text-white/50">{{ t('room.stats.idle') }}</span>
         </div>
       </div>
@@ -638,6 +639,9 @@ const activeTab = ref<Tab>('furniture')
 const trayOpen = ref(true)
 // The editor shows the room by day or by night; it starts as it is right now
 const previewMode = ref<'day' | 'night'>(getDaylight(room.value.environment).isDay ? 'day' : 'night')
+/** Which renderer drew the frame, next to the FPS (for testing WebGPU on devices) */
+const RENDERER_LABEL: Record<string, string> = { webgl: 'WebGL', webgpu: 'WebGPU', webgl2: 'WebGL 2' }
+
 /** Rendering stats from the scene, for the FPS readout */
 const stats = ref<RoomSceneStats | null>(null)
 const fpsColor = computed(() => {
