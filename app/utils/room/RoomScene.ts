@@ -639,11 +639,17 @@ export class RoomScene {
     this.controls.removeEventListener('change', this.clampTarget)
     this.controls.dispose()
     this.scene.traverse((obj) => {
+      // Cached models are shared with the other rooms on the page (the
+      // editor's, while the video records); freeing them would take them from
+      // under those (WebGPU then drops every frame that draws them)
+      if (obj.userData.shared) return
       const mesh = obj as THREE.Mesh
-      mesh.geometry?.dispose()
+      // Sprites all share one built-in geometry (see clearGroup)
+      if (!(obj as THREE.Sprite).isSprite) mesh.geometry?.dispose()
       const material = mesh.material as THREE.Material | THREE.Material[] | undefined
-      if (Array.isArray(material)) material.forEach(m => this.disposeMaterial(m))
-      else if (material) this.disposeMaterial(material)
+      for (const m of Array.isArray(material) ? material : material ? [material] : []) {
+        if (!m.userData.shared) this.disposeMaterial(m)
+      }
     })
     this.envTarget?.dispose()
     this.pmrem.dispose()

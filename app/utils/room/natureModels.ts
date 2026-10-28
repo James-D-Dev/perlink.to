@@ -64,15 +64,18 @@ function drawMaterial(material: THREE.Material) {
 
 /**
  * Set by the room: compiles freshly made scenery before it joins the scene,
- * so the frame it appears in doesn't stall (most noticeable on WebGPU)
+ * so the frame it appears in doesn't stall (most noticeable on WebGPU). The
+ * newest room wins; when it goes (the video recorder's) the one before is back
  */
-let prepareScenery: ((object: THREE.Object3D) => Promise<unknown>) | null = null
-export function setSceneryPreparer(prepare: typeof prepareScenery) {
-  prepareScenery = prepare
+type SceneryPreparer = (object: THREE.Object3D) => Promise<unknown>
+const preparers: SceneryPreparer[] = []
+const prepareScenery = (object: THREE.Object3D) => preparers.at(-1)?.(object)
+export function setSceneryPreparer(prepare: SceneryPreparer) {
+  preparers.push(prepare)
 }
-/** Unset it when the room that set it goes away (unless another room took over) */
-export function clearSceneryPreparer(prepare: typeof prepareScenery) {
-  if (prepareScenery === prepare) prepareScenery = null
+export function clearSceneryPreparer(prepare: SceneryPreparer) {
+  const index = preparers.lastIndexOf(prepare)
+  if (index >= 0) preparers.splice(index, 1)
 }
 
 const loader = new GLTFLoader()
@@ -213,7 +216,7 @@ export async function scatterModel(
       group.add(mesh)
     }
   }
-  if (prepareScenery) await prepareScenery(group).catch(() => {})
+  await prepareScenery(group)?.catch(() => {})
   target.add(...group.children)
 }
 

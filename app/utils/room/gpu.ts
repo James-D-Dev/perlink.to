@@ -1,13 +1,13 @@
 import * as THREE from 'three'
 
-// WebGPU for the 3D rooms (experimental, behind ?gpu=1).
+// WebGPU for the 3D rooms: on by default where the browser has WebGPU.
 //
-// three.js' WebGPURenderer uses WebGPU where the browser has it and falls back
-// to WebGL 2 on its own. It can't draw our hand-written GLSL materials, and the
+// three.js' WebGPURenderer can't draw our hand-written GLSL materials, and the
 // classic WebGLRenderer can't draw its node (TSL) materials, so one switch picks
 // the whole set: once the kit is loaded, every room renderer (scene, video
 // recorder, thumbnails) is a WebGPURenderer and every custom material is made
-// in its TSL version (./nodeMaterials). Without it nothing changes, and the
+// in its TSL version (./nodeMaterials). Without WebGPU the rooms use the classic
+// WebGLRenderer, not WebGPURenderer's WebGL 2 fallback (much slower), and the
 // WebGPU code isn't even downloaded.
 
 export type GpuKit = typeof import('./nodeMaterials')
@@ -17,22 +17,24 @@ let loading: Promise<GpuKit | null> | null = null
 
 const STORAGE_KEY = 'perlink:gpu'
 
+const hasWebGPU = () => typeof navigator !== 'undefined' && 'gpu' in navigator
+
 /**
- * ?gpu=1 turns it on (and remembers it), ?gpu=webgl2 does too but makes
- * WebGPURenderer use its WebGL 2 fallback (to test that path on a browser
- * that has WebGPU), ?gpu=0 turns it off again
+ * WebGPU when the browser has it. ?gpu=0 turns it off (and remembers it),
+ * ?gpu=1 turns it back on, ?gpu=webgl2 makes WebGPURenderer use its WebGL 2
+ * fallback (to test that path on a browser that has WebGPU)
  */
 export function gpuMode(): 'webgpu' | 'webgl2' | null {
   if (typeof window === 'undefined') return null
   const param = new URLSearchParams(window.location.search).get('gpu')
+  let choice = param
   try {
-    if (param === '1' || param === 'webgl2') localStorage.setItem(STORAGE_KEY, param)
-    if (param === '0') localStorage.removeItem(STORAGE_KEY)
-    const stored = localStorage.getItem(STORAGE_KEY)
-    return stored === 'webgl2' ? 'webgl2' : stored ? 'webgpu' : null
-  } catch {
-    return param === 'webgl2' ? 'webgl2' : param === '1' ? 'webgpu' : null
-  }
+    if (param === '0' || param === '1' || param === 'webgl2') localStorage.setItem(STORAGE_KEY, param)
+    choice = localStorage.getItem(STORAGE_KEY)
+  } catch {}
+  if (choice === 'webgl2') return 'webgl2'
+  if (choice === '0') return null
+  return hasWebGPU() ? 'webgpu' : null
 }
 
 export const wantsWebGPU = () => gpuMode() !== null
@@ -40,9 +42,20 @@ export const wantsWebGPU = () => gpuMode() !== null
 /** Loads the WebGPU renderer and the TSL materials when wanted; null otherwise */
 export function loadGpuKit(): Promise<GpuKit | null> {
   if (kit) return Promise.resolve(kit)
-  if (!wantsWebGPU()) return Promise.resolve(null)
-  loading ??= import('./nodeMaterials')
+  const mode = gpuMode()
+  if (!mode) return Promise.resolve(null)
+  loading ??= (async () => {
+    // navigator.gpu can be there without a usable GPU (blocklisted drivers,
+    // some Linux/Android); WebGPURenderer would then drop to WebGL 2, so stay
+    // on the classic renderer instead
+    if (mode === 'webgpu') {
+      const adapter = await (navigator as Navigator & { gpu: { requestAdapter(): Promise<unknown> } }).gpu.requestAdapter().catch(() => null)
+      if (!adapter) return null
+    }
+    return import('./nodeMaterials')
+  })()
     .then((module) => {
+      if (!module) return null
       kit = module
       return module
     })

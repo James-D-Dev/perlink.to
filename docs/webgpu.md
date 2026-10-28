@@ -1,11 +1,21 @@
-# WebGPU for the 3D rooms (experimental)
+# WebGPU for the 3D rooms
 
-The rooms render with WebGL by default. Add `?gpu=1` to any page with a room
-(a site's 3D view, the room editor) to switch to three.js' `WebGPURenderer`:
-it uses WebGPU where the browser has it and falls back to WebGL 2 by itself.
-The choice is remembered in the browser (`localStorage`, key `perlink:gpu`);
-`?gpu=0` turns it off again. The console logs `[room] renderer: webgpu` (or
-`webgl2` for the fallback).
+The rooms render with three.js' `WebGPURenderer` on WebGPU wherever the
+browser has it (and a usable GPU adapter). Everywhere else they use the
+classic `WebGLRenderer` with the GLSL materials, not `WebGPURenderer`'s own
+WebGL 2 fallback, which is several times slower on our scenes (it emulates
+WebGPU's pipelines and bind groups in JavaScript on top of WebGL).
+
+Overrides, on any page with a room (remembered in `localStorage`, key
+`perlink:gpu`):
+
+- `?gpu=0`: classic WebGL, even where WebGPU is available
+- `?gpu=1`: back to the default (WebGPU where available)
+- `?gpu=webgl2`: `WebGPURenderer` forced onto its WebGL 2 fallback, to test it
+
+The console logs `[room] renderer: webgpu` (or `webgl2`) and the time of the
+first frame; the editor's FPS chip shows the renderer (WebGL / WebGPU /
+WebGL 2).
 
 How it's built (`app/utils/room/gpu.ts`):
 
@@ -14,14 +24,18 @@ How it's built (`app/utils/room/gpu.ts`):
   kit is loaded every room renderer (scene, video recorder, thumbnails) is a
   `WebGPURenderer` and every custom material is made in its TSL version.
 - The WebGPU code (`three/webgpu`, `three/tsl`, `nodeMaterials.ts`) is loaded
-  lazily, only when switched on; both builds share `three.core.js`.
+  lazily, only after `navigator.gpu.requestAdapter()` returned an adapter;
+  both builds share `three.core.js`.
 - TSL twins of the GLSL pieces live in `app/utils/room/nodeMaterials.ts`:
   flames, the gradient sky dome, the physical sky (`SkyMesh`), stars, water,
   foliage wind sway, and sized points (fireflies, snow) — WebGPU draws point
   primitives 1 px wide, so those become instanced sprites.
-- `RoomScene.clearGroup` only frees geometry/materials nothing else in the
-  scene still uses (WebGPU drops a frame that uses a freed buffer; sprites
-  share one built-in geometry).
-
-Next step before making it the default: check performance and looks on a few
-phones and laptops (both backends), and the video recorder.
+- New scenery and lands are compiled (`compileOffscreen`) before they join
+  the scene, so the frame they appear in doesn't stall. WebGPU's
+  `compileAsync` skips hidden and culled objects, so they're shown and
+  unculled for that walk.
+- Freeing resources: `RoomScene.clearGroup` and `dispose` never free cached
+  models (`userData.shared`) or sprite geometry (all sprites share one).
+  Another room on the page (the editor, while the video recorder has its own
+  scene) may still be drawing them, and WebGPU drops every frame that uses a
+  freed buffer, where WebGL quietly re-uploads it.

@@ -99,9 +99,9 @@ defineExpose({
   snapshot(light?: number | DaylightState, maxWidth?: number) {
     return scene?.snapshot(light, maxWidth) ?? Promise.resolve(null)
   },
-  /** true while models are still loading */
+  /** true while models are still loading (or the scene isn't made yet) */
   isLoading() {
-    return !!scene?.loading
+    return !scene || scene.loading
   },
   resetView() {
     scene?.resetView()
