@@ -6,7 +6,7 @@ import { ProfileRepository } from '../repositories/profileRepository'
 export interface SocialAccount {
   provider: 'facebook' | 'tiktok'
   /** The provider's id for the user (Facebook app-scoped id, TikTok open_id) */
-  id: string
+  id: string | number | undefined
   /** Only when the provider vouches for it (Facebook returns confirmed emails only) */
   email?: string | null
   name?: string | null
@@ -32,6 +32,11 @@ async function freeUsername(repo: ProfileRepository, seed: string) {
  * new profile. Ends with a redirect, like the Google sign-in.
  */
 export async function signInWithSocial(event: H3Event, account: SocialAccount) {
+  // Never sign in without the provider's id: every such sign-in would share
+  // one account
+  if (typeof account.id !== 'string' && typeof account.id !== 'number') throw new Error(`${account.provider}: no user id`)
+  account = { ...account, id: String(account.id).trim() }
+  if (!account.id || account.id === 'undefined' || account.id === 'null') throw new Error(`${account.provider}: no user id`)
   const db = getDB(event)
   const repo = new ProfileRepository(event)
   const email = account.email?.trim().toLowerCase() || null

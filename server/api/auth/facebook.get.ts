@@ -7,14 +7,17 @@ export default withOAuthState('facebook', defineOAuthFacebookEventHandler({
     scope: ['email', 'public_profile'],
     fields: ['id', 'name', 'email', 'picture.type(large)'],
   },
-  async onSuccess(event, { user }) {
+  async onSuccess(event, { user: raw }) {
     try {
+      // The Graph API answers with Content-Type text/javascript, so the
+      // handler's $fetch hands back the JSON as a string
+      const user = typeof raw === 'string' ? JSON.parse(raw) : raw
       return await signInWithSocial(event, {
         provider: 'facebook',
-        id: String(user.id),
-        email: user.email,
-        name: user.name,
-        avatar: user.picture?.data?.is_silhouette ? null : user.picture?.data?.url,
+        id: user?.id,
+        email: user?.email,
+        name: user?.name,
+        avatar: user?.picture?.data?.is_silhouette ? null : user?.picture?.data?.url,
       })
     } catch (error) {
       return socialLoginFailed(event, 'facebook', error)

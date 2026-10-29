@@ -30,7 +30,7 @@ export default withOAuthState('tiktok', (event: H3Event) => {
       try {
         return await signInWithSocial(event, {
           provider: 'tiktok',
-          id: String(user.open_id),
+          id: user.open_id,
           name: user.display_name,
           avatar: user.avatar_large_url || user.avatar_url,
         })
