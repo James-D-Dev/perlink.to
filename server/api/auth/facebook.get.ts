@@ -1,7 +1,8 @@
 // Sign in with Facebook. nuxt-auth-utils reads NUXT_OAUTH_FACEBOOK_CLIENT_ID
 // and NUXT_OAUTH_FACEBOOK_CLIENT_SECRET. Facebook only returns an email the
-// user has confirmed, and not every account has one.
-export default defineOAuthFacebookEventHandler({
+// user has confirmed, and not every account has one. withOAuthState adds the
+// CSRF state the handler doesn't.
+export default withOAuthState('facebook', defineOAuthFacebookEventHandler({
   config: {
     scope: ['email', 'public_profile'],
     fields: ['id', 'name', 'email', 'picture.type(large)'],
@@ -22,4 +23,4 @@ export default defineOAuthFacebookEventHandler({
   onError(event, error) {
     return socialLoginFailed(event, 'facebook', error)
   },
-})
+}))
