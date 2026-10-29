@@ -4,7 +4,8 @@ import { getDB } from '../../utils/db'
 // Permanently delete the signed-in account: profile, sites (with their form
 // requests), short links, feedback, analytics and uploaded images.
 // The user must type their email address to confirm (DELETE for accounts
-// without one, e.g. signed in with TikTok).
+// without one, e.g. signed in with TikTok). A POST, not DELETE /api/account:
+// on Cloudflare a DELETE request with a body crashes the worker (error 1101).
 export default defineEventHandler(async (event) => {
   const user = event.context.user
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
@@ -26,7 +27,7 @@ export default defineEventHandler(async (event) => {
     try {
       await db.prepare(`DELETE FROM click_events WHERE link_id IN (${chunk.map(() => '?').join(',')})`).bind(...chunk).run()
     } catch (error) {
-      console.error('[DELETE /api/account] click_events', error)
+      console.error('[POST /api/account/delete] click_events', error)
     }
   }
 
@@ -46,7 +47,7 @@ export default defineEventHandler(async (event) => {
           cursor = listed.truncated ? listed.cursor : undefined
         } while (cursor)
       } catch (error) {
-        console.error('[DELETE /api/account] images', error)
+        console.error('[POST /api/account/delete] images', error)
       }
     }
   }

@@ -205,7 +205,7 @@ const deleting = ref(false)
 async function deleteAccount() {
   deleting.value = true
   try {
-    await $fetch('/api/account', { method: 'DELETE', body: { confirm: confirmEmail.value } })
+    await $fetch('/api/account/delete', { method: 'POST', body: { confirm: confirmEmail.value } })
     await clear()
     await navigateTo('/')
   } catch (error: any) {
