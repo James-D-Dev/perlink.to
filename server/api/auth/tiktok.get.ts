@@ -6,13 +6,10 @@ import { createHash } from 'node:crypto'
 import type { H3Event } from 'h3'
 
 const SCOPE = ['user.info.basic']
-const SANDBOX = process.env.NUXT_OAUTH_TIKTOK_SANDBOX === '1'
 
 export default withOAuthState('tiktok', defineOAuthTikTokEventHandler({
   config: {
     scope: [...SCOPE],
-    // Sandbox (PKCE) only when the app's TikTok keys are sandbox keys
-    sandbox: SANDBOX,
   },
   async onSuccess(event, { user }) {
     try {
@@ -30,7 +27,7 @@ export default withOAuthState('tiktok', defineOAuthTikTokEventHandler({
     return socialLoginFailed(event, 'tiktok', error)
   },
 }), (event: H3Event, state: string) => {
-  const clientKey = useRuntimeConfig(event).oauth?.tiktok?.clientKey
+  const { clientKey, sandbox } = useRuntimeConfig(event).oauth?.tiktok ?? {}
   if (!clientKey) {
     console.error('[OAuth] tiktok error: NUXT_OAUTH_TIKTOK_CLIENT_KEY is not set')
     return '/login?error=tiktok_failed'
@@ -44,7 +41,7 @@ export default withOAuthState('tiktok', defineOAuthTikTokEventHandler({
     scope: SCOPE.join(','),
     state,
     // Sandbox apps need PKCE; the handler checks the same fixed verifier
-    ...SANDBOX ? { code_challenge: createHash('sha256').update('verify').digest('hex'), code_challenge_method: 'S256' } : {},
+    ...sandbox ? { code_challenge: createHash('sha256').update('verify').digest('hex'), code_challenge_method: 'S256' } : {},
   }).toString()
   return url.toString()
 })
