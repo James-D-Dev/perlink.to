@@ -15,7 +15,7 @@ export const PRIVACY: LegalDocs = {
         id: 'collect',
         title: 'What we collect',
         blocks: [
-          '**Account:** your email address, name and profile picture from Google sign-in, and when you joined.',
+          '**Account:** your name and profile picture from the account you sign in with (Google, Facebook or TikTok), your email address when that account shares it (TikTok does not), that account\'s user ID, and when you joined.',
           '**What you create:** site content (text, links, menus, images), 3D world layouts and photos, theme settings, and links or QR codes made with earlier versions.',
           '**Visits to your sites:** page views and clicks, the referring site, country or region, device type and browser. Visitor IP addresses are hashed with a daily changing salt, so they cannot be read back.',
           '**Payments:** the plan, amount, order or payment code and date of each payment. Online payments are processed by our reseller Lemon Squeezy (Merchant of Record), and bank transfers in Vietnam by your bank; we never see card numbers or bank logins.',
@@ -44,7 +44,7 @@ export const PRIVACY: LegalDocs = {
           { table: [
             ['Provider', 'What for'],
             ['Cloudflare', 'Hosting, database, file storage, security, sending emails (e.g. form submissions to site owners)'],
-            ['Google', 'Sign-in'],
+            ['Google, Meta (Facebook), TikTok', 'Sign-in'],
             ['Lemon Squeezy', 'Selling plans as our reseller and Merchant of Record: checkout, payments, tax, invoices and refunds'],
             ['SePay', 'Notifications of bank transfers for plan payments in Vietnam'],
           ] },
@@ -119,7 +119,7 @@ export const PRIVACY: LegalDocs = {
         id: 'collect',
         title: 'Chúng tôi thu thập gì',
         blocks: [
-          '**Tài khoản:** email, tên và ảnh đại diện từ đăng nhập Google, cùng ngày bạn tham gia.',
+          '**Tài khoản:** tên và ảnh đại diện từ tài khoản bạn dùng để đăng nhập (Google, Facebook hoặc TikTok), email nếu tài khoản đó cung cấp (TikTok thì không), mã người dùng của tài khoản đó, cùng ngày bạn tham gia.',
           '**Nội dung bạn tạo:** nội dung trang (chữ, link, thực đơn, hình ảnh), bố cục và ảnh trong thế giới 3D, cài đặt giao diện, link rút gọn và mã QR từ phiên bản cũ.',
           '**Lượt truy cập trang của bạn:** lượt xem và lượt bấm, trang giới thiệu, quốc gia/khu vực, loại thiết bị và trình duyệt. IP người xem được mã hóa một chiều với khóa đổi mỗi ngày nên không thể đọc ngược lại.',
           '**Thanh toán:** gói, số tiền, mã đơn hàng hoặc mã thanh toán và ngày của từng giao dịch. Thanh toán trực tuyến do đại lý bán lại Lemon Squeezy (đơn vị bán hàng chính thức) xử lý, chuyển khoản tại Việt Nam do ngân hàng của bạn xử lý; chúng tôi không bao giờ thấy số thẻ hay thông tin đăng nhập ngân hàng.',
@@ -148,7 +148,7 @@ export const PRIVACY: LegalDocs = {
           { table: [
             ['Nhà cung cấp', 'Mục đích'],
             ['Cloudflare', 'Máy chủ, cơ sở dữ liệu, lưu trữ tệp, bảo mật, gửi email (ví dụ: gửi biểu mẫu khách điền cho chủ trang)'],
-            ['Google', 'Đăng nhập'],
+            ['Google, Meta (Facebook), TikTok', 'Đăng nhập'],
             ['Lemon Squeezy', 'Bán gói với vai trò đại lý bán lại và đơn vị bán hàng chính thức: thanh toán, thuế, hoá đơn, hoàn tiền'],
             ['SePay', 'Thông báo giao dịch chuyển khoản khi thanh toán gói tại Việt Nam'],
           ] },

@@ -3,7 +3,8 @@ import { getDB } from '../../utils/db'
 
 // Permanently delete the signed-in account: profile, sites (with their form
 // requests), short links, feedback, analytics and uploaded images.
-// The user must type their email address to confirm.
+// The user must type their email address to confirm (DELETE for accounts
+// without one, e.g. signed in with TikTok).
 export default defineEventHandler(async (event) => {
   const user = event.context.user
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const db = getDB(event)
   const profile = await db.prepare('SELECT email FROM profiles WHERE id = ?').bind(user.id).first<{ email: string | null }>()
   if (!profile) throw createError({ statusCode: 404, statusMessage: 'Profile not found' })
-  if (!body.success || body.data.confirm.trim().toLowerCase() !== (profile.email ?? '').toLowerCase()) {
+  if (!body.success || body.data.confirm.trim().toLowerCase() !== (profile.email || 'DELETE').toLowerCase()) {
     throw createError({ statusCode: 400, statusMessage: 'Type your email address to confirm' })
   }
 
@@ -31,6 +32,7 @@ export default defineEventHandler(async (event) => {
 
   // Sites, form requests, links, QR codes and feedback go with the profile (ON DELETE CASCADE)
   await db.prepare('DELETE FROM profiles WHERE id = ?').bind(user.id).run()
+  await db.prepare('DELETE FROM auth_accounts WHERE user_id = ?').bind(user.id).run()
 
   // Uploaded images (best effort; the account is already gone)
   const bucket = event.context.cloudflare?.env?.AVATARS_BUCKET as R2Bucket | undefined

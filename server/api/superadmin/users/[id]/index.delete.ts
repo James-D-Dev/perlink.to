@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
     const result = await stmt.run()
     
     if (!result.success) throw createError({ statusCode: 500, statusMessage: 'Failed to delete user' })
+    await db.prepare('DELETE FROM auth_accounts WHERE user_id = ?').bind(userId).run()
     
     return { success: true }
   } catch (error: any) {

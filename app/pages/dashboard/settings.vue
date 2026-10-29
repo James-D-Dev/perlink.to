@@ -92,8 +92,8 @@
       <AppSheet v-model:open="deleteOpen" :title="t('dashboard.account.deleteTitle')" :description="t('dashboard.account.deleteConfirmText')">
         <template #body>
           <div class="space-y-3">
-            <p class="text-sm text-muted">{{ t('dashboard.account.deleteTypeEmail', { email: account?.email ?? '' }) }}</p>
-            <UInput v-model="confirmEmail" type="email" autocomplete="off" :placeholder="account?.email ?? ''" class="w-full" />
+            <p class="text-sm text-muted">{{ t('dashboard.account.deleteTypeEmail', { email: deletePhrase }) }}</p>
+            <UInput v-model="confirmEmail" :type="account?.email ? 'email' : 'text'" autocomplete="off" :placeholder="deletePhrase" class="w-full" />
           </div>
         </template>
         <template #footer>
@@ -101,7 +101,7 @@
             <UButton color="neutral" variant="ghost" :label="t('common.cancel')" @click="deleteOpen = false" />
             <UButton
               color="error"
-              :disabled="confirmEmail.trim().toLowerCase() !== (account?.email ?? '').toLowerCase()"
+              :disabled="confirmEmail.trim().toLowerCase() !== deletePhrase.toLowerCase()"
               :loading="deleting"
               :label="t('dashboard.account.deleteForever')"
               @click="deleteAccount"
@@ -199,6 +199,8 @@ async function signOutEverywhere() {
 
 const deleteOpen = ref(false)
 const confirmEmail = ref('')
+// Accounts without an email (signed in with TikTok) type DELETE instead
+const deletePhrase = computed(() => account.value?.email || 'DELETE')
 const deleting = ref(false)
 async function deleteAccount() {
   deleting.value = true

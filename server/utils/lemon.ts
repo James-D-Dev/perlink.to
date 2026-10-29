@@ -72,7 +72,7 @@ export async function lemonCatalog(event: H3Event, fresh = false): Promise<Catal
 }
 
 /** A hosted checkout for this plan, tagged with the account so the webhook can find it */
-export async function createLemonCheckout(event: H3Event, input: { userId: string; email: string; name?: string | null; plan: PaidPlanId; period: BillingPeriod; redirectUrl: string }) {
+export async function createLemonCheckout(event: H3Event, input: { userId: string; email?: string | null; name?: string | null; plan: PaidPlanId; period: BillingPeriod; redirectUrl: string }) {
   const { storeId, variants } = await lemonCatalog(event)
   const variantId = variants[`${input.plan}:${input.period}`]
   if (!variantId) return null
@@ -83,7 +83,7 @@ export async function createLemonCheckout(event: H3Event, input: { userId: strin
         type: 'checkouts',
         attributes: {
           checkout_data: {
-            email: input.email,
+            email: input.email || undefined,
             name: input.name || undefined,
             custom: { user_id: input.userId, plan: input.plan, period: input.period },
           },

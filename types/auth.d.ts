@@ -2,7 +2,7 @@
 declare module '#auth-utils' {
   interface User {
     id: string
-    email: string
+    email: string | null
     username?: string | null
     name?: string | null
     avatar?: string | null

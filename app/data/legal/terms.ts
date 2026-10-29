@@ -39,7 +39,7 @@ export const TERMS: LegalDocs = {
         id: 'accounts',
         title: 'Your account',
         blocks: [
-          'You sign in with Google. You must be at least 13 years old, or the minimum age of digital consent in your country.',
+          'You sign in with Google, Facebook or TikTok. You must be at least 13 years old, or the minimum age of digital consent in your country.',
           'You are responsible for keeping your account secure and for everything done with it. Tell us right away at {email} if you notice unauthorized use.',
         ],
       },
@@ -187,7 +187,7 @@ export const TERMS: LegalDocs = {
         id: 'accounts',
         title: 'Tài khoản của bạn',
         blocks: [
-          'Bạn đăng nhập bằng Google. Bạn cần từ 13 tuổi trở lên, hoặc đủ độ tuổi theo quy định tại quốc gia của bạn.',
+          'Bạn đăng nhập bằng Google, Facebook hoặc TikTok. Bạn cần từ 13 tuổi trở lên, hoặc đủ độ tuổi theo quy định tại quốc gia của bạn.',
           'Bạn chịu trách nhiệm bảo mật tài khoản và mọi hoạt động trên tài khoản. Hãy báo ngay cho chúng tôi qua {email} nếu thấy có người dùng trái phép.',
         ],
       },

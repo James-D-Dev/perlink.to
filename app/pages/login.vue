@@ -34,16 +34,20 @@
             {{ error }}
           </div>
 
-          <button
-            type="button"
-            class="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-paper text-[15px] font-medium text-ink ring-1 ring-inset ring-line transition-colors hover:bg-sand disabled:opacity-60"
-            :disabled="isLoading"
-            @click="handleGoogleLogin"
-          >
-            <UIcon v-if="isLoading" name="i-lucide-loader-circle" class="size-5 animate-spin" />
-            <UIcon v-else name="i-flat-color-icons-google" class="size-5" />
-            Continue with Google
-          </button>
+          <div class="mt-8 space-y-2.5">
+            <button
+              v-for="provider in PROVIDERS"
+              :key="provider.id"
+              type="button"
+              class="flex h-12 w-full items-center justify-center gap-3 rounded-full bg-paper text-[15px] font-medium text-ink ring-1 ring-inset ring-line transition-colors hover:bg-sand disabled:opacity-60"
+              :disabled="!!loadingProvider"
+              @click="signIn(provider.id)"
+            >
+              <UIcon v-if="loadingProvider === provider.id" name="i-lucide-loader-circle" class="size-5 animate-spin" />
+              <UIcon v-else :name="provider.icon" class="size-5" :style="provider.color ? { color: provider.color } : undefined" />
+              Continue with {{ provider.label }}
+            </button>
+          </div>
 
           <p class="mt-6 text-center text-xs leading-relaxed text-ink-faint">
             New here? Signing in creates your free account.<br>
@@ -74,7 +78,14 @@ useHead({ link: [{ rel: 'canonical', href: 'https://perlink.to/login' }] })
 const { loggedIn, clear } = useUserSession()
 const route = useRoute()
 const error = ref('')
-const isLoading = ref(false)
+const loadingProvider = ref<string | null>(null)
+
+type ProviderId = 'google' | 'facebook' | 'tiktok'
+const PROVIDERS: { id: ProviderId; label: string; icon: string; color?: string }[] = [
+  { id: 'google', label: 'Google', icon: 'i-flat-color-icons-google' },
+  { id: 'facebook', label: 'Facebook', icon: 'i-simple-icons-facebook', color: '#0866ff' },
+  { id: 'tiktok', label: 'TikTok', icon: 'i-simple-icons-tiktok', color: '#000000' },
+]
 
 // Already signed in: straight on to where the link was going, or the dashboard
 // (landing buttons all point here)
@@ -89,9 +100,8 @@ watch(loggedIn, (isIn) => {
 
 onMounted(() => {
   if (route.query.error) {
-    error.value = route.query.error === 'oauth_failed'
-      ? 'Sign-in with Google did not finish. Please try again.'
-      : String(route.query.error)
+    const failed = { oauth_failed: 'Google', facebook_failed: 'Facebook', tiktok_failed: 'TikTok' }[String(route.query.error)]
+    error.value = failed ? `Sign-in with ${failed} did not finish. Please try again.` : String(route.query.error)
   }
 })
 
@@ -101,12 +111,12 @@ async function logout() {
   window.location.reload()
 }
 
-function handleGoogleLogin() {
-  isLoading.value = true
+function signIn(provider: ProviderId) {
+  loadingProvider.value = provider
   error.value = ''
-  // Remember where to go after Google sends the user back (e.g. a claimed name)
+  // Remember where to go after the provider sends the user back (e.g. a claimed name)
   const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
   if (redirect.startsWith('/') && !redirect.startsWith('//')) rememberPostLoginRedirect(redirect)
-  window.location.href = '/api/auth/google?prompt=select_account'
+  window.location.href = provider === 'google' ? '/api/auth/google?prompt=select_account' : `/api/auth/${provider}`
 }
 </script>

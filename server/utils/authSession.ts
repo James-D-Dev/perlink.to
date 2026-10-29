@@ -7,7 +7,8 @@ const RENEW_AFTER_MS = 24 * 60 * 60 * 1000
 
 interface SessionUser {
   id: string
-  email: string
+  // None for TikTok sign-ins (and Facebook ones without an email)
+  email: string | null
   username: string | null
   name?: string | null
   avatar?: string | null
