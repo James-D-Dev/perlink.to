@@ -30,10 +30,11 @@ export default defineNuxtConfig({
 
   // Public runtime config only (private secrets handled by nuxt-auth-utils)
   runtimeConfig: {
-    // TikTok sign-in against a sandbox app (its own keys): NUXT_OAUTH_TIKTOK_SANDBOX=true.
-    // TikTok's app review wants the demo video recorded in the sandbox.
+    // TikTok sign-in against the sandbox app: NUXT_OAUTH_TIKTOK_SANDBOX=true with
+    // NUXT_OAUTH_TIKTOK_SANDBOX_CLIENT_KEY / _SANDBOX_CLIENT_SECRET. TikTok's app
+    // review wants the demo video recorded in the sandbox.
     oauth: {
-      tiktok: { sandbox: false },
+      tiktok: { sandbox: false, sandboxClientKey: "", sandboxClientSecret: "" },
     },
     // Login session: without maxAge the cookie has no expiry, so browsers drop
     // it when they close (on phones that happens within hours)
