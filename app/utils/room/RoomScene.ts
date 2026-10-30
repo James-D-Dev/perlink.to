@@ -1497,25 +1497,28 @@ export class RoomScene {
       }
       this.updateEnvironment(`${Math.round(skyDir.y * 40)}|${Math.round(skyDir.x * 8)}|${atmosphere.turbidity}`)
       // The physical sky is very bright (HDR), so its light is scaled down
+      // A land's light scaling touches the daylight only, so nights stay as
+      // bright on every land
       const light = this.land?.light
-      this.scene.environmentIntensity = (0.08 + 0.32 * d) * (light?.sky ?? 1)
+      // Night floors (moonlit, not black) easing to the day's level
+      this.scene.environmentIntensity = THREE.MathUtils.lerp(0.18, 0.4 * (light?.sky ?? 1), d)
       // Image-based light does the fill; keep flat ambient low so colours stay rich
-      this.hemi.intensity = (0.08 + 0.3 * d) * (light?.sky ?? 1)
-      this.ambient.intensity = 0.03 + 0.05 * d
-      this.sun.intensity = (isDay ? 0.6 + 3.2 * d : 0.3 * (1 - d) + 0.05) * (light?.sun ?? 1)
+      this.hemi.intensity = THREE.MathUtils.lerp(0.24, 0.38 * (light?.sky ?? 1), d)
+      this.ambient.intensity = 0.07 + 0.01 * d
+      this.sun.intensity = isDay ? (0.6 + 3.2 * d) * (light?.sun ?? 1) : 0.55 * (1 - d) + 0.1
       this.sunDisc.visible = false
     } else {
       if (this.scene.environment) {
         this.scene.environment = null
         this.envKey = ''
       }
-      this.hemi.intensity = 0.15 + 0.9 * d
-      this.ambient.intensity = 0.06 + 0.2 * d
-      this.sun.intensity = isDay ? 0.4 + 2.2 * d : 0.25 * (1 - d) + 0.05
+      this.hemi.intensity = 0.24 + 0.81 * d
+      this.ambient.intensity = 0.1 + 0.16 * d
+      this.sun.intensity = isDay ? 0.4 + 2.2 * d : 0.38 * (1 - d) + 0.08
       this.sunDisc.visible = isDay
     }
     this.hemi.color.copy(this.skyColor).lerp(new THREE.Color('#ffffff'), 0.5)
-    this.renderer.toneMappingExposure = atmosphere ? 0.75 + 0.1 * d : 1 + 0.1 * d
+    this.renderer.toneMappingExposure = (atmosphere ? 0.75 + 0.1 * d : 1 + 0.1 * d) * (this.land?.light?.exposure ?? 1)
     this.moonDisc.visible = !isDay
     ;(isDay ? this.sunDisc : this.moonDisc).position.copy(arcPos)
 

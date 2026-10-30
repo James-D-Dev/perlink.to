@@ -51,7 +51,7 @@ export interface LandInstance {
   /** Stars stay visible during the day (space) */
   starsAlways: boolean
   /** Light scaled for this land (1 = as usual): less sky light keeps saturated colours from turning pastel */
-  light?: { sun?: number; sky?: number }
+  light?: { sun?: number; sky?: number; exposure?: number }
   /** A landmark the low-angle video shot looks up at (crimson's giant tree) */
   focus?: { position: THREE.Vector3; height: number }
   /** Ground height at a point (absolute y), for cameras close to the ground */
@@ -1535,6 +1535,14 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
   const petalSources = trees.map(t => new THREE.Vector3(t.x, t.y + t.height * 0.75, t.z))
 
   const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, inPond)
+  // A full lawn under the meadow's clumps (blades, like the crimson land's)
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(9000 * (ctx.detail ?? 1)), {
+    colors: ['#2f5a1e', '#5f9e3a', '#b9e27c'],
+    tints: ['#ffffff', '#f2ffe0', '#dff5c8', '#fff6d8'],
+    height: [0.2, 0.46],
+    pathClear: 0.95,
+    avoid: inPond,
+  }))
   plantPathEdges(group, terrain, rand, ctx, radius)
 
   const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffe6f0', emissiveIntensity: 0.15 })
@@ -1554,6 +1562,9 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
     starsAlways: false,
     sky: { night: new THREE.Color('#140c2a'), dusk: new THREE.Color('#ffb3c7'), day: new THREE.Color('#bfe3ff') },
     atmosphere: { turbidity: 2, rayleigh: 1.8, mie: 0.0025 },
+    // Its pale greens and pinks burn out under the full midday sun, most of
+    // all seen from above (the ground and crowns face it)
+    light: { sun: 0.9, sky: 0.45 },
     update(time, dt, daylight, lamps) {
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
@@ -1943,20 +1954,27 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
   return { tree, blossoms: blossoms.map(b => b.position) }
 }
 
-/** Red grass: thousands of thin blades, dark at the root and bright at the tip */
-function crimsonGrass(ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, count: number) {
+/** A field of grass blades (thousands, instanced), dark at the root and bright at the tip */
+function bladeGrass(ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, count: number, look: {
+  /** Root, middle and tip colours of a blade */
+  colors: [string, string, string]
+  /** Per-blade tints over those */
+  tints: string[]
+  height: [number, number]
+  /** How much of the path stays clear, 0..1 */
+  pathClear: number
+  avoid?: (x: number, z: number) => boolean
+}) {
   const blade = new THREE.BufferGeometry()
   blade.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, -0.32, 0.5, 0.04, 0.32, 0.5, 0.04, 0, 1, 0.12], 3))
-  const root = new THREE.Color('#2a040c')
-  const mid = new THREE.Color('#8c0f2c')
-  const tip = new THREE.Color('#ff4f78')
+  const [root, mid, tip] = look.colors.map(c => new THREE.Color(c)) as [THREE.Color, THREE.Color, THREE.Color]
   blade.setAttribute('color', new THREE.Float32BufferAttribute([...root.toArray(), ...root.toArray(), ...mid.toArray(), ...mid.toArray(), ...tip.toArray()], 3))
   blade.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4])
   blade.computeVertexNormals()
   const material = swayingMaterial(new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }))
   const mesh = new THREE.InstancedMesh(blade, material, count)
   const dummy = new THREE.Object3D()
-  const tints = ['#ffffff', '#ffd0da', '#e8a0b0', '#ffe4ea'].map(c => new THREE.Color(c))
+  const tints = look.tints.map(c => new THREE.Color(c))
   // Clumped, like grass grows: a few hundred tufts with blades around each
   const centers = landSpots(rand, ctx, radius, Math.ceil(count / 22), 0.3)
   let n = 0
@@ -1968,8 +1986,9 @@ function crimsonGrass(ctx: LandContext, radius: number, terrain: Terrain, rand: 
     const z = cz + Math.sin(a) * r
     if (Math.hypot(x, z) > radius - 0.15) continue
     if (Math.abs(x) < ctx.style.width / 2 + 0.05 && Math.abs(z) < ctx.style.depth / 2 + 0.05) continue
-    if (terrain.blocked(x, z) && rand() < 0.6) continue
-    const height = 0.3 + rand() * 0.42
+    if (terrain.blocked(x, z) && rand() < look.pathClear) continue
+    if (look.avoid?.(x, z)) continue
+    const height = look.height[0] + rand() * (look.height[1] - look.height[0])
     dummy.position.set(x, terrain.heightAt(x, z) - 0.01, z)
     dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5)
     dummy.scale.set(0.025 + rand() * 0.022, height, 1)
@@ -2014,7 +2033,12 @@ function buildCrimson(ctx: LandContext, radius: number): LandInstance {
   hero.tree.updateMatrixWorld(true)
   const petalSources = hero.blossoms.map(p => p.clone().applyMatrix4(hero.tree.matrixWorld))
 
-  const grass = crimsonGrass(ctx, radius, terrain, rand, Math.round(15000 * detail))
+  const grass = bladeGrass(ctx, radius, terrain, rand, Math.round(15000 * detail), {
+    colors: ['#2a040c', '#8c0f2c', '#ff4f78'],
+    tints: ['#ffffff', '#ffd0da', '#e8a0b0', '#ffe4ea'],
+    height: [0.3, 0.72],
+    pathClear: 0.6,
+  })
   group.add(grass)
 
   const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#eaf2ff', emissiveIntensity: 0.2 })
