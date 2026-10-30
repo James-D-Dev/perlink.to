@@ -198,6 +198,10 @@
         "name": "Hoa anh đào",
         "description": "Hoa anh đào, cánh hoa rơi, bướm và hồ nước"
       },
+      "crimson": {
+        "name": "Anh đào đỏ",
+        "description": "Cây anh đào đỏ khổng lồ, cỏ đỏ và cánh hoa bay dưới bầu trời xanh"
+      },
       "city": {
         "name": "Thành phố",
         "description": "Khu phố trung tâm: đường phố, xe cộ, đèn đường và cửa sổ sáng đèn về đêm"

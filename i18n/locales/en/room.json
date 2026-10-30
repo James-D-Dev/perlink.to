@@ -198,6 +198,10 @@
         "name": "Sakura",
         "description": "Cherry blossoms, falling petals, butterflies and a pond"
       },
+      "crimson": {
+        "name": "Crimson sakura",
+        "description": "A giant crimson cherry tree, red grass and petals drifting under a blue sky"
+      },
       "city": {
         "name": "City",
         "description": "Downtown block: streets, traffic, street lamps and lit windows at night"

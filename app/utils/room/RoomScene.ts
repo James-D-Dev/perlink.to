@@ -1376,11 +1376,12 @@ export class RoomScene {
       }
       this.updateEnvironment(`${Math.round(skyDir.y * 40)}|${Math.round(skyDir.x * 8)}|${atmosphere.turbidity}`)
       // The physical sky is very bright (HDR), so its light is scaled down
-      this.scene.environmentIntensity = 0.08 + 0.32 * d
+      const light = this.land?.light
+      this.scene.environmentIntensity = (0.08 + 0.32 * d) * (light?.sky ?? 1)
       // Image-based light does the fill; keep flat ambient low so colours stay rich
-      this.hemi.intensity = 0.08 + 0.3 * d
+      this.hemi.intensity = (0.08 + 0.3 * d) * (light?.sky ?? 1)
       this.ambient.intensity = 0.03 + 0.05 * d
-      this.sun.intensity = isDay ? 0.6 + 3.2 * d : 0.3 * (1 - d) + 0.05
+      this.sun.intensity = (isDay ? 0.6 + 3.2 * d : 0.3 * (1 - d) + 0.05) * (light?.sun ?? 1)
       this.sunDisc.visible = false
     } else {
       if (this.scene.environment) {

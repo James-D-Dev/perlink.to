@@ -33,16 +33,75 @@ export interface ScatterItem {
 /** Shared wind clock for swaying grass, leaves and flowers (seconds) */
 export const natureWind = { value: 0 }
 
+/**
+ * Wind with a direction and gusts: bands of stronger wind sweep across the
+ * land along `dir`, bending the foliage they pass. `gust` is 0 on lands
+ * without it (their foliage just sways, as before); a land turns it on.
+ * Gust bands are where sin(dot(xz, dir) * k - time * speed) peaks, so they
+ * travel at speed / k metres a second (see gustAt, for petals and streaks).
+ */
+export const windField = {
+  dir: new THREE.Vector2(1, 0.35).normalize(),
+  gust: { value: 0 },
+  /** Half the room's width and depth: inside its walls there's no wind */
+  room: new THREE.Vector2(0, 0),
+  k: 0.35,
+  // Bands cross at ~2.6 m/s: a breeze, not a storm
+  speed: 0.9,
+}
+
+/** Gust strength 0..1 at a point (matches the foliage shader) */
+export function gustAt(x: number, z: number, time: number) {
+  const phase = (x * windField.dir.x + z * windField.dir.y) * windField.k - time * windField.speed
+  return Math.pow(0.5 + 0.5 * Math.sin(phase), 4) * windField.gust.value
+}
+
 /** Make cut-out foliage sway: the higher a vertex, the more it moves */
 function addWindSway(material: THREE.Material) {
   if (material.userData.wind) return
   material.userData.wind = true
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uWindTime = natureWind
+    shader.uniforms.uGust = windField.gust
+    shader.uniforms.uWindDir = { value: windField.dir }
+    shader.uniforms.uGustK = { value: windField.k }
+    shader.uniforms.uGustSpeed = { value: windField.speed }
+    shader.uniforms.uRoomHalf = { value: windField.room }
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nuniform float uWindTime;')
+      .replace('#include <common>', '#include <common>\nuniform float uWindTime;\nuniform float uGust;\nuniform vec2 uWindDir;\nuniform float uGustK;\nuniform float uGustSpeed;\nuniform vec2 uRoomHalf;')
+      // Wind with a direction and gusts, in world space (so every instance,
+      // however it's turned, bends the same way): a steady lean, plus the
+      // gust bands bending it further and down as they pass
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        if (uGust > 0.0 && outdoors > 0.0) {
+          #ifdef USE_INSTANCING
+            mat4 windM = modelMatrix * instanceMatrix;
+          #else
+            mat4 windM = modelMatrix;
+          #endif
+          vec2 windBase = windM[3].xz;
+          float windH = max(position.y, 0.0) * length(windM[1].xyz);
+          float windPhase = dot(windBase, uWindDir) * uGustK - uWindTime * uGustSpeed;
+          float gust = pow(0.5 + 0.5 * sin(windPhase), 4.0) * uGust;
+          vec3 windOffset = vec3(uWindDir.x, 0.0, uWindDir.y) * windH * (0.04 + gust * 0.35);
+          windOffset.y -= gust * windH * 0.12;
+          mvPosition.xyz += (viewMatrix * vec4(windOffset, 0.0)).xyz;
+          gl_Position = projectionMatrix * mvPosition;
+          // Blades turned by the gust catch the light: a bright wave over the field
+          #if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA ) || defined( USE_INSTANCING_COLOR )
+            vColor.rgb *= 1.0 + gust * 0.55 * clamp(position.y, 0.0, 1.0);
+          #endif
+        }`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>
-        float swayH = max(position.y, 0.0);
+        // Plants inside the room's walls are out of the wind
+        #ifdef USE_INSTANCING
+          vec2 calmAt = (modelMatrix * instanceMatrix)[3].xz;
+        #else
+          vec2 calmAt = modelMatrix[3].xz;
+        #endif
+        float calm = step(uRoomHalf.x, abs(calmAt.x)) + step(uRoomHalf.y, abs(calmAt.y));
+        float outdoors = min(calm, 1.0);
+        float swayH = max(position.y, 0.0) * outdoors;
         float seed = 0.0;
         #ifdef USE_INSTANCING
           seed = instanceMatrix[3].x * 0.7 + instanceMatrix[3].z * 0.9;
@@ -60,6 +119,17 @@ function addWindSway(material: THREE.Material) {
 function drawMaterial(material: THREE.Material) {
   const kit = gpuKit()
   return kit && material.userData.wind ? kit.windMaterial(material as THREE.MeshStandardMaterial, () => natureWind.value) : material
+}
+
+/**
+ * A material of our own (not from a model) that sways in the wind, on either
+ * renderer. Lambert suits dense foliage: grass and blossom cards cover the
+ * screen many times over, and a full PBR material is several times dearer per
+ * pixel (on WebGPU it becomes a standard node material either way)
+ */
+export function swayingMaterial(material: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial) {
+  addWindSway(material)
+  return drawMaterial(material)
 }
 
 /**
@@ -112,7 +182,8 @@ function loadModel(name: string): Promise<LoadedModel> {
   return promise
 }
 
-function loadTexture(file: string) {
+/** A texture from the nature pack (cached; glTF orientation, not flipped) */
+export function natureTexture(file: string) {
   let texture = textureCache.get(file)
   if (!texture) {
     texture = new THREE.TextureLoader().load(`${BASE}${file}`)
@@ -131,7 +202,7 @@ export function cherryLeaves(material: THREE.Material): THREE.Material {
   let pink = cherryMaterials.get(material)
   if (!pink) {
     const m = (material as THREE.MeshStandardMaterial).clone()
-    m.map = loadTexture('Leaves_Cherry.png')
+    m.map = natureTexture('Leaves_Cherry.png')
     m.emissive = new THREE.Color('#ffc2dc')
     m.emissiveMap = m.map
     m.emissiveIntensity = 0.07
@@ -151,7 +222,7 @@ export function greenLeaves(material: THREE.Material): THREE.Material {
   let green = greenMaterials.get(material)
   if (!green) {
     const m = (material as THREE.MeshStandardMaterial).clone()
-    m.map = loadTexture('Leaves_NormalTree_C.png')
+    m.map = natureTexture('Leaves_NormalTree_C.png')
     m.userData.shared = true
     m.userData.wind = false
     addWindSway(m)

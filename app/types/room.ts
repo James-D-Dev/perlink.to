@@ -15,7 +15,7 @@ export type DayNightMode =
 export type WallSide = 'back' | 'left';
 
 /** The scenery outside the room */
-export type LandId = 'island' | 'mars' | 'sakura' | 'winter' | 'city';
+export type LandId = 'island' | 'mars' | 'sakura' | 'crimson' | 'winter' | 'city';
 
 /** Visual style of the room shell */
 export type RoomTheme = 'classic' | 'dungeon';

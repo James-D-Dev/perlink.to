@@ -3,7 +3,7 @@ import { gpuKit } from './gpu'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js'
-import { cherryLeaves, greenLeaves, natureWind, scatterModel, type ScatterItem } from './natureModels'
+import { cherryLeaves, greenLeaves, gustAt, natureTexture, natureWind, scatterModel, swayingMaterial, windField, type ScatterItem } from './natureModels'
 import type { LandId, RoomStyle } from '~/types/room'
 import { attachCityModel, beamMaterial, carMaterials, cityMaterials, createCar } from './cityModels'
 import { CATALOG_BY_TYPE } from './catalog'
@@ -26,6 +26,7 @@ export const LANDS: LandMeta[] = [
   { id: 'island', name: 'Sky island', description: 'Floating island above the clouds, flowers and butterflies', icon: 'i-lucide-cloud-sun', preview: 'linear-gradient(180deg,#8fd0f5 0%,#cfeaff 55%,#6fbf5a 56%,#4f8a3a 100%)', thumbnail: '/images/lands/island.webp' },
   { id: 'mars', name: 'Mars', description: 'Red planet surface floating in space, planets all around', icon: 'i-lucide-orbit', preview: 'linear-gradient(180deg,#0b0614 0%,#2a1440 55%,#c4572d 56%,#7a2f18 100%)', thumbnail: '/images/lands/mars.webp' },
   { id: 'sakura', name: 'Sakura', description: 'Cherry blossoms, falling petals, butterflies and a pond', icon: 'i-lucide-flower-2', preview: 'linear-gradient(180deg,#bfe3ff 0%,#ffd6e8 55%,#9fd88a 56%,#6fb35a 100%)', thumbnail: '/images/lands/sakura.webp' },
+  { id: 'crimson', name: 'Crimson sakura', description: 'A giant crimson cherry tree, red grass and petals drifting under a blue sky', icon: 'i-lucide-trees', preview: 'linear-gradient(180deg,#5d9cf0 0%,#a9cdf7 55%,#a3173a 56%,#5c0f22 100%)', thumbnail: '/images/lands/crimson.webp' },
   { id: 'city', name: 'City', description: 'Downtown block: streets, traffic, street lamps and lit windows at night', icon: 'i-lucide-building-2', preview: 'linear-gradient(180deg,#9fcdf0 0%,#d9e6f2 55%,#8d8f95 56%,#55585e 100%)', thumbnail: '/images/lands/city.webp' },
   { id: 'winter', name: 'Winter', description: 'Snowfall, snowy pines and a snowman with a Santa hat', icon: 'i-lucide-snowflake', preview: 'linear-gradient(180deg,#9fb8d1 0%,#dce8f3 55%,#f4f8ff 56%,#d6e2ef 100%)', thumbnail: '/images/lands/winter.webp' },
 ]
@@ -49,6 +50,8 @@ export interface LandInstance {
   atmosphere?: Atmosphere
   /** Stars stay visible during the day (space) */
   starsAlways: boolean
+  /** Light scaled for this land (1 = as usual): less sky light keeps saturated colours from turning pastel */
+  light?: { sun?: number; sky?: number }
   /** Called every frame; daylight 0..1, lamps 0..1 (night lights) */
   update: (time: number, dt: number, daylight: number, lamps: number) => void
   /** Ground surface, for finding the point under the cursor */
@@ -630,10 +633,42 @@ function createSnowfall(count: number, ctx: LandContext, radius: number, rand: (
 }
 
 /** Pink petals drifting down from the cherry trees */
-function createPetals(count: number, ctx: LandContext, sources: THREE.Vector3[], rand: () => number) {
-  const geometry = new THREE.PlaneGeometry(0.07, 0.05)
-  const material = new THREE.MeshStandardMaterial({ color: '#ffc0d9', side: THREE.DoubleSide, roughness: 0.7 })
+/**
+ * A cherry petal: narrow at the base, round, with the small notch at its tip
+ * that cherry petals have. `length` is base to tip.
+ */
+function cherryPetalGeometry(length: number) {
+  const w = length * 0.42
+  const shape = new THREE.Shape()
+  shape.moveTo(0, 0)
+  shape.bezierCurveTo(-w * 0.55, length * 0.08, -w * 1.05, length * 0.45, -w * 0.8, length * 0.82)
+  shape.quadraticCurveTo(-w * 0.55, length * 1.02, -w * 0.18, length * 0.98)
+  // The notch
+  shape.lineTo(0, length * 0.86)
+  shape.lineTo(w * 0.18, length * 0.98)
+  shape.quadraticCurveTo(w * 0.55, length * 1.02, w * 0.8, length * 0.82)
+  shape.bezierCurveTo(w * 1.05, length * 0.45, w * 0.55, length * 0.08, 0, 0)
+  const geometry = new THREE.ShapeGeometry(shape, 3)
+  // Cupped a little, like a real petal, and centred so it spins about its middle
+  const pos = geometry.attributes.position as THREE.BufferAttribute
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) / w
+    pos.setZ(i, x * x * length * 0.12)
+  }
+  geometry.translate(0, -length * 0.5, 0)
+  geometry.computeVertexNormals()
+  return geometry
+}
+
+function createPetals(count: number, ctx: LandContext, sources: THREE.Vector3[], rand: () => number, options: { colors?: string[]; size?: number } = {}) {
+  const size = options.size ?? 1
+  const geometry = cherryPetalGeometry(0.075 * size)
+  const material = new THREE.MeshStandardMaterial({ color: options.colors ? '#ffffff' : '#ffc0d9', side: THREE.DoubleSide, roughness: 0.7 })
   const mesh = new THREE.InstancedMesh(geometry, material, count)
+  if (options.colors) {
+    const palette = options.colors.map(c => new THREE.Color(c))
+    for (let i = 0; i < count; i++) mesh.setColorAt(i, palette[Math.floor(rand() * palette.length)]!)
+  }
   const dummy = new THREE.Object3D()
   const petals = Array.from({ length: count }, () => {
     const s = sources[Math.floor(rand() * sources.length)]!
@@ -645,12 +680,34 @@ function createPetals(count: number, ctx: LandContext, sources: THREE.Vector3[],
       phase: rand() * 10,
     }
   })
+  // Where the petals can be: round their sources (plus the breeze's drift),
+  // down to the ground. A fixed bound, so the renderer can skip them when it's
+  // off screen (the instances' own bound would go stale as they fall)
+  const bounds = new THREE.Box3()
+  for (const s of sources) bounds.expandByPoint(s)
+  // With gusts (windField) they're carried a long way downwind
+  const windy = windField.gust.value > 0
+  bounds.expandByScalar(windy ? 9 : 3)
+  bounds.min.y = ctx.groundY
+  mesh.boundingBox = bounds
+  mesh.boundingSphere = bounds.getBoundingSphere(new THREE.Sphere())
+  // And they're only moved while they're drawn: off screen they wait in the air
+  let drawn = true
+  mesh.onBeforeRender = () => {
+    drawn = true
+  }
   function update(time: number, dt: number) {
+    if (!drawn || dt <= 0) return
+    drawn = false
     petals.forEach((p, i) => {
-      p.pos.y -= p.speed * dt
-      p.pos.x += Math.sin(time * 1.3 + p.phase) * 0.3 * dt + 0.08 * dt
-      p.pos.z += Math.cos(time * 1.1 + p.phase) * 0.2 * dt
-      if (p.pos.y < ctx.groundY + 0.02) {
+      // Carried along the wind, faster (and held up a little) as a gust passes
+      const gust = windy ? gustAt(p.pos.x, p.pos.z, time) : 0
+      const push = windy ? 0.25 + gust * 1.8 : 0
+      p.pos.y -= p.speed * dt * (1 - gust * 0.5)
+      p.pos.x += Math.sin(time * 1.3 + p.phase) * 0.3 * dt + 0.08 * dt + windField.dir.x * push * dt
+      p.pos.z += Math.cos(time * 1.1 + p.phase) * 0.2 * dt + windField.dir.y * push * dt
+      // Back to the crown once on the ground, or if it ever strays out of bounds
+      if (p.pos.y < ctx.groundY + 0.02 || !bounds.containsPoint(p.pos)) {
         p.pos.set(p.origin.x + (rand() - 0.5) * 1.6, p.origin.y, p.origin.z + (rand() - 0.5) * 1.6)
       }
       dummy.position.copy(p.pos)
@@ -661,6 +718,188 @@ function createPetals(count: number, ctx: LandContext, sources: THREE.Vector3[],
     mesh.instanceMatrix.needsUpdate = true
   }
   return { mesh, update }
+}
+
+/**
+ * Wind made visible, the way games draw it: a thin glowing line is drawn
+ * along a curve (its head runs ahead, a tapering tail follows and catches
+ * up), often curling into a little loop at the end, then it's gone. Each
+ * line always faces the camera, and starts on a gust band (windField) as it
+ * crosses the grass, so the grass bows as a line sweeps over it. Never over
+ * the room. Not on WebGPU (it's a GLSL shader; that renderer is experimental).
+ */
+function createWindStreaks(count: number, ctx: LandContext, radius: number, rand: () => number) {
+  const group = new THREE.Group()
+  if (gpuKit()) return { group, update: () => {} }
+  const points = 72
+  // Slow and few: a line now and then, not a show
+  const life = 3.2
+  const trail = 0.38
+  const { k, speed, dir } = windField
+  const side = new THREE.Vector2(-dir.y, dir.x)
+  const roomReach = Math.hypot(ctx.style.width, ctx.style.depth) / 2 + 0.5
+  const material = new THREE.ShaderMaterial({
+    uniforms: { uHead: { value: 0 }, uTrail: { value: trail }, uWidth: { value: 0.05 }, uOpacity: { value: 0 }, uColor: { value: new THREE.Color('#ffffff') } },
+    vertexShader: /* glsl */ `
+      attribute float along;
+      attribute float edge;
+      attribute vec3 tangent;
+      uniform float uHead;
+      uniform float uTrail;
+      uniform float uWidth;
+      varying float vAlpha;
+      varying float vEdge;
+      void main() {
+        vec4 world = modelMatrix * vec4(position, 1.0);
+        vec3 t = normalize(mat3(modelMatrix) * tangent);
+        // Always side-on to the camera, so it reads as a line from anywhere
+        vec3 across = normalize(cross(t, cameraPosition - world.xyz));
+        float tail = uHead - uTrail;
+        float inside = step(tail, along) * step(along, uHead);
+        float k = clamp((along - tail) / uTrail, 0.0, 1.0);
+        world.xyz += across * edge * uWidth * (0.2 + 0.8 * k) * inside;
+        vAlpha = inside * pow(k, 1.4) * smoothstep(uHead, uHead - 0.02, along);
+        vEdge = edge;
+        gl_Position = projectionMatrix * viewMatrix * world;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uOpacity;
+      uniform vec3 uColor;
+      varying float vAlpha;
+      varying float vEdge;
+      void main() {
+        // Bright core, soft edges
+        float a = vAlpha * uOpacity * (1.0 - vEdge * vEdge);
+        gl_FragColor = vec4(uColor * a, a);
+      }`,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+  })
+
+  const index: number[] = []
+  for (let i = 0; i < points - 1; i++) {
+    const a = i * 2
+    index.push(a, a + 1, a + 2, a + 1, a + 3, a + 2)
+  }
+  const edges = new Float32Array(points * 2).map((_, i) => (i % 2 ? 1 : -1))
+
+  const streaks = Array.from({ length: count }, () => {
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points * 2 * 3), 3))
+    geometry.setAttribute('tangent', new THREE.BufferAttribute(new Float32Array(points * 2 * 3), 3))
+    geometry.setAttribute('along', new THREE.BufferAttribute(new Float32Array(points * 2), 1))
+    geometry.setAttribute('edge', new THREE.BufferAttribute(edges, 1))
+    geometry.setIndex(index)
+    const mesh = new THREE.Mesh(geometry, material.clone())
+    mesh.frustumCulled = false
+    mesh.visible = false
+    group.add(mesh)
+    return { mesh, uniforms: (mesh.material as THREE.ShaderMaterial).uniforms, age: -rand() * 5, length: 4 }
+  })
+
+  const p = new THREE.Vector3()
+  const prev = new THREE.Vector3()
+  const up = new THREE.Vector3(0, 1, 0)
+  const wind = new THREE.Vector3(dir.x, 0, dir.y)
+  const sideways = new THREE.Vector3(side.x, 0, side.y)
+
+  /** A new curve: a gentle S along the wind, rising a little, often ending in a loop */
+  function shape(st: (typeof streaks)[number], start: THREE.Vector3) {
+    const geometry = st.mesh.geometry
+    const pos = geometry.attributes.position as THREE.BufferAttribute
+    const tan = geometry.attributes.tangent as THREE.BufferAttribute
+    const alongAttr = geometry.attributes.along as THREE.BufferAttribute
+    const length = 2.4 + rand() * 1.8
+    const sway = (rand() - 0.5) * 0.9
+    const rise = 0.2 + rand() * 0.5
+    const loop = rand() < 0.6
+    const loopRadius = 0.22 + rand() * 0.22
+    const straight = loop ? 0.72 : 1
+    const path: THREE.Vector3[] = []
+    for (let i = 0; i < points; i++) {
+      const t = i / (points - 1)
+      if (t <= straight) {
+        const f = t / straight
+        path.push(start.clone()
+          .addScaledVector(wind, f * length)
+          .addScaledVector(sideways, Math.sin(f * Math.PI * 1.3) * sway)
+          .addScaledVector(up, Math.sin(f * Math.PI * 0.5) * rise))
+      }
+      else {
+        // The curl: one loop, up and over, in the wind's vertical plane
+        const end = path[path.length - 1]!
+        const a = ((t - straight) / (1 - straight)) * Math.PI * 2
+        path.push(end.clone()
+          .addScaledVector(wind, Math.sin(a) * loopRadius + a * 0.04)
+          .addScaledVector(up, (1 - Math.cos(a)) * loopRadius))
+      }
+    }
+    // Parameter by distance along the curve, so the head moves evenly
+    let total = 0
+    const dist = [0]
+    for (let i = 1; i < points; i++) {
+      total += path[i]!.distanceTo(path[i - 1]!)
+      dist.push(total)
+    }
+    for (let i = 0; i < points; i++) {
+      p.copy(path[i]!)
+      prev.copy(path[Math.min(i + 1, points - 1)]!).sub(path[Math.max(i - 1, 0)]!).normalize()
+      for (let e = 0; e < 2; e++) {
+        pos.setXYZ(i * 2 + e, p.x, p.y, p.z)
+        tan.setXYZ(i * 2 + e, prev.x, prev.y, prev.z)
+        alongAttr.setX(i * 2 + e, dist[i]! / total)
+      }
+    }
+    pos.needsUpdate = true
+    tan.needsUpdate = true
+    alongAttr.needsUpdate = true
+    st.length = total
+  }
+
+  /** Where a gust band now crosses the land over the grass (null if none) */
+  function startOnGust(time: number) {
+    const spacing = (Math.PI * 2) / k
+    // Crest positions along the wind: (time * speed + π/2 + 2πn) / k
+    const first = (time * speed + Math.PI / 2) / k
+    const n = Math.floor((-radius - first) / spacing) + 1
+    const crest = first + n * spacing
+    if (crest > radius * 0.6) return null
+    const lateral = (rand() < 0.5 ? -1 : 1) * (roomReach + rand() * (radius * 0.75 - roomReach))
+    const x = dir.x * crest + side.x * lateral
+    const z = dir.y * crest + side.y * lateral
+    // The whole curve (up to ~4.5 m downwind) stays over the land
+    if (Math.hypot(x, z) > radius - 1 || Math.hypot(x + dir.x * 4.5, z + dir.y * 4.5) > radius - 0.3) return null
+    return new THREE.Vector3(x, ctx.groundY + 0.3 + rand() * 1.3, z)
+  }
+
+  let last = 0
+  function update(time: number, daylight: number) {
+    const dt = Math.min(Math.max(time - last, 0), 0.1)
+    last = time
+    for (const st of streaks) {
+      st.age += dt
+      if (st.age < 0) continue
+      if (!st.mesh.visible) {
+        const start = startOnGust(time)
+        if (!start) continue
+        shape(st, start)
+        st.mesh.visible = true
+        st.age = 0
+      }
+      const t = st.age / life
+      // Head eases out along the curve; the tail catches up and it's gone
+      const head = (1 - Math.pow(1 - Math.min(t, 1), 2)) * (1 + trail)
+      st.uniforms.uHead!.value = head
+      st.uniforms.uOpacity!.value = (0.45 + 0.2 * (1 - daylight)) * windField.gust.value
+      if (t >= 1) {
+        st.mesh.visible = false
+        st.age = -(2 + rand() * 4)
+      }
+    }
+  }
+  return { group, update }
 }
 
 function cloudPuff(rand: () => number, material: THREE.Material) {
@@ -1328,6 +1567,490 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
   }
 }
 
+// ---------- Crimson sakura ----------
+
+/** White blossom clusters on a transparent card (coloured per instance) */
+let blossomCanvas: THREE.CanvasTexture | null = null
+function blossomTexture() {
+  if (blossomCanvas) return blossomCanvas
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const g = canvas.getContext('2d')!
+  const rand = seeded(91)
+  // Round flower heads of five petals, packed towards the middle
+  for (let i = 0; i < 46; i++) {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * size * 0.4
+    const x = size / 2 + Math.cos(a) * r
+    const y = size / 2 + Math.sin(a) * r
+    const petal = 7 + rand() * 7
+    const turn = rand() * Math.PI
+    for (let k = 0; k < 5; k++) {
+      const pa = turn + (k / 5) * Math.PI * 2
+      const shade = g.createRadialGradient(x, y, 0, x, y, petal * 1.8)
+      shade.addColorStop(0, '#ffffff')
+      shade.addColorStop(1, `rgb(${215 + rand() * 30},${215 + rand() * 30},${225 + rand() * 30})`)
+      g.fillStyle = shade
+      g.beginPath()
+      g.ellipse(x + Math.cos(pa) * petal * 0.75, y + Math.sin(pa) * petal * 0.75, petal * 0.75, petal * 0.5, pa, 0, Math.PI * 2)
+      g.fill()
+    }
+  }
+  blossomCanvas = new THREE.CanvasTexture(canvas)
+  blossomCanvas.colorSpace = THREE.SRGBColorSpace
+  return blossomCanvas
+}
+
+/** Smooth 3D value noise, 0..1 (bark bumps) */
+function noise3(x: number, y: number, z: number) {
+  const h = (i: number, j: number, k: number) => {
+    const n = Math.sin(i * 127.1 + j * 311.7 + k * 74.7) * 43758.5453
+    return n - Math.floor(n)
+  }
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z)
+  const u = x - xi, v = y - yi, w = z - zi
+  const su = u * u * (3 - 2 * u), sv = v * v * (3 - 2 * v), sw = w * w * (3 - 2 * w)
+  const lerp = THREE.MathUtils.lerp
+  const x0 = lerp(lerp(h(xi, yi, zi), h(xi + 1, yi, zi), su), lerp(h(xi, yi + 1, zi), h(xi + 1, yi + 1, zi), su), sv)
+  const x1 = lerp(lerp(h(xi, yi, zi + 1), h(xi + 1, yi, zi + 1), su), lerp(h(xi, yi + 1, zi + 1), h(xi + 1, yi + 1, zi + 1), su), sv)
+  return lerp(x0, x1, sw)
+}
+
+/** Bark for the old cherry's trunk, repeated round it (its own copy: the shared one isn't repeated) */
+let trunkBarkTexture: THREE.Texture | null = null
+
+/**
+ * The old cherry's trunk, sculpted from a dense cylinder: a cone that flares
+ * hard at the ground (further on one side, a mound down the slope), big
+ * lumps and a hollow, bark fissures twisting up it; coloured black in the
+ * fissures and silver-grey on the ridges. Returns the mesh's geometry and the
+ * centre and radius of its top, where the limbs start.
+ */
+function crimsonTrunk(rand: () => number, height: number, lean: THREE.Vector3, slopeAngle: number) {
+  const h = height * 0.42
+  const rBase = height * 0.26
+  const rTop = height * 0.08
+  const radial = 40
+  const rows = 22
+  const geometry = new THREE.CylinderGeometry(1, 1, 1, radial, rows, true)
+  const pos = geometry.attributes.position as THREE.BufferAttribute
+  const colors = new Float32Array(pos.count * 3)
+  const crevice = new THREE.Color('#141012')
+  const ridge = new THREE.Color('#aaa0a6')
+  const c = new THREE.Color()
+  const seed = rand() * 100
+  // A few big burls, low on the trunk
+  const burls = Array.from({ length: 7 }, () => ({ angle: rand() * Math.PI * 2, t: 0.15 + rand() * 0.6, size: 0.18 + rand() * 0.22 }))
+  for (let i = 0; i < pos.count; i++) {
+    const t = pos.getY(i) + 0.5
+    const angle = Math.atan2(pos.getZ(i), pos.getX(i))
+    // Cone, flaring hard at the ground, more so down the slope
+    const flare = Math.pow(1 - t, 3.2)
+    const downhill = Math.pow(Math.max(0, Math.cos(angle - slopeAngle)), 2)
+    let r = rTop + (rBase - rTop) * flare + rBase * 0.7 * Math.pow(1 - t, 4) * downhill
+    // Big lumps and burls, a hollow on one side
+    const ca = Math.cos(angle), sa = Math.sin(angle)
+    const lumps = (noise3(ca * 1.3 + seed, t * 2.6, sa * 1.3) - 0.5) * 0.75 + (noise3(ca * 3.5, t * 7 + seed, sa * 3.5) - 0.5) * 0.35
+    const hollow = Math.exp(-((angle - slopeAngle - 2.2) ** 2) * 6 - ((t - 0.45) ** 2) * 40) * 0.28
+    // Bark fissures twisting up the trunk
+    const fissure = Math.pow(Math.abs(Math.sin(angle * 11 + t * 5 + noise3(ca * 2, t * 4, sa * 2) * 3)), 0.35)
+    let burl = 0
+    for (const b of burls) {
+      const da = Math.atan2(Math.sin(angle - b.angle), Math.cos(angle - b.angle))
+      burl += b.size * Math.exp(-(da * da) * 9 - ((t - b.t) ** 2) * 60)
+    }
+    r *= 1 + lumps + burl - hollow - (1 - fissure) * 0.1
+    // Leans a little, and the top drifts with it
+    const x = ca * r + lean.x * h * Math.pow(t, 1.6) * 0.35
+    const z = sa * r + lean.z * h * Math.pow(t, 1.6) * 0.35
+    pos.setXYZ(i, x, t * h - h * 0.08, z)
+    // Mostly black; only thin ridges between the fissures and the tops of lumps catch the light
+    const ridgeLine = Math.pow(Math.abs(Math.sin(angle * 11 + t * 5 + noise3(ca * 2, t * 4, sa * 2) * 3)), 8)
+    c.copy(crevice).lerp(ridge, THREE.MathUtils.clamp(ridgeLine * 0.7 + Math.max(lumps + burl, 0) * 0.45 + (noise3(ca * 6, t * 12, sa * 6) - 0.5) * 0.2, 0, 1))
+    colors.set([c.r, c.g, c.b], i * 3)
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+  geometry.computeVertexNormals()
+  const top = new THREE.Vector3(lean.x * h * 0.35, h * 0.9, lean.z * h * 0.35)
+  return { geometry, top, topRadius: rTop }
+}
+
+/**
+ * A giant old cherry with a crimson crown, grown from code, after a
+ * reference shot: a short, very thick trunk with buttress roots and knotted
+ * bark forks low into five limbs that spread almost level, twist and fork
+ * again, their tips drooping; the crown is a wide, flat umbrella of blossom
+ * clumps (sky between them), bright pink-red on top, crimson in the middle
+ * and dark red underneath. The crown reaches towards the middle of the land
+ * (place.toward), over the room's back half but high, so the room stays in
+ * view (place.blocked).
+ * Returns the tree and the blossom points (petals fall from them).
+ */
+function crimsonTree(rand: () => number, height: number, detail: number, place: { origin: THREE.Vector3; toward: THREE.Vector3; blocked: (x: number, y: number, z: number) => boolean }) {
+  const up = new THREE.Vector3(0, 1, 0)
+  const over = (p: THREE.Vector3) => place.blocked(place.origin.x + p.x, place.origin.y + p.y, place.origin.z + p.z)
+  const limbs: THREE.BufferGeometry[] = []
+  const blossoms: { position: THREE.Vector3; size: number }[] = []
+  const maxDepth = detail < 0.7 ? 4 : 5
+
+  function segment(from: THREE.Vector3, dir: THREE.Vector3, length: number, rTop: number, rBottom: number, sides = 9, rows = 3) {
+    // A little longer than the piece, so bends don't show gaps
+    const geometry = new THREE.CylinderGeometry(rTop, rBottom, length * 1.08, sides, rows)
+    geometry.translate(0, length / 2, 0)
+    geometry.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up, dir))
+    geometry.translate(from.x, from.y, from.z)
+    limbs.push(geometry)
+  }
+
+  function grow(start: THREE.Vector3, direction: THREE.Vector3, length: number, radius: number, depth: number) {
+    const pieces = depth <= 1 ? 4 : 3
+    const end = radius * (depth === 0 ? 0.5 : 0.58)
+    const p = start.clone()
+    const d = direction.clone()
+    for (let i = 0; i < pieces; i++) {
+      // Every piece turns (twisting limbs); the outer ones droop a little
+      // Snaking: limbs swing up and down along their length, the outer ones droop
+      const wave = depth <= 2 ? Math.sin(i * 1.7 + rand() * 2) * 0.3 : 0
+      d.add(new THREE.Vector3((rand() - 0.5) * 0.5, (rand() - 0.5) * 0.18 + wave - (depth >= 3 ? 0.1 : 0), (rand() - 0.5) * 0.5)).normalize()
+      if (d.y < -0.35) d.setY(-0.35).normalize()
+      const r0 = radius + (end - radius) * (i / pieces)
+      const r1 = radius + (end - radius) * ((i + 1) / pieces)
+      // Twigs don't grow into the space kept clear over the room, where they
+      // couldn't carry blossoms and would hang there bare
+      if (depth >= 2 && over(p.clone().addScaledVector(d, length / pieces))) return
+      // Thick limbs keep their roundness and rows (for the bark bumps); twigs,
+      // most of the pieces, are thin enough for 5 sides and one row
+      segment(p, d, length / pieces, r1, r0, depth <= 1 ? 10 : depth === 2 ? 6 : 5, depth <= 1 ? 3 : 1)
+      p.addScaledVector(d, length / pieces)
+      if (depth >= 2 && !over(p)) blossoms.push({ position: p.clone(), size: 0.8 + rand() * 0.5 + (depth - 2) * 0.15 })
+    }
+    if (depth >= maxDepth || (depth >= 2 && over(p))) {
+      if (!over(p)) blossoms.push({ position: p.clone(), size: 1.1 + rand() * 0.5 })
+      return
+    }
+    // The trunk forks low into five near-level limbs; limbs fork in two or three
+    const children = depth === 0 ? 5 : depth === 1 ? 3 : rand() < 0.5 ? 2 : 3
+    const side = new THREE.Vector3().crossVectors(d, Math.abs(d.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : up).normalize()
+    const side2 = new THREE.Vector3().crossVectors(d, side).normalize()
+    const turn = rand() * Math.PI * 2
+    for (let c = 0; c < children; c++) {
+      const around = turn + (c / children) * Math.PI * 2 + (rand() - 0.5) * 0.5
+      const spread = depth === 0 ? 1.15 + rand() * 0.2 : depth === 1 ? 0.45 + rand() * 0.3 : 0.4 + rand() * 0.45
+      const child = d.clone().multiplyScalar(Math.cos(spread))
+        .addScaledVector(side, Math.cos(around) * Math.sin(spread))
+        .addScaledVector(side2, Math.sin(around) * Math.sin(spread))
+      // Keep the crown flat: limbs rise a little at first, then run level
+      child.y += depth === 0 ? 0.22 : depth === 1 ? 0 : -0.04
+      if (depth <= 2) child.addScaledVector(place.toward, depth === 0 ? 0.35 : 0.25)
+      child.normalize()
+      const factor = depth === 0 ? 1.05 : 0.7
+      grow(p, child, length * factor * (0.85 + rand() * 0.3), end, depth + 1)
+    }
+  }
+
+  // The trunk: one sculpted mass (crimsonTrunk), then limbs from its top
+  // Leans towards the middle; the root mound spreads the other way, down the slope
+  const lean = place.toward.clone().multiplyScalar(0.5)
+  const trunk = crimsonTrunk(rand, height, lean, Math.atan2(-place.toward.z, -place.toward.x))
+  // Two or three short, thick knobs reaching up, crowned with blossoms
+  for (let i = 0; i < 3; i++) {
+    const a = rand() * Math.PI * 2
+    const dir = new THREE.Vector3(Math.cos(a) * 0.45, 1, Math.sin(a) * 0.45).normalize()
+    const from = trunk.top.clone().add(new THREE.Vector3(Math.cos(a), 0, Math.sin(a)).multiplyScalar(trunk.topRadius * 0.5))
+    grow(from, dir, height * (0.04 + rand() * 0.03), trunk.topRadius * 0.5, maxDepth - 1)
+  }
+  // Long limbs, much thinner than the trunk, snaking out almost level
+  const limbCount = 6
+  const turn = rand() * Math.PI * 2
+  for (let i = 0; i < limbCount; i++) {
+    const a = turn + (i / limbCount) * Math.PI * 2 + (rand() - 0.5) * 0.5
+    const out = new THREE.Vector3(Math.cos(a), 0, Math.sin(a))
+    const dir = out.clone().setY(0.12 + rand() * 0.15).addScaledVector(place.toward, 0.5).normalize()
+    const from = trunk.top.clone().addScaledVector(out, trunk.topRadius * 0.55).add(new THREE.Vector3(0, -rand() * height * 0.05, 0))
+    grow(from, dir, height * (0.36 + rand() * 0.12), trunk.topRadius * (0.3 + rand() * 0.1), 1)
+  }
+
+  // The crown sits above the fork, so the knobs and limbs show under it
+  const crownBase = trunk.top.y + height * 0.04
+  // Twigs lower down get small tufts rather than staying bare; only those
+  // close to the trunk lose theirs, so the fork stays in view
+  for (let i = blossoms.length - 1; i >= 0; i--) {
+    const b = blossoms[i]!
+    if (b.position.y >= crownBase) continue
+    if (Math.hypot(b.position.x - trunk.top.x, b.position.z - trunk.top.z) < trunk.topRadius * 3) blossoms.splice(i, 1)
+    else b.size *= 0.6
+  }
+  // A flat umbrella, not a tall dome: squash anything above a set thickness
+  const flatTop = crownBase + height * 0.2
+  // The top rolls a little (clumps rise and dip), so it isn't a flat slab
+  const roll = (x: number, z: number) => (noise3(x * 0.55, 0, z * 0.55) - 0.5) * height * 0.14
+  for (const b of blossoms) {
+    const top = flatTop + roll(b.position.x, b.position.z)
+    if (b.position.y > top) b.position.y = top + (b.position.y - top) * 0.3
+  }
+  // Fill the dome: the limbs reach outwards, which leaves a hole over the trunk
+  const centre = blossoms.reduce((sum, b) => sum.add(b.position), new THREE.Vector3()).divideScalar(Math.max(blossoms.length, 1))
+  const crownTop = Math.max(...blossoms.map(b => b.position.y))
+  const reach = Math.max(...blossoms.map(b => Math.hypot(b.position.x - centre.x, b.position.z - centre.z)))
+  const fill = Math.round(blossoms.length * 0.3)
+  for (let i = 0; i < fill; i++) {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * reach * 0.8
+    // Higher in the middle, a dome
+    const dome = 1 - (r / (reach * 0.8)) ** 2 * 0.5
+    const position = new THREE.Vector3(centre.x + Math.cos(a) * r, crownTop - height * 0.06 * (1 - dome) - rand() * height * 0.08, centre.z + Math.sin(a) * r)
+    if (!over(position)) blossoms.push({ position, size: 1 + rand() * 0.5 })
+  }
+  // A second, lower tier: a ring under the outer crown, clear of the trunk
+  for (let i = 0; i < Math.round(blossoms.length * 0.22); i++) {
+    const a = rand() * Math.PI * 2
+    const r = reach * (0.45 + rand() * 0.5)
+    // Its rim droops, and it rolls like the top
+    const droop = ((r / reach) ** 2) * height * 0.06
+    const position = new THREE.Vector3(centre.x + Math.cos(a) * r, 0, centre.z + Math.sin(a) * r)
+    position.y = crownBase - height * (0.07 + rand() * 0.07) - droop + roll(position.x, position.z) * 0.7
+    if (Math.hypot(position.x - trunk.top.x, position.z - trunk.top.z) < trunk.topRadius * 3) continue
+    if (!over(position)) blossoms.push({ position, size: 0.75 + rand() * 0.35 })
+  }
+  // A third, sparse tier on top: a few small peaks rising out of the crown,
+  // their feet sunk in it so they grow from it
+  const peaks = detail < 0.7 ? 7 : 11
+  for (let i = 0; i < peaks; i++) {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * reach * 0.75
+    const x = centre.x + Math.cos(a) * r
+    const z = centre.z + Math.sin(a) * r
+    // Feet at the crown's real top (clumps sit a little above the squash line)
+    const foot = crownTop + roll(x, z) * 0.5 - height * 0.04
+    // A solid, rounded mound of clumps (a dome), its wide foot merging into the crown
+    const rise = height * (0.08 + rand() * 0.06)
+    const width = height * (0.12 + rand() * 0.05)
+    for (let j = 0; j < 18; j++) {
+      const ang = rand() * Math.PI * 2
+      const rr = Math.sqrt(rand()) * width
+      const cap = Math.sqrt(Math.max(0, 1 - (rr / width) ** 2))
+      const position = new THREE.Vector3(x + Math.cos(ang) * rr, foot + cap * rise * (0.55 + rand() * 0.45), z + Math.sin(ang) * rr)
+      if (!over(position)) blossoms.push({ position, size: 1 + rand() * 0.3 })
+    }
+  }
+  // And right over the trunk, where the knobs reach up through the crown
+  for (let i = 0; i < Math.round(fill * 0.5); i++) {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * reach * 0.45
+    const position = new THREE.Vector3(trunk.top.x + Math.cos(a) * r, crownTop - rand() * height * 0.1, trunk.top.z + Math.sin(a) * r)
+    if (!over(position)) blossoms.push({ position, size: 1 + rand() * 0.5 })
+  }
+
+  const wood = mergeGeometries(limbs)!
+  limbs.forEach(g => g.dispose())
+  // Knotted limbs: small bumps along their surface; squashed like the crown,
+  // so no twigs stick out of its top
+  const pos = wood.attributes.position as THREE.BufferAttribute
+  const nor = wood.attributes.normal as THREE.BufferAttribute
+  const k = 12.8 / height
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i)
+    let y = pos.getY(i)
+    const woodTop = flatTop + roll(x, z) - height * 0.02
+    if (y > woodTop) y = woodTop + (y - woodTop) * 0.3
+    const amount = height * 0.004 * (noise3(x * k, y * k, z * k) - 0.5) * 2
+    pos.setXYZ(i, x + nor.getX(i) * amount, y + nor.getY(i) * amount, z + nor.getZ(i) * amount)
+  }
+  wood.computeVertexNormals()
+
+  const tree = new THREE.Group()
+  const barkMap = natureTexture('Bark_TwistedTree.jpg')
+  const bark = new THREE.MeshStandardMaterial({ map: barkMap, color: '#2e262b', roughness: 1, envMapIntensity: 0.15 })
+  const branches = new THREE.Mesh(wood, bark)
+  branches.castShadow = true
+  branches.receiveShadow = true
+  // The trunk carries its own colours: black fissures, silver-grey ridges
+  // Fine fissures from the bark texture, repeated round the trunk; little sky
+  // reflection, or the black bark turns blue-grey
+  trunkBarkTexture ??= new THREE.TextureLoader().load('/models/nature/Bark_TwistedTree.jpg', (t) => {
+    t.colorSpace = THREE.SRGBColorSpace
+    t.wrapS = t.wrapT = THREE.RepeatWrapping
+    t.repeat.set(5, 3)
+    t.needsUpdate = true
+  })
+  const trunkBark = trunkBarkTexture
+  const trunkMesh = new THREE.Mesh(trunk.geometry, new THREE.MeshStandardMaterial({ map: trunkBark, color: '#ffffff', vertexColors: true, roughness: 1, flatShading: true, envMapIntensity: 0.15 }))
+  trunkMesh.castShadow = true
+  trunkMesh.receiveShadow = true
+  tree.add(trunkMesh, branches)
+
+  // Blossom clumps: several cards per spot, flattened so the crown spreads wide
+  const cardPlanes = [0, 1, 2].map((i) => {
+    const plane = new THREE.PlaneGeometry(1, 1)
+    plane.rotateY((i * Math.PI) / 3)
+    plane.rotateX((i - 1) * 0.45)
+    return plane
+  })
+  const cardGeometry = mergeGeometries(cardPlanes)!
+  cardPlanes.forEach(g => g.dispose())
+  const blossomMaterial = swayingMaterial(new THREE.MeshLambertMaterial({
+    map: blossomTexture(),
+    alphaTest: 0.4,
+    side: THREE.DoubleSide,
+    emissive: new THREE.Color('#3a0410'),
+    emissiveIntensity: 0.1,
+  }))
+  const perSpot = 4
+  const crown = new THREE.InstancedMesh(cardGeometry, blossomMaterial, blossoms.length * perSpot)
+  // Shaded by height in the crown: dark red underneath, crimson, pink-red on top
+  const ys = blossoms.map(b => b.position.y)
+  const low = Math.min(...ys)
+  const high = Math.max(...ys)
+  // Darker than they look: the room's bright light lifts them to crimson
+  const under = new THREE.Color('#2a0309')
+  const middle = new THREE.Color('#8a0a22')
+  const top = new THREE.Color('#e8284e')
+  const shade = new THREE.Color()
+  const dummy = new THREE.Object3D()
+  const unit = height * 0.1
+  let n = 0
+  for (const b of blossoms) {
+    for (let j = 0; j < perSpot; j++) {
+      dummy.position.copy(b.position).add(new THREE.Vector3((rand() - 0.5) * unit * 1.3, (rand() - 0.4) * unit * 0.45, (rand() - 0.5) * unit * 1.3))
+      if (over(dummy.position)) continue
+      // Gaps between the clumps, so from above the crown breaks up and the
+      // limbs and grass show through (not one solid lid)
+      if (noise3(dummy.position.x * 0.5 + 3, 0, dummy.position.z * 0.5 + 7) < 0.36 && rand() < 0.9) continue
+      dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5)
+      dummy.scale.set(unit * b.size * (0.8 + rand() * 0.5), unit * b.size * (0.55 + rand() * 0.3), unit * b.size * (0.8 + rand() * 0.5))
+      dummy.updateMatrix()
+      crown.setMatrixAt(n, dummy.matrix)
+      // Mostly crimson; only the very top turns pink-red
+      const t = Math.pow(THREE.MathUtils.clamp((dummy.position.y - low) / Math.max(high - low, 0.01) + (rand() - 0.5) * 0.25, 0, 1), 1.8)
+      if (t < 0.5) shade.copy(under).lerp(middle, t / 0.5)
+      else shade.copy(middle).lerp(top, (t - 0.5) / 0.5)
+      crown.setColorAt(n, shade)
+      n++
+    }
+  }
+  crown.count = n
+  // No crown shadow: it would leave the trunk in the dark (the reference shot
+  // lights it), and a thousand clumps cost a lot in the shadow pass
+  crown.castShadow = false
+  tree.add(crown)
+  return { tree, blossoms: blossoms.map(b => b.position) }
+}
+
+/** Red grass: thousands of thin blades, dark at the root and bright at the tip */
+function crimsonGrass(ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, count: number) {
+  const blade = new THREE.BufferGeometry()
+  blade.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, -0.32, 0.5, 0.04, 0.32, 0.5, 0.04, 0, 1, 0.12], 3))
+  const root = new THREE.Color('#2a040c')
+  const mid = new THREE.Color('#8c0f2c')
+  const tip = new THREE.Color('#ff4f78')
+  blade.setAttribute('color', new THREE.Float32BufferAttribute([...root.toArray(), ...root.toArray(), ...mid.toArray(), ...mid.toArray(), ...tip.toArray()], 3))
+  blade.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4])
+  blade.computeVertexNormals()
+  const material = swayingMaterial(new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }))
+  const mesh = new THREE.InstancedMesh(blade, material, count)
+  const dummy = new THREE.Object3D()
+  const tints = ['#ffffff', '#ffd0da', '#e8a0b0', '#ffe4ea'].map(c => new THREE.Color(c))
+  // Clumped, like grass grows: a few hundred tufts with blades around each
+  const centers = landSpots(rand, ctx, radius, Math.ceil(count / 22), 0.3)
+  let n = 0
+  for (let tries = 0; n < count && tries < count * 4; tries++) {
+    const [cx, cz] = centers[tries % centers.length]!
+    const a = rand() * Math.PI * 2
+    const r = Math.pow(rand(), 0.7) * 0.55
+    const x = cx + Math.cos(a) * r
+    const z = cz + Math.sin(a) * r
+    if (Math.hypot(x, z) > radius - 0.15) continue
+    if (Math.abs(x) < ctx.style.width / 2 + 0.05 && Math.abs(z) < ctx.style.depth / 2 + 0.05) continue
+    if (terrain.blocked(x, z) && rand() < 0.6) continue
+    const height = 0.3 + rand() * 0.42
+    dummy.position.set(x, terrain.heightAt(x, z) - 0.01, z)
+    dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5)
+    dummy.scale.set(0.025 + rand() * 0.022, height, 1)
+    dummy.updateMatrix()
+    mesh.setMatrixAt(n, dummy.matrix)
+    mesh.setColorAt(n, tints[Math.floor(rand() * tints.length)]!)
+    n++
+  }
+  mesh.count = n
+  mesh.receiveShadow = true
+  return mesh
+}
+
+function buildCrimson(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(53)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  const { group } = floatingGround(ctx, radius, std('#3a0812'))
+  // Ground the same red as the grass roots, the path barely showing through it
+  const terrain = createTerrain(ctx, radius, 29, { grass: ['#3a0812', '#4a0b18', '#560e1e', '#420915'], dry: '#30060f', path: '#5a1424' })
+  group.add(terrain.mesh)
+
+  // One giant tree behind the room's back corner, its crown spreading over the land
+  const heroX = -width / 2 - 2
+  const heroZ = -depth / 2 - 2
+  const heroHeight = Math.max(8, ctx.style.height * 2.5)
+  const origin = new THREE.Vector3(heroX, terrain.heightAt(heroX, heroZ), heroZ)
+  const wallTop = ctx.groundY + ctx.style.height
+  const hero = crimsonTree(rand, heroHeight, detail, {
+    origin,
+    toward: new THREE.Vector3(-heroX, 0, -heroZ).normalize(),
+    // Over the room's back half only, and well above the walls; nothing over
+    // the front half of the land, between the camera and the room
+    blocked: (x, y, z) => {
+      if (x + z > -0.5) return true
+      const overRoom = Math.abs(x) < width / 2 + 0.6 && Math.abs(z) < depth / 2 + 0.6
+      return overRoom && y < wallTop + 1.4
+    },
+  })
+  hero.tree.position.copy(origin)
+  group.add(hero.tree)
+  hero.tree.updateMatrixWorld(true)
+  const petalSources = hero.blossoms.map(p => p.clone().applyMatrix4(hero.tree.matrixWorld))
+
+  const grass = crimsonGrass(ctx, radius, terrain, rand, Math.round(15000 * detail))
+  group.add(grass)
+
+  const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#eaf2ff', emissiveIntensity: 0.2 })
+  skyClouds(group, rand, cloudMaterial)
+  skyClouds(group, rand, cloudMaterial)
+
+  const petals = createPetals(Math.round(900 * detail), ctx, petalSources, rand, { colors: ['#e8355d', '#ff5c7a', '#ff8fa3', '#c41e45', '#ffd1db'], size: 1.6 })
+  const wind = createWindStreaks(detail < 0.7 ? 3 : 4, ctx, radius, rand)
+  group.add(wind.group)
+  const flutterSpots = landSpots(rand, ctx, radius, 12, 1).map(([x, z]) => new THREE.Vector3(x, terrain.heightAt(x, z) + 0.45, z))
+  const butterflies = createButterflies(3, flutterSpots, rand, ['#ffffff', '#ffe4ec'])
+  const fireflies = createFireflies(24, ctx, radius, rand)
+  group.add(petals.mesh, butterflies.group, fireflies.points)
+
+  const nightTint = new THREE.Color('#3a2a4a')
+  const white = new THREE.Color('#ffffff')
+  const cloudNight = new THREE.Color('#4f4870')
+
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#0d0a1f'), dusk: new THREE.Color('#ff9a8a'), day: new THREE.Color('#4f86d9') },
+    // Clear, deep saturated blue (less haze than the other lands)
+    atmosphere: { turbidity: 1.2, rayleigh: 3.4, mie: 0.004 },
+    // The blue sky light turns crimson pink and strong sun washes it out
+    light: { sun: 0.75, sky: 0.3 },
+    update(time, dt, daylight, lamps) {
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
+      cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
+      petals.update(time, dt)
+      wind.update(time, daylight)
+      butterflies.group.visible = daylight > 0.25
+      if (butterflies.group.visible) butterflies.update(time, dt)
+      fireflies.update(time, lamps)
+    },
+    ground: terrain.mesh,
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
+  }
+}
+
 // ---------- City ----------
 
 /** Building footprints in pack units (x, z), for laying out the blocks */
@@ -1976,11 +2699,17 @@ function buildWinter(ctx: LandContext, radius: number): LandInstance {
 
 export function buildLand(id: LandId, ctx: LandContext): LandInstance {
   const radius = Math.max(ctx.style.width, ctx.style.depth) * 1.1 + 2.5
+  // Gusting wind is a land's own (crimson); the others just sway
+  windField.gust.value = id === 'crimson' ? 1 : 0
+  // No wind inside the room's walls (potted plants use the same leaves)
+  windField.room.set(ctx.style.width / 2, ctx.style.depth / 2)
   switch (id) {
     case 'mars':
       return buildMars(ctx, radius)
     case 'sakura':
       return buildSakura(ctx, radius)
+    case 'crimson':
+      return buildCrimson(ctx, radius)
     case 'winter':
       return buildWinter(ctx, radius)
     case 'city':
