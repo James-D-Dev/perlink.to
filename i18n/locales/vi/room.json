@@ -209,6 +209,26 @@
       "winter": {
         "name": "Mùa đông",
         "description": "Cây cổ thụ phủ sương trắng, hồ băng, tuyết bay trong gió và đèn lồng về đêm"
+      },
+      "autumn": {
+        "name": "Mùa thu",
+        "description": "Cây phong khổng lồ đỏ vàng, lá bay trong gió và những quả bí ngô"
+      },
+      "tropical": {
+        "name": "Đảo nhiệt đới",
+        "description": "Hàng dừa trên cát trắng, biển xanh ngọc có sóng, đuốc tiki về đêm"
+      },
+      "fairy": {
+        "name": "Rừng nấm thần tiên",
+        "description": "Nấm khổng lồ phát sáng, bào tử lơ lửng và đom đóm trên thảm rêu"
+      },
+      "volcano": {
+        "name": "Núi lửa",
+        "description": "Núi lửa bốc khói, dòng dung nham đổ khỏi mép đảo và tàn lửa bay lên"
+      },
+      "zen": {
+        "name": "Vườn thiền",
+        "description": "Rừng tre, sân sỏi cào vân, hồ cá koi và đèn đá"
       }
     },
     "objects": {

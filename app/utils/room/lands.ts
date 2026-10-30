@@ -29,6 +29,11 @@ export const LANDS: LandMeta[] = [
   { id: 'crimson', name: 'Crimson sakura', description: 'A giant crimson cherry tree, red grass and petals drifting under a blue sky', icon: 'i-lucide-trees', preview: 'linear-gradient(180deg,#5d9cf0 0%,#a9cdf7 55%,#a3173a 56%,#5c0f22 100%)', thumbnail: '/images/lands/crimson.webp' },
   { id: 'city', name: 'City', description: 'Downtown block: streets, traffic, street lamps and lit windows at night', icon: 'i-lucide-building-2', preview: 'linear-gradient(180deg,#9fcdf0 0%,#d9e6f2 55%,#8d8f95 56%,#55585e 100%)', thumbnail: '/images/lands/city.webp' },
   { id: 'winter', name: 'Winter', description: 'A frost-white giant tree, a frozen pond, blowing snow and lanterns at night', icon: 'i-lucide-snowflake', preview: 'linear-gradient(180deg,#9fb8d1 0%,#dce8f3 55%,#f4f8ff 56%,#d6e2ef 100%)', thumbnail: '/images/lands/winter.webp' },
+  { id: 'autumn', name: 'Autumn', description: 'A giant maple in red and gold, leaves blowing in the wind, pumpkins', icon: 'i-lucide-leaf', preview: 'linear-gradient(180deg,#86b9e6 0%,#f6c27a 55%,#b8862a 56%,#7a5a1e 100%)', thumbnail: '/images/lands/autumn.webp' },
+  { id: 'tropical', name: 'Tropical beach', description: 'Palms on white sand, turquoise sea and waves, tiki torches at night', icon: 'i-lucide-tree-palm', preview: 'linear-gradient(180deg,#6ec3f2 0%,#bfe8ff 55%,#f0dcaa 56%,#2fb8c8 100%)', thumbnail: '/images/lands/tropical.webp' },
+  { id: 'fairy', name: 'Fairy forest', description: 'Giant glowing mushrooms, drifting spores and fireflies in deep moss', icon: 'i-lucide-sparkles', preview: 'linear-gradient(180deg,#a9b8ee 0%,#d6c4f2 55%,#2c6b52 56%,#15362c 100%)', thumbnail: '/images/lands/fairy.webp' },
+  { id: 'volcano', name: 'Volcano', description: 'A smoking volcano, a river of lava pouring off the edge, rising embers', icon: 'i-lucide-flame', preview: 'linear-gradient(180deg,#d9a582 0%,#f08a4a 55%,#3b322d 56%,#1a1412 100%)', thumbnail: '/images/lands/volcano.webp' },
+  { id: 'zen', name: 'Zen garden', description: 'Bamboo grove, raked gravel, a koi pond and stone lanterns', icon: 'i-lucide-sprout', preview: 'linear-gradient(180deg,#a8cfe8 0%,#dfeee0 55%,#4d7a2c 56%,#2a481e 100%)', thumbnail: '/images/lands/zen.webp' },
 ]
 
 export interface SkyPalette {
@@ -1020,7 +1025,12 @@ interface Terrain {
  * Rolling ground: flat under and around the room, gentle bumps in front,
  * soft hills behind the walls, colour variation and a sandy path.
  */
-function createTerrain(ctx: LandContext, radius: number, seed: number, colors: { grass: string[]; dry: string; path: string }): Terrain {
+function createTerrain(ctx: LandContext, radius: number, seed: number, colors: { grass: string[]; dry: string; path: string }, shape: {
+  /** Ground sinks this far towards the edge (a beach running down into the sea) */
+  edgeDrop?: number
+  /** Colour near the edge (wet sand) */
+  shore?: string
+} = {}): Terrain {
   const { width, depth } = ctx.style
   // Path from the room's front corner out to the island edge
   const path = [
@@ -1056,7 +1066,8 @@ function createTerrain(ctx: LandContext, radius: number, seed: number, colors: {
     h *= fromRoom * rim
     const onPath = 1 - THREE.MathUtils.smoothstep(pathDistance(x, z), 0.25, 0.6)
     // Sunk a little, but never under the land's top (it would show through as a dark hole)
-    return onPath > 0 ? Math.max(h - onPath * 0.03, onPath * 0.004) : h
+    const sunk = onPath > 0 ? Math.max(h - onPath * 0.03, onPath * 0.004) : h
+    return shape.edgeDrop ? sunk - shape.edgeDrop * THREE.MathUtils.smoothstep(r, radius - 2.6, radius) : sunk
   }
 
   const geometry = new THREE.RingGeometry(0.001, radius, 160, 64)
@@ -1066,6 +1077,7 @@ function createTerrain(ctx: LandContext, radius: number, seed: number, colors: {
   const grass = colors.grass.map(c => new THREE.Color(c))
   const dry = new THREE.Color(colors.dry)
   const sand = new THREE.Color(colors.path)
+  const shore = shape.shore ? new THREE.Color(shape.shore) : null
   const c = new THREE.Color()
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i)
@@ -1077,6 +1089,7 @@ function createTerrain(ctx: LandContext, radius: number, seed: number, colors: {
     c.copy(grass[idx]!).lerp(grass[Math.min(idx + 1, grass.length - 1)]!, (n * grass.length) % 1)
     c.lerp(dry, THREE.MathUtils.smoothstep(fbm(x * 0.8, z * 0.8, seed + 5), 0.62, 0.8) * 0.6)
     c.lerp(sand, 1 - THREE.MathUtils.smoothstep(pathDistance(x, z), 0.28, 0.55))
+    if (shore) c.lerp(shore, THREE.MathUtils.smoothstep(Math.hypot(x, z), radius - 2.4, radius - 1))
     colorAttr.set([c.r, c.g, c.b], i * 3)
   }
   geometry.setAttribute('color', new THREE.BufferAttribute(colorAttr, 3))
@@ -1238,7 +1251,7 @@ function createWater(radius: number) {
  * the sea of clouds. Calm water in the stream, white streaks in the fall,
  * fading out at the bottom.
  */
-function createWaterfall(ctx: LandContext, radius: number, terrain: Terrain, from: THREE.Vector2, angle: number) {
+function createWaterfall(ctx: LandContext, radius: number, terrain: Terrain, from: THREE.Vector2, angle: number, lava = false) {
   const out = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle))
   const side = new THREE.Vector3(-out.z, 0, out.x)
   const lip = new THREE.Vector3(out.x * radius, ctx.groundY + 0.03, out.z * radius)
@@ -1321,9 +1334,16 @@ function createWaterfall(ctx: LandContext, radius: number, terrain: Terrain, fro
         float edge = smoothstep(0.0, mix(0.12, 0.3, falling), vUv.x) * smoothstep(1.0, 1.0 - mix(0.12, 0.3, falling), vUv.x);
         float fade = 1.0 - smoothstep(0.6, 1.0, vUv.y);
         float alpha = mix(0.88, 0.5 + foam * 0.5, falling) * edge * fade;
+        #ifdef LAVA
+          // Molten rock: a dark crust broken by glowing cracks, white-hot in the fall
+          float heat = smoothstep(0.35, 0.75, s) + falling * 0.35;
+          color = mix(vec3(0.16, 0.04, 0.02), mix(vec3(1.0, 0.32, 0.04), vec3(1.0, 0.85, 0.35), smoothstep(0.7, 1.0, heat)), clamp(heat, 0.0, 1.0));
+          alpha = mix(1.0, 0.85, falling) * edge * fade;
+        #endif
         gl_FragColor = vec4(color, alpha);
       }
     `,
+    defines: lava ? { LAVA: '' } : {},
   })
   const mesh = new THREE.Mesh(geometry, material)
   // Clear of the ground in the stream (it lies on it)
@@ -3179,10 +3199,1443 @@ function buildWinter(ctx: LandContext, radius: number): LandInstance {
   }
 }
 
+// ---------- Autumn ----------
+
+/** Five-lobed maple leaves on a card (coloured per instance), for an autumn crown */
+let mapleCanvas: THREE.CanvasTexture | null = null
+function mapleTexture() {
+  if (mapleCanvas) return mapleCanvas
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const g = canvas.getContext('2d')!
+  const rand = seeded(83)
+  const leaves = 56
+  for (let i = 0; i < leaves; i++) {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * size * 0.38
+    const x = size / 2 + Math.cos(a) * r
+    const y = size / 2 + Math.sin(a) * r
+    const length = 14 + rand() * 9
+    const rim = r / (size * 0.38)
+    const light = Math.round(115 + (i / leaves) * 70 + rim * 55 + rand() * 15)
+    g.save()
+    g.translate(x, y)
+    g.rotate(rand() * Math.PI * 2)
+    g.fillStyle = `rgb(${light},${light},${light})`
+    g.beginPath()
+    // Five pointed lobes round the stalk
+    for (let k = 0; k <= 60; k++) {
+      const t = (k / 60) * Math.PI * 2
+      const lobe = Math.pow(Math.abs(Math.cos(2.5 * t)), 0.55)
+      const rr = length * (0.42 + 0.58 * lobe) * (t > Math.PI * 0.85 && t < Math.PI * 1.15 ? 0.55 : 1)
+      const px = Math.sin(t) * rr
+      const py = -Math.cos(t) * rr
+      if (k === 0) g.moveTo(px, py)
+      else g.lineTo(px, py)
+    }
+    g.fill()
+    g.strokeStyle = 'rgba(255,255,255,0.28)'
+    g.lineWidth = 1
+    for (let k = 0; k < 5; k++) {
+      const t = (k / 5) * Math.PI * 2
+      g.beginPath()
+      g.moveTo(0, 0)
+      g.lineTo(Math.sin(t) * length * 0.8, -Math.cos(t) * length * 0.8)
+      g.stroke()
+    }
+    g.restore()
+  }
+  mapleCanvas = new THREE.CanvasTexture(canvas)
+  mapleCanvas.colorSpace = THREE.SRGBColorSpace
+  return mapleCanvas
+}
+
+const MAPLE_CROWN: CrownLook = { texture: mapleTexture, under: '#5e1608', middle: '#c9481a', top: '#ffb13a', emissive: '#2a0a02', vary: '#d8962a', bark: '#5a4232' }
+
+/** Fallen leaves lying flat on the ground, in a carpet round `spots` (x, z, radius) */
+function leafLitter(ctx: LandContext, terrain: Terrain, rand: () => number, count: number, spots: [number, number, number][], colors: string[]) {
+  const geometry = cherryPetalGeometry(0.16)
+  geometry.rotateX(-Math.PI / 2)
+  const mesh = new THREE.InstancedMesh(geometry, new THREE.MeshLambertMaterial({ color: '#ffffff', side: THREE.DoubleSide }), count)
+  const palette = colors.map(c => new THREE.Color(c))
+  const dummy = new THREE.Object3D()
+  let n = 0
+  for (let tries = 0; n < count && tries < count * 3; tries++) {
+    const [cx, cz, radius] = spots[tries % spots.length]!
+    const a = rand() * Math.PI * 2
+    const r = Math.pow(rand(), 0.8) * radius
+    const x = cx + Math.cos(a) * r
+    const z = cz + Math.sin(a) * r
+    if (Math.abs(x) < ctx.style.width / 2 + 0.05 && Math.abs(z) < ctx.style.depth / 2 + 0.05) continue
+    dummy.position.set(x, terrain.heightAt(x, z) + 0.015 + rand() * 0.03, z)
+    dummy.rotation.set((rand() - 0.5) * 0.4, rand() * Math.PI * 2, (rand() - 0.5) * 0.4)
+    dummy.scale.setScalar(0.8 + rand() * 0.6)
+    dummy.updateMatrix()
+    mesh.setMatrixAt(n, dummy.matrix)
+    mesh.setColorAt(n, palette[Math.floor(rand() * palette.length)]!)
+    n++
+  }
+  mesh.count = n
+  mesh.receiveShadow = true
+  return mesh
+}
+
+/** A ribbed pumpkin with a curly stalk */
+function pumpkin(size: number) {
+  const g = new THREE.Group()
+  const body = new THREE.SphereGeometry(size, 24, 14)
+  const pos = body.attributes.position as THREE.BufferAttribute
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i)
+    const rib = 1 - 0.09 * (1 - Math.cos(Math.atan2(z, x) * 8)) * 0.5
+    pos.setXYZ(i, x * rib, y * 0.72, z * rib)
+  }
+  body.computeVertexNormals()
+  const shell = new THREE.Mesh(body, std('#e8731c', { roughness: 0.6 }))
+  shell.position.y = size * 0.68
+  const stalk = new THREE.Mesh(new THREE.CylinderGeometry(size * 0.08, size * 0.12, size * 0.4, 6), std('#5b6b2a'))
+  stalk.position.y = size * 1.35
+  stalk.rotation.z = 0.3
+  g.add(shell, stalk)
+  return g
+}
+
+function buildAutumn(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(67)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  const { group } = floatingGround(ctx, radius, std('#4a3d16'))
+  // Ground the colour of the grass roots, so the lawn reads as one field
+  const terrain = createTerrain(ctx, radius, 41, { grass: ['#463a14', '#4f4318', '#584a1b', '#4a3e16'], dry: '#5c4418', path: '#9a7a4e' })
+  group.add(terrain.mesh)
+
+  // The centrepiece: a giant maple in full autumn colour behind the room's back corner
+  const heroHeight = Math.max(8, ctx.style.height * 2.5)
+  const heroAt: [number, number] = [-width / 2 - 2, -depth / 2 - 2]
+  const hero = plantHeroTree(group, ctx, terrain, rand, heroAt, heroHeight, MAPLE_CROWN)
+
+  // Two young red maples side by side beyond the back wall's far end
+  const young: ScatterItem[] = ([[width / 2 + 1.6, -depth / 2 - 1.4], [width / 2 + 2.9, -depth / 2 - 2.5]] as const)
+    .filter(([x, z]) => Math.hypot(x, z) < radius - 1)
+    .map(([x, z]) => ({ x, y: terrain.heightAt(x, z), z, height: 3.6 + rand() * 0.6, rotation: rand() * Math.PI * 2 }))
+  scatterModel(group, 'TwistedTree_2', young)
+
+  // Golden grass, then a carpet of fallen leaves under the trees and in a few drifts
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(14000 * detail), {
+    colors: ['#3a2f10', '#8a7a2a', '#e2c45e'],
+    tints: ['#ffffff', '#fff0d0', '#f0e2b8', '#e8f0c8'],
+    height: [0.28, 0.6],
+    pathClear: 0.85,
+  }))
+  const leafColors = ['#c9481a', '#e0651e', '#f29a2e', '#b8321a', '#e8b23a', '#8e2a14']
+  group.add(leafLitter(ctx, terrain, rand, Math.round(2600 * detail), [
+    [heroAt[0] + 1.5, heroAt[1] + 1.5, 3.2],
+    [young[0]?.x ?? width / 2 + 1.6, young[0]?.z ?? -depth / 2 - 1.4, 1.8],
+    [-width / 2 - 0.4, depth / 2 + 1.4, 1.2],
+    [radius * 0.62, radius * 0.18, 1],
+  ], leafColors))
+
+  // Pumpkins and a hay bale on the open side
+  const props: [number, number, number][] = [[-width / 2 + 0.4, depth / 2 + 1.6, 0.32], [-width / 2 + 0.95, depth / 2 + 1.9, 0.22], [-width / 2 + 0.1, depth / 2 + 2.3, 0.18], [width / 2 + 2.2, depth / 2 - 0.6, 0.26]]
+  for (const [x, z, size] of props) {
+    const p = pumpkin(size)
+    p.rotation.y = rand() * Math.PI * 2
+    group.add(place(p, x, terrain.heightAt(x, z), z))
+  }
+  const hay = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.75, 18), std('#d6ae58', { roughness: 1 }))
+  hay.rotation.z = Math.PI / 2
+  hay.rotation.y = 0.6
+  const hayX = -width / 2 - 0.9
+  const hayZ = depth / 2 + 2.4
+  group.add(place(hay, hayX, terrain.heightAt(hayX, hayZ) + 0.4, hayZ))
+
+  const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#fff1e0', emissiveIntensity: 0.15 })
+  skyClouds(group, rand, cloudMaterial)
+
+  const petals = createPetals(Math.round(500 * detail), ctx, hero.blossoms, rand, { colors: leafColors, size: 2.2 })
+  const wind = createWindStreaks(detail < 0.7 ? 2 : 3, ctx, radius, rand)
+  const flutterSpots = landSpots(rand, ctx, radius, 12, 1).map(([x, z]) => new THREE.Vector3(x, terrain.heightAt(x, z) + 0.45, z))
+  const butterflies = createButterflies(3, flutterSpots, rand, ['#ffb347', '#fff176'])
+  const fireflies = createFireflies(24, ctx, radius, rand)
+  group.add(petals.mesh, wind.group, butterflies.group, fireflies.points)
+
+  const nightTint = new THREE.Color('#3f3a52')
+  const white = new THREE.Color('#ffffff')
+  const cloudNight = new THREE.Color('#4f4a68')
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#0d0b1f'), dusk: new THREE.Color('#f59a52'), day: new THREE.Color('#86b9e6') },
+    atmosphere: { turbidity: 3, rayleigh: 2, mie: 0.004 },
+    light: { sun: 0.85, sky: 0.45 },
+    focus: { position: hero.origin.clone(), height: heroHeight },
+    heightAt: terrain.heightAt,
+    ground: terrain.mesh,
+    update(time, dt, daylight, lamps) {
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
+      cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
+      petals.update(time, dt)
+      wind.update(time, daylight)
+      butterflies.group.visible = daylight > 0.25
+      if (butterflies.group.visible) butterflies.update(time, dt)
+      fireflies.update(time, lamps)
+    },
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
+  }
+}
+
+// ---------- Tropical ----------
+
+/** The sea round a beach: turquoise shallows, deep blue further out, foam breaking on the sand */
+function createSea(radius: number, y: number) {
+  const uniforms = { time: { value: 0 }, daylight: { value: 1 }, shore: { value: radius } }
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    transparent: true,
+    depthWrite: false,
+    vertexShader: `
+      varying vec3 vWorld;
+      void main() {
+        vec4 world = modelMatrix * vec4(position, 1.0);
+        vWorld = world.xyz;
+        gl_Position = projectionMatrix * viewMatrix * world;
+      }
+    `,
+    fragmentShader: `
+      uniform float time;
+      uniform float daylight;
+      uniform float shore;
+      varying vec3 vWorld;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+      }
+      void main() {
+        float r = length(vWorld.xz);
+        float out_ = r - shore;
+        vec3 shallow = vec3(0.25, 0.86, 0.82);
+        vec3 deep = vec3(0.05, 0.38, 0.62);
+        vec3 color = mix(shallow, deep, smoothstep(-1.0, 7.0, out_));
+        // Small ripples catching the light
+        float w = noise(vWorld.xz * 3.5 + vec2(time * 0.5, time * 0.3)) * 0.55 + noise(vWorld.xz * 7.0 - vec2(time * 0.4, -time * 0.45)) * 0.45;
+        color += vec3(smoothstep(0.74, 0.92, w)) * 0.18 * (0.3 + 0.7 * daylight);
+        // Waves rolling in and breaking white, only close to the beach and
+        // broken up along their length, so they never read as rings
+        float wave = fract(out_ * 0.6 + time * 0.22);
+        float breaking = smoothstep(0.85, 0.97, wave) * (1.0 - smoothstep(0.0, 2.2, out_));
+        float foam = breaking * smoothstep(0.35, 0.7, noise(vWorld.xz * 2.4 + time * 0.3));
+        // The wash on the sand, sliding up and back
+        foam += (1.0 - smoothstep(-1.4, -0.5, out_ + sin(time * 0.9) * 0.25)) * smoothstep(0.25, 0.6, noise(vWorld.xz * 3.0 - time * 0.2));
+        color = mix(color, vec3(1.0), clamp(foam, 0.0, 1.0) * 0.8);
+        color = mix(vec3(0.02, 0.06, 0.13), color, 0.22 + 0.78 * daylight);
+        float alpha = 1.0 - smoothstep(shore * 2.6, shore * 3.0, r);
+        gl_FragColor = vec4(color, alpha);
+      }
+    `,
+  })
+  const mesh = new THREE.Mesh(new THREE.RingGeometry(radius * 0.7, radius * 3, 160, 8), material)
+  mesh.rotation.x = -Math.PI / 2
+  mesh.position.y = y
+  mesh.renderOrder = -1
+  return { mesh, uniforms }
+}
+
+/** Pinnate palm frond on a card: a stalk with long leaflets either side */
+let frondCanvas: THREE.CanvasTexture | null = null
+function frondTexture() {
+  if (frondCanvas) return frondCanvas
+  const w = 128
+  const h = 512
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  const g = canvas.getContext('2d')!
+  g.strokeStyle = '#ffffff'
+  g.lineCap = 'round'
+  g.lineWidth = 5
+  g.beginPath()
+  g.moveTo(w / 2, h)
+  g.lineTo(w / 2, 4)
+  g.stroke()
+  for (let y = h - 24; y > 10; y -= 9) {
+    const t = y / h
+    const reach = (w / 2 - 4) * Math.sin(Math.PI * Math.min(1, (1 - t) * 1.15 + 0.08))
+    const shade = Math.round(170 + 85 * (1 - t))
+    g.strokeStyle = `rgb(${shade},${shade},${shade})`
+    g.lineWidth = 4
+    for (const side of [-1, 1]) {
+      g.beginPath()
+      g.moveTo(w / 2, y)
+      g.quadraticCurveTo(w / 2 + side * reach * 0.5, y - 10, w / 2 + side * reach, y - 26)
+      g.stroke()
+    }
+  }
+  frondCanvas = new THREE.CanvasTexture(canvas)
+  frondCanvas.colorSpace = THREE.SRGBColorSpace
+  return frondCanvas
+}
+
+/** A coconut palm: ringed trunk curving up from its lean, drooping fronds, coconuts */
+function palmTree(rand: () => number, height: number, lean: THREE.Vector2) {
+  const tree = new THREE.Group()
+  const up = new THREE.Vector3(0, 1, 0)
+  const bend = new THREE.Vector3(lean.x, 0, lean.y)
+  const at = (t: number) => bend.clone().multiplyScalar(height * 0.32 * t * t).addScaledVector(up, height * t)
+  const parts: THREE.BufferGeometry[] = []
+  const rings = 14
+  for (let i = 0; i < rings; i++) {
+    const a = at(i / rings)
+    const b = at((i + 1) / rings)
+    const length = a.distanceTo(b)
+    const radius = THREE.MathUtils.lerp(0.17, 0.1, i / rings) * (height / 6)
+    // Each ring flares at its foot, so the trunk reads as stacked rings
+    const piece = new THREE.CylinderGeometry(radius * 0.92, radius * 1.12, length * 1.04, 9, 1)
+    piece.translate(0, length / 2, 0)
+    piece.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up, b.clone().sub(a).normalize()))
+    piece.translate(a.x, a.y, a.z)
+    parts.push(piece)
+  }
+  const trunk = new THREE.Mesh(mergeGeometries(parts)!, std('#8a6a48', { roughness: 1, flatShading: true }))
+  parts.forEach(p => p.dispose())
+  trunk.castShadow = true
+  tree.add(trunk)
+
+  const top = at(1)
+  // Fronds are tinted per palm, from fresh green to sun-yellowed
+  const frondMaterial = swayingMaterial(new THREE.MeshLambertMaterial({ map: frondTexture(), alphaTest: 0.35, side: THREE.DoubleSide, color: ['#5f9e2e', '#6aa832', '#78a838'][Math.floor(rand() * 3)]! }))
+  const fronds = 11
+  const crown = new THREE.Group()
+  crown.position.copy(top)
+  for (let i = 0; i < fronds; i++) {
+    const length = height * (0.42 + rand() * 0.12)
+    const segments = 10
+    const width = length * 0.34
+    const positions: number[] = []
+    const uvs: number[] = []
+    const index: number[] = []
+    const yaw = (i / fronds) * Math.PI * 2 + rand() * 0.3
+    const dir = new THREE.Vector3(Math.cos(yaw), 0, Math.sin(yaw))
+    const side = new THREE.Vector3(-dir.z, 0, dir.x)
+    const rise = 0.25 + rand() * 0.35
+    for (let k = 0; k <= segments; k++) {
+      const s = k / segments
+      // Rising out of the crown, then arching over and drooping at the tip
+      const p = dir.clone().multiplyScalar(length * s).addScaledVector(up, length * (rise * s - 0.75 * s * s))
+      // Leaflets hang down either side: a shallow V across the frond
+      const l = p.clone().addScaledVector(side, -width / 2).addScaledVector(up, -width * 0.18)
+      const rr = p.clone().addScaledVector(side, width / 2).addScaledVector(up, -width * 0.18)
+      positions.push(l.x, l.y, l.z, p.x, p.y + width * 0.05, p.z, rr.x, rr.y, rr.z)
+      uvs.push(0, s, 0.5, s, 1, s)
+      if (k > 0) {
+        const b = (k - 1) * 3
+        const c = k * 3
+        index.push(b, c, b + 1, b + 1, c, c + 1, b + 1, c + 1, b + 2, b + 2, c + 1, c + 2)
+      }
+    }
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
+    geometry.setIndex(index)
+    geometry.computeVertexNormals()
+    const frond = new THREE.Mesh(geometry, frondMaterial)
+    frond.castShadow = true
+    crown.add(frond)
+  }
+  const nut = std('#5a3d20', { roughness: 0.8 })
+  for (let i = 0; i < 4; i++) {
+    const a = rand() * Math.PI * 2
+    const c = new THREE.Mesh(new THREE.SphereGeometry(0.11 * (height / 6), 10, 8), nut)
+    c.position.set(Math.cos(a) * 0.16, -0.15 - rand() * 0.1, Math.sin(a) * 0.16)
+    c.castShadow = true
+    crown.add(c)
+  }
+  tree.add(crown)
+  return { tree, crown }
+}
+
+/** A striped beach umbrella over a towel */
+function beachUmbrella() {
+  const g = new THREE.Group()
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 8
+  const c = canvas.getContext('2d')!
+  for (let i = 0; i < 8; i++) {
+    c.fillStyle = i % 2 ? '#ffffff' : '#ef4444'
+    c.fillRect(i * 32, 0, 32, 8)
+  }
+  const stripes = new THREE.CanvasTexture(canvas)
+  stripes.colorSpace = THREE.SRGBColorSpace
+  const canopy = new THREE.Mesh(new THREE.ConeGeometry(1.05, 0.38, 16, 1, true), new THREE.MeshStandardMaterial({ map: stripes, side: THREE.DoubleSide, roughness: 0.8 }))
+  canopy.position.y = 1.85
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 2, 6), std('#e8e2d0'))
+  pole.position.y = 1
+  pole.rotation.z = 0.12
+  canopy.rotation.z = 0.12
+  canopy.position.x = -0.12
+  const towel = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.015, 1.3), std('#38bdf8'))
+  towel.position.set(0.55, 0.01, 0.2)
+  towel.rotation.y = 0.25
+  g.add(canopy, pole, towel)
+  return g
+}
+
+/** A tiki torch: bamboo pole, a flame that flickers and glows at night */
+function tikiTorch(flame: THREE.MeshBasicMaterial, glow: THREE.SpriteMaterial) {
+  const g = new THREE.Group()
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 1.4, 6), std('#b08850'))
+  pole.position.y = 0.7
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.06, 0.16, 8), std('#5a4026'))
+  cup.position.y = 1.46
+  const fire = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.24, 8), flame)
+  fire.position.y = 1.64
+  const halo = new THREE.Sprite(glow)
+  halo.position.y = 1.62
+  halo.scale.setScalar(1.1)
+  g.add(pole, cup, fire, halo)
+  return { group: g, fire }
+}
+
+function buildTropical(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(73)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  // No floating rock here: the island sits in the sea, its beach running down under the water
+  const group = new THREE.Group()
+  const terrain = createTerrain(ctx, radius, 47, { grass: ['#ead6a0', '#f2e0b0', '#e4cd92', '#eedaa6'], dry: '#dcc58e', path: '#dcc794' }, { edgeDrop: 0.55, shore: '#c9ad74' })
+  group.add(terrain.mesh)
+  const sea = createSea(radius - 1.6, ctx.groundY - 0.16)
+  group.add(sea.mesh)
+
+  // Palms: a tall stand behind the room's back corner, a pair at the right, one leaning out over the beach
+  const sway = swayer()
+  const palms: [number, number, number, number, number][] = [
+    [-width / 2 - 1.8, -depth / 2 - 1.6, 7.2, -0.3, 0.2],
+    [-width / 2 - 0.3, -depth / 2 - 2.8, 6, 0.25, -0.35],
+    [-width / 2 - 3, -depth / 2 + 0.6, 5.6, -0.45, 0.35],
+    [width / 2 + 1.7, -depth / 2 - 1.2, 5.2, 0.4, -0.3],
+    [width / 2 + 3, -depth / 2 - 0.2, 4.4, 0.6, 0.1],
+    [-width / 2 - 1.8, depth / 2 + 1.2, 4.8, -0.65, 0.45],
+  ]
+  let heroAt = new THREE.Vector3()
+  palms.forEach(([x, z, height, lx, lz], i) => {
+    if (Math.hypot(x, z) > radius - 1.6) return
+    const palm = palmTree(rand, height, new THREE.Vector2(lx, lz))
+    group.add(place(palm.tree, x, terrain.heightAt(x, z), z))
+    sway.add(palm.crown, rand() * 10)
+    if (i === 0) heroAt = new THREE.Vector3(x, terrain.heightAt(x, z), z)
+  })
+
+  // Beach grass in tufts round the palms, ferns and bushes at their feet
+  const tufts: [number, number, number][] = palms.map(([x, z]) => [x, z, 1.1])
+  const inTuft = (x: number, z: number) => tufts.some(([cx, cz, r]) => Math.hypot(x - cx, z - cz) < r * (0.75 + 0.25 * Math.sin(Math.atan2(z - cz, x - cx) * 3)))
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(4000 * detail), {
+    colors: ['#3d5a1c', '#6f9a34', '#c8d878'],
+    tints: ['#ffffff', '#f2ffe0', '#fff6d8'],
+    height: [0.25, 0.55],
+    pathClear: 0.97,
+    avoid: (x, z) => !inTuft(x, z) || Math.hypot(x, z) > radius - 2,
+  }))
+  scatterModel(group, 'Fern_1', clumps(rand, terrain, palms.slice(0, 4).map(([x, z]) => [x + 0.6, z + 0.6] as [number, number]), 3, 0.8, [0.45, 0.7]), { castShadow: false })
+
+  // A striped umbrella and towel on the sand, shells and starfish by the water
+  const umbrella = beachUmbrella()
+  const umX = -radius * 0.18
+  const umZ = radius * 0.62
+  umbrella.rotation.y = 0.6
+  group.add(place(umbrella, umX, terrain.heightAt(umX, umZ), umZ))
+  const starfish = new THREE.Shape()
+  for (let k = 0; k <= 10; k++) {
+    const a = (k / 10) * Math.PI * 2 - Math.PI / 2
+    const rr = k % 2 ? 0.045 : 0.12
+    if (k === 0) starfish.moveTo(Math.cos(a) * rr, Math.sin(a) * rr)
+    else starfish.lineTo(Math.cos(a) * rr, Math.sin(a) * rr)
+  }
+  const starGeometry = new THREE.ExtrudeGeometry(starfish, { depth: 0.02, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 1 })
+  starGeometry.rotateX(-Math.PI / 2)
+  for (let i = 0; i < 5; i++) {
+    const a = Math.PI * (0.15 + rand() * 0.55)
+    const rr = radius - 2.3 + rand() * 0.6
+    const x = Math.cos(a) * rr
+    const z = Math.sin(a) * rr
+    const star = new THREE.Mesh(starGeometry, std(i % 2 ? '#f97316' : '#fb7185'))
+    star.rotation.y = rand() * Math.PI * 2
+    group.add(place(star, x, terrain.heightAt(x, z) + 0.01, z, false))
+  }
+
+  // Tiki torches either side of the path, lit at night
+  const flame = new THREE.MeshBasicMaterial({ color: '#ffb347', transparent: true, opacity: 0 })
+  const glow = new THREE.SpriteMaterial({ map: softDotTexture(), color: '#ff9a3c', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })
+  const fires: THREE.Mesh[] = []
+  const pathFrom = new THREE.Vector2(width / 2 + 1.8, depth / 2 + 1.2)
+  const pathTo = new THREE.Vector2(radius * 0.5, radius * 0.62)
+  const across = pathTo.clone().sub(pathFrom).normalize()
+  across.set(-across.y, across.x)
+  for (const [t, s] of [[0.2, 1], [0.2, -1]] as const) {
+    const at = pathFrom.clone().lerp(pathTo, t).addScaledVector(across, s * 0.75)
+    const torch = tikiTorch(flame, glow)
+    fires.push(torch.fire)
+    group.add(place(torch.group, at.x, terrain.heightAt(at.x, at.y), at.y))
+  }
+
+  const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffffff', emissiveIntensity: 0.15 })
+  skyClouds(group, rand, cloudMaterial)
+  const flutterSpots = landSpots(rand, ctx, radius - 2, 10, 1).map(([x, z]) => new THREE.Vector3(x, terrain.heightAt(x, z) + 0.5, z))
+  const butterflies = createButterflies(3, flutterSpots, rand, ['#38bdf8', '#facc15'])
+  const fireflies = createFireflies(16, ctx, radius - 2, rand)
+  group.add(butterflies.group, fireflies.points)
+
+  // Moonlit sand stays pale
+  const nightTint = new THREE.Color('#8a93c0')
+  const white = new THREE.Color('#ffffff')
+  const cloudNight = new THREE.Color('#4a5878')
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#06122a'), dusk: new THREE.Color('#ff9e6b'), day: new THREE.Color('#6ec3f2') },
+    atmosphere: { turbidity: 2, rayleigh: 2.6, mie: 0.003 },
+    light: { sun: 0.9, sky: 0.5 },
+    focus: { position: heroAt, height: 7.2 },
+    heightAt: terrain.heightAt,
+    ground: terrain.mesh,
+    update(time, dt, daylight, lamps) {
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
+      cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
+      sea.uniforms.time.value = time
+      sea.uniforms.daylight.value = daylight
+      sway.update(time)
+      flame.opacity = lamps
+      glow.opacity = lamps * (0.8 + Math.sin(time * 9) * 0.1)
+      fires.forEach((f, i) => f.scale.set(1, 0.85 + Math.sin(time * 11 + i * 2) * 0.15, 1))
+      butterflies.group.visible = daylight > 0.25
+      if (butterflies.group.visible) butterflies.update(time, dt)
+      fireflies.update(time, lamps)
+    },
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
+  }
+}
+
+// ---------- Fairy forest ----------
+
+/** Radial gills under a mushroom cap */
+let gillCanvas: THREE.CanvasTexture | null = null
+function gillTexture() {
+  if (gillCanvas) return gillCanvas
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const g = canvas.getContext('2d')!
+  g.fillStyle = '#d8c8b8'
+  g.fillRect(0, 0, size, size)
+  g.strokeStyle = '#fff8ee'
+  g.lineWidth = 1.5
+  for (let i = 0; i < 90; i++) {
+    const a = (i / 90) * Math.PI * 2
+    g.beginPath()
+    g.moveTo(size / 2 + Math.cos(a) * size * 0.08, size / 2 + Math.sin(a) * size * 0.08)
+    g.lineTo(size / 2 + Math.cos(a) * size * 0.5, size / 2 + Math.sin(a) * size * 0.5)
+    g.stroke()
+  }
+  gillCanvas = new THREE.CanvasTexture(canvas)
+  gillCanvas.colorSpace = THREE.SRGBColorSpace
+  return gillCanvas
+}
+
+/** Soft round light pool (for glows on the ground) */
+let poolCanvas: THREE.CanvasTexture | null = null
+function lightPoolTexture() {
+  if (poolCanvas) return poolCanvas
+  const size = 128
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const g = canvas.getContext('2d')!
+  const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+  grad.addColorStop(0, 'rgba(255,255,255,1)')
+  grad.addColorStop(0.4, 'rgba(255,255,255,0.45)')
+  grad.addColorStop(1, 'rgba(255,255,255,0)')
+  g.fillStyle = grad
+  g.fillRect(0, 0, size, size)
+  poolCanvas = new THREE.CanvasTexture(canvas)
+  return poolCanvas
+}
+
+interface MushroomGlow {
+  /** Emissive materials, brightened at night */
+  emissive: THREE.MeshStandardMaterial[]
+  /** Additive halos and light pools, shown at night */
+  halos: THREE.Material[]
+}
+
+/**
+ * A mushroom: a bulging, curving stalk and a domed cap with a curled rim,
+ * pale on top and deeper towards the edge; spots and gills glow at night,
+ * with a halo round the cap and a pool of its light on the ground.
+ */
+function giantMushroom(rand: () => number, height: number, cap: { color: string; glow: string; spots?: boolean; wide?: number }) {
+  const g = new THREE.Group()
+  const capR = height * (cap.wide ?? 0.42)
+  const lean = (rand() - 0.5) * 0.25
+  const profile: THREE.Vector2[] = []
+  for (let i = 0; i <= 12; i++) {
+    const t = i / 12
+    // Bulb at the foot, slim neck, a little wider under the cap
+    profile.push(new THREE.Vector2(height * (0.085 + 0.06 * Math.pow(1 - t, 3) + 0.02 * t * t), t * height * 0.92))
+  }
+  const stem = new THREE.LatheGeometry(profile, 16)
+  const pos = stem.attributes.position as THREE.BufferAttribute
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i)
+    pos.setX(i, pos.getX(i) + Math.sin((y / height) * Math.PI * 0.8) * lean * height * 0.4)
+  }
+  stem.computeVertexNormals()
+  const stalk = new THREE.Mesh(stem, std('#efe4cc', { roughness: 0.9 }))
+  stalk.castShadow = true
+  const top = new THREE.Vector3(Math.sin(Math.PI * 0.74) * lean * height * 0.4, height * 0.9, 0)
+
+  // The cap: a dome flattened on top, its rim curling down and in
+  const dome = new THREE.SphereGeometry(capR, 40, 16, 0, Math.PI * 2, 0, Math.PI * 0.62)
+  const dp = dome.attributes.position as THREE.BufferAttribute
+  const shades = new Float32Array(dp.count * 3)
+  const base = new THREE.Color(cap.color)
+  const pale = base.clone().lerp(new THREE.Color('#ffffff'), 0.35)
+  const deep = base.clone().multiplyScalar(0.55)
+  const c = new THREE.Color()
+  for (let i = 0; i < dp.count; i++) {
+    const x = dp.getX(i), y = dp.getY(i), z = dp.getZ(i)
+    const down = 1 - y / capR
+    // Lumpy, not a perfect bowl
+    const wobble = 1 + Math.sin(Math.atan2(z, x) * 5 + y * 3) * 0.025
+    const curl = Math.max(0, down - 0.75) * 1.4
+    dp.setXYZ(i, x * wobble * (1 - curl * 0.18), y * 0.55 - curl * capR * 0.12, z * wobble * (1 - curl * 0.18))
+    c.copy(pale).lerp(base, THREE.MathUtils.smoothstep(down, 0.05, 0.5)).lerp(deep, THREE.MathUtils.smoothstep(down, 0.6, 1))
+    shades.set([c.r, c.g, c.b], i * 3)
+  }
+  dome.setAttribute('color', new THREE.BufferAttribute(shades, 3))
+  dome.computeVertexNormals()
+  const capMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.5, emissive: cap.glow, emissiveIntensity: 0.04 })
+  const capMesh = new THREE.Mesh(dome, capMaterial)
+  capMesh.position.copy(top)
+  capMesh.castShadow = true
+  // The gills underneath, glowing at night
+  const gillMaterial = new THREE.MeshStandardMaterial({ map: gillTexture(), emissive: cap.glow, emissiveIntensity: 0.1, side: THREE.DoubleSide })
+  const gills = new THREE.Mesh(new THREE.CircleGeometry(capR * 0.9, 40), gillMaterial)
+  gills.rotation.x = Math.PI / 2
+  gills.position.copy(top).add(new THREE.Vector3(0, -capR * 0.06, 0))
+  g.add(stalk, capMesh, gills)
+  const glow: MushroomGlow = { emissive: [capMaterial, gillMaterial], halos: [] }
+  if (cap.spots) {
+    const spotMaterial = new THREE.MeshStandardMaterial({ color: '#fffaf0', roughness: 0.8, emissive: '#ffffff', emissiveIntensity: 0 })
+    glow.emissive.push(spotMaterial)
+    for (let i = 0; i < 16; i++) {
+      const a = rand() * Math.PI * 2
+      const polar = Math.acos(1 - rand() * 0.75)
+      const d = new THREE.Vector3(Math.sin(polar) * Math.cos(a), Math.cos(polar) * 0.55, Math.sin(polar) * Math.sin(a))
+      const sp = new THREE.Mesh(new THREE.SphereGeometry(capR * (0.05 + rand() * 0.05), 8, 6), spotMaterial)
+      sp.scale.y = 0.4
+      sp.position.copy(top).addScaledVector(d, capR * 0.99)
+      sp.lookAt(top.clone().addScaledVector(d, capR * 2))
+      g.add(sp)
+    }
+  }
+  // A halo round the cap and a pool of its light on the ground, at night
+  const haloMaterial = new THREE.SpriteMaterial({ map: softDotTexture(), color: cap.glow, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })
+  const halo = new THREE.Sprite(haloMaterial)
+  halo.position.copy(top).add(new THREE.Vector3(0, -capR * 0.1, 0))
+  halo.scale.setScalar(capR * 3.2)
+  const poolMaterial = new THREE.MeshBasicMaterial({ map: lightPoolTexture(), color: cap.glow, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(capR * 4, capR * 4), poolMaterial)
+  pool.rotation.x = -Math.PI / 2
+  pool.position.set(top.x, 0.04, top.z)
+  pool.userData.noShadow = true
+  g.add(halo, pool)
+  glow.halos.push(haloMaterial, poolMaterial)
+  return { group: g, glow }
+}
+
+/** Glowing spores drifting slowly upwards */
+function createSpores(count: number, ctx: LandContext, radius: number, rand: () => number) {
+  const positions = new Float32Array(count * 3)
+  const speeds = new Float32Array(count)
+  const phases = new Float32Array(count)
+  for (let i = 0; i < count; i++) {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * radius
+    positions[i * 3] = Math.cos(a) * r
+    positions[i * 3 + 1] = ctx.groundY + rand() * 6
+    positions[i * 3 + 2] = Math.sin(a) * r
+    speeds[i] = 0.08 + rand() * 0.15
+    phases[i] = rand() * 10
+  }
+  const { object: points, material, markDirty } = sizedPoints(positions, { color: '#b8f5ff', size: 0.07, map: softDotTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.4 })
+  function update(time: number, dt: number, lamps: number) {
+    material.opacity = 0.25 + lamps * 0.65
+    for (let i = 0; i < count; i++) {
+      positions[i * 3 + 1]! += speeds[i]! * dt
+      positions[i * 3]! += Math.sin(time * 0.5 + phases[i]!) * 0.05 * dt
+      if (positions[i * 3 + 1]! > ctx.groundY + 6) positions[i * 3 + 1] = ctx.groundY
+    }
+    markDirty()
+  }
+  return { points, update }
+}
+
+function buildFairy(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(79)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  const { group } = floatingGround(ctx, radius, std('#163a30'))
+  const terrain = createTerrain(ctx, radius, 53, { grass: ['#15362c', '#183c31', '#1c4436', '#16382e'], dry: '#22402a', path: '#7a6a8a' })
+  group.add(terrain.mesh)
+
+  // The centrepiece: a giant glowing mushroom behind the room's back corner
+  const glows: THREE.MeshStandardMaterial[] = []
+  const halos: THREE.Material[] = []
+  const heroHeight = Math.max(5.2, ctx.style.height * 1.75)
+  const heroAt = new THREE.Vector3(-width / 2 - 2, 0, -depth / 2 - 2)
+  heroAt.y = terrain.heightAt(heroAt.x, heroAt.z)
+  const add = (x: number, z: number, height: number, cap: { color: string; glow: string; spots?: boolean; wide?: number }) => {
+    if (Math.hypot(x, z) > radius - 0.8) return
+    const m = giantMushroom(rand, height, cap)
+    m.group.rotation.y = rand() * Math.PI * 2
+    group.add(place(m.group, x, terrain.heightAt(x, z), z))
+    // The light pool is light, not a thing: it casts no shadow
+    m.group.traverse(o => o.userData.noShadow && (o.castShadow = false))
+    glows.push(...m.glow.emissive)
+    halos.push(...m.glow.halos)
+  }
+  add(heroAt.x, heroAt.z, heroHeight, { color: '#7a4ff0', glow: '#7cc8ff', spots: true, wide: 0.6 })
+  // Red toadstools and glowing blue caps round the walls
+  add(width / 2 + 1.5, -depth / 2 - 1.3, 3.4, { color: '#d93a3a', glow: '#ffb38a', spots: true })
+  add(width / 2 + 2.6, -depth / 2 - 2.4, 2.2, { color: '#d93a3a', glow: '#ffb38a', spots: true })
+  add(-width / 2 - 1.6, depth / 2 - 0.2, 2.8, { color: '#3aa0c8', glow: '#7cf2ff' })
+  add(-width / 2 - 2.6, depth / 2 + 0.8, 1.6, { color: '#3aa0c8', glow: '#7cf2ff' })
+  add(-width / 2 - 1.2, -depth / 2 - 3.6, 2.4, { color: '#b04ad8', glow: '#e7a8ff' })
+  // Little ones in rings on the open side
+  for (const [cx, cz] of [[radius * 0.62, radius * 0.18], [-radius * 0.1, radius * 0.7]] as const) {
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + rand() * 0.4
+      add(cx + Math.cos(a) * 0.7, cz + Math.sin(a) * 0.7, 0.35 + rand() * 0.35, { color: i % 2 ? '#3aa0c8' : '#b04ad8', glow: i % 2 ? '#7cf2ff' : '#e7a8ff' })
+    }
+  }
+
+  // Deep green moss, ferns round the mushrooms, small mushrooms in the moss
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(14000 * detail), {
+    colors: ['#0e2a24', '#2c6b52', '#7fd6a6'],
+    tints: ['#ffffff', '#e0fff0', '#d8f0ff', '#f0e8ff'],
+    height: [0.2, 0.45],
+    pathClear: 0.85,
+  }))
+  scatterModel(group, 'Fern_1', clumps(rand, terrain, [[width / 2 + 1.5, -depth / 2 - 0.6], [-width / 2 - 1, depth / 2 + 0.4], [-width / 2 - 0.6, -depth / 2 - 1]], 4, 1, [0.5, 0.8]), { castShadow: false })
+  scatterModel(group, 'Mushroom_Common', clumps(rand, terrain, landSpots(rand, ctx, radius, 6, 1), 4, 0.5, [0.14, 0.24]), { castShadow: false })
+
+  const spores = createSpores(Math.round(260 * detail), ctx, radius, rand)
+  const fireflies = createFireflies(50, ctx, radius, rand)
+  const flutterSpots = landSpots(rand, ctx, radius, 12, 1).map(([x, z]) => new THREE.Vector3(x, terrain.heightAt(x, z) + 0.5, z))
+  const butterflies = createButterflies(4, flutterSpots, rand, ['#b9f3ff', '#e0b3ff'])
+  group.add(spores.points, fireflies.points, butterflies.group)
+  const mist = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#e8dcff', emissiveIntensity: 0.2 })
+  skyClouds(group, rand, mist)
+
+  const nightTint = new THREE.Color('#6a74a8')
+  const white = new THREE.Color('#ffffff')
+  const mistNight = new THREE.Color('#4a3f78')
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#120a2a'), dusk: new THREE.Color('#d68ad6'), day: new THREE.Color('#a9b8ee') },
+    atmosphere: { turbidity: 3, rayleigh: 2.6, mie: 0.004 },
+    light: { sun: 0.8, sky: 0.55 },
+    focus: { position: heroAt, height: heroHeight },
+    heightAt: terrain.heightAt,
+    ground: terrain.mesh,
+    update(time, dt, daylight, lamps) {
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
+      mist.color.copy(mistNight).lerp(white, daylight)
+      // Caps glow softly by day, brightly at night, breathing slowly
+      glows.forEach((m, i) => (m.emissiveIntensity = 0.04 + lamps * (0.9 + Math.sin(time * 0.8 + i) * 0.25)))
+      // Halos round the caps soft, their light on the ground stronger (it lands on dark moss)
+      halos.forEach((m, i) => (m.opacity = lamps * ((m instanceof THREE.SpriteMaterial ? 0.3 : 0.75) + Math.sin(time * 0.8 + i) * 0.06)))
+      spores.update(time, dt, lamps)
+      fireflies.update(time, lamps)
+      butterflies.group.visible = daylight > 0.25
+      if (butterflies.group.visible) butterflies.update(time, dt)
+    },
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
+  }
+}
+
+// ---------- Volcano ----------
+
+/** Glowing lava for a crater or a pool: dark crust, cracks of molten rock moving slowly */
+function lavaMaterial() {
+  const uniforms = { time: { value: 0 } }
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: `
+      varying vec3 vWorld;
+      void main() {
+        vec4 world = modelMatrix * vec4(position, 1.0);
+        vWorld = world.xyz;
+        gl_Position = projectionMatrix * viewMatrix * world;
+      }
+    `,
+    fragmentShader: `
+      uniform float time;
+      varying vec3 vWorld;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+      }
+      void main() {
+        vec2 p = vWorld.xz * 1.6;
+        float s = noise(p + vec2(time * 0.15, time * 0.1)) * 0.6 + noise(p * 2.2 - vec2(time * 0.12, 0.0)) * 0.4;
+        float heat = smoothstep(0.3, 0.75, s);
+        vec3 color = mix(vec3(0.16, 0.04, 0.02), mix(vec3(1.0, 0.3, 0.03), vec3(1.0, 0.85, 0.35), smoothstep(0.75, 1.0, heat)), heat);
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `,
+  })
+  return { material, uniforms }
+}
+
+/** The volcano: a rugged cone of dark rock, a glowing crater, lava running down its flanks */
+function volcanoCone(rand: () => number, base: number, height: number, lava: THREE.Material) {
+  const g = new THREE.Group()
+  const profile: THREE.Vector2[] = []
+  const rim = base * 0.2
+  for (let i = 0; i <= 16; i++) {
+    const t = i / 16
+    // Broad, gently concave flanks rising to the rim
+    profile.push(new THREE.Vector2(rim + (base - rim) * Math.pow(1 - t, 1.35), t * height))
+  }
+  // Over the rim and down into the crater
+  profile.push(new THREE.Vector2(rim * 0.8, height * 0.97), new THREE.Vector2(rim * 0.55, height * 0.9))
+  const geometry = new THREE.LatheGeometry(profile, 48)
+  const pos = geometry.attributes.position as THREE.BufferAttribute
+  const colors = new Float32Array(pos.count * 3)
+  const rock = new THREE.Color('#2b2522')
+  const ash = new THREE.Color('#4a403a')
+  const scorch = new THREE.Color('#5a2a18')
+  const c = new THREE.Color()
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i)
+    const a = Math.atan2(z, x)
+    // Ridges and gullies down the flanks, lumps everywhere
+    const bump = 1 + (noise3(x * 0.8, y * 0.8, z * 0.8) - 0.5) * 0.25 + Math.sin(a * 9) * 0.04 * (y / height)
+    pos.setX(i, x * bump)
+    pos.setZ(i, z * bump)
+    const t = y / height
+    c.copy(rock).lerp(ash, noise3(x * 1.5, y * 1.5, z * 1.5) * 0.6).lerp(scorch, THREE.MathUtils.smoothstep(t, 0.7, 1) * 0.7)
+    colors.set([c.r, c.g, c.b], i * 3)
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+  geometry.computeVertexNormals()
+  const cone = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }))
+  cone.castShadow = true
+  cone.receiveShadow = true
+  const crater = new THREE.Mesh(new THREE.CircleGeometry(rim * 0.6, 24), lava)
+  crater.rotation.x = -Math.PI / 2
+  crater.position.y = height * 0.9
+  g.add(cone, crater)
+  // Lava runs: glowing strips down the flanks, hugging the slope
+  for (let k = 0; k < 4; k++) {
+    const a = rand() * Math.PI * 2
+    const positions: number[] = []
+    const index: number[] = []
+    for (let i = 0; i <= 14; i++) {
+      const t = 1 - (i / 14) * (0.55 + rand() * 0.05)
+      const r = (rim + (base - rim) * Math.pow(1 - t, 1.35)) * 1.02 + 0.03
+      const wobble = a + Math.sin(i * 0.9 + k) * 0.06
+      const w = 0.06 + (1 - t) * 0.1
+      for (const s of [-1, 1]) {
+        const aa = wobble + (s * w) / r
+        positions.push(Math.cos(aa) * r, t * height, Math.sin(aa) * r)
+      }
+      if (i > 0) index.push((i - 1) * 2, (i - 1) * 2 + 1, i * 2, (i - 1) * 2 + 1, i * 2 + 1, i * 2)
+    }
+    const strip = new THREE.BufferGeometry()
+    strip.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    strip.setIndex(index)
+    g.add(new THREE.Mesh(strip, lava))
+  }
+  return g
+}
+
+/** Embers rising from the crater and the lava, flickering out as they go */
+function createEmbers(count: number, sources: THREE.Vector3[], rand: () => number) {
+  const positions = new Float32Array(count * 3)
+  const speeds = new Float32Array(count)
+  const origin: THREE.Vector3[] = []
+  const reset = (i: number, spread: number) => {
+    const s = sources[Math.floor(rand() * sources.length)]!
+    positions[i * 3] = s.x + (rand() - 0.5) * spread
+    positions[i * 3 + 1] = s.y + rand() * 0.3
+    positions[i * 3 + 2] = s.z + (rand() - 0.5) * spread
+    origin[i] = s
+  }
+  for (let i = 0; i < count; i++) {
+    reset(i, 1.2)
+    positions[i * 3 + 1]! += rand() * 5
+    speeds[i] = 0.5 + rand() * 1.1
+  }
+  const { object: points, markDirty } = sizedPoints(positions, { color: '#ff9a3c', size: 0.08, map: softDotTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95 })
+  function update(time: number, dt: number) {
+    for (let i = 0; i < count; i++) {
+      positions[i * 3 + 1]! += speeds[i]! * dt
+      positions[i * 3]! += (Math.sin(time * 1.7 + i) * 0.25 + windField.dir.x * 0.3) * dt
+      positions[i * 3 + 2]! += (Math.cos(time * 1.3 + i) * 0.25 + windField.dir.y * 0.3) * dt
+      if (positions[i * 3 + 1]! > origin[i]!.y + 6) reset(i, 1.2)
+    }
+    markDirty()
+  }
+  return { points, update }
+}
+
+/** Smoke rising from the crater: soft grey puffs that swell and fade */
+function createSmoke(at: THREE.Vector3, rand: () => number) {
+  const group = new THREE.Group()
+  const puffs = Array.from({ length: 14 }, (_, i) => {
+    const material = new THREE.SpriteMaterial({ map: softDotTexture(), color: '#5a5450', transparent: true, depthWrite: false, opacity: 0 })
+    const sprite = new THREE.Sprite(material)
+    group.add(sprite)
+    return { sprite, material, age: (i / 14) * 7, drift: new THREE.Vector2((rand() - 0.5) * 0.4, (rand() - 0.5) * 0.4) }
+  })
+  function update(dt: number, daylight: number) {
+    for (const p of puffs) {
+      p.age = (p.age + dt) % 7
+      const t = p.age / 7
+      p.sprite.position.set(at.x + p.drift.x * t * 4 + windField.dir.x * t * 2.5, at.y + t * 5, at.z + p.drift.y * t * 4 + windField.dir.y * t * 2.5)
+      p.sprite.scale.setScalar(0.8 + t * 3.2)
+      p.material.opacity = Math.sin(Math.PI * t) * 0.55
+      // Grey by day; lit orange from the crater below at night, fading as it rises
+      p.material.color.setRGB(0.18 + daylight * 0.17 + (1 - daylight) * 0.5 * (1 - t), 0.16 + daylight * 0.17 + (1 - daylight) * 0.16 * (1 - t), 0.15 + daylight * 0.17)
+    }
+  }
+  return { group, update }
+}
+
+/** Darker rocks for the volcano (the nature pack's are grey) */
+const basaltMaterials = new WeakMap<THREE.Material, THREE.Material>()
+function basalt(material: THREE.Material): THREE.Material {
+  let dark = basaltMaterials.get(material)
+  if (!dark) {
+    const m = (material as THREE.MeshStandardMaterial).clone()
+    m.color = new THREE.Color('#4a423e')
+    m.userData.shared = true
+    basaltMaterials.set(material, m)
+    dark = m
+  }
+  return dark
+}
+
+function buildVolcano(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(89)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  // The land's top the same as the ground (it shows through where the ground dips)
+  const { group } = floatingGround(ctx, radius, std('#352b26', { roughness: 1 }))
+  const terrain = createTerrain(ctx, radius, 59, { grass: ['#2e2622', '#342a25', '#3a2f29', '#302723'], dry: '#3e2c22', path: '#4e4036' })
+  group.add(terrain.mesh)
+
+  // The centrepiece: a smoking volcano behind the room's back corner
+  const lava = lavaMaterial()
+  // Big and broad, standing well back (its far foot may reach past the edge)
+  const coneAt = new THREE.Vector2(-width / 2 - 3.2, -depth / 2 - 3.2)
+  const base = 4.6
+  const coneHeight = Math.max(6.5, ctx.style.height * 2.1)
+  const cone = volcanoCone(rand, base, coneHeight, lava.material)
+  const coneY = terrain.heightAt(coneAt.x, coneAt.y) - 0.1
+  cone.position.set(coneAt.x, coneY, coneAt.y)
+  group.add(cone)
+  const craterTop = new THREE.Vector3(coneAt.x, coneY + coneHeight * 0.92, coneAt.y)
+
+  // A lava river from a glowing pool to the edge, pouring off into the sky
+  const flowAngle = Math.PI * 0.62
+  const poolAt = new THREE.Vector2(Math.cos(flowAngle), Math.sin(flowAngle)).multiplyScalar(radius * 0.62)
+  const pool = new THREE.Mesh(new THREE.CircleGeometry(0.85, 28), lava.material)
+  pool.rotation.x = -Math.PI / 2
+  pool.position.set(poolAt.x, terrain.heightAt(poolAt.x, poolAt.y) + 0.03, poolAt.y)
+  group.add(pool)
+  const river = createWaterfall(ctx, radius, terrain, poolAt, flowAngle, true)
+  if (!gpuKit()) group.add(river.mesh)
+  const lavaLight = new THREE.PointLight('#ff6a1a', 2, 6, 1.6)
+  lavaLight.position.set(poolAt.x, terrain.heightAt(poolAt.x, poolAt.y) + 0.8, poolAt.y)
+  group.add(lavaLight)
+  const nearLava = (x: number, z: number) => Math.hypot(x - poolAt.x, z - poolAt.y) < 1.4 || river.covers(x, z)
+
+  // Black rocks, obsidian shards, scorched shrubs
+  const boulders: ScatterItem[] = [[width / 2 + 1.6, -depth / 2 - 1.2, 1.2], [width / 2 + 2.6, -depth / 2 - 2.4, 0.8], [-width / 2 - 1.4, depth / 2 + 0.4, 0.9], [poolAt.x + 1.3, poolAt.y - 0.6, 0.5], [radius * 0.66, radius * 0.1, 0.7]]
+    .filter(([x, z]) => Math.hypot(x!, z!) < radius - 0.8)
+    .map(([x, z, h]) => ({ x: x!, y: terrain.heightAt(x!, z!) - 0.1, z: z!, height: h!, rotation: rand() * Math.PI * 2 }))
+  for (const [name, list] of byVariant(['Rock_Medium_1', 'Rock_Medium_2', 'Rock_Medium_3'], boulders, rand)) scatterModel(group, name, list, { material: basalt })
+  const obsidian = std('#14111a', { roughness: 0.15, metalness: 0.3, flatShading: true })
+  for (const [cx, cz] of [[width / 2 + 2.4, depth / 2 - 0.4], [-width / 2 - 2.2, depth / 2 + 1.6], [radius * 0.2, -depth / 2 - 2.2]] as const) {
+    if (Math.hypot(cx, cz) > radius - 1) continue
+    for (let i = 0; i < 5; i++) {
+      const shard = new THREE.Mesh(new THREE.ConeGeometry(0.08 + rand() * 0.1, 0.4 + rand() * 0.7, 5), obsidian)
+      shard.rotation.set((rand() - 0.5) * 0.7, rand() * Math.PI, (rand() - 0.5) * 0.7)
+      const x = cx + (rand() - 0.5) * 0.9
+      const z = cz + (rand() - 0.5) * 0.9
+      group.add(place(shard, x, terrain.heightAt(x, z) + 0.15, z))
+    }
+  }
+  // Dry, scorched grass in a few tufts away from the lava
+  const tufts: [number, number, number][] = [[width / 2 + 1, depth / 2 + 1.2, 0.9], [-width / 2 - 0.6, depth / 2 + 2, 0.8], [radius * 0.7, -radius * 0.2, 0.9]]
+  const inTuft = (x: number, z: number) => tufts.some(([cx, cz, r]) => Math.hypot(x - cx, z - cz) < r)
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(3000 * detail), {
+    colors: ['#2a1d12', '#6a4a26', '#b08a4a'],
+    tints: ['#ffffff', '#e8d8c0'],
+    height: [0.15, 0.35],
+    pathClear: 0.97,
+    avoid: (x, z) => !inTuft(x, z) || nearLava(x, z),
+  }))
+
+  // Glowing cracks across the ground, branching out from the volcano and the pool
+  const cracks = new THREE.Group()
+  const crackStarts: [number, number, number][] = [[coneAt.x + 3.2, coneAt.y + 1.2, 0.3], [coneAt.x + 1.4, coneAt.y + 3.4, 1.2], [poolAt.x + 0.8, poolAt.y - 0.4, -0.6], [poolAt.x - 0.6, poolAt.y - 0.7, -1.8], [radius * 0.55, -radius * 0.35, 2.6]]
+  for (const [sx, sz, heading] of crackStarts) {
+    for (let branch = 0; branch < 2; branch++) {
+      let x = sx
+      let z = sz
+      let a = heading + (branch ? 0.8 : -0.3)
+      const positions: number[] = []
+      const index: number[] = []
+      const steps = 9 + Math.floor(rand() * 6)
+      for (let i = 0; i <= steps; i++) {
+        const w = 0.07 * (1 - i / steps) + 0.015
+        const side = new THREE.Vector2(-Math.sin(a), Math.cos(a)).multiplyScalar(w)
+        const y = terrain.heightAt(x, z) + 0.015
+        positions.push(x - side.x, y, z - side.y, x + side.x, y, z + side.y)
+        if (i > 0) index.push((i - 1) * 2, (i - 1) * 2 + 1, i * 2, (i - 1) * 2 + 1, i * 2 + 1, i * 2)
+        a += (rand() - 0.5) * 0.9
+        x += Math.cos(a) * 0.28
+        z += Math.sin(a) * 0.28
+        if (Math.hypot(x, z) > radius - 0.3 || (Math.abs(x) < width / 2 + 0.2 && Math.abs(z) < depth / 2 + 0.2)) break
+      }
+      if (index.length) {
+        const crack = new THREE.BufferGeometry()
+        crack.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+        crack.setIndex(index)
+        cracks.add(new THREE.Mesh(crack, lava.material))
+      }
+    }
+  }
+  group.add(cracks)
+  // The crater's glow on its smoke and the sky above it
+  const craterGlow = new THREE.SpriteMaterial({ map: softDotTexture(), color: '#ff5a1a', transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending })
+  const craterHalo = new THREE.Sprite(craterGlow)
+  craterHalo.position.copy(craterTop).add(new THREE.Vector3(0, 0.6, 0))
+  craterHalo.scale.setScalar(4.5)
+  group.add(craterHalo)
+
+  const embers = createEmbers(Math.round(220 * detail), [craterTop, new THREE.Vector3(poolAt.x, terrain.heightAt(poolAt.x, poolAt.y), poolAt.y)], rand)
+  const smoke = createSmoke(craterTop, rand)
+  group.add(embers.points, smoke.group)
+
+  const nightTint = new THREE.Color('#8a5a50')
+  const white = new THREE.Color('#ffffff')
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#1a0806'), dusk: new THREE.Color('#ff6a2c'), day: new THREE.Color('#d9a582') },
+    atmosphere: { turbidity: 9, rayleigh: 1, mie: 0.015 },
+    light: { sun: 0.8, sky: 0.5 },
+    focus: { position: new THREE.Vector3(coneAt.x, coneY, coneAt.y), height: coneHeight },
+    heightAt: terrain.heightAt,
+    ground: terrain.mesh,
+    update(time, dt, daylight) {
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
+      lava.uniforms.time.value = time
+      river.uniforms.time.value = time
+      river.uniforms.daylight.value = daylight
+      lavaLight.intensity = 1.5 + (1 - daylight) * 3 + Math.sin(time * 3) * 0.3
+      craterGlow.opacity = 0.25 + (1 - daylight) * 0.5 + Math.sin(time * 2.3) * 0.05
+      embers.update(time, dt)
+      smoke.update(dt, daylight)
+    },
+  }
+}
+
+// ---------- Zen garden ----------
+
+/** Raked gravel: concentric lines round the stones, straight rows elsewhere */
+function gravelTexture(size: number, stones: [number, number, number][]) {
+  const px = 512
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = px
+  const g = canvas.getContext('2d')!
+  g.fillStyle = '#c9c2b2'
+  g.fillRect(0, 0, px, px)
+  // Grain
+  const grain = seeded(113)
+  for (let i = 0; i < 9000; i++) {
+    const v = Math.round(150 + grain() * 70)
+    g.fillStyle = `rgb(${v},${v - 4},${v - 12})`
+    g.fillRect(grain() * px, grain() * px, 2, 2)
+  }
+  const k = px / size
+  const toPx = (x: number) => (x + size / 2) * k
+  // Straight rows first, then the stones' rings over them, on gravel cleared under each ring
+  // Each furrow: a shadowed groove with a lit ridge beside it
+  const furrow = (draw: () => void) => {
+    g.strokeStyle = 'rgba(95,88,74,0.75)'
+    g.lineWidth = 3
+    draw()
+    g.save()
+    g.translate(0, 2.5)
+    g.strokeStyle = 'rgba(250,246,236,0.7)'
+    g.lineWidth = 2
+    draw()
+    g.restore()
+  }
+  for (let y = 5; y < px; y += 12) {
+    furrow(() => {
+      g.beginPath()
+      g.moveTo(0, y)
+      g.lineTo(px, y)
+      g.stroke()
+    })
+  }
+  for (const [x, z, r] of stones) {
+    g.fillStyle = '#c9c2b2'
+    g.beginPath()
+    g.arc(toPx(x), toPx(z), (r + 0.6) * k, 0, Math.PI * 2)
+    g.fill()
+    for (let ring = r + 0.12; ring < r + 0.6; ring += 12 / k) {
+      furrow(() => {
+        g.beginPath()
+        g.arc(toPx(x), toPx(z), ring * k, 0, Math.PI * 2)
+        g.stroke()
+      })
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = 4
+  return texture
+}
+
+/** Narrow bamboo leaves on a card (coloured per instance) */
+let bambooLeafCanvas: THREE.CanvasTexture | null = null
+function bambooLeafTexture() {
+  if (bambooLeafCanvas) return bambooLeafCanvas
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const g = canvas.getContext('2d')!
+  const rand = seeded(101)
+  for (let i = 0; i < 46; i++) {
+    const x = size / 2 + (rand() - 0.5) * size * 0.7
+    const y = size / 2 + (rand() - 0.5) * size * 0.7
+    const length = 40 + rand() * 30
+    const light = Math.round(140 + rand() * 100)
+    g.save()
+    g.translate(x, y)
+    // Drooping, mostly pointing down and out
+    g.rotate(Math.PI / 2 + (rand() - 0.5) * 1.6)
+    g.fillStyle = `rgb(${light},${light},${light})`
+    g.beginPath()
+    g.moveTo(0, -length / 2)
+    g.quadraticCurveTo(length * 0.09, 0, 0, length / 2)
+    g.quadraticCurveTo(-length * 0.09, 0, 0, -length / 2)
+    g.fill()
+    g.restore()
+  }
+  bambooLeafCanvas = new THREE.CanvasTexture(canvas)
+  bambooLeafCanvas.colorSpace = THREE.SRGBColorSpace
+  return bambooLeafCanvas
+}
+
+/** A grove of bamboo along `spots`: jointed stalks and drooping leaf sprays, all swaying */
+function bambooGrove(ctx: LandContext, terrain: Terrain, rand: () => number, spots: [number, number][], perSpot: number, height: number) {
+  const group = new THREE.Group()
+  // One unit stalk: segments with a bulging node ring between them
+  const parts: THREE.BufferGeometry[] = []
+  const joints = 9
+  for (let i = 0; i < joints; i++) {
+    const seg = new THREE.CylinderGeometry(0.5, 0.5, 1 / joints, 8, 1, true)
+    seg.translate(0, (i + 0.5) / joints, 0)
+    parts.push(seg)
+    const node = new THREE.TorusGeometry(0.52, 0.06, 4, 8)
+    node.rotateX(Math.PI / 2)
+    node.translate(0, (i + 1) / joints, 0)
+    parts.push(node)
+  }
+  const unit = mergeGeometries(parts.map(p => p.toNonIndexed()))!
+  parts.forEach(p => p.dispose())
+  const stalkMaterial = swayingMaterial(new THREE.MeshLambertMaterial({ color: '#ffffff' }))
+  const stalks: { x: number; y: number; z: number; h: number; lean: number; turn: number }[] = []
+  for (const [cx, cz] of spots) {
+    for (let i = 0; i < perSpot; i++) {
+      const x = cx + (rand() - 0.5) * 1.6
+      const z = cz + (rand() - 0.5) * 1.6
+      if (Math.abs(x) < ctx.style.width / 2 + 0.3 && Math.abs(z) < ctx.style.depth / 2 + 0.3) continue
+      stalks.push({ x, y: terrain.heightAt(x, z), z, h: height * (0.7 + rand() * 0.4), lean: (rand() - 0.5) * 0.12, turn: rand() * Math.PI * 2 })
+    }
+  }
+  const stalkMesh = new THREE.InstancedMesh(unit, stalkMaterial, stalks.length)
+  const dummy = new THREE.Object3D()
+  const greens = ['#5f7f30', '#6f8a36', '#56742c', '#7d8a3e', '#8a8a48'].map(c => new THREE.Color(c))
+  stalks.forEach((s, i) => {
+    dummy.position.set(s.x, s.y, s.z)
+    dummy.rotation.set(s.lean, s.turn, s.lean * 0.5)
+    dummy.scale.set(0.07, s.h, 0.07)
+    dummy.updateMatrix()
+    stalkMesh.setMatrixAt(i, dummy.matrix)
+    stalkMesh.setColorAt(i, greens[i % greens.length]!)
+  })
+  stalkMesh.castShadow = true
+  stalkMesh.receiveShadow = true
+  group.add(stalkMesh)
+  // Leaf sprays on the upper half of each stalk
+  const card = mergeGeometries([0, 1].map((k) => {
+    const plane = new THREE.PlaneGeometry(1, 1)
+    plane.rotateY(k * Math.PI / 2)
+    return plane
+  }))!
+  const leafMaterial = swayingMaterial(new THREE.MeshLambertMaterial({ map: bambooLeafTexture(), alphaTest: 0.4, side: THREE.DoubleSide }))
+  const perStalk = 11
+  const leaves = new THREE.InstancedMesh(card, leafMaterial, stalks.length * perStalk)
+  const leafGreens = ['#4f7a24', '#6a9a30', '#86b040', '#5d8a2a'].map(c => new THREE.Color(c))
+  let n = 0
+  for (const s of stalks) {
+    for (let k = 0; k < perStalk; k++) {
+      const a = rand() * Math.PI * 2
+      const t2 = 0.42 + rand() * 0.6
+      dummy.position.set(s.x + Math.cos(a) * 0.4 + Math.sin(s.lean) * s.h * t2, s.y + s.h * Math.min(t2, 1.02), s.z + Math.sin(a) * 0.4)
+      dummy.rotation.set((rand() - 0.5) * 0.4, rand() * Math.PI * 2, (rand() - 0.5) * 0.4)
+      dummy.scale.setScalar(1.2 + rand() * 0.8)
+      dummy.updateMatrix()
+      leaves.setMatrixAt(n, dummy.matrix)
+      leaves.setColorAt(n, leafGreens[Math.floor(rand() * leafGreens.length)]!)
+      n++
+    }
+  }
+  leaves.count = n
+  leaves.castShadow = true
+  group.add(leaves)
+  return group
+}
+
+/** A stone lantern (tōrō): footing, post, a fire box with windows, wide roof */
+function stoneLantern(glass: THREE.MeshStandardMaterial, glow: THREE.SpriteMaterial) {
+  const g = new THREE.Group()
+  const stone = std('#77746c', { roughness: 1, flatShading: true })
+  const parts: [THREE.BufferGeometry, number][] = [
+    [new THREE.CylinderGeometry(0.3, 0.34, 0.12, 6), 0.06],
+    [new THREE.CylinderGeometry(0.1, 0.13, 0.6, 6), 0.42],
+    [new THREE.CylinderGeometry(0.26, 0.2, 0.1, 6), 0.77],
+  ]
+  for (const [geometry, y] of parts) {
+    const m = new THREE.Mesh(geometry, stone)
+    m.position.y = y
+    g.add(m)
+  }
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.26, 0.3), glass)
+  box.position.y = 0.95
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.27, 0.12), stone)
+  frame.position.y = 0.95
+  const frame2 = frame.clone()
+  frame2.rotation.y = Math.PI / 2
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(0.42, 0.24, 6), stone)
+  roof.position.y = 1.2
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), stone)
+  knob.position.y = 1.36
+  const halo = new THREE.Sprite(glow)
+  halo.position.y = 0.95
+  halo.scale.setScalar(1.1)
+  g.add(box, frame, frame2, roof, knob, halo)
+  return g
+}
+
+/** Koi swimming slow circles in a pond */
+function createKoi(count: number, at: THREE.Vector3, radius: number, rand: () => number) {
+  const group = new THREE.Group()
+  const body = new THREE.SphereGeometry(0.1, 10, 6)
+  body.scale(1, 0.35, 0.45)
+  const tail = new THREE.ConeGeometry(0.05, 0.1, 4)
+  tail.rotateZ(Math.PI / 2)
+  tail.translate(-0.13, 0, 0)
+  const fish = Array.from({ length: count }, (_, i) => {
+    const color = ['#ff7a1a', '#ffffff', '#ff5a3a', '#ffd23a'][i % 4]!
+    const m = std(color, { roughness: 0.4 })
+    const g = new THREE.Group()
+    g.add(new THREE.Mesh(body, m), new THREE.Mesh(tail, m))
+    group.add(g)
+    return { g, r: radius * (0.35 + rand() * 0.45), speed: (0.25 + rand() * 0.2) * (rand() < 0.5 ? -1 : 1), phase: rand() * Math.PI * 2 }
+  })
+  function update(time: number) {
+    for (const f of fish) {
+      const a = f.phase + time * f.speed
+      const r = f.r + Math.sin(time * 0.7 + f.phase) * 0.08
+      f.g.position.set(at.x + Math.cos(a) * r, at.y, at.z + Math.sin(a) * r)
+      // Facing along the circle
+      f.g.rotation.y = -a - (f.speed > 0 ? Math.PI / 2 : -Math.PI / 2)
+      f.g.children[1]!.rotation.y = Math.sin(time * 6 + f.phase) * 0.4
+    }
+  }
+  return { group, update }
+}
+
+function buildZen(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(97)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  const { group } = floatingGround(ctx, radius, std('#2a4a1e'))
+  const terrain = createTerrain(ctx, radius, 61, { grass: ['#2a481e', '#2f5022', '#355824', '#2c4c20'], dry: '#3a5a26', path: '#7f7a6e' })
+  group.add(terrain.mesh)
+
+  // The centrepiece: a tall bamboo grove wrapping round behind both walls
+  const grove: [number, number][] = []
+  for (let i = 0; i <= 6; i++) grove.push([-width / 2 - 1.4 + i * ((width + 2.4) / 6), -depth / 2 - 1.6 - (i % 2) * 0.9])
+  for (let i = 1; i <= 5; i++) grove.push([-width / 2 - 1.6 - (i % 2) * 0.9, -depth / 2 - 1.4 + i * ((depth + 1.6) / 5)])
+  const groveHeight = Math.max(6.5, ctx.style.height * 2.2)
+  group.add(bambooGrove(ctx, terrain, rand, grove.filter(([x, z]) => Math.hypot(x, z) < radius - 0.8), Math.round(7 * Math.max(detail, 0.6)), groveHeight))
+
+  // Raked gravel with three stones, front left
+  const gravelAt = new THREE.Vector2(-radius * 0.08, radius * 0.6)
+  const gravelR = Math.min(2.3, radius * 0.26)
+  const stones: [number, number, number][] = [[-0.6, -0.3, 0.45], [0.7, 0.4, 0.32], [0.1, 0.9, 0.22]]
+  // Laid over the ground's own rise and fall, a little above it
+  const gravelShape = new THREE.RingGeometry(0.001, gravelR, 48, 12)
+  gravelShape.rotateX(-Math.PI / 2)
+  const gp = gravelShape.attributes.position as THREE.BufferAttribute
+  // Never under the land's top, which fills the ground's hollows
+  for (let i = 0; i < gp.count; i++) gp.setY(i, Math.max(terrain.heightAt(gravelAt.x + gp.getX(i), gravelAt.y + gp.getZ(i)), ctx.groundY) + 0.03)
+  gravelShape.computeVertexNormals()
+  const gravel = new THREE.Mesh(gravelShape, new THREE.MeshStandardMaterial({ map: gravelTexture(gravelR * 2, stones), roughness: 1 }))
+  gravel.position.set(gravelAt.x, 0, gravelAt.y)
+  gravel.receiveShadow = true
+  group.add(gravel)
+  const stoneItems = stones.map(([x, z, r]) => ({ x: gravelAt.x + x, y: terrain.heightAt(gravelAt.x + x, gravelAt.y + z) - 0.03, z: gravelAt.y + z, height: r * 1.6, rotation: rand() * Math.PI * 2 }))
+  for (const [name, list] of byVariant(['Rock_Medium_1', 'Rock_Medium_2', 'Rock_Medium_3'], stoneItems, rand)) scatterModel(group, name, list)
+  const inGravel = (x: number, z: number) => Math.hypot(x - gravelAt.x, z - gravelAt.y) < gravelR + 0.15
+
+  // Koi pond to the right of the path, a red maple leaning over it
+  const pondX = radius * 0.66
+  const pondZ = radius * 0.2
+  const pondR = 1.35
+  const pondY = terrain.heightAt(pondX, pondZ)
+  const inPond = (x: number, z: number) => Math.hypot(x - pondX, z - pondZ) < pondR + 0.35
+  const water = createWater(pondR)
+  water.mesh.position.set(pondX, pondY + 0.03, pondZ)
+  group.add(water.mesh)
+  const koi = createKoi(6, new THREE.Vector3(pondX, pondY + 0.045, pondZ), pondR, rand)
+  group.add(koi.group)
+  const shore: ScatterItem[] = []
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2 + rand() * 0.15
+    const r = pondR + 0.05 + rand() * 0.12
+    const x = pondX + Math.cos(a) * r
+    const z = pondZ + Math.sin(a) * r
+    shore.push({ x, y: terrain.heightAt(x, z), z, height: 0.12 + rand() * 0.12, rotation: rand() * Math.PI * 2 })
+  }
+  for (const [name, items] of byVariant(['Pebble_Round_1', 'Pebble_Round_2', 'Pebble_Round_3', 'Pebble_Round_4', 'Pebble_Round_5'], shore, rand)) scatterModel(group, name, items)
+  const pads = Array.from({ length: 4 }, () => {
+    const pad = new THREE.Mesh(new THREE.CircleGeometry(0.15, 14, 0.3, Math.PI * 1.8), std('#4f9d3a', { side: THREE.DoubleSide }))
+    pad.rotation.x = -Math.PI / 2
+    const a = rand() * Math.PI * 2
+    const r = rand() * 0.9
+    pad.position.set(pondX + Math.cos(a) * r, pondY + 0.04, pondZ + Math.sin(a) * r)
+    group.add(pad)
+    return pad
+  })
+  const mapleX = pondX + pondR + 0.6
+  const mapleZ = pondZ - pondR - 0.2
+  if (Math.hypot(mapleX, mapleZ) < radius - 0.8) scatterModel(group, 'TwistedTree_1', [{ x: mapleX, y: terrain.heightAt(mapleX, mapleZ), z: mapleZ, height: 3.4, rotation: rand() * Math.PI * 2 }])
+
+  // Stepping stones along the path
+  const pathFrom = new THREE.Vector2(width / 2 + 0.9, depth / 2 + 0.8)
+  const pathMid = new THREE.Vector2(width / 2 + 1.8, depth / 2 + 1.2)
+  const pathTo = new THREE.Vector2(radius * 0.5, radius * 0.62)
+  const slab = std('#8e8a80', { roughness: 1, flatShading: true })
+  const steps: THREE.Vector2[] = []
+  for (const [a, b] of [[pathFrom, pathMid], [pathMid, pathTo]] as const) {
+    const n = Math.max(1, Math.round(a.distanceTo(b) / 0.62))
+    for (let i = 0; i < n; i++) steps.push(a.clone().lerp(b, i / n))
+  }
+  steps.push(pathTo.clone().lerp(new THREE.Vector2(radius * 0.62, radius * 0.95), 0.4))
+  for (const p of steps) {
+    if (p.length() > radius - 0.4) continue
+    const stone = new THREE.Mesh(new THREE.CylinderGeometry(0.24 + rand() * 0.06, 0.26, 0.06, 7), slab)
+    stone.rotation.y = rand() * Math.PI
+    group.add(place(stone, p.x + (rand() - 0.5) * 0.1, terrain.heightAt(p.x, p.y) + 0.02, p.y + (rand() - 0.5) * 0.1, false))
+  }
+
+  // Moss lawn
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(13000 * detail), {
+    colors: ['#203a16', '#4d7a2c', '#a6cc62'],
+    tints: ['#ffffff', '#f2ffe0', '#e8f5d8'],
+    height: [0.18, 0.4],
+    pathClear: 0.95,
+    avoid: (x, z) => inGravel(x, z) || inPond(x, z),
+  }))
+
+  // Stone lanterns by the pond and the gravel, lit at night
+  const glass = new THREE.MeshStandardMaterial({ color: '#fff4dc', emissive: '#ffb347', emissiveIntensity: 0.1 })
+  const glow = new THREE.SpriteMaterial({ map: softDotTexture(), color: '#ffc46b', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })
+  for (const [x, z] of [[pondX - pondR - 0.5, pondZ + 0.9], [gravelAt.x - gravelR - 0.4, gravelAt.y - 0.6]] as const) {
+    if (Math.hypot(x, z) > radius - 0.6) continue
+    group.add(place(stoneLantern(glass, glow), x, terrain.heightAt(x, z), z))
+  }
+
+  const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffffff', emissiveIntensity: 0.15 })
+  skyClouds(group, rand, cloudMaterial)
+  const petals = createPetals(Math.round(120 * detail), ctx, [new THREE.Vector3(mapleX, terrain.heightAt(mapleX, mapleZ) + 2.6, mapleZ)], rand, { colors: ['#c9301a', '#e0461e', '#b8221a'], size: 1.6 })
+  const fireflies = createFireflies(26, ctx, radius, rand)
+  const flutterSpots = landSpots(rand, ctx, radius, 10, 1).map(([x, z]) => new THREE.Vector3(x, terrain.heightAt(x, z) + 0.5, z))
+  const butterflies = createButterflies(3, flutterSpots, rand, ['#ffffff', '#fde68a'])
+  group.add(petals.mesh, fireflies.points, butterflies.group)
+
+  const nightTint = new THREE.Color('#3a4560')
+  const white = new THREE.Color('#ffffff')
+  const cloudNight = new THREE.Color('#4a5878')
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#0a1020'), dusk: new THREE.Color('#f2a07a'), day: new THREE.Color('#a8cfe8') },
+    atmosphere: { turbidity: 2.5, rayleigh: 2, mie: 0.003 },
+    focus: { position: new THREE.Vector3(-width / 2 - 1.4, terrain.heightAt(-width / 2 - 1.4, -depth / 2 - 1.6), -depth / 2 - 1.6), height: groveHeight },
+    heightAt: terrain.heightAt,
+    ground: terrain.mesh,
+    update(time, dt, daylight, lamps) {
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
+      cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
+      water.uniforms.time.value = time
+      water.uniforms.daylight.value = daylight
+      koi.update(time)
+      pads.forEach((p, i) => (p.position.y = pondY + 0.04 + Math.sin(time + i) * 0.004))
+      petals.update(time, dt)
+      glass.emissiveIntensity = 0.1 + lamps * 2.2
+      glow.opacity = lamps * 0.8
+      butterflies.group.visible = daylight > 0.25
+      if (butterflies.group.visible) butterflies.update(time, dt)
+      fireflies.update(time, lamps)
+    },
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
+  }
+}
+
 export function buildLand(id: LandId, ctx: LandContext): LandInstance {
   const radius = Math.max(ctx.style.width, ctx.style.depth) * 1.1 + 2.5
-  // Gusting wind is a land's own (crimson, winter); the others just sway
-  windField.gust.value = id === 'crimson' || id === 'winter' ? 1 : 0
+  // Gusting wind is a land's own (crimson, winter, autumn); the others just sway
+  windField.gust.value = id === 'crimson' || id === 'winter' || id === 'autumn' ? 1 : 0
   // No wind inside the room's walls (potted plants use the same leaves)
   windField.room.set(ctx.style.width / 2, ctx.style.depth / 2)
   switch (id) {
@@ -3194,6 +4647,16 @@ export function buildLand(id: LandId, ctx: LandContext): LandInstance {
       return buildCrimson(ctx, radius)
     case 'winter':
       return buildWinter(ctx, radius)
+    case 'autumn':
+      return buildAutumn(ctx, radius)
+    case 'tropical':
+      return buildTropical(ctx, radius)
+    case 'fairy':
+      return buildFairy(ctx, radius)
+    case 'volcano':
+      return buildVolcano(ctx, radius)
+    case 'zen':
+      return buildZen(ctx, radius)
     case 'city':
       // A city needs more room for streets and buildings
       return buildCity(ctx, radius * 1.65)

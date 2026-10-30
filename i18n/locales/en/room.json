@@ -209,6 +209,26 @@
       "winter": {
         "name": "Winter",
         "description": "A frost-white giant tree, a frozen pond, blowing snow and lanterns at night"
+      },
+      "autumn": {
+        "name": "Autumn",
+        "description": "A giant maple in red and gold, leaves blowing in the wind, pumpkins"
+      },
+      "tropical": {
+        "name": "Tropical beach",
+        "description": "Palms on white sand, turquoise sea and waves, tiki torches at night"
+      },
+      "fairy": {
+        "name": "Fairy forest",
+        "description": "Giant glowing mushrooms, drifting spores and fireflies in deep moss"
+      },
+      "volcano": {
+        "name": "Volcano",
+        "description": "A smoking volcano, a river of lava pouring off the edge, rising embers"
+      },
+      "zen": {
+        "name": "Zen garden",
+        "description": "Bamboo grove, raked gravel, a koi pond and stone lanterns"
       }
     },
     "objects": {
