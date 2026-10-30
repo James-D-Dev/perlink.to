@@ -1122,27 +1122,31 @@ function plantGroves(group: THREE.Group, ctx: LandContext, radius: number, terra
   return trees
 }
 
-/** Dense grass clumps, flower patches, bushes and pebbles in front; returns flower tops for butterflies */
-function plantMeadow(group: THREE.Group, ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, avoid?: (x: number, z: number) => boolean) {
-  // Grass is most of the land's triangles: the wispy variants are 3-4x heavier
-  // per clump than the common ones, so they're used sparingly
-  const per = (n: number) => Math.max(1, Math.round(n * (ctx.detail ?? 1)))
-  scatterModel(group, 'Grass_Common_Short', clumps(rand, terrain, landSpots(rand, ctx, radius, 56), per(15), 0.9, [0.2, 0.32], avoid), { castShadow: false })
-  scatterModel(group, 'Grass_Wispy_Short', clumps(rand, terrain, landSpots(rand, ctx, radius, 18), per(8), 0.7, [0.22, 0.34], avoid), { castShadow: false })
-  scatterModel(group, 'Grass_Common_Tall', clumps(rand, terrain, landSpots(rand, ctx, radius, 22), per(8), 0.6, [0.35, 0.55], avoid), { castShadow: false })
-  scatterModel(group, 'Grass_Wispy_Tall', clumps(rand, terrain, landSpots(rand, ctx, radius, 10), per(6), 0.5, [0.45, 0.65], avoid), { castShadow: false })
+/**
+ * A lawn of long, soft grass blades (like the crimson land's: one even field,
+ * not scattered little clumps, which read as noise), flower patches standing
+ * out of it, bushes; returns flower tops for butterflies
+ */
+function plantMeadow(group: THREE.Group, ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, lawn: [string, string, string], avoid?: (x: number, z: number) => boolean) {
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(15000 * (ctx.detail ?? 1)), {
+    colors: lawn,
+    tints: ['#ffffff', '#f2ffe0', '#dff5c8', '#fff6d8'],
+    height: [0.3, 0.68],
+    pathClear: 0.95,
+    avoid,
+  }))
 
   // Flower patches: each patch is one kind, like wildflowers grow
   const patchCenters = Array.from({ length: 8 }, () => outdoorSpot(rand, ctx.style, radius, 0.8))
   const flowers: ScatterItem[] = []
   patchCenters.forEach((center, i) => {
     const name = ['Flower_3_Group', 'Flower_4_Group', 'Flower_3_Single', 'Flower_4_Single'][i % 4]!
-    const items = clumps(rand, terrain, [center], 7, 0.75, name.includes('Group') ? [0.3, 0.42] : [0.26, 0.38], avoid)
+    // Taller than the lawn, so they stand out of it
+    const items = clumps(rand, terrain, [center], 7, 0.75, name.includes('Group') ? [0.6, 0.78] : [0.55, 0.72], avoid)
     scatterModel(group, name, items, { castShadow: false })
     flowers.push(...items)
   })
   for (const [name, list] of byVariant(['Bush_Common_Flowers'], clumps(rand, terrain, Array.from({ length: 5 }, () => outdoorSpot(rand, ctx.style, radius, 1)), 1, 0.2, [0.55, 0.85], avoid), rand)) scatterModel(group, name, list)
-  scatterModel(group, 'Plant_1', clumps(rand, terrain, landSpots(rand, ctx, radius, 6), 2, 0.4, [0.3, 0.45], avoid), { castShadow: false })
   return flowers.map(f => new THREE.Vector3(f.x, f.y + f.height * 0.9, f.z))
 }
 
@@ -1230,7 +1234,7 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
   group.add(terrain.mesh)
 
   plantGroves(group, ctx, radius, terrain, rand, ['CommonTree_1', 'CommonTree_2', 'CommonTree_3', 'CommonTree_4', 'CommonTree_5', 'Pine_1'])
-  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand)
+  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, ['#2d5a1c', '#4f9a34', '#a6dc6a'])
   plantPathEdges(group, terrain, rand, ctx, radius)
 
   const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffffff', emissiveIntensity: 0.15 })
@@ -1534,15 +1538,7 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
   const trees = plantGroves(group, ctx, radius, terrain, rand, ['TwistedTree_1', 'TwistedTree_2', 'TwistedTree_3'], cherryLeaves)
   const petalSources = trees.map(t => new THREE.Vector3(t.x, t.y + t.height * 0.75, t.z))
 
-  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, inPond)
-  // A full lawn under the meadow's clumps (blades, like the crimson land's)
-  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(9000 * (ctx.detail ?? 1)), {
-    colors: ['#2f5a1e', '#5f9e3a', '#b9e27c'],
-    tints: ['#ffffff', '#f2ffe0', '#dff5c8', '#fff6d8'],
-    height: [0.2, 0.46],
-    pathClear: 0.95,
-    avoid: inPond,
-  }))
+  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, ['#2f5a1e', '#5f9e3a', '#b9e27c'], inPond)
   plantPathEdges(group, terrain, rand, ctx, radius)
 
   const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffe6f0', emissiveIntensity: 0.15 })
