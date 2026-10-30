@@ -49,7 +49,7 @@ export type TourStyle = (typeof TOUR_STYLES)[number]
 export interface RoomSceneStats {
   /** Frames actually rendered in the last second */
   fps: number
-  /** Frame rate cap currently in effect (60 interacting, 30 idle, 15 preview) */
+  /** Frame rate cap currently in effect (60 interacting, 30 idle, 24 long idle, 15 preview) */
   cap: number
   drawCalls: number
   triangles: number
@@ -84,7 +84,11 @@ const QUALITY_LEVELS = [
   { pixelRatio: 1.25, shadowSize: 1024, shadows: true },
   // Small previews
   { pixelRatio: 1, shadowSize: 1024, shadows: true },
+  // Weakest phones, last resort: a coarser shadow map
+  { pixelRatio: 1, shadowSize: 512, shadows: true },
 ]
+/** Where small previews start */
+const PREVIEW_QUALITY = 4
 /** Widest zoom (camera distance from the room) */
 const MAX_ZOOM_DISTANCE = 30
 /** Intro: start distance, pause before flying, and flight time (ms) */
@@ -206,6 +210,19 @@ export class RoomScene {
   private activeUntil = 0
   private quality = 0
   private frameRatios: number[] = []
+  /** Frame times at the 60 fps cap, to see whether a lowered quality can step back up */
+  private activeRatios: number[] = []
+  /** The level the device started at: stepping back up stops there */
+  private startQuality = 0
+  /** Quality levels that already proved too slow once after stepping back up: the device stays below them */
+  private qualityFailed = new Set<number>()
+  /** Last time something was touched or changed (the deep idle frame rate starts a while after it) */
+  private touchedAt = performance.now()
+  // The sun's shadow map is redrawn only when something casting a shadow may have moved
+  private shadowsUntil = 0
+  private shadowedAt = 0
+  private shadowSun = new THREE.Vector3(Infinity, 0, 0)
+  private shadowFrames = 0
   private startedAt = performance.now()
   private pointerDown = { x: 0, y: 0 }
   /** Object being dragged directly in the editor */
@@ -303,6 +320,8 @@ export class RoomScene {
     this.sun.shadow.camera.far = 80
     this.sun.shadow.bias = -0.0005
     this.sun.shadow.normalBias = 0.02
+    // Redrawn on demand (updateShadows); a recording redraws them every frame
+    this.sun.shadow.autoUpdate = !!options.capture
 
     this.sunDisc = new THREE.Mesh(
       new THREE.SphereGeometry(1.4, 24, 16),
@@ -336,7 +355,8 @@ export class RoomScene {
     // Phones and low-memory devices start a step or two lighter, previews lightest
     const coarse = window.matchMedia?.('(pointer: coarse)').matches
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
-    this.quality = options.capture ? 0 : options.preview ? QUALITY_LEVELS.length - 1 : memory < 4 ? 2 : coarse ? 1 : 0
+    this.quality = options.capture ? 0 : options.preview ? PREVIEW_QUALITY : memory < 4 ? 2 : coarse ? 1 : 0
+    this.startQuality = this.quality
     if (options.capture) this.controls.enabled = false
     this.applyQuality()
 
@@ -359,6 +379,7 @@ export class RoomScene {
   setRoom(room: RoomConfig) {
     this.room = room
     this.markActive()
+    this.markShadows()
     const signature = JSON.stringify(room.style)
     if (signature !== this.styleSignature) {
       this.styleSignature = signature
@@ -390,8 +411,11 @@ export class RoomScene {
     this.shownDaylight = null
     this.applyDaylight(typeof light === 'number' ? daylightAtHour(light) : light)
     this.land?.update(this.timer.getElapsed(), 0, this.shownDaylight ?? 1, this.lamps)
+    // Shadows from the snapshot's sun, then back to the current one's
+    this.sun.shadow.needsUpdate = true
     this.renderer.render(this.scene, this.camera)
     this.shownDaylight = shownBefore
+    this.markShadows()
     // Copy the frame now, before the WebGL buffer is cleared, at thumbnail size
     const source = this.renderer.domElement
     const width = Math.min(maxWidth, source.width)
@@ -411,6 +435,7 @@ export class RoomScene {
     // Stands whose product changed get redrawn
     if (this.room) this.syncObjects(this.room.objects)
     this.markActive()
+    this.markShadows()
   }
 
   /**
@@ -437,6 +462,7 @@ export class RoomScene {
     this.guestOrder = list.map(g => g.id)
     this.placeGuests()
     this.markActive()
+    this.markShadows()
   }
 
   /** Glide the camera to a guestbook gift */
@@ -801,6 +827,7 @@ export class RoomScene {
       .then(() => {
         land.group.visible = true
         this.markActive()
+        this.markShadows()
       })
     this.updateRoomFlowers()
     this.placeGuests()
@@ -918,6 +945,7 @@ export class RoomScene {
         entry.popping = animate
         this.updateRoomFlowers()
         this.markActive()
+        this.markShadows()
       })
   }
 
@@ -1089,6 +1117,7 @@ export class RoomScene {
     const entry = this.drag ? this.entries.get(this.drag.id) : undefined
     if (!entry || !this.drag || !this.style) return
     this.markActive()
+    this.markShadows()
     if (entry.item.wallMounted) {
       const target = this.wallTarget(clientX, clientY)
       if (!target) return
@@ -1340,6 +1369,31 @@ export class RoomScene {
   /** Something changed: render at full frame rate for a moment */
   private markActive = () => {
     this.activeUntil = performance.now() + 1500
+    this.touchedAt = performance.now()
+  }
+
+  /** Something casting a shadow appeared, moved or changed: redraw the shadows for a moment */
+  private markShadows() {
+    this.shadowsUntil = performance.now() + 1500
+  }
+
+  /**
+   * The shadow map is a second drawing of everything that casts a shadow,
+   * from the sun. The scenery stands still, so it's redrawn only while
+   * something changes (objects loading, popping in, dragged; the room or
+   * land rebuilt; the sun moving with the time of day), every frame on lands
+   * whose shadows always move (traffic), a few times a second with guestbook
+   * gifts bobbing, and once a second anyway, in case a change was missed.
+   */
+  private updateShadows(now: number) {
+    if (this.options.capture || !this.renderer.shadowMap.enabled) return
+    const sunMoved = this.shadowSun.distanceToSquared(this.sun.position) > 1e-4
+    const changing = now < this.shadowsUntil || sunMoved || !!this.drag?.active || this.loadingMarkers.size > 0 || !!this.land?.movingShadows
+    const bobbing = this.guests.size > 0 && ++this.shadowFrames % 3 === 0
+    if (!changing && !bobbing && now - this.shadowedAt < 1000) return
+    this.sun.shadow.needsUpdate = true
+    this.shadowedAt = now
+    this.shadowSun.copy(this.sun.position)
   }
 
   private applyQuality() {
@@ -1352,6 +1406,7 @@ export class RoomScene {
       this.sun.shadow.map?.dispose()
       this.sun.shadow.map = null
     }
+    this.markShadows()
     this.resize()
   }
 
@@ -1361,16 +1416,33 @@ export class RoomScene {
    */
   private trackPerformance(interval: number, target: number) {
     // Skip the first seconds: models and shaders loading cause hitches that aren't representative
-    if (this.options.capture || this.quality >= QUALITY_LEVELS.length - 1 || performance.now() - this.startedAt < 5000) return
+    if (this.options.capture || this.options.preview || performance.now() - this.startedAt < 5000) return
+    const median = (list: number[]) => [...list].sort((a, b) => a - b)[Math.floor(list.length / 2)]!
     this.frameRatios.push(interval / target)
-    if (this.frameRatios.length < 120) return
-    const sorted = [...this.frameRatios].sort((a, b) => a - b)
-    const median = sorted[Math.floor(sorted.length / 2)]!
-    this.frameRatios = []
-    if (median > 1.8) {
-      this.quality++
-      this.applyQuality()
+    if (this.frameRatios.length >= 120) {
+      const slow = median(this.frameRatios) > 1.5
+      this.frameRatios = []
+      if (slow && this.quality < QUALITY_LEVELS.length - 1) {
+        this.quality++
+        this.activeRatios = []
+        this.applyQuality()
+        return
+      }
     }
+    // Back up a step when frames at the full 60 fps keep arriving on time (a
+    // hitch, another tab busy, may have stepped it down), but never again to a
+    // level that proved too slow twice
+    if (target > 20) return
+    this.activeRatios.push(interval / target)
+    if (this.activeRatios.length < 240) return
+    const fast = median(this.activeRatios) < 1.1
+    this.activeRatios = []
+    const better = this.quality - 1
+    if (!fast || better < this.startQuality || this.qualityFailed.has(better)) return
+    this.qualityFailed.add(better)
+    this.quality = better
+    this.frameRatios = []
+    this.applyQuality()
   }
 
   private animate = (now: number = performance.now()) => {
@@ -1378,9 +1450,11 @@ export class RoomScene {
     this.frame = requestAnimationFrame(this.animate)
     // A recording draws its own frames
     if (!this.onScreen || this.options.capture || this.paused) return
-    // 60 fps while interacting, 30 fps for ambient motion, 15 fps for previews
+    // 60 fps while interacting, 30 fps for ambient motion, 24 once nobody has
+    // touched it for a while (grass and petals still move smoothly enough), 15
+    // for previews
     const active = now < this.activeUntil || !!this.cameraGlide || !!this.drag?.active || !!this.intro || this.loadingMarkers.size > 0
-    const fps = this.options.preview ? 15 : active ? 60 : 30
+    const fps = this.options.preview ? 15 : active ? 60 : now - this.touchedAt > 30000 ? 24 : 30
     this.statsCap = fps
     const target = 1000 / fps
     const interval = now - this.lastRender
@@ -1417,6 +1491,7 @@ export class RoomScene {
     this.updateObjectEffects(now)
     this.updateGuests(now, time)
     this.keepSkyAroundCamera()
+    this.updateShadows(now)
     if (this.cinematic) this.cinematic.render(dt)
     else this.renderer.render(this.scene, this.camera)
     this.reportStats(now)

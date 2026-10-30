@@ -56,6 +56,8 @@ export interface LandInstance {
   focus?: { position: THREE.Vector3; height: number }
   /** Ground height at a point (absolute y), for cameras close to the ground */
   heightAt?: (x: number, z: number) => number
+  /** Something casting a shadow moves all the time (traffic): the sun's shadows are redrawn every frame */
+  movingShadows?: boolean
   /** Called every frame; daylight 0..1, lamps 0..1 (night lights) */
   update: (time: number, dt: number, daylight: number, lamps: number) => void
   /** Ground surface, for finding the point under the cursor */
@@ -1287,7 +1289,7 @@ function createWaterfall(ctx: LandContext, radius: number, terrain: Terrain, fro
   }
 }
 
-const GREEN_CROWN: CrownLook = { texture: leafTexture, under: '#0e260b', middle: '#2f661d', top: '#7db544', emissive: '#0b1d06' }
+const GREEN_CROWN: CrownLook = { texture: leafTexture, under: '#142e10', middle: '#355f22', top: '#86a94e', emissive: '#0a1806', vary: '#4f6b2a', bark: '#6b5442' }
 const CHERRY_CROWN: CrownLook = { texture: blossomTexture, under: '#b86688', middle: '#eb9cbb', top: '#ffdbe8', emissive: '#3a1424' }
 
 function buildIsland(ctx: LandContext, radius: number): LandInstance {
@@ -1744,30 +1746,37 @@ function leafTexture() {
   canvas.width = canvas.height = size
   const g = canvas.getContext('2d')!
   const rand = seeded(97)
-  // Pointed leaves packed towards the middle, darker ones first (underneath)
-  for (let i = 0; i < 110; i++) {
+  // Pointed leaves packed towards the middle, darker ones first (underneath);
+  // the heart of the clump in its own shade, the rim catching the light
+  const leaves = 64
+  for (let i = 0; i < leaves; i++) {
     const a = rand() * Math.PI * 2
-    const r = Math.sqrt(rand()) * size * 0.4
+    const r = Math.sqrt(rand()) * size * 0.38
     const x = size / 2 + Math.cos(a) * r
     const y = size / 2 + Math.sin(a) * r
-    const length = 16 + rand() * 12
-    const turn = rand() * Math.PI * 2
-    const light = Math.round(150 + (i / 110) * 90 + rand() * 15)
+    const length = 24 + rand() * 16
+    // Leaves point outwards from the clump, give or take
+    const turn = a + Math.PI / 2 + (rand() - 0.5) * 1.2
+    const rim = r / (size * 0.38)
+    const light = Math.round(110 + (i / leaves) * 70 + rim * 60 + rand() * 15)
     g.save()
     g.translate(x, y)
     g.rotate(turn)
-    g.fillStyle = `rgb(${light},${light},${light})`
+    const shade = g.createLinearGradient(-length * 0.3, 0, length * 0.3, 0)
+    shade.addColorStop(0, `rgb(${light},${light},${light})`)
+    shade.addColorStop(1, `rgb(${Math.round(light * 0.78)},${Math.round(light * 0.78)},${Math.round(light * 0.78)})`)
+    g.fillStyle = shade
     g.beginPath()
     g.moveTo(0, -length / 2)
-    g.quadraticCurveTo(length * 0.38, 0, 0, length / 2)
-    g.quadraticCurveTo(-length * 0.38, 0, 0, -length / 2)
+    g.quadraticCurveTo(length * 0.4, 0, 0, length / 2)
+    g.quadraticCurveTo(-length * 0.4, 0, 0, -length / 2)
     g.fill()
     // A lighter midrib
-    g.strokeStyle = `rgba(255,255,255,0.35)`
-    g.lineWidth = 1
+    g.strokeStyle = 'rgba(255,255,255,0.3)'
+    g.lineWidth = 1.2
     g.beginPath()
-    g.moveTo(0, -length * 0.4)
-    g.lineTo(0, length * 0.4)
+    g.moveTo(0, -length * 0.42)
+    g.lineTo(0, length * 0.42)
     g.stroke()
     g.restore()
   }
@@ -1868,6 +1877,10 @@ interface CrownLook {
   middle: string
   top: string
   emissive: string
+  /** A second hue some clumps lean towards, so the crown isn't one flat colour */
+  vary?: string
+  /** Tint over the bark (crimson's is near black) */
+  bark?: string
 }
 
 const CRIMSON_CROWN: CrownLook = { texture: blossomTexture, under: '#2a0309', middle: '#8a0a22', top: '#e8284e', emissive: '#3a0410' }
@@ -1949,12 +1962,28 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
   const limbCount = 6
   const turn = rand() * Math.PI * 2
   for (let i = 0; i < limbCount; i++) {
-    const a = turn + (i / limbCount) * Math.PI * 2 + (rand() - 0.5) * 0.5
-    const out = new THREE.Vector3(Math.cos(a), 0, Math.sin(a))
-    const dir = out.clone().setY(0.12 + rand() * 0.15).addScaledVector(place.toward, 0.5).normalize()
-    const from = trunk.top.clone().addScaledVector(out, trunk.topRadius * 0.55).add(new THREE.Vector3(0, -rand() * height * 0.05, 0))
-    // None reaching into the space kept clear (it would be cut off there, a bare stump)
-    if (place.wholeLimbs && [0.15, 0.3, 0.45].some(k => over(from.clone().addScaledVector(dir, height * k)))) continue
+    let a = turn + (i / limbCount) * Math.PI * 2 + (rand() - 0.5) * 0.5
+    const rise = 0.12 + rand() * 0.15
+    const drop = rand() * height * 0.05
+    const limb = (angle: number) => {
+      const out = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle))
+      return {
+        dir: out.clone().setY(rise).addScaledVector(place.toward, 0.5).normalize(),
+        from: trunk.top.clone().addScaledVector(out, trunk.topRadius * 0.55).add(new THREE.Vector3(0, -drop, 0)),
+      }
+    }
+    // None reaching into the space kept clear (it would be cut off there, a
+    // bare stump): such a limb swings round to the nearest open side instead
+    if (place.wholeLimbs) {
+      const clear = (angle: number) => {
+        const { dir, from } = limb(angle)
+        return ![0.15, 0.3, 0.45].some(k => over(from.clone().addScaledVector(dir, height * k)))
+      }
+      const swing = [0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, 1.4, -1.4].find(d => clear(a + d))
+      if (swing === undefined) continue
+      a += swing
+    }
+    const { dir, from } = limb(a)
     grow(from, dir, height * (0.36 + rand() * 0.12), trunk.topRadius * (0.3 + rand() * 0.1), 1)
   }
 
@@ -2048,7 +2077,7 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
 
   const tree = new THREE.Group()
   const barkMap = natureTexture('Bark_TwistedTree.jpg')
-  const bark = new THREE.MeshStandardMaterial({ map: barkMap, color: '#2e262b', roughness: 1, envMapIntensity: 0.15 })
+  const bark = new THREE.MeshStandardMaterial({ map: barkMap, color: look.bark ?? '#2e262b', roughness: 1, envMapIntensity: 0.15 })
   const branches = new THREE.Mesh(wood, bark)
   branches.castShadow = true
   branches.receiveShadow = true
@@ -2062,7 +2091,7 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
     t.needsUpdate = true
   })
   const trunkBark = trunkBarkTexture
-  const trunkMesh = new THREE.Mesh(trunk.geometry, new THREE.MeshStandardMaterial({ map: trunkBark, color: '#ffffff', vertexColors: true, roughness: 1, flatShading: true, envMapIntensity: 0.15 }))
+  const trunkMesh = new THREE.Mesh(trunk.geometry, new THREE.MeshStandardMaterial({ map: trunkBark, color: look.bark ? new THREE.Color(look.bark).lerp(new THREE.Color('#ffffff'), 0.35) : '#ffffff', vertexColors: true, roughness: 1, flatShading: true, envMapIntensity: 0.15 }))
   trunkMesh.castShadow = true
   trunkMesh.receiveShadow = true
   tree.add(trunkMesh, branches)
@@ -2093,6 +2122,7 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
   const under = new THREE.Color(look.under)
   const middle = new THREE.Color(look.middle)
   const top = new THREE.Color(look.top)
+  const vary = look.vary ? new THREE.Color(look.vary) : null
   const shade = new THREE.Color()
   const dummy = new THREE.Object3D()
   const unit = height * 0.1
@@ -2112,6 +2142,7 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
       const t = Math.pow(THREE.MathUtils.clamp((dummy.position.y - low) / Math.max(high - low, 0.01) + (rand() - 0.5) * 0.25, 0, 1), 1.8)
       if (t < 0.5) shade.copy(under).lerp(middle, t / 0.5)
       else shade.copy(middle).lerp(top, (t - 0.5) / 0.5)
+      if (vary) shade.lerp(vary, rand() * 0.45)
       crown.setColorAt(n, shade)
       n++
     }
@@ -2152,7 +2183,12 @@ function plantHeroTree(group: THREE.Group, ctx: LandContext, terrain: Terrain, r
   return { origin, blossoms: hero.blossoms.map(p => p.clone().applyMatrix4(hero.tree.matrixWorld)) }
 }
 
-/** A field of grass blades (thousands, instanced), dark at the root and bright at the tip */
+/**
+ * A field of grass blades (thousands, instanced), dark at the root and bright
+ * at the tip. Split into square patches, so the patches off screen (most of
+ * the land on a portrait phone, or zoomed in) aren't drawn; far away, where
+ * the blades are tiny, a patch draws only some of its blades.
+ */
 function bladeGrass(ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, count: number, look: {
   /** Root, middle and tip colours of a blade */
   colors: [string, string, string]
@@ -2170,9 +2206,11 @@ function bladeGrass(ctx: LandContext, radius: number, terrain: Terrain, rand: ()
   blade.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4])
   blade.computeVertexNormals()
   const material = swayingMaterial(new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }))
-  const mesh = new THREE.InstancedMesh(blade, material, count)
   const dummy = new THREE.Object3D()
   const tints = look.tints.map(c => new THREE.Color(c))
+  const cells = 4
+  const cellSize = (radius * 2) / cells
+  const patches = new Map<number, { matrix: THREE.Matrix4; tint: THREE.Color }[]>()
   // Clumped, like grass grows: a few hundred tufts with blades around each
   const centers = landSpots(rand, ctx, radius, Math.ceil(count / 22), 0.3)
   let n = 0
@@ -2191,13 +2229,39 @@ function bladeGrass(ctx: LandContext, radius: number, terrain: Terrain, rand: ()
     dummy.rotation.set((rand() - 0.5) * 0.5, rand() * Math.PI * 2, (rand() - 0.5) * 0.5)
     dummy.scale.set(0.025 + rand() * 0.022, height, 1)
     dummy.updateMatrix()
-    mesh.setMatrixAt(n, dummy.matrix)
-    mesh.setColorAt(n, tints[Math.floor(rand() * tints.length)]!)
+    const key = THREE.MathUtils.clamp(Math.floor((x + radius) / cellSize), 0, cells - 1) * cells + THREE.MathUtils.clamp(Math.floor((z + radius) / cellSize), 0, cells - 1)
+    if (!patches.has(key)) patches.set(key, [])
+    patches.get(key)!.push({ matrix: dummy.matrix.clone(), tint: tints[Math.floor(rand() * tints.length)]! })
     n++
   }
-  mesh.count = n
-  mesh.receiveShadow = true
-  return mesh
+
+  const field = new THREE.Group()
+  const centre = new THREE.Vector3()
+  // Its own random numbers: the land's sequence (and so its layout) stays as it was
+  const shuffle = seeded(count)
+  for (const blades of patches.values()) {
+    // Shuffled, so drawing only the first part of a patch thins it evenly
+    for (let i = blades.length - 1; i > 0; i--) {
+      const j = Math.floor(shuffle() * (i + 1))
+      ;[blades[i], blades[j]] = [blades[j]!, blades[i]!]
+    }
+    const mesh = new THREE.InstancedMesh(blade, material, blades.length)
+    blades.forEach((b, i) => {
+      mesh.setMatrixAt(i, b.matrix)
+      mesh.setColorAt(i, b.tint)
+    })
+    mesh.computeBoundingSphere()
+    mesh.receiveShadow = true
+    const full = blades.length
+    mesh.onBeforeRender = (_renderer, _scene, camera) => {
+      // A blade about half a metre tall is a few pixels high from 40 m off
+      // (the intro's fly-in, the widest zoom): from 24 m out, fewer blades
+      const distance = camera.position.distanceTo(centre.copy(mesh.boundingSphere!.center).applyMatrix4(mesh.matrixWorld))
+      mesh.count = Math.max(1, Math.round(full * THREE.MathUtils.clamp(1 - (distance - 24) / 30, 0.45, 1)))
+    }
+    field.add(mesh)
+  }
+  return field
 }
 
 function buildCrimson(ctx: LandContext, radius: number): LandInstance {
@@ -2729,6 +2793,7 @@ function buildCity(ctx: LandContext, radius: number): LandInstance {
 
   return {
     group,
+    movingShadows: true,
     starsAlways: false,
     sky: { night: new THREE.Color('#0b1026'), dusk: new THREE.Color('#f09a6b'), day: new THREE.Color('#9fcdf0') },
     atmosphere: { turbidity: 4, rayleigh: 1.6, mie: 0.005 },
