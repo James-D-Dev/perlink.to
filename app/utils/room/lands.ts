@@ -1289,7 +1289,7 @@ function createWaterfall(ctx: LandContext, radius: number, terrain: Terrain, fro
   }
 }
 
-const GREEN_CROWN: CrownLook = { texture: leafTexture, under: '#142e10', middle: '#355f22', top: '#86a94e', emissive: '#0a1806', vary: '#4f6b2a', bark: '#6b5442' }
+const GREEN_CROWN: CrownLook = { texture: leafTexture, under: '#0e260b', middle: '#2f661d', top: '#7db544', emissive: '#0b1d06', bark: '#6b5442' }
 const CHERRY_CROWN: CrownLook = { texture: blossomTexture, under: '#b86688', middle: '#eb9cbb', top: '#ffdbe8', emissive: '#3a1424' }
 
 function buildIsland(ctx: LandContext, radius: number): LandInstance {
