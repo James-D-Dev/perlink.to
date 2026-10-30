@@ -9,6 +9,7 @@ import { buildRoomShell, FLOOR_THICKNESS } from './shell'
 import { flameFlicker, flameTime } from './flame'
 import { compileOffscreen, createRoomRenderer, gpuKit, maxAnisotropy } from './gpu'
 import { clearSceneryPreparer, setSceneryPreparer } from './natureModels'
+import type { Cinematic } from './cinematic'
 import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
 import { drawProductCard, productSignature, type ShopProduct } from './productCard'
 import type { GuestGiftType } from '#shared/guestbook'
@@ -117,6 +118,14 @@ export class RoomScene {
   /** For the console: how long until the first frame was drawn */
   private firstFrameLogged = false
   private rendererReady: Promise<void>
+  /** Film look for the room video (./cinematic); only the recorder's scene has one */
+  private cinematic: Cinematic | null = null
+  /** The lens for the current frame shape (narrow frames get a wider one) */
+  private baseFov = 32
+  /** Pace of recent video frames (renderTour), to drop the film look if it can't keep up */
+  private lastTourFrame = 0
+  private tourGap = 0
+  private tourFrames = 0
   /** Compiles new scenery before it joins the scene (see natureModels) */
   private prepareScenery = (object: THREE.Object3D) =>
     this.rendererReady.then(() => compileOffscreen(this.renderer, object, this.camera, this.scene))
@@ -228,6 +237,17 @@ export class RoomScene {
       if (gpuKit()) console.info(`[room] renderer: ${created.backend()}`)
       this.markActive()
     })
+    // The video's film look (depth of field, glow, vignette), recorder only
+    if (options.capture && !gpuKit()) {
+      this.rendererReady
+        .then(() => import('./cinematic'))
+        .then(m => m.createCinematic(this.renderer, this.scene, this.camera))
+        .then((cinematic) => {
+          if (this.disposed) cinematic.dispose()
+          else this.cinematic = cinematic
+        })
+        .catch(error => console.warn('[room] film look unavailable', error))
+    }
     this.renderer.shadowMap.enabled = true
     // Newer three.js removed PCFSoftShadowMap (it fell back to this anyway)
     this.renderer.shadowMap.type = THREE.PCFShadowMap
@@ -489,6 +509,19 @@ export class RoomScene {
    */
   renderTour(progress: number, style: TourStyle = 'sweep'): HTMLCanvasElement {
     this.touring = true
+    // The film look is dear on weak devices: if frames come too slowly while
+    // recording, drop it rather than record a stuttering video
+    const now = performance.now()
+    const gap = now - this.lastTourFrame
+    this.lastTourFrame = now
+    if (this.cinematic && gap < 500) {
+      this.tourGap = this.tourFrames++ ? this.tourGap * 0.85 + gap * 0.15 : gap
+      if (this.tourFrames > 20 && this.tourGap > 45) {
+        console.info(`[room] film look off: ${Math.round(this.tourGap)} ms a frame`)
+        this.cinematic.dispose()
+        this.cinematic = null
+      }
+    }
     const p = THREE.MathUtils.clamp(progress, 0, 1)
     const ease = (x: number) => (x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2)
     const smooth = (x: number) => x * x * (3 - 2 * x)
@@ -502,8 +535,9 @@ export class RoomScene {
     let azimuth: number
     let lookHeight = 0.32
 
-    // Low angle: the camera among the grass tips, looking up (wider lens)
-    const lens = style === 'ground' ? 52 : 32
+    // Low angle: the camera among the grass tips, looking up (a wider lens
+    // than the frame's own, which the other styles keep)
+    const lens = style === 'ground' ? Math.max(this.baseFov, 44) + 8 : this.baseFov
     if (this.camera.fov !== lens) {
       this.camera.fov = lens
       this.camera.updateProjectionMatrix()
@@ -544,6 +578,10 @@ export class RoomScene {
       if (Math.abs(at.x) < halfW && Math.abs(at.z) < halfD) at.setLength(Math.hypot(halfW, halfD))
       // Level with the grass tips: a band of blades along the bottom of the frame
       at.y = ground(at.x, at.z) + lerp(0.62, 0.85, t)
+      // Sharp on the trunk (or the room), the grass in front and the far
+      // land soft
+      const sharp = focus ? focus.position.clone().setY(focus.position.y + focus.height * 0.3) : new THREE.Vector3(0, height * 0.5, 0)
+      this.cinematic?.focus(sharp, focus ? focus.height * 0.18 : size * 0.4, 6)
       this.controls.target.copy(target)
       this.camera.position.copy(at)
       this.camera.lookAt(target)
@@ -582,6 +620,8 @@ export class RoomScene {
     }
 
     this.controls.target.set(0, height * lookHeight, 0)
+    // The room in focus, the land around it a little soft
+    this.cinematic?.focus(this.controls.target, size * 0.9, 1.6)
     this.camera.position.setFromSphericalCoords(Math.min(distance, MAX_ZOOM_DISTANCE - 1), polar, azimuth).add(this.controls.target)
     this.camera.lookAt(this.controls.target)
     this.renderFrame(performance.now())
@@ -702,6 +742,7 @@ export class RoomScene {
     })
     this.envTarget?.dispose()
     this.pmrem.dispose()
+    this.cinematic?.dispose()
     this.renderer.dispose()
     el.remove()
   }
@@ -1232,7 +1273,8 @@ export class RoomScene {
     this.renderer.domElement.style.height = '100%'
     this.camera.aspect = clientWidth / clientHeight
     // Pull back on narrow screens so the whole room fits
-    this.camera.fov = clientWidth / clientHeight < 0.8 ? 46 : clientWidth / clientHeight < 1.3 ? 38 : 32
+    this.baseFov = clientWidth / clientHeight < 0.8 ? 46 : clientWidth / clientHeight < 1.3 ? 38 : 32
+    this.camera.fov = this.baseFov
     this.camera.updateProjectionMatrix()
     this.markActive()
   }
@@ -1346,7 +1388,8 @@ export class RoomScene {
     this.updateObjectEffects(now)
     this.updateGuests(now, time)
     this.keepSkyAroundCamera()
-    this.renderer.render(this.scene, this.camera)
+    if (this.cinematic) this.cinematic.render(dt)
+    else this.renderer.render(this.scene, this.camera)
     this.reportStats(now)
   }
 

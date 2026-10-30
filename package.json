@@ -41,6 +41,7 @@
 		"nuxt": "^4.3.0",
 		"nuxt-auth-utils": "0.5.29",
 		"ogl": "^1.0.11",
+		"postprocessing": "6.39.5",
 		"qrcode-generator": "^2.0.4",
 		"tailwindcss": "^4.3.0",
 		"three": "0.186.1",
