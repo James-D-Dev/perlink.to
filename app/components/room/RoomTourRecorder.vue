@@ -146,6 +146,7 @@ const STYLE_ICONS: Record<TourStyle, string> = {
   orbit: 'i-lucide-rotate-3d',
   dive: 'i-lucide-plane-landing',
   crane: 'i-lucide-move-diagonal',
+  ground: 'i-lucide-sprout',
 }
 const styleItems = computed(() => TOUR_STYLES.map(style => ({
   label: t(`room.tour.styles.${style}`),

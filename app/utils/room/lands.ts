@@ -52,6 +52,10 @@ export interface LandInstance {
   starsAlways: boolean
   /** Light scaled for this land (1 = as usual): less sky light keeps saturated colours from turning pastel */
   light?: { sun?: number; sky?: number }
+  /** A landmark the low-angle video shot looks up at (crimson's giant tree) */
+  focus?: { position: THREE.Vector3; height: number }
+  /** Ground height at a point (absolute y), for cameras close to the ground */
+  heightAt?: (x: number, z: number) => number
   /** Called every frame; daylight 0..1, lamps 0..1 (night lights) */
   update: (time: number, dt: number, daylight: number, lamps: number) => void
   /** Ground surface, for finding the point under the cursor */
@@ -1282,6 +1286,7 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
       fireflies.update(time, lamps)
     },
     ground: terrain.mesh,
+    heightAt: terrain.heightAt,
     setAttractor: butterflies.setAttractor,
     setRoomFlowers: butterflies.setRoomFlowers,
   }
@@ -1562,6 +1567,7 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
       fireflies.update(time, lamps)
     },
     ground: terrain.mesh,
+    heightAt: terrain.heightAt,
     setAttractor: butterflies.setAttractor,
     setRoomFlowers: butterflies.setRoomFlowers,
   }
@@ -2035,6 +2041,8 @@ function buildCrimson(ctx: LandContext, radius: number): LandInstance {
     atmosphere: { turbidity: 1.2, rayleigh: 3.4, mie: 0.004 },
     // The blue sky light turns crimson pink and strong sun washes it out
     light: { sun: 0.75, sky: 0.3 },
+    focus: { position: origin.clone(), height: heroHeight },
+    heightAt: terrain.heightAt,
     update(time, dt, daylight, lamps) {
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)

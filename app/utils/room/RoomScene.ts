@@ -42,7 +42,7 @@ export interface RoomSceneOptions {
 }
 
 /** Camera paths for the room video */
-export const TOUR_STYLES = ['sweep', 'orbit', 'dive', 'crane'] as const
+export const TOUR_STYLES = ['sweep', 'orbit', 'dive', 'crane', 'ground'] as const
 export type TourStyle = (typeof TOUR_STYLES)[number]
 
 export interface RoomSceneStats {
@@ -501,6 +501,55 @@ export class RoomScene {
     let polar: number
     let azimuth: number
     let lookHeight = 0.32
+
+    // Low angle: the camera among the grass tips, looking up (wider lens)
+    const lens = style === 'ground' ? 52 : 32
+    if (this.camera.fov !== lens) {
+      this.camera.fov = lens
+      this.camera.updateProjectionMatrix()
+    }
+    if (style === 'ground') {
+      const t = ease(p)
+      const ground = this.land?.heightAt ?? (() => 0)
+      const halfW = (this.style?.width ?? 6) / 2 + 0.7
+      const halfD = (this.style?.depth ?? 6) / 2 + 0.7
+      const focus = this.land?.focus
+      const target = new THREE.Vector3()
+      const at = new THREE.Vector3()
+      if (focus) {
+        // Round the landmark from beside it (the room off to one side), moving
+        // in and tilting up from the trunk to the crown
+        const towardMiddle = Math.atan2(-focus.position.z, -focus.position.x)
+        // (Further round is the hillside behind the walls, which hides the tree)
+        const angle = lerp(towardMiddle + 1.2, towardMiddle + 0.98, t)
+        const reach = lerp(0.9, 0.78, t) * focus.height
+        at.set(focus.position.x + Math.cos(angle) * reach, 0, focus.position.z + Math.sin(angle) * reach)
+        // Aimed a little to the side of the trunk away from the room: the
+        // trunk sits to one side, sky and crown fill the other, the room stays
+        // out of the frame
+        const look = new THREE.Vector3().subVectors(focus.position, at).setY(0).normalize()
+        const aside = new THREE.Vector3(-look.z, 0, look.x)
+        if (aside.dot(new THREE.Vector3(-focus.position.x, 0, -focus.position.z)) > 0) aside.negate()
+        const past = lerp(0.12, 0.22, t) * focus.height
+        target.copy(focus.position).addScaledVector(aside, past).setY(focus.position.y + lerp(0.32, 0.45, t) * focus.height)
+      } else {
+        // Round the room's open side at ground level, looking up at it
+        const angle = lerp(0.25, Math.PI / 2 - 0.25, smooth(p))
+        // Inside the land's edge (it's about 1.1 room sizes out)
+        const reach = lerp(1.05, 0.85, t) * size
+        at.set(Math.cos(angle) * reach, 0, Math.sin(angle) * reach)
+        target.set(0, height * lerp(0.55, 0.8, t), 0)
+      }
+      // Never inside the room
+      if (Math.abs(at.x) < halfW && Math.abs(at.z) < halfD) at.setLength(Math.hypot(halfW, halfD))
+      // Level with the grass tips: a band of blades along the bottom of the frame
+      at.y = ground(at.x, at.z) + lerp(0.62, 0.85, t)
+      this.controls.target.copy(target)
+      this.camera.position.copy(at)
+      this.camera.lookAt(target)
+      this.renderFrame(performance.now())
+      return this.renderer.domElement
+    }
 
     if (style === 'orbit') {
       // An even arc from one open side to the other, higher up (any further

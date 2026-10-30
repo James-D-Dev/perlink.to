@@ -308,7 +308,8 @@
         "sweep": "Sweep",
         "orbit": "Orbit",
         "dive": "Fly in",
-        "crane": "Pull out"
+        "crane": "Pull out",
+        "ground": "Low angle"
       }
     },
     "guestbook": {
