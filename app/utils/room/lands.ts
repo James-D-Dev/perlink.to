@@ -997,7 +997,8 @@ function createTerrain(ctx: LandContext, radius: number, seed: number, colors: {
     let h = (fbm(x * 0.32, z * 0.32, seed) - 0.45) * 0.5 + behind * (0.5 + fbm(x * 0.2, z * 0.2, seed + 9) * 0.9)
     h *= fromRoom * rim
     const onPath = 1 - THREE.MathUtils.smoothstep(pathDistance(x, z), 0.25, 0.6)
-    return h - onPath * 0.03
+    // Sunk a little, but never under the land's top (it would show through as a dark hole)
+    return onPath > 0 ? Math.max(h - onPath * 0.03, onPath * 0.004) : h
   }
 
   const geometry = new THREE.RingGeometry(0.001, radius, 160, 64)
@@ -1078,88 +1079,32 @@ function landSpots(rand: () => number, ctx: LandContext, radius: number, count: 
   return spots
 }
 
-/** Groves of trees behind and beside the walls, with undergrowth and big rocks */
-function plantGroves(group: THREE.Group, ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, treeNames: string[], material?: (m: THREE.Material) => THREE.Material) {
-  const { width, depth } = ctx.style
-  const allCenters: [number, number][] = [
-    [-width / 2 + 0.8, -depth / 2 - 3.2],
-    [width / 2 - 0.4, -depth / 2 - 3.8],
-    [-width / 2 - 3.2, depth / 2 - 1],
-    [-width / 2 - 3.6, -depth / 2 + 0.6],
-    [-width / 2 - 2.9, -depth / 2 - 2.9],
-    [width / 2 + 2.6, -depth / 2 - 1.6],
-    [-width / 2 - 1.6, depth / 2 + 2.8],
-  ]
-  const groveCenters = allCenters.filter(([x, z]) => Math.hypot(x, z) < radius - 1.2)
-
-  const trees: ScatterItem[] = []
-  groveCenters.forEach(([cx, cz], g) => {
-    const count = g >= 5 ? 1 : 3
-    for (let i = 0; i < count; i++) {
-      const a = rand() * Math.PI * 2
-      const r = i === 0 ? 0 : 0.9 + rand() * 0.7
-      const x = cx + Math.cos(a) * r
-      const z = cz + Math.sin(a) * r
-      // One tall tree per grove, smaller ones around it
-      const height = i === 0 ? 4.8 + rand() * 1.2 : 3.2 + rand() * 1.1
-      trees.push({ x, y: terrain.heightAt(x, z), z, height, rotation: rand() * Math.PI * 2 })
-    }
-  })
-  for (const [name, list] of byVariant(treeNames, trees, rand)) scatterModel(group, name, list, { material })
-
-  // Undergrowth at the tree bases
-  scatterModel(group, 'Fern_1', clumps(rand, terrain, groveCenters, 4, 1.8, [0.35, 0.6]), { castShadow: false })
-  scatterModel(group, 'Mushroom_Common', clumps(rand, terrain, groveCenters, 2, 1.4, [0.1, 0.18]), { castShadow: false })
-  for (const [name, list] of byVariant(['Bush_Common_Flowers'], clumps(rand, terrain, groveCenters, 2, 2, [0.6, 1]), rand)) scatterModel(group, name, list)
-
-  // A few large boulders among the groves
-  const boulders = groveCenters.slice(0, 4).map(([cx, cz]) => {
-    const x = cx + (rand() - 0.5) * 2
-    const z = cz + (rand() - 0.5) * 2
-    return { x, y: terrain.heightAt(x, z) - 0.15, z, height: 1 + rand() * 1.1, rotation: rand() * Math.PI * 2 }
-  })
-  for (const [name, list] of byVariant(['Rock_Medium_1', 'Rock_Medium_2', 'Rock_Medium_3'], boulders, rand)) scatterModel(group, name, list)
-  return trees
-}
-
 /**
- * A lawn of long, soft grass blades (like the crimson land's: one even field,
- * not scattered little clumps, which read as noise), flower patches standing
- * out of it, bushes; returns flower tops for butterflies
+ * A lawn of long, soft grass blades (like the crimson land's: one even field
+ * over ground of the same dark green, so no light gaps between the tufts read
+ * as specks), a few flower patches standing out of it on the open side;
+ * returns flower tops for butterflies
  */
 function plantMeadow(group: THREE.Group, ctx: LandContext, radius: number, terrain: Terrain, rand: () => number, lawn: [string, string, string], avoid?: (x: number, z: number) => boolean) {
   group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(15000 * (ctx.detail ?? 1)), {
     colors: lawn,
-    tints: ['#ffffff', '#f2ffe0', '#dff5c8', '#fff6d8'],
-    height: [0.3, 0.68],
-    pathClear: 0.95,
+    tints: ['#ffffff', '#eef8e0', '#e2f0cc', '#f6f2d8'],
+    height: [0.32, 0.7],
+    pathClear: 0.85,
     avoid,
   }))
 
   // Flower patches: each patch is one kind, like wildflowers grow
-  const patchCenters = Array.from({ length: 8 }, () => outdoorSpot(rand, ctx.style, radius, 0.8))
   const flowers: ScatterItem[] = []
-  patchCenters.forEach((center, i) => {
-    const name = ['Flower_3_Group', 'Flower_4_Group', 'Flower_3_Single', 'Flower_4_Single'][i % 4]!
+  for (let i = 0; i < 4; i++) {
+    const center = outdoorSpot(rand, ctx.style, radius, 1.2, radius * 0.45)
+    const name = ['Flower_3_Group', 'Flower_4_Group'][i % 2]!
     // Taller than the lawn, so they stand out of it
-    const items = clumps(rand, terrain, [center], 7, 0.75, name.includes('Group') ? [0.6, 0.78] : [0.55, 0.72], avoid)
+    const items = clumps(rand, terrain, [center], 9, 0.6, [0.62, 0.8], avoid)
     scatterModel(group, name, items, { castShadow: false })
     flowers.push(...items)
-  })
-  for (const [name, list] of byVariant(['Bush_Common_Flowers'], clumps(rand, terrain, Array.from({ length: 5 }, () => outdoorSpot(rand, ctx.style, radius, 1)), 1, 0.2, [0.55, 0.85], avoid), rand)) scatterModel(group, name, list)
-  return flowers.map(f => new THREE.Vector3(f.x, f.y + f.height * 0.9, f.z))
-}
-
-/** Pebbles lining both sides of the path */
-function plantPathEdges(group: THREE.Group, terrain: Terrain, rand: () => number, ctx: LandContext, radius: number) {
-  const items: ScatterItem[] = []
-  for (let i = 0; i < 140 && items.length < 26; i++) {
-    const [x, z] = landSpots(rand, ctx, radius, 1)[0]!
-    if (!terrain.blocked(x, z)) continue
-    if (Math.abs(x) < ctx.style.width / 2 + 0.2 && Math.abs(z) < ctx.style.depth / 2 + 0.2) continue
-    items.push({ x, y: terrain.heightAt(x, z), z, height: 0.06 + rand() * 0.08, rotation: rand() * Math.PI * 2 })
   }
-  for (const [name, list] of byVariant(['Pebble_Round_1', 'Pebble_Round_2', 'Pebble_Round_3', 'Pebble_Round_4', 'Pebble_Round_5'], items, rand)) scatterModel(group, name, list, { castShadow: false })
+  return flowers.map(f => new THREE.Vector3(f.x, f.y + f.height * 0.9, f.z))
 }
 
 /** Soft clouds on the horizon, visible above the walls */
@@ -1219,6 +1164,8 @@ function createWater(radius: number) {
         color = mix(color, vec3(0.92, 0.97, 1.0), rim * 0.45 * (0.4 + 0.6 * daylight));
         float alpha = (1.0 - smoothstep(0.98, 1.0, r)) * 0.94;
         gl_FragColor = vec4(color, alpha);
+        // The colours are linear (THREE.Color): to the screen's sRGB, or the water turns navy
+        #include <colorspace_fragment>
       }
     `,
   })
@@ -1227,15 +1174,170 @@ function createWater(radius: number) {
   return { mesh, uniforms }
 }
 
+/**
+ * A stream from a pool near the rim, pouring over the edge of the floating
+ * land: one ribbon, flat along the ground, then arcing out and falling into
+ * the sea of clouds. Calm water in the stream, white streaks in the fall,
+ * fading out at the bottom.
+ */
+function createWaterfall(ctx: LandContext, radius: number, terrain: Terrain, from: THREE.Vector2, angle: number) {
+  const out = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle))
+  const side = new THREE.Vector3(-out.z, 0, out.x)
+  const lip = new THREE.Vector3(out.x * radius, ctx.groundY + 0.03, out.z * radius)
+  const drop = radius * 0.9
+  const centre: { p: THREE.Vector3; width: number }[] = []
+  const start = new THREE.Vector3(from.x, 0, from.y)
+  const run = start.distanceTo(new THREE.Vector3(lip.x, 0, lip.z))
+  for (let i = 0; i <= 10; i++) {
+    const p = start.clone().lerp(new THREE.Vector3(lip.x, 0, lip.z), i / 10)
+    p.y = Math.max(terrain.heightAt(p.x, p.z), ctx.groundY) + 0.035
+    centre.push({ p, width: 0.85 })
+  }
+  for (let i = 1; i <= 28; i++) {
+    const t = i / 28
+    // Thrown out a little over the edge, then straight down
+    const p = lip.clone().addScaledVector(out, 0.55 * Math.sqrt(t) + 0.15 * t)
+    p.y = lip.y - drop * t * t * 0.4 - drop * t * 0.6
+    centre.push({ p, width: 0.85 + t * 1.1 })
+  }
+  // Distance along the ribbon, for the texture to flow along
+  const along = [0]
+  for (let i = 1; i < centre.length; i++) along.push(along[i - 1]! + centre[i]!.p.distanceTo(centre[i - 1]!.p))
+  const total = along[along.length - 1]!
+  const positions: number[] = []
+  const uvs: number[] = []
+  const index: number[] = []
+  centre.forEach(({ p, width }, i) => {
+    positions.push(...p.clone().addScaledVector(side, -width / 2).toArray(), ...p.clone().addScaledVector(side, width / 2).toArray())
+    uvs.push(0, along[i]! / total, 1, along[i]! / total)
+    if (i > 0) index.push((i - 1) * 2, (i - 1) * 2 + 1, i * 2, (i - 1) * 2 + 1, i * 2 + 1, i * 2)
+  })
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
+  geometry.setIndex(index)
+
+  const uniforms = {
+    time: { value: 0 },
+    daylight: { value: 1 },
+    lip: { value: run / total },
+    length: { value: total },
+  }
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float time;
+      uniform float daylight;
+      uniform float lip;
+      uniform float length;
+      varying vec2 vUv;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+      }
+      void main() {
+        float d = vUv.y * length;
+        float falling = smoothstep(lip - 0.01, lip + 0.04, vUv.y);
+        // Long streaks running down (fast in the fall, slow in the stream)
+        vec2 q = vec2(vUv.x * 9.0, d * mix(1.6, 0.5, falling) - time * mix(0.5, 2.6, falling));
+        float s = noise(q) * 0.6 + noise(q * 2.3 + 7.0) * 0.4;
+        float foam = smoothstep(mix(0.62, 0.42, falling), 0.85, s);
+        vec3 deep = vec3(0.22, 0.56, 0.78);
+        vec3 shallow = vec3(0.55, 0.85, 0.95);
+        vec3 color = mix(mix(deep, shallow, 0.5 + 0.5 * sin(vUv.x * 3.14159)), vec3(1.0), foam * mix(0.55, 0.95, falling));
+        color = mix(vec3(0.05, 0.1, 0.18), color, 0.18 + 0.82 * daylight);
+        // Soft banks, the fall frays at its sides and fades into the clouds
+        float edge = smoothstep(0.0, mix(0.12, 0.3, falling), vUv.x) * smoothstep(1.0, 1.0 - mix(0.12, 0.3, falling), vUv.x);
+        float fade = 1.0 - smoothstep(0.6, 1.0, vUv.y);
+        float alpha = mix(0.88, 0.5 + foam * 0.5, falling) * edge * fade;
+        gl_FragColor = vec4(color, alpha);
+      }
+    `,
+  })
+  const mesh = new THREE.Mesh(geometry, material)
+  // Clear of the ground in the stream (it lies on it)
+  mesh.renderOrder = 1
+  return {
+    mesh,
+    uniforms,
+    /** Ground the stream runs over (for keeping grass out of it) */
+    covers: (x: number, z: number) => {
+      const v = new THREE.Vector2(x, z)
+      const a = new THREE.Vector2(from.x, from.y)
+      const b = new THREE.Vector2(lip.x, lip.z)
+      const ab = b.clone().sub(a)
+      const t = THREE.MathUtils.clamp(v.clone().sub(a).dot(ab) / ab.lengthSq(), 0, 1)
+      return v.distanceTo(a.addScaledVector(ab, t)) < 0.5
+    },
+    foot: lip.clone().addScaledVector(out, 0.9).setY(lip.y - drop),
+    lip,
+  }
+}
+
+const GREEN_CROWN: CrownLook = { texture: leafTexture, under: '#0e260b', middle: '#2f661d', top: '#7db544', emissive: '#0b1d06' }
+const CHERRY_CROWN: CrownLook = { texture: blossomTexture, under: '#b86688', middle: '#eb9cbb', top: '#ffdbe8', emissive: '#3a1424' }
+
 function buildIsland(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(11)
-  const { group } = floatingGround(ctx, radius, std('#5f9a3c'), '#8a5a3b', '#6f6258', 3)
-  const terrain = createTerrain(ctx, radius, 4, { grass: ['#5f9a3c', '#74ad45', '#8cbf4f', '#6aa340'], dry: '#b9b85a', path: '#d6c08a' })
+  const { width, depth } = ctx.style
+  // Ground the dark green of the grass roots, so the lawn reads as one field
+  const { group } = floatingGround(ctx, radius, std('#2f5d1e'))
+  const terrain = createTerrain(ctx, radius, 4, { grass: ['#2c581b', '#31601e', '#376822', '#2f5c1d'], dry: '#466d24', path: '#9a8a5c' })
   group.add(terrain.mesh)
 
-  plantGroves(group, ctx, radius, terrain, rand, ['CommonTree_1', 'CommonTree_2', 'CommonTree_3', 'CommonTree_4', 'CommonTree_5', 'Pine_1'])
-  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, ['#2d5a1c', '#4f9a34', '#a6dc6a'])
-  plantPathEdges(group, terrain, rand, ctx, radius)
+  // The centrepiece: a giant green tree behind the left wall
+  const heroHeight = Math.max(7.5, ctx.style.height * 2.3)
+  const hero = plantHeroTree(group, ctx, terrain, rand, [-width / 2 - 2.3, -depth * 0.15], heroHeight, GREEN_CROWN)
+  // Dark pines behind the back wall's far end, against the sky
+  const pines: ScatterItem[] = ([[width / 2 - 0.3, -depth / 2 - 2.4, 5.6], [width / 2 + 1.5, -depth / 2 - 1.5, 4.4], [width / 2 + 0.9, -depth / 2 - 3.9, 6.2]] as const)
+    .filter(([x, z]) => Math.hypot(x, z) < radius - 1)
+    .map(([x, z, height]) => ({ x, y: terrain.heightAt(x, z), z, height, rotation: rand() * Math.PI * 2 }))
+  scatterModel(group, 'Pine_1', pines)
+
+  // A pool near the front edge, its stream pouring off the island into the clouds
+  // Towards the camera's side, so the fall is seen face on
+  const fallAngle = Math.PI * 0.47
+  const poolCentre = new THREE.Vector2(Math.cos(fallAngle), Math.sin(fallAngle)).multiplyScalar(radius * 0.66)
+  const poolR = 1.05
+  const poolY = terrain.heightAt(poolCentre.x, poolCentre.y)
+  const pool = createWater(poolR)
+  pool.mesh.position.set(poolCentre.x, poolY + 0.03, poolCentre.y)
+  group.add(pool.mesh)
+  const fall = createWaterfall(ctx, radius, terrain, poolCentre, fallAngle)
+  // A GLSL shader: not on WebGPU (experimental)
+  if (!gpuKit()) group.add(fall.mesh)
+  const inWater = (x: number, z: number) => Math.hypot(x - poolCentre.x, z - poolCentre.y) < poolR + 0.3 || fall.covers(x, z)
+  // Stones round the pool, open where the stream leaves
+  const shore: ScatterItem[] = []
+  for (let i = 0; i < 22; i++) {
+    const a = (i / 22) * Math.PI * 2 + rand() * 0.15
+    if (Math.abs(Math.atan2(Math.sin(a - fallAngle), Math.cos(a - fallAngle))) < 0.45) continue
+    const r = poolR + 0.05 + rand() * 0.12
+    const x = poolCentre.x + Math.cos(a) * r
+    const z = poolCentre.y + Math.sin(a) * r
+    shore.push({ x, y: terrain.heightAt(x, z), z, height: 0.14 + rand() * 0.14, rotation: rand() * Math.PI * 2 })
+  }
+  for (const [name, items] of byVariant(['Pebble_Round_1', 'Pebble_Round_2', 'Pebble_Round_3', 'Pebble_Round_4', 'Pebble_Round_5'], shore, rand)) scatterModel(group, name, items)
+  // Spray where it goes over
+  const spray = new THREE.Sprite(new THREE.SpriteMaterial({ map: softDotTexture(), color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false }))
+  spray.position.copy(fall.lip).add(new THREE.Vector3(0, -0.3, 0))
+  spray.scale.setScalar(1.4)
+  group.add(spray)
+
+  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, ['#2d5a1c', '#4f9a34', '#a6dc6a'], inWater)
 
   const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffffff', emissiveIntensity: 0.15 })
   const horizon = skyClouds(group, rand, cloudMaterial)
@@ -1248,6 +1350,13 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
     const puff = cloudPuff(rand, cloudMaterial)
     puff.position.set(Math.cos(a) * r, ctx.groundY - radius * (0.75 + rand() * 0.5), Math.sin(a) * r)
     puff.scale.multiplyScalar(1.2 + rand() * 1.4)
+    clouds.add(puff)
+  }
+  // Mist where the waterfall meets the clouds
+  for (let i = 0; i < 4; i++) {
+    const puff = cloudPuff(rand, cloudMaterial)
+    puff.position.copy(fall.foot).add(new THREE.Vector3((rand() - 0.5) * 2, rand() * 0.8, (rand() - 0.5) * 2))
+    puff.scale.multiplyScalar(1 + rand() * 0.8)
     clouds.add(puff)
   }
   group.add(clouds)
@@ -1274,12 +1383,15 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
     starsAlways: false,
     sky: { night: new THREE.Color('#070b1f'), dusk: new THREE.Color('#f2a65a'), day: new THREE.Color('#8fd0f5') },
     atmosphere: { turbidity: 2.5, rayleigh: 2.2, mie: 0.003 },
+    focus: { position: hero.origin.clone(), height: heroHeight },
     update(time, dt, daylight, lamps) {
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
       cloudMaterial.emissiveIntensity = 0.05 + daylight * 0.15
-      clouds.rotation.y = time * 0.004
+      pool.uniforms.time.value = fall.uniforms.time.value = time
+      pool.uniforms.daylight.value = fall.uniforms.daylight.value = daylight
+      spray.material.opacity = 0.12 + daylight * 0.43
       horizon.rotation.y = Math.sin(time * 0.02) * 0.05
       rocks.forEach((r) => {
         r.rock.position.y = r.baseY + Math.sin(time * 0.6 + r.phase) * 0.25
@@ -1500,8 +1612,10 @@ function buildMars(ctx: LandContext, radius: number): LandInstance {
 
 function buildSakura(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(37)
-  const { group } = floatingGround(ctx, radius, std('#7fc06a'), '#8a5a3b', '#6f6258', 13)
-  const terrain = createTerrain(ctx, radius, 21, { grass: ['#7fc06a', '#93cc72', '#a7d97f', '#88c46c'], dry: '#c9d48a', path: '#e3d3a8' })
+  const { width, depth } = ctx.style
+  // Ground the dark green of the grass roots, so the lawn reads as one field
+  const { group } = floatingGround(ctx, radius, std('#33601f'))
+  const terrain = createTerrain(ctx, radius, 21, { grass: ['#305c1d', '#356421', '#3b6b25', '#33601f'], dry: '#4c7228', path: '#a8946a' })
   group.add(terrain.mesh)
 
   // Pond to the right of the path: animated water, stone shore, reeds, lily pads
@@ -1534,17 +1648,22 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
     return { pad, phase: rand() * 10 }
   })
 
-  // Cherry groves: twisted trees with pink blossom leaves
-  const trees = plantGroves(group, ctx, radius, terrain, rand, ['TwistedTree_1', 'TwistedTree_2', 'TwistedTree_3'], cherryLeaves)
-  const petalSources = trees.map(t => new THREE.Vector3(t.x, t.y + t.height * 0.75, t.z))
+  // The centrepiece: one giant cherry behind the room's back corner, two
+  // young ones beside the walls
+  const heroHeight = Math.max(8, ctx.style.height * 2.5)
+  const hero = plantHeroTree(group, ctx, terrain, rand, [-width / 2 - 2, -depth / 2 - 2], heroHeight, CHERRY_CROWN)
+  const young: ScatterItem[] = ([[width / 2 + 1.6, -depth / 2 - 1.4], [-width / 2 - 1.5, depth / 2 + 0.6]] as const)
+    .filter(([x, z]) => Math.hypot(x, z) < radius - 1)
+    .map(([x, z]) => ({ x, y: terrain.heightAt(x, z), z, height: 3.6 + rand() * 0.6, rotation: rand() * Math.PI * 2 }))
+  scatterModel(group, 'TwistedTree_1', young, { material: cherryLeaves })
+  const petalSources = [...hero.blossoms, ...young.map(t => new THREE.Vector3(t.x, t.y + t.height * 0.75, t.z))]
 
   const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, ['#2f5a1e', '#5f9e3a', '#b9e27c'], inPond)
-  plantPathEdges(group, terrain, rand, ctx, radius)
 
   const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffe6f0', emissiveIntensity: 0.15 })
   skyClouds(group, rand, cloudMaterial)
 
-  const petals = createPetals(180, ctx, petalSources, rand)
+  const petals = createPetals(Math.round(500 * (ctx.detail ?? 1)), ctx, petalSources, rand, { colors: ['#ffc0d9', '#ffd6e6', '#f7a8c6', '#ffffff'], size: 1.3 })
   const butterflies = createButterflies(5, flowerTops, rand, ['#ffffff', '#ffb6d9', '#c4b5fd'])
   const fireflies = createFireflies(20, ctx, radius, rand)
   group.add(petals.mesh, butterflies.group, fireflies.points)
@@ -1561,6 +1680,7 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
     // Its pale greens and pinks burn out under the full midday sun, most of
     // all seen from above (the ground and crowns face it)
     light: { sun: 0.9, sky: 0.45 },
+    focus: { position: hero.origin.clone(), height: heroHeight },
     update(time, dt, daylight, lamps) {
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
@@ -1613,6 +1733,47 @@ function blossomTexture() {
   blossomCanvas = new THREE.CanvasTexture(canvas)
   blossomCanvas.colorSpace = THREE.SRGBColorSpace
   return blossomCanvas
+}
+
+/** Leaf clusters on a transparent card (coloured per instance), for a green crown */
+let leafCanvas: THREE.CanvasTexture | null = null
+function leafTexture() {
+  if (leafCanvas) return leafCanvas
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const g = canvas.getContext('2d')!
+  const rand = seeded(97)
+  // Pointed leaves packed towards the middle, darker ones first (underneath)
+  for (let i = 0; i < 110; i++) {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * size * 0.4
+    const x = size / 2 + Math.cos(a) * r
+    const y = size / 2 + Math.sin(a) * r
+    const length = 16 + rand() * 12
+    const turn = rand() * Math.PI * 2
+    const light = Math.round(150 + (i / 110) * 90 + rand() * 15)
+    g.save()
+    g.translate(x, y)
+    g.rotate(turn)
+    g.fillStyle = `rgb(${light},${light},${light})`
+    g.beginPath()
+    g.moveTo(0, -length / 2)
+    g.quadraticCurveTo(length * 0.38, 0, 0, length / 2)
+    g.quadraticCurveTo(-length * 0.38, 0, 0, -length / 2)
+    g.fill()
+    // A lighter midrib
+    g.strokeStyle = `rgba(255,255,255,0.35)`
+    g.lineWidth = 1
+    g.beginPath()
+    g.moveTo(0, -length * 0.4)
+    g.lineTo(0, length * 0.4)
+    g.stroke()
+    g.restore()
+  }
+  leafCanvas = new THREE.CanvasTexture(canvas)
+  leafCanvas.colorSpace = THREE.SRGBColorSpace
+  return leafCanvas
 }
 
 /** Smooth 3D value noise, 0..1 (bark bumps) */
@@ -1700,7 +1861,18 @@ function crimsonTrunk(rand: () => number, height: number, lean: THREE.Vector3, s
  * view (place.blocked).
  * Returns the tree and the blossom points (petals fall from them).
  */
-function crimsonTree(rand: () => number, height: number, detail: number, place: { origin: THREE.Vector3; toward: THREE.Vector3; blocked: (x: number, y: number, z: number) => boolean }) {
+/** A giant tree's crown: clump cards and the shades from its underside to its top */
+interface CrownLook {
+  texture: () => THREE.Texture
+  under: string
+  middle: string
+  top: string
+  emissive: string
+}
+
+const CRIMSON_CROWN: CrownLook = { texture: blossomTexture, under: '#2a0309', middle: '#8a0a22', top: '#e8284e', emissive: '#3a0410' }
+
+function crimsonTree(rand: () => number, height: number, detail: number, place: { origin: THREE.Vector3; toward: THREE.Vector3; blocked: (x: number, y: number, z: number) => boolean; wholeLimbs?: boolean }, look: CrownLook = CRIMSON_CROWN) {
   const up = new THREE.Vector3(0, 1, 0)
   const over = (p: THREE.Vector3) => place.blocked(place.origin.x + p.x, place.origin.y + p.y, place.origin.z + p.z)
   const limbs: THREE.BufferGeometry[] = []
@@ -1781,6 +1953,8 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
     const out = new THREE.Vector3(Math.cos(a), 0, Math.sin(a))
     const dir = out.clone().setY(0.12 + rand() * 0.15).addScaledVector(place.toward, 0.5).normalize()
     const from = trunk.top.clone().addScaledVector(out, trunk.topRadius * 0.55).add(new THREE.Vector3(0, -rand() * height * 0.05, 0))
+    // None reaching into the space kept clear (it would be cut off there, a bare stump)
+    if (place.wholeLimbs && [0.15, 0.3, 0.45].some(k => over(from.clone().addScaledVector(dir, height * k)))) continue
     grow(from, dir, height * (0.36 + rand() * 0.12), trunk.topRadius * (0.3 + rand() * 0.1), 1)
   }
 
@@ -1903,10 +2077,10 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
   const cardGeometry = mergeGeometries(cardPlanes)!
   cardPlanes.forEach(g => g.dispose())
   const blossomMaterial = swayingMaterial(new THREE.MeshLambertMaterial({
-    map: blossomTexture(),
+    map: look.texture(),
     alphaTest: 0.4,
     side: THREE.DoubleSide,
-    emissive: new THREE.Color('#3a0410'),
+    emissive: new THREE.Color(look.emissive),
     emissiveIntensity: 0.1,
   }))
   const perSpot = 4
@@ -1916,9 +2090,9 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
   const low = Math.min(...ys)
   const high = Math.max(...ys)
   // Darker than they look: the room's bright light lifts them to crimson
-  const under = new THREE.Color('#2a0309')
-  const middle = new THREE.Color('#8a0a22')
-  const top = new THREE.Color('#e8284e')
+  const under = new THREE.Color(look.under)
+  const middle = new THREE.Color(look.middle)
+  const top = new THREE.Color(look.top)
   const shade = new THREE.Color()
   const dummy = new THREE.Object3D()
   const unit = height * 0.1
@@ -1948,6 +2122,34 @@ function crimsonTree(rand: () => number, height: number, detail: number, place: 
   crown.castShadow = false
   tree.add(crown)
   return { tree, blossoms: blossoms.map(b => b.position) }
+}
+
+/**
+ * A giant tree (crimsonTree) as a land's centrepiece, standing behind the
+ * walls; its crown spreads over the land behind the room, never between the
+ * camera and the room
+ */
+function plantHeroTree(group: THREE.Group, ctx: LandContext, terrain: Terrain, rand: () => number, at: [number, number], height: number, look?: CrownLook) {
+  const { width, depth } = ctx.style
+  const origin = new THREE.Vector3(at[0], terrain.heightAt(at[0], at[1]), at[1])
+  const wallTop = ctx.groundY + ctx.style.height
+  const hero = crimsonTree(rand, height, ctx.detail ?? 1, {
+    origin,
+    toward: new THREE.Vector3(-at[0], 0, -at[1]).normalize(),
+    // Over the room's back half only, and well above the walls; nothing over
+    // the front half of the land, between the camera and the room
+    blocked: (x, y, z) => {
+      if (x + z > -0.5) return true
+      const overRoom = Math.abs(x) < width / 2 + 0.6 && Math.abs(z) < depth / 2 + 0.6
+      return overRoom && y < wallTop + 1.4
+    },
+    // The crimson tree (no look given) keeps the shape it was made with
+    wholeLimbs: look !== undefined,
+  }, look)
+  hero.tree.position.copy(origin)
+  group.add(hero.tree)
+  hero.tree.updateMatrixWorld(true)
+  return { origin, blossoms: hero.blossoms.map(p => p.clone().applyMatrix4(hero.tree.matrixWorld)) }
 }
 
 /** A field of grass blades (thousands, instanced), dark at the root and bright at the tip */
@@ -2008,26 +2210,10 @@ function buildCrimson(ctx: LandContext, radius: number): LandInstance {
   group.add(terrain.mesh)
 
   // One giant tree behind the room's back corner, its crown spreading over the land
-  const heroX = -width / 2 - 2
-  const heroZ = -depth / 2 - 2
   const heroHeight = Math.max(8, ctx.style.height * 2.5)
-  const origin = new THREE.Vector3(heroX, terrain.heightAt(heroX, heroZ), heroZ)
-  const wallTop = ctx.groundY + ctx.style.height
-  const hero = crimsonTree(rand, heroHeight, detail, {
-    origin,
-    toward: new THREE.Vector3(-heroX, 0, -heroZ).normalize(),
-    // Over the room's back half only, and well above the walls; nothing over
-    // the front half of the land, between the camera and the room
-    blocked: (x, y, z) => {
-      if (x + z > -0.5) return true
-      const overRoom = Math.abs(x) < width / 2 + 0.6 && Math.abs(z) < depth / 2 + 0.6
-      return overRoom && y < wallTop + 1.4
-    },
-  })
-  hero.tree.position.copy(origin)
-  group.add(hero.tree)
-  hero.tree.updateMatrixWorld(true)
-  const petalSources = hero.blossoms.map(p => p.clone().applyMatrix4(hero.tree.matrixWorld))
+  const hero = plantHeroTree(group, ctx, terrain, rand, [-width / 2 - 2, -depth / 2 - 2], heroHeight)
+  const origin = hero.origin
+  const petalSources = hero.blossoms
 
   const grass = bladeGrass(ctx, radius, terrain, rand, Math.round(15000 * detail), {
     colors: ['#2a040c', '#8c0f2c', '#ff4f78'],
