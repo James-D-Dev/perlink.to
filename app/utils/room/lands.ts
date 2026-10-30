@@ -1651,16 +1651,26 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
   })
 
   // The centrepiece: one giant cherry behind the room's back corner, two
-  // young ones beside the walls
+  // young ones side by side beyond the back wall's far end
   const heroHeight = Math.max(8, ctx.style.height * 2.5)
   const hero = plantHeroTree(group, ctx, terrain, rand, [-width / 2 - 2, -depth / 2 - 2], heroHeight, CHERRY_CROWN)
-  const young: ScatterItem[] = ([[width / 2 + 1.6, -depth / 2 - 1.4], [-width / 2 - 1.5, depth / 2 + 0.6]] as const)
+  const young: ScatterItem[] = ([[width / 2 + 1.6, -depth / 2 - 1.4], [width / 2 + 2.9, -depth / 2 - 2.5]] as const)
     .filter(([x, z]) => Math.hypot(x, z) < radius - 1)
     .map(([x, z]) => ({ x, y: terrain.heightAt(x, z), z, height: 3.6 + rand() * 0.6, rotation: rand() * Math.PI * 2 }))
   scatterModel(group, 'TwistedTree_1', young, { material: cherryLeaves })
   const petalSources = [...hero.blossoms, ...young.map(t => new THREE.Vector3(t.x, t.y + t.height * 0.75, t.z))]
 
-  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, ['#2f5a1e', '#5f9e3a', '#b9e27c'], inPond)
+  // A few big stones beside the left wall, sunk a little into the lawn
+  const stonesAt = [-width / 2 - 1.5, depth / 2 + 0.6] as const
+  const stones: ScatterItem[] = ([[0, 0, 0.95], [0.75, 0.35, 0.55], [-0.45, 0.6, 0.38], [0.3, -0.7, 0.3]] as const).map(([dx, dz, height]) => {
+    const x = stonesAt[0] + dx
+    const z = stonesAt[1] + dz
+    return { x, y: terrain.heightAt(x, z) - height * 0.12, z, height, rotation: rand() * Math.PI * 2 }
+  })
+  for (const [name, list] of byVariant(['Rock_Medium_1', 'Rock_Medium_2', 'Rock_Medium_3'], stones, rand)) scatterModel(group, name, list)
+  const nearStones = (x: number, z: number) => Math.hypot(x - stonesAt[0], z - stonesAt[1]) < 1.2
+
+  const flowerTops = plantMeadow(group, ctx, radius, terrain, rand, ['#2f5a1e', '#5f9e3a', '#b9e27c'], (x, z) => inPond(x, z) || nearStones(x, z))
 
   const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#ffe6f0', emissiveIntensity: 0.15 })
   skyClouds(group, rand, cloudMaterial)
