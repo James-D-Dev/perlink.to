@@ -188,7 +188,7 @@
     "lands": {
       "island": {
         "name": "Đảo trên mây",
-        "description": "Hòn đảo bay trên mây, đầy hoa và bướm"
+        "description": "Hòn đảo bay trên mây với cây cổ thụ và thác nước đổ xuống biển mây"
       },
       "mars": {
         "name": "Sao Hỏa",
@@ -196,7 +196,7 @@
       },
       "sakura": {
         "name": "Hoa anh đào",
-        "description": "Hoa anh đào, cánh hoa rơi, bướm và hồ nước"
+        "description": "Cây anh đào khổng lồ nở rộ, cánh hoa rơi, bướm và hồ nước"
       },
       "crimson": {
         "name": "Anh đào đỏ",
@@ -208,7 +208,7 @@
       },
       "winter": {
         "name": "Mùa đông",
-        "description": "Tuyết rơi, thông phủ tuyết và người tuyết đội mũ Ông già Noel"
+        "description": "Cây cổ thụ phủ sương trắng, hồ băng, tuyết bay trong gió và đèn lồng về đêm"
       }
     },
     "objects": {

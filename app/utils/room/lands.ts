@@ -23,12 +23,12 @@ export interface LandMeta {
 }
 
 export const LANDS: LandMeta[] = [
-  { id: 'island', name: 'Sky island', description: 'Floating island above the clouds, flowers and butterflies', icon: 'i-lucide-cloud-sun', preview: 'linear-gradient(180deg,#8fd0f5 0%,#cfeaff 55%,#6fbf5a 56%,#4f8a3a 100%)', thumbnail: '/images/lands/island.webp' },
+  { id: 'island', name: 'Sky island', description: 'Floating island with a giant tree and a waterfall pouring into the clouds', icon: 'i-lucide-cloud-sun', preview: 'linear-gradient(180deg,#8fd0f5 0%,#cfeaff 55%,#6fbf5a 56%,#4f8a3a 100%)', thumbnail: '/images/lands/island.webp' },
   { id: 'mars', name: 'Mars', description: 'Red planet surface floating in space, planets all around', icon: 'i-lucide-orbit', preview: 'linear-gradient(180deg,#0b0614 0%,#2a1440 55%,#c4572d 56%,#7a2f18 100%)', thumbnail: '/images/lands/mars.webp' },
-  { id: 'sakura', name: 'Sakura', description: 'Cherry blossoms, falling petals, butterflies and a pond', icon: 'i-lucide-flower-2', preview: 'linear-gradient(180deg,#bfe3ff 0%,#ffd6e8 55%,#9fd88a 56%,#6fb35a 100%)', thumbnail: '/images/lands/sakura.webp' },
+  { id: 'sakura', name: 'Sakura', description: 'A giant cherry in bloom, falling petals, butterflies and a pond', icon: 'i-lucide-flower-2', preview: 'linear-gradient(180deg,#bfe3ff 0%,#ffd6e8 55%,#9fd88a 56%,#6fb35a 100%)', thumbnail: '/images/lands/sakura.webp' },
   { id: 'crimson', name: 'Crimson sakura', description: 'A giant crimson cherry tree, red grass and petals drifting under a blue sky', icon: 'i-lucide-trees', preview: 'linear-gradient(180deg,#5d9cf0 0%,#a9cdf7 55%,#a3173a 56%,#5c0f22 100%)', thumbnail: '/images/lands/crimson.webp' },
   { id: 'city', name: 'City', description: 'Downtown block: streets, traffic, street lamps and lit windows at night', icon: 'i-lucide-building-2', preview: 'linear-gradient(180deg,#9fcdf0 0%,#d9e6f2 55%,#8d8f95 56%,#55585e 100%)', thumbnail: '/images/lands/city.webp' },
-  { id: 'winter', name: 'Winter', description: 'Snowfall, snowy pines and a snowman with a Santa hat', icon: 'i-lucide-snowflake', preview: 'linear-gradient(180deg,#9fb8d1 0%,#dce8f3 55%,#f4f8ff 56%,#d6e2ef 100%)', thumbnail: '/images/lands/winter.webp' },
+  { id: 'winter', name: 'Winter', description: 'A frost-white giant tree, a frozen pond, blowing snow and lanterns at night', icon: 'i-lucide-snowflake', preview: 'linear-gradient(180deg,#9fb8d1 0%,#dce8f3 55%,#f4f8ff 56%,#d6e2ef 100%)', thumbnail: '/images/lands/winter.webp' },
 ]
 
 export interface SkyPalette {
@@ -626,12 +626,68 @@ function createSnowfall(count: number, ctx: LandContext, radius: number, rand: (
     phases[i] = rand() * 10
   }
   const { object: points, material, markDirty } = sizedPoints(positions, { color: '#ffffff', size: 0.09, map: softDotTexture(), transparent: true, depthWrite: false, opacity: 0.9 })
+  // With gusts (windField) the flakes are blown along, harder as a gust passes
+  const windy = windField.gust.value > 0
   function update(time: number, dt: number, daylight: number) {
     material.color.setScalar(0.6 + 0.4 * daylight)
     for (let i = 0; i < count; i++) {
+      let x = positions[i * 3]!
+      let z = positions[i * 3 + 2]!
+      const push = windy ? 0.5 + gustAt(x, z, time) * 2.5 : 0
       positions[i * 3 + 1]! -= speeds[i]! * dt
-      positions[i * 3]! += Math.sin(time + phases[i]!) * 0.15 * dt
+      x += Math.sin(time + phases[i]!) * 0.15 * dt + windField.dir.x * push * dt
+      z += windField.dir.y * push * dt
+      // Blown off the far side: back in on the upwind side
+      if (x * x + z * z > radius * radius) {
+        x -= windField.dir.x * radius * 1.9
+        z -= windField.dir.y * radius * 1.9
+      }
+      positions[i * 3] = x
+      positions[i * 3 + 2] = z
       if (positions[i * 3 + 1]! < ctx.groundY) positions[i * 3 + 1] = top
+    }
+    markDirty()
+  }
+  return { points, update }
+}
+
+/**
+ * Blowing snow: fine powder carried low over the ground by the wind, fast
+ * in the gusts, rising and settling as it goes
+ */
+function createSnowDrift(count: number, ctx: LandContext, radius: number, rand: () => number) {
+  const positions = new Float32Array(count * 3)
+  const lift = new Float32Array(count)
+  const phases = new Float32Array(count)
+  const spot = (i: number) => {
+    const a = rand() * Math.PI * 2
+    const r = Math.sqrt(rand()) * radius
+    positions[i * 3] = Math.cos(a) * r
+    positions[i * 3 + 2] = Math.sin(a) * r
+  }
+  for (let i = 0; i < count; i++) {
+    spot(i)
+    lift[i] = 0.05 + rand() * 0.5
+    phases[i] = rand() * 10
+  }
+  const { object: points, material, markDirty } = sizedPoints(positions, { color: '#ffffff', size: 0.05, map: softDotTexture(), transparent: true, depthWrite: false, opacity: 0.7 })
+  function update(time: number, dt: number, daylight: number) {
+    material.color.setScalar(0.55 + 0.45 * daylight)
+    for (let i = 0; i < count; i++) {
+      let x = positions[i * 3]!
+      let z = positions[i * 3 + 2]!
+      const gust = gustAt(x, z, time)
+      const push = 0.6 + gust * 4
+      x += windField.dir.x * push * dt
+      z += windField.dir.y * push * dt
+      if (x * x + z * z > radius * radius) {
+        x -= windField.dir.x * radius * 1.9
+        z -= windField.dir.y * radius * 1.9
+      }
+      positions[i * 3] = x
+      positions[i * 3 + 2] = z
+      // Lifted by the gusts, curling over the drifts
+      positions[i * 3 + 1] = ctx.groundY + 0.03 + lift[i]! * (0.3 + gust) * (0.6 + 0.4 * Math.sin(time * 2.3 + phases[i]!))
     }
     markDirty()
   }
@@ -2936,60 +2992,197 @@ function christmasTree(rand: () => number) {
   return { group: g, bulbs, light }
 }
 
+/** Frozen pond: glossy ice, darker where it's deep, a few white cracks */
+function iceTexture() {
+  const size = 256
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const g = canvas.getContext('2d')!
+  const deep = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+  deep.addColorStop(0, '#7fb4d6')
+  deep.addColorStop(0.65, '#b9dcef')
+  deep.addColorStop(1, '#eaf6fc')
+  g.fillStyle = deep
+  g.fillRect(0, 0, size, size)
+  const rand = seeded(71)
+  g.strokeStyle = 'rgba(255,255,255,0.7)'
+  g.lineWidth = 1.5
+  for (let i = 0; i < 7; i++) {
+    let x = size / 2 + (rand() - 0.5) * size * 0.5
+    let y = size / 2 + (rand() - 0.5) * size * 0.5
+    let a = rand() * Math.PI * 2
+    g.beginPath()
+    g.moveTo(x, y)
+    for (let k = 0; k < 6; k++) {
+      a += (rand() - 0.5) * 1.2
+      x += Math.cos(a) * 14
+      y += Math.sin(a) * 14
+      g.lineTo(x, y)
+    }
+    g.stroke()
+  }
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  return texture
+}
+
+/** A wooden post with a lantern that glows at night */
+function lanternPost(glass: THREE.MeshStandardMaterial, glow: THREE.SpriteMaterial) {
+  const lantern = new THREE.Group()
+  const wood = std('#4a3626')
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 1, 6), wood)
+  post.position.y = 0.5
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.24, 0.2), glass)
+  box.position.y = 1.12
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.12, 4), std('#f4f8ff', { roughness: 1 }))
+  cap.position.y = 1.3
+  cap.rotation.y = Math.PI / 4
+  const halo = new THREE.Sprite(glow)
+  halo.position.y = 1.12
+  halo.scale.setScalar(0.9)
+  lantern.add(post, box, cap, halo)
+  return lantern
+}
+
+const FROST_CROWN: CrownLook = { texture: leafTexture, under: '#61779a', middle: '#c4d4e8', top: '#ffffff', emissive: '#121a2c', bark: '#4a3a30' }
+
 function buildWinter(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(53)
-  const snowTop = std('#f4f8ff', { roughness: 1 })
-  const { group } = floatingGround(ctx, radius, snowTop, '#c9d6e3', '#8796a8', 19)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  const snowTop = std('#dbe5f1', { roughness: 1 })
+  const { group } = floatingGround(ctx, radius, snowTop)
+  // Snow in soft drifts, blue in their hollows, a trodden path through it
+  const terrain = createTerrain(ctx, radius, 33, { grass: ['#e9f0f9', '#f5f8fc', '#dde7f3', '#eef3fa'], dry: '#c6d4e6', path: '#b5c3d4' })
+  group.add(terrain.mesh)
 
+  // The centrepiece: a giant tree white with hoarfrost behind the room's back corner
+  const heroHeight = Math.max(8, ctx.style.height * 2.5)
+  const hero = plantHeroTree(group, ctx, terrain, rand, [-width / 2 - 2, -depth / 2 - 2], heroHeight, FROST_CROWN)
+
+  // Snowy pines beyond the back wall's far end
   const sway = swayer()
-  for (let i = 0; i < 10; i++) {
-    const [x, z] = backdropSpot(rand, ctx.style, radius)
-    const pine = pineTree(rand, 1.1 + rand() * 0.8, true)
-    group.add(place(pine, x, ctx.groundY, z))
+  for (const [x, z, scale] of [[width / 2 + 1.5, -depth / 2 - 1.3, 1.7], [width / 2 + 2.9, -depth / 2 - 2.6, 2.1], [width / 2 + 0.2, -depth / 2 - 3.3, 1.4], [width / 2 + 3.4, -depth / 2 - 0.6, 1.2]] as const) {
+    if (Math.hypot(x, z) > radius - 1) continue
+    const pine = pineTree(rand, scale, true)
+    group.add(place(pine, x, terrain.heightAt(x, z), z))
     sway.add(pine, rand() * 10)
   }
-  // Little snow mounds
-  for (let i = 0; i < 10; i++) {
-    const [x, z] = outdoorSpot(rand, ctx.style, radius, 0.6)
-    const mound = new THREE.Mesh(new THREE.SphereGeometry(0.25 + rand() * 0.25, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), snowTop)
-    group.add(place(mound, x, ctx.groundY, z))
+
+  // Frozen pond to the right of the path, snow heaped round its edge
+  const pondX = radius * 0.66
+  const pondZ = radius * 0.2
+  const pondR = 1.3
+  const pondY = terrain.heightAt(pondX, pondZ)
+  const inPond = (x: number, z: number) => Math.hypot(x - pondX, z - pondZ) < pondR + 0.3
+  const ice = new THREE.Mesh(new THREE.CircleGeometry(pondR, 40), new THREE.MeshStandardMaterial({ map: iceTexture(), roughness: 0.12, metalness: 0.05 }))
+  ice.rotation.x = -Math.PI / 2
+  ice.position.set(pondX, pondY + 0.025, pondZ)
+  ice.receiveShadow = true
+  group.add(ice)
+  // The land's own snow material, so the banks dim with it at night
+  const bank = snowTop
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2 + rand() * 0.2
+    const r = pondR + 0.08 + rand() * 0.1
+    const mound = new THREE.Mesh(new THREE.SphereGeometry(0.18 + rand() * 0.14, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), bank)
+    mound.scale.y = 0.55
+    const x = pondX + Math.cos(a) * r
+    const z = pondZ + Math.sin(a) * r
+    group.add(place(mound, x, terrain.heightAt(x, z) - 0.02, z, false))
   }
+
+  // Dry grass poking through the snow in a few tufts (by the pond, round the
+  // trees, out at the rim), not sprinkled all over, which reads as specks
+  const tufts: [number, number, number][] = [
+    [pondX - pondR - 0.4, pondZ + 0.5, 0.8],
+    [pondX + 0.3, pondZ - pondR - 0.4, 0.6],
+    [width / 2 + 1.2, -depth / 2 + 0.4, 0.9],
+    [-width / 2 - 0.6, depth / 2 + 1.1, 0.7],
+    [-radius * 0.15, radius * 0.82, 1],
+    [radius * 0.82, -radius * 0.25, 0.8],
+  ]
+  const inTuft = (x: number, z: number) => tufts.some(([cx, cz, r]) => Math.hypot(x - cx, z - cz) < r * (0.75 + 0.25 * Math.sin(Math.atan2(z - cz, x - cx) * 3)))
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(5000 * detail), {
+    colors: ['#5c4a33', '#9a8256', '#ddcc9c'],
+    tints: ['#ffffff', '#f3e8d0', '#e6dcc4'],
+    height: [0.18, 0.42],
+    pathClear: 0.97,
+    avoid: (x, z) => inPond(x, z) || !inTuft(x, z),
+  }))
 
   const man = snowman()
   man.rotation.y = Math.PI / 4
-  group.add(place(man, ctx.style.width / 2 + 1.4, ctx.groundY, -ctx.style.depth / 2 - 0.9))
+  const manX = -width / 2 + 0.7
+  const manZ = depth / 2 + 2
+  group.add(place(man, manX, terrain.heightAt(manX, manZ), manZ))
 
   const xmas = christmasTree(rand)
-  group.add(place(xmas.group, -ctx.style.width / 2 - 1.3, ctx.groundY, ctx.style.depth / 2 + 0.2))
+  const xmasX = -width / 2 - 1.3
+  const xmasZ = depth / 2 + 0.2
+  group.add(place(xmas.group, xmasX, terrain.heightAt(xmasX, xmasZ), xmasZ))
 
-  const snowfall = createSnowfall(700, ctx, radius + 2, rand)
-  group.add(snowfall.points)
+  // Lanterns along the path, lit at night
+  const glass = new THREE.MeshStandardMaterial({ color: '#fff4dc', emissive: '#ffb347', emissiveIntensity: 0.1, transparent: true, opacity: 0.9 })
+  const glow = new THREE.SpriteMaterial({ map: softDotTexture(), color: '#ffc46b', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })
+  const pathFrom = new THREE.Vector2(width / 2 + 1.8, depth / 2 + 1.2)
+  const pathTo = new THREE.Vector2(radius * 0.5, radius * 0.62)
+  const along = pathTo.clone().sub(pathFrom).normalize()
+  const across = new THREE.Vector2(-along.y, along.x)
+  for (const [t, side] of [[0.1, 1], [0.55, -1], [1, 1]] as const) {
+    const at = pathFrom.clone().lerp(pathTo, t).addScaledVector(across, side * 0.75)
+    if (at.length() > radius - 0.6 || inPond(at.x, at.y)) continue
+    group.add(place(lanternPost(glass, glow), at.x, terrain.heightAt(at.x, at.y), at.y))
+  }
 
-  const snowDay = new THREE.Color('#f4f8ff')
-  const snowNight = new THREE.Color('#a9b9d3')
+  const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, emissive: '#eef4ff', emissiveIntensity: 0.15 })
+  skyClouds(group, rand, cloudMaterial)
+
+  const snowfall = createSnowfall(Math.round(900 * detail), ctx, radius + 2, rand)
+  const drift = createSnowDrift(Math.round(500 * detail), ctx, radius, rand)
+  const wind = createWindStreaks(detail < 0.7 ? 3 : 4, ctx, radius, rand)
+  group.add(snowfall.points, drift.points, wind.group)
+
+  const nightTint = new THREE.Color('#7f90b4')
+  const white = new THREE.Color('#ffffff')
+  const snowDay = new THREE.Color('#dbe5f1')
+  const snowNight = new THREE.Color('#8797b6')
+  const cloudNight = new THREE.Color('#4f5a78')
 
   return {
     group,
     starsAlways: false,
-    sky: { night: new THREE.Color('#0b1424'), dusk: new THREE.Color('#e7b8a6'), day: new THREE.Color('#bcd3e8') },
-    atmosphere: { turbidity: 6, rayleigh: 1.2, mie: 0.005 },
+    sky: { night: new THREE.Color('#0b1424'), dusk: new THREE.Color('#e7b8a6'), day: new THREE.Color('#a9c9e6') },
+    atmosphere: { turbidity: 4, rayleigh: 1.7, mie: 0.004 },
+    // White snow burns out under the full sun
+    light: { sun: 0.8, sky: 0.55 },
+    focus: { position: hero.origin.clone(), height: heroHeight },
+    heightAt: terrain.heightAt,
+    ground: terrain.mesh,
     update(time, dt, daylight, lamps) {
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
       snowTop.color.copy(snowNight).lerp(snowDay, daylight)
+      cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
       snowfall.update(time, dt, daylight)
+      drift.update(time, dt, daylight)
+      wind.update(time, daylight)
       sway.update(time)
-      // Christmas lights twinkle at night
+      // Christmas lights twinkle at night, the lanterns glow
       xmas.bulbs.forEach((m, i) => {
         m.emissiveIntensity = 0.2 + lamps * (1.6 + Math.sin(time * 3 + i) * 0.8)
       })
       xmas.light.intensity = lamps * 3
+      glass.emissiveIntensity = 0.1 + lamps * 2.2
+      glow.opacity = lamps * (0.75 + Math.sin(time * 2.1) * 0.05)
     },
   }
 }
 
 export function buildLand(id: LandId, ctx: LandContext): LandInstance {
   const radius = Math.max(ctx.style.width, ctx.style.depth) * 1.1 + 2.5
-  // Gusting wind is a land's own (crimson); the others just sway
-  windField.gust.value = id === 'crimson' ? 1 : 0
+  // Gusting wind is a land's own (crimson, winter); the others just sway
+  windField.gust.value = id === 'crimson' || id === 'winter' ? 1 : 0
   // No wind inside the room's walls (potted plants use the same leaves)
   windField.room.set(ctx.style.width / 2, ctx.style.depth / 2)
   switch (id) {

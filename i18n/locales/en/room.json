@@ -188,7 +188,7 @@
     "lands": {
       "island": {
         "name": "Sky island",
-        "description": "Floating island above the clouds, flowers and butterflies"
+        "description": "Floating island with a giant tree and a waterfall pouring into the clouds"
       },
       "mars": {
         "name": "Mars",
@@ -196,7 +196,7 @@
       },
       "sakura": {
         "name": "Sakura",
-        "description": "Cherry blossoms, falling petals, butterflies and a pond"
+        "description": "A giant cherry in bloom, falling petals, butterflies and a pond"
       },
       "crimson": {
         "name": "Crimson sakura",
@@ -208,7 +208,7 @@
       },
       "winter": {
         "name": "Winter",
-        "description": "Snowfall, snowy pines and a snowman with a Santa hat"
+        "description": "A frost-white giant tree, a frozen pond, blowing snow and lanterns at night"
       }
     },
     "objects": {
