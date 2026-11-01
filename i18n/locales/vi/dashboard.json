@@ -54,6 +54,7 @@
       "unpublishFailed": "Không ngừng xuất bản được trang",
       "edit": "Sửa",
       "newSite": "Tạo trang mới",
+      "newSiteHint": "Website, menu, cửa hàng hay phòng 3D",
       "greeting": {
         "morning": "Chào buổi sáng, {name}",
         "afternoon": "Chào buổi chiều, {name}",

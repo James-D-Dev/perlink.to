@@ -54,6 +54,7 @@
       "unpublishFailed": "Failed to unpublish site",
       "edit": "Edit",
       "newSite": "New site",
+      "newSiteHint": "Website, menu, shop or 3D room",
       "greeting": {
         "morning": "Good morning, {name}",
         "afternoon": "Good afternoon, {name}",

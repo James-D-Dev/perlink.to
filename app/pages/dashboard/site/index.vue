@@ -66,16 +66,7 @@
 
           <div v-else-if="bioPages.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <!-- One more, first -->
-            <NuxtLink
-              v-if="!searchQuery"
-              to="/dashboard"
-              class="flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed py-10 sm:aspect-[4/5] sm:py-0 border-line text-ink-muted transition-colors hover:border-ink-faint hover:bg-sand/40 hover:text-ink"
-            >
-              <span class="flex size-12 items-center justify-center rounded-full bg-sand">
-                <UIcon name="i-lucide-plus" class="size-5" />
-              </span>
-              <span class="text-sm font-medium">{{ t('dashboard.sites.newSite') }}</span>
-            </NuxtLink>
+            <SiteNewCard v-if="!searchQuery" />
             <SiteCard
               v-for="bio in filteredBioPages"
               :key="bio.id"
