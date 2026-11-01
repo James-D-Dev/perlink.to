@@ -289,11 +289,12 @@ onMounted(() => {
 })
 
 // ---------- Content ----------
+// Sky island leads (the first is shown, and loaded, at once); the night city last
 const SHOWCASE = [
-  { id: 'city', image: '/images/landing/city-night.jpg', orb: 'night' as const },
-  { id: 'sakura', image: '/images/landing/sakura.jpg', orb: 'sakura' as const },
   { id: 'island', image: '/images/landing/island.jpg', orb: 'lagoon' as const },
+  { id: 'sakura', image: '/images/landing/sakura.jpg', orb: 'sakura' as const },
   { id: 'mars', image: '/images/landing/mars.jpg', orb: 'mars' as const },
+  { id: 'city', image: '/images/landing/city-night.jpg', orb: 'night' as const },
 ] as const
 const showcase = computed(() => SHOWCASE.map(world => ({ ...world, ...c.value.showcase[world.id] })))
 const active = ref(0)
