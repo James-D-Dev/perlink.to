@@ -2,7 +2,7 @@
   <!-- "New site", first in the list: what a site can hold drifts up behind it -->
   <NuxtLink
     to="/dashboard"
-    class="new-site group relative flex h-56 flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-[#fff6ee] via-[#fcf0f4] to-[#eef1ff] ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl sm:h-auto sm:aspect-[4/5] dark:from-[#1c1613] dark:via-[#1b1320] dark:to-[#11141f] dark:ring-white/10"
+    class="new-site group relative flex aspect-[4/5] [--float-scale:0.7] sm:[--float-scale:1] flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-[#fff6ee] via-[#fcf0f4] to-[#eef1ff] ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl dark:from-[#1c1613] dark:via-[#1b1320] dark:to-[#11141f] dark:ring-white/10"
   >
     <!-- Social networks and reactions rising through it, like on a live video -->
     <div class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
@@ -14,8 +14,8 @@
         class="new-site-float absolute bottom-0 -ml-3 box-content p-3 drop-shadow-[0_6px_14px_rgb(0_0_0/0.22)]"
         :style="{
           left: `${b.x}%`,
-          width: `${b.size}px`,
-          height: `${b.size}px`,
+          width: `calc(${b.size}px * var(--float-scale))`,
+          height: `calc(${b.size}px * var(--float-scale))`,
           animationDuration: `${b.duration}s`,
           animationDelay: `${-b.delay}s`,
           '--sway': `${b.sway}px`,
@@ -39,7 +39,7 @@
     </div>
 
     <!-- The glow, the plus, the words, on a soft haze so nothing busy shows behind them -->
-    <div class="relative z-10 flex flex-col items-center gap-3 px-6 py-4 text-center">
+    <div class="relative z-10 flex flex-col items-center gap-3 px-3 py-4 text-center sm:px-6">
       <span class="absolute inset-0 -z-0 rounded-full bg-[radial-gradient(closest-side,rgb(255_255_255/0.85),transparent)] blur-md dark:bg-[radial-gradient(closest-side,rgb(20_16_24/0.85),transparent)]" aria-hidden="true" />
       <span class="relative flex items-center justify-center">
         <MarketingMkOrb palette="sunset" :size="84" />
@@ -48,7 +48,7 @@
         </span>
       </span>
       <span class="relative text-base font-semibold text-ink">{{ t('dashboard.sites.newSite') }}</span>
-      <span class="relative max-w-[12rem] text-xs text-ink-muted">{{ t('dashboard.sites.newSiteHint') }}</span>
+      <span class="relative hidden max-w-[12rem] text-xs text-ink-muted sm:block">{{ t('dashboard.sites.newSiteHint') }}</span>
     </div>
   </NuxtLink>
 </template>

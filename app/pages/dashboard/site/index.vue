@@ -64,20 +64,21 @@
             </div>
           </div>
 
-          <div v-if="loading" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+          <div v-if="loading" class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3" aria-busy="true">
             <div v-for="i in 2" :key="i" class="relative aspect-[4/5] overflow-hidden rounded-3xl">
               <USkeleton class="absolute inset-0 rounded-3xl" />
-              <div class="absolute inset-x-4 bottom-4 flex items-end gap-2">
-                <div class="flex-1 space-y-2">
-                  <USkeleton class="h-5 w-32 bg-paper/70" />
-                  <USkeleton class="h-3 w-24 bg-paper/70" />
+              <div class="absolute inset-x-3 bottom-3 flex items-end gap-2 sm:inset-x-4 sm:bottom-4">
+                <div class="min-w-0 flex-1 space-y-2">
+                  <USkeleton class="h-4 w-3/4 bg-paper/70 sm:h-5" />
+                  <USkeleton class="h-3 w-1/2 bg-paper/70" />
                 </div>
-                <USkeleton class="h-10 w-16 rounded-full bg-paper/70" />
+                <USkeleton class="hidden h-10 w-16 rounded-full bg-paper/70 sm:block" />
               </div>
             </div>
           </div>
 
-          <div v-else-if="bioPages.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Two columns on phones, like the templates -->
+          <div v-else-if="bioPages.length" class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
             <!-- One more, first -->
             <SiteNewCard v-if="!searchQuery && statusFilter === 'all'" />
             <SiteCard

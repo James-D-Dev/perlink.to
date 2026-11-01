@@ -55,10 +55,12 @@
               :label="t('dashboard.home.seeAllSites', { n: sites.length })"
             />
           </div>
-          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Two columns up to large screens, so four fill two rows; three there -->
+          <div class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
             <SiteCard
-              v-for="site in recentSites"
+              v-for="(site, i) in recentSites"
               :key="site.id"
+              :class="i === 3 && 'lg:hidden'"
               :site="site"
               :pending="pendingSite === site.username"
               @share="shareSite(site)"
@@ -207,7 +209,7 @@ function templateDescription(id: string) {
 // Their sites, newest edits first; the home shows the latest three
 const sites = ref<any[]>([])
 const recentSites = computed(() =>
-  [...sites.value].sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''))).slice(0, 3),
+  [...sites.value].sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''))).slice(0, 4),
 )
 const { qrSite, pendingSite, copyUrl, shareSite, publishSite, unpublishSite } = useSiteActions(sites)
 onMounted(async () => {

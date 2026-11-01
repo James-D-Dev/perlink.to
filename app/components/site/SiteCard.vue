@@ -1,5 +1,5 @@
 <template>
-  <article class="group relative flex aspect-[4/3] flex-col sm:aspect-[4/5] overflow-hidden rounded-3xl bg-sand ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
+  <article class="group relative flex aspect-[4/5] flex-col overflow-hidden rounded-3xl bg-sand ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
     <!-- The site itself, scaled down; the whole card opens the editor -->
     <NuxtLink :to="editTo" class="absolute inset-0" :aria-label="t('dashboard.sites.edit')">
       <!-- The site's snapshot; a site without one renders its page once, which is then snapshotted -->
@@ -22,7 +22,7 @@
     <!-- Status, top left: solid light colours in both themes, since it sits
          on the site's own picture (not the dark dashboard's emerald wash) -->
     <span
-      class="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm"
+      class="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium shadow-sm sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-xs"
       :class="site.isPublished ? 'bg-[#ecfdf5] text-[#047857]' : 'bg-white text-[#57524c]'"
     >
       <span class="size-1.5 rounded-full" :class="site.isPublished ? 'bg-[#10b981]' : 'bg-[#a8a29e]'" />
@@ -31,17 +31,19 @@
 
     <!-- Name and actions over a fade at the bottom, dark enough under the
          name that the page's own text doesn't show through it -->
-    <div class="pointer-events-none relative mt-auto bg-gradient-to-t from-black/95 from-40% via-black/75 to-transparent px-4 pb-4 pt-20">
+    <!-- Phones (two columns): name and the menu only; the card itself opens
+         the editor, and sharing is in the menu -->
+    <div class="pointer-events-none relative mt-auto bg-gradient-to-t from-black/95 from-40% via-black/75 to-transparent px-3 pb-3 pt-14 sm:px-4 sm:pb-4 sm:pt-20">
       <div class="flex items-end gap-2">
         <div class="min-w-0 flex-1 text-white">
-          <h3 class="truncate text-lg font-semibold leading-tight">{{ site.title || site.username }}</h3>
-          <p class="truncate text-xs text-white/75">perlink.to/{{ site.username }}</p>
+          <h3 class="truncate text-sm font-semibold leading-tight sm:text-lg">{{ site.title || site.username }}</h3>
+          <p class="truncate text-[11px] text-white/75 sm:text-xs">perlink.to/{{ site.username }}</p>
         </div>
         <div class="pointer-events-auto flex shrink-0 items-center gap-1.5">
           <UTooltip :text="t('dashboard.editor.share')">
             <button
               type="button"
-              class="flex size-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/30"
+              class="hidden size-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/30 sm:flex"
               :aria-label="t('dashboard.editor.share')"
               @click="$emit('share')"
             >
@@ -51,7 +53,7 @@
           <UDropdownMenu :items="menuItems" :content="{ align: 'end' }" :ui="{ content: 'w-52' }">
             <button
               type="button"
-              class="relative flex size-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/30"
+              class="relative flex size-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/30 sm:size-10"
               :aria-label="t('blocks.editor.menu.more')"
             >
               <UIcon name="i-lucide-ellipsis" class="size-4" />
@@ -60,7 +62,7 @@
           </UDropdownMenu>
           <NuxtLink
             :to="editTo"
-            class="flex h-10 items-center rounded-full bg-white px-4 text-sm font-semibold text-[#0c0b0a] transition hover:bg-white/90"
+            class="hidden h-10 items-center rounded-full bg-white px-4 text-sm font-semibold text-[#0c0b0a] transition hover:bg-white/90 sm:flex"
           >
             {{ t('dashboard.sites.edit') }}
           </NuxtLink>
@@ -160,6 +162,7 @@ const menuItems = computed(() => [
     },
   ],
   [
+    { label: t('dashboard.editor.share'), icon: 'i-lucide-share', onSelect: () => emit('share') },
     { label: t('common.copyLink'), icon: 'i-lucide-copy', onSelect: () => emit('copy') },
     { label: t('dashboard.qr.open'), icon: 'i-lucide-qr-code', onSelect: () => emit('qr') },
   ],
