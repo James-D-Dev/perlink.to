@@ -36,16 +36,17 @@
       </span>
     </div>
 
-    <!-- The glow, the plus, the words -->
-    <div class="relative flex flex-col items-center gap-3 text-center">
+    <!-- The glow, the plus, the words, on a soft haze so nothing busy shows behind them -->
+    <div class="relative flex flex-col items-center gap-3 px-6 py-4 text-center">
+      <span class="absolute inset-0 -z-0 rounded-full bg-[radial-gradient(closest-side,rgb(255_255_255/0.85),transparent)] blur-md dark:bg-[radial-gradient(closest-side,rgb(20_16_24/0.85),transparent)]" aria-hidden="true" />
       <span class="relative flex items-center justify-center">
         <MarketingMkOrb palette="sunset" :size="84" />
         <span class="absolute flex size-11 items-center justify-center rounded-full bg-white/90 text-[#1c1a17] shadow-lg transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110">
           <UIcon name="i-lucide-plus" class="size-5" />
         </span>
       </span>
-      <span class="text-base font-semibold text-ink">{{ t('dashboard.sites.newSite') }}</span>
-      <span class="max-w-[14rem] text-xs text-ink-muted">{{ t('dashboard.sites.newSiteHint') }}</span>
+      <span class="relative text-base font-semibold text-ink">{{ t('dashboard.sites.newSite') }}</span>
+      <span class="relative max-w-[14rem] text-xs text-ink-muted">{{ t('dashboard.sites.newSiteHint') }}</span>
     </div>
   </NuxtLink>
 </template>
@@ -65,19 +66,20 @@ const REACTIONS = {
   },
 } as const
 
-// Few and large, slow, spread across the card so only a handful are in view
-// at once. x: across the card (%); delay staggers them
+// Few and large, slow, rising in two lanes along the sides (the middle stays
+// clear for the words), so only a handful are in view at once.
+// x: across the card (%); delay staggers them
 const FLOATERS: { kind: 'logo' | 'tiktok' | 'like' | 'love'; icon?: string; x: number; size: number; duration: number; delay: number; sway: number }[] = [
-  { kind: 'logo', icon: 'i-logos-facebook', x: 10, size: 44, duration: 12, delay: 0, sway: 10 },
-  { kind: 'love', x: 74, size: 36, duration: 10, delay: 1.5, sway: -10 },
-  { kind: 'logo', icon: 'i-logos-instagram-icon', x: 44, size: 46, duration: 13, delay: 3, sway: 12 },
-  { kind: 'like', x: 18, size: 34, duration: 10.5, delay: 4.6, sway: 8 },
-  { kind: 'tiktok', x: 80, size: 44, duration: 12.5, delay: 6, sway: -12 },
-  { kind: 'love', x: 30, size: 32, duration: 9.5, delay: 7.4, sway: 10 },
-  { kind: 'logo', icon: 'i-logos-youtube-icon', x: 62, size: 46, duration: 12, delay: 8.6, sway: -8 },
-  { kind: 'like', x: 86, size: 34, duration: 10, delay: 10.2, sway: -6 },
-  { kind: 'love', x: 6, size: 30, duration: 9, delay: 11.4, sway: 8 },
-  { kind: 'love', x: 54, size: 34, duration: 10.5, delay: 5.2, sway: -10 },
+  { kind: 'logo', icon: 'i-logos-facebook', x: 8, size: 44, duration: 12, delay: 0, sway: 10 },
+  { kind: 'love', x: 78, size: 36, duration: 10, delay: 1.5, sway: -10 },
+  { kind: 'logo', icon: 'i-skill-icons-instagram', x: 74, size: 46, duration: 13, delay: 3, sway: -8 },
+  { kind: 'like', x: 14, size: 34, duration: 10.5, delay: 4.6, sway: 8 },
+  { kind: 'tiktok', x: 80, size: 44, duration: 12.5, delay: 6.4, sway: -12 },
+  { kind: 'love', x: 6, size: 32, duration: 9.5, delay: 7.4, sway: 10 },
+  { kind: 'logo', icon: 'i-logos-youtube-icon', x: 10, size: 46, duration: 12, delay: 9, sway: 8 },
+  { kind: 'like', x: 84, size: 34, duration: 10, delay: 10.2, sway: -6 },
+  { kind: 'love', x: 18, size: 30, duration: 9, delay: 11.6, sway: 8 },
+  { kind: 'love', x: 72, size: 32, duration: 10.5, delay: 5.2, sway: -10 },
 ]
 </script>
 
