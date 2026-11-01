@@ -13,9 +13,9 @@
         autocomplete="off"
         spellcheck="false"
         maxlength="40"
-:placeholder="copy.claim.placeholder"
+        :placeholder="placeholder"
         :aria-label="copy.claim.aria"
-        class="min-w-0 flex-1 bg-transparent px-0.5 text-[15px] text-ink placeholder:text-ink-faint focus:outline-none"
+        class="min-w-0 flex-1 bg-transparent px-0.5 text-[15px] text-ink placeholder:text-ink-muted/80 focus:outline-none"
       >
       <MarketingMkButton type="submit" size="sm" class="h-9 px-4">{{ copy.claim.button }}</MarketingMkButton>
     </div>
@@ -29,8 +29,10 @@
 withDefaults(defineProps<{ dark?: boolean }>(), { dark: false })
 
 const { loggedIn } = useUserSession()
-const { copy } = useMarketingLang()
+const { copy, lang } = useMarketingLang()
 const name = ref('')
+// Types out example names, brands and shops while the box is empty
+const placeholder = useTypingPlaceholder(lang, () => !!name.value)
 const error = ref('')
 
 function claim() {

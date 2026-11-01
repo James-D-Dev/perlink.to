@@ -13,8 +13,8 @@
         autocomplete="off"
         autocapitalize="off"
         spellcheck="false"
-        :placeholder="t('dashboard.claim.placeholder')"
-        class="min-w-0 flex-1 bg-transparent font-medium text-highlighted outline-none placeholder:text-dimmed dark:text-white dark:placeholder:text-neutral-600"
+        :placeholder="placeholder"
+        class="min-w-0 flex-1 bg-transparent font-medium text-highlighted outline-none placeholder:text-muted dark:text-white dark:placeholder:text-neutral-400"
         :class="size === 'lg' ? 'sm:text-lg' : 'text-sm'"
         :aria-label="t('dashboard.claim.ariaLabel')"
       >
@@ -58,10 +58,12 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ created: [username: string] }>()
 
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { createSite } = useCreateSite()
 const inputRef = ref<HTMLInputElement | null>(null)
 const slug = ref(props.initialSlug)
+// Types out example names, brands and shops while the box is empty
+const placeholder = useTypingPlaceholder(locale, () => !!slug.value)
 const status = ref<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle')
 // A message key (translated at render time) or raw text from the server
 const messageState = ref<{ key?: string; params?: Record<string, unknown>; text?: string }>({ key: 'hint' })
