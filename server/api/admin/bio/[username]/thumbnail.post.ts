@@ -24,7 +24,9 @@ export default defineEventHandler(async (event) => {
 
   const ext = file.type === 'image/png' ? 'png' : file.type === 'image/jpeg' ? 'jpg' : 'webp'
   const prefix = `${user.id}/${bioPage.id}/thumb_${kind}_`
-  const key = `${prefix}${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}.${ext}`
+  // Page snapshots are marked v2 since they leave out the share button (the
+  // site list takes older ones again)
+  const key = `${prefix}${kind === 'page' ? 'v2' : ''}${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}.${ext}`
 
   await env.AVATARS_BUCKET.put(key, await file.arrayBuffer(), {
     httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000' },

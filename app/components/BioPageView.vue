@@ -10,7 +10,7 @@
       size="xl"
       icon="i-lucide-share"
       square
-      class="fixed right-4 top-[calc(1rem+env(safe-area-inset-top))] z-50 text-[#1c1a17] shadow-[inset_0_1px_0_rgb(255_255_255/0.85),0_10px_30px_-8px_rgb(0_0_0/0.3)]"
+      class="pv-share fixed right-4 top-[calc(1rem+env(safe-area-inset-top))] z-50 text-[#1c1a17] shadow-[inset_0_1px_0_rgb(255_255_255/0.85),0_10px_30px_-8px_rgb(0_0_0/0.3)]"
       :aria-label="siteT(siteLang, 'sharePage')"
       @click="sharePage"
     />
@@ -809,4 +809,6 @@ useHead({
 .pv-capturing.pv-active-self,
 .pv-capturing .pv-active-self { outline: none; }
 .pv-capturing [data-placeholder] { display: none; }
+/* Nor the share button: in a site's thumbnail it would look like a button on the card */
+.pv-capturing .pv-share { display: none; }
 </style>

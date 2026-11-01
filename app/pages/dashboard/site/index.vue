@@ -30,7 +30,7 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-5xl space-y-10 py-2 sm:py-4">
+      <div ref="content" class="mx-auto w-full max-w-5xl space-y-10 py-2 sm:py-4">
         <h1 class="mk-display text-3xl text-ink sm:text-4xl">{{ greeting }}</h1>
 
         <!-- Sites -->
@@ -65,6 +65,17 @@
           </div>
 
           <div v-else-if="bioPages.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- One more, first -->
+            <NuxtLink
+              v-if="!searchQuery"
+              to="/dashboard"
+              class="flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed py-10 sm:aspect-[4/5] sm:py-0 border-line text-ink-muted transition-colors hover:border-ink-faint hover:bg-sand/40 hover:text-ink"
+            >
+              <span class="flex size-12 items-center justify-center rounded-full bg-sand">
+                <UIcon name="i-lucide-plus" class="size-5" />
+              </span>
+              <span class="text-sm font-medium">{{ t('dashboard.sites.newSite') }}</span>
+            </NuxtLink>
             <SiteCard
               v-for="bio in filteredBioPages"
               :key="bio.id"
@@ -76,17 +87,6 @@
               @publish="publishBio(bio.username)"
               @unpublish="unpublishBio(bio.username)"
             />
-            <!-- One more -->
-            <NuxtLink
-              v-if="!searchQuery"
-              to="/dashboard"
-              class="flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed py-10 sm:aspect-[4/5] sm:py-0 border-line text-ink-muted transition-colors hover:border-ink-faint hover:bg-sand/40 hover:text-ink"
-            >
-              <span class="flex size-12 items-center justify-center rounded-full bg-sand">
-                <UIcon name="i-lucide-plus" class="size-5" />
-              </span>
-              <span class="text-sm font-medium">{{ t('dashboard.sites.newSite') }}</span>
-            </NuxtLink>
           </div>
 
           <!-- Empty State -->
@@ -204,15 +204,16 @@ const { t, locale } = useI18n();
 const { user } = useUserSession();
 const { current: setup } = useSiteSetup();
 
-// State
-const loading = ref(true);
-const bioPages = ref<any[]>([]);
+// State: the list is kept between visits, so coming back from a site shows
+// it at once (and where it was scrolled to) while it refreshes
+const bioPages = useState<any[]>(`dashboard-sites-${(user.value as any)?.id ?? ""}`, () => []);
+const loading = ref(!bioPages.value.length);
 const searchQuery = ref("");
 
 // Fetch bio pages
 const fetchBioPages = async () => {
   try {
-    loading.value = true;
+    if (!bioPages.value.length) loading.value = true;
     const response = await $fetch("/api/admin/bios");
     if (response.success && response.bioPages) {
       bioPages.value = response.bioPages;
@@ -300,8 +301,21 @@ onBeforeUnmount(() => {
 });
 
 
+// Scroll position, kept while away (in a site's editor, analytics...)
+const content = ref<HTMLElement | null>(null);
+const scrolledTo = useState(`dashboard-sites-scroll-${(user.value as any)?.id ?? ""}`, () => 0);
+const scroller = () => content.value?.closest<HTMLElement>('[data-slot="body"]') ?? null;
+onBeforeRouteLeave(() => {
+  scrolledTo.value = scroller()?.scrollTop ?? 0;
+});
+
 // Initial fetch
-onMounted(() => {
+onMounted(async () => {
+  if (bioPages.value.length && scrolledTo.value) {
+    await nextTick();
+    const el = scroller();
+    if (el) el.scrollTop = scrolledTo.value;
+  }
   fetchBioPages();
 });
 </script>

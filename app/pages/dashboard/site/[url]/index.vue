@@ -1336,7 +1336,8 @@ const loadBio = async () => {
       await nextTick();
       markSavedSnapshotOnly();
       // Sites from before thumbnails get their first picture once the preview has drawn
-      if (!response.bioPage.thumbnailUrl) scheduleSnapshot(3000);
+      // None yet, or one from before the share button was left out of them
+      if (!String(response.bioPage.thumbnailUrl || "").includes("/thumb_page_v2")) scheduleSnapshot(3000);
       // Came from the sidebar card on another page: show the checklist
       if (route.query.setup) {
         useSiteSetup().open.value = true;

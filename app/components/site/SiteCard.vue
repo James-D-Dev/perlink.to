@@ -100,10 +100,13 @@ useIntersectionObserver(frame, ([entry]) => {
 // A snapshot taken here, for a site that had none
 const snapped = ref<string | null>(null)
 
+// Page snapshots from before the share button was left out of them are taken again
+const pageSnapshot = computed(() => (String(props.site.thumbnailUrl || '').includes('/thumb_page_v2') ? props.site.thumbnailUrl : null))
+
 // Sites that open in 3D show their room
 const picture = computed(() =>
   snapped.value
-  || (props.site.themeConfig?.pageMode === '3d' && props.site.roomThumbnailUrl ? props.site.roomThumbnailUrl : props.site.thumbnailUrl),
+  || (props.site.themeConfig?.pageMode === '3d' && props.site.roomThumbnailUrl ? props.site.roomThumbnailUrl : pageSnapshot.value),
 )
 
 // No snapshot yet (the site hasn't been opened in the editor since they
