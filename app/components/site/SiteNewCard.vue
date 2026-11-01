@@ -4,12 +4,12 @@
     to="/dashboard"
     class="new-site group relative flex h-56 flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-[#fff6ee] via-[#fcf0f4] to-[#eef1ff] ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl sm:h-auto sm:aspect-[4/5] dark:from-[#1c1613] dark:via-[#1b1320] dark:to-[#11141f] dark:ring-white/10"
   >
-    <!-- Social networks and site features rising like bubbles -->
+    <!-- Social networks and reactions rising through it, like on a live video -->
     <div class="pointer-events-none absolute inset-0" aria-hidden="true">
       <span
-        v-for="(b, i) in BUBBLES"
+        v-for="(b, i) in FLOATERS"
         :key="i"
-        class="new-site-bubble absolute bottom-0 flex items-center justify-center rounded-full bg-white/85 shadow-[0_6px_18px_-6px_rgb(0_0_0/0.25)] ring-1 ring-black/5 backdrop-blur dark:bg-white/10 dark:ring-white/10"
+        class="new-site-float absolute bottom-0 drop-shadow-[0_6px_14px_rgb(0_0_0/0.22)]"
         :style="{
           left: `${b.x}%`,
           width: `${b.size}px`,
@@ -19,7 +19,20 @@
           '--sway': `${b.sway}px`,
         }"
       >
-        <UIcon :name="b.icon" class="size-[55%]" :class="b.dark" :style="{ color: b.color }" />
+        <!-- Facebook, Instagram, YouTube: their own full-colour logos -->
+        <UIcon v-if="b.kind === 'logo'" :name="b.icon!" class="size-full" />
+        <!-- TikTok: the app icon, a white note edged cyan and red on black -->
+        <span v-else-if="b.kind === 'tiktok'" class="flex size-full items-center justify-center rounded-[28%] bg-[#010101]">
+          <UIcon name="i-simple-icons-tiktok" class="tiktok-note size-[58%] text-white" />
+        </span>
+        <!-- Love and like, as on the "Share your room" button -->
+        <span
+          v-else
+          class="flex size-full items-center justify-center rounded-full ring-2 ring-white"
+          :style="{ background: REACTIONS[b.kind].background }"
+        >
+          <svg viewBox="0 0 24 24" class="size-[56%] fill-white"><path :d="REACTIONS[b.kind].path" /></svg>
+        </span>
       </span>
     </div>
 
@@ -40,28 +53,36 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
-// Brand colours for the networks; the features in the site's own ink.
-// x: position across the card (%), delay staggers them so some are always rising
-const BUBBLES: { icon: string; color?: string; dark?: string; x: number; size: number; duration: number; delay: number; sway: number }[] = [
-  { icon: 'i-simple-icons-instagram', color: '#E4405F', x: 8, size: 38, duration: 9, delay: 0, sway: 10 },
-  { icon: 'i-lucide-link', dark: 'text-ink', x: 72, size: 32, duration: 8, delay: 1.2, sway: -8 },
-  { icon: 'i-simple-icons-tiktok', dark: 'text-[#111] dark:text-white', x: 40, size: 34, duration: 10, delay: 2.4, sway: 12 },
-  { icon: 'i-lucide-shopping-bag', dark: 'text-ink', x: 84, size: 36, duration: 9.5, delay: 3.1, sway: -10 },
-  { icon: 'i-simple-icons-youtube', color: '#FF0000', x: 22, size: 34, duration: 8.5, delay: 4.2, sway: 8 },
-  { icon: 'i-lucide-box', dark: 'text-ink', x: 58, size: 38, duration: 10.5, delay: 5, sway: -12 },
-  { icon: 'i-simple-icons-facebook', color: '#1877F2', x: 90, size: 30, duration: 9, delay: 6.1, sway: -6 },
-  { icon: 'i-lucide-calendar-check', dark: 'text-ink', x: 6, size: 32, duration: 8, delay: 6.8, sway: 10 },
-  { icon: 'i-simple-icons-spotify', color: '#1DB954', x: 66, size: 32, duration: 9.5, delay: 7.6, sway: 8 },
-  { icon: 'i-lucide-image', dark: 'text-ink', x: 30, size: 36, duration: 10, delay: 8.4, sway: -10 },
-  { icon: 'i-simple-icons-whatsapp', color: '#25D366', x: 48, size: 30, duration: 8.5, delay: 3.8, sway: 6 },
-  { icon: 'i-lucide-map-pin', dark: 'text-ink', x: 78, size: 30, duration: 9, delay: 9.2, sway: -8 },
-  { icon: 'i-lucide-music', dark: 'text-ink', x: 14, size: 30, duration: 10, delay: 5.6, sway: 12 },
-  { icon: 'i-lucide-qr-code', dark: 'text-ink', x: 52, size: 30, duration: 9, delay: 0.8, sway: -6 },
+// Facebook's reaction colours, with filled glyphs (as ReactionBurst)
+const REACTIONS = {
+  like: {
+    background: 'linear-gradient(180deg, #18afff, #0062df)',
+    path: 'M2 21h3V9H2v12zm20-11c0-1.1-.9-2-2-2h-6.3l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 1 6.59 7.59C6.22 7.95 6 8.45 6 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z',
+  },
+  love: {
+    background: 'linear-gradient(180deg, #ff6680, #e61739)',
+    path: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+  },
+} as const
+
+// Few and large, slow, spread across the card so only a handful are in view
+// at once. x: across the card (%); delay staggers them
+const FLOATERS: { kind: 'logo' | 'tiktok' | 'like' | 'love'; icon?: string; x: number; size: number; duration: number; delay: number; sway: number }[] = [
+  { kind: 'logo', icon: 'i-logos-facebook', x: 10, size: 44, duration: 12, delay: 0, sway: 10 },
+  { kind: 'love', x: 74, size: 36, duration: 10, delay: 1.5, sway: -10 },
+  { kind: 'logo', icon: 'i-logos-instagram-icon', x: 44, size: 46, duration: 13, delay: 3, sway: 12 },
+  { kind: 'like', x: 18, size: 34, duration: 10.5, delay: 4.6, sway: 8 },
+  { kind: 'tiktok', x: 80, size: 44, duration: 12.5, delay: 6, sway: -12 },
+  { kind: 'love', x: 30, size: 32, duration: 9.5, delay: 7.4, sway: 10 },
+  { kind: 'logo', icon: 'i-logos-youtube-icon', x: 62, size: 46, duration: 12, delay: 8.6, sway: -8 },
+  { kind: 'like', x: 86, size: 34, duration: 10, delay: 10.2, sway: -6 },
+  { kind: 'love', x: 6, size: 30, duration: 9, delay: 11.4, sway: 8 },
+  { kind: 'love', x: 54, size: 34, duration: 10.5, delay: 5.2, sway: -10 },
 ]
 </script>
 
 <style scoped>
-.new-site-bubble {
+.new-site-float {
   opacity: 0;
   animation-name: new-site-rise;
   animation-timing-function: linear;
@@ -78,14 +99,19 @@ const BUBBLES: { icon: string; color?: string; dark?: string; x: number; size: n
   100% { transform: translate(0, -420px) scale(0.9) rotate(0deg); opacity: 0; }
 }
 
+/* TikTok's note: edged cyan on one side, red on the other */
+.tiktok-note {
+  filter: drop-shadow(-1.5px -1px 0 #25f4ee) drop-shadow(1.5px 1px 0 #fe2c55);
+}
+
 /* Still for people who prefer less motion: a few icons resting round the edge */
 @media (prefers-reduced-motion: reduce) {
-  .new-site-bubble {
+  .new-site-float {
     animation: none;
     opacity: 0.85;
   }
-  .new-site-bubble:nth-child(odd) { bottom: 12%; }
-  .new-site-bubble:nth-child(even) { bottom: 78%; }
-  .new-site-bubble:nth-child(n + 9) { display: none; }
+  .new-site-float:nth-child(odd) { bottom: 12%; }
+  .new-site-float:nth-child(even) { bottom: 78%; }
+  .new-site-float:nth-child(n + 7) { display: none; }
 }
 </style>
