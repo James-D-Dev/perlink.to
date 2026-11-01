@@ -42,13 +42,32 @@
                 {{ t('dashboard.sites.count', bioPages.length) }} · {{ t('dashboard.sites.liveCount', { n: liveCount }) }}
               </p>
             </div>
-            <UInput
-              v-if="bioPages.length > 3"
-              v-model="searchQuery"
-              :placeholder="t('dashboard.sites.search')"
-              icon="i-lucide-search"
-              class="w-full sm:w-64"
-            />
+            <div v-if="bioPages.length > 1" class="flex w-full items-center gap-2 sm:w-auto">
+              <!-- All | Live | Draft -->
+              <div class="flex shrink-0 rounded-full bg-sand p-1" role="tablist">
+                <button
+                  v-for="f in FILTERS"
+                  :key="f"
+                  type="button"
+                  role="tab"
+                  :aria-selected="statusFilter === f"
+                  class="flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors"
+                  :class="statusFilter === f ? 'bg-paper text-ink shadow-sm' : 'text-ink-muted hover:text-ink'"
+                  @click="statusFilter = f"
+                >
+                  <span v-if="f !== 'all'" class="size-1.5 rounded-full" :class="f === 'live' ? 'bg-emerald-500' : 'bg-ink-faint'" />
+                  {{ t(`dashboard.sites.${f}`) }}
+                  <span class="text-xs tabular-nums text-ink-faint">{{ f === 'all' ? bioPages.length : f === 'live' ? liveCount : bioPages.length - liveCount }}</span>
+                </button>
+              </div>
+              <UInput
+                v-if="bioPages.length > 3"
+                v-model="searchQuery"
+                :placeholder="t('dashboard.sites.search')"
+                icon="i-lucide-search"
+                class="min-w-0 flex-1 sm:w-64 sm:flex-none"
+              />
+            </div>
           </div>
 
           <div v-if="loading" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
@@ -66,7 +85,7 @@
 
           <div v-else-if="bioPages.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <!-- One more, first -->
-            <SiteNewCard v-if="!searchQuery" />
+            <SiteNewCard v-if="!searchQuery && statusFilter === 'all'" />
             <SiteCard
               v-for="bio in filteredBioPages"
               :key="bio.id"
@@ -89,7 +108,7 @@
           </div>
 
           <p v-if="!loading && bioPages.length && !filteredBioPages.length" class="text-sm text-ink-muted">
-            {{ t('dashboard.sites.noMatch', { query: searchQuery }) }}
+            {{ searchQuery ? t('dashboard.sites.noMatch', { query: searchQuery }) : t(statusFilter === 'live' ? 'dashboard.sites.noneLive' : 'dashboard.sites.noneDraft') }}
           </p>
         </section>
 
@@ -200,6 +219,9 @@ const { current: setup } = useSiteSetup();
 const bioPages = useState<any[]>(`dashboard-sites-${(user.value as any)?.id ?? ""}`, () => []);
 const loading = ref(!bioPages.value.length);
 const searchQuery = ref("");
+// Live / draft filter, kept while away like the scroll position
+const FILTERS = ["all", "live", "draft"] as const;
+const statusFilter = useState<(typeof FILTERS)[number]>("dashboard-sites-filter", () => "all");
 
 // Fetch bio pages
 const fetchBioPages = async () => {
@@ -226,9 +248,12 @@ const liveCount = computed(() => bioPages.value.filter((bio) => bio.isPublished)
 
 // Filtered bio pages
 const filteredBioPages = computed(() => {
-  if (!searchQuery.value) return bioPages.value;
+  const byStatus = statusFilter.value === "all"
+    ? bioPages.value
+    : bioPages.value.filter((bio) => !!bio.isPublished === (statusFilter.value === "live"));
+  if (!searchQuery.value) return byStatus;
   const query = searchQuery.value.toLowerCase();
-  return bioPages.value.filter(
+  return byStatus.filter(
     (bio) =>
       bio.username?.toLowerCase().includes(query) ||
       bio.title?.toLowerCase().includes(query),
