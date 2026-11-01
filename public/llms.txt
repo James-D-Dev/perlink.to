@@ -1,0 +1,46 @@
+# Perlink
+
+> Perlink (perlink.to) is a link in bio and personal website builder. Anyone can make a mobile-first page at perlink.to/yourname from a template, with links, menus, products, photos and a blog, and show the same page as a small 3D room visitors can walk around. Free to start; English and Vietnamese.
+
+Perlink is made for creators, restaurants, cafés, hotels, small shops, portfolios and events. A page is built in a drag-and-drop editor from blocks, and every template comes with sample content, a matching theme and a matching 3D room.
+
+Key facts:
+
+- Address: each site lives at perlink.to/<name>. Names are 3–30 characters (lowercase letters, digits, hyphens, underscores).
+- Blocks: links, social profiles, menu with prices, products, opening hours, contact and map, forms (requests go to an inbox), photo albums, videos, testimonials, blog posts, VietQR bank-transfer codes, birthday countdown.
+- 3D room: the page as a room on one of 11 lands (Sky island, Sakura, Crimson sakura, Mars, City, Winter, Autumn, Tropical beach, Fairy forest, Volcano, Zen garden), by day or night, with music, clickable objects and a guestbook. Owners can record a vertical room video for TikTok, Reels and Shorts.
+- Templates: 34 ready-made pages (portfolio, restaurant menu, hotel and homestay, café, creator, link in bio, services, events, blogs, shops and more).
+- Analytics: visits and clicks per site; a QR code for each site.
+- Sign in with Google, Facebook or TikTok.
+- Languages: the editor and sites work in English and Vietnamese.
+- Plans: Free (1 site, 30 days of analytics). Starter, US$6 or 150,000đ a month (3 sites, Pro themes, 90 days of analytics). Plus, US$12 or 300,000đ a month (10 sites, a year of analytics). A year costs ten months. 7-day money-back guarantee. Custom domains are coming soon.
+
+## Main pages
+
+- [Home](https://perlink.to/): what Perlink is, templates, 3D worlds, FAQ
+- [Trang chủ (tiếng Việt)](https://perlink.to/vi): the home page in Vietnamese
+- [Templates](https://perlink.to/templates): the gallery of all templates by category ([Vietnamese](https://perlink.to/vi/templates))
+- [Pricing](https://perlink.to/pricing): plans and what each includes
+- [Trends](https://perlink.to/trends): popular 3D worlds and website styles
+- [Linktree alternative](https://perlink.to/linktree-alternative): how Perlink compares with Linktree ([Vietnamese](https://perlink.to/vi/thay-the-linktree))
+
+## Templates
+
+- [Personal portfolio](https://perlink.to/templates/personal): introduce yourself, your work and where to find you
+- [Restaurant menu](https://perlink.to/templates/restaurant): menu with prices, opening hours and table booking
+- [Hotel & homestay](https://perlink.to/templates/hotel): rooms with nightly prices, contact and booking
+- [Café & shop](https://perlink.to/templates/cafe): drinks or products, opening hours and where to find you
+- [Creator & artist](https://perlink.to/templates/creator): your work as a gallery with links to shop or commission
+- [Link in bio](https://perlink.to/templates/link-in-bio): a clean, dark page with your socials and top links
+
+## Policies
+
+- [Terms of Service](https://perlink.to/terms)
+- [Privacy Policy](https://perlink.to/privacy)
+- [Refund Policy](https://perlink.to/refund)
+- [Report a site](https://perlink.to/report): report phishing, scams or abuse on a Perlink site
+
+## Optional
+
+- [Sitemap](https://perlink.to/sitemap.xml): every public page and published site
+- [Contact](mailto:support@perlink.to): support@perlink.to

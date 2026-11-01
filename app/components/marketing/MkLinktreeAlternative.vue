@@ -136,8 +136,8 @@ const TEXT = {
     templates: 'Browse templates',
     faqTitle: 'Questions',
     faq: [
-      { q: 'Is Perlink free?', a: 'Yes. The free plan includes one site with a link in bio page, a 3D room and analytics. Paid plans add more sites, Pro themes and your own domain.' },
-      { q: 'Can I use my own domain?', a: 'Yes, on the Plus plan and above you can connect your own domain to your site.' },
+      { q: 'Is Perlink free?', a: 'Yes. The free plan includes one site with a link in bio page, a 3D room and analytics. Paid plans add more sites, Pro themes and longer analytics.' },
+      { q: 'Can I use my own domain?', a: 'Custom domains are coming soon. For now every site lives at perlink.to/yourname, which you can choose and change.' },
       { q: 'Do I need to know how to code?', a: 'No. You pick a template and edit everything in a drag-and-drop editor, on your phone or computer.' },
       { q: 'What is the 3D room?', a: 'Your page shown as a small room on a floating land that visitors can look around, with your links and blocks as objects they can tap.' },
     ],
@@ -182,8 +182,8 @@ const TEXT = {
     templates: 'Xem các mẫu',
     faqTitle: 'Câu hỏi',
     faq: [
-      { q: 'Perlink có miễn phí không?', a: 'Có. Gói miễn phí gồm một trang với link bio, phòng 3D và thống kê. Gói trả phí có thêm trang, theme Pro và tên miền riêng.' },
-      { q: 'Tôi có dùng tên miền riêng được không?', a: 'Được, từ gói Plus trở lên bạn có thể gắn tên miền riêng cho trang.' },
+      { q: 'Perlink có miễn phí không?', a: 'Có. Gói miễn phí gồm một trang với link bio, phòng 3D và thống kê. Gói trả phí có thêm trang, theme Pro và thống kê dài hơn.' },
+      { q: 'Tôi có dùng tên miền riêng được không?', a: 'Tên miền riêng sắp ra mắt. Hiện mỗi trang có địa chỉ perlink.to/tên-bạn, bạn tự chọn và đổi được.' },
       { q: 'Tôi có cần biết lập trình không?', a: 'Không. Bạn chọn mẫu và chỉnh mọi thứ bằng trình kéo thả, trên điện thoại hay máy tính.' },
       { q: 'Phòng 3D là gì?', a: 'Trang của bạn hiện thành một căn phòng nhỏ trên vùng đất lơ lửng, khách xoay xem được, với liên kết và nội dung là các đồ vật bấm vào được.' },
     ],
