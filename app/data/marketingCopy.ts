@@ -49,6 +49,7 @@ const en = {
     line2: 'Or a whole 3D world.',
     /** The part of line2 shown in the brand gradient */
     accent: '3D world',
+    eyebrow: 'Websites & walkable 3D worlds',
     lead: 'Perlink turns your work, your menu or your shop into a personal website, and lets visitors walk around it in 3D. Pick a template, make it yours, publish at perlink.to/you.',
     explore: 'Explore 3D worlds',
     note: 'Free to start · No credit card · Live in a minute',
@@ -177,6 +178,7 @@ const vi: MarketingCopy = {
     line1: 'Trang web của riêng bạn.',
     line2: 'Hay cả một thế giới 3D.',
     accent: 'thế giới 3D',
+    eyebrow: 'Trang web & thế giới 3D dạo được',
     lead: 'Perlink biến công việc, thực đơn hay cửa hàng của bạn thành một trang web, và cho khách dạo quanh nó trong không gian 3D. Chọn mẫu, chỉnh theo ý bạn, xuất bản tại perlink.to/tên-bạn.',
     explore: 'Khám phá thế giới 3D',
     note: 'Miễn phí để bắt đầu · Không cần thẻ · Lên sóng trong một phút',

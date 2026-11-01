@@ -6,16 +6,17 @@
         <MarketingMkHeroBackdrop />
         <div class="grid gap-10 md:grid-cols-[1.45fr_1fr] md:items-end">
           <div>
-            <h1 class="mk-display text-[44px] sm:text-6xl md:text-[60px] xl:text-[72px]">
+            <!-- The mark, alive (the room builds itself, the pearl bounces), in a small label -->
+            <p class="mb-6 inline-flex items-center gap-2.5 rounded-full bg-paper/70 py-1.5 pl-1.5 pr-4 text-sm text-ink-soft ring-1 ring-line backdrop-blur">
+              <span aria-hidden="true" class="flex"><AppLoader :size="26" /></span>
+              {{ c.hero.eyebrow }}
+            </p>
+            <h1 class="mk-display text-[44px] sm:text-6xl md:text-[64px]">
               {{ c.hero.line1 }}<br>
               <span class="text-ink-muted">{{ heroLine2[0] }}<span class="mk-accent whitespace-nowrap">{{ c.hero.accent }}</span>{{ heroLine2[1] }}</span>
             </h1>
           </div>
-          <div class="flex flex-col items-start gap-6 md:pb-2">
-            <!-- The mark, alive: the room builds itself and the pearl bounces in it -->
-            <div aria-hidden="true" class="mk-mark-float hidden sm:block">
-              <AppLoader :size="132" />
-            </div>
+          <div class="md:pb-2">
             <p class="text-lg leading-relaxed text-ink-soft">
               {{ c.hero.lead }}
             </p>
@@ -333,27 +334,9 @@ const trends = TRENDS.slice(0, 6)
 </script>
 
 <style>
-/* "3D world": heavier, in the brand blue drifting to violet, a slow sheen across it */
+/* "3D world": heavier, in the brand blue */
 .mk-accent {
   font-weight: 600;
-  background: linear-gradient(100deg, #086bf5 0%, #2f8fff 30%, #8b5cf6 55%, #086bf5 80%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: mk-accent-sheen 7s ease-in-out infinite alternate;
-}
-@keyframes mk-accent-sheen {
-  from { background-position: 0% 50%; }
-  to { background-position: 100% 50%; }
-}
-/* The mark hovers gently, like the floating lands */
-.mk-mark-float { animation: mk-mark-float 5s ease-in-out infinite; }
-@keyframes mk-mark-float {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-10px) rotate(2deg); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .mk-accent, .mk-mark-float { animation: none; }
+  color: var(--color-perlink-blue);
 }
 </style>
