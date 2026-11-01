@@ -4,7 +4,9 @@ import { isReservedName } from '../../utils/reservedNames'
 import { requireRoomForSite } from '../../utils/plan'
 
 const createBioSchema = z.object({
-  username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_-]+$/),
+  // Addresses are lowercase (as when one is changed), so MyShop and myshop
+  // can't be two sites
+  username: z.string().trim().toLowerCase().min(3).max(30).regex(/^[a-z0-9_-]+$/),
   title: z.string().max(100).optional(),
   bio: z.string().max(500).optional(),
   avatarUrl: z.string().url().optional(),

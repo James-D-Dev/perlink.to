@@ -370,8 +370,9 @@ export class BioRepository {
   }
 
   async isUsernameAvailable(username: string): Promise<boolean> {
+    // Whatever the case: an older address with capitals still counts
     const result = await this.db.prepare(
-      'SELECT id FROM bio_pages WHERE username = ?'
+      'SELECT id FROM bio_pages WHERE LOWER(username) = LOWER(?)'
     ).bind(username).first()
     
     return !result
