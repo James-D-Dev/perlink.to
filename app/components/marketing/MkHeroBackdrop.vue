@@ -3,11 +3,15 @@
        lavender) with a sky accent kept apart so colours never mix to grey,
        drifting on short loops, plus a soft sheen sweeping across. CSS only. -->
   <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" :class="{ 'mk-backdrop--fade': fade }" aria-hidden="true">
-    <span class="mk-light mk-light--peach" />
-    <span class="mk-light mk-light--pink" />
-    <span class="mk-light mk-light--lavender" />
-    <span class="mk-light mk-light--sky" />
-    <span class="mk-sheen" />
+    <!-- A box of fixed height, so the lights don't move (and count as
+         layout shift) when the hero grows a little as its fonts arrive -->
+    <div class="absolute inset-x-0 top-0 h-[900px]">
+      <span class="mk-light mk-light--peach" />
+      <span class="mk-light mk-light--pink" />
+      <span class="mk-light mk-light--lavender" />
+      <span class="mk-light mk-light--sky" />
+      <span class="mk-sheen" />
+    </div>
   </div>
 </template>
 

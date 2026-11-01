@@ -18,7 +18,7 @@
             </h1>
           </div>
           <div class="md:pb-2">
-            <p class="mk-rise text-lg leading-relaxed text-ink-soft" style="--rise-delay: 200ms">
+            <p class="mk-rise-solid text-lg leading-relaxed text-ink-soft" style="--rise-delay: 120ms">
               {{ c.hero.lead }}
             </p>
           </div>

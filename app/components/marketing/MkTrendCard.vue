@@ -4,6 +4,8 @@
       <img
         v-if="trend.image"
         :src="trend.image"
+        :srcset="`${trend.image.replace(/\.webp$/, '-720.webp')} 720w, ${trend.image} 1440w`"
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         :alt="`${trend.title} 3D world`"
         loading="lazy"
         class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"

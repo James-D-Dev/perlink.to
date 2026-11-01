@@ -453,10 +453,11 @@ sheet, 3D room popups) use these classes:
   from { opacity: 0; transform: translateY(22px); }
   to { opacity: 1; transform: none; }
 }
-/* The headline only slides: it is the largest text on the page, and text
-   that starts invisible counts as painted only once it fades in */
+/* The headline and lead only slide: they are the largest text on the page,
+   and text that starts invisible counts as painted only once it fades in */
 .mk-rise-solid {
   animation: mk-rise-solid 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
 }
 @keyframes mk-rise-solid {
   from { transform: translateY(14px); }
