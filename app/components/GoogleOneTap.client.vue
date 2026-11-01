@@ -11,21 +11,30 @@
 const config = useRuntimeConfig()
 const { loggedIn, user } = useUserSession()
 
-// Define function first (hoisting-safe)
+// Google's script is heavy: it waits for the visitor's first gesture
+// (scroll, tap, key) or 10 s, so it never holds up the page while it loads
+let scheduled = false
+function scheduleOneTap() {
+  if (scheduled) return
+  scheduled = true
+  const events = ['pointerdown', 'keydown', 'scroll', 'touchstart'] as const
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const go = () => {
+    events.forEach(e => window.removeEventListener(e, go))
+    clearTimeout(timer)
+    loadOneTapScript()
+  }
+  events.forEach(e => window.addEventListener(e, go, { once: true, passive: true }))
+  timer = setTimeout(go, 10_000)
+}
+
 function loadOneTapScript() {
-  useHead({
-    script: [
-      {
-        src: 'https://accounts.google.com/gsi/client',
-        async: true,
-        defer: true,
-        onload: () => {
-          console.log('[One Tap] Script loaded, initializing...')
-          initOneTap()
-        }
-      }
-    ]
-  })
+  if (document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) return initOneTap()
+  const script = document.createElement('script')
+  script.src = 'https://accounts.google.com/gsi/client'
+  script.async = true
+  script.onload = () => initOneTap()
+  document.head.appendChild(script)
 }
 
 // Only run if clientId exists and user is not logged in
@@ -38,10 +47,7 @@ const shouldLoad = computed(() => {
 
 // Load Google script when shouldLoad becomes true
 watch(shouldLoad, (canLoad) => {
-  if (canLoad) {
-    console.log('[One Tap] Loading script...')
-    loadOneTapScript()
-  }
+  if (canLoad) scheduleOneTap()
 }, { immediate: true })
 
 function initOneTap() {

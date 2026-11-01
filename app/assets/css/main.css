@@ -431,16 +431,15 @@ sheet, 3D room popups) use these classes:
 .mk-reveal {
   opacity: 0;
   transform: translateY(28px);
-  filter: blur(6px);
+  /* Opacity and transform only: they run on the compositor (a blur would
+     repaint on every frame) */
   transition:
     opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
-    filter 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
 }
 .mk-reveal.mk-revealed {
   opacity: 1;
   transform: none;
-  filter: none;
 }
 
 /* The hero's entrance: plays from the server-rendered page, no script needed */
@@ -449,8 +448,8 @@ sheet, 3D room popups) use these classes:
   animation-delay: var(--rise-delay, 0ms);
 }
 @keyframes mk-rise {
-  from { opacity: 0; transform: translateY(22px); filter: blur(8px); }
-  to { opacity: 1; transform: none; filter: none; }
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .mk-rise { animation: none; }

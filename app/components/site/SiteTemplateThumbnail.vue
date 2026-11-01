@@ -34,16 +34,22 @@ const { locale } = useI18n()
 const { lang: marketingLang } = useMarketingLang()
 const lang = computed(() => (route.path.startsWith('/dashboard') ? locale.value : marketingLang.value))
 
+/** Template photos swapped for their small versions (480 px), anywhere in a value */
+function smallPhotos<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value).replace(/(\/images\/templates\/photos\/[a-z0-9-]+?)(-sm)?\.(webp|jpg)/g, '$1-sm.webp')) as T
+}
+
 const bioData = computed<BioData>(() => {
   const content = localizeTemplateContent(props.template.build(), lang.value)
   return {
     title: content.title,
     bio: content.bio,
-    avatarUrl: content.avatarUrl || '',
+    avatarUrl: smallPhotos(content.avatarUrl || ''),
     templateId: 'modern',
-    themeConfig: { ...content.themeConfig, showShare: false },
-    // Numbered ids, so the thumbnail renders the same on the server and in the browser
-    blocks: stableBlockIds(content.blocks, props.template.id),
+    themeConfig: smallPhotos({ ...content.themeConfig, showShare: false }),
+    // Numbered ids, so the thumbnail renders the same on the server and in the
+    // browser; the photos' small versions, as a thumbnail shows them small
+    blocks: smallPhotos(stableBlockIds(content.blocks, props.template.id)),
   }
 })
 </script>
