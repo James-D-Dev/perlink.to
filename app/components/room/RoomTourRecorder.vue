@@ -182,8 +182,10 @@ function cycleDuration() {
 const mimeType = import.meta.client
   ? ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'].find(type => typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(type)) ?? ''
   : ''
-const supported = !!mimeType
-const extension = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm'
+// Encoding frame by frame (WebCodecs) needs no MediaRecorder
+const supported = !!mimeType || (import.meta.client && typeof VideoEncoder !== 'undefined')
+/** The finished video's file extension */
+const extension = () => (videoBlob.value?.type.includes('mp4') ? 'mp4' : 'webm')
 const canShare = ref(false)
 
 let scene: RoomScene | null = null
@@ -349,6 +351,141 @@ function cancelRecording() {
   cancelled = true
 }
 
+// ---------- Encoding frame by frame (WebCodecs + mp4-muxer) ----------
+
+/** H.264 profiles to try, best first (1080x1920 needs level 4) */
+const AVC_CODECS = ['avc1.640028', 'avc1.4d0028', 'avc1.420028']
+
+interface EncodingSetup { codec: string; audio: AudioEncoderConfig | null }
+
+/**
+ * Whether this browser can encode the video (and its music, if it has some)
+ * itself; null: record it with MediaRecorder instead
+ */
+async function encodingSupport(music: AudioBuffer | null): Promise<EncodingSetup | null> {
+  if (typeof VideoEncoder === 'undefined' || typeof VideoFrame === 'undefined') return null
+  let codec = ''
+  for (const candidate of AVC_CODECS) {
+    try {
+      const { supported } = await VideoEncoder.isConfigSupported({ codec: candidate, width: WIDTH, height: HEIGHT, bitrate: 8_000_000, framerate: FPS })
+      if (supported) {
+        codec = candidate
+        break
+      }
+    } catch {}
+  }
+  if (!codec) return null
+  if (!music) return { codec, audio: null }
+  if (typeof AudioEncoder === 'undefined' || typeof AudioData === 'undefined') return null
+  const audio: AudioEncoderConfig = { codec: 'mp4a.40.2', sampleRate: music.sampleRate, numberOfChannels: Math.min(2, music.numberOfChannels), bitrate: 160_000 }
+  try {
+    if (!(await AudioEncoder.isConfigSupported(audio)).supported) return null
+  } catch {
+    return null
+  }
+  return { codec, audio }
+}
+
+/**
+ * The whole video, frame by frame: each frame is drawn at its own moment,
+ * with every effect, and encoded at once with that exact timestamp; the
+ * music is cut, faded and encoded straight from the decoded track. However
+ * slow the device, the video is exactly 30 fps and in sync.
+ */
+async function encodeVideo(setup: EncodingSetup, music: AudioBuffer | null): Promise<Blob | null> {
+  const { Muxer, ArrayBufferTarget } = await import('mp4-muxer')
+  const total = duration.value
+  const count = Math.round(total * FPS)
+  const muxer = new Muxer({
+    target: new ArrayBufferTarget(),
+    video: { codec: 'avc', width: WIDTH, height: HEIGHT, frameRate: FPS },
+    audio: setup.audio ? { codec: 'aac', numberOfChannels: setup.audio.numberOfChannels, sampleRate: setup.audio.sampleRate } : undefined,
+    // The index at the front, so players start it at once
+    fastStart: 'in-memory',
+    firstTimestampBehavior: 'offset',
+  })
+
+  let failure: unknown = null
+  const encoder = new VideoEncoder({
+    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+    error: (error) => {
+      failure = error
+    },
+  })
+  encoder.configure({ codec: setup.codec, width: WIDTH, height: HEIGHT, bitrate: 8_000_000, framerate: FPS, avc: { format: 'avc' } })
+
+  const live = recordCanvas!
+  const ctx = live.getContext('2d')!
+  const start = performance.now()
+  for (let i = 0; i < count; i++) {
+    if (cancelled || !scene) {
+      encoder.close()
+      return null
+    }
+    if (failure) throw failure
+    const p = i / (count - 1)
+    // Drawn into the frame box too, so the video shows taking shape
+    ctx.drawImage(scene.renderTour(p, tourStyle.value, start + (i * 1000) / FPS), 0, 0, WIDTH, HEIGHT)
+    drawTitles(ctx, p)
+    const frame = new VideoFrame(live, { timestamp: Math.round((i * 1_000_000) / FPS), duration: Math.round(1_000_000 / FPS) })
+    // A key frame every two seconds
+    encoder.encode(frame, { keyFrame: i % (FPS * 2) === 0 })
+    frame.close()
+    progress.value = (i + 1) / count
+    // Let the encoder keep up (and the page breathe)
+    while (encoder.encodeQueueSize > 3) await new Promise(r => setTimeout(r, 5))
+    if (i % 4 === 3) await new Promise(r => setTimeout(r, 0))
+  }
+  await encoder.flush()
+  encoder.close()
+  if (failure) throw failure
+  stopScene()
+
+  if (setup.audio && music) await encodeMusic(setup.audio, music, total, muxer)
+  muxer.finalize()
+  return new Blob([muxer.target.buffer], { type: 'video/mp4' })
+}
+
+/** The track from its first sound, looped to the video's length, at the room's volume, fading over the last second */
+async function encodeMusic(config: AudioEncoderConfig, music: AudioBuffer, total: number, muxer: { addAudioChunk: (chunk: EncodedAudioChunk, meta?: EncodedAudioChunkMetadata) => void }) {
+  const rate = music.sampleRate
+  const channels = config.numberOfChannels
+  const length = Math.round(total * rate)
+  const offset = Math.round(firstSound(music) * rate)
+  const loop = Math.max(1, music.length - offset)
+  const volume = props.room.music?.volume ?? 0.6
+  const fadeFrom = length - rate
+  const sources = Array.from({ length: channels }, (_, c) => music.getChannelData(Math.min(c, music.numberOfChannels - 1)))
+
+  let failure: unknown = null
+  const encoder = new AudioEncoder({
+    output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+    error: (error) => {
+      failure = error
+    },
+  })
+  encoder.configure(config)
+  // A second at a time, planar float
+  for (let at = 0; at < length; at += rate) {
+    const frames = Math.min(rate, length - at)
+    const data = new Float32Array(frames * channels)
+    for (let c = 0; c < channels; c++) {
+      const source = sources[c]!
+      for (let i = 0; i < frames; i++) {
+        const n = at + i
+        const fade = n > fadeFrom ? Math.max(0, (length - n) / rate) : 1
+        data[c * frames + i] = source[offset + (n % loop)]! * volume * fade
+      }
+    }
+    const chunk = new AudioData({ format: 'f32-planar', sampleRate: rate, numberOfFrames: frames, numberOfChannels: channels, timestamp: Math.round((at / rate) * 1_000_000), data })
+    encoder.encode(chunk)
+    chunk.close()
+  }
+  await encoder.flush()
+  encoder.close()
+  if (failure) throw failure
+}
+
 /** A canvas's picture as a JPEG */
 function jpeg(canvas: HTMLCanvasElement) {
   return new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.88))
@@ -388,7 +525,28 @@ async function record() {
   const [, buffer] = await Promise.all([scene?.prepareTour(tourStyle.value), music])
   if (cancelled || !scene) return finish(audioContext, null)
 
-  // 1. Draw every frame
+  // Straight to an MP4 where the browser can encode it (and its music)
+  const encoding = await encodingSupport(buffer)
+  if (encoding) {
+    stage.value = 'drawing'
+    let blob: Blob | null = null
+    try {
+      blob = await encodeVideo(encoding, buffer)
+    } catch (error) {
+      console.warn('[tour] encoding failed', error)
+    }
+    if (blob || cancelled || !mimeType) return finish(audioContext, blob)
+    // Encoding failed midway: record the other way instead (with the scene
+    // set up again if it was already freed)
+    progress.value = 0
+    if (!scene) {
+      startScene()
+      await scene?.prepareTour(tourStyle.value)
+      if (cancelled || !scene) return finish(audioContext, null)
+    }
+  }
+
+  // Otherwise, 1. draw every frame
   const total = duration.value
   const count = Math.round(total * FPS) + 1
   const frames: Blob[] = []
@@ -520,13 +678,13 @@ function finish(audioContext: AudioContext | null, blob: Blob | null) {
 }
 
 function videoFile() {
-  return new File([videoBlob.value!], `perlink-${props.username}.${extension}`, { type: videoBlob.value!.type })
+  return new File([videoBlob.value!], `perlink-${props.username}.${extension()}`, { type: videoBlob.value!.type })
 }
 
 function download() {
   const a = document.createElement('a')
   a.href = videoUrl.value
-  a.download = `perlink-${props.username}.${extension}`
+  a.download = `perlink-${props.username}.${extension()}`
   a.click()
 }
 
