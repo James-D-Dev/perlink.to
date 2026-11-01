@@ -125,3 +125,21 @@ export const SAMPLE_PHONE = '+84 90 123 4567'
 
 export const COFFEE_TABLE_TOP = 0.43
 export const DESK_TOP = 0.76
+
+/**
+ * The same blocks with ids numbered in order ("restaurant-0", "restaurant-1"…)
+ * instead of random ones: a template shown (thumbnails, previews) renders the
+ * same on the server and in the browser. Sites made from a template keep
+ * random ids.
+ */
+export function stableBlockIds(blocks: BioBlock[], prefix: string): BioBlock[] {
+  let n = 0
+  const walk = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(walk)
+    if (!value || typeof value !== 'object') return value
+    const out: Record<string, unknown> = {}
+    for (const [key, v] of Object.entries(value)) out[key] = key === 'id' && typeof v === 'string' ? `${prefix}-${n++}` : walk(v)
+    return out
+  }
+  return walk(blocks) as BioBlock[]
+}

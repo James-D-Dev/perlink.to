@@ -7,10 +7,11 @@
         <div class="grid gap-10 md:grid-cols-[1.45fr_1fr] md:items-end">
           <div>
             <!-- The mark, alive (the room builds itself, the pearl bounces), in a small label -->
-            <p class="mk-rise mb-6 inline-flex items-center gap-2.5 rounded-full bg-paper/70 py-1.5 pl-1.5 pr-4 text-sm text-ink-soft ring-1 ring-line backdrop-blur">
+            <!-- A div, not a p: the loader inside is a div -->
+            <div class="mk-rise mb-6 inline-flex items-center gap-2.5 rounded-full bg-paper/70 py-1.5 pl-1.5 pr-4 text-sm text-ink-soft ring-1 ring-line backdrop-blur">
               <span aria-hidden="true" class="flex"><AppLoader :size="26" /></span>
               {{ c.hero.eyebrow }}
-            </p>
+            </div>
             <h1 class="mk-rise mk-display text-[44px] sm:text-6xl md:text-[64px]" style="--rise-delay: 90ms">
               {{ c.hero.line1 }}<br>
               <span class="text-ink-muted">{{ heroLine2[0] }}<span class="mk-accent whitespace-nowrap">{{ c.hero.accent }}</span>{{ heroLine2[1] }}</span>

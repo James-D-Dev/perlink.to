@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { stableBlockIds } from '~/data/templateKit'
 import type { BioData } from '~/types/bio'
 import { localizeTemplateContent } from '~/data/templateCopyVi'
 import type { PageTemplate } from '~/data/pageTemplates'
@@ -41,7 +42,8 @@ const bioData = computed<BioData>(() => {
     avatarUrl: content.avatarUrl || '',
     templateId: 'modern',
     themeConfig: { ...content.themeConfig, showShare: false },
-    blocks: content.blocks,
+    // Numbered ids, so the thumbnail renders the same on the server and in the browser
+    blocks: stableBlockIds(content.blocks, props.template.id),
   }
 })
 </script>

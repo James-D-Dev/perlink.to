@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { stableBlockIds } from '~/data/templateKit'
 import type { BioData } from '~/types/bio'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
 import { localizeTemplateContent } from '~/data/templateCopyVi'
@@ -32,7 +33,8 @@ const bioData = computed<BioData>(() => {
     avatarUrl: content.avatarUrl || '',
     templateId: 'modern',
     themeConfig: { ...content.themeConfig, showShare: false, roomButton: false },
-    blocks: content.blocks,
+    // Numbered ids, so the page renders the same on the server and in the browser
+    blocks: stableBlockIds(content.blocks, template.id),
   }
 })
 
