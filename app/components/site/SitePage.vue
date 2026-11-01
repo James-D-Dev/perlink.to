@@ -50,18 +50,8 @@
         </div>
       </div>
 
-      <!-- Error -->
-      <div v-else-if="error" class="text-center py-20">
-        <UIcon
-          name="i-lucide-alert-circle"
-          class="w-16 h-16 text-gray-400 mx-auto mb-4"
-        />
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">Page Not Found</h1>
-        <p class="text-gray-500">
-          This bio page doesn't exist or isn't published yet.
-        </p>
-        <UButton to="/" class="mt-6" color="primary"> Go Home </UButton>
-      </div>
+      <!-- Missing: an invitation to claim the address -->
+      <SiteNotFound v-else-if="error" :name="username" />
 
       <!-- 3D room. The loader covers it from the first paint (it's in the
            server HTML) until the viewer has mounted and the loader's intro
