@@ -7,31 +7,31 @@
         <div class="grid gap-10 md:grid-cols-[1.45fr_1fr] md:items-end">
           <div>
             <!-- The mark, alive (the room builds itself, the pearl bounces), in a small label -->
-            <p class="mb-6 inline-flex items-center gap-2.5 rounded-full bg-paper/70 py-1.5 pl-1.5 pr-4 text-sm text-ink-soft ring-1 ring-line backdrop-blur">
+            <p class="mk-rise mb-6 inline-flex items-center gap-2.5 rounded-full bg-paper/70 py-1.5 pl-1.5 pr-4 text-sm text-ink-soft ring-1 ring-line backdrop-blur">
               <span aria-hidden="true" class="flex"><AppLoader :size="26" /></span>
               {{ c.hero.eyebrow }}
             </p>
-            <h1 class="mk-display text-[44px] sm:text-6xl md:text-[64px]">
+            <h1 class="mk-rise mk-display text-[44px] sm:text-6xl md:text-[64px]" style="--rise-delay: 90ms">
               {{ c.hero.line1 }}<br>
               <span class="text-ink-muted">{{ heroLine2[0] }}<span class="mk-accent whitespace-nowrap">{{ c.hero.accent }}</span>{{ heroLine2[1] }}</span>
             </h1>
           </div>
           <div class="md:pb-2">
-            <p class="text-lg leading-relaxed text-ink-soft">
+            <p class="mk-rise text-lg leading-relaxed text-ink-soft" style="--rise-delay: 200ms">
               {{ c.hero.lead }}
             </p>
           </div>
         </div>
-        <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div class="mk-rise mt-10 flex flex-col gap-4 sm:flex-row sm:items-center" style="--rise-delay: 300ms">
           <MarketingMkClaimForm />
           <MarketingMkButton to="#3d" variant="outline" size="lg" class="sm:ml-1">{{ c.hero.explore }}</MarketingMkButton>
         </div>
-        <p class="mt-4 text-sm text-ink-faint">{{ c.hero.note }}</p>
+        <p class="mk-rise mt-4 text-sm text-ink-faint" style="--rise-delay: 380ms">{{ c.hero.note }}</p>
       </div>
 
       <!-- Showcase: switch between worlds -->
       <div class="px-5 pb-16 sm:px-8 md:pb-24">
-        <div class="rounded-2xl bg-sand p-1.5">
+        <div class="mk-rise rounded-2xl bg-sand p-1.5" style="--rise-delay: 480ms">
           <div class="grid grid-cols-2 gap-1 sm:grid-cols-4" role="tablist" :aria-label="c.hero.worldsLabel">
             <button
               v-for="(world, i) in showcase"
@@ -83,7 +83,7 @@
         <MarketingMkButton to="/trends" variant="outline" size="sm" trailing-icon="i-lucide-arrow-right">{{ c.audiences.trending }}</MarketingMkButton>
       </div>
       <div class="grid grid-cols-2 gap-px border-t border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
-        <div v-for="audience in audiences" :key="audience.label" class="flex flex-col items-center justify-center gap-2 bg-paper py-8 text-ink-muted">
+        <div v-for="(audience, i) in audiences" :key="audience.label" v-reveal="i * 60" class="flex flex-col items-center justify-center gap-2 bg-paper py-8 text-ink-muted">
           <UIcon :name="audience.icon" class="size-5" />
           <span class="text-sm">{{ audience.label }}</span>
         </div>
@@ -93,7 +93,7 @@
     <!-- ============ TWO WAYS ============ -->
     <MarketingMkSection :title="c.twoWays.title" :description="c.twoWays.description">
       <div class="grid gap-4 md:grid-cols-2">
-        <div class="flex flex-col rounded-2xl bg-sand p-6 md:p-8">
+        <div v-reveal class="flex flex-col rounded-2xl bg-sand p-6 md:p-8">
           <p class="text-sm font-medium text-ink">{{ c.twoWays.site }}</p>
           <p class="mt-1 text-sm text-ink-muted">{{ c.twoWays.siteText }}</p>
           <div class="mt-8 flex flex-1 items-end justify-center">
@@ -104,7 +104,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col rounded-2xl bg-sand p-6 md:p-8">
+        <div v-reveal="120" class="flex flex-col rounded-2xl bg-sand p-6 md:p-8">
           <p class="text-sm font-medium text-ink">{{ c.twoWays.world }}</p>
           <p class="mt-1 text-sm text-ink-muted">{{ c.twoWays.worldText }}</p>
           <div class="mt-8 flex flex-1 items-end">
@@ -122,7 +122,7 @@
       :description="c.templates.description"
     >
       <div class="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4">
-        <article v-for="template in templates" :key="template.id" class="group">
+        <article v-for="(template, i) in templates" :key="template.id" v-reveal="(i % 4) * 90" class="group">
           <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-sand">
             <div class="absolute inset-x-4 top-4 bottom-0 overflow-hidden rounded-t-xl ring-1 ring-line transition-transform duration-500 group-hover:-translate-y-1">
               <SiteTemplateThumbnail :template="template" :scale="0.38" />
@@ -140,7 +140,7 @@
     <!-- ============ 3D ============ -->
     <MarketingMkSection id="3d" :padded="false">
       <div class="grid md:grid-cols-[1fr_1.2fr]">
-        <div class="px-5 py-16 sm:px-8 md:py-24">
+        <div v-reveal class="px-5 py-16 sm:px-8 md:py-24">
           <p class="mk-eyebrow mb-4">{{ c.worlds.eyebrow }}</p>
           <h2 class="mk-display text-3xl sm:text-4xl md:text-[44px]">{{ c.worlds.title }}</h2>
           <p class="mt-4 max-w-md text-base leading-relaxed text-ink-muted md:text-lg">
@@ -149,7 +149,7 @@
           <MarketingMkButton to="/login" class="mt-8" trailing-icon="i-lucide-arrow-right">{{ c.worlds.cta }}</MarketingMkButton>
         </div>
         <div class="grid grid-cols-2 gap-px border-t border-line bg-line md:border-l md:border-t-0">
-          <div v-for="feature in worldFeatures" :key="feature.title" class="bg-paper p-6 md:p-8">
+          <div v-for="(feature, i) in worldFeatures" :key="feature.title" v-reveal="i * 90" class="bg-paper p-6 md:p-8">
             <UIcon :name="feature.icon" class="size-5 text-ink" />
             <p class="mt-4 text-sm font-medium text-ink">{{ feature.title }}</p>
             <p class="mt-1 text-sm leading-relaxed text-ink-muted">{{ feature.text }}</p>
@@ -161,7 +161,7 @@
     <!-- ============ TRENDS ============ -->
     <MarketingMkSection id="trends" :eyebrow="c.trends.eyebrow" :title="c.trends.title" :description="c.trends.description">
       <div class="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-        <MarketingMkTrendCard v-for="trend in trends" :key="trend.id" :trend="trend" />
+        <MarketingMkTrendCard v-for="(trend, i) in trends" :key="trend.id" v-reveal="(i % 3) * 100" :trend="trend" />
       </div>
       <div class="mt-10">
         <MarketingMkButton to="/trends" variant="outline" trailing-icon="i-lucide-arrow-right">{{ c.trends.all }}</MarketingMkButton>
@@ -171,7 +171,7 @@
     <!-- ============ HOW IT WORKS ============ -->
     <MarketingMkSection :title="c.steps.title">
       <ol class="grid gap-4 md:grid-cols-3">
-        <li v-for="(step, i) in c.steps.items" :key="step.title" class="rounded-2xl bg-sand p-6 md:p-8">
+        <li v-for="(step, i) in c.steps.items" :key="step.title" v-reveal="i * 110" class="rounded-2xl bg-sand p-6 md:p-8">
           <span class="mk-display text-4xl text-ink-faint">0{{ i + 1 }}</span>
           <p class="mt-6 text-base font-medium text-ink">{{ step.title }}</p>
           <p class="mt-1 text-sm leading-relaxed text-ink-muted">{{ step.text }}</p>
@@ -182,7 +182,7 @@
     <!-- ============ FAQ ============ -->
     <MarketingMkSection id="faq" :title="c.faq.title">
       <div class="divide-y divide-line border-y border-line">
-        <details v-for="item in c.faq.items" :key="item.q" class="group py-5">
+        <details v-for="(item, i) in c.faq.items" :key="item.q" v-reveal="i * 50" class="group py-5">
           <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-[15px] text-ink [&::-webkit-details-marker]:hidden">
             {{ item.q }}
             <UIcon name="i-lucide-plus" class="size-4 shrink-0 text-ink-muted transition-transform group-open:rotate-45" />
@@ -202,7 +202,7 @@
           <span class="absolute right-48 top-14"><MarketingMkOrb palette="lagoon" :size="48" /></span>
           <span class="absolute bottom-14 right-12"><MarketingMkOrb palette="night" :size="130" /></span>
         </div>
-        <div class="relative">
+        <div v-reveal class="relative">
           <h2 class="mk-display mx-auto max-w-2xl text-4xl sm:text-5xl">{{ c.cta.title }}</h2>
           <p class="mx-auto mt-4 max-w-md text-ink-muted">{{ c.cta.text }}</p>
           <div class="mt-8 flex justify-center">

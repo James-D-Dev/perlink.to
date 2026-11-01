@@ -426,3 +426,32 @@ sheet, 3D room popups) use these classes:
 .blog-prose pre code { background: none; padding: 0; }
 .blog-prose hr { border: 0; border-top: 1px solid currentColor; opacity: 0.15; margin: 2em 0; }
 .blog-prose figure img { width: 100%; border-radius: 16px; }
+
+/* Landing reveals (plugins/reveal.ts): rise into place as they scroll in */
+.mk-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(6px);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    filter 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+}
+.mk-reveal.mk-revealed {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* The hero's entrance: plays from the server-rendered page, no script needed */
+.mk-rise {
+  animation: mk-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+@keyframes mk-rise {
+  from { opacity: 0; transform: translateY(22px); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-rise { animation: none; }
+}

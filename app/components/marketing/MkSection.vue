@@ -7,7 +7,7 @@
         <span class="absolute -right-[3px] -top-[3px] hidden size-[5px] rounded-full bg-ink-faint/60 xl:block" aria-hidden="true" />
       </template>
       <div :class="padded && 'px-5 py-16 sm:px-8 md:py-24'">
-        <header v-if="title || eyebrow" class="mb-10 max-w-2xl md:mb-14" :class="center && 'mx-auto text-center'">
+        <header v-if="title || eyebrow" v-reveal class="mb-10 max-w-2xl md:mb-14" :class="center && 'mx-auto text-center'">
           <p v-if="eyebrow" class="mk-eyebrow mb-4">{{ eyebrow }}</p>
           <h2 v-if="title" class="mk-display text-3xl sm:text-4xl md:text-[44px]">{{ title }}</h2>
           <p v-if="description" class="mt-4 text-base leading-relaxed text-ink-muted md:text-lg">{{ description }}</p>
