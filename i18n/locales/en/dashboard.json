@@ -207,7 +207,7 @@
       "subjectPlaceholder": "Brief summary of your feedback",
       "message": "Your feedback",
       "messagePlaceholder": "Tell us what you think, report a bug, or suggest a feature...",
-      "rating": "Rating (Optional)",
+      "rating": "Rating (optional)",
       "ratingValue": "{rating} out of 5",
       "clear": "Clear",
       "submit": "Submit feedback",
@@ -344,7 +344,7 @@
         "description": "Treatments, prices, opening hours and appointments."
       },
       "tutor": {
-        "name": "Tutor & learning centre",
+        "name": "Tutor & learning center",
         "description": "Courses, fees, parent reviews and sign-up."
       },
       "bakery": {
@@ -483,11 +483,11 @@
       "open": "QR code",
       "title": "QR code",
       "ctaLabel": "Message on the card",
-      "styleLabel": "Card colour",
+      "styleLabel": "Card color",
       "styles": {
         "light": "Light",
         "dark": "Dark",
-        "brand": "Your colour"
+        "brand": "Your color"
       },
       "trackingNote": "Scans are counted separately as “QR” in analytics.",
       "print": "Print",
@@ -758,7 +758,7 @@
       },
       "subscription": {
         "renews": "Renews on {date}",
-        "ends": "Cancelled · ends on {date}",
+        "ends": "Canceled · ends on {date}",
         "pastDue": "Payment failed · update your card",
         "manage": "Manage subscription"
       }

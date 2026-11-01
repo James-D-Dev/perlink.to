@@ -5,7 +5,7 @@
     class="new-site group relative flex h-56 flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-[#fff6ee] via-[#fcf0f4] to-[#eef1ff] ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl sm:h-auto sm:aspect-[4/5] dark:from-[#1c1613] dark:via-[#1b1320] dark:to-[#11141f] dark:ring-white/10"
   >
     <!-- Social networks and reactions rising through it, like on a live video -->
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+    <div class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
       <span
         v-for="(b, i) in FLOATERS"
         :key="i"
@@ -37,7 +37,7 @@
     </div>
 
     <!-- The glow, the plus, the words, on a soft haze so nothing busy shows behind them -->
-    <div class="relative flex flex-col items-center gap-3 px-6 py-4 text-center">
+    <div class="relative z-10 flex flex-col items-center gap-3 px-6 py-4 text-center">
       <span class="absolute inset-0 -z-0 rounded-full bg-[radial-gradient(closest-side,rgb(255_255_255/0.85),transparent)] blur-md dark:bg-[radial-gradient(closest-side,rgb(20_16_24/0.85),transparent)]" aria-hidden="true" />
       <span class="relative flex items-center justify-center">
         <MarketingMkOrb palette="sunset" :size="84" />
@@ -46,7 +46,7 @@
         </span>
       </span>
       <span class="relative text-base font-semibold text-ink">{{ t('dashboard.sites.newSite') }}</span>
-      <span class="relative max-w-[14rem] text-xs text-ink-muted">{{ t('dashboard.sites.newSiteHint') }}</span>
+      <span class="relative max-w-[12rem] text-xs text-ink-muted">{{ t('dashboard.sites.newSiteHint') }}</span>
     </div>
   </NuxtLink>
 </template>
@@ -71,15 +71,15 @@ const REACTIONS = {
 // x: across the card (%); delay staggers them
 const FLOATERS: { kind: 'logo' | 'tiktok' | 'like' | 'love'; icon?: string; x: number; size: number; duration: number; delay: number; sway: number }[] = [
   { kind: 'logo', icon: 'i-logos-facebook', x: 8, size: 44, duration: 12, delay: 0, sway: 10 },
-  { kind: 'love', x: 78, size: 36, duration: 10, delay: 1.5, sway: -10 },
-  { kind: 'logo', icon: 'i-skill-icons-instagram', x: 74, size: 46, duration: 13, delay: 3, sway: -8 },
-  { kind: 'like', x: 14, size: 34, duration: 10.5, delay: 4.6, sway: 8 },
-  { kind: 'tiktok', x: 80, size: 44, duration: 12.5, delay: 6.4, sway: -12 },
+  { kind: 'love', x: 84, size: 36, duration: 10, delay: 1.5, sway: -10 },
+  { kind: 'logo', icon: 'i-skill-icons-instagram', x: 82, size: 46, duration: 13, delay: 3, sway: -8 },
+  { kind: 'like', x: 8, size: 34, duration: 10.5, delay: 4.6, sway: 8 },
+  { kind: 'tiktok', x: 84, size: 44, duration: 12.5, delay: 6.4, sway: -12 },
   { kind: 'love', x: 6, size: 32, duration: 9.5, delay: 7.4, sway: 10 },
-  { kind: 'logo', icon: 'i-logos-youtube-icon', x: 10, size: 46, duration: 12, delay: 9, sway: 8 },
-  { kind: 'like', x: 84, size: 34, duration: 10, delay: 10.2, sway: -6 },
-  { kind: 'love', x: 18, size: 30, duration: 9, delay: 11.6, sway: 8 },
-  { kind: 'love', x: 72, size: 32, duration: 10.5, delay: 5.2, sway: -10 },
+  { kind: 'logo', icon: 'i-logos-youtube-icon', x: 5, size: 46, duration: 12, delay: 9, sway: 8 },
+  { kind: 'like', x: 86, size: 34, duration: 10, delay: 10.2, sway: -6 },
+  { kind: 'love', x: 4, size: 30, duration: 9, delay: 11.6, sway: 8 },
+  { kind: 'love', x: 88, size: 32, duration: 10.5, delay: 5.2, sway: -10 },
 ]
 </script>
 

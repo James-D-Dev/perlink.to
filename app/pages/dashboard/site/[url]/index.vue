@@ -17,7 +17,7 @@
               <span v-else class="flex size-7 shrink-0 items-center justify-center rounded-full bg-paper text-xs font-semibold text-ink-soft">{{ (bioData.title || existingBio.username).charAt(0).toUpperCase() }}</span>
               <span class="min-w-0 text-left leading-tight">
                 <span class="block max-w-40 truncate text-sm font-medium text-ink sm:max-w-56">{{ bioData.title || existingBio.username }}</span>
-                <span class="block max-w-40 truncate text-[11px] text-ink-muted sm:max-w-56">perlink.to/{{ existingBio.username }}</span>
+                <span class="block max-w-40 truncate text-xs text-ink-muted sm:max-w-56">perlink.to/{{ existingBio.username }}</span>
               </span>
               <UIcon name="i-lucide-chevrons-up-down" class="size-3.5 shrink-0 text-ink-muted" />
             </button>
@@ -166,7 +166,7 @@
             >
               <UIcon :name="tab.icon" class="size-5" />
             </span>
-            <span class="text-[11px] font-medium" :class="activeTab === tab.value ? 'text-ink' : 'text-ink-muted'">{{ tab.label }}</span>
+            <span class="text-xs font-medium" :class="activeTab === tab.value ? 'text-ink' : 'text-ink-muted'">{{ tab.label }}</span>
           </button>
         </nav>
 
@@ -629,7 +629,7 @@
           icon="i-lucide-box"
           size="lg"
           :label="t('dashboard.editor.room.fab')"
-          class="fixed bottom-5 right-5 z-50 hidden pr-4 shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] lg:inline-flex print:hidden"
+          class="fixed bottom-5 right-5 z-50 hidden pr-4 shadow-[0_8px_24px_-6px_rgb(0_102_214/0.45)] lg:inline-flex print:hidden"
           @click="activeTab = 'room'"
         />
       </div>

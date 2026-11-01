@@ -17,7 +17,7 @@
     </div>
 
     <!-- Stat tiles: cells on a hairline grid -->
-    <div class="grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-line ring-1 ring-line">
+    <div class="grid grid-cols-3 gap-px overflow-hidden rounded-3xl bg-line ring-1 ring-line">
       <div v-for="card in overviewCards" :key="card.label" class="bg-paper p-4 sm:p-5">
         <p class="text-xs text-ink-muted">{{ card.label }}</p>
         <USkeleton v-if="!loaded" class="mt-2 h-8 w-16" />
@@ -31,7 +31,7 @@
     </p>
 
     <!-- Views over time: column chart -->
-    <section class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
+    <section class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-5">
       <div class="flex items-baseline justify-between gap-3">
         <h4 class="text-sm font-medium text-ink">{{ t('analytics.overview.viewsOverTime') }}</h4>
         <p v-if="timeseries.length" class="text-xs text-ink-muted">{{ t('analytics.overview.peak', { value: compact(maxClicks) }) }}</p>
@@ -72,7 +72,7 @@
 
     <!-- Breakdowns -->
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <section v-for="(panel, i) in breakdowns" :key="panel.title" class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5" :class="i === 2 && 'md:col-span-2 lg:col-span-1'">
+      <section v-for="(panel, i) in breakdowns" :key="panel.title" class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-5" :class="i === 2 && 'md:col-span-2 lg:col-span-1'">
         <h4 class="text-sm font-medium text-ink">{{ panel.title }}</h4>
         <div v-if="!loaded" class="mt-4 space-y-4" aria-busy="true">
           <div v-for="i in 4" :key="i" class="space-y-1.5">

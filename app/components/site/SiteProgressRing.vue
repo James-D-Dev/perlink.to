@@ -14,7 +14,7 @@
         :stroke-dasharray="`${value * 94.2} 94.2`"
       />
     </svg>
-    <span v-if="label" class="relative text-[9px] font-semibold tabular-nums text-ink">{{ label }}</span>
+    <span v-if="label" class="relative text-[11px] font-semibold tracking-tight tabular-nums text-ink">{{ label }}</span>
   </span>
 </template>
 

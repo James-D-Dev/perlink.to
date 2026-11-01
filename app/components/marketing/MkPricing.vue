@@ -13,7 +13,7 @@
           @click="period = option"
         >
           {{ t(`dashboard.billing.${option}`) }}
-          <span v-if="option === 'annual'" class="ml-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">{{ t('dashboard.billing.annualSave') }}</span>
+          <span v-if="option === 'annual'" class="ml-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700">{{ t('dashboard.billing.annualSave') }}</span>
         </button>
       </div>
     </div>
@@ -22,7 +22,7 @@
       <article
         v-for="plan in shownPlans"
         :key="plan"
-        class="relative flex flex-col rounded-2xl p-6 transition"
+        class="relative flex flex-col rounded-3xl p-6 transition"
         :class="[
           isPopular(plan) ? 'bg-ink text-paper' : 'bg-sand text-ink',
           highlight === plan && 'ring-2 ring-amber-400 ring-offset-2 ring-offset-paper',
@@ -30,7 +30,7 @@
       >
         <div class="flex items-center justify-between">
           <h3 class="text-base font-medium">{{ t(`dashboard.billing.plans.${plan}.name`) }}</h3>
-          <span v-if="currentPlan === plan" class="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium" :class="isPopular(plan) ? 'text-emerald-300' : 'text-emerald-700'">{{ t('dashboard.billing.current') }}</span>
+          <span v-if="currentPlan === plan" class="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium" :class="isPopular(plan) ? 'text-emerald-300' : 'text-emerald-800'">{{ t('dashboard.billing.current') }}</span>
           <span v-else-if="isPopular(plan)" class="rounded-full bg-paper/15 px-2.5 py-0.5 text-xs">{{ t('dashboard.billing.recommended') }}</span>
         </div>
         <p class="mt-1 text-sm" :class="muted(plan)">{{ t(`dashboard.billing.plans.${plan}.description`) }}</p>

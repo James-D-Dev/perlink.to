@@ -1,5 +1,5 @@
 <template>
-  <article class="group relative flex aspect-[4/5] flex-col overflow-hidden rounded-3xl bg-sand ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
+  <article class="group relative flex aspect-[4/3] flex-col sm:aspect-[4/5] overflow-hidden rounded-3xl bg-sand ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
     <!-- The site itself, scaled down; the whole card opens the editor -->
     <NuxtLink :to="editTo" class="absolute inset-0" :aria-label="t('dashboard.sites.edit')">
       <!-- The site's snapshot; a site without one renders its page once, which is then snapshotted -->
@@ -19,12 +19,13 @@
       </div>
     </NuxtLink>
 
-    <!-- Status, top left -->
+    <!-- Status, top left: solid light colours in both themes, since it sits
+         on the site's own picture (not the dark dashboard's emerald wash) -->
     <span
-      class="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium shadow-sm backdrop-blur"
-      :class="site.isPublished ? 'bg-emerald-50/90 text-emerald-700' : 'bg-white/90 text-[#6b655e]'"
+      class="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm"
+      :class="site.isPublished ? 'bg-[#ecfdf5] text-[#047857]' : 'bg-white text-[#57524c]'"
     >
-      <span class="size-1.5 rounded-full" :class="site.isPublished ? 'bg-emerald-500' : 'bg-ink-faint'" />
+      <span class="size-1.5 rounded-full" :class="site.isPublished ? 'bg-[#10b981]' : 'bg-[#a8a29e]'" />
       {{ site.isPublished ? t('dashboard.sites.live') : t('dashboard.sites.draft') }}
     </span>
 
@@ -54,7 +55,7 @@
               :aria-label="t('blocks.editor.menu.more')"
             >
               <UIcon name="i-lucide-ellipsis" class="size-4" />
-              <span v-if="site.unreadRequests" class="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-semibold">{{ site.unreadRequests }}</span>
+              <span v-if="site.unreadRequests" class="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold">{{ site.unreadRequests }}</span>
             </button>
           </UDropdownMenu>
           <NuxtLink

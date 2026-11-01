@@ -11,12 +11,13 @@
     <template #body>
       <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-6">
         <!-- Hero -->
-        <section class="relative isolate overflow-hidden rounded-3xl bg-elevated p-6 ring-1 ring-line dark:bg-[#141414] dark:ring-white/[0.1] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] sm:p-10">
+        <section class="relative isolate overflow-hidden rounded-3xl bg-elevated p-6 ring-1 ring-line dark:bg-[#171412] dark:ring-white/[0.1] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] sm:p-10">
           <!-- Same living backdrop as the landing hero -->
           <MarketingMkHeroBackdrop :fade="false" />
           <div class="pointer-events-none absolute inset-0 dark:bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgb(255_255_255/0.06),transparent)]" />
           <!-- Gradient orbs, echoing the 3D lands -->
-          <div class="pointer-events-none absolute right-12 top-1/2 hidden -translate-y-1/2 lg:block" aria-hidden="true">
+          <!-- Softer on the dark theme, where full-strength colour glares -->
+          <div class="pointer-events-none absolute right-12 top-1/2 hidden -translate-y-1/2 lg:block dark:opacity-55 dark:saturate-[0.8]" aria-hidden="true">
             <span class="absolute -left-36 -top-16"><MarketingMkOrb palette="sakura" :size="88" /></span>
             <span class="absolute -left-10 top-6"><MarketingMkOrb palette="sunset" :size="120" /></span>
             <span class="absolute -left-44 top-20"><MarketingMkOrb palette="lagoon" :size="52" /></span>

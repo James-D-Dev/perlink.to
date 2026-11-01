@@ -5,17 +5,17 @@
     <UTooltip v-if="collapsed" :text="t('dashboard.onboarding.cardTitle')">
       <button
         type="button"
-        class="mx-auto mt-4 flex size-11 items-center justify-center rounded-full transition-colors hover:bg-sand"
+        class="mx-auto mt-4 flex size-12 items-center justify-center rounded-full transition-colors hover:bg-sand"
         :aria-label="t('dashboard.onboarding.cardTitle')"
         @click="openChecklist"
       >
-        <SiteProgressRing :value="progress" :size="36" :label="`${setup.done.value}/${total}`" />
+        <SiteProgressRing :value="progress" :size="40" :label="`${setup.done.value}/${total}`" />
       </button>
     </UTooltip>
 
     <div v-else class="mt-4 rounded-2xl bg-paper p-4 ring-1 ring-line">
       <div class="flex items-center gap-3">
-        <SiteProgressRing :value="progress" :size="36" :label="`${setup.done.value}/${total}`" />
+        <SiteProgressRing :value="progress" :size="40" :label="`${setup.done.value}/${total}`" />
         <div class="min-w-0">
           <p class="text-sm font-medium text-ink">{{ t('dashboard.onboarding.cardTitle') }}</p>
           <p class="text-xs text-ink-muted">{{ t('dashboard.onboarding.progress', { done: setup.done.value, total }) }}</p>

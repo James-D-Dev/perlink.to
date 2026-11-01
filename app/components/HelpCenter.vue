@@ -54,7 +54,8 @@
       size="lg"
       square
       :icon="open ? 'i-lucide-x' : 'i-lucide-circle-help'"
-      class="shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] lg:hidden"
+      class="shadow-[0_8px_24px_-6px_rgb(0_102_214/0.45)] transition-[translate,opacity] duration-300 lg:hidden"
+      :class="tucked && !open && 'pointer-events-none translate-y-24 opacity-0'"
       :aria-expanded="open"
       :aria-label="open ? t('dashboard.help.close') : t('dashboard.help.ariaLabel')"
       @click="open = !open"
@@ -83,5 +84,29 @@ const answers = computed(() =>
   })),
 )
 
-watch(() => route.fullPath, () => (open.value = false))
+watch(() => route.fullPath, () => {
+  open.value = false
+  tucked.value = false
+})
+
+// On phones the button steps aside while the page scrolls down (so it never
+// sits on a card's buttons), and comes back on the way up or at the end
+const tucked = ref(false)
+const lastTop = new WeakMap<EventTarget, number>()
+// Smooth scrolling moves a few pixels per event, so the travel in one
+// direction adds up before it counts
+let travel = 0
+function onScroll(event: Event) {
+  const el = event.target === document ? document.scrollingElement : event.target
+  if (!(el instanceof Element)) return
+  const top = el.scrollTop
+  const delta = top - (lastTop.get(el) ?? 0)
+  lastTop.set(el, top)
+  travel = Math.sign(delta) === Math.sign(travel) ? travel + delta : delta
+  const atEnd = el.scrollHeight - top - el.clientHeight < 48
+  if (atEnd || top < 80 || travel < -24) tucked.value = false
+  else if (travel > 24) tucked.value = true
+}
+onMounted(() => document.addEventListener('scroll', onScroll, { capture: true, passive: true }))
+onBeforeUnmount(() => document.removeEventListener('scroll', onScroll, { capture: true }))
 </script>

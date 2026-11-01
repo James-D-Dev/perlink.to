@@ -1,5 +1,5 @@
 <template>
-  <section class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
+  <section class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-5">
     <!-- Header with toggle -->
     <div class="flex items-center justify-between mb-4">
       <h4 class="text-sm font-medium text-ink">{{ t('analytics.countryMap.title') }}</h4>

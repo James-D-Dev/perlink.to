@@ -8,20 +8,16 @@
       </UDashboardNavbar>
     </template>
     <template #body>
-      <div class="max-w-xl w-full mx-auto py-8 px-4">
-        <h1 class="text-2xl font-bold text-highlighted dark:text-white mb-6">{{ t('dashboard.feedback.title') }}</h1>
+      <!-- Same frame and heading as Settings; the bar above names the page on phones -->
+      <div class="mx-auto w-full max-w-2xl space-y-6 py-2 sm:py-4">
+        <h1 class="mk-display hidden text-3xl text-ink sm:block sm:text-4xl">{{ t('dashboard.feedback.title') }}</h1>
 
         <!-- Feedback Form -->
-        <UCard class="mb-6">
+        <UCard>
           <template #header>
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-500/15 flex items-center justify-center"
-              >
-                <UIcon
-                  name="i-lucide-message-square"
-                  class="w-5 h-5 text-purple-600 dark:text-purple-400"
-                />
+              <div class="flex size-10 items-center justify-center rounded-xl bg-sand">
+                <UIcon name="i-lucide-message-square-heart" class="size-5 text-ink-soft" />
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-highlighted dark:text-white">

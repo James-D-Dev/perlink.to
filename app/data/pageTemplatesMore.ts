@@ -601,7 +601,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     preview: { bg: '#18181B', accent: '#D4A373' },
     build: () => ({
       title: s('Your Salon', 'Salon tóc của bạn'),
-      bio: s('Cuts, colour and styling for everyone. Walk-ins welcome.', 'Cắt, nhuộm và tạo kiểu cho mọi người. Khách vãng lai luôn được chào đón.'),
+      bio: s('Cuts, color and styling for everyone. Walk-ins welcome.', 'Cắt, nhuộm và tạo kiểu cho mọi người. Khách vãng lai luôn được chào đón.'),
       avatarUrl: photo('hair-avatar'),
       themeConfig: look({
         bg: '#18181B', text: '#F4F4F5', accent: '#D4A373', onAccent: '#18181B', surface: '#27272A', border: '#3F3F46', radius: 6,
@@ -612,7 +612,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'menu', data: { title: s('Services', 'Dịch vụ'), currency: '₫', layout: 'list', sections: menu([
           { name: '', items: [
             [s('Haircut', 'Cắt tóc'), '120,000', s('Wash and style included', 'Gồm gội và tạo kiểu')],
-            [s('Colour', 'Nhuộm'), '450,000', s('From, depending on length', 'Từ, tùy độ dài')],
+            [s('Color', 'Nhuộm'), '450,000', s('From, depending on length', 'Từ, tùy độ dài')],
             [s('Perm', 'Uốn'), '550,000'],
             [s('Beard trim', 'Tỉa râu'), '60,000'],
           ] },
@@ -891,7 +891,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     preview: { bg: '#FAFAFA', accent: '#0A0A0A' },
     build: () => ({
       title: s('Your Shop', 'Shop của bạn'),
-      bio: s('Everyday clothes in soft colours. New drops every Friday.', 'Quần áo hằng ngày tông màu dịu. Hàng mới mỗi thứ Sáu.'),
+      bio: s('Everyday clothes in soft colors. New drops every Friday.', 'Quần áo hằng ngày tông màu dịu. Hàng mới mỗi thứ Sáu.'),
       avatarUrl: photo('shop-avatar'),
       themeConfig: look({
         bg: '#FAFAFA', text: '#0A0A0A', accent: '#0A0A0A', onAccent: '#FFFFFF', surface: '#FFFFFF', border: '#E5E5E5', radius: 0,

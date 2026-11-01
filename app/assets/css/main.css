@@ -34,13 +34,15 @@ comes from imagery and the gradient orbs, not from the UI chrome.
   --color-ink: #0c0b0a;
   --color-ink-soft: #3a3631;
   --color-ink-muted: #6b655e;
-  --color-ink-faint: #9b948c;
+  /* Still 4.5:1 on paper and sand, so small print stays readable */
+  --color-ink-faint: #746e67;
 }
 
 @theme {
   --color-perlink-cyan: #00A8FF;
-  /* The action colour, like iOS systemBlue (a lighter step in dark mode) */
-  --color-tint: #007aff;
+  /* The action colour: a deep blue (the logo's "per") that holds white
+     labels at 5.4:1; a brighter step in dark mode */
+  --color-tint: #0066d6;
   --color-perlink-blue: #086bf5;
   --color-perlink-purple: #6C5CE7;
   --color-perlink-violet: #8E44AD;
@@ -52,10 +54,10 @@ comes from imagery and the gradient orbs, not from the UI chrome.
      actions, warm neutrals for everything else */
   --ui-primary: var(--color-tint);
   --ui-secondary: var(--color-ink-soft);
-  /* iOS system colours for states */
-  --ui-success: #34c759;
-  --ui-warning: #ff9500;
-  --ui-error: #ff3b30;
+  /* States, deep enough to read as text on paper and to carry white labels */
+  --ui-success: #047857;
+  --ui-warning: #b45309;
+  --ui-error: #dc2626;
   --ui-radius: 0.25rem;
 
   --ui-bg: var(--color-paper);
@@ -96,7 +98,8 @@ Neutral black/gray instead of the blue-tinted slate palette.
 Must come after :root so it overrides the light --ui-bg above.
 */
 .dark {
-  --color-tint: #0a84ff;
+  /* The brightest blue that still holds white labels at 4.5:1 */
+  --color-tint: #1a73e8;
   --ui-primary: var(--color-tint);
   --ui-success: #30d158;
   --ui-warning: #ff9f0a;
@@ -148,18 +151,58 @@ Dashboard and superadmin (class on <html> from their layouts): the
 paper/sand/ink surfaces, with a dark version for their dark modes
 */
 .admin-theme.dark {
-  --color-paper: #0a0a0a;
-  --color-sand: #1a1a1a;
-  --color-sand-strong: #262626;
+  /* Warm near-blacks and stone grays, the dark side of the warm paper and
+     ink of the light theme. Small print (faint) keeps 4.5:1 */
+  --color-paper: #0c0a09;
+  --color-sand: #1c1917;
+  --color-sand-strong: #292524;
   --color-line: rgb(255 255 255 / 0.09);
-  --color-ink: #fafafa;
-  --color-ink-soft: #d4d4d4;
-  --color-ink-muted: #a1a1a1;
-  --color-ink-faint: #6b6b6b;
+  --color-ink: #fafaf9;
+  --color-ink-soft: #d6d3d1;
+  --color-ink-muted: #a8a29e;
+  --color-ink-faint: #8a847e;
+
+  --ui-bg: #0c0a09;
+  --ui-bg-muted: #12100f;
+  --ui-bg-elevated: #1a1716;
+  --ui-bg-accented: #262321;
+  --ui-bg-inverted: #fafaf9;
+  --ui-text-dimmed: #8a847e;
+  --ui-text-muted: #a8a29e;
+  --ui-text-toned: #d6d3d1;
+  --ui-text: #e7e5e4;
+  --ui-text-highlighted: #fafaf9;
+  --ui-text-inverted: #0c0a09;
+  --ui-border-inverted: #fafaf9;
+
+  /* Stone instead of neutral, for components and for the dark: classes in
+     templates; 500 lifted so text in it keeps 4.5:1 */
+  --ui-color-neutral-50: #fafaf9;
+  --ui-color-neutral-100: #f5f5f4;
+  --ui-color-neutral-200: #e7e5e4;
+  --ui-color-neutral-300: #d6d3d1;
+  --ui-color-neutral-400: #a8a29e;
+  --ui-color-neutral-500: #8a847e;
+  --ui-color-neutral-600: #57534e;
+  --ui-color-neutral-700: #44403c;
+  --ui-color-neutral-800: #292524;
+  --ui-color-neutral-900: #1c1917;
+  --ui-color-neutral-950: #0c0a09;
+  --color-neutral-50: #fafaf9;
+  --color-neutral-100: #f5f5f4;
+  --color-neutral-200: #e7e5e4;
+  --color-neutral-300: #d6d3d1;
+  --color-neutral-400: #a8a29e;
+  --color-neutral-500: #8a847e;
+  --color-neutral-600: #57534e;
+  --color-neutral-700: #44403c;
+  --color-neutral-800: #292524;
+  --color-neutral-900: #1c1917;
+  --color-neutral-950: #0c0a09;
 }
 /* The page itself is dark too, so no white shows behind see-through panels */
 html.admin-theme.dark {
-  background-color: #0a0a0a;
+  background-color: #0c0a09;
 }
 
 /*

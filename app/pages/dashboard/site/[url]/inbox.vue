@@ -72,7 +72,7 @@
         </div>
 
         <!-- Empty -->
-        <div v-else-if="!submissions.length" class="flex flex-col items-center rounded-xl bg-sand px-6 py-14 text-center">
+        <div v-else-if="!submissions.length" class="flex flex-col items-center rounded-3xl bg-sand px-6 py-14 text-center">
           <span class="flex size-12 items-center justify-center rounded-full bg-paper ring-1 ring-line">
             <UIcon name="i-lucide-inbox" class="size-5 text-ink-soft" />
           </span>

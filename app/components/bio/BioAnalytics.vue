@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <!-- No Data State -->
-    <div v-if="!bioPageId" class="rounded-xl bg-paper py-16 text-center ring-1 ring-line">
+    <div v-if="!bioPageId" class="rounded-3xl bg-paper py-16 text-center ring-1 ring-line">
       <UIcon name="i-lucide-chart-column" class="mx-auto mb-3 size-8 text-ink-faint" />
       <p class="text-sm text-ink-muted">{{ t('analytics.unpublished') }}</p>
     </div>
@@ -11,10 +11,15 @@
       :items="tabs"
       default-value="page"
       class="w-full"
-      variant="link"
+      variant="pill"
       color="neutral"
       size="md"
-      :ui="{ list: 'border-b border-line', trigger: 'px-2.5 sm:px-3' }"
+      :ui="{
+        // Segmented, like the sites list's All | Live | Draft
+        list: 'inline-flex w-auto self-start rounded-full bg-sand p-1',
+        indicator: 'rounded-full bg-paper shadow-sm',
+        trigger: 'flex-none rounded-full px-3.5 py-1.5 text-sm font-medium text-ink-muted data-[state=active]:text-ink hover:text-ink',
+      }"
     >
       <template #content="{ item }">
         <div v-if="item.value === 'page'" class="pt-4">
@@ -23,7 +28,7 @@
 
         <div v-else-if="item.value === 'links'" class="space-y-4 pt-4">
           <!-- What visitors did: calls, directions, chats, bookings, form requests -->
-          <section class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+          <section class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
             <div class="border-b border-line px-4 py-3">
               <h4 class="text-sm font-medium text-ink">{{ t('analytics.actions.title') }}</h4>
               <p class="mt-0.5 text-xs text-ink-muted">{{ t('analytics.actions.text') }}</p>
@@ -41,13 +46,13 @@
 
           <div
             v-if="!bioLinks?.length && !socialLinks?.length"
-            class="rounded-xl bg-paper py-12 text-center text-sm text-ink-muted ring-1 ring-line"
+            class="rounded-3xl bg-paper py-12 text-center text-sm text-ink-muted ring-1 ring-line"
           >
             {{ t('analytics.links.empty') }}
           </div>
 
           <div v-else class="space-y-4">
-            <section v-if="bioLinks?.length" class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+            <section v-if="bioLinks?.length" class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
               <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">{{ t('analytics.links.linksTitle') }}</h4>
               <ul class="divide-y divide-line">
                 <li v-for="link in bioLinks" :key="link.id" class="flex items-center gap-3 px-4 py-3">
@@ -60,13 +65,13 @@
                   </div>
                   <div class="shrink-0 text-right">
                     <p class="text-lg font-semibold tabular-nums text-ink">{{ getLinkClickCount(link.id) }}</p>
-                    <p class="text-[11px] text-ink-muted">{{ t('analytics.links.clicks', getLinkClickCount(link.id)) }}</p>
+                    <p class="text-xs text-ink-muted">{{ t('analytics.links.clicks', getLinkClickCount(link.id)) }}</p>
                   </div>
                 </li>
               </ul>
             </section>
 
-            <section v-if="socialLinks?.length" class="overflow-hidden rounded-xl bg-paper ring-1 ring-line">
+            <section v-if="socialLinks?.length" class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
               <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">{{ t('analytics.links.socialTitle') }}</h4>
               <ul class="divide-y divide-line">
                 <li v-for="social in socialLinks" :key="social.id" class="flex items-center gap-3 px-4 py-3">
@@ -79,7 +84,7 @@
                   </div>
                   <div class="shrink-0 text-right">
                     <p class="text-lg font-semibold tabular-nums text-ink">{{ getSocialClickCount(social.id) }}</p>
-                    <p class="text-[11px] text-ink-muted">{{ t('analytics.links.clicks', getSocialClickCount(social.id)) }}</p>
+                    <p class="text-xs text-ink-muted">{{ t('analytics.links.clicks', getSocialClickCount(social.id)) }}</p>
                   </div>
                 </li>
               </ul>

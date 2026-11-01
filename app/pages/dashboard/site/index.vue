@@ -140,13 +140,13 @@
               <!-- Daily bars -->
               <div class="mt-5 flex h-24 items-end gap-1.5">
                 <div v-for="(n, i) in weekSeries" :key="i" class="group/bar relative flex flex-1 flex-col items-center justify-end gap-1.5 self-stretch">
-                  <span class="pointer-events-none absolute -top-5 rounded bg-ink px-1.5 py-0.5 text-[10px] tabular-nums text-paper opacity-0 transition group-hover/bar:opacity-100">{{ n }}</span>
+                  <span class="pointer-events-none absolute -top-5 rounded bg-ink px-1.5 py-0.5 text-[11px] tabular-nums text-paper opacity-0 transition group-hover/bar:opacity-100">{{ n }}</span>
                   <div
                     class="w-full rounded-t-md transition-colors"
                     :class="n ? 'bg-ink group-hover/bar:bg-ink-soft' : 'bg-sand-strong'"
                     :style="{ height: `${n ? Math.max(8, (n / weekMax) * 100) : 4}%` }"
                   />
-                  <span class="text-[10px] text-ink-faint">{{ weekdayLabel(i) }}</span>
+                  <span class="text-[11px] text-ink-faint">{{ weekdayLabel(i) }}</span>
                 </div>
               </div>
             </div>

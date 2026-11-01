@@ -111,7 +111,7 @@ const en = {
     title: 'Live in three steps',
     items: [
       { title: 'Claim your name', text: 'Pick perlink.to/yourname. It is yours as long as you use it.' },
-      { title: 'Make it yours', text: 'Start from a template, then edit blocks, colours and your 3D room.' },
+      { title: 'Make it yours', text: 'Start from a template, then edit blocks, colors and your 3D room.' },
       { title: 'Share it', text: 'Publish with one click and share the link anywhere.' },
     ],
   },

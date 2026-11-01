@@ -49,7 +49,7 @@
         "dark": "Dark",
         "gradient": "Gradient"
       },
-      "accent": "Accent colour",
+      "accent": "Accent color",
       "accentHelp": "Used for cards, buttons and icons."
     },
     "background": {
@@ -81,7 +81,7 @@
       "title": "Card style",
       "style": "Style",
       "color": "Card color",
-      "colorHelp": "Empty uses the primary colour.",
+      "colorHelp": "Empty uses the primary color.",
       "colorAria": "Card color",
       "borderColor": "Border color",
       "borderColorAria": "Card border color",
@@ -224,7 +224,7 @@
       },
       "stone": {
         "name": "Stone",
-        "description": "Warm grey with soft cards"
+        "description": "Warm gray with soft cards"
       },
       "mono": {
         "name": "Mono",
@@ -236,7 +236,7 @@
       },
       "cloud": {
         "name": "Cloud",
-        "description": "Airy blue-grey, rounded"
+        "description": "Airy blue-gray, rounded"
       },
       "coffee": {
         "name": "Coffee house",
@@ -368,7 +368,7 @@
       },
       "birthday": {
         "name": "Birthday",
-        "description": "Confetti colours, round cards"
+        "description": "Confetti colors, round cards"
       },
       "christmas": {
         "name": "Christmas",
@@ -500,7 +500,7 @@
       }
     },
     "sections": {
-      "colors": "Colours & background",
+      "colors": "Colors & background",
       "text": "Text",
       "cards": "Cards & buttons",
       "layout": "Layout",
@@ -510,11 +510,11 @@
       "general": "Main font",
       "generalHelp": "Used for the text in your blocks.",
       "align": "Alignment",
-      "pageColor": "Content text colour",
-      "pageColorHelp": "Colour of the text inside blocks.",
+      "pageColor": "Content text color",
+      "pageColorHelp": "Color of the text inside blocks.",
       "pairs": "Font pairs",
       "nameGradient": "Gradient name",
-      "nameGradientHelp": "Paint the site name with the accent colours."
+      "nameGradientHelp": "Paint the site name with the accent colors."
     },
     "presetActions": {
       "random": "Surprise me",
