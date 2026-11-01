@@ -6,12 +6,16 @@
         <MarketingMkHeroBackdrop />
         <div class="grid gap-10 md:grid-cols-[1.45fr_1fr] md:items-end">
           <div>
-            <h1 class="mk-display text-[44px] sm:text-6xl md:text-[64px]">
+            <h1 class="mk-display text-[44px] sm:text-6xl md:text-[60px] xl:text-[72px]">
               {{ c.hero.line1 }}<br>
-              <span class="text-ink-muted">{{ c.hero.line2 }}</span>
+              <span class="text-ink-muted">{{ heroLine2[0] }}<span class="mk-accent whitespace-nowrap">{{ c.hero.accent }}</span>{{ heroLine2[1] }}</span>
             </h1>
           </div>
-          <div class="md:pb-2">
+          <div class="flex flex-col items-start gap-6 md:pb-2">
+            <!-- The mark, alive: the room builds itself and the pearl bounces in it -->
+            <div aria-hidden="true" class="mk-mark-float hidden sm:block">
+              <AppLoader :size="132" />
+            </div>
             <p class="text-lg leading-relaxed text-ink-soft">
               {{ c.hero.lead }}
             </p>
@@ -216,6 +220,13 @@ import { TRENDS } from '~/data/trends'
 // The landing page, in the language of its URL ("/" English, "/vi" Vietnamese)
 const { lang, copy: c } = useMarketingLang()
 
+// The hero's second line around its highlighted words ("3D world")
+const heroLine2 = computed(() => {
+  const { line2, accent } = c.value.hero
+  const at = line2.indexOf(accent)
+  return at < 0 ? [line2, ''] : [line2.slice(0, at), line2.slice(at + accent.length)]
+})
+
 // ---------- SEO ----------
 const SITE_URL = 'https://perlink.to'
 const pageUrl = computed(() => (lang.value === 'vi' ? `${SITE_URL}/vi` : SITE_URL))
@@ -320,3 +331,29 @@ const worldFeatures = computed(() => {
 
 const trends = TRENDS.slice(0, 6)
 </script>
+
+<style>
+/* "3D world": heavier, in the brand blue drifting to violet, a slow sheen across it */
+.mk-accent {
+  font-weight: 600;
+  background: linear-gradient(100deg, #086bf5 0%, #2f8fff 30%, #8b5cf6 55%, #086bf5 80%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mk-accent-sheen 7s ease-in-out infinite alternate;
+}
+@keyframes mk-accent-sheen {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+/* The mark hovers gently, like the floating lands */
+.mk-mark-float { animation: mk-mark-float 5s ease-in-out infinite; }
+@keyframes mk-mark-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-accent, .mk-mark-float { animation: none; }
+}
+</style>
