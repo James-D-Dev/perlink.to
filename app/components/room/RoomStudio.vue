@@ -572,7 +572,7 @@ import { ROOM_CATALOG, CATALOG_BY_TYPE, CATEGORY_LABELS, preloadDungeonModels, t
 import type { ShopProduct } from '~/utils/room/productCard'
 import type { ObjectPatch } from '~/utils/room/RoomScene'
 import { createFloorTexture } from '~/utils/room/RoomScene'
-import { getDaylight, type DaylightState } from '~/utils/room/daylight'
+import type { DaylightState } from '~/utils/room/daylight'
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
 import { ROOM_MUSIC, MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 import { LANDS } from '~/utils/room/lands'
@@ -637,8 +637,9 @@ const barRef = ref<HTMLElement | null>(null)
 const selectedId = ref<string | null>(null)
 const activeTab = ref<Tab>('furniture')
 const trayOpen = ref(true)
-// The editor shows the room by day or by night; it starts as it is right now
-const previewMode = ref<'day' | 'night'>(getDaylight(room.value.environment).isDay ? 'day' : 'night')
+// The editor opens in daylight, whatever the time, so everything can be seen
+// while arranging it; the sun/moon button previews the night
+const previewMode = ref<'day' | 'night'>('day')
 /** Which renderer drew the frame, next to the FPS (for testing WebGPU on devices) */
 const RENDERER_LABEL: Record<string, string> = { webgl: 'WebGL', webgpu: 'WebGPU', webgl2: 'WebGL 2' }
 
