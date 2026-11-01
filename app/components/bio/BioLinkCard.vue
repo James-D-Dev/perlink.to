@@ -20,7 +20,7 @@
     
       :href="link.url"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener noreferrer nofollow ugc"
       class="block w-full relative"
       @click="trackClick"
    

@@ -101,7 +101,7 @@
             v-if="photo.link?.url"
             :href="safeUrl(photo.link.url)"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow ugc"
             class="flex items-center gap-1.5 rounded-full bg-black/30 px-4 py-2 text-sm font-medium text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/40"
           >
             {{ photo.link.label || hostOf(photo.link.url) }}
@@ -137,7 +137,7 @@
               v-else-if="shopShown.product.url"
               :href="safeUrl(shopShown.product.url)"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow ugc"
               class="mt-2 flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-[15px] font-semibold text-white"
               :style="{ backgroundColor: accent }"
               @click="trackVisitorAction(username ?? '', 'store', 'view')"
@@ -294,7 +294,7 @@
           :key="obj.id"
           :href="safeUrl(obj.link!.url)"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer nofollow ugc"
           class="flex shrink-0 items-center gap-1.5 rounded-full bg-white/85 px-3 py-1.5 text-sm font-medium text-gray-800 shadow backdrop-blur transition hover:bg-white"
         >
           <UIcon :name="iconFor(obj.type)" class="size-4" />

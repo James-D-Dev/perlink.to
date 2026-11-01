@@ -5,7 +5,7 @@
       :key="social.id"
       :href="getSocialUrl(social)"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener noreferrer nofollow ugc"
       :style="socialButtonStyle"
       :aria-label="social.provider"
       @mouseenter="onMouseEnter"

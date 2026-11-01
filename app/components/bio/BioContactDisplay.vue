@@ -2,7 +2,7 @@
   <section class="space-y-3 p-5" :style="cardStyle">
     <h2 class="text-[17px]" :style="{ fontFamily: headingStyle?.fontFamily, fontWeight: headingStyle?.fontWeight, letterSpacing: headingStyle?.letterSpacing }">{{ data.title || t('contact') }}</h2>
 
-    <a v-if="data.address" :href="mapHref" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 text-sm hover:underline" @click="track('map')">
+    <a v-if="data.address" :href="mapHref" target="_blank" rel="noopener noreferrer nofollow ugc" class="flex items-start gap-2 text-sm hover:underline" @click="track('map')">
       <UIcon name="i-lucide-map-pin" class="mt-0.5 size-4 shrink-0" />
       <span>{{ data.address }}</span>
     </a>
@@ -20,7 +20,7 @@
         v-if="data.bookingUrl"
         :href="safeUrl(data.bookingUrl)"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener noreferrer nofollow ugc"
         class="flex flex-1 items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold"
         :style="buttonStyle"
         @click="track('book')"

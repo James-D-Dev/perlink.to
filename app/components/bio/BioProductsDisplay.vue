@@ -34,7 +34,7 @@
             v-if="item.url && !item.soldOut"
             :href="safeWebUrl(item.url)"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow ugc"
             class="mt-2 flex items-center justify-center gap-1.5 px-3 py-2 text-[13px] font-semibold"
             :style="buttonStyle"
             @click="onStoreClick($event)"
