@@ -21,16 +21,16 @@
       <Meta property="og:image" :content="metaImg" />
       <Meta property="og:type" content="website" />
 
-      <Link rel="canonical" :href="metaUrl" />
+      <Link v-if="!error" rel="canonical" :href="metaUrl" />
+      <!-- An address nobody uses: not for search results -->
+      <Meta v-if="error" name="robots" content="noindex" />
       <Meta name="mobile-web-app-capable" content="yes" />
       <Meta name="apple-mobile-web-app-title" content="Perlink" />
       <Meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <Meta name="theme-color" content="#000000" />
-      <Meta name="fb:app_id" content="" />
 
       <Meta name="twitter:card" content="summary_large_image" />
       <Meta name="twitter:site" content="@perlinkto" />
-      <Meta name="twitter:creator" :content="`@${bioPage?.username}`" />
       <Meta name="twitter:title" :content="metaTitle" />
       <Meta name="twitter:description" :content="metaDesc" />
       <Meta name="twitter:image" :content="metaImg" />
@@ -146,8 +146,17 @@ const bioPage = computed(() => data.value?.bioPage);
 
 // Owner's own title/description/image, or sensible defaults (utils/siteSeo)
 const seo = computed(() => siteSeo(bioPage.value ?? {}, bioPage.value?.username ?? username, props.domain));
-const metaTitle = computed(() => seo.value.title);
-const metaDesc = computed(() => seo.value.description);
+const metaTitle = computed(() => (error.value ? "Page not found — Perlink" : seo.value.title));
+const metaDesc = computed(() =>
+  error.value ? "This Perlink address isn't in use yet. Claim it for your own link in bio page or personal website." : seo.value.description,
+);
+
+// No such site (or not published): a real 404, not a "not found" page sent
+// as 200 that search engines would index as a page of its own
+if (import.meta.server && error.value) {
+  const event = useRequestEvent();
+  if (event) setResponseStatus(event, 404);
+}
 const metaUrl = computed(() => seo.value.url);
 const metaImg = computed(() => seo.value.image);
 

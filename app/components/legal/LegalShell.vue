@@ -98,5 +98,17 @@ onMounted(() => {
   if (current && pillsEl.value) pillsEl.value.scrollLeft = current.offsetLeft - (pillsEl.value.clientWidth - current.offsetWidth) / 2
 })
 
-useSeoMeta({ title: () => `${props.title} — Perlink`, description: () => props.description || props.intro })
+// Search and sharing: the page's own address as canonical
+const pageUrl = computed(() => `https://perlink.to${route.path === '/' ? '' : route.path}`)
+useSeoMeta({
+  title: () => `${props.title} — Perlink`,
+  description: () => props.description || props.intro,
+  ogTitle: () => `${props.title} — Perlink`,
+  ogDescription: () => props.description || props.intro,
+  ogUrl: () => pageUrl.value,
+  ogType: 'website',
+  ogImage: 'https://perlink.to/images/og.jpg',
+  twitterCard: 'summary_large_image',
+})
+useHead({ link: () => [{ rel: 'canonical', href: pageUrl.value }] })
 </script>

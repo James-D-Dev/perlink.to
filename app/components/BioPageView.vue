@@ -67,9 +67,9 @@
           <div
             class="absolute bottom-0 left-0 right-0 flex flex-col items-center"
           >
-            <h1 :style="{ ...nameStyle, textAlign: 'center' }" class="mb-1">
+            <component :is="nameTag" :style="{ ...nameStyle, textAlign: 'center' }" class="mb-1">
               {{ bioData.title || username }}
-            </h1>
+            </component>
           </div>
         </div>
       </template>
@@ -118,9 +118,9 @@
               : '56px',
           }"
         >
-          <h1 :style="{ ...nameStyle, textAlign: 'center' }" class="mb-2">
+          <component :is="nameTag" :style="{ ...nameStyle, textAlign: 'center' }" class="mb-2">
             {{ bioData.title || username }}
-          </h1>
+          </component>
         </div>
       </template>
 
@@ -142,9 +142,9 @@
               class="absolute inset-0 flex flex-col items-center justify-center"
               style="background: rgba(0, 0, 0, 0.35)"
             >
-              <h1 :style="{ ...nameStyle, textAlign: 'center' }" class="mb-1">
+              <component :is="nameTag" :style="{ ...nameStyle, textAlign: 'center' }" class="mb-1">
                 {{ bioData.title || username }}
-              </h1>
+              </component>
             </div>
           </div>
         </div>
@@ -164,9 +164,9 @@
             @error="onAvatarError"
           />
           <div class="flex flex-col min-w-0">
-            <h1 :style="{ ...nameStyle, textAlign: 'left' }" class="mb-1">
+            <component :is="nameTag" :style="{ ...nameStyle, textAlign: 'left' }" class="mb-1">
               {{ bioData.title || username }}
-            </h1>
+            </component>
           </div>
         </div>
       </template>
@@ -194,12 +194,13 @@
             @mouseleave="onAvatarMouseLeave"
             @error="onAvatarError"
           />
-          <h1
+          <component
+            :is="nameTag"
             :style="{ ...nameStyle, textAlign: headerAlignment }"
             class="mb-2"
           >
             {{ bioData.title || username }}
-          </h1>
+          </component>
         </div>
       </template>
 
@@ -637,6 +638,9 @@ const avatarFallbackStyle = computed(() => ({
 // Previews (editor, template thumbnails) also show items that still need a
 // URL, so a fresh template looks complete; the public page hides them
 const isPreview = computed(() => props.mode === "preview");
+// The site's name is its page heading; in thumbnails and template cards (many
+// on one page) it's plain text, so the host page keeps a single h1
+const nameTag = computed(() => (props.mode === "thumbnail" || props.mode === "template" ? "p" : "h1"));
 // Editor previews and template previews never send orders or forms
 const noSending = computed(() => props.mode === "preview" || props.mode === "template");
 

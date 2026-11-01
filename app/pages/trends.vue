@@ -44,8 +44,8 @@ import { TRENDS } from '~/data/trends'
 
 definePageMeta({ layout: 'default', colorMode: 'light' })
 
-const title = 'Trends — Perlink'
-const description = 'Popular 3D worlds and website styles on Perlink: city nights, sakura gardens, restaurant menus, creator hubs and more.'
+const title = 'Trending 3D Worlds & Website Ideas | Perlink'
+const description = 'See what people build on Perlink: 3D city nights, sakura gardens, restaurant menus, creator link in bio pages and more. Get ideas for your own site.'
 useSeoMeta({
   title,
   description,

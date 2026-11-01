@@ -3,7 +3,10 @@ import { getDB } from '../utils/db'
 const SITE = 'https://perlink.to'
 
 /** Public marketing pages, then every published site and its blog posts */
-const STATIC_PAGES = ['/', '/vi', '/trends', '/pricing', '/terms', '/privacy']
+const STATIC_PAGES = ['/', '/vi', '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
+
+/** The home page in each language, linked to each other (hreflang) */
+const HOME_LANGS = `<xhtml:link rel="alternate" hreflang="en" href="${SITE}/"/><xhtml:link rel="alternate" hreflang="vi" href="${SITE}/vi"/><xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/"/>`
 
 const escapeXml = (value: string) => value.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[c]!)
 
@@ -26,7 +29,7 @@ export default defineEventHandler(async (event) => {
   const lastmod = (value: string | null) => (value ? `<lastmod>${new Date(value).toISOString()}</lastmod>` : '')
 
   const urls = [
-    ...STATIC_PAGES.map(path => `<url><loc>${SITE}${path}</loc></url>`),
+    ...STATIC_PAGES.map(path => `<url><loc>${SITE}${path}</loc>${path === '/' || path === '/vi' ? HOME_LANGS : ''}</url>`),
     ...sites.map(site => `<url><loc>${SITE}/${escapeXml(encodeURIComponent(site.username))}</loc>${lastmod(site.updated_at)}</url>`),
     ...[...new Set(posts.map(p => p.username))].map(username => `<url><loc>${SITE}/${escapeXml(encodeURIComponent(username))}/blog</loc></url>`),
     ...posts.map(post => `<url><loc>${SITE}/${escapeXml(encodeURIComponent(post.username))}/blog/${escapeXml(encodeURIComponent(post.slug))}</loc>${lastmod(post.updated_at)}</url>`),
@@ -36,5 +39,5 @@ export default defineEventHandler(async (event) => {
     'Content-Type': 'application/xml; charset=utf-8',
     'Cache-Control': 'public, max-age=3600',
   })
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join('')}</urlset>\n`
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join('')}</urlset>\n`
 })

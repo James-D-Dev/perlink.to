@@ -44,6 +44,7 @@
       >
         <img
           :src="image.url"
+          :alt="image.alt || data?.title || ''"
           class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
@@ -68,6 +69,7 @@
       >
         <img
           :src="item.url"
+          :alt="item.alt || data?.title || ''"
           class="w-full h-full object-cover"
           loading="lazy"
         />
@@ -86,6 +88,7 @@
           <div class="relative">
             <img
               v-if="currentImage"
+              :alt="currentImage.alt || data?.title || ''"
               :src="currentImage.url"
               class="w-full h-auto max-h-[80vh] object-contain rounded-lg"
             />

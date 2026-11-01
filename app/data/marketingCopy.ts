@@ -6,8 +6,8 @@ export type MarketingLang = 'en' | 'vi'
 
 const en = {
   meta: {
-    title: 'Perlink — Personal websites and 3D worlds',
-    description: 'Build a personal website for your work, restaurant, hotel or shop, and turn it into a 3D world people can explore. Templates, drag-and-drop editing, live at perlink.to/you.',
+    title: 'Link in Bio & Personal Website Builder with 3D | Perlink',
+    description: 'Create a free link in bio page or personal website in minutes. Templates for creators, restaurants and shops, plus a 3D room visitors can walk around.',
   },
   header: {
     home: 'Perlink home',
@@ -49,7 +49,7 @@ const en = {
     line2: 'Or a whole 3D world.',
     /** The part of line2 shown in the brand gradient */
     accent: '3D world',
-    eyebrow: 'Websites & walkable 3D worlds',
+    eyebrow: 'Link in bio & website builder · 3D rooms',
     lead: 'Perlink turns your work, your menu or your shop into a personal website, and lets visitors walk around it in 3D. Pick a template, make it yours, publish at perlink.to/you.',
     explore: 'Explore 3D worlds',
     note: 'Free to start · No credit card · Live in a minute',
@@ -136,8 +136,8 @@ export type MarketingCopy = typeof en
 
 const vi: MarketingCopy = {
   meta: {
-    title: 'Perlink — Trang web cá nhân và thế giới 3D',
-    description: 'Tạo trang web cho công việc, nhà hàng, khách sạn hay cửa hàng của bạn, rồi biến nó thành một thế giới 3D để khách khám phá. Có mẫu sẵn, kéo thả dễ dàng, lên sóng tại perlink.to/tên-bạn.',
+    title: 'Tạo link bio & trang web cá nhân miễn phí, có 3D | Perlink',
+    description: 'Tạo link bio và trang web cá nhân miễn phí trong vài phút cho TikTok, Facebook, nhà hàng hay cửa hàng. Mẫu đẹp, kéo thả dễ, thêm phòng 3D độc đáo.',
   },
   header: {
     home: 'Trang chủ Perlink',
@@ -178,7 +178,7 @@ const vi: MarketingCopy = {
     line1: 'Trang web của riêng bạn.',
     line2: 'Hay cả một thế giới 3D.',
     accent: 'thế giới 3D',
-    eyebrow: 'Trang web & thế giới 3D dạo được',
+    eyebrow: 'Link bio & trang web cá nhân · phòng 3D',
     lead: 'Perlink biến công việc, thực đơn hay cửa hàng của bạn thành một trang web, và cho khách dạo quanh nó trong không gian 3D. Chọn mẫu, chỉnh theo ý bạn, xuất bản tại perlink.to/tên-bạn.',
     explore: 'Khám phá thế giới 3D',
     note: 'Miễn phí để bắt đầu · Không cần thẻ · Lên sóng trong một phút',

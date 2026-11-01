@@ -7,7 +7,7 @@
       aria-hidden="true"
       inert
     >
-      <BioPageView :bio-data="bioData" :username="template.id" mode="preview" />
+      <BioPageView :bio-data="bioData" :username="template.id" mode="thumbnail" />
     </div>
   </div>
 </template>
