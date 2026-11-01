@@ -122,11 +122,10 @@ export class RoomScene {
   /** For the console: how long until the first frame was drawn */
   private firstFrameLogged = false
   private rendererReady: Promise<void>
-  /** Film look for the room video (./cinematic), or just its glow when viewing */
+  /** Film look for the room video (./cinematic); only the recorder's scene has one */
   private cinematic: Cinematic | null = null
-  /** The viewing glow is on (not the recorder's film look) */
-  private glowOnly = false
-  private glowLoading = false
+  /** Settles once the recorder's film look is set up (or failed to) */
+  private filmReady: Promise<void> = Promise.resolve()
   /** The lens for the current frame shape (narrow frames get a wider one) */
   private baseFov = 32
   /** Pace of recent video frames (renderTour), to drop the film look if it can't keep up */
@@ -257,10 +256,9 @@ export class RoomScene {
       if (gpuKit()) console.info(`[room] renderer: ${created.backend()}`)
       this.markActive()
     })
-    // The video's film look (depth of field, glow, vignette) for the recorder;
-    // viewing gets the glow alone (applyQuality), on devices that keep up
+    // The video's film look (depth of field, glow, vignette), recorder only
     if (options.capture && !gpuKit()) {
-      this.rendererReady
+      this.filmReady = this.rendererReady
         .then(() => import('./cinematic'))
         .then(m => m.createCinematic(this.renderer, this.scene, this.camera))
         .then((cinematic) => {
@@ -537,14 +535,32 @@ export class RoomScene {
    * One frame of the room tour, progress 0..1, in one of the camera styles
    * (TOUR_STYLES). Returns the canvas with the frame on it, to copy right away.
    */
-  renderTour(progress: number, style: TourStyle = 'sweep'): HTMLCanvasElement {
+  /**
+   * Everything a recording needs, before its first frame: the renderer, the
+   * film look, the models (up to `maxWait` ms), then a few frames drawn and
+   * thrown away so every shader is compiled
+   */
+  async prepareTour(style: TourStyle = 'sweep', maxWait = 20000) {
+    await this.rendererReady
+    await this.filmReady
+    const until = performance.now() + maxWait
+    while (this.loading && performance.now() < until && !this.disposed) await new Promise(r => setTimeout(r, 150))
+    for (let i = 0; i < 3 && !this.disposed; i++) {
+      this.renderTour(i * 0.3, style)
+      await new Promise(r => setTimeout(r, 30))
+    }
+  }
+
+  renderTour(progress: number, style: TourStyle = 'sweep', frameAt?: number): HTMLCanvasElement {
     this.touring = true
-    // The film look is dear on weak devices: if frames come too slowly while
-    // recording, drop it rather than record a stuttering video
+    // In real time, the film look is dear on weak devices: if frames come too
+    // slowly, drop it rather than record a stuttering video. Frames drawn
+    // ahead of time (`frameAt`, the frame's own moment in ms) take as long as
+    // they need, so they keep it
     const now = performance.now()
     const gap = now - this.lastTourFrame
     this.lastTourFrame = now
-    if (this.cinematic && gap < 500) {
+    if (frameAt === undefined && this.cinematic && gap < 500) {
       this.tourGap = this.tourFrames++ ? this.tourGap * 0.85 + gap * 0.15 : gap
       if (this.tourFrames > 20 && this.tourGap > 45) {
         console.info(`[room] film look off: ${Math.round(this.tourGap)} ms a frame`)
@@ -644,7 +660,7 @@ export class RoomScene {
       this.controls.target.copy(target)
       this.camera.position.copy(at)
       this.camera.lookAt(target)
-      this.renderFrame(performance.now())
+      this.renderFrame(frameAt ?? performance.now())
       return this.renderer.domElement
     }
 
@@ -683,7 +699,7 @@ export class RoomScene {
     this.cinematic?.focus(this.controls.target, size * 0.9, 1.6)
     this.camera.position.setFromSphericalCoords(Math.min(distance, MAX_ZOOM_DISTANCE - 1), polar, azimuth).add(this.controls.target)
     this.camera.lookAt(this.controls.target)
-    this.renderFrame(performance.now())
+    this.renderFrame(frameAt ?? performance.now())
     return this.renderer.domElement
   }
 
@@ -1370,38 +1386,6 @@ export class RoomScene {
     }
   }
 
-  /**
-   * The glow (bloom) while viewing, as in the room video: on at the two best
-   * quality levels, off once the device has had to step down (it's the first
-   * thing to go). Not for small previews, the recorder (it has the full film
-   * look) or WebGPU.
-   */
-  private updateGlow() {
-    const wanted = !this.options.capture && !this.options.preview && !gpuKit() && this.quality <= 1
-    if (!wanted && this.glowOnly && this.cinematic) {
-      this.cinematic.dispose()
-      this.cinematic = null
-      this.glowOnly = false
-    }
-    if (!wanted || this.cinematic || this.glowLoading || this.disposed) return
-    this.glowLoading = true
-    this.rendererReady
-      .then(() => import('./cinematic'))
-      .then(m => m.createCinematic(this.renderer as THREE.WebGLRenderer, this.scene, this.camera, 'glow'))
-      .then((glow) => {
-        this.glowLoading = false
-        // Gone, or stepped down meanwhile
-        if (this.disposed || this.quality > 1 || this.cinematic) return glow.dispose()
-        this.cinematic = glow
-        this.glowOnly = true
-        this.markActive()
-      })
-      .catch((error) => {
-        this.glowLoading = false
-        console.warn('[room] glow unavailable', error)
-      })
-  }
-
   /** Something changed: render at full frame rate for a moment */
   private markActive = () => {
     this.activeUntil = performance.now() + 1500
@@ -1433,7 +1417,6 @@ export class RoomScene {
   }
 
   private applyQuality() {
-    this.updateGlow()
     const level = QUALITY_LEVELS[this.quality]!
     // A recording is always full resolution (1080x1920 from a 540x960 box)
     this.renderer.setPixelRatio(this.options.capture ? 2 : Math.min(window.devicePixelRatio, level.pixelRatio))

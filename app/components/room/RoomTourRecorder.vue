@@ -24,12 +24,12 @@
               <span class="relative size-3 rounded-full" :class="preparing ? 'bg-white/30' : 'bg-red-500'" />
             </span>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-semibold">{{ preparing ? t('room.tour.preparing') : t('room.tour.recordingNow') }}</p>
+              <p class="text-sm font-semibold">{{ stage === 'loading' ? t('room.tour.preparing') : stage === 'drawing' ? t('room.tour.drawing') : t('room.tour.recordingNow') }}</p>
               <div class="mt-1 h-1 overflow-hidden rounded-full bg-white/15">
-                <div class="h-full rounded-full bg-red-500" :style="{ width: `${Math.round(progress * 100)}%` }" />
+                <div class="h-full rounded-full" :class="stage === 'recording' ? 'bg-red-500' : 'bg-white/70'" :style="{ width: `${Math.round(progress * 100)}%` }" />
               </div>
             </div>
-            <span class="shrink-0 text-sm font-semibold tabular-nums text-white/70">{{ clock(progress * duration) }} / {{ clock(duration) }}</span>
+            <span class="shrink-0 text-sm font-semibold tabular-nums text-white/70">{{ stage === 'drawing' ? `${Math.round(progress * 100)}%` : `${clock(progress * duration)} / ${clock(duration)}` }}</span>
           </div>
           <h2 v-else class="text-[17px] font-semibold tracking-tight">{{ phase === 'done' ? t('room.tour.ready') : t('room.tour.title') }}</h2>
         </header>
@@ -41,7 +41,7 @@
             <video v-if="phase === 'done' && videoUrl" :src="videoUrl" class="size-full object-cover" controls autoplay loop playsinline />
             <div v-show="phase === 'recording'" ref="liveBox" class="size-full [&>canvas]:size-full" />
             <canvas v-show="phase === 'setup'" ref="frameCanvas" :width="WIDTH" :height="HEIGHT" class="size-full" />
-            <div v-if="(phase === 'setup' && !stillReady) || preparing" class="absolute inset-0 flex items-center justify-center bg-black/40">
+            <div v-if="(phase === 'setup' && !stillReady) || stage === 'loading' && preparing" class="absolute inset-0 flex items-center justify-center bg-black/40">
               <UIcon name="i-lucide-loader-circle" class="size-8 animate-spin text-white" />
             </div>
           </div>
@@ -159,6 +159,8 @@ const withMusic = ref(true)
 // setup: choosing options; recording: dialog hidden, recording; done: the video
 const phase = ref<'setup' | 'recording' | 'done'>('setup')
 const preparing = ref(false)
+// While recording: the scene getting ready, the frames being drawn, then recorded
+const stage = ref<'loading' | 'drawing' | 'recording'>('loading')
 const progress = ref(0)
 const stillReady = ref(false)
 const liveBox = ref<HTMLElement | null>(null)
@@ -264,14 +266,6 @@ watch(timeOfDay, applyTime)
 
 // ---------- Drawing ----------
 
-/** One video frame: the room at this point of the tour, with the titles over it */
-function drawFrame(target: HTMLCanvasElement, p: number) {
-  const ctx = target.getContext('2d')
-  if (!scene || !ctx) return
-  ctx.drawImage(scene.renderTour(p, tourStyle.value), 0, 0, WIDTH, HEIGHT)
-  drawTitles(ctx, p)
-}
-
 /** Name, link, watermark and the closing card */
 function drawTitles(ctx: CanvasRenderingContext2D, p: number) {
   // Top shade so the text reads on any sky
@@ -355,11 +349,21 @@ function cancelRecording() {
   cancelled = true
 }
 
+/** A canvas's picture as a JPEG */
+function jpeg(canvas: HTMLCanvasElement) {
+  return new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.88))
+}
+
 /**
- * Records in real time. To keep it smooth the editor's own scene stays
- * paused and a scene of its own is made just for this; each frame is pushed to the video right after
- * it's drawn (at 30 fps). Music is decoded up front and played by the audio
- * engine, so a busy moment on the page can't make it skip.
+ * Two steps, so phones record as smoothly as computers, with every effect:
+ *
+ * 1. Drawing: a scene of its own (the editor's stays paused) is prepared
+ *    (models, film look, shaders), then every frame is drawn at its own
+ *    moment of the video (not the clock's), however long each takes, and
+ *    kept as a JPEG. A slow phone only takes longer here.
+ * 2. Recording: the frames are played back in real time into the recorder,
+ *    with the titles and the music. Playing pictures back is light, so
+ *    nothing stutters. The next few frames are decoded ahead of time.
  */
 async function record() {
   if (phase.value !== 'setup') return
@@ -368,30 +372,50 @@ async function record() {
   cancelled = false
   progress.value = 0
   preparing.value = true
+  stage.value = 'loading'
   phase.value = 'recording'
 
   recordCanvas ??= Object.assign(document.createElement('canvas'), { width: WIDTH, height: HEIGHT })
+  const shot = Object.assign(document.createElement('canvas'), { width: WIDTH, height: HEIGHT })
   await nextTick()
   startScene()
   liveBox.value?.replaceChildren(recordCanvas)
-  drawFrame(recordCanvas, 0)
 
-  // Models finish loading (up to 6 s) while the music decodes
-  const loaded = (async () => {
-    const until = performance.now() + 6000
-    while (scene?.loading && performance.now() < until) await new Promise(r => setTimeout(r, 150))
-  })()
+  // The scene gets ready (models, film look, shaders) while the music decodes
   const music = audioContext && track.value
     ? fetch(track.value.src).then(r => r.arrayBuffer()).then(b => audioContext.decodeAudioData(b)).catch(() => null)
     : Promise.resolve(null)
-  const [, buffer] = await Promise.all([loaded, music])
+  const [, buffer] = await Promise.all([scene?.prepareTour(tourStyle.value), music])
   if (cancelled || !scene) return finish(audioContext, null)
 
-  // Video: a frame is added each time one is drawn
+  // 1. Draw every frame
+  const total = duration.value
+  const count = Math.round(total * FPS) + 1
+  const frames: Blob[] = []
+  const shotCtx = shot.getContext('2d')!
+  const liveCtx = recordCanvas.getContext('2d')!
+  const start = performance.now()
+  stage.value = 'drawing'
+  for (let i = 0; i < count; i++) {
+    if (cancelled || !scene) return finish(audioContext, null)
+    const p = i / (count - 1)
+    // Copied at once: the WebGL picture is only there until the next frame
+    shotCtx.drawImage(scene.renderTour(p, tourStyle.value, start + (i * 1000) / FPS), 0, 0, WIDTH, HEIGHT)
+    const blob = await jpeg(shot)
+    if (!blob) return finish(audioContext, null)
+    frames.push(blob)
+    // The frame box shows the video taking shape
+    liveCtx.drawImage(shot, 0, 0)
+    drawTitles(liveCtx, p)
+    progress.value = (i + 1) / count
+  }
+  // The scene's work is done: free the GPU before playing back
+  stopScene()
+
+  // 2. Play the frames back into the recorder, in real time
   let stream = recordCanvas.captureStream(0)
   const videoTrack = stream.getVideoTracks()[0] as (MediaStreamTrack & { requestFrame?: () => void }) | undefined
   if (!videoTrack?.requestFrame) stream = recordCanvas.captureStream(FPS)
-  const total = duration.value
 
   // Music, with a fade over the last second scheduled ahead
   let source: AudioBufferSourceNode | null = null
@@ -414,31 +438,63 @@ async function record() {
     gain.gain.linearRampToValueAtTime(0, at + total)
   }
 
+  // Frames decoded a little ahead of when they're shown
+  const decoded = new Map<number, Promise<ImageBitmap>>()
+  const decode = (i: number) => {
+    if (i >= count || decoded.has(i)) return
+    decoded.set(i, createImageBitmap(frames[i]!))
+  }
+  for (let i = 0; i < 8; i++) decode(i)
+  const first = await decoded.get(0)!
+
   const chunks: Blob[] = []
   const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000, audioBitsPerSecond: 160_000 })
   recorder.ondataavailable = event => event.data.size && chunks.push(event.data)
   const stopped = new Promise<void>(resolve => (recorder.onstop = () => resolve()))
 
+  const show = (bitmap: ImageBitmap, i: number) => {
+    liveCtx.drawImage(bitmap, 0, 0, WIDTH, HEIGHT)
+    drawTitles(liveCtx, i / (count - 1))
+    videoTrack?.requestFrame?.()
+  }
   preparing.value = false
+  stage.value = 'recording'
+  progress.value = 0
+  show(first, 0)
   recorder.start(1000)
   source?.start(0, musicOffset)
   const startedAt = performance.now()
   await new Promise<void>((resolve) => {
-    let last = 0
+    let shown = 0
+    let pending = false
     const tick = (now: number) => {
       if (cancelled) return resolve()
-      const p = Math.min((now - startedAt) / (total * 1000), 1)
-      if (now - last >= 1000 / FPS - 2 || p >= 1) {
-        last = now
-        drawFrame(recordCanvas!, p)
-        videoTrack?.requestFrame?.()
-        progress.value = p
+      const due = Math.min(Math.floor(((now - startedAt) / 1000) * FPS), count - 1)
+      // The frame due now, once it's decoded (until then the last one stays)
+      if (due > shown && !pending) {
+        pending = true
+        decoded.get(due)?.then((bitmap) => {
+          pending = false
+          if (cancelled) return
+          show(bitmap, due)
+          shown = due
+          progress.value = due / (count - 1)
+          // Frames passed over and this one are no longer needed
+          for (const [i, p] of decoded) {
+            if (i <= due) {
+              p.then(b => b.close())
+              decoded.delete(i)
+            }
+          }
+        })
+        for (let i = due; i < due + 8; i++) decode(i)
       }
-      if (p < 1) requestAnimationFrame(tick)
+      if (shown < count - 1) requestAnimationFrame(tick)
       else resolve()
     }
     requestAnimationFrame(tick)
   })
+  first.close()
   // Hold the last frame a moment so it isn't cut
   if (!cancelled) await new Promise(r => setTimeout(r, 150))
   recorder.stop()
