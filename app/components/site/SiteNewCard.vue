@@ -6,10 +6,12 @@
   >
     <!-- Social networks and reactions rising through it, like on a live video -->
     <div class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+      <!-- Room around each one (p-3) for its shadow: Safari clips a moving,
+           filtered element to its own box -->
       <span
         v-for="(b, i) in FLOATERS"
         :key="i"
-        class="new-site-float absolute bottom-0 drop-shadow-[0_6px_14px_rgb(0_0_0/0.22)]"
+        class="new-site-float absolute bottom-0 -ml-3 box-content p-3 drop-shadow-[0_6px_14px_rgb(0_0_0/0.22)]"
         :style="{
           left: `${b.x}%`,
           width: `${b.size}px`,
@@ -28,7 +30,7 @@
         <!-- Love and like, as on the "Share your room" button -->
         <span
           v-else
-          class="flex size-full items-center justify-center rounded-full ring-2 ring-white"
+          class="flex size-full items-center justify-center rounded-full border-2 border-white"
           :style="{ background: REACTIONS[b.kind].background }"
         >
           <svg viewBox="0 0 24 24" class="size-[56%] fill-white"><path :d="REACTIONS[b.kind].path" /></svg>

@@ -12,7 +12,7 @@
         @animationend="remove(r.id)"
       >
         <span
-          class="reaction-sway flex items-center justify-center rounded-full shadow-[0_2px_6px_rgb(0_0_0/0.2)] ring-[1.5px] ring-white"
+          class="reaction-sway flex items-center justify-center rounded-full border-[1.5px] border-white shadow-[0_2px_6px_rgb(0_0_0/0.2)]"
           :style="{ width: `${r.size}px`, height: `${r.size}px`, background: KINDS[r.kind].background, animationDuration: `${r.duration / 2}ms` }"
         >
           <svg viewBox="0 0 24 24" class="size-[58%] fill-white"><path :d="KINDS[r.kind].path" /></svg>
