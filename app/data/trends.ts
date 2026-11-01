@@ -23,7 +23,7 @@ export const TRENDS: Trend[] = [
     title: 'City nights',
     description: 'A downtown block with traffic, street lamps and windows that light up after dark.',
     tags: ['Cafés', 'Studios', 'Night owls'],
-    image: '/images/landing/city-night.jpg',
+    image: '/images/landing/city-night.webp',
   },
   {
     id: 'sakura-garden',
@@ -31,7 +31,7 @@ export const TRENDS: Trend[] = [
     title: 'Sakura garden',
     description: 'Cherry blossoms, falling petals, butterflies and a quiet pond.',
     tags: ['Portfolios', 'Florists', 'Weddings'],
-    image: '/images/landing/sakura.jpg',
+    image: '/images/landing/sakura.webp',
   },
   {
     id: 'restaurant-menu',
@@ -47,7 +47,7 @@ export const TRENDS: Trend[] = [
     title: 'Sky island',
     description: 'A floating meadow above the clouds, with flowers and butterflies.',
     tags: ['Creators', 'Kids brands'],
-    image: '/images/landing/island.jpg',
+    image: '/images/landing/island.webp',
   },
   {
     id: 'creator-hub',
@@ -63,7 +63,7 @@ export const TRENDS: Trend[] = [
     title: 'Winter cabin',
     description: 'Snowfall, snowy pines and a snowman with a Santa hat.',
     tags: ['Seasonal', 'Gift shops'],
-    image: '/images/landing/winter.jpg',
+    image: '/images/landing/winter.webp',
   },
   {
     id: 'homestay',
@@ -79,7 +79,7 @@ export const TRENDS: Trend[] = [
     title: 'Red planet',
     description: 'Cratered Mars terrain floating in space with planets all around.',
     tags: ['Gamers', 'Tech'],
-    image: '/images/landing/mars.jpg',
+    image: '/images/landing/mars.webp',
   },
   {
     id: 'personal-portfolio',

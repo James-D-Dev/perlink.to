@@ -5,7 +5,7 @@
     <span
       v-if="variant === 'full'"
       class="whitespace-nowrap leading-none"
-      :style="{ fontFamily: 'Geist, var(--font-display)', fontWeight: 600, letterSpacing: '-0.045em', fontSize: `${size * 0.82}px`, color: ink }"
+      :style="{ fontFamily: 'var(--font-logo)', fontWeight: 600, letterSpacing: '-0.045em', fontSize: `${size * 0.82}px`, color: ink }"
       role="img"
       aria-label="Perlink"
     ><span aria-hidden="true"><span :class="inverted ? 'text-tint' : 'text-[#0066d6]'">per</span>l<span class="relative inline-block">ı<span class="absolute rounded-full bg-tint" :style="dotStyle" /></span>nk</span></span>

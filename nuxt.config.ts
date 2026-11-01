@@ -96,6 +96,20 @@ export default defineNuxtConfig({
   },
 
   css: ["~/assets/css/main.css", "animate.css/animate.min.css"],
+
+  // Perlink's own fonts, self-hosted by @nuxt/fonts (part of Nuxt UI): only
+  // the weights in use, upright, in the scripts English and Vietnamese need
+  fonts: {
+    defaults: {
+      styles: ["normal"],
+      subsets: ["latin", "latin-ext", "vietnamese"],
+    },
+    families: [
+      { name: "Inter", weights: [400, 500, 600, 700] },
+      { name: "Inter Tight", weights: [300, 400, 500, 600] },
+      { name: "Geist", weights: [600], subsets: ["latin"] },
+    ],
+  },
   app: {
     head: {
       title: "Perlink — Personal websites and 3D worlds",
@@ -108,12 +122,9 @@ export default defineNuxtConfig({
         { name: "apple-mobile-web-app-title", content: "Perlink" },
       ],
       link: [
+        // Sites' theme fonts come from Google; Perlink's own are served from here
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@300;400;500&family=Geist:wght@600&display=swap",
-        },
         {
           rel: "icon",
           type: "image/png",
@@ -191,7 +202,8 @@ export default defineNuxtConfig({
     },
   },
 
-  ui: {},
+  // Styles only for the Nuxt UI components the app uses
+  ui: { experimental: { componentDetection: true } },
   colorMode: {
     preference: "light", // Sets the default fallback to light
     fallback: "light", // Ensures light mode if system preference is unreadable

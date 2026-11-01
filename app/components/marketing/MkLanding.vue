@@ -12,7 +12,7 @@
               <span aria-hidden="true" class="flex"><AppLoader :size="26" /></span>
               {{ c.hero.eyebrow }}
             </div>
-            <h1 class="mk-rise mk-display text-[44px] sm:text-6xl md:text-[64px]" style="--rise-delay: 90ms">
+            <h1 class="mk-rise-solid mk-display text-[44px] sm:text-6xl md:text-[64px]">
               {{ c.hero.line1 }}<br>
               <span class="text-ink-muted">{{ heroLine2[0] }}<span class="mk-accent whitespace-nowrap">{{ c.hero.accent }}</span>{{ heroLine2[1] }}</span>
             </h1>
@@ -59,7 +59,9 @@
                 v-for="(world, i) in showcase"
                 v-show="active === i"
                 :key="world.id"
-                :src="world.image"
+                :src="`${world.image}.webp`"
+                :srcset="`${world.image}-720.webp 720w, ${world.image}.webp 1440w`"
+                sizes="(min-width: 1280px) 1200px, 100vw"
                 :alt="c.hero.worldAlt(world.title)"
                 class="absolute inset-0 size-full object-cover"
                 :loading="i === 0 ? 'eager' : 'lazy'"
@@ -109,7 +111,7 @@
           <p class="text-sm font-medium text-ink">{{ c.twoWays.world }}</p>
           <p class="mt-1 text-sm text-ink-muted">{{ c.twoWays.worldText }}</p>
           <div class="mt-8 flex flex-1 items-end">
-            <img src="/images/landing/sakura.jpg" :alt="c.twoWays.worldAlt" class="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy">
+            <img src="/images/landing/sakura.webp" srcset="/images/landing/sakura-720.webp 720w, /images/landing/sakura.webp 1440w" sizes="(min-width: 768px) 50vw, 100vw" :alt="c.twoWays.worldAlt" class="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy">
           </div>
         </div>
       </div>
@@ -292,10 +294,10 @@ onMounted(() => {
 // ---------- Content ----------
 // Sky island leads (the first is shown, and loaded, at once); the night city last
 const SHOWCASE = [
-  { id: 'island', image: '/images/landing/island.jpg', orb: 'lagoon' as const },
-  { id: 'sakura', image: '/images/landing/sakura.jpg', orb: 'sakura' as const },
-  { id: 'mars', image: '/images/landing/mars.jpg', orb: 'mars' as const },
-  { id: 'city', image: '/images/landing/city-night.jpg', orb: 'night' as const },
+  { id: 'island', image: '/images/landing/island', orb: 'lagoon' as const },
+  { id: 'sakura', image: '/images/landing/sakura', orb: 'sakura' as const },
+  { id: 'mars', image: '/images/landing/mars', orb: 'mars' as const },
+  { id: 'city', image: '/images/landing/city-night', orb: 'night' as const },
 ] as const
 const showcase = computed(() => SHOWCASE.map(world => ({ ...world, ...c.value.showcase[world.id] })))
 const active = ref(0)

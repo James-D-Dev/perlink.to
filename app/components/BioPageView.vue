@@ -788,9 +788,25 @@ const fontsHref = computed(() => {
     t.typography.bioFontFamily,
   ]);
 });
+// Thumbnails (template galleries, the landing, the site list) get theirs
+// once the page is up, so a page full of them isn't held back by font files
+const lazyFonts = props.mode === "thumbnail";
 useHead({
-  link: computed(() => (fontsHref.value ? [{ key: fontsHref.value, rel: "stylesheet", href: fontsHref.value }] : [])),
+  link: computed(() => (fontsHref.value && !lazyFonts ? [{ key: fontsHref.value, rel: "stylesheet", href: fontsHref.value }] : [])),
 });
+if (lazyFonts) {
+  const attachFonts = (href: string) => {
+    if (!href || document.querySelector(`link[rel="stylesheet"][href="${CSS.escape(href)}"]`)) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.appendChild(link);
+  };
+  onMounted(() => {
+    attachFonts(fontsHref.value);
+    watch(fontsHref, attachFonts);
+  });
+}
 </script>
 
 <style>
