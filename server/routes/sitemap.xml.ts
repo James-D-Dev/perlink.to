@@ -1,12 +1,22 @@
+import { PAGE_TEMPLATES } from '../../app/data/pageTemplates'
 import { getDB } from '../utils/db'
 
 const SITE = 'https://perlink.to'
 
 /** Public marketing pages, then every published site and its blog posts */
-const STATIC_PAGES = ['/', '/vi', '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
+const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/linktree-alternative', '/vi/thay-the-linktree', '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
 
-/** The home page in each language, linked to each other (hreflang) */
-const HOME_LANGS = `<xhtml:link rel="alternate" hreflang="en" href="${SITE}/"/><xhtml:link rel="alternate" hreflang="vi" href="${SITE}/vi"/><xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/"/>`
+/** Pages with an address per language, linked to each other (hreflang) */
+const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/linktree-alternative', '/vi/thay-the-linktree']]
+function languages(path: string) {
+  const pair = LANG_PAIRS.find(p => p.includes(path))
+  if (!pair) return ''
+  const [en, vi] = pair
+  return `<xhtml:link rel="alternate" hreflang="en" href="${SITE}${en}"/><xhtml:link rel="alternate" hreflang="vi" href="${SITE}${vi}"/><xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${en}"/>`
+}
+
+/** Every template's preview page */
+const TEMPLATE_IDS = PAGE_TEMPLATES.map(t => t.id)
 
 const escapeXml = (value: string) => value.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[c]!)
 
@@ -29,7 +39,8 @@ export default defineEventHandler(async (event) => {
   const lastmod = (value: string | null) => (value ? `<lastmod>${new Date(value).toISOString()}</lastmod>` : '')
 
   const urls = [
-    ...STATIC_PAGES.map(path => `<url><loc>${SITE}${path}</loc>${path === '/' || path === '/vi' ? HOME_LANGS : ''}</url>`),
+    ...STATIC_PAGES.map(path => `<url><loc>${SITE}${path}</loc>${languages(path)}</url>`),
+    ...TEMPLATE_IDS.map(id => `<url><loc>${SITE}/templates/${escapeXml(encodeURIComponent(id))}</loc></url>`),
     ...sites.map(site => `<url><loc>${SITE}/${escapeXml(encodeURIComponent(site.username))}</loc>${lastmod(site.updated_at)}</url>`),
     ...[...new Set(posts.map(p => p.username))].map(username => `<url><loc>${SITE}/${escapeXml(encodeURIComponent(username))}/blog</loc></url>`),
     ...posts.map(post => `<url><loc>${SITE}/${escapeXml(encodeURIComponent(post.username))}/blog/${escapeXml(encodeURIComponent(post.slug))}</loc>${lastmod(post.updated_at)}</url>`),

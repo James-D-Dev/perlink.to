@@ -65,8 +65,15 @@
 
       <!-- 3D room. The loader covers it from the first paint (it's in the
            server HTML) until the viewer has mounted and the loader's intro
-           has played out -->
-      <ClientOnly v-else-if="bioPage && room && !show2d">
+           has played out. The room is drawn in the browser only, so the
+           page's name and intro are also in the HTML as text, for search
+           engines and screen readers -->
+      <template v-else-if="bioPage && room && !show2d">
+      <div class="sr-only">
+        <h1>{{ bioPage.title || bioPage.username }}</h1>
+        <p v-if="bioPage.bio">{{ bioPage.bio }}</p>
+      </div>
+      <ClientOnly>
         <LazyRoomViewer
           :room="room"
           :username="bioPage.username"
@@ -81,6 +88,7 @@
           @ready="onViewerMounted"
         />
       </ClientOnly>
+      </template>
 
       <!-- Bio Content -->
       <BioPageView

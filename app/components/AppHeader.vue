@@ -78,8 +78,11 @@ const { lang, copy, home, anchor } = useMarketingLang()
 // The other language: the other home page, or this page in that language
 const route = useRoute()
 const { setLocale } = useI18n()
-const onHome = computed(() => route.path === '/' || route.path === '/vi')
-const otherLanguage = computed(() => (onHome.value ? (lang.value === 'vi' ? '/' : '/vi') : route.fullPath))
+// Pages with an address per language (home, templates...) switch address;
+// the others switch language in place
+const paired = computed(() => pairedPath(route.path))
+const onHome = computed(() => !!paired.value)
+const otherLanguage = computed(() => paired.value ?? route.fullPath)
 function switchInPlace(event: MouseEvent) {
   if (onHome.value) return
   event.preventDefault()
@@ -89,7 +92,7 @@ function switchInPlace(event: MouseEvent) {
   if (loggedIn.value) $fetch('/api/account', { method: 'PATCH', body: { language: next } }).catch(() => {})
 }
 const nav = computed(() => [
-  { label: copy.value.header.nav.templates, to: anchor('templates') },
+  { label: copy.value.header.nav.templates, to: lang.value === 'vi' ? '/vi/templates' : '/templates' },
   { label: copy.value.header.nav.worlds, to: anchor('3d') },
   { label: copy.value.header.nav.trends, to: '/trends' },
   { label: copy.value.header.nav.pricing, to: '/pricing' },

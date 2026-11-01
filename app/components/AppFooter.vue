@@ -30,14 +30,14 @@
 <script setup lang="ts">
 const year = new Date().getFullYear()
 
-const { copy, anchor } = useMarketingLang()
+const { copy, anchor, lang } = useMarketingLang()
 const columns = computed(() => {
   const f = copy.value.footer
   return [
     {
       title: f.product,
       links: [
-        { label: f.templates, to: anchor('templates') },
+        { label: f.templates, to: lang.value === 'vi' ? '/vi/templates' : '/templates' },
         { label: f.worlds, to: anchor('3d') },
         { label: f.trends, to: '/trends' },
         { label: f.pricing, to: '/pricing' },
@@ -47,6 +47,7 @@ const columns = computed(() => {
       title: f.resources,
       links: [
         { label: f.start, to: '/login' },
+        { label: f.linktree, to: lang.value === 'vi' ? '/vi/thay-the-linktree' : '/linktree-alternative' },
         { label: f.faq, to: anchor('faq') },
       ],
     },

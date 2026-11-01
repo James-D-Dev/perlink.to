@@ -8,6 +8,8 @@ export const RESERVED_NAMES = new Set([
   // Likely future pages
   'blog', 'docs', 'help', 'support', 'settings', 'templates', 'features', 'explore', 'signup', 'register',
   'account', 'billing', 'status', 'perlink', 'www', 'app',
+  // Marketing pages
+  'vi', 'refund', 'report', 'linktree-alternative', 'vs', 'compare', 'alternatives',
 ])
 
 export function isReservedName(name: string) {

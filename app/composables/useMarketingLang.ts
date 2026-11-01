@@ -7,12 +7,32 @@ import { MARKETING_COPY, type MarketingLang } from '~/data/marketingCopy'
  * pages (pricing, trends...) follow the language the visitor picked, like
  * the rest of the page.
  */
+/**
+ * Pages with a fixed address in each language (English first), like the home
+ * pages: each always renders the same for search engines, and the language
+ * switch goes to the other address
+ */
+export const LANG_PAIRS: [string, string][] = [
+  ['/', '/vi'],
+  ['/templates', '/vi/templates'],
+  ['/linktree-alternative', '/vi/thay-the-linktree'],
+]
+/** The same page in the other language, for paired pages; null otherwise */
+export function pairedPath(path: string) {
+  const clean = path.length > 1 ? path.replace(/\/$/, '') : path
+  for (const [en, vi] of LANG_PAIRS) {
+    if (clean === en) return vi
+    if (clean === vi) return en
+  }
+  return null
+}
+
 export function useMarketingLang() {
   const route = useRoute()
   const { locale } = useI18n()
   const lang = computed<MarketingLang>(() => {
     if (route.path === '/vi' || route.path.startsWith('/vi/')) return 'vi'
-    if (route.path === '/') return 'en'
+    if (pairedPath(route.path)) return 'en'
     return locale.value === 'vi' ? 'vi' : 'en'
   })
   const copy = computed(() => MARKETING_COPY[lang.value])

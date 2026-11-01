@@ -8,6 +8,8 @@ interface SeoSource {
   avatarUrl?: string | null
   themeConfig?: Partial<ThemeConfig> | null
   blocks?: BioBlock[] | null
+  /** False on plans without the Perlink badge */
+  showBranding?: boolean
 }
 
 function absolute(url: string) {
@@ -27,7 +29,9 @@ export function siteSeo(page: SeoSource, username: string, domain?: string) {
   const defaults = siteSeoDefaults(page, username)
   const seo = page.themeConfig?.seo ?? {}
   return {
-    title: seo.title?.trim() || defaults.title,
+    // The owner's own SEO title as it is; otherwise the name, signed
+    // "· Perlink" (not on their own domain, nor on plans without the badge)
+    title: seo.title?.trim() || (domain || page.showBranding === false ? defaults.title : `${defaults.title} · Perlink`),
     description: (seo.description?.trim() || defaults.description).slice(0, 300),
     image: absolute(seo.imageUrl || defaults.image),
     url: domain ? `https://${domain}/` : `${SITE}/${username}`,

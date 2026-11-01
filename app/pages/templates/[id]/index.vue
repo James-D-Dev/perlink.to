@@ -36,5 +36,24 @@ const bioData = computed<BioData>(() => {
   }
 })
 
-useSeoMeta({ title: () => `${name.value} · ${t('dashboard.home.previewTitle')}`, robots: 'noindex' })
+// A landing page for searches like "restaurant menu website template"
+const vi = computed(() => locale.value === 'vi')
+const description = computed(() => t(`dashboard.templates.${template.id}.description`))
+const metaTitle = computed(() => (vi.value ? `Mẫu ${name.value} miễn phí | Perlink` : `Free ${name.value} Template | Perlink`))
+const metaDescription = computed(() =>
+  `${description.value} ${vi.value ? 'Mẫu miễn phí cho link bio hoặc trang web, kèm phòng 3D. Chỉnh theo ý bạn trên Perlink.' : 'A free template for your link in bio page or website, with a matching 3D room.'}`.slice(0, 160),
+)
+const pageUrl = `https://perlink.to/templates/${template.id}`
+useSeoMeta({
+  title: metaTitle,
+  description: metaDescription,
+  ogTitle: metaTitle,
+  ogDescription: metaDescription,
+  ogUrl: pageUrl,
+  ogType: 'website',
+  ogSiteName: 'Perlink',
+  ogImage: 'https://perlink.to/images/og.jpg',
+  twitterCard: 'summary_large_image',
+})
+useHead({ link: [{ rel: 'canonical', href: pageUrl }] })
 </script>
