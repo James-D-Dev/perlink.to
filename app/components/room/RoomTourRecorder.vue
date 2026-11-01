@@ -541,7 +541,8 @@ async function record() {
     progress.value = 0
     if (!scene) {
       startScene()
-      await scene?.prepareTour(tourStyle.value)
+      // (startScene sets it again; TypeScript can't see that)
+      await (scene as RoomScene | null)?.prepareTour(tourStyle.value)
       if (cancelled || !scene) return finish(audioContext, null)
     }
   }
