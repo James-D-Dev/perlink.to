@@ -27,7 +27,7 @@
           <MarketingMkClaimForm />
           <MarketingMkButton to="#3d" variant="outline" size="lg" class="sm:ml-1">{{ c.hero.explore }}</MarketingMkButton>
         </div>
-        <p class="mk-rise mt-4 text-sm text-ink-faint" style="--rise-delay: 380ms">{{ c.hero.note }}</p>
+        <p class="mk-rise mt-4 text-sm text-ink-muted" style="--rise-delay: 380ms">{{ c.hero.note }}</p>
       </div>
 
       <!-- Showcase: switch between worlds -->
