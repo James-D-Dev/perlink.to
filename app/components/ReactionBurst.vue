@@ -58,7 +58,7 @@ function spawn() {
         kind: Math.random() < 0.55 ? 'love' : 'like',
         x: random(55, 92),
         size: Math.round(random(18, 24)),
-        rise: Math.round(random(48, 78)),
+        rise: Math.round(random(40, 60)),
         drift: Math.round(random(-14, 14)),
         duration: Math.round(random(1500, 2200)),
       })

@@ -43,6 +43,13 @@
             @click="discardDraft"
           />
 
+          <!-- The site's numbers and messages, one click away -->
+          <UTooltip :text="t('common.analytics')">
+            <UButton :to="`/dashboard/site/${existingBio.username}/analytics`" icon="i-lucide-chart-column" color="neutral" variant="ghost" class="hidden sm:inline-flex" :aria-label="t('common.analytics')" />
+          </UTooltip>
+          <UTooltip :text="t('dashboard.inbox.open')">
+            <UButton :to="`/dashboard/site/${existingBio.username}/inbox`" icon="i-lucide-inbox" color="neutral" variant="ghost" class="hidden sm:inline-flex" :aria-label="t('dashboard.inbox.open')" />
+          </UTooltip>
           <UTooltip :text="t('common.openSite')">
             <UButton :to="`/${existingBio.username}`" target="_blank" icon="i-lucide-external-link" color="neutral" variant="ghost" :aria-label="t('common.openSite')" />
           </UTooltip>
@@ -317,21 +324,24 @@
           </template>
 
           <!-- 3D room Tab -->
-          <div v-if="paneMounted('room')" class="mx-auto max-w-3xl space-y-4 pt-4" :class="paneClass('room')" :style="paneStyle('room')" :inert="activeTab !== 'room' || undefined">
-            <div class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line sm:flex">
-              <div class="relative h-44 sm:h-auto sm:min-h-56 sm:w-1/2">
+          <div v-if="paneMounted('room')" class="grid grid-cols-1 gap-6 pt-4 lg:grid-cols-12 lg:gap-8 lg:pt-0" :class="paneClass('room')" :style="paneStyle('room')" :inert="activeTab !== 'room' || undefined">
+            <div class="min-w-0 space-y-4 lg:col-span-7">
+            <div class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line 2xl:flex">
+              <div class="relative h-44 2xl:h-auto 2xl:min-h-56 2xl:w-1/2">
                 <!-- The picture the 3D editor saves with each save or publish; until
                      there is one, the picture of the room's land -->
                 <img :src="roomPicture" :alt="t('dashboard.editor.room.heading')" class="absolute inset-0 size-full object-cover" loading="lazy" decoding="async" @error="roomPictureFailed = true">
               </div>
-              <div class="flex flex-col justify-center gap-3 p-4 sm:w-1/2 sm:p-5">
+              <!-- Text at the top, buttons at the bottom: the reactions rising
+                   from the video button stay in the space between -->
+              <div class="flex flex-col gap-3 p-4 sm:p-5 2xl:w-1/2 2xl:justify-between">
                 <div>
                   <h3 class="font-semibold text-highlighted">{{ t('dashboard.editor.room.heading') }}</h3>
                   <p class="mt-1 text-sm text-muted">
                     {{ t('dashboard.editor.room.objects', { n: roomModel.objects.length }) }}
                   </p>
                 </div>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 pt-12 2xl:pt-0">
                   <UButton icon="i-lucide-box" :label="t('dashboard.editor.room.openEditor')" size="sm" :loading="openingRoom === 'edit'" :disabled="!!openingRoom" @click="openRoomEditor()" />
                   <!-- Stands out: every room video posted brings people back.
                        Likes and hearts float up from it -->
@@ -390,15 +400,43 @@
               @publish="publishBio"
               @discard="discardDraft"
             />
+            </div>
+            <div v-if="activeTab === 'room'" class="hidden lg:block lg:col-span-5">
+              <div class="sticky top-0">
+                <BioPreviewPanel
+                  :ref="(el: any) => (previewPanelRef = el)"
+                  :preview-data="bioData"
+                  :existing-bio="existingBio"
+                  :username="existingBio?.username || username"
+                  :active-block="activeBlock"
+                  @select-block="openBlock"
+                />
+              </div>
+            </div>
           </div>
 
           <!-- Blog Tab -->
-          <div v-if="paneMounted('blog')" class="mx-auto max-w-3xl space-y-4 pt-4" :class="paneClass('blog')" :style="paneStyle('blog')" :inert="activeTab !== 'blog' || undefined">
-            <SiteBlogPosts v-if="existingBio?.username" :username="existingBio.username" :published="!!existingBio.isPublished" />
+          <div v-if="paneMounted('blog')" class="grid grid-cols-1 gap-6 pt-4 lg:grid-cols-12 lg:gap-8 lg:pt-0" :class="paneClass('blog')" :style="paneStyle('blog')" :inert="activeTab !== 'blog' || undefined">
+            <div class="min-w-0 space-y-4 lg:col-span-7">
+              <SiteBlogPosts v-if="existingBio?.username" :username="existingBio.username" :published="!!existingBio.isPublished" />
+            </div>
+            <div v-if="activeTab === 'blog'" class="hidden lg:block lg:col-span-5">
+              <div class="sticky top-0">
+                <BioPreviewPanel
+                  :ref="(el: any) => (previewPanelRef = el)"
+                  :preview-data="bioData"
+                  :existing-bio="existingBio"
+                  :username="existingBio?.username || username"
+                  :active-block="activeBlock"
+                  @select-block="openBlock"
+                />
+              </div>
+            </div>
           </div>
 
           <!-- Settings Tab -->
-          <div v-if="paneMounted('settings')" class="pt-4 max-w-lg mx-auto space-y-6" :class="paneClass('settings')" :style="paneStyle('settings')" :inert="activeTab !== 'settings' || undefined">
+          <div v-if="paneMounted('settings')" class="grid grid-cols-1 gap-6 pt-4 lg:grid-cols-12 lg:gap-8 lg:pt-0" :class="paneClass('settings')" :style="paneStyle('settings')" :inert="activeTab !== 'settings' || undefined">
+            <div class="min-w-0 space-y-6 lg:col-span-7">
             <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.editor.settings.addressHeading') }}</h3>
               <p class="text-sm text-muted dark:text-neutral-400 mb-3">
@@ -501,6 +539,19 @@
               </p>
               <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
             </div>
+            </div>
+            <div v-if="activeTab === 'settings'" class="hidden lg:block lg:col-span-5">
+              <div class="sticky top-0">
+                <BioPreviewPanel
+                  :ref="(el: any) => (previewPanelRef = el)"
+                  :preview-data="bioData"
+                  :existing-bio="existingBio"
+                  :username="existingBio?.username || username"
+                  :active-block="activeBlock"
+                  @select-block="openBlock"
+                />
+              </div>
+            </div>
           </div>
         </div>
         </div>
@@ -569,14 +620,16 @@
           </template>
         </UModal>
 
-        <!-- Floating shortcut to the 3D room tab (where the help button sits
-             on other pages; help is still in the sidebar). Hidden on that tab -->
+        <!-- Floating shortcut to the 3D room tab, under the preview on wide
+             screens (where the help button sits on other pages; help is still
+             in the sidebar). Phones have the tab in their tab bar, and the
+             button would cover the content there -->
         <UButton
-          v-if="existingBio?.username && !previewOpen && activeTab !== 'room'"
+          v-if="existingBio?.username && !previewOpen && (GRID_PANES as readonly string[]).includes(activeTab)"
           icon="i-lucide-box"
           size="lg"
           :label="t('dashboard.editor.room.fab')"
-          class="fixed bottom-20 right-5 z-50 pr-4 shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] lg:bottom-5 print:hidden"
+          class="fixed bottom-5 right-5 z-50 hidden pr-4 shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] lg:inline-flex print:hidden"
           @click="activeTab = 'room'"
         />
       </div>
@@ -639,6 +692,7 @@ const bioData = reactive<BioData>({
   themeConfig: { ...DEFAULT_THEME },
   blocks: [],
 });
+
 
 // Bio page selector state
 const userBioPages = ref<{ label: string; value: string; title?: string; avatarUrl?: string }[]>([]);
@@ -755,7 +809,8 @@ const editorTabs = computed(() => [
   { value: "design", label: t("dashboard.editor.tabs.design"), icon: "i-lucide-palette" },
   { value: "room", label: t("dashboard.editor.tabs.room"), icon: "i-lucide-box" },
   { value: "blog", label: t("dashboard.editor.tabs.blog"), icon: "i-lucide-newspaper" },
-  { value: "settings", label: t("dashboard.editor.tabs.settings"), icon: "i-lucide-settings" },
+  // Not the gear: the sidebar's account settings use that, right beside this rail
+  { value: "settings", label: t("dashboard.editor.tabs.settings"), icon: "i-lucide-sliders-horizontal" },
 ]);
 
 // Social icons on the page, for the header layout thumbnails
@@ -1286,6 +1341,8 @@ const setPageMode = (mode: PageMode) => {
 // Get username from route param
 const route = useRoute();
 const routeUsername = computed(() => route.params.url as string);
+// The tab says which site is open
+useSeoMeta({ title: () => `${bioData.title || routeUsername.value} · ${t('common.edit')} — Perlink`, robots: 'noindex, nofollow' });
 
 // Load existing bio by username
 const loadBio = async () => {

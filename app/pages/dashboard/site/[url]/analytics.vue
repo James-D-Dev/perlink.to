@@ -1,9 +1,12 @@
 <template>
   <UDashboardPanel id="site-analytics">
     <template #header>
-      <UDashboardNavbar :title="t('common.analytics')">
+      <UDashboardNavbar>
         <template #leading>
           <UDashboardSidebarCollapse />
+        </template>
+        <template #title>
+          <SiteBreadcrumb :username="username" :page="t('common.analytics')" />
         </template>
         <template #right>
           <UButton
@@ -19,8 +22,7 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-5xl">
-        <p class="mb-4 text-sm text-muted">perlink.to/{{ username }}</p>
+      <div class="mx-auto w-full max-w-5xl py-2 sm:py-4">
         <!-- Tabs, stat tiles and chart, shimmering until the site loads -->
         <div v-if="loading" class="space-y-4" aria-busy="true">
           <div class="flex gap-4 border-b border-line pb-3">

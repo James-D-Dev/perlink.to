@@ -17,13 +17,18 @@
     </div>
 
     <!-- Stat tiles: cells on a hairline grid -->
-    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-line ring-1 ring-line md:grid-cols-4">
+    <div class="grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-line ring-1 ring-line">
       <div v-for="card in overviewCards" :key="card.label" class="bg-paper p-4 sm:p-5">
         <p class="text-xs text-ink-muted">{{ card.label }}</p>
         <USkeleton v-if="!loaded" class="mt-2 h-8 w-16" />
         <p v-else class="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink sm:text-3xl">{{ compact(card.value) }}</p>
       </div>
     </div>
+    <!-- Bots aren't visitors: a note, not a number beside the real ones -->
+    <p v-if="loaded && overview.bot_clicks" class="-mt-2 flex items-center gap-1.5 px-1 text-xs text-ink-muted">
+      <UIcon name="i-lucide-shield-check" class="size-3.5" />
+      {{ t('analytics.overview.botsNote', { n: overview.bot_clicks }, overview.bot_clicks) }}
+    </p>
 
     <!-- Views over time: column chart -->
     <section class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
@@ -56,16 +61,18 @@
             </div>
           </div>
         </div>
-        <div class="mt-2 flex justify-between text-[11px] tabular-nums text-ink-muted">
-          <span>{{ formatChartDate(timeseries[0]!.date) }}</span>
-          <span v-if="timeseries.length > 1">{{ formatChartDate(timeseries[timeseries.length - 1]!.date) }}</span>
+        <!-- A date under every few bars (each bar's own is in its tooltip) -->
+        <div class="mt-2 flex h-4 gap-0.5 text-[11px] tabular-nums text-ink-muted">
+          <span v-for="(point, i) in timeseries" :key="point.date" class="relative flex flex-1 justify-center">
+            <span v-if="showsDate(i)" class="absolute whitespace-nowrap" :class="i === 0 ? 'left-0' : i === timeseries.length - 1 ? 'right-0' : ''">{{ formatChartDate(point.date) }}</span>
+          </span>
         </div>
       </div>
     </section>
 
     <!-- Breakdowns -->
-    <div class="grid gap-4 md:grid-cols-2">
-      <section v-for="panel in breakdowns" :key="panel.title" class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <section v-for="(panel, i) in breakdowns" :key="panel.title" class="rounded-xl bg-paper p-4 ring-1 ring-line sm:p-5" :class="i === 2 && 'md:col-span-2 lg:col-span-1'">
         <h4 class="text-sm font-medium text-ink">{{ panel.title }}</h4>
         <div v-if="!loaded" class="mt-4 space-y-4" aria-busy="true">
           <div v-for="i in 4" :key="i" class="space-y-1.5">
@@ -90,7 +97,7 @@
         </ul>
       </section>
 
-      <FeaturesCountryMap :countries="countries" class="md:col-span-2" />
+      <FeaturesCountryMap :countries="countries" class="md:col-span-2 lg:col-span-3" />
     </div>
   </div>
 </template>
@@ -138,7 +145,6 @@ const overviewCards = computed(() => [
   { label: t("analytics.overview.cards.views"), value: overview.value.total_clicks },
   { label: t("analytics.overview.cards.unique"), value: overview.value.unique_clicks },
   { label: t("analytics.overview.cards.today"), value: overview.value.today_clicks },
-  { label: t("analytics.overview.cards.bots"), value: overview.value.bot_clicks },
 ]);
 
 const breakdowns = computed(() => [
@@ -188,6 +194,13 @@ const fetchAnalytics = async () => {
 const getBarWidth = (clicks: number): number => {
   const max = Math.max(...timeseries.value.map((p) => p.clicks), 1);
   return Math.round((clicks / max) * 100);
+};
+
+// About six dates along the axis, always the first and the last
+const showsDate = (i: number) => {
+  const n = timeseries.value.length;
+  const step = Math.max(1, Math.ceil(n / 6));
+  return i === 0 || i === n - 1 || (i % step === 0 && n - 1 - i >= step / 2);
 };
 
 const formatChartDate = (date: string): string => {

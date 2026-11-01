@@ -525,7 +525,7 @@
     },
     "rows": {
       "theme": "Giao diện có sẵn",
-      "themeHint": "40 bộ màu, phông và kiểu thẻ phối sẵn",
+      "themeHint": "{n} bộ màu, phông và kiểu thẻ phối sẵn",
       "customize": "Tùy chỉnh",
       "custom": "Tự phối"
     }
@@ -559,6 +559,7 @@
       },
       "viewsOverTime": "Lượt xem theo thời gian",
       "peak": "Cao nhất {value}",
+      "botsNote": "Đã loại {n} lượt truy cập của bot",
       "noViews": "Chưa có lượt xem nào trong khoảng này",
       "viewsCount": "{n} lượt xem | {n} lượt xem",
       "topReferrers": "Nguồn truy cập hàng đầu",

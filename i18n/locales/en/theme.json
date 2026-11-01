@@ -1,8 +1,8 @@
 {
   "theme": {
-    "panelTitle": "Template & Theme",
+    "panelTitle": "Template & theme",
     "tabs": {
-      "presets": "Theme Presets",
+      "presets": "Theme presets",
       "custom": "Customize"
     },
     "options": {
@@ -14,23 +14,23 @@
       "xl": "XL"
     },
     "fields": {
-      "fontFamily": "Font Family",
-      "fontSize": "Font Size",
-      "textColor": "Text Color",
+      "fontFamily": "Font family",
+      "fontSize": "Font size",
+      "textColor": "Text color",
       "weight": "Weight",
-      "letterSpacing": "Letter Spacing"
+      "letterSpacing": "Letter spacing"
     },
     "headerLayout": {
-      "label": "Header Layout",
+      "label": "Header layout",
       "tabs": {
-        "noBanner": "No Banner",
+        "noBanner": "No banner",
         "banner": "Banner"
       },
       "options": {
         "centered": "Centered",
         "left": "Left",
         "cover": "Cover",
-        "imageOverlay": "Img Overlay",
+        "imageOverlay": "Image overlay",
         "bannerCircle": "Banner ○",
         "bannerSquare": "Banner □"
       },
@@ -71,25 +71,25 @@
       "videoUrl": "Video URL (mp4, webm)"
     },
     "header": {
-      "title": "Header Title",
-      "blockTitleFont": "Block Title Font"
+      "title": "Header title",
+      "blockTitleFont": "Block title font"
     },
     "bio": {
-      "title": "Bio Text"
+      "title": "Bio text"
     },
     "card": {
-      "title": "Card Style",
+      "title": "Card style",
       "style": "Style",
-      "color": "Card Color",
+      "color": "Card color",
       "colorHelp": "Empty uses the primary colour.",
       "colorAria": "Card color",
-      "borderColor": "Border Color",
+      "borderColor": "Border color",
       "borderColorAria": "Card border color",
-      "cornerRadius": "Corner Radius",
+      "cornerRadius": "Corner radius",
       "shadow": "Shadow",
-      "backdropBlur": "Backdrop Blur",
-      "appearAnimation": "Appear Animation",
-      "hoverAnimation": "Hover Animation",
+      "backdropBlur": "Backdrop blur",
+      "appearAnimation": "Appear animation",
+      "hoverAnimation": "Hover animation",
       "styles": {
         "filled": "Filled",
         "outline": "Outline",
@@ -119,13 +119,13 @@
     "page": {
       "title": "Page",
       "textColorAria": "Page text color",
-      "blockSpacing": "Block Spacing",
-      "blockTitles": "Block Titles",
+      "blockSpacing": "Block spacing",
+      "blockTitles": "Block titles",
       "titleAlign": {
         "center": "Centered",
         "left": "Left"
       },
-      "socialIcons": "Social Icons"
+      "socialIcons": "Social icons"
     },
     "blockGaps": {
       "compact": "Compact",
@@ -143,7 +143,7 @@
       "selectPlaceholder": "Select font..."
     },
     "avatar": {
-      "title": "Avatar Shape",
+      "title": "Avatar shape",
       "shapes": {
         "circle": "Circle",
         "rounded": "Rounded",
@@ -151,7 +151,7 @@
       }
     },
     "linkLayout": {
-      "title": "Link Card Layout",
+      "title": "Link card layout",
       "vertical": "Vertical (image top)",
       "horizontalLeft": "Horizontal (image left)",
       "horizontalRight": "Horizontal (image right)",
@@ -159,40 +159,40 @@
     },
     "animations": {
       "appear": {
-        "fadeIn": "Fade In",
-        "fadeInDown": "Fade In Down",
-        "fadeInUp": "Fade In Up",
-        "fadeInLeft": "Fade In Left",
-        "fadeInRight": "Fade In Right",
-        "zoomIn": "Zoom In",
-        "zoomInDown": "Zoom In Down",
-        "zoomInUp": "Zoom In Up",
-        "bounceIn": "Bounce In",
-        "bounceInDown": "Bounce In Down",
-        "bounceInUp": "Bounce In Up",
-        "slideInDown": "Slide In Down",
-        "slideInUp": "Slide In Up",
-        "slideInLeft": "Slide In Left",
-        "slideInRight": "Slide In Right",
-        "backInDown": "Back In Down",
-        "backInUp": "Back In Up",
-        "flipInX": "Flip In X",
-        "flipInY": "Flip In Y",
-        "lightSpeedInRight": "Light Speed In Right",
-        "rotateIn": "Rotate In"
+        "fadeIn": "Fade in",
+        "fadeInDown": "Fade in down",
+        "fadeInUp": "Fade in up",
+        "fadeInLeft": "Fade in left",
+        "fadeInRight": "Fade in right",
+        "zoomIn": "Zoom in",
+        "zoomInDown": "Zoom in down",
+        "zoomInUp": "Zoom in up",
+        "bounceIn": "Bounce in",
+        "bounceInDown": "Bounce in down",
+        "bounceInUp": "Bounce in up",
+        "slideInDown": "Slide in down",
+        "slideInUp": "Slide in up",
+        "slideInLeft": "Slide in left",
+        "slideInRight": "Slide in right",
+        "backInDown": "Back in down",
+        "backInUp": "Back in up",
+        "flipInX": "Flip in X",
+        "flipInY": "Flip in Y",
+        "lightSpeedInRight": "Light speed in right",
+        "rotateIn": "Rotate in"
       },
       "hover": {
         "pulse": "Pulse",
         "bounce": "Bounce",
-        "rubberBand": "Rubber Band",
+        "rubberBand": "Rubber band",
         "shakeX": "Shake X",
         "shakeY": "Shake Y",
-        "headShake": "Head Shake",
+        "headShake": "Head shake",
         "swing": "Swing",
         "tada": "Tada",
         "wobble": "Wobble",
         "jello": "Jello",
-        "heartBeat": "Heart Beat",
+        "heartBeat": "Heart beat",
         "flash": "Flash",
         "flip": "Flip"
       },
@@ -525,7 +525,7 @@
     },
     "rows": {
       "theme": "Theme",
-      "themeHint": "40 ready-made looks",
+      "themeHint": "{n} ready-made looks",
       "customize": "Customize",
       "custom": "Custom"
     }
@@ -559,6 +559,7 @@
       },
       "viewsOverTime": "Views over time",
       "peak": "Peak {value}",
+      "botsNote": "{n} bot visit left out | {n} bot visits left out",
       "noViews": "No views in this period yet",
       "viewsCount": "{n} view | {n} views",
       "topReferrers": "Top referrers",

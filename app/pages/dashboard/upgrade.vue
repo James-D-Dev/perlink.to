@@ -30,6 +30,7 @@
                 {{ t('dashboard.billing.status.sites', { used: info.sites, max: info.limits.sites >= 1000 ? '∞' : info.limits.sites }) }}
               </p>
               <!-- A card subscription: when it renews or ends, and where to manage it -->
+              <p v-if="info.sites > info.limits.sites" class="mt-1 text-sm text-warning">{{ t('dashboard.billing.status.overLimit', { used: info.sites, max: info.limits.sites }) }}</p>
               <p v-if="subscriptionLine" class="mt-0.5 text-sm" :class="info.subscription?.status === 'past_due' ? 'text-error' : 'text-ink-muted'">{{ subscriptionLine }}</p>
             </div>
             <UButton

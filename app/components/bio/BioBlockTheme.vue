@@ -9,7 +9,7 @@
         </span>
         <span class="min-w-0 flex-1 text-left">
           <span class="block text-sm font-medium text-ink">{{ t('theme.rows.theme') }}</span>
-          <span class="block truncate text-xs text-ink-muted">{{ t('theme.rows.themeHint') }}</span>
+          <span class="block truncate text-xs text-ink-muted">{{ t('theme.rows.themeHint', { n: THEME_PRESETS.length }) }}</span>
         </span>
         <span class="max-w-[40%] truncate text-sm text-ink-muted">{{ currentPresetName }}</span>
         <UIcon name="i-lucide-chevron-right" class="size-4 shrink-0 text-ink-faint" />
@@ -278,7 +278,7 @@
 
 <script setup lang="ts">
 import type { Template, ThemeConfig, SocialLink } from "~/types/bio";
-import { type ThemePreset } from "~/data/themePresets";
+import { THEME_PRESETS, type ThemePreset } from "~/data/themePresets";
 import { nameFontOptions, headingFontOptions, paragraphFontOptions, FONT_PAIRS, type FontOption } from "~/data/fontOptions";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
 import { backgroundCss } from "~/utils/themeBackground";

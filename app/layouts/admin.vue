@@ -89,7 +89,6 @@
     <UDashboardSearch :groups="groups" />
 
     <slot />
-    <NotificationsSlideover />
     <BillingUpgradeDialog />
     <BillingCelebration />
     <HelpCenter />
@@ -143,7 +142,8 @@ const { t } = useI18n();
 
 const navigationLinks = computed<NavigationMenuItem[]>(() => [
   { label: t("nav.home"), icon: "i-lucide-house", to: "/dashboard", exact: true },
-  { label: t("nav.sites"), icon: "i-lucide-layout-template", to: "/dashboard/site" },
+  // Also lit inside a site: its editor, analytics and inbox are separate pages
+  { label: t("nav.sites"), icon: "i-lucide-layout-template", to: "/dashboard/site", active: route.path.startsWith("/dashboard/site") },
   { label: t("nav.settings"), icon: "i-lucide-settings", to: "/dashboard/settings" },
 ]);
 

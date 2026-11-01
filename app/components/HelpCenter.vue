@@ -47,13 +47,14 @@
       </section>
     </Transition>
 
-    <!-- The site editor puts its 3D room button here; help opens from the sidebar -->
+    <!-- The site editor puts its 3D room button here; help opens from the
+         sidebar there, and on wide screens, where the sidebar shows Help -->
     <UButton
       v-if="!aboveActionBar"
       size="lg"
       square
       :icon="open ? 'i-lucide-x' : 'i-lucide-circle-help'"
-      class="shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)]"
+      class="shadow-[0_8px_24px_-6px_rgb(0_122_255/0.45)] lg:hidden"
       :aria-expanded="open"
       :aria-label="open ? t('dashboard.help.close') : t('dashboard.help.ariaLabel')"
       @click="open = !open"

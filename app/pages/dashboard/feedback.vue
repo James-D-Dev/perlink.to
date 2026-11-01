@@ -196,6 +196,7 @@ definePageMeta({
 
 const toast = useToast();
 const { t, te, locale } = useI18n();
+useSeoMeta({ title: () => `${t('nav.feedback')} — Perlink`, robots: 'noindex, nofollow' });
 
 const form = ref({
   type: "general",

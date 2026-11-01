@@ -28,8 +28,9 @@
       {{ site.isPublished ? t('dashboard.sites.live') : t('dashboard.sites.draft') }}
     </span>
 
-    <!-- Name and actions over a fade at the bottom -->
-    <div class="pointer-events-none relative mt-auto bg-gradient-to-t from-black/85 via-black/55 to-transparent px-4 pb-4 pt-16">
+    <!-- Name and actions over a fade at the bottom, dark enough under the
+         name that the page's own text doesn't show through it -->
+    <div class="pointer-events-none relative mt-auto bg-gradient-to-t from-black/95 from-40% via-black/75 to-transparent px-4 pb-4 pt-20">
       <div class="flex items-end gap-2">
         <div class="min-w-0 flex-1 text-white">
           <h3 class="truncate text-lg font-semibold leading-tight">{{ site.title || site.username }}</h3>

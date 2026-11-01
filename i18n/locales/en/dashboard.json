@@ -117,7 +117,7 @@
         "languageText": "The language of buttons and labels your visitors see, like opening hours and “Book now”. Your own text stays as you write it.",
         "templateHeading": "Change template",
         "templateText": "Replace all current content, the theme and the 3D room with another template.",
-        "shareHeading": "Share Button",
+        "shareHeading": "Share button",
         "shareText": "Show a floating share button on your site",
         "visibilityHeading": "Visibility",
         "visibilityText": "Control who can see your site",
@@ -176,7 +176,7 @@
       "notLiveYet": "Not published yet, visitors can’t see it"
     },
     "username": {
-      "heading": "Choose Your Username",
+      "heading": "Choose your username",
       "placeholder": "yourname",
       "available": "Username available"
     },
@@ -199,32 +199,32 @@
     },
     "feedback": {
       "title": "Feedback",
-      "formHeading": "Send Feedback",
+      "formHeading": "Send feedback",
       "formIntro": "Help us improve Perlink",
-      "type": "Feedback Type",
+      "type": "Feedback type",
       "typePlaceholder": "Select feedback type",
       "subject": "Subject",
       "subjectPlaceholder": "Brief summary of your feedback",
-      "message": "Your Feedback",
+      "message": "Your feedback",
       "messagePlaceholder": "Tell us what you think, report a bug, or suggest a feature...",
       "rating": "Rating (Optional)",
       "ratingValue": "{rating} out of 5",
       "clear": "Clear",
-      "submit": "Submit Feedback",
-      "historyHeading": "My Feedback History",
+      "submit": "Submit feedback",
+      "historyHeading": "My feedback history",
       "historyIntro": "Track your previous submissions",
       "submittedCount": "{n} submitted",
       "types": {
-        "general": "General Feedback",
-        "bug": "Bug Report",
-        "feature": "Feature Request",
-        "improvement": "Improvement Suggestion",
+        "general": "General feedback",
+        "bug": "Bug report",
+        "feature": "Feature request",
+        "improvement": "Improvement suggestion",
         "other": "Other"
       },
       "typeBadges": {
         "general": "General",
-        "bug": "Bug Report",
-        "feature": "Feature Request",
+        "bug": "Bug report",
+        "feature": "Feature request",
         "improvement": "Improvement",
         "other": "Other"
       },
@@ -460,7 +460,7 @@
     "inbox": {
       "title": "Inbox",
       "editSite": "Edit site",
-      "unreadCount": "no unread requests | {n} unread request | {n} unread requests",
+      "unreadCount": "No unread requests | {n} unread request | {n} unread requests",
       "all": "All",
       "unread": "Unread",
       "emptyTitle": "No requests yet",
@@ -625,6 +625,7 @@
         "analyticsYear": "1 year of analytics",
         "support": "Priority support",
         "customDomains": "{n} custom domain | {n} custom domains",
+        "customDomainsSoon": "Custom domains (coming soon)",
         "analyticsYears": "{n} years of analytics",
         "posts": "{n} blog posts",
         "postsUnlimited": "Unlimited blog posts"
@@ -646,11 +647,12 @@
         "free": "You're on the Free plan",
         "paid": "You're on {plan}",
         "until": "Until {date}",
-        "sites": "Using {used}/{max} sites"
+        "sites": "Using {used}/{max} sites",
+        "overLimit": "You have {used} sites and your plan includes {max}. They all stay online; to add another, upgrade or delete one."
       },
       "trial": {
         "title": "Try Plus free for 7 days",
-        "text": "Pro themes, a custom domain, no Perlink badge. No card needed; it goes back to Free when it ends.",
+        "text": "Pro themes, 10 sites and a year of analytics. No card needed; it goes back to Free when it ends.",
         "start": "Start free trial",
         "started": "Plus is on until {date}",
         "failed": "Couldn't start the trial"
@@ -792,7 +794,7 @@
     "blog": {
       "heading": "Blog",
       "intro": "Write posts for your site. Readers find them at",
-      "usage": "{n}/{max} posts published (your plan)",
+      "usage": "{n} of {max} posts published on your plan",
       "write": "Write a post",
       "emptyTitle": "No posts yet",
       "emptyText": "Share news, stories or guides. Each post gets its own page, ready for Google and for sharing.",

@@ -10,7 +10,7 @@
 
     <template #body>
       <div class="mx-auto w-full max-w-2xl space-y-6 py-2 sm:py-4">
-        <h1 class="mk-display text-3xl text-ink sm:text-4xl">{{ t('dashboard.account.title') }}</h1>
+        <h1 class="mk-display text-3xl text-ink sm:text-4xl">{{ t('common.settings') }}</h1>
 
         <div v-if="loading" class="space-y-3">
           <USkeleton v-for="i in 3" :key="i" class="h-28 w-full rounded-xl" />
@@ -28,7 +28,7 @@
               <div class="min-w-0 flex-1 space-y-1">
                 <div class="flex gap-2">
                   <UInput v-model="name" :placeholder="t('dashboard.account.namePlaceholder')" maxlength="80" class="min-w-0 flex-1" />
-                  <UButton :disabled="name === (account.name || '')" :loading="savingName" :label="t('common.save')" @click="saveName" />
+                  <UButton :disabled="name.trim() === savedName" :loading="savingName" :label="t('common.save')" @click="saveName" />
                 </div>
                 <p class="truncate text-sm text-ink-muted">{{ account.email }}</p>
               </div>
@@ -50,11 +50,12 @@
             </div>
             <div class="bg-paper p-5">
               <h2 class="text-sm font-medium text-ink">{{ t('dashboard.account.plan') }}</h2>
-              <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.account.sites', { n: account.sites }, account.sites) }}</p>
+              <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.billing.status.sites', { used: account.sites, max: siteLimit >= 1000 ? '∞' : siteLimit }) }}</p>
               <div class="mt-3 flex items-center justify-between gap-3">
                 <span class="text-lg font-semibold text-ink">{{ t(`dashboard.billing.plans.${account.plan}.name`) }}</span>
                 <UButton to="/dashboard/upgrade" size="sm" color="neutral" variant="outline" :label="t('dashboard.account.seePlans')" />
               </div>
+              <p v-if="account.sites > siteLimit" class="mt-3 text-xs leading-relaxed text-warning">{{ t('dashboard.billing.status.overLimit', { used: account.sites, max: siteLimit }) }}</p>
             </div>
           </section>
 
@@ -114,6 +115,8 @@
 </template>
 
 <script setup lang="ts">
+import { PLAN_LIMITS, isPlanId, type PlanId } from '#shared/plans'
+
 definePageMeta({
   colorMode: 'light',
   layout: 'admin',
@@ -141,17 +144,22 @@ const toast = useToast()
 const confirm = useConfirm()
 const { clear } = useUserSession()
 
-useSeoMeta({ title: () => `${t('dashboard.account.title')} — Perlink`, robots: 'noindex, nofollow' })
+useSeoMeta({ title: () => `${t('common.settings')} — Perlink`, robots: 'noindex, nofollow' })
 
 const loading = ref(true)
 const account = ref<Account | null>(null)
 const name = ref('')
+// The name shown around the dashboard: the one saved here, else the one the
+// sign-in gave (so the field never looks empty while the menu shows a name)
+const { user: sessionUser } = useUserSession()
+const savedName = computed(() => account.value?.name || sessionUser.value?.name || '')
+const siteLimit = computed(() => PLAN_LIMITS[isPlanId(account.value?.plan) ? account.value!.plan as PlanId : 'free'].sites)
 
 onMounted(async () => {
   try {
     const response = await $fetch<{ account: Account }>('/api/account')
     account.value = response.account
-    name.value = response.account.name ?? ''
+    name.value = savedName.value
   } catch {
     toast.add({ title: t('common.error'), color: 'error' })
   } finally {

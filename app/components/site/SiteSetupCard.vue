@@ -1,14 +1,15 @@
 <template>
   <template v-if="setup?.visible.value">
-    <!-- Collapsed sidebar: just the ring -->
+    <!-- Collapsed sidebar: the ring with its count, so it reads as progress
+         and not as something loading -->
     <UTooltip v-if="collapsed" :text="t('dashboard.onboarding.cardTitle')">
       <button
         type="button"
-        class="mx-auto mt-4 flex size-10 items-center justify-center rounded-full transition-colors hover:bg-sand"
+        class="mx-auto mt-4 flex size-11 items-center justify-center rounded-full transition-colors hover:bg-sand"
         :aria-label="t('dashboard.onboarding.cardTitle')"
         @click="openChecklist"
       >
-        <SiteProgressRing :value="progress" :size="28" />
+        <SiteProgressRing :value="progress" :size="36" :label="`${setup.done.value}/${total}`" />
       </button>
     </UTooltip>
 

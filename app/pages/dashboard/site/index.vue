@@ -19,12 +19,6 @@
             perlink.to/{{ primary.username }}
             <UIcon name="i-lucide-copy" class="size-3.5 text-ink-muted" />
           </button>
-          <UButton
-            to="/dashboard"
-            color="primary"
-            icon="i-lucide-plus"
-            :label="t('dashboard.sites.createSite')"
-          />
         </template>
       </UDashboardNavbar>
     </template>
@@ -211,6 +205,7 @@ definePageMeta({
 
 const toast = useToast();
 const { t, locale } = useI18n();
+useSeoMeta({ title: () => `${t('dashboard.sites.title')} — Perlink`, robots: 'noindex, nofollow' });
 const { user } = useUserSession();
 const { current: setup } = useSiteSetup();
 

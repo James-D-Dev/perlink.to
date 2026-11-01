@@ -41,6 +41,12 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
  */
 export const BRANDING_FOR_ALL = true
 
+/**
+ * Whether custom domains can be connected yet (docs/custom-domains.md). Until
+ * then the plans list them as coming soon instead of promising them.
+ */
+export const CUSTOM_DOMAINS_LIVE = false
+
 /** Whether a site on this plan shows the Perlink badge */
 export const showsBranding = (plan: PlanId | null | undefined) => BRANDING_FOR_ALL || !plan || !PLAN_LIMITS[plan].removeBranding
 

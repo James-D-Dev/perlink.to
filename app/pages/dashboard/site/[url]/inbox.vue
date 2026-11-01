@@ -1,9 +1,12 @@
 <template>
   <UDashboardPanel id="site-inbox">
     <template #header>
-      <UDashboardNavbar :title="t('dashboard.inbox.title')">
+      <UDashboardNavbar>
         <template #leading>
           <UDashboardSidebarCollapse />
+        </template>
+        <template #title>
+          <SiteBreadcrumb :username="username" :page="t('dashboard.inbox.title')" />
         </template>
         <template #right>
           <UButton
@@ -19,12 +22,12 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-3xl space-y-4 py-2 sm:py-4">
+      <div class="mx-auto w-full max-w-5xl space-y-4 py-2 sm:py-4">
         <div class="flex items-end justify-between gap-3">
           <div>
             <h1 class="mk-display text-3xl text-ink">{{ t('dashboard.inbox.title') }}</h1>
             <p class="mt-1 text-sm text-ink-muted">
-              perlink.to/{{ username }}<template v-if="!loading"> · {{ t('dashboard.inbox.unreadCount', { n: unread }, unread) }}</template>
+              <template v-if="!loading">{{ t('dashboard.inbox.unreadCount', { n: unread }, unread) }}</template>
             </p>
           </div>
           <div v-if="view === 'requests' && submissions.length" class="inline-flex rounded-full bg-sand p-0.5">

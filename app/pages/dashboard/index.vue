@@ -1,12 +1,9 @@
 <template>
   <UDashboardPanel id="create-site">
     <template #header>
-      <UDashboardNavbar :title="t('dashboard.home.title')">
+      <UDashboardNavbar :title="t('nav.home')">
         <template #leading>
           <UDashboardSidebarCollapse />
-        </template>
-        <template #right>
-          <UButton to="/dashboard/site" color="neutral" variant="ghost" icon="i-lucide-layout-grid" :label="t('dashboard.home.mySites')" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -92,7 +89,8 @@
             </div>
           </div>
 
-          <div class="-mx-1 flex gap-2 overflow-x-auto scroll-fade-x px-1 pb-1 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
+          <!-- Phones swipe through the categories; wider screens show them all -->
+          <div class="-mx-1 flex gap-2 overflow-x-auto scroll-fade-x px-1 pb-1 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible sm:[mask-image:none]">
             <button
               v-for="chip in chips"
               :key="chip.id"
@@ -174,6 +172,7 @@ definePageMeta({
 
 const route = useRoute()
 const { t } = useI18n()
+useSeoMeta({ title: () => `${t('nav.home')} — Perlink`, robots: 'noindex, nofollow' })
 
 // Name typed on the landing page (?input=) carries over
 const initialSlug = computed(() => (typeof route.query.input === 'string' ? route.query.input.toLowerCase() : ''))
