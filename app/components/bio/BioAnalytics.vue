@@ -75,9 +75,7 @@
               <h4 class="border-b border-line px-4 py-3 text-sm font-medium text-ink">{{ t('analytics.links.socialTitle') }}</h4>
               <ul class="divide-y divide-line">
                 <li v-for="social in socialLinks" :key="social.id" class="flex items-center gap-3 px-4 py-3">
-                  <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-sand">
-                    <UIcon :name="getSocialIcon(social.provider)" class="size-4" />
-                  </span>
+                  <SocialBadge :provider="social.provider" :size="32" />
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-medium capitalize text-ink">{{ social.provider }}</p>
                     <p class="truncate text-xs text-ink-muted">{{ getSocialUrl(social) || t('analytics.links.noLink') }}</p>
@@ -159,10 +157,6 @@ const getLinkClickCount = (linkId: string) =>
 const getSocialClickCount = (socialId: string) =>
   socialClickCounts.value[socialId] ?? 0;
 
-const getSocialIcon = (provider: string) => {
-  const found = SOCIAL_PROVIDERS.find(p => p.key === provider);
-  return found?.icon || 'i-lucide-link';
-};
 
 const getSocialUrl = (social: SocialLink): string => {
   const provider = SOCIAL_PROVIDERS.find(p => p.key === social.provider);

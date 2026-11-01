@@ -652,7 +652,7 @@ export const SOCIAL_PROVIDERS: SocialProviderInfo[] = [
   },
   {
     key: "twitter",
-    label: "Twitter",
+    label: "X (Twitter)",
     icon: "i-prime-twitter",
     color: "#000000",
     placeholder: "username",

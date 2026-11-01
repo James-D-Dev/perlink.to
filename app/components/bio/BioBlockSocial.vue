@@ -9,17 +9,17 @@
       @toggle-hidden="toggleBlockHidden('social')"
     >
       <template #preview>
-        <div class="flex items-center -space-x-1 mr-1">
-          <template
-            v-for="(social, i) in displayedSocials.slice(0, 4)"
-            :key="social.provider"
-          >
-            <div
-              class="size-6 rounded-full bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl ring-1 ring-white flex items-center justify-center"
-            >
-              <UIcon :name="getProviderIcon(social.provider)" class="size-5" />
-            </div>
-          </template>
+        <!-- Overlapping app icons, each edged in the row's colour so they read
+             as separate coins -->
+        <div class="mr-1 flex items-center -space-x-1.5">
+          <SocialBadge
+            v-for="social in displayedSocials"
+            :key="social.id"
+            :provider="social.provider"
+            :size="24"
+            shape="circle"
+            class="ring-2 ring-white dark:ring-[#221f1d]"
+          />
         </div>
       </template>
     </BioBlockItemHeader>
@@ -46,18 +46,7 @@
               </div>
 
               <!-- Provider Icon -->
-              <div
-                class="size-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                :style="{
-                  backgroundColor: getProviderColor(social.provider) + '20',
-                }"
-              >
-                <UIcon
-                  :name="getProviderIcon(social.provider)"
-                  class="w-5 h-5"
-                  :style="{ color: getProviderColor(social.provider) }"
-                />
-              </div>
+              <SocialBadge :provider="social.provider" :size="32" />
 
               <!-- Provider name above its link or username -->
               <div class="min-w-0 flex-1">
@@ -133,16 +122,7 @@
               class="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-perlink-cyan hover:bg-perlink-cyan/5 transition-all"
               @click="addSocial(provider.key)"
             >
-              <div
-                class="w-10 h-10 rounded-lg flex items-center justify-center"
-                :style="{ backgroundColor: provider.color + '20' }"
-              >
-                <UIcon
-                  :name="provider.icon"
-                  class="w-6 h-6"
-                  :style="{ color: provider.color }"
-                />
-              </div>
+              <SocialBadge :provider="provider.key" :size="40" />
               <span class="text-xs font-medium text-gray-700 dark:text-neutral-200">{{
                 provider.label
               }}</span>
@@ -238,13 +218,7 @@ function getProviderInfo(provider: string): SocialProviderInfo | undefined {
   return SOCIAL_PROVIDERS.find((p) => p.key === provider);
 }
 
-function getProviderIcon(provider: string): string {
-  return getProviderInfo(provider)?.icon || "i-lucide-link";
-}
 
-function getProviderColor(provider: string): string {
-  return getProviderInfo(provider)?.color || "#6B7280";
-}
 
 function getProviderLabel(provider: string): string {
   return getProviderInfo(provider)?.label || provider;
