@@ -83,7 +83,9 @@ export function look(l: Look): ThemeConfig {
 }
 
 // Sample photos from Pexels (free to use, no attribution required)
-export const photo = (name: string) => `/images/templates/photos/${name}.jpg`
+// WebP, sized for phones (covers 1000 px, avatars 400 px); the original JPEGs
+// stay for sites made before
+export const photo = (name: string) => `/images/templates/photos/${name}.webp`
 
 export function album(...names: string[]) {
   return names.map((name, index) => ({ id: nanoid(6), url: photo(name), index }))

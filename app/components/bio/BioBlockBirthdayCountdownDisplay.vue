@@ -58,10 +58,13 @@ const props = defineProps<{
 
 const { t, lang } = useSiteI18n();
 
-const now = ref(new Date());
+// The visitor's clock, from mount on: the server's moment (and time zone)
+// differs, so counting from it would not match the page in the browser
+const now = ref<Date | null>(null);
 let interval: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
+  now.value = new Date();
   interval = setInterval(() => {
     now.value = new Date();
   }, 1000);
@@ -81,7 +84,7 @@ const birthDate = computed(() => {
 
 // Calculate next birthday
 const nextBirthday = computed(() => {
-  if (!birthDate.value) return null;
+  if (!birthDate.value || !now.value) return null;
   
   const today = now.value;
   const currentYear = today.getFullYear();
@@ -100,7 +103,7 @@ const nextBirthday = computed(() => {
 
 // Check if birthday is today
 const isBirthdayToday = computed(() => {
-  if (!birthDate.value) return false;
+  if (!birthDate.value || !now.value) return false;
   const today = now.value;
   return (
     today.getMonth() === birthDate.value.getMonth() &&
@@ -110,6 +113,8 @@ const isBirthdayToday = computed(() => {
 
 // Calculate time left
 const timeLeft = computed(() => {
+  // Until mounted: dashes, the same on the server and in the browser
+  if (!now.value) return { days: '–', hours: '–', minutes: '–', seconds: '–' };
   if (!nextBirthday.value) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
   
   const diff = nextBirthday.value.getTime() - now.value.getTime();

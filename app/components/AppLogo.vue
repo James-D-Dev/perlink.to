@@ -8,7 +8,7 @@
       :style="{ fontFamily: 'Geist, var(--font-display)', fontWeight: 600, letterSpacing: '-0.045em', fontSize: `${size * 0.82}px`, color: ink }"
       role="img"
       aria-label="Perlink"
-    ><span aria-hidden="true"><span class="text-tint">per</span>l<span class="relative inline-block">ı<span class="absolute rounded-full bg-tint" :style="dotStyle" /></span>nk</span></span>
+    ><span aria-hidden="true"><span :class="inverted ? 'text-tint' : 'text-[#0066d6]'">per</span>l<span class="relative inline-block">ı<span class="absolute rounded-full bg-tint" :style="dotStyle" /></span>nk</span></span>
 
     <!-- Mark (favicons, folded sidebar): an open isometric room, the 3D
          world every site gets, with a pearl on its floor ("pearl link", per =

@@ -1,6 +1,8 @@
 <template>
   <AppHeader />
-  <slot />
+  <main>
+    <slot />
+  </main>
   <AppFooter />
   <HelpCenter />
   <!-- Google One Tap - only runs on client -->

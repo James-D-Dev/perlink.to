@@ -91,7 +91,10 @@ const sending = ref(false)
 const sent = ref(false)
 const error = ref('')
 
-const today = new Date().toISOString().slice(0, 10)
+// The earliest date to book, from the visitor's clock once mounted (the
+// server's date can differ around midnight and break hydration)
+const today = ref<string>()
+onMounted(() => (today.value = new Date().toISOString().slice(0, 10)))
 
 // Neutral fields that sit on any card colour
 const inputClass = 'block w-full min-w-0 rounded-md border border-black/10 bg-white/90 px-3 py-2 text-[15px] text-[#1c1a17] outline-none placeholder:text-black/35 focus:border-black/30 focus:ring-2 focus:ring-black/5'
