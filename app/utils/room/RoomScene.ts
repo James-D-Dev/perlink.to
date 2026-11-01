@@ -122,8 +122,11 @@ export class RoomScene {
   /** For the console: how long until the first frame was drawn */
   private firstFrameLogged = false
   private rendererReady: Promise<void>
-  /** Film look for the room video (./cinematic); only the recorder's scene has one */
+  /** Film look for the room video (./cinematic), or just its glow when viewing */
   private cinematic: Cinematic | null = null
+  /** The viewing glow is on (not the recorder's film look) */
+  private glowOnly = false
+  private glowLoading = false
   /** The lens for the current frame shape (narrow frames get a wider one) */
   private baseFov = 32
   /** Pace of recent video frames (renderTour), to drop the film look if it can't keep up */
@@ -254,7 +257,8 @@ export class RoomScene {
       if (gpuKit()) console.info(`[room] renderer: ${created.backend()}`)
       this.markActive()
     })
-    // The video's film look (depth of field, glow, vignette), recorder only
+    // The video's film look (depth of field, glow, vignette) for the recorder;
+    // viewing gets the glow alone (applyQuality), on devices that keep up
     if (options.capture && !gpuKit()) {
       this.rendererReady
         .then(() => import('./cinematic'))
@@ -1366,6 +1370,38 @@ export class RoomScene {
     }
   }
 
+  /**
+   * The glow (bloom) while viewing, as in the room video: on at the two best
+   * quality levels, off once the device has had to step down (it's the first
+   * thing to go). Not for small previews, the recorder (it has the full film
+   * look) or WebGPU.
+   */
+  private updateGlow() {
+    const wanted = !this.options.capture && !this.options.preview && !gpuKit() && this.quality <= 1
+    if (!wanted && this.glowOnly && this.cinematic) {
+      this.cinematic.dispose()
+      this.cinematic = null
+      this.glowOnly = false
+    }
+    if (!wanted || this.cinematic || this.glowLoading || this.disposed) return
+    this.glowLoading = true
+    this.rendererReady
+      .then(() => import('./cinematic'))
+      .then(m => m.createCinematic(this.renderer as THREE.WebGLRenderer, this.scene, this.camera, 'glow'))
+      .then((glow) => {
+        this.glowLoading = false
+        // Gone, or stepped down meanwhile
+        if (this.disposed || this.quality > 1 || this.cinematic) return glow.dispose()
+        this.cinematic = glow
+        this.glowOnly = true
+        this.markActive()
+      })
+      .catch((error) => {
+        this.glowLoading = false
+        console.warn('[room] glow unavailable', error)
+      })
+  }
+
   /** Something changed: render at full frame rate for a moment */
   private markActive = () => {
     this.activeUntil = performance.now() + 1500
@@ -1397,6 +1433,7 @@ export class RoomScene {
   }
 
   private applyQuality() {
+    this.updateGlow()
     const level = QUALITY_LEVELS[this.quality]!
     // A recording is always full resolution (1080x1920 from a 540x960 box)
     this.renderer.setPixelRatio(this.options.capture ? 2 : Math.min(window.devicePixelRatio, level.pixelRatio))
