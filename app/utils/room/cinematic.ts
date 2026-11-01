@@ -2,10 +2,8 @@ import * as THREE from 'three'
 
 // The room video's film look (pmndrs postprocessing): depth of field, a soft
 // glow from the bright parts, the scene's own Neutral tone mapping, a light
-// vignette and a touch of contrast. Loaded on demand.
-//
-// 'glow' is the lighter look for viewing a room (not recording): the glow
-// and the tone mapping only, on devices that keep up (see RoomScene).
+// vignette and a touch of contrast. Only the video recorder's scene uses it
+// (loaded on demand), so visitors' phones never pay for it.
 //
 // The scene renders into a half-float buffer (render targets skip the
 // renderer's tone mapping), so tone mapping happens here, after the glow,
@@ -19,7 +17,7 @@ export interface Cinematic {
   dispose: () => void
 }
 
-export async function createCinematic(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera, look: 'film' | 'glow' = 'film'): Promise<Cinematic> {
+export async function createCinematic(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera): Promise<Cinematic> {
   const pp = await import('postprocessing')
   const composer = new pp.EffectComposer(renderer, {
     frameBufferType: THREE.HalfFloatType,
@@ -28,18 +26,18 @@ export async function createCinematic(renderer: THREE.WebGLRenderer, scene: THRE
   composer.addPass(new pp.RenderPass(scene, camera))
 
   const target = new THREE.Vector3()
-  const depthOfField = look === 'film' ? new pp.DepthOfFieldEffect(camera, { focusRange: 4, bokehScale: 2, resolutionScale: 0.5 }) : null
-  if (depthOfField) {
-    depthOfField.target = target
-    // Depth of field needs its own pass (it can't share one with other blurs)
-    composer.addPass(new pp.EffectPass(camera, depthOfField))
-  }
+  const depthOfField = new pp.DepthOfFieldEffect(camera, { focusRange: 4, bokehScale: 2, resolutionScale: 0.5 })
+  depthOfField.target = target
+  // Depth of field needs its own pass (it can't share one with other blurs)
+  composer.addPass(new pp.EffectPass(camera, depthOfField))
 
-  const bloom = new pp.BloomEffect({ mipmapBlur: true, luminanceThreshold: 0.75, luminanceSmoothing: 0.2, intensity: 0.65, radius: 0.7 })
-  const toneMapping = new pp.ToneMappingEffect({ mode: pp.ToneMappingMode.NEUTRAL })
-  composer.addPass(look === 'film'
-    ? new pp.EffectPass(camera, bloom, toneMapping, new pp.BrightnessContrastEffect({ contrast: 0.08 }), new pp.VignetteEffect({ offset: 0.32, darkness: 0.5 }))
-    : new pp.EffectPass(camera, bloom, toneMapping))
+  composer.addPass(new pp.EffectPass(
+    camera,
+    new pp.BloomEffect({ mipmapBlur: true, luminanceThreshold: 0.75, luminanceSmoothing: 0.2, intensity: 0.65, radius: 0.7 }),
+    new pp.ToneMappingEffect({ mode: pp.ToneMappingMode.NEUTRAL }),
+    new pp.BrightnessContrastEffect({ contrast: 0.08 }),
+    new pp.VignetteEffect({ offset: 0.32, darkness: 0.5 }),
+  ))
 
   // Follow the renderer's size (the quality level can change its pixel ratio)
   const size = new THREE.Vector2()
@@ -56,7 +54,6 @@ export async function createCinematic(renderer: THREE.WebGLRenderer, scene: THRE
     },
     setSize: (width, height) => composer.setSize(width, height, false),
     focus(point, range, blur) {
-      if (!depthOfField) return
       target.copy(point)
       depthOfField.cocMaterial.focusRange = range
       depthOfField.bokehScale = blur
