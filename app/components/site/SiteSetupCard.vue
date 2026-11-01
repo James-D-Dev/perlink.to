@@ -20,9 +20,12 @@
           <p class="text-xs text-ink-muted">{{ t('dashboard.onboarding.progress', { done: setup.done.value, total }) }}</p>
         </div>
       </div>
+      <!-- Quiet: the sidebar's one primary button is "Create a site" -->
       <UButton
         size="sm"
         block
+        color="neutral"
+        variant="soft"
         trailing-icon="i-lucide-arrow-right"
         :label="t('dashboard.onboarding.cardAction')"
         class="mt-3"
