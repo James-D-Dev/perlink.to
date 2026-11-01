@@ -2,7 +2,7 @@
   <article class="group relative flex aspect-[4/5] flex-col overflow-hidden rounded-3xl bg-sand ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
     <!-- The site itself, scaled down; the whole card opens the editor -->
     <NuxtLink :to="editTo" class="absolute inset-0" :aria-label="t('dashboard.sites.edit')">
-      <!-- The snapshot taken in the editor; the live page only until there is one -->
+      <!-- The site's snapshot; a site without one renders its page once, which is then snapshotted -->
       <img
         v-if="picture"
         :src="picture"
@@ -14,7 +14,7 @@
       <div v-else ref="frame" class="pointer-events-none absolute inset-0 overflow-hidden" :style="{ background: previewBg }" aria-hidden="true" inert>
         <!-- Rendered at phone width, then scaled to the card; only once the card is on screen -->
         <div v-if="onScreen" class="absolute left-0 top-0 origin-top-left" :style="{ width: `${PHONE_WIDTH}px`, transform: `scale(${scale})` }">
-          <BioPageView :bio-data="bioData" :username="site.username" mode="thumbnail" />
+          <BioPageView ref="page" :bio-data="bioData" :username="site.username" mode="thumbnail" />
         </div>
       </div>
     </NuxtLink>
@@ -71,6 +71,7 @@
 <script setup lang="ts">
 import { useElementSize, useIntersectionObserver } from '@vueuse/core'
 import type { BioData } from '~/types/bio'
+import { queueSnapshot, snapshotPage } from '~/composables/useSiteSnapshot'
 
 const props = defineProps<{
   site: any
@@ -96,10 +97,34 @@ useIntersectionObserver(frame, ([entry]) => {
   if (entry?.isIntersecting) onScreen.value = true
 }, { rootMargin: '200px' })
 
+// A snapshot taken here, for a site that had none
+const snapped = ref<string | null>(null)
+
 // Sites that open in 3D show their room
 const picture = computed(() =>
-  props.site.themeConfig?.pageMode === '3d' && props.site.roomThumbnailUrl ? props.site.roomThumbnailUrl : props.site.thumbnailUrl,
+  snapped.value
+  || (props.site.themeConfig?.pageMode === '3d' && props.site.roomThumbnailUrl ? props.site.roomThumbnailUrl : props.site.thumbnailUrl),
 )
+
+// No snapshot yet (the site hasn't been opened in the editor since they
+// were added): once its page has rendered here, take one and keep it, so the
+// list shows a light image from then on instead of rendering every page
+const page = ref<{ $el?: HTMLElement } | null>(null)
+watch(onScreen, async (visible) => {
+  if (!visible || picture.value) return
+  await nextTick()
+  // Images and fonts settle first
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  await document.fonts?.ready
+  const element = page.value?.$el
+  if (!element || picture.value) return
+  try {
+    const result = await queueSnapshot(() => snapshotPage(props.site.username, element))
+    if (result?.url) snapped.value = result.url
+  } catch (error) {
+    console.warn('[sites] snapshot failed', props.site.username, error)
+  }
+})
 
 const editTo = computed(() => `/dashboard/site/${props.site.username}`)
 

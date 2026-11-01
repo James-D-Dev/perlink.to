@@ -37,6 +37,14 @@ export async function uploadSnapshot(username: string, kind: 'page' | 'room', bl
   return await $fetch<{ url: string; saved: boolean }>(`/api/admin/bio/${username}/thumbnail`, { method: 'POST', body: form })
 }
 
+// One snapshot at a time: a list of new sites would otherwise capture them all at once
+let queue: Promise<unknown> = Promise.resolve()
+export function queueSnapshot<T>(take: () => Promise<T>): Promise<T> {
+  const next = queue.then(take, take)
+  queue = next.catch(() => {})
+  return next
+}
+
 /** Picture of the top of a page preview (a BioPageView element), as it looks on a phone */
 export async function snapshotPage(username: string, element: HTMLElement) {
   const { domToBlob } = await import('modern-screenshot')
