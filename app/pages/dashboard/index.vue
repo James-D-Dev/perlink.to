@@ -9,24 +9,21 @@
     </template>
 
     <template #body>
-      <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-6">
-        <!-- Hero -->
-        <section class="relative isolate overflow-hidden rounded-3xl bg-elevated p-6 ring-1 ring-line dark:bg-[#171412] dark:ring-white/[0.1] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] sm:p-10">
-          <!-- Same living backdrop as the landing hero -->
-          <MarketingMkHeroBackdrop :fade="false" />
-          <div class="pointer-events-none absolute inset-0 dark:bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgb(255_255_255/0.06),transparent)]" />
+      <!-- Hero: the full width of the page, right under the bar; its content
+           lines up with the page's (75rem: max-w-6xl plus the page padding) -->
+      <section class="relative isolate -mx-4 -mt-4 shrink-0 overflow-hidden border-b border-line bg-elevated sm:-mx-6 sm:-mt-6 dark:bg-[#171412]">
+        <!-- Same living backdrop as the landing hero -->
+        <MarketingMkHeroBackdrop :fade="false" />
+        <div class="pointer-events-none absolute inset-0 dark:bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgb(255_255_255/0.06),transparent)]" />
+        <div class="relative mx-auto w-full max-w-[75rem] px-4 py-10 sm:px-6 sm:py-14">
           <!-- Gradient orbs, echoing the 3D lands -->
           <!-- Softer on the dark theme, where full-strength colour glares -->
-          <div class="pointer-events-none absolute right-12 top-1/2 hidden -translate-y-1/2 lg:block dark:opacity-55 dark:saturate-[0.8]" aria-hidden="true">
+          <div class="pointer-events-none absolute right-24 top-1/2 hidden -translate-y-1/2 lg:block dark:opacity-55 dark:saturate-[0.8]" aria-hidden="true">
             <span class="absolute -left-36 -top-16"><MarketingMkOrb palette="sakura" :size="88" /></span>
             <span class="absolute -left-10 top-6"><MarketingMkOrb palette="sunset" :size="120" /></span>
             <span class="absolute -left-44 top-20"><MarketingMkOrb palette="lagoon" :size="52" /></span>
           </div>
           <div class="relative max-w-2xl">
-            <p class="mb-3 inline-flex items-center gap-1.5 rounded-full border border-default px-2.5 py-1 text-xs font-medium text-muted dark:border-white/10 dark:text-neutral-300">
-              <UIcon name="i-lucide-sparkles" class="size-3.5 text-highlighted" />
-              {{ t('dashboard.home.badge') }}
-            </p>
             <h1 class="mk-display text-4xl sm:text-5xl dark:text-white">
               {{ t('dashboard.home.heading') }}
             </h1>
@@ -37,8 +34,10 @@
               <SiteClaimForm size="lg" :initial-slug="initialSlug" autofocus />
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
+      <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-4">
         <!-- The sites they already have (most recently edited first) -->
         <section v-if="sites.length" class="space-y-5">
           <div class="flex flex-wrap items-end justify-between gap-3">
