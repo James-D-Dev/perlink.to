@@ -653,7 +653,12 @@
       "rsvpNo": "Not coming",
       "rsvpComing": "reply coming | replies coming",
       "rsvpPeople": "person in all | people in all",
-      "rsvpNotComing": "can’t make it | can’t make it"
+      "rsvpNotComing": "can’t make it | can’t make it",
+      "answerYes": "Said yes",
+      "nights": "{n} night | {n} nights",
+      "kindBooking": "Booking",
+      "kindStay": "Room",
+      "kindContact": "Message"
     },
     "qr": {
       "open": "QR code",

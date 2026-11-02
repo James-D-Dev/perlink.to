@@ -2,27 +2,35 @@
   <!-- A date that matters: counted down to (a birthday, every year; a
        wedding, once) or counted up from ("together for"). The 'card' look
        takes the page's own cards; the others are washes of colour -->
-  <div class="w-full overflow-hidden" :class="look.box" :style="boxStyle">
+  <div ref="root" class="relative w-full overflow-hidden" :class="look.box" :style="boxStyle">
+    <!-- The day itself: one burst of confetti -->
+    <BioConfetti v-if="isToday" :origin-y="45" />
     <div class="px-5 py-6 text-center sm:px-6">
       <p v-if="data.label" class="mb-4 text-sm font-medium" :class="look.soft">{{ data.label }}</p>
 
       <!-- Counting up: one big number of days, then years, months, days -->
       <template v-if="counting === 'since'">
-        <p class="text-5xl font-semibold leading-none tracking-tight tabular-nums" :style="numberStyle">{{ since.days }}</p>
+        <!-- Counts up from 0 the first time it comes into view -->
+        <p class="text-5xl font-semibold leading-none tracking-tight tabular-nums" :style="numberStyle">{{ sinceShown }}</p>
         <p class="mt-2 text-sm uppercase tracking-[0.18em]" :class="look.soft">{{ t('days') }}</p>
         <p v-if="since.parts" class="mt-4 text-sm" :class="look.soft">{{ since.parts }}</p>
       </template>
 
       <!-- Today -->
       <div v-else-if="isToday" class="flex flex-col items-center gap-2 py-2 text-xl font-semibold">
-        <UIcon name="i-lucide-party-popper" class="size-10 animate-bounce" />
-        <span>{{ repeat ? t('birthdayTime') : t('countdownToday') }}</span>
+        <UIcon name="i-lucide-party-popper" class="today-pop size-10" />
+        <span class="today-text">{{ repeat ? t('birthdayTime') : t('countdownToday') }}</span>
       </div>
 
       <!-- Counting down: four tiles -->
       <div v-else class="grid grid-cols-4 gap-2">
         <div v-for="unit in units" :key="unit.key" class="flex flex-col items-center rounded-xl py-3" :class="look.tile">
-          <span class="text-2xl font-semibold tabular-nums sm:text-3xl" :style="numberStyle">{{ unit.value }}</span>
+          <!-- Each new value flips down over the old one, like a split-flap board -->
+          <span class="flip relative block text-2xl font-semibold tabular-nums sm:text-3xl" :style="numberStyle">
+            <Transition name="flip">
+              <span :key="unit.value" class="flip-face block">{{ unit.value }}</span>
+            </Transition>
+          </span>
           <span class="mt-0.5 text-[11px] uppercase tracking-wider" :class="look.soft">{{ t(unit.key) }}</span>
         </div>
       </div>
@@ -129,6 +137,47 @@ const since = computed(() => {
   return { days: days.toLocaleString(lang.value), parts: years > 0 || months > 0 ? parts.join(' · ') : '' }
 })
 
+// ---------- Counting up into view ----------
+const root = ref<HTMLElement>()
+const shownDays = ref<number | null>(null)
+let observer: IntersectionObserver | null = null
+let frame = 0
+const sinceShown = computed(() => {
+  if (shownDays.value === null) return since.value.days
+  return shownDays.value.toLocaleString(lang.value)
+})
+function countUp(total: number) {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || total < 2) return
+  const start = performance.now()
+  const length = Math.min(1800, 700 + total * 0.6)
+  const step = (time: number) => {
+    const p = Math.min(1, (time - start) / length)
+    // Fast at first, easing into the real number
+    shownDays.value = Math.round(total * (1 - Math.pow(1 - p, 3)))
+    if (p < 1) frame = requestAnimationFrame(step)
+    else shownDays.value = null
+  }
+  shownDays.value = 0
+  frame = requestAnimationFrame(step)
+}
+watch(
+  () => counting.value === 'since' && !!now.value,
+  (ready) => {
+    if (!ready || observer || !root.value || !date.value) return
+    observer = new IntersectionObserver((entries) => {
+      if (!entries.some(e => e.isIntersecting)) return
+      observer?.disconnect()
+      const total = Math.max(0, Math.floor((Date.now() - date.value!.getTime()) / 86_400_000))
+      countUp(total)
+    }, { threshold: 0.4 })
+    observer.observe(root.value)
+  },
+)
+onUnmounted(() => {
+  observer?.disconnect()
+  cancelAnimationFrame(frame)
+})
+
 const nextAge = computed(() => (date.value && target.value ? target.value.getFullYear() - date.value.getFullYear() : null))
 
 const fullDate = computed(() => date.value?.toLocaleDateString(lang.value, { day: 'numeric', month: 'long', year: 'numeric' }) ?? '')
@@ -155,3 +204,22 @@ const numberStyle = computed<CSSProperties | undefined>(() => {
   return accent ? { color: String(accent) } : undefined
 })
 </script>
+
+<style scoped>
+/* Split-flap digits: the new value swings down from above the old one */
+.flip { perspective: 300px; }
+.flip-face { backface-visibility: hidden; transform-origin: 50% 60%; }
+.flip-enter-active { transition: transform 0.42s cubic-bezier(0.3, 1.4, 0.5, 1), opacity 0.2s ease; }
+.flip-leave-active { position: absolute; inset: 0; transition: transform 0.3s ease-in, opacity 0.3s ease-in; }
+.flip-enter-from { transform: rotateX(-88deg); opacity: 0.2; }
+.flip-leave-to { transform: rotateX(70deg); opacity: 0; }
+.today-pop { animation: pop 0.9s cubic-bezier(0.3, 1.6, 0.5, 1) both, wiggle 2.4s ease-in-out 1s infinite; }
+.today-text { animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+@keyframes pop { from { transform: scale(0.2) rotate(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes wiggle { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-12deg); } 40% { transform: rotate(10deg); } 60% { transform: rotate(-6deg); } }
+@keyframes rise { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .flip-enter-active, .flip-leave-active { transition: none; }
+  .today-pop, .today-text { animation: none; }
+}
+</style>

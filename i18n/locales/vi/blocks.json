@@ -45,7 +45,11 @@
       "modalTitle": "Thêm liên kết mạng xã hội",
       "searchPlaceholder": "Tìm nền tảng mạng xã hội...",
       "usernamePlaceholder": "tên người dùng",
-      "urlPlaceholder": "Nhập URL"
+      "urlPlaceholder": "Nhập URL",
+      "groups": {
+        "social": "Mạng xã hội",
+        "stores": "Sàn bán hàng, giao đồ ăn & bản đồ (hiện thành nút)"
+      }
     },
     "album": {
       "title": "Bộ sưu tập ảnh",
@@ -321,7 +325,8 @@
       "kinds": {
         "booking": "Đặt chỗ",
         "contact": "Liên hệ",
-        "rsvp": "Xác nhận tham dự"
+        "rsvp": "Xác nhận tham dự",
+        "stay": "Đặt phòng (lưu trú)"
       },
       "fieldsLabel": "Các ô",
       "fieldsHelp": "Luôn hỏi họ tên.",
@@ -331,8 +336,13 @@
         "date": "Ngày",
         "time": "Giờ",
         "guests": "Số khách",
-        "message": "Lời nhắn"
+        "message": "Lời nhắn",
+        "service": "Dịch vụ",
+        "checkout": "Ngày trả phòng"
       },
+      "serviceHint": "Dịch vụ: khách chọn từ bảng giá hoặc sản phẩm trên trang, kèm giá. Trang chưa có bảng giá thì khách tự ghi.",
+      "checkoutHint": "Ngày trả phòng: khách chọn ngày nhận và trả phòng, tự thấy số đêm.",
+      "hoursHint": "Giờ mở cửa trên trang sẽ chia giờ thành các khung và chặn ngày nghỉ.",
       "submitLabel": "Chữ trên nút",
       "submitPlaceholder": "Gửi yêu cầu đặt chỗ",
       "successLabel": "Lời cảm ơn",
@@ -403,7 +413,20 @@
       "soldOut": "Hết hàng",
       "moveUp": "Lên trên",
       "moveDown": "Xuống dưới",
-      "add": "Thêm sản phẩm"
+      "add": "Thêm sản phẩm",
+      "choices": "Phân loại & tồn kho",
+      "stock": "Tồn kho",
+      "stockPlaceholder": "Không đếm",
+      "stockHelp": "Để trống nếu không đếm. Còn từ 5 trở xuống sẽ hiện “Chỉ còn 3”, về 0 sẽ hiện Hết hàng.",
+      "stockCount": "còn {n}",
+      "optionName": "Size",
+      "optionValues": "S, M, L (cách nhau dấu phẩy)",
+      "addSize": "Size",
+      "addColour": "Màu",
+      "addOption": "Phân loại khác",
+      "sizeName": "Size",
+      "colourName": "Màu",
+      "colourValues": "Đen, Trắng, Be"
     },
     "blog": {
       "title": "Bài viết mới",

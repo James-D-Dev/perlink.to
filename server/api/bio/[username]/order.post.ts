@@ -21,6 +21,8 @@ const bodySchema = z.object({
   address: z.string().trim().max(500).optional(),
   note: z.string().trim().max(1000).optional(),
   payment: z.enum(['cod', 'transfer']),
+  // Option group id -> chosen value id, e.g. size and colour
+  options: z.record(z.string().max(40), z.string().max(40)).optional(),
   // Honeypot: hidden from people, bots fill it in
   website: z.string().optional(),
 })
@@ -42,7 +44,19 @@ export default defineEventHandler(async (event) => {
   const block = blocks.find(b => b.id === body.blockId && b.name === 'products' && !b.hidden)
   const product = block?.data?.items?.find((item: any) => item.id === body.productId)
   if (!block?.data?.ordering || !product || product.url) throw createError({ statusCode: 404, statusMessage: 'Product not found' })
-  if (product.soldOut) throw createError({ statusCode: 409, statusMessage: 'Sold out' })
+  // Stock, when counted: none left is sold out, and no more than what's left
+  const stock = typeof product.stock === 'number' ? product.stock : undefined
+  if (product.soldOut || stock === 0) throw createError({ statusCode: 409, statusMessage: 'Sold out' })
+  if (stock !== undefined && body.quantity > stock) throw createError({ statusCode: 409, statusMessage: `Only ${stock} left` })
+
+  // Every option group of the product needs one of its own values
+  const picked: string[] = []
+  for (const option of (Array.isArray(product.options) ? product.options : []) as { id: string; name: string; values?: { id: string; label: string }[] }[]) {
+    if (!option?.values?.length) continue
+    const value = option.values.find(v => v.id === body.options?.[option.id])
+    if (!value) throw createError({ statusCode: 422, statusMessage: `Please choose ${String(option.name).toLowerCase()}` })
+    picked.push(String(value.label))
+  }
 
   const payment = block.data.payment ?? 'both'
   if (payment !== 'both' && payment !== body.payment) throw createError({ statusCode: 400, statusMessage: 'Payment method not available' })
@@ -72,7 +86,8 @@ export default defineEventHandler(async (event) => {
   const data: Record<string, string> = {
     kind: 'order',
     code,
-    product: String(product.name).slice(0, 200),
+    // The choices ride along in the product line: "Linen shirt · M · Cream"
+    product: [String(product.name), ...picked].join(' · ').slice(0, 200),
     quantity: String(body.quantity),
     total: price ? formatVnd(total) : '',
     payment: body.payment,

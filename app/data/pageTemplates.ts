@@ -125,7 +125,7 @@ const BASE_TEMPLATES: PageTemplate[] = [
         { name: 'hours', data: { title: 'Opening hours', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '10:00', close: '22:00' })), note: 'Last orders 30 minutes before closing.' } },
         { name: 'contact', data: { title: 'Find us', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, bookingLabel: 'Book a table', bookingUrl: '' } },
         { name: 'form', data: { title: 'Book a table', description: 'We’ll confirm by phone within the hour.', kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: true, message: true } } },
-        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'zalo') } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'zalo', 'grabfood', 'shopeefood', 'googlemaps') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#7a4b3a', floorColor: '#9c6b46', floorMaterial: 'wood', trimColor: '#3b2a22' }, [
         { type: 'neon-sign', position: [0.2, 2.1, -3], rotation: 0, wall: 'back', color: '#ffb347', link: { label: 'See our menu', url: '' } },
@@ -178,9 +178,9 @@ const BASE_TEMPLATES: PageTemplate[] = [
           },
         },
         { name: 'contact', data: { title: 'Contact & booking', address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, email: '', bookingLabel: 'Book your stay', bookingUrl: '' } },
-        { name: 'form', data: { title: 'Ask about your dates', kind: 'booking', fields: { phone: true, email: true, date: true, time: false, guests: true, message: true }, submitLabel: 'Check availability' } },
+        { name: 'form', data: { title: 'Ask about your dates', kind: 'stay', fields: { phone: true, email: true, date: true, time: false, guests: true, message: true, service: true, checkout: true }, submitLabel: 'Check availability' } },
         { name: 'hours', data: { title: 'Reception', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '07:00', close: '23:00' })), note: 'Check-in from 14:00, check-out before 12:00.' } },
-        { name: 'social', data: { links: social('facebook', 'instagram', 'whatsapp') } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'whatsapp', 'googlemaps') } },
       ] as Omit<BioBlock, 'index' | 'hidden'>[]),
       room: room({ wallColor: '#ece4d8', floorColor: '#b89b7a', floorMaterial: 'wood' }, [
         { type: 'window', position: [1.6, 1.6, -3], rotation: 0, wall: 'back', link: { label: 'Book your stay', url: '' } },
@@ -215,7 +215,7 @@ const BASE_TEMPLATES: PageTemplate[] = [
         header: 'left', link: 'centered', social: 'filled', titleAlign: 'left',
       }),
       blocks: withIndex([
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'grabfood', 'shopeefood', 'googlemaps') } },
         {
           name: 'menu',
           data: {

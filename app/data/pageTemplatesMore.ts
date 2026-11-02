@@ -26,8 +26,8 @@ export function hours(open: string, close: string, closedDays: number[] = []) {
   return DEFAULT_OPENING_DAYS.map(d => ({ ...d, open, close, closed: closedDays.includes(d.day) }))
 }
 
-export const booking = (date = true, time = true, guests = false) =>
-  ({ phone: true, email: false, date, time, guests, message: true })
+export const booking = (date = true, time = true, guests = false, service = true) =>
+  ({ phone: true, email: false, date, time, guests, message: true, service })
 
 // ---- 3D rooms, reused with each template's colours ----
 
@@ -956,7 +956,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
           [s('Best hot stone massage in town.', 'Massage đá nóng ngon nhất thành phố.'), 'Anna L.'],
         ) } },
         { name: 'contact', data: { title: s('Visit the spa', 'Ghé spa'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('facebook', 'instagram', 'zalo') } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'zalo', 'googlemaps') } },
       ] as Blocks),
       room: loungeRoom('#e3e8dc', '#c9b79c', '#6b7f65', s('Book a treatment', 'Đặt lịch')),
     }),
@@ -986,7 +986,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Book a seat', 'Đặt lịch làm móng'), kind: 'booking', fields: booking() } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('09:00', '20:30') } },
         { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo', 'googlemaps') } },
       ] as Blocks),
       room: shopRoom('#ffd6e8', '#e8c4a0', '#ec4899', s('See our designs', 'Xem mẫu móng')),
     }),
@@ -1171,7 +1171,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Order a cake', 'Đặt bánh'), description: s('Tell us the size, flavour and the name to write.', 'Cho chúng tôi biết cỡ bánh, vị và tên cần viết.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('06:30', '20:00') } },
         { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('facebook', 'instagram', 'zalo') } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'zalo', 'grabfood', 'shopeefood') } },
       ] as Blocks),
       room: shopRoom('#fdeccb', '#c99a6b', '#d98e04', s('Order a cake', 'Đặt bánh')),
     }),
@@ -1205,7 +1205,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'hours', data: { title: s('Open', 'Giờ bán'), days: hours('16:00', '23:00') } },
         { name: 'image-album', data: { images: album('street-1', 'street-2', 'street-3'), layout: 'grid' } },
         { name: 'contact', data: { title: s('Find us', 'Địa chỉ'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('tiktok', 'facebook', 'zalo') } },
+        { name: 'social', data: { links: social('tiktok', 'facebook', 'zalo', 'grabfood', 'shopeefood') } },
       ] as Blocks),
       room: nightRoom('#3a1f1a', '#fbbf24', s('See the menu', 'Xem thực đơn')),
     }),
@@ -1235,10 +1235,10 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
           { name: s('Classics', 'Cổ điển'), items: [[s('Negroni', 'Negroni'), '170,000'], [s('Old Fashioned', 'Old Fashioned'), '170,000']] },
         ]) } },
         { name: 'image-album', data: { images: album('bar-1', 'bar-2', 'bar-3'), layout: 'grid' } },
-        { name: 'form', data: { title: s('Reserve a table', 'Đặt bàn'), kind: 'booking', fields: booking(true, true, true) } },
+        { name: 'form', data: { title: s('Reserve a table', 'Đặt bàn'), kind: 'booking', fields: booking(true, true, true, false) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('18:00', '01:00') } },
         { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('instagram', 'facebook') } },
+        { name: 'social', data: { links: social('instagram', 'facebook', 'googlemaps') } },
       ] as Blocks),
       room: nightRoom('#141414', '#c9a45c', s('Reserve a table', 'Đặt bàn')),
     }),
@@ -1273,7 +1273,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Order flowers', 'Đặt hoa'), description: s('Tell us the date, budget and who they are for.', 'Cho chúng tôi biết ngày nhận, ngân sách và người nhận.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('07:00', '21:00') } },
         { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('facebook', 'instagram', 'zalo') } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'zalo', 'shopee') } },
       ] as Blocks),
       room: shopRoom('#fbe4ea', '#d8b49a', '#5b8c51', s('Order flowers', 'Đặt hoa'), [
         { type: 'plant', position: [1.2, 0, -1.6], rotation: 0, color: '#f472b6' },
@@ -1308,7 +1308,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         ]) } },
         { name: 'image-album', data: { title: s('Lookbook', 'Lookbook'), images: album('shop-1', 'shop-2', 'shop-3'), layout: 'masonry' } },
         { name: 'contact', data: { title: s('Questions?', 'Cần tư vấn?'), phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo', 'shopee', 'tiktokshop', 'lazada') } },
       ] as Blocks),
       room: shopRoom('#f0eeea', '#bfb6aa', '#0a0a0a', s('Shop now', 'Mua ngay')),
     }),

@@ -14,7 +14,7 @@
       <UFormField :label="t('blocks.form.kind')">
         <div class="flex flex-wrap gap-1">
           <UButton
-            v-for="kind in (['booking', 'contact', 'rsvp'] as const)"
+            v-for="kind in (['booking', 'stay', 'contact', 'rsvp'] as const)"
             :key="kind"
             size="sm"
             :color="data.kind === kind ? 'primary' : 'neutral'"
@@ -44,6 +44,12 @@
             {{ t(`blocks.form.fields.${field}`) }}
           </label>
         </div>
+        <!-- What the smart fields do -->
+        <ul v-if="fields.service || fields.checkout || fields.time" class="mt-2 space-y-1 text-xs text-muted">
+          <li v-if="fields.service" class="flex gap-1.5"><UIcon name="i-lucide-list-checks" class="mt-0.5 size-3.5 shrink-0" />{{ t('blocks.form.serviceHint') }}</li>
+          <li v-if="fields.checkout" class="flex gap-1.5"><UIcon name="i-lucide-bed-double" class="mt-0.5 size-3.5 shrink-0" />{{ t('blocks.form.checkoutHint') }}</li>
+          <li v-if="fields.time || fields.date" class="flex gap-1.5"><UIcon name="i-lucide-clock" class="mt-0.5 size-3.5 shrink-0" />{{ t('blocks.form.hoursHint') }}</li>
+        </ul>
       </UFormField>
 
       <div class="grid gap-3 sm:grid-cols-2">
@@ -80,7 +86,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const FIELD_KEYS: (keyof FormFields)[] = ['phone', 'email', 'date', 'time', 'guests', 'message']
+const FIELD_KEYS: (keyof FormFields)[] = ['service', 'phone', 'email', 'date', 'checkout', 'time', 'guests', 'message']
 
 const { getBlock, toggleBlockHidden } = useBioBlock({ blocks: toRef(props, 'blocks') })
 const formBlock = computed(() => getBlock<FormBlock>('form'))

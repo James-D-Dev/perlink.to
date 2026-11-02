@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3'
 import { getDB } from './db'
 import { escapeHtml } from './email'
+import { stayNights } from './formNotification'
 import { toAppLanguage } from '#shared/language'
 
 // Messages from the Perlink Telegram bot. An owner links their account once
@@ -57,9 +58,12 @@ const COPY = {
     order: (code: string) => `🛍 <b>New order ${code}</b>`,
     request: '📩 <b>New request</b>',
     rsvp: '💌 <b>Reply to your invitation</b>',
+    stay: '🛏 <b>New room booking</b>',
+    booking: '📅 <b>New booking</b>',
+    answer: '💘 <b>Someone said YES</b>',
     guestbook: (gift: string) => `💌 <b>New guestbook message</b> ${gift}`,
     on: (site: string) => `on perlink.to/${site}`,
-    labels: { product: 'Product', quantity: 'Quantity', total: 'Total', payment: 'Payment', name: 'Name', attending: 'Coming', phone: 'Phone', email: 'Email', address: 'Address', date: 'Date', time: 'Time', guests: 'Guests', message: 'Message' } as Record<string, string>,
+    labels: { product: 'Product', quantity: 'Quantity', total: 'Total', payment: 'Payment', question: 'Question', name: 'Name', attending: 'Coming', service: 'Service', phone: 'Phone', email: 'Email', address: 'Address', date: 'Date', checkout: 'Check-out', nights: 'Nights', time: 'Time', guests: 'Guests', message: 'Message' } as Record<string, string>,
     payments: { cod: 'Cash on delivery', transfer: 'Bank transfer — check your bank account' } as Record<string, string>,
     attending: { yes: '✅ Yes', no: '❌ Can’t make it' } as Record<string, string>,
     open: 'Open inbox',
@@ -68,9 +72,12 @@ const COPY = {
     order: (code: string) => `🛍 <b>Đơn hàng mới ${code}</b>`,
     request: '📩 <b>Yêu cầu mới</b>',
     rsvp: '💌 <b>Khách trả lời thiệp mời</b>',
+    stay: '🛏 <b>Đặt phòng mới</b>',
+    booking: '📅 <b>Lịch hẹn mới</b>',
+    answer: '💘 <b>Người ấy đã đồng ý</b>',
     guestbook: (gift: string) => `💌 <b>Lời chúc mới trong phòng 3D</b> ${gift}`,
     on: (site: string) => `trên perlink.to/${site}`,
-    labels: { product: 'Sản phẩm', quantity: 'Số lượng', total: 'Tổng tiền', payment: 'Thanh toán', name: 'Họ tên', attending: 'Tham dự', phone: 'SĐT', email: 'Email', address: 'Địa chỉ', date: 'Ngày', time: 'Giờ', guests: 'Số khách', message: 'Lời nhắn' } as Record<string, string>,
+    labels: { product: 'Sản phẩm', quantity: 'Số lượng', total: 'Tổng tiền', payment: 'Thanh toán', question: 'Câu hỏi', name: 'Họ tên', attending: 'Tham dự', service: 'Dịch vụ', phone: 'SĐT', email: 'Email', address: 'Địa chỉ', date: 'Ngày', checkout: 'Trả phòng', nights: 'Số đêm', time: 'Giờ', guests: 'Số khách', message: 'Lời nhắn' } as Record<string, string>,
     payments: { cod: 'Thanh toán khi nhận hàng (COD)', transfer: 'Chuyển khoản — kiểm tra tài khoản ngân hàng' } as Record<string, string>,
     attending: { yes: '✅ Có, sẽ đến', no: '❌ Không đến được' } as Record<string, string>,
     open: 'Mở Hộp thư',
@@ -97,12 +104,25 @@ export async function notifyOwnerTelegram(
     ...data,
     ...(isOrder && data.payment ? { payment: copy.payments[data.payment] ?? data.payment } : {}),
     ...(data.attending ? { attending: copy.attending[data.attending] ?? data.attending } : {}),
+    ...(data.date && data.checkout ? { nights: String(stayNights(data.date, data.checkout)) } : {}),
   }
-  const lines = Object.keys(copy.labels)
-    .filter(key => shown[key])
-    .map(key => `<b>${escapeHtml(copy.labels[key]!)}:</b> ${escapeHtml(shown[key]!)}`)
+  const isAnswer = data.kind === 'answer'
+  // A "yes" to a question: just the question, no contact details
+  const lines = isAnswer
+    ? (data.question ? [`“${escapeHtml(data.question)}”`] : [])
+    : Object.keys(copy.labels)
+        .filter(key => shown[key])
+        .map(key => `<b>${escapeHtml(copy.labels[key]!)}:</b> ${escapeHtml(shown[key]!)}`)
   const isGuestbook = data.kind === 'guestbook'
-  const heading = isOrder ? copy.order(escapeHtml(data.code ?? '')) : isGuestbook ? copy.guestbook(escapeHtml(data.gift ?? '')) : data.kind === 'rsvp' ? copy.rsvp : copy.request
+  const heading = isOrder
+    ? copy.order(escapeHtml(data.code ?? ''))
+    : isGuestbook
+      ? copy.guestbook(escapeHtml(data.gift ?? ''))
+      : data.kind === 'rsvp' ? copy.rsvp
+        : isAnswer ? copy.answer
+          : data.kind === 'stay' ? copy.stay
+            : data.kind === 'booking' && data.date ? copy.booking
+              : copy.request
   const html = `${heading} ${escapeHtml(copy.on(site.username))}\n\n${lines.join('\n')}`
   await sendTelegram(event, owner.telegram_chat_id, html, [
     { text: copy.open, url: `https://perlink.to/dashboard/site/${site.username}/inbox${isGuestbook ? '#guestbook' : ''}` },

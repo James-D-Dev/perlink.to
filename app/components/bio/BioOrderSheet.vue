@@ -73,7 +73,7 @@
                 <img v-if="placed.product.imageUrl" :src="placed.product.imageUrl" alt="" class="size-12 shrink-0 rounded-xl object-cover">
                 <div class="min-w-0 flex-1">
                   <p class="truncate font-medium">{{ placed.product.name }}</p>
-                  <p class="text-sm text-black/50 tabular-nums">× {{ placed.quantity }}</p>
+                  <p class="text-sm text-black/50 tabular-nums"><template v-if="placed.variant">{{ placed.variant }} · </template>× {{ placed.quantity }}</p>
                 </div>
                 <p v-if="placed.total" class="font-semibold tabular-nums">{{ formatVnd(placed.total) }}</p>
               </div>
@@ -111,7 +111,7 @@
                     </p>
                   </div>
                   <div class="flex shrink-0 flex-col items-center rounded-2xl bg-[#f5f4f2] p-1" :aria-label="t('orderQuantity')">
-                    <button type="button" class="qty" :disabled="form.quantity >= 99" :aria-label="'+'" @click="form.quantity++">
+                    <button type="button" class="qty" :disabled="form.quantity >= maxQuantity" :aria-label="'+'" @click="form.quantity++">
                       <UIcon name="i-lucide-plus" class="size-3.5" />
                     </button>
                     <span class="w-8 py-0.5 text-center text-[15px] font-bold tabular-nums">{{ form.quantity }}</span>
@@ -121,6 +121,31 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Size, colour...: one choice each before ordering -->
+              <section v-if="options.length" class="space-y-4 px-5 pb-6">
+                <div v-for="option in options" :key="option.id">
+                  <p class="mb-2 flex items-baseline justify-between gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-black/40">
+                    {{ option.name }}
+                    <span v-if="chosenLabel(option)" class="truncate text-[13px] font-medium normal-case tracking-normal text-black/70">{{ chosenLabel(option) }}</span>
+                  </p>
+                  <div class="flex flex-wrap gap-2" role="radiogroup" :aria-label="option.name">
+                    <button
+                      v-for="value in option.values"
+                      :key="value.id"
+                      type="button"
+                      role="radio"
+                      :aria-checked="choices[option.id] === value.id"
+                      class="choice"
+                      :class="choices[option.id] === value.id && 'choice-on'"
+                      @click="choices[option.id] = value.id"
+                    >
+                      <span v-if="value.color" class="size-4 shrink-0 rounded-full ring-1 ring-black/15" :style="{ backgroundColor: value.color }" />
+                      {{ value.label }}
+                    </button>
+                  </div>
+                </div>
+              </section>
 
               <!-- Contact -->
               <section class="px-5">
@@ -189,6 +214,7 @@
               </div>
               <button type="submit" class="cta" :disabled="sending || preview || !canSubmit">
                 <UIcon v-if="sending" name="i-lucide-loader-circle" class="size-5 animate-spin" />
+                <template v-else-if="missingOption">{{ t('orderChooseFirst', { name: missingOption.name.toLowerCase() }) }}</template>
                 <template v-else>
                   <UIcon name="i-lucide-shopping-bag" class="size-[18px]" />
                   {{ t('orderPlace') }}<template v-if="product.price"> · {{ formatVnd(product.price * form.quantity) }}</template>
@@ -203,7 +229,7 @@
 
 <script setup lang="ts">
 import qrcode from 'qrcode-generator'
-import type { ProductItem, ProductsBlock } from '~/types/bio'
+import type { ProductItem, ProductOption, ProductsBlock } from '~/types/bio'
 import { formatVnd } from '#shared/plans'
 
 // Order form for one product (products block on the page, or a product
@@ -231,6 +257,8 @@ interface Placed {
   transfer: Transfer | null
   // What was ordered, for the receipt
   product: ProductItem
+  /** The choices made, e.g. "M · Cream" */
+  variant: string
   quantity: number
   payment: 'cod' | 'transfer'
   name: string
@@ -272,7 +300,16 @@ const paymentOptions = computed(() =>
 
 const phoneValid = computed(() => /^[+\d][\d\s.-]{7,}$/.test(form.phone.trim()))
 const phoneError = computed(() => phoneTouched.value && !!form.phone.trim() && !phoneValid.value)
-const canSubmit = computed(() => !!form.name.trim() && phoneValid.value && (!props.data.askAddress || !!form.address.trim()))
+// One choice per option group (size, colour...)
+const choices = reactive<Record<string, string>>({})
+const options = computed<ProductOption[]>(() => (product.value?.options ?? []).filter(o => o.values?.length))
+const missingOption = computed(() => options.value.find(o => !o.values.some(v => v.id === choices[o.id])))
+const chosenLabel = (option: ProductOption) => option.values.find(v => v.id === choices[option.id])?.label ?? ''
+const variant = computed(() => options.value.map(chosenLabel).filter(Boolean).join(' · '))
+// No more than what's left
+const maxQuantity = computed(() => Math.max(1, Math.min(99, typeof product.value?.stock === 'number' ? product.value.stock : 99)))
+
+const canSubmit = computed(() => !missingOption.value && !!form.name.trim() && phoneValid.value && (!props.data.askAddress || !!form.address.trim()))
 
 const transferRows = computed(() => {
   const tr = placed.value?.transfer
@@ -293,6 +330,11 @@ watch(product, (item) => {
   phoneTouched.value = false
   form.quantity = 1
   form.payment = paymentOptions.value[0]?.value ?? 'cod'
+  for (const key of Object.keys(choices)) delete choices[key]
+  // A single value needs no choosing
+  for (const option of item.options ?? []) {
+    if (option.values?.length === 1) choices[option.id] = option.values[0]!.id
+  }
 })
 
 // The product stays until the sheet has slid away, so it doesn't empty mid-way
@@ -325,12 +367,14 @@ async function placeOrder() {
         address: props.data.askAddress ? form.address : undefined,
         note: form.note || undefined,
         payment: form.payment,
+        options: options.value.length ? { ...choices } : undefined,
         website: form.website,
       },
     })
     placed.value = {
       ...res,
       product: product.value,
+      variant: variant.value,
       quantity: form.quantity,
       payment: form.payment,
       name: form.name.trim(),
@@ -440,6 +484,30 @@ const qrImage = (text: string) => qrCode(text).createDataURL(8, 4)
 .cta:disabled {
   opacity: 0.45;
   box-shadow: none;
+}
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  border-radius: 9999px;
+  background: white;
+  padding: 0.4rem 0.95rem;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+  transition: box-shadow 0.15s, background-color 0.15s, transform 0.1s;
+}
+.choice:hover {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+}
+.choice:active {
+  transform: scale(0.97);
+}
+.choice-on,
+.choice-on:hover {
+  box-shadow: inset 0 0 0 2px var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, white);
 }
 .step {
   display: flex;

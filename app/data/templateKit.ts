@@ -112,8 +112,18 @@ export function menu(sections: { name: string; items: [string, string, string?, 
   }))
 }
 
+// Sample links for store, delivery and map buttons, so templates show them
+const CHANNEL_URLS: Record<string, string> = {
+  shopee: 'https://shopee.vn',
+  lazada: 'https://www.lazada.vn',
+  tiktokshop: 'https://shop.tiktok.com',
+  grabfood: 'https://food.grab.com/vn',
+  shopeefood: 'https://shopeefood.vn',
+  googlemaps: 'https://maps.google.com',
+}
+
 export function social(...providers: string[]) {
-  return providers.map((provider, index) => ({ id: nanoid(6), provider, url: '', index }))
+  return providers.map((provider, index) => ({ id: nanoid(6), provider, url: CHANNEL_URLS[provider] ?? '', index }))
 }
 
 export function links(...items: [string, string][]) {

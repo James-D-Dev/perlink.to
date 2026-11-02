@@ -115,19 +115,23 @@
             class="mb-4 w-full"
             size="lg"
           />
-          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
-            <button
-              v-for="provider in availableProviders"
-              :key="provider.key"
-              class="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-perlink-cyan hover:bg-perlink-cyan/5 transition-all"
-              @click="addSocial(provider.key)"
-            >
-              <SocialBadge :provider="provider.key" :size="40" />
-              <span class="text-xs font-medium text-gray-700 dark:text-neutral-200">{{
-                provider.label
-              }}</span>
-            </button>
-          </div>
+          <!-- Networks, then where people buy, order food or find the place -->
+          <template v-for="group in providerGroups" :key="group.key">
+            <p v-if="group.items.length" class="mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-muted first:mt-0">{{ t(`blocks.social.groups.${group.key}`) }}</p>
+            <div v-if="group.items.length" class="mb-5 grid grid-cols-3 sm:grid-cols-4 gap-3">
+              <button
+                v-for="provider in group.items"
+                :key="provider.key"
+                class="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-perlink-cyan hover:bg-perlink-cyan/5 transition-all"
+                @click="addSocial(provider.key)"
+              >
+                <SocialBadge :provider="provider.key" :size="40" />
+                <span class="text-xs font-medium text-gray-700 dark:text-neutral-200">{{
+                  provider.label
+                }}</span>
+              </button>
+            </div>
+          </template>
         </div>
       </template>
     </AppSheet>
@@ -207,6 +211,13 @@ const availableProviders = computed(() => {
   }
   return providers;
 });
+
+// Stores, delivery apps and maps show on the page as buttons in their colour
+const CHANNEL_KEYS = new Set(["shopee", "lazada", "tiktokshop", "grabfood", "shopeefood", "googlemaps"]);
+const providerGroups = computed(() => [
+  { key: "social", items: availableProviders.value.filter((p) => !CHANNEL_KEYS.has(p.key)) },
+  { key: "stores", items: availableProviders.value.filter((p) => CHANNEL_KEYS.has(p.key)) },
+]);
 
 // Display first 4 socials for preview
 const displayedSocials = computed(() => {

@@ -94,8 +94,15 @@
               <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-ink'" />
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                  <p class="flex items-center gap-2 font-medium text-ink">
-                    {{ item.data.name }}
+                  <p class="flex flex-wrap items-center gap-2 font-medium text-ink">
+                    <!-- A "yes" to the page's question: no name, just the answer -->
+                    <template v-if="item.data.kind === 'answer'">💘 {{ t('dashboard.inbox.answerYes') }}</template>
+                    <template v-else>{{ item.data.name }}</template>
+                    <!-- What kind of request -->
+                    <span v-if="kindChip(item.data)" class="inline-flex items-center gap-1 rounded-full bg-sand px-2 py-0.5 text-xs font-medium text-ink-soft ring-1 ring-line">
+                      <UIcon :name="kindChip(item.data)!.icon" class="size-3" />
+                      {{ kindChip(item.data)!.label }}
+                    </span>
                     <span
                       v-if="item.data.kind === 'rsvp'"
                       class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ring-1"
@@ -126,9 +133,20 @@
                     <span v-if="item.data.address" class="inline-flex items-start gap-1"><UIcon name="i-lucide-map-pin" class="mt-0.5 size-3.5 shrink-0" />{{ item.data.address }}</span>
                   </p>
                 </div>
+                <!-- The question they said yes to -->
+                <p v-if="item.data.kind === 'answer' && item.data.question" class="mt-1 text-sm text-ink-soft">“{{ item.data.question }}”</p>
+                <!-- What they picked from the price list -->
+                <p v-if="item.data.service" class="mt-1.5 inline-flex items-center gap-1.5 rounded-lg bg-sand/70 px-2.5 py-1 text-sm font-medium text-ink">
+                  <UIcon :name="item.data.kind === 'stay' ? 'i-lucide-bed-double' : 'i-lucide-sparkles'" class="size-3.5 text-ink-muted" />
+                  {{ item.data.service }}
+                </p>
                 <!-- Booking details -->
                 <p v-if="item.data.date || item.data.time || item.data.guests" class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-soft">
-                  <span v-if="item.data.date" class="inline-flex items-center gap-1"><UIcon name="i-lucide-calendar" class="size-3.5" />{{ formatDate(item.data.date) }}</span>
+                  <span v-if="item.data.date && item.data.checkout" class="inline-flex items-center gap-1">
+                    <UIcon name="i-lucide-calendar-range" class="size-3.5" />{{ formatDate(item.data.date) }} → {{ formatDate(item.data.checkout) }}
+                    <span class="text-ink-muted">· {{ t('dashboard.inbox.nights', { n: nights(item.data) }, nights(item.data)) }}</span>
+                  </span>
+                  <span v-else-if="item.data.date" class="inline-flex items-center gap-1"><UIcon name="i-lucide-calendar" class="size-3.5" />{{ formatDate(item.data.date) }}</span>
                   <span v-if="item.data.time" class="inline-flex items-center gap-1"><UIcon name="i-lucide-clock" class="size-3.5" />{{ item.data.time }}</span>
                   <span v-if="item.data.guests" class="inline-flex items-center gap-1"><UIcon name="i-lucide-users" class="size-3.5" />{{ t('dashboard.inbox.guests', { n: Number(item.data.guests) }, Number(item.data.guests)) }}</span>
                 </p>
@@ -233,6 +251,19 @@ const dateLocale = computed(() => (locale.value === 'vi' ? 'vi-VN' : 'en-GB'))
 function formatWhen(value: string) {
   const date = new Date(`${value.replace(' ', 'T')}Z`)
   return date.toLocaleString(dateLocale.value, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
+
+// A chip for what kind of request this is (orders and replies have their own)
+function kindChip(data: Record<string, string>) {
+  if (data.kind === 'stay') return { icon: 'i-lucide-bed-double', label: t('dashboard.inbox.kindStay') }
+  if (data.kind === 'contact') return { icon: 'i-lucide-message-circle', label: t('dashboard.inbox.kindContact') }
+  if (data.kind === 'booking' || (!data.kind && (data.date || data.time))) return { icon: 'i-lucide-calendar-check', label: t('dashboard.inbox.kindBooking') }
+  return null
+}
+
+function nights(data: Record<string, string>) {
+  const day = (d: string) => Date.parse(`${d}T00:00:00Z`)
+  return Math.max(0, Math.round((day(data.checkout!) - day(data.date!)) / 86_400_000))
 }
 
 function formatDate(value: string) {

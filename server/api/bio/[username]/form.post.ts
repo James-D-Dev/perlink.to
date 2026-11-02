@@ -6,10 +6,25 @@ import { emailEnabled, runInBackground } from '../../../utils/email'
 import { notifyOwnerOfRequest } from '../../../utils/formNotification'
 import { notifyOwnerTelegram } from '../../../utils/telegram'
 
-// A visitor sends a site's form (booking or contact request, or a reply to
-// an invitation)
+// A visitor sends a site's form (a booking, a room for some nights, a
+// contact request, or a reply to an invitation)
 
 const FIELDS = ['phone', 'email', 'date', 'time', 'guests', 'message'] as const
+const DATE = /^\d{4}-\d{2}-\d{2}$/
+
+/** The names a visitor can pick as a service: the page's price lists and products */
+function serviceNames(blocks: any[]) {
+  const names = new Set<string>()
+  for (const block of blocks) {
+    if (block.hidden) continue
+    if (block.name === 'menu') {
+      for (const section of block.data?.sections ?? []) for (const item of section.items ?? []) if (item.name?.trim()) names.add(item.name.trim().toLowerCase())
+    } else if (block.name === 'products') {
+      for (const item of block.data?.items ?? []) if (item.name?.trim()) names.add(item.name.trim().toLowerCase())
+    }
+  }
+  return names
+}
 
 const bodySchema = z.object({
   blockId: z.string().min(1).max(40),
@@ -54,6 +69,26 @@ export default defineEventHandler(async (event) => {
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     throw createError({ statusCode: 422, statusMessage: 'Invalid email' })
   }
+  if (data.date && !DATE.test(data.date)) delete data.date
+
+  // A service from the page's own price list (anything, briefly, without one)
+  const service = values.service?.trim()
+  if (enabled.service && service) {
+    const known = serviceNames(bioPage.blocks as any[])
+    if (known.size && !known.has(service.toLowerCase())) {
+      throw createError({ statusCode: 422, statusMessage: 'Please pick a service from the list' })
+    }
+    data.service = service.slice(0, 120)
+  }
+
+  // A stay: check-out after check-in
+  const checkout = values.checkout?.trim()
+  if (enabled.checkout && checkout && data.date) {
+    if (!DATE.test(checkout) || checkout <= data.date) {
+      throw createError({ statusCode: 422, statusMessage: 'Check-out must be after check-in' })
+    }
+    data.checkout = checkout
+  }
   if (block.data?.kind === 'rsvp') {
     // A reply to an invitation: coming or not is all it needs
     const attending = values.attending
@@ -63,8 +98,12 @@ export default defineEventHandler(async (event) => {
     data.kind = 'rsvp'
     data.attending = attending
     if (attending === 'no') delete data.guests
-  } else if (!data.phone && !data.email && !data.message) {
-    throw createError({ statusCode: 422, statusMessage: 'Please leave a way to reach you' })
+  } else {
+    if (!data.phone && !data.email && !data.message) {
+      throw createError({ statusCode: 422, statusMessage: 'Please leave a way to reach you' })
+    }
+    // booking, stay or contact, for the inbox
+    data.kind = ['booking', 'stay', 'contact'].includes(block.data?.kind) ? block.data.kind : 'booking'
   }
 
   const db = getDB(event)

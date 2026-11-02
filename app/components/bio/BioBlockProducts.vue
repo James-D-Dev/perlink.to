@@ -127,6 +127,51 @@
           {{ item.url ? t('blocks.products.urlHelpStore', { store: productStore(item.url)?.name ?? t('blocks.products.website') }) : data.ordering ? t('blocks.products.urlHelpOrder') : t('blocks.products.urlHelp') }}
         </p>
 
+        <!-- Size, colour and how many are left -->
+        <details class="group rounded-md border border-default bg-elevated/30 dark:border-white/10" :open="!!item.options?.length || typeof item.stock === 'number'">
+          <summary class="flex cursor-pointer list-none items-center gap-2 px-3 py-2 text-sm font-medium text-highlighted [&::-webkit-details-marker]:hidden">
+            <UIcon name="i-lucide-sliders-horizontal" class="size-4 text-muted" />
+            {{ t('blocks.products.choices') }}
+            <span v-if="item.options?.length || typeof item.stock === 'number'" class="truncate text-xs font-normal text-muted">{{ choicesSummary(item) }}</span>
+            <UIcon name="i-lucide-chevron-down" class="ml-auto size-4 text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <div class="space-y-3 border-t border-default px-3 pb-3 pt-3 dark:border-white/10">
+            <UFormField :label="t('blocks.products.stock')" :help="t('blocks.products.stockHelp')">
+              <UInput
+                :model-value="item.stock"
+                type="number"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                :placeholder="t('blocks.products.stockPlaceholder')"
+                class="w-40"
+                @update:model-value="updateItem(index, { stock: toStock($event) })"
+              />
+            </UFormField>
+
+            <div v-for="(option, oi) in item.options ?? []" :key="option.id" class="space-y-2 rounded-md bg-default p-2.5 ring-1 ring-default dark:ring-white/10">
+              <div class="flex items-center gap-2">
+                <UInput :model-value="option.name" :placeholder="t('blocks.products.optionName')" class="w-28 shrink-0" @update:model-value="updateOption(index, oi, { name: String($event) })" />
+                <UInput :model-value="option.values.map(v => v.label).join(', ')" :placeholder="t('blocks.products.optionValues')" class="min-w-0 flex-1" @change="setValues(index, oi, ($event.target as HTMLInputElement).value)" />
+                <UButton variant="ghost" color="neutral" size="xs" icon="i-lucide-x" :aria-label="t('common.delete')" @click="removeOption(index, oi)" />
+              </div>
+              <!-- Swatches: a colour per value -->
+              <div v-if="option.values.some(v => v.color !== undefined)" class="flex flex-wrap gap-2">
+                <label v-for="(value, vi) in option.values" :key="value.id" class="flex cursor-pointer items-center gap-1.5 rounded-full bg-elevated px-2 py-1 text-xs">
+                  <input type="color" :value="value.color || '#d6d3d1'" class="size-5 cursor-pointer appearance-none rounded-full border-0 bg-transparent p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-black/10 [&::-webkit-color-swatch-wrapper]:p-0" @input="setColor(index, oi, vi, ($event.target as HTMLInputElement).value)">
+                  {{ value.label }}
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5">
+              <UButton size="xs" variant="soft" color="neutral" icon="i-lucide-ruler" :label="t('blocks.products.addSize')" @click="addOption(index, 'size')" />
+              <UButton size="xs" variant="soft" color="neutral" icon="i-lucide-palette" :label="t('blocks.products.addColour')" @click="addOption(index, 'colour')" />
+              <UButton size="xs" variant="soft" color="neutral" icon="i-lucide-plus" :label="t('blocks.products.addOption')" @click="addOption(index, 'other')" />
+            </div>
+          </div>
+        </details>
+
         <div class="flex flex-wrap items-center gap-2">
           <UInput :model-value="item.tag" :placeholder="t('blocks.products.tagPlaceholder')" class="min-w-0 flex-1" @update:model-value="updateItem(index, { tag: String($event) })" />
           <label class="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-muted">
@@ -148,7 +193,7 @@
 
 <script setup lang="ts">
 import { nanoid } from 'nanoid'
-import type { BioBlock, ProductItem, ProductPayment, ProductsBlock } from '~/types/bio'
+import type { BioBlock, ProductItem, ProductOption, ProductPayment, ProductsBlock } from '~/types/bio'
 import { useBioBlock } from '~/composables/useBioBlock'
 
 const props = defineProps<{
@@ -212,6 +257,54 @@ function move(index: number, by: number) {
   const [item] = items.splice(index, 1)
   items.splice(index + by, 0, item!)
   setItems(items)
+}
+
+const toStock = (value: unknown) => {
+  if (value === '' || value === null || value === undefined) return undefined
+  const n = Math.round(Number(value))
+  return Number.isFinite(n) && n >= 0 ? n : undefined
+}
+
+// ---------- Choices (size, colour...) ----------
+function choicesSummary(item: ProductItem) {
+  const parts = (item.options ?? []).map(o => `${o.name}: ${o.values.map(v => v.label).join('/')}`)
+  if (typeof item.stock === 'number') parts.push(t('blocks.products.stockCount', { n: item.stock }))
+  return parts.join(' · ')
+}
+function setOptions(index: number, options: ProductOption[]) {
+  updateItem(index, { options: options.length ? options : undefined })
+}
+function addOption(index: number, kind: 'size' | 'colour' | 'other') {
+  const options = data.value.items[index]?.options ?? []
+  const values = (labels: string[], colors?: string[]) => labels.map((label, i) => ({ id: nanoid(5), label, ...(colors ? { color: colors[i] } : {}) }))
+  const option: ProductOption
+    = kind === 'size'
+      ? { id: nanoid(5), name: t('blocks.products.sizeName'), values: values(['S', 'M', 'L', 'XL']) }
+      : kind === 'colour'
+        ? { id: nanoid(5), name: t('blocks.products.colourName'), values: values(t('blocks.products.colourValues').split(',').map(v => v.trim()), ['#1c1a17', '#f5f5f4', '#e8dcc8']) }
+        : { id: nanoid(5), name: '', values: [] }
+  setOptions(index, [...options, option])
+}
+function updateOption(index: number, oi: number, patch: Partial<ProductOption>) {
+  const options = data.value.items[index]?.options ?? []
+  setOptions(index, options.map((o, i) => (i === oi ? { ...o, ...patch } : o)))
+}
+function removeOption(index: number, oi: number) {
+  setOptions(index, (data.value.items[index]?.options ?? []).filter((_, i) => i !== oi))
+}
+// "S, M, L": the same labels keep their ids (and colours)
+function setValues(index: number, oi: number, text: string) {
+  const option = data.value.items[index]?.options?.[oi]
+  if (!option) return
+  const swatches = option.values.some(v => v.color !== undefined)
+  const labels = [...new Set(text.split(',').map(v => v.trim()).filter(Boolean))].slice(0, 20)
+  const values = labels.map(label => option.values.find(v => v.label === label) ?? { id: nanoid(5), label, ...(swatches ? { color: '#d6d3d1' } : {}) })
+  updateOption(index, oi, { values })
+}
+function setColor(index: number, oi: number, vi: number, color: string) {
+  const option = data.value.items[index]?.options?.[oi]
+  if (!option) return
+  updateOption(index, oi, { values: option.values.map((v, i) => (i === vi ? { ...v, color } : v)) })
 }
 
 const toPrice = (value: unknown) => {

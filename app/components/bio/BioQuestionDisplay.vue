@@ -1,7 +1,8 @@
 <template>
   <!-- "Will you be my Valentine?": the "no" button slips away from the
-       finger and the "yes" button grows each time; yes fills the card with
-       hearts and shows the answer -->
+       finger and the "yes" button grows each time; yes bursts into hearts,
+       shows the answer and tells the owner. The answer is remembered on
+       this device, so coming back shows it again -->
   <section ref="card" class="relative overflow-hidden px-5 py-8 text-center sm:px-6" :style="cardStyle">
     <div v-if="!saidYes">
       <UIcon name="i-lucide-heart" class="question-heart mx-auto size-10" :style="accentText" />
@@ -31,10 +32,13 @@
       <p v-if="noClicked && !playful" class="mt-3 text-sm opacity-75">{{ t('questionNoReply') }}</p>
     </div>
 
-    <div v-else class="relative z-10 py-4">
-      <UIcon name="i-lucide-heart-handshake" class="mx-auto size-12" :style="accentText" />
-      <p class="mt-3 whitespace-pre-line text-2xl leading-snug" :style="titleStyle">{{ data.answer || t('questionDone') }}</p>
+    <div v-else class="answer relative z-10 py-4" :class="{ 'answer--fresh': fresh }" aria-live="polite">
+      <UIcon name="i-lucide-heart-handshake" class="answer-icon mx-auto size-12" :style="accentText" />
+      <p class="answer-text mt-3 whitespace-pre-line text-2xl leading-snug" :style="titleStyle">{{ data.answer || t('questionDone') }}</p>
     </div>
+
+    <!-- The burst, once, right when they say yes -->
+    <BioConfetti v-if="fresh" shape="hearts" :colors="[accent, '#ff7aa2', '#ffb3c7', '#ff4d6d']" :count="34" :origin-y="60" />
 
     <!-- Hearts floating up after yes -->
     <span
@@ -56,6 +60,10 @@ const props = defineProps<{
   cardStyle?: CSSProperties
   accentStyle?: CSSProperties
   headingStyle?: CSSProperties
+  blockId?: string
+  username?: string
+  /** Editor previews and template thumbnails never send or remember */
+  preview?: boolean
 }>()
 
 const { t } = useSiteI18n()
@@ -95,10 +103,30 @@ function dodge(event: PointerEvent) {
 }
 
 const hearts = ref<{ id: number; x: number; delay: number; size: number }[]>([])
+// Said yes just now (with the burst), rather than on an earlier visit
+const fresh = ref(false)
+const storageKey = computed(() => `perlink:answer:${props.username}:${props.blockId}`)
+
 function sayYes() {
   saidYes.value = true
+  fresh.value = true
   hearts.value = Array.from({ length: 18 }, (_, id) => ({ id, x: Math.random() * 92, delay: Math.random() * 900, size: 14 + Math.random() * 18 }))
+  if (props.preview || !props.username || !props.blockId) return
+  try {
+    if (localStorage.getItem(storageKey.value)) return
+    localStorage.setItem(storageKey.value, new Date().toISOString())
+  } catch {}
+  // Tell the owner (inbox and Telegram); a failure doesn't spoil the moment
+  $fetch(`/api/bio/${props.username}/answer`, { method: 'POST', body: { blockId: props.blockId } }).catch(() => {})
 }
+
+// Coming back on the same device: the answer is already given
+onMounted(() => {
+  if (props.preview || !props.username || !props.blockId) return
+  try {
+    if (localStorage.getItem(storageKey.value)) saidYes.value = true
+  } catch {}
+})
 
 // ---------- Looks ----------
 const accent = computed(() => String(props.accentStyle?.backgroundColor || '#e8457a'))
@@ -128,7 +156,12 @@ const outlineStyle = computed<CSSProperties>(() => ({ border: `1.5px solid curre
   15% { opacity: 1; }
   100% { transform: translateY(-260px) scale(1.1) rotate(12deg); opacity: 0; }
 }
+.answer--fresh .answer-icon { animation: answer-pop 0.8s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+.answer--fresh .answer-text { animation: answer-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+@keyframes answer-pop { from { transform: scale(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes answer-in { from { transform: translateY(10px) scale(0.96); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
+  .answer--fresh .answer-icon, .answer--fresh .answer-text { animation: none; }
   .question-heart, .question-float { animation: none; }
 }
 </style>

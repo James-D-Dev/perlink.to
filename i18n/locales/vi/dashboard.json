@@ -653,7 +653,12 @@
       "rsvpNo": "Không đến",
       "rsvpComing": "khách sẽ đến | khách sẽ đến",
       "rsvpPeople": "người tổng cộng | người tổng cộng",
-      "rsvpNotComing": "không đến được | không đến được"
+      "rsvpNotComing": "không đến được | không đến được",
+      "answerYes": "Đã đồng ý",
+      "nights": "{n} đêm | {n} đêm",
+      "kindBooking": "Lịch hẹn",
+      "kindStay": "Đặt phòng",
+      "kindContact": "Liên hệ"
     },
     "qr": {
       "open": "Mã QR",

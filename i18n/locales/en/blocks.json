@@ -45,7 +45,11 @@
       "modalTitle": "Add social link",
       "searchPlaceholder": "Search social platforms...",
       "usernamePlaceholder": "username",
-      "urlPlaceholder": "Enter URL"
+      "urlPlaceholder": "Enter URL",
+      "groups": {
+        "social": "Social networks",
+        "stores": "Stores, food delivery & maps (shown as buttons)"
+      }
     },
     "album": {
       "title": "Image album",
@@ -321,7 +325,8 @@
       "kinds": {
         "booking": "Booking",
         "contact": "Contact",
-        "rsvp": "Invitation reply (RSVP)"
+        "rsvp": "Invitation reply (RSVP)",
+        "stay": "Room booking (stay)"
       },
       "fieldsLabel": "Fields",
       "fieldsHelp": "Name is always asked.",
@@ -331,8 +336,13 @@
         "date": "Date",
         "time": "Time",
         "guests": "Guests",
-        "message": "Message"
+        "message": "Message",
+        "service": "Service",
+        "checkout": "Check-out date"
       },
+      "serviceHint": "Service: visitors pick from your page’s price list or products, with prices. Without one they can type what they want.",
+      "checkoutHint": "Check-out: for stays, visitors pick check-in and check-out and see how many nights.",
+      "hoursHint": "Your opening hours turn the time into slots and keep closed days from being booked.",
       "submitLabel": "Button text",
       "submitPlaceholder": "Request a booking",
       "successLabel": "Thank-you message",
@@ -403,7 +413,20 @@
       "soldOut": "Sold out",
       "moveUp": "Move up",
       "moveDown": "Move down",
-      "add": "Add product"
+      "add": "Add product",
+      "choices": "Choices & stock",
+      "stock": "Stock",
+      "stockPlaceholder": "Not counted",
+      "stockHelp": "Leave empty to not count. 5 or fewer shows “Only 3 left”, 0 shows Sold out.",
+      "stockCount": "{n} in stock",
+      "optionName": "Size",
+      "optionValues": "S, M, L (comma between)",
+      "addSize": "Size",
+      "addColour": "Colour",
+      "addOption": "Other choice",
+      "sizeName": "Size",
+      "colourName": "Colour",
+      "colourValues": "Black, White, Beige"
     },
     "blog": {
       "title": "Latest posts",

@@ -305,23 +305,13 @@
           </section>
 
           <!-- VietQR Block -->
-          <div
+          <BioVietQRDisplay
             v-if="block.name === 'vietqr' && block.data?.qrString"
             :id="blockDomId(block)"
-            class="flex flex-col items-center gap-4"
-          >
-            <ClientOnly>
-              <QRCodeWithTheme
-                :qr-string="block.data.qrString"
-                :bank-name="block.data.bankName"
-                :account-number="block.data.accountNumber"
-                :account-name="block.data.accountName"
-                :amount="parseFloat(block.data.amount || '0')"
-                :theme-id="block.data.theme || 'vietnam'"
-                class="w-full"
-              />
-            </ClientOnly>
-          </div>
+            :data="block.data"
+            :card-style="panelStyle"
+            :accent-style="solidButtonStyle"
+          />
           <!-- Birthday Countdown Block -->
           <BioBlockBirthdayCountdownDisplay
             v-if="block.name === 'birthday-countdown' && block.data?.birthDate"
@@ -361,6 +351,9 @@
             v-if="block.name === 'question' && block.data?.question"
             :id="blockDomId(block)"
             :data="block.data"
+            :block-id="block.id"
+            :username="username"
+            :preview="noSending"
             :card-style="panelStyle"
             :accent-style="solidButtonStyle"
             :heading-style="headingStyle"
@@ -368,10 +361,11 @@
           <!-- Menu Block -->
           <BioMenuDisplay
             v-if="block.name === 'menu' && block.data?.sections?.length"
-:id="blockDomId(block)"
+            :id="blockDomId(block)"
             :data="block.data"
             :card-style="panelStyle"
             :heading-style="headingStyle"
+            :accent-style="solidButtonStyle"
           />
           <!-- Opening Hours Block -->
           <BioHoursDisplay
@@ -414,21 +408,14 @@
           </section>
 
           <!-- Testimonials -->
-          <section v-if="block.name === 'testimonials' && block.data?.items?.some((i) => i.quote)" :id="blockDomId(block)">
-            <h2 v-if="block.data.title" class="mb-3 text-[17px]" :style="headingStyle">{{ block.data.title }}</h2>
-            <div class="space-y-2.5">
-              <figure v-for="item in block.data.items.filter((i) => i.quote)" :key="item.id" class="p-4" :style="panelStyle">
-                <div v-if="item.rating" class="mb-1 flex text-sm tracking-[0.1em]" role="img" :aria-label="`${item.rating}/5`">
-                  <span v-for="n in 5" :key="n" :class="n > item.rating && 'opacity-25'">★</span>
-                </div>
-                <blockquote class="text-[15px] leading-relaxed">“{{ item.quote }}”</blockquote>
-                <figcaption v-if="item.author" class="mt-2 text-sm">
-                  <span class="font-medium">{{ item.author }}</span>
-                  <span v-if="item.detail" class="opacity-65"> · {{ item.detail }}</span>
-                </figcaption>
-              </figure>
-            </div>
-          </section>
+          <BioTestimonialsDisplay
+            v-if="block.name === 'testimonials' && block.data?.items?.some((i) => i.quote)"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :card-style="panelStyle"
+            :heading-style="headingStyle"
+            :accent-style="solidButtonStyle"
+          />
 
           <!-- Latest blog posts -->
           <BioBlogDisplay
@@ -452,6 +439,8 @@
             :card-style="panelStyle"
             :button-style="solidButtonStyle"
             :heading-style="headingStyle"
+            :blocks="sortedBlocks"
+            :site-title="bioData.title || username"
           />
           <!-- Products Block -->
           <BioProductsDisplay

@@ -5,13 +5,20 @@ import { toAppLanguage } from '#shared/language'
 
 // "New request" email to a site owner when a visitor sends a form
 
+/** Nights between check-in and check-out (YYYY-MM-DD) */
+export function stayNights(from: string, to: string) {
+  const day = (d: string) => Date.parse(`${d}T00:00:00Z`)
+  return Math.max(0, Math.round((day(to) - day(from)) / 86_400_000))
+}
+
 const COPY = {
   en: {
     subject: (name: string, site: string) => `New request from ${name} · perlink.to/${site}`,
     intro: (site: string) => `Someone sent a request through your site perlink.to/${site}.`,
-    labels: { code: 'Order', product: 'Product', quantity: 'Quantity', total: 'Total', payment: 'Payment', name: 'Name', attending: 'Coming', phone: 'Phone', email: 'Email', address: 'Address', date: 'Date', time: 'Time', guests: 'Guests', message: 'Message' },
+    labels: { code: 'Order', product: 'Product', quantity: 'Quantity', total: 'Total', payment: 'Payment', question: 'Question', name: 'Name', attending: 'Coming', service: 'Service', phone: 'Phone', email: 'Email', address: 'Address', date: 'Date', checkout: 'Check-out', nights: 'Nights', time: 'Time', guests: 'Guests', message: 'Message' },
     attending: { yes: 'Yes', no: 'No, can’t make it' } as Record<string, string>,
     rsvpSubject: (name: string, site: string) => `${name} replied to your invitation · perlink.to/${site}`,
+    answerSubject: (site: string) => `💘 Someone said yes · perlink.to/${site}`,
     orderSubject: (code: string, site: string) => `New order ${code} · perlink.to/${site}`,
     orderIntro: (site: string) => `You have a new order on perlink.to/${site}.`,
     payments: { cod: 'Cash on delivery', transfer: 'Bank transfer' } as Record<string, string>,
@@ -21,8 +28,9 @@ const COPY = {
   vi: {
     subject: (name: string, site: string) => `Yêu cầu mới từ ${name} · perlink.to/${site}`,
     intro: (site: string) => `Có khách vừa gửi yêu cầu qua trang perlink.to/${site} của bạn.`,
-    labels: { code: 'Mã đơn', product: 'Sản phẩm', quantity: 'Số lượng', total: 'Tổng tiền', payment: 'Thanh toán', name: 'Họ tên', attending: 'Tham dự', phone: 'Số điện thoại', email: 'Email', address: 'Địa chỉ', date: 'Ngày', time: 'Giờ', guests: 'Số khách', message: 'Lời nhắn' },
+    labels: { code: 'Mã đơn', product: 'Sản phẩm', quantity: 'Số lượng', total: 'Tổng tiền', payment: 'Thanh toán', question: 'Câu hỏi', name: 'Họ tên', attending: 'Tham dự', service: 'Dịch vụ', phone: 'Số điện thoại', email: 'Email', address: 'Địa chỉ', date: 'Ngày', checkout: 'Trả phòng', nights: 'Số đêm', time: 'Giờ', guests: 'Số khách', message: 'Lời nhắn' },
     attending: { yes: 'Có, sẽ đến', no: 'Không đến được' } as Record<string, string>,
+    answerSubject: (site: string) => `💘 Người ấy đã đồng ý · perlink.to/${site}`,
     rsvpSubject: (name: string, site: string) => `${name} đã trả lời thiệp mời · perlink.to/${site}`,
     orderSubject: (code: string, site: string) => `Đơn hàng mới ${code} · perlink.to/${site}`,
     orderIntro: (site: string) => `Bạn có đơn hàng mới trên trang perlink.to/${site}.`,
@@ -51,6 +59,7 @@ export async function notifyOwnerOfRequest(
     ...data,
     ...(isOrder && data.payment ? { payment: copy.payments[data.payment] ?? data.payment } : {}),
     ...(data.attending ? { attending: copy.attending[data.attending] ?? data.attending } : {}),
+    ...(data.date && data.checkout ? { nights: String(stayNights(data.date, data.checkout)) } : {}),
   }
   const rows = (Object.keys(copy.labels) as (keyof typeof copy.labels)[])
     .filter(key => shown[key])
@@ -67,7 +76,13 @@ export async function notifyOwnerOfRequest(
 
   await sendEmail(event, {
     to: owner.email,
-    subject: isOrder ? copy.orderSubject(data.code ?? '', site.username) : data.kind === 'rsvp' ? copy.rsvpSubject(data.name ?? '', site.username) : copy.subject(data.name ?? '', site.username),
+    subject: isOrder
+      ? copy.orderSubject(data.code ?? '', site.username)
+      : data.kind === 'rsvp'
+        ? copy.rsvpSubject(data.name ?? '', site.username)
+        : data.kind === 'answer'
+          ? copy.answerSubject(site.username)
+          : copy.subject(data.name ?? '', site.username),
     html,
     text,
     // Replying goes straight to the visitor when they left an email

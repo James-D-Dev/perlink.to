@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import type { ProductItem } from '~/types/bio'
+import type { ProductItem, ProductOption } from '~/types/bio'
 import type { PageTemplate } from '../pageTemplates'
 import { SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, photo, social, withIndex } from '../templateKit'
 import { type Blocks, booking, hours, loungeRoom, reviews, shopRoom, studioRoom } from '../pageTemplatesMore'
@@ -21,6 +21,16 @@ function products(...items: [string, number, string, string?, string?, number?][
 }
 
 const step = (date: string, title: string, text?: string) => ({ id: nanoid(6), date, title, text })
+
+/** A product option, e.g. opt('Size', 'S', 'M') or opt('Colour', ['Sand', '#d8c3a5']) */
+function opt(name: string, ...values: (string | [string, string])[]): ProductOption {
+  return { id: nanoid(6), name, values: values.map(v => (Array.isArray(v) ? { id: nanoid(6), label: v[0], color: v[1] } : { id: nanoid(6), label: v })) }
+}
+
+/** Extra fields for the products made by products(), in the same order */
+function withDetails(items: ProductItem[], ...details: Partial<ProductItem>[]): ProductItem[] {
+  return items.map((item, i) => ({ ...item, ...details[i] }))
+}
 
 export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
   // ─── Business ─────────────────────────────────────────────────
@@ -64,7 +74,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('Fast, sharp and honest about what wouldn’t work.', 'Nhanh, sắc sảo và thẳng thắn với những gì không hiệu quả.'), 'David Lee', s('CMO, Finly', 'CMO, Finly')],
         ) } },
         { name: 'form', data: { title: s('Start a project', 'Bắt đầu dự án'), description: s('Tell us what you’re making and your budget. We reply within a day.', 'Kể cho chúng tôi bạn đang làm gì và ngân sách. Chúng tôi trả lời trong một ngày.'), kind: 'contact', fields: { phone: true, email: true, date: false, time: false, guests: false, message: true }, submitLabel: s('Send the brief', 'Gửi brief') } },
-        { name: 'social', data: { links: social('website', 'instagram', 'linkedin', 'facebook') } },
+        { name: 'social', data: { links: social('behance', 'instagram', 'linkedin', 'facebook') } },
       ] as Blocks),
       room: studioRoom('#fff4d6', '#c9b38e', '#ff4d2e', s('Start a project', 'Bắt đầu dự án'), [
         { type: 'neon-sign', position: [-0.9, 2.1, -3], rotation: 0, wall: 'back', color: '#ff4d2e', link: { label: s('Our work', 'Dự án'), url: '' } },
@@ -318,18 +328,22 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
         header: 'cover', link: 'vertical', social: 'plain',
       }),
       blocks: withIndex([
-        { name: 'products', data: { title: s('New drop', 'Hàng mới về'), layout: 'grid', ordering: true, askAddress: true, payment: 'both', items: products(
-          [s('Linen wrap dress', 'Đầm lanh quấn'), 590000, 'boutique-2', s('Sand, sizes S–L', 'Màu cát, size S–L'), s('New', 'Mới')],
+        { name: 'products', data: { title: s('New drop', 'Hàng mới về'), layout: 'grid', ordering: true, askAddress: true, payment: 'both', items: withDetails(products(
+          [s('Linen wrap dress', 'Đầm lanh quấn'), 590000, 'boutique-2', s('Washed linen, relaxed fit', 'Lanh giặt mềm, dáng suông'), s('New', 'Mới')],
           [s('Plaid mini skirt', 'Chân váy kẻ caro'), 390000, 'boutique-3', '', s('Sale', 'Giảm giá'), 490000],
           [s('Everyday shirt', 'Sơ mi hằng ngày'), 450000, 'boutique-1', s('Cotton poplin', 'Cotton poplin')],
           [s('The weekend set', 'Set cuối tuần'), 790000, 'boutique-cover', s('Top and wide trousers', 'Áo và quần ống rộng'), s('Best seller', 'Bán chạy')],
+        ),
+          { options: [opt(s('Size', 'Size'), 'S', 'M', 'L'), opt(s('Colour', 'Màu'), [s('Sand', 'Màu cát'), '#d8c3a5'], [s('Black', 'Đen'), '#1c1c1c'])] },
+          { options: [opt(s('Size', 'Size'), 'S', 'M', 'L')], stock: 3 },
+          { options: [opt(s('Size', 'Size'), 'S', 'M', 'L', 'XL'), opt(s('Colour', 'Màu'), [s('White', 'Trắng'), '#f5f3ee'], [s('Sky', 'Xanh trời'), '#a9c7e3'])] },
+          { options: [opt(s('Size', 'Size'), 'S', 'M', 'L'), opt(s('Colour', 'Màu'), [s('Cream', 'Kem'), '#efe6d6'], [s('Olive', 'Xanh ô liu'), '#7c7a52'])] },
         ) } },
-        { name: 'links', data: { items: links([s('Shop on Shopee', 'Mua trên Shopee'), ''], [s('Shop on TikTok Shop', 'Mua trên TikTok Shop'), '']) } },
         { name: 'image-album', data: { title: s('Lookbook · Autumn', 'Lookbook · Thu'), images: album('boutique-3', 'boutique-cover', 'boutique-1', 'boutique-2'), layout: 'masonry' } },
         { name: 'text', data: { title: s('Size & exchange', 'Size & đổi trả'), content: s('Free exchange within 7 days. Message us your height and weight and we’ll pick your size.', 'Đổi miễn phí trong 7 ngày. Nhắn chiều cao, cân nặng để được chọn size giúp.'), align: 'center', style: 'card' } },
         { name: 'hours', data: { title: s('Showroom', 'Showroom'), days: hours('10:00', '21:30') } },
         { name: 'contact', data: { title: s('Visit the showroom', 'Ghé showroom'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo', 'shopee', 'tiktokshop') } },
       ] as Blocks),
       room: shopRoom('#f2eee9', '#9c948a', '#141414', s('Shop the drop', 'Xem hàng mới'), [
         { type: 'picture-frame', position: [-3, 1.6, -1.6], rotation: 0, wall: 'left', color: '#141414', image: photo('boutique-3') },
@@ -361,14 +375,14 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('Speckled mug', 'Cốc men lấm tấm'), 220000, 'craft-avatar', s('350 ml, each one a little different', '350 ml, mỗi chiếc một khác'), s('Best seller', 'Bán chạy')],
           [s('Dinner plate set', 'Bộ đĩa ăn'), 680000, 'craft-1', s('Four plates, 24 cm', 'Bốn đĩa, 24 cm')],
           [s('Rice bowls', 'Bát cơm'), 360000, 'craft-2', s('Set of two', 'Bộ hai chiếc')],
-          [s('Glazed vase', 'Bình men màu'), 450000, 'craft-3', '', s('Last pieces', 'Sắp hết')],
-        ) } },
+          [s('Glazed vase', 'Bình men màu'), 450000, 'craft-3', s('Each glaze is one of a kind', 'Mỗi lớp men là duy nhất'), s('Last pieces', 'Sắp hết')],
+        ).map((item, i) => (i === 3 ? { ...item, stock: 2, options: [opt(s('Glaze', 'Màu men'), [s('Celadon', 'Men ngọc'), '#9fbfae'], [s('Rust', 'Men gỉ'), '#a5552f'])] } : item)) } },
         { name: 'event', data: { name: s('Pottery workshop', 'Workshop làm gốm'), date: '2026-11-29', startTime: '14:00', endTime: '17:00', venue: s('Đất Lành studio', 'Xưởng Đất Lành'), address: SAMPLE_ADDRESS, note: s('550,000 ₫ per person, clay and firing included. Take home what you make.', '550.000 ₫ một người, gồm đất và nung. Mang về sản phẩm bạn làm.') } },
-        { name: 'form', data: { title: s('Book a workshop seat', 'Giữ chỗ workshop'), kind: 'booking', fields: booking(true, false, true), submitLabel: s('Book my seat', 'Giữ chỗ') } },
+        { name: 'form', data: { title: s('Book a workshop seat', 'Giữ chỗ workshop'), kind: 'booking', fields: booking(true, false, true, false), submitLabel: s('Book my seat', 'Giữ chỗ') } },
         { name: 'text', data: { title: s('Our story', 'Câu chuyện của xưởng'), content: s('Two sisters, one kiln and clay from the Red River. Everything is thrown by hand and glazed in small batches.', 'Hai chị em, một lò nung và đất từ sông Hồng. Mọi sản phẩm đều vuốt tay và tráng men theo mẻ nhỏ.'), align: 'center', style: 'plain' } },
         { name: 'image-album', data: { title: s('In the studio', 'Trong xưởng'), images: album('craft-cover', 'craft-2', 'craft-3', 'craft-1'), layout: 'grid' } },
         { name: 'video', data: { title: s('A day at the wheel', 'Một ngày bên bàn xoay'), url: '' } },
-        { name: 'social', data: { links: social('instagram', 'facebook', 'tiktok') } },
+        { name: 'social', data: { links: social('instagram', 'facebook', 'tiktok', 'shopee') } },
         { name: 'vietqr', data: {} },
       ] as Blocks),
       room: shopRoom('#efe2d1', '#a87b56', '#b65e3c', s('Shop ceramics', 'Mua gốm'), [
@@ -401,7 +415,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('Cloud cleanser', 'Sữa rửa mặt Cloud'), 260000, 'skin-avatar', s('Low pH, for every skin type', 'pH thấp, cho mọi loại da')],
           [s('Daily sunscreen SPF 50', 'Kem chống nắng SPF 50'), 320000, 'skin-2', s('No white cast', 'Không vệt trắng')],
           [s('Glow routine set', 'Bộ chu trình Glow'), 890000, 'skin-3', s('Cleanser, serum, sunscreen', 'Sữa rửa mặt, serum, chống nắng'), s('Save 10%', 'Tiết kiệm 10%'), 970000],
-        ) } },
+        ).map((item, i) => (i === 0 ? { ...item, options: [opt(s('Size', 'Dung tích'), '30 ml', '50 ml')] } : i === 3 ? { ...item, stock: 4 } : item)) } },
         { name: 'timeline', data: { title: s('Your morning routine', 'Chu trình buổi sáng'), items: [
           step(s('Step 1', 'Bước 1'), s('Cleanse', 'Làm sạch'), s('A pea-sized drop of Cloud cleanser.', 'Một lượng nhỏ sữa rửa mặt Cloud.')),
           step(s('Step 2', 'Bước 2'), s('Treat', 'Đặc trị'), s('Three drops of Calm serum, pat in.', 'Ba giọt serum dịu da, vỗ nhẹ.'), ),
@@ -414,7 +428,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
         { name: 'image-album', data: { title: s('#GlowLabSkin', '#GlowLabSkin'), images: album('skin-1', 'skin-4', 'skin-2', 'skin-3'), layout: 'grid' } },
         { name: 'form', data: { title: s('Free skin consult', 'Tư vấn da miễn phí'), description: s('Tell us your skin type and concerns; we reply with a routine.', 'Cho chúng tôi biết loại da và vấn đề, chúng tôi gửi bạn chu trình phù hợp.'), kind: 'contact', fields: { phone: true, email: false, date: false, time: false, guests: false, message: true }, submitLabel: s('Get my routine', 'Nhận chu trình') } },
         { name: 'links', data: { items: links([s('Shop on Shopee', 'Mua trên Shopee'), ''], [s('Shop on TikTok Shop', 'Mua trên TikTok Shop'), '']) } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'shopee', 'tiktokshop', 'lazada') } },
       ] as Blocks),
       room: shopRoom('#f3ecff', '#d9cbe8', '#7c5cff', s('Shop Glow Lab', 'Mua Glow Lab'), [
         { type: 'plant', position: [1.2, 0, -1.6], rotation: 0, color: '#c4b5fd' },

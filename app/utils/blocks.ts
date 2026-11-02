@@ -25,10 +25,12 @@ export function contactMapHref(data: { mapUrl?: string; address?: string }) {
   return ''
 }
 
-export const FORM_PRESETS: Record<'booking' | 'contact' | 'rsvp', FormFields> = {
-  booking: { phone: true, email: false, date: true, time: true, guests: true, message: true },
+export const FORM_PRESETS: Record<'booking' | 'contact' | 'rsvp' | 'stay', FormFields> = {
+  booking: { phone: true, email: false, date: true, time: true, guests: true, message: true, service: true },
   contact: { phone: true, email: true, date: false, time: false, guests: false, message: true },
   rsvp: { phone: true, email: false, date: false, time: false, guests: true, message: true },
+  // A room: check-in and check-out, guests and the room type
+  stay: { phone: true, email: false, date: true, time: false, guests: true, message: true, service: true, checkout: true },
 }
 
 /** Starting data for a freshly added block */

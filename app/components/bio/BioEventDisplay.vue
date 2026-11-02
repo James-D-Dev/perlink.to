@@ -3,6 +3,13 @@
        the place, and buttons to save it to a calendar and find the way -->
   <section class="px-5 py-6 sm:px-6" :style="cardStyle">
     <p v-if="data.name" class="text-center text-xs font-semibold uppercase tracking-[0.2em]" :style="accentText">{{ data.name }}</p>
+    <!-- How soon, by the visitor's clock -->
+    <p v-if="soon" class="mt-2 flex justify-center">
+      <span class="soon-chip inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold" :style="chipStyle">
+        <span class="size-1.5 rounded-full" :class="soon.today && 'animate-pulse'" :style="{ backgroundColor: accent }" />
+        {{ soon.label }}
+      </span>
+    </p>
 
     <div v-if="day" class="mt-4 flex items-center justify-center gap-4">
       <div class="flex size-[76px] shrink-0 flex-col items-center justify-center" :style="tileStyle">
@@ -28,10 +35,10 @@
     <p v-if="data.note" class="mt-3 whitespace-pre-line text-center text-sm leading-relaxed opacity-80">{{ data.note }}</p>
 
     <div class="mt-5 grid gap-2" :class="mapHref && 'grid-cols-2'">
-      <div class="relative">
+      <div ref="calendarBox" class="relative">
         <button
           type="button"
-          class="flex w-full items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-semibold"
+          class="press flex w-full items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-semibold"
           :style="buttonStyle"
           :aria-expanded="calendarOpen"
           @click="calendarOpen = !calendarOpen"
@@ -39,6 +46,7 @@
           <UIcon name="i-lucide-calendar-plus" class="size-4" />
           {{ t('eventAddToCalendar') }}
         </button>
+        <Transition name="menu">
         <div v-if="calendarOpen" class="absolute inset-x-0 top-full z-10 mt-1.5 overflow-hidden rounded-xl bg-white text-left text-sm text-[#1c1a17] shadow-lg ring-1 ring-black/10">
           <a :href="googleHref" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-2.5 hover:bg-black/5" @click="calendarOpen = false">
             <UIcon name="i-lucide-calendar" class="size-4 opacity-60" />Google Calendar
@@ -47,13 +55,14 @@
             <UIcon name="i-lucide-download" class="size-4 opacity-60" />{{ t('eventIcs') }}
           </button>
         </div>
+        </Transition>
       </div>
       <a
         v-if="mapHref"
         :href="mapHref"
         target="_blank"
         rel="noopener"
-        class="flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-semibold"
+        class="press flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-semibold"
         :style="outlineStyle"
       >
         <UIcon name="i-lucide-navigation" class="size-4" />
@@ -77,6 +86,35 @@ const props = defineProps<{
 
 const { t, lang, time } = useSiteI18n()
 const calendarOpen = ref(false)
+
+// The calendar menu closes on a tap elsewhere or Escape
+const calendarBox = ref<HTMLElement>()
+function onDocPointer(event: PointerEvent) {
+  if (calendarOpen.value && !calendarBox.value?.contains(event.target as Node)) calendarOpen.value = false
+}
+function onKey(event: KeyboardEvent) {
+  if (event.key === 'Escape') calendarOpen.value = false
+}
+// "In 12 days", "Tomorrow", "Today": from the visitor's clock, after mount
+const today = ref<Date | null>(null)
+onMounted(() => {
+  const now = new Date()
+  today.value = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  document.addEventListener('pointerdown', onDocPointer)
+  document.addEventListener('keydown', onKey)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', onDocPointer)
+  document.removeEventListener('keydown', onKey)
+})
+const soon = computed(() => {
+  if (!today.value || !date.value) return null
+  const days = Math.round((date.value.getTime() - today.value.getTime()) / 86_400_000)
+  if (days < 0) return null
+  if (days === 0) return { label: t('eventToday'), today: true }
+  if (days === 1) return { label: t('eventTomorrow'), today: false }
+  return { label: t('eventInDays', { n: days }), today: false }
+})
 
 const date = computed(() => {
   const [year, month, day] = (props.data.date || '').split('-').map(Number)
@@ -165,4 +203,15 @@ const tileStyle = computed<CSSProperties>(() => ({
 }))
 const buttonStyle = computed<CSSProperties>(() => ({ ...props.accentStyle, borderRadius: radius.value }))
 const outlineStyle = computed<CSSProperties>(() => ({ border: `1.5px solid ${accent.value}`, color: accent.value, borderRadius: radius.value }))
+const chipStyle = computed<CSSProperties>(() => ({ backgroundColor: `color-mix(in srgb, ${accent.value} 14%, transparent)`, color: accent.value }))
 </script>
+
+<style scoped>
+.press { transition: transform 0.15s ease, filter 0.15s ease; -webkit-tap-highlight-color: transparent; }
+.press:active { transform: scale(0.97); filter: brightness(0.95); }
+.menu-enter-active, .menu-leave-active { transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: top center; }
+.menu-enter-from, .menu-leave-to { opacity: 0; transform: translateY(-4px) scale(0.97); }
+@media (prefers-reduced-motion: reduce) {
+  .press, .menu-enter-active, .menu-leave-active { transition: none; }
+}
+</style>

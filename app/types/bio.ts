@@ -37,6 +37,14 @@ export type SocialProvider =
   | "pinterest"
   | "reddit"
   | "zalo"
+  | "messenger"
+  | "behance"
+  | "shopee"
+  | "lazada"
+  | "tiktokshop"
+  | "grabfood"
+  | "shopeefood"
+  | "googlemaps"
   | "website"
   | "email"
   | "phone";
@@ -447,6 +455,10 @@ export interface FormFields {
   time: boolean;
   guests: boolean;
   message: boolean;
+  /** Pick a service from the page's own price list or products (free text without one) */
+  service?: boolean;
+  /** A check-out date after the date (stays); shows the number of nights */
+  checkout?: boolean;
 }
 
 export interface FormBlock extends BaseBlock {
@@ -454,8 +466,8 @@ export interface FormBlock extends BaseBlock {
   data: {
     title?: string;
     description?: string;
-    /** 'rsvp': guests say whether they're coming, for invitations */
-    kind: 'booking' | 'contact' | 'rsvp';
+    /** 'rsvp': guests say whether they're coming, for invitations; 'stay': a room booking with check-in and check-out */
+    kind: 'booking' | 'contact' | 'rsvp' | 'stay';
     fields: FormFields;
     submitLabel?: string;
     successMessage?: string;
@@ -591,6 +603,24 @@ export interface ProductItem {
   soldOut?: boolean;
   /** Buy on another store instead of ordering here */
   url?: string;
+  /** Choices the buyer makes before ordering, e.g. Size: S, M, L and Colour */
+  options?: ProductOption[];
+  /** Units left; unset means not counted. Few left shows a badge, 0 is sold out */
+  stock?: number;
+}
+
+export interface ProductOptionValue {
+  id: string;
+  label: string;
+  /** A colour swatch, e.g. "#e8dcc8" */
+  color?: string;
+}
+
+export interface ProductOption {
+  id: string;
+  /** e.g. "Size" or "Colour" */
+  name: string;
+  values: ProductOptionValue[];
 }
 
 export type ProductPayment = 'cod' | 'transfer' | 'both';
@@ -858,6 +888,65 @@ export const SOCIAL_PROVIDERS: SocialProviderInfo[] = [
     icon: "custom:zalo",
     color: "#0068FF",
     placeholder: "https://zalo.me/phone",
+  },
+  {
+    key: "messenger",
+    label: "Messenger",
+    icon: "i-simple-icons-messenger",
+    color: "#0084FF",
+    placeholder: "username",
+    prefix: "https://m.me/",
+  },
+  {
+    key: "behance",
+    label: "Behance",
+    icon: "i-simple-icons-behance",
+    color: "#1769FF",
+    placeholder: "username",
+    prefix: "https://www.behance.net/",
+  },
+  // Where people buy, order food or find the place: shown as buttons
+  {
+    key: "shopee",
+    label: "Shopee",
+    icon: "i-simple-icons-shopee",
+    color: "#EE4D2D",
+    placeholder: "https://shopee.vn/yourshop",
+  },
+  {
+    key: "lazada",
+    label: "Lazada",
+    icon: "i-lucide-shopping-bag",
+    color: "#0F146D",
+    placeholder: "https://www.lazada.vn/shop/yourshop",
+  },
+  {
+    key: "tiktokshop",
+    label: "TikTok Shop",
+    icon: "i-simple-icons-tiktok",
+    color: "#000000",
+    placeholder: "https://www.tiktok.com/@yourshop",
+  },
+  {
+    key: "grabfood",
+    label: "GrabFood",
+    icon: "i-simple-icons-grab",
+    color: "#00B14F",
+    placeholder: "https://food.grab.com/vn/vi/restaurant/...",
+  },
+  {
+    key: "shopeefood",
+    label: "ShopeeFood",
+    icon: "i-lucide-utensils",
+    color: "#EE4D2D",
+    placeholder: "https://shopeefood.vn/...",
+  },
+  {
+    key: "googlemaps",
+    label: "Google Maps",
+    icon: "i-simple-icons-googlemaps",
+    color: "#34A853",
+    placeholder: "https://maps.app.goo.gl/...",
   },
 
   {
