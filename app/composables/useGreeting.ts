@@ -8,7 +8,7 @@ export function dayPart(hour = new Date().getHours()): DayPart {
   return 'night'
 }
 
-/** "Good afternoon, Minh" by the owner's local time */
+/** "Good afternoon" and the owner's name, by their local time; shown on two lines */
 export function useGreeting() {
   const { t } = useI18n()
   const { user } = useUserSession()
@@ -17,6 +17,6 @@ export function useGreeting() {
     // Late at night still reads "Good evening"
     const key = part === 'night' ? 'evening' : part
     const name = ((user.value as any)?.name || (user.value as any)?.username || '').trim()
-    return name ? t(`dashboard.sites.greeting.${key}`, { name }) : t(`dashboard.sites.greeting.${key}Plain`)
+    return { hello: t(`dashboard.sites.greeting.${key}Plain`), name }
   })
 }

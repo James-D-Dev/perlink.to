@@ -38,7 +38,7 @@
       <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-4">
         <!-- Coming back: a greeting, and making another site is one line -->
         <header v-if="!sitesLoaded || sites.length" class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <DashboardGreeting :title="greeting" :subtitle="t('dashboard.home.newSiteLine')" class="lg:flex-1" />
+          <DashboardGreeting :title="greeting.hello" :name="greeting.name" :subtitle="t('dashboard.home.newSiteLine')" class="lg:flex-1" />
           <SiteClaimForm class="w-full lg:max-w-md" quiet :initial-slug="initialSlug" :autofocus="!!initialSlug" />
         </header>
         <!-- The sites they already have (most recently edited first) -->

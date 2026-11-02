@@ -22,7 +22,7 @@
 
     <template #body>
       <div ref="content" class="mx-auto w-full max-w-5xl space-y-10 py-2 sm:py-4">
-        <DashboardGreeting :title="greeting" :subtitle="t(`dashboard.sites.greeting.line.${dayPart()}`)" />
+        <DashboardGreeting :title="greeting.hello" :name="greeting.name" :subtitle="t(`dashboard.sites.greeting.line.${dayPart()}`)" />
 
         <!-- Sites -->
         <section class="space-y-4">

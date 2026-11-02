@@ -92,8 +92,13 @@
     </svg>
 
     <div class="px-5 py-6 sm:px-7 sm:py-8">
-      <h1 class="relative max-w-[70%] text-2xl font-semibold tracking-tight sm:max-w-none sm:text-[28px]" :style="{ color: INK[part] }">{{ title }}</h1>
-      <p v-if="subtitle" class="mt-1 max-w-[65%] text-sm sm:max-w-md" :style="{ color: INK[part], opacity: 0.78 }">{{ subtitle }}</p>
+      <!-- The greeting, then the name on a line of its own; each stays on one
+           line, a long name ends in an ellipsis -->
+      <h1 class="relative max-w-[72%] text-2xl font-semibold leading-tight tracking-tight sm:text-[28px]" :style="{ color: INK[part] }">
+        <span class="block truncate">{{ title }}<template v-if="name">,</template></span>
+        <span v-if="name" class="block truncate">{{ name }}</span>
+      </h1>
+      <p v-if="subtitle" class="relative mt-2 text-sm" :style="{ color: INK[part], opacity: 0.8 }">{{ subtitle }}</p>
       <slot />
     </div>
   </section>
@@ -103,7 +108,10 @@
 import { dayPart, type DayPart } from '~/composables/useGreeting'
 
 const props = defineProps<{
+  /** "Good evening" */
   title: string
+  /** The owner's name, on its own line */
+  name?: string
   subtitle?: string
   /** The scene; the owner's time of day by default */
   part?: DayPart
@@ -144,6 +152,8 @@ function cloud(x: number, y: number, s: number) {
 .greeting--afternoon { background: linear-gradient(120deg, #e3f2ff 0%, #c4e3ff 50%, #9fd0ff 100%); }
 .greeting--evening { background: linear-gradient(160deg, #3b1d5a 0%, #a23f6b 55%, #f08a5d 100%); }
 .greeting--night { background: linear-gradient(160deg, #0b1030 0%, #1b2350 60%, #2e2a6b 100%); }
+/* Stars behind the words fade, so none sits on a letter like an accent */
+.greeting--night > svg { mask-image: linear-gradient(to right, rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.18) 50%, #000 82%); }
 
 .spin { animation: spin 40s linear infinite; }
 .pulse { animation: pulse 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
