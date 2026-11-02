@@ -20,14 +20,7 @@ function resizeImage(file: File): Promise<Blob> {
       const ctx = canvas.getContext('2d')!
       ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, MAX_SIZE, MAX_SIZE)
 
-      canvas.toBlob(
-        (blob) => {
-          if (blob) resolve(blob)
-          else reject(new Error('Canvas toBlob failed'))
-        },
-        'image/jpeg',
-        QUALITY,
-      )
+      encodeImage(canvas, QUALITY).then(resolve, reject)
     }
 
     img.onerror = () => {
@@ -49,7 +42,7 @@ export function useAvatarUpload() {
 
     try {
       const resized = await resizeImage(file)
-      const resizedFile = new File([resized], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })
+      const resizedFile = encodedFile(resized, file.name)
 
       const formData = new FormData()
       formData.append('file', resizedFile)

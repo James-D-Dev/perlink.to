@@ -1,7 +1,7 @@
 <template>
   <!-- Any other error page: missing pages get the same invitation as a free
        site address; other errors a short note -->
-  <SiteNotFound v-if="error.statusCode === 404" />
+  <LazySiteNotFound v-if="error.statusCode === 404" />
   <div v-else class="flex min-h-dvh flex-col items-center justify-center gap-4 bg-[#fdfcfb] px-5 text-center text-[#0c0b0a]">
     <AppLoader :size="64" />
     <h1 class="mk-display text-3xl">Something went wrong</h1>

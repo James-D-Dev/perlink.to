@@ -112,6 +112,9 @@
 <script setup lang="ts">
 import { SOCIAL_PROVIDERS } from '~/types/bio'
 
+// Social links may include Zalo, an icon of our own
+registerZaloIcon()
+
 export interface BlockSeed {
   /** e.g. a pasted video address, or a social link to append */
   url?: string

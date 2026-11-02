@@ -51,7 +51,7 @@
       </div>
 
       <!-- Missing: an invitation to claim the address -->
-      <SiteNotFound v-else-if="error" :name="username" />
+      <LazySiteNotFound v-else-if="error" :name="username" />
 
       <!-- 3D room. The loader covers it from the first paint (it's in the
            server HTML) until the viewer has mounted and the loader's intro

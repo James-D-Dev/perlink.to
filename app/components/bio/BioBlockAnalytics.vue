@@ -131,6 +131,9 @@
 import type { BioLink, SocialLink } from "~/types/bio";
 import { SOCIAL_PROVIDERS } from "~/types/bio";
 
+// Social links may include Zalo, an icon of our own
+registerZaloIcon()
+
 const props = defineProps<{
   isActive: boolean;
   bioPageId: string;

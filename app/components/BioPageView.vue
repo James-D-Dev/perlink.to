@@ -53,6 +53,8 @@
         >
           <img
             :src="avatarSrc"
+            :srcset="templatePhotoSrcset(avatarSrc, 'banner')"
+            sizes="(min-width: 768px) 576px, (min-width: 448px) 448px, 100vw"
             :alt="bioData.title || username"
             class="w-full object-cover"
             style="height: 480px"
@@ -87,6 +89,8 @@
           <img
             v-if="theme.header?.bannerUrl"
             :src="theme.header.bannerUrl"
+            :srcset="templatePhotoSrcset(theme.header.bannerUrl, 'banner')"
+            sizes="(min-width: 768px) 576px, (min-width: 448px) 448px, 100vw"
             alt="Banner"
             fetchpriority="high"
             decoding="async"
@@ -97,6 +101,8 @@
           >
             <img
               :src="avatarSrc"
+              :srcset="templatePhotoSrcset(avatarSrc, 'avatar')"
+              sizes="128px"
               :alt="bioData.title || username"
               :style="{
                 ...avatarStyle,
@@ -135,6 +141,8 @@
           >
             <img
               :src="avatarSrc"
+              :srcset="templatePhotoSrcset(avatarSrc, 'banner')"
+              sizes="(min-width: 768px) 576px, (min-width: 448px) 448px, 100vw"
               :alt="bioData.title || username"
               class="w-full object-cover"
               style="aspect-ratio: 1/1"
@@ -157,6 +165,8 @@
         <div class="flex flex-row items-center gap-3 mb-6 px-4">
           <img
             :src="avatarSrc"
+            :srcset="templatePhotoSrcset(avatarSrc, 'avatar')"
+            sizes="128px"
             :alt="bioData.title || username"
             :style="avatarStyle"
             :class="avatarAppearClasses"
@@ -188,6 +198,8 @@
         >
           <img
             :src="avatarSrc"
+            :srcset="templatePhotoSrcset(avatarSrc, 'avatar')"
+            sizes="128px"
             :alt="bioData.title || username"
             :style="avatarStyle"
             :class="avatarAppearClasses"
@@ -475,6 +487,9 @@ import { SOCIAL_PROVIDERS } from "~/types/bio";
 import { useBioTheme } from "~/composables/useBioTheme";
 import { getEffectBgClass } from "~/utils/effectUtils";
 import { googleFontsUrlFor } from "~/composables/useGoogleFonts";
+
+// Social links may include Zalo, an icon of our own
+registerZaloIcon()
 
 const bgEffectMap: Record<string, ReturnType<typeof defineAsyncComponent>> = {
   aurora: defineAsyncComponent(

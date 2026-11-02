@@ -22,6 +22,9 @@ import type { StyleValue } from 'vue'
 import type { SocialLink } from '~/types/bio'
 import { SOCIAL_PROVIDERS } from '~/types/bio'
 
+// Social links may include Zalo, an icon of our own
+registerZaloIcon()
+
 const props = defineProps<{
   socials: SocialLink[]
   socialButtonStyle: StyleValue

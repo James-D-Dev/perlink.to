@@ -27,14 +27,7 @@ function resizeBanner(file: File): Promise<Blob> {
       const ctx = canvas.getContext('2d')!
       ctx.drawImage(img, sx, sy, img.width, cropHeight, 0, 0, scaledWidth, canvas.height)
 
-      canvas.toBlob(
-        (blob) => {
-          if (blob) resolve(blob)
-          else reject(new Error('Canvas toBlob failed'))
-        },
-        'image/jpeg',
-        QUALITY,
-      )
+      encodeImage(canvas, QUALITY).then(resolve, reject)
     }
 
     img.onerror = () => {
@@ -56,7 +49,7 @@ export function useBannerUpload() {
 
     try {
       const resized = await resizeBanner(file)
-      const resizedFile = new File([resized], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })
+      const resizedFile = encodedFile(resized, file.name)
 
       const formData = new FormData()
       formData.append('file', resizedFile)
