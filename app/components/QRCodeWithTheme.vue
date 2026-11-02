@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import QRCode from "@/plugins/QRCodeVue3/index.vue";
+import QRCode from "~/lib/QRCodeVue3/index.vue";
 
 interface PositionConfig {
   left: string;

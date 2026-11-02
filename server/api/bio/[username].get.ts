@@ -28,7 +28,10 @@ export default defineEventHandler(async (event) => {
 
   // Free sites carry the "Made with Perlink" badge
   const ownerPlan = await getAccountPlan(event, bioPage.userId).catch(() => null)
-  const page = { ...publicBioPage(bioPage), showBranding: showsBranding(ownerPlan?.plan) }
+  // Template sample photos saved as JPG (sites made before their WebP
+  // versions) go out as the WebP ones, a third of the size
+  const page = JSON.parse(JSON.stringify({ ...publicBioPage(bioPage), showBranding: showsBranding(ownerPlan?.plan) })
+    .replace(/(\/images\/templates\/photos\/[a-z0-9-]+)\.jpg/g, '$1.webp'))
 
   // For bots: track as bot view (deduplicated per bot per day), then return data
   if (isBot(userAgent)) {

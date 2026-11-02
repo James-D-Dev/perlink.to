@@ -28,7 +28,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import QRCodeVue3 from "@/plugins/QRCodeVue3/index.vue";
+import QRCodeVue3 from "~/lib/QRCodeVue3/index.vue";
 
 enum DotOptionsType {
   "rounded" = "rounded",

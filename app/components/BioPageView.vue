@@ -88,6 +88,8 @@
             v-if="theme.header?.bannerUrl"
             :src="theme.header.bannerUrl"
             alt="Banner"
+            fetchpriority="high"
+            decoding="async"
             class="absolute inset-0 w-full h-full object-cover"
           />
           <div

@@ -10,10 +10,11 @@
         tabindex="0"
         class="relative aspect-square cursor-pointer overflow-hidden"
         :style="{ borderRadius: radius }"
+        :aria-label="image.alt || `${index + 1} / ${sortedImages.length}`"
         @click="openLightbox(index)"
         @keydown.enter="openLightbox(index)"
       >
-        <img :src="image.url" :alt="image.alt || ''" class="size-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy">
+        <img :src="gridSrc(image.url)" :alt="image.alt || ''" class="size-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy">
       </div>
     </div>
 
@@ -26,10 +27,11 @@
         tabindex="0"
         class="mb-2 block w-full cursor-pointer overflow-hidden break-inside-avoid"
         :style="{ borderRadius: radius }"
+        :aria-label="image.alt || `${index + 1} / ${sortedImages.length}`"
         @click="openLightbox(index)"
         @keydown.enter="openLightbox(index)"
       >
-        <img :src="image.url" :alt="image.alt || ''" class="w-full transition-transform duration-300 hover:scale-105" loading="lazy">
+        <img :src="gridSrc(image.url)" :alt="image.alt || ''" class="w-full transition-transform duration-300 hover:scale-105" loading="lazy">
       </div>
     </div>
 
@@ -136,6 +138,10 @@ const prevIcon = 'i-lucide-chevron-left';
 const nextIcon = 'i-lucide-chevron-right';
 
 const images = computed(() => props.data?.images || []);
+
+// Tiles are small: template photos use their small (480 px) versions there,
+// the full one opens in the viewer
+const gridSrc = (url: string) => url.replace(/(\/images\/templates\/photos\/[a-z0-9-]+?)(-sm)?\.(webp|jpg)$/, '$1-sm.webp');
 const sortedImages = computed(() => [...images.value].sort((a, b) => (a.index ?? 0) - (b.index ?? 0)));
 const layout = computed<ImageAlbumLayout>(() => props.data?.layout || 'vertical');
 const hasImages = computed(() => images.value.length > 0);

@@ -1,10 +1,10 @@
-import QRDot from "@/plugins/QRCodeVue3/core/QRDot";
-import QRCornerSquare from "@/plugins/QRCodeVue3/core/QRCornerSquare";
-import QRCornerDot from "@/plugins/QRCodeVue3/core/QRCornerDot";
-import dotTypes from "@/plugins/QRCodeVue3/constants/dotTypes";
-import cornerSquareTypes from "@/plugins/QRCodeVue3/constants/cornerSquareTypes";
-import cornerDotTypes from "@/plugins/QRCodeVue3/constants/cornerDotTypes";
-import type { DotType, CornerSquareType, CornerDotType } from "@/plugins/QRCodeVue3/types";
+import QRDot from "~/lib/QRCodeVue3/core/QRDot";
+import QRCornerSquare from "~/lib/QRCodeVue3/core/QRCornerSquare";
+import QRCornerDot from "~/lib/QRCodeVue3/core/QRCornerDot";
+import dotTypes from "~/lib/QRCodeVue3/constants/dotTypes";
+import cornerSquareTypes from "~/lib/QRCodeVue3/constants/cornerSquareTypes";
+import cornerDotTypes from "~/lib/QRCodeVue3/constants/cornerDotTypes";
+import type { DotType, CornerSquareType, CornerDotType } from "~/lib/QRCodeVue3/types";
 
 /**
  * QR Pattern Template (8x8 grid)
