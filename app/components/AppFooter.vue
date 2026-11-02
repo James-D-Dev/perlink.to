@@ -47,6 +47,7 @@ const columns = computed(() => {
       title: f.resources,
       links: [
         { label: f.start, to: '/login' },
+        { label: f.portfolio3d, to: lang.value === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio' },
         { label: f.linktree, to: lang.value === 'vi' ? '/vi/thay-the-linktree' : '/linktree-alternative' },
         { label: f.faq, to: anchor('faq') },
       ],

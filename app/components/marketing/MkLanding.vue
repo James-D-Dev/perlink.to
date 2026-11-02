@@ -151,7 +151,10 @@
           <p class="mt-4 max-w-md text-base leading-relaxed text-ink-muted md:text-lg">
             {{ c.worlds.text }}
           </p>
-          <MarketingMkButton to="/login" class="mt-8" trailing-icon="i-lucide-arrow-right">{{ c.worlds.cta }}</MarketingMkButton>
+          <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <MarketingMkButton to="/login" trailing-icon="i-lucide-arrow-right">{{ c.worlds.cta }}</MarketingMkButton>
+            <NuxtLink :to="lang === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio'" class="text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink">{{ c.worlds.portfolioLink }}</NuxtLink>
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-px border-t border-line bg-line md:border-l md:border-t-0">
           <div v-for="(feature, i) in worldFeatures" :key="feature.title" v-reveal="i * 90" class="bg-paper p-6 md:p-8">

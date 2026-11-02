@@ -5,6 +5,7 @@
         <p class="mk-eyebrow mb-4">{{ text.eyebrow }}</p>
         <h1 class="mk-display text-[40px] sm:text-6xl">{{ text.title }}</h1>
         <p class="mt-5 text-lg text-ink-muted">{{ text.intro }}</p>
+        <NuxtLink :to="lang === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio'" class="mt-4 inline-block text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink">{{ text.portfolioLink }}</NuxtLink>
       </div>
 
       <!-- Categories -->
@@ -72,6 +73,7 @@ const TEXT = {
     all: 'All',
     use: 'Use template',
     preview: 'Preview',
+    portfolioLink: 'Making a portfolio? See 3D portfolio websites',
     ctaTitle: 'Ready to make it yours?',
     ctaText: 'Claim your name and start from any template.',
   },
@@ -85,6 +87,7 @@ const TEXT = {
     all: 'Tất cả',
     use: 'Dùng mẫu',
     preview: 'Xem mẫu',
+    portfolioLink: 'Làm portfolio? Xem website portfolio 3D',
     ctaTitle: 'Sẵn sàng làm trang của bạn?',
     ctaText: 'Giữ tên của bạn và bắt đầu từ bất kỳ mẫu nào.',
   },

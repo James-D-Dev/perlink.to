@@ -22,6 +22,7 @@ Key facts:
 - [Templates](https://perlink.to/templates): the gallery of all templates by category ([Vietnamese](https://perlink.to/vi/templates))
 - [Pricing](https://perlink.to/pricing): plans and what each includes
 - [Trends](https://perlink.to/trends): popular 3D worlds and website styles
+- [3D portfolio website](https://perlink.to/3d-portfolio): a portfolio page plus a 3D room, without code ([Vietnamese](https://perlink.to/vi/portfolio-3d))
 - [Linktree alternative](https://perlink.to/linktree-alternative): how Perlink compares with Linktree ([Vietnamese](https://perlink.to/vi/thay-the-linktree))
 
 ## Templates

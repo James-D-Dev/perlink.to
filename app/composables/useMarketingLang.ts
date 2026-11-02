@@ -16,6 +16,7 @@ export const LANG_PAIRS: [string, string][] = [
   ['/', '/vi'],
   ['/templates', '/vi/templates'],
   ['/linktree-alternative', '/vi/thay-the-linktree'],
+  ['/3d-portfolio', '/vi/portfolio-3d'],
 ]
 /** The same page in the other language, for paired pages; null otherwise */
 export function pairedPath(path: string) {
