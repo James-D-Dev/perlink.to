@@ -176,6 +176,25 @@
               @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
 
+            <BioBlockTimeline
+              v-if="block.name === 'timeline'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              :bio-page-id="bioPageId"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
+            <BioBlockLetter
+              v-if="block.name === 'letter'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
             <BioBlockContact
               v-if="block.name === 'contact'"
               :is-active="activeBlock === block.id"

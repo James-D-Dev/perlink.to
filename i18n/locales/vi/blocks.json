@@ -152,20 +152,31 @@
       "quickBarHelp": "Các nút Gọi, Chỉ đường và nhắn tin luôn hiện ở cuối trang. Nút nhắn tin dùng Zalo, WhatsApp hoặc Telegram trong khối biểu tượng mạng xã hội."
     },
     "birthday": {
-      "title": "Đếm ngược sinh nhật",
+      "title": "Đếm ngày",
       "birthDate": "Ngày sinh",
       "birthDatePlaceholder": "Chọn ngày sinh",
       "label": "Nhãn",
-      "labelPlaceholder": "VD: Sinh nhật mình, Sinh nhật của An",
+      "labelPlaceholder": "VD: Sinh nhật của Lily, Bên nhau, Còn bao lâu đến ngày cưới",
       "theme": "Giao diện",
       "themes": {
         "classic": "Cổ điển",
         "modern": "Hiện đại",
         "minimal": "Tối giản",
         "party": "Tiệc tùng",
-        "elegant": "Thanh lịch"
+        "elegant": "Thanh lịch",
+        "card": "Thẻ của trang",
+        "rose": "Hồng",
+        "night": "Đêm"
       },
-      "showAge": "Hiện tuổi (VD: 'Tròn 25 tuổi')"
+      "showAge": "Hiện tuổi (VD: 'Tròn 25 tuổi')",
+      "sinceDate": "Ngày bắt đầu",
+      "mode": "Cách đếm",
+      "modes": {
+        "until": "Đếm ngược",
+        "since": "Đếm lên"
+      },
+      "repeat": "Lặp lại hằng năm",
+      "repeatHint": "Cho sinh nhật và ngày kỷ niệm. Tắt: đếm tới đúng ngày đó, như ngày cưới."
     },
     "vietqr": {
       "title": "Thanh toán VietQR",
@@ -232,8 +243,8 @@
           "description": "Mã QR ngân hàng để mọi người chuyển khoản hoặc ủng hộ bạn."
         },
         "birthdayCountdown": {
-          "label": "Đếm ngược sinh nhật",
-          "description": "Số ngày tới sinh nhật tiếp theo của bạn."
+          "label": "Đếm ngày",
+          "description": "Đếm ngược tới sinh nhật, ngày cưới, hoặc đếm số ngày bên nhau."
         },
         "form": {
           "label": "Form đặt chỗ / liên hệ",
@@ -254,6 +265,14 @@
         "blog": {
           "label": "Bài viết mới",
           "description": "Những bài blog mới nhất, dẫn tới trang blog của bạn."
+        },
+        "timeline": {
+          "label": "Dòng thời gian",
+          "description": "Câu chuyện theo từng mốc: lần đầu gặp, lịch trình ngày cưới, cột mốc."
+        },
+        "letter": {
+          "label": "Lá thư",
+          "description": "Thư tình hay thiệp mời trong phong bì, khách chạm để mở."
         }
       },
       "searchPlaceholder": "Dán link hoặc tìm khối…",
@@ -384,6 +403,39 @@
       "countLabel": "Số bài hiển thị",
       "hint": "Viết bài trong tab Blog.",
       "empty": "Chưa có bài đã đăng — hãy viết bài trong tab Blog."
+    },
+    "timeline": {
+      "title": "Dòng thời gian",
+      "count": "{n} mốc | {n} mốc",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Chuyện của chúng mình",
+      "datePlaceholder": "02/2023",
+      "itemTitlePlaceholder": "Điều đã xảy ra",
+      "textPlaceholder": "Vài dòng kể thêm (không bắt buộc)",
+      "photo": "Ảnh",
+      "photoHint": "Thêm ảnh (không bắt buộc)",
+      "removePhoto": "Gỡ ảnh",
+      "photoFailed": "Không tải được ảnh lên",
+      "add": "Thêm mốc",
+      "moveUp": "Lên trên",
+      "moveDown": "Xuống dưới"
+    },
+    "letter": {
+      "title": "Lá thư",
+      "to": "Gửi",
+      "toPlaceholder": "Anh Minh",
+      "body": "Nội dung thư",
+      "bodyPlaceholder": "Viết điều bạn muốn nói…",
+      "from": "Chữ ký",
+      "fromPlaceholder": "Thương anh, Mai",
+      "paper": "Giấy",
+      "papers": {
+        "cream": "Kem",
+        "blush": "Hồng",
+        "night": "Đêm"
+      },
+      "sealed": "Cho vào phong bì",
+      "sealedHint": "Khách chạm vào phong bì để mở thư."
     }
   }
 }

@@ -17,8 +17,25 @@
 
     <!-- Birthday Countdown Edit Form -->
     <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
+      <!-- Count down to the date, or up from it -->
+      <div class="grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1 dark:bg-white/[0.06]" role="radiogroup" :aria-label="t('blocks.birthday.mode')">
+        <button
+          v-for="option in modes"
+          :key="option.id"
+          type="button"
+          role="radio"
+          :aria-checked="mode === option.id"
+          class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm transition-colors"
+          :class="mode === option.id ? 'bg-white font-medium text-highlighted shadow-sm dark:bg-white/15' : 'text-muted hover:text-highlighted'"
+          @click="updateField('mode', option.id)"
+        >
+          <UIcon :name="option.icon" class="size-4" />
+          {{ option.label }}
+        </button>
+      </div>
+
       <!-- Birth Date -->
-      <UFormField :label="t('blocks.birthday.birthDate')" required>
+      <UFormField :label="mode === 'since' ? t('blocks.birthday.sinceDate') : t('blocks.birthday.birthDate')" required>
         <UInput
           type="date"
           :model-value="data.birthDate"
@@ -63,8 +80,18 @@
         </div>
       </UFormField>
 
+      <!-- Counting down: every year (a birthday) or to that one day (a wedding) -->
+      <UFormField v-if="mode === 'until'">
+        <UCheckbox
+          :model-value="data.repeat !== false"
+          :label="t('blocks.birthday.repeat')"
+          :description="t('blocks.birthday.repeatHint')"
+          @update:model-value="updateField('repeat', Boolean($event))"
+        />
+      </UFormField>
+
       <!-- Show Age Toggle -->
-      <UFormField>
+      <UFormField v-if="mode === 'until' && data.repeat !== false">
         <UCheckbox
           :model-value="data.showAge"
           :label="t('blocks.birthday.showAge')"
@@ -95,12 +122,21 @@ const { t, locale } = useI18n();
 
 // Theme options
 const countdownThemeOptions = [
+  { id: 'card', name: 'Card', icon: 'i-lucide-square', colorClass: 'bg-white dark:bg-white/10 text-neutral-700 dark:text-neutral-200 ring-1 ring-black/10' },
+  { id: 'rose', name: 'Rose', icon: 'i-lucide-heart', colorClass: 'bg-rose-100 dark:bg-rose-500/15 text-rose-600 dark:text-rose-300' },
+  { id: 'night', name: 'Night', icon: 'i-lucide-moon-star', colorClass: 'bg-[#2a1a3a] text-[#ffe4ee]' },
   { id: 'classic', name: 'Classic', icon: 'i-lucide-cake', colorClass: 'bg-pink-100 dark:bg-pink-500/15 text-pink-600 dark:text-pink-400' },
   { id: 'modern', name: 'Modern', icon: 'i-lucide-sparkles', colorClass: 'bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400' },
   { id: 'minimal', name: 'Minimal', icon: 'i-lucide-minus', colorClass: 'bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-neutral-300' },
   { id: 'party', name: 'Party', icon: 'i-lucide-party-popper', colorClass: 'bg-purple-100 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400' },
   { id: 'elegant', name: 'Elegant', icon: 'i-lucide-gem', colorClass: 'bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400' },
 ] as const;
+
+const modes = computed(() => [
+  { id: 'until' as const, label: t('blocks.birthday.modes.until'), icon: 'i-lucide-hourglass' },
+  { id: 'since' as const, label: t('blocks.birthday.modes.since'), icon: 'i-lucide-heart-handshake' },
+])
+const mode = computed(() => data.value.mode ?? 'until')
 
 const countdownThemes = computed(() =>
   countdownThemeOptions.map(theme => ({ ...theme, name: t(`blocks.birthday.themes.${theme.id}`) })),

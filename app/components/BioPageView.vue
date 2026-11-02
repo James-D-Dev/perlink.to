@@ -322,6 +322,25 @@
             v-if="block.name === 'birthday-countdown' && block.data?.birthDate"
             :id="blockDomId(block)"
             :data="block.data"
+            :card-style="panelStyle"
+            :accent-style="solidButtonStyle"
+          />
+          <!-- Timeline -->
+          <BioTimelineDisplay
+            v-if="block.name === 'timeline' && block.data?.items?.some((i) => i.title)"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :card-style="panelStyle"
+            :accent-style="solidButtonStyle"
+            :heading-style="headingStyle"
+          />
+          <!-- Letter -->
+          <BioLetterDisplay
+            v-if="block.name === 'letter' && block.data?.body"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :heading-style="headingStyle"
+            :accent-style="solidButtonStyle"
           />
           <!-- Menu Block -->
           <BioMenuDisplay
@@ -700,6 +719,8 @@ function hasContent(block: BioBlock): boolean {
     case "video": return !!videoEmbed(d?.url);
     case "testimonials": return !!d?.items?.some((i: any) => i.quote);
     case "products": return !!d?.items?.some((i: any) => i.name);
+    case "timeline": return !!d?.items?.some((i: any) => i.title);
+    case "letter": return !!d?.body;
     default: return true;
   }
 }

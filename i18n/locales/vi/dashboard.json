@@ -393,7 +393,11 @@
       },
       "gift-love": {
         "name": "Phòng tặng người yêu",
-        "description": "Tạo bất ngờ cho người ấy: phòng 3D với ảnh hai bạn, nhạc và một lá thư tình."
+        "description": "Tạo bất ngờ cho người ấy: lá thư tình, số ngày bên nhau, chuyện của hai bạn và ảnh, trong một căn phòng 3D."
+      },
+      "wedding-invite": {
+        "name": "Thiệp cưới online",
+        "description": "Thiệp mời cưới online: lời mời, đếm ngược, lịch trình, địa điểm, xác nhận tham dự và mã QR mừng cưới."
       },
       "blog": {
         "name": "Blog cá nhân",

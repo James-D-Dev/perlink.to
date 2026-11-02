@@ -288,7 +288,9 @@ export type BlockName =
   | 'video'
   | 'testimonials'
   | 'products'
-  | 'blog';
+  | 'blog'
+  | 'timeline'
+  | 'letter';
 
 export interface BaseBlock {
   /** Unique per page, so a page can hold several blocks of one type. Older pages get one on load */
@@ -358,9 +360,14 @@ export interface BirthdayCountdownBlock extends BaseBlock {
   name: 'birthday-countdown';
   data: {
     birthDate: string; // ISO date string YYYY-MM-DD
-    theme: 'classic' | 'modern' | 'minimal' | 'party' | 'elegant';
+    /** 'card' takes the page's own card look; the rest are colour washes */
+    theme: 'classic' | 'modern' | 'minimal' | 'party' | 'elegant' | 'card' | 'rose' | 'night';
     showAge: boolean;
     label: string;
+    /** Count down to the date (a birthday, a wedding), or up from it ("together for") */
+    mode?: 'until' | 'since';
+    /** Counting down: to the next yearly return of the date (birthdays, the default), or to that one day */
+    repeat?: boolean;
   };
 }
 
@@ -482,6 +489,40 @@ export interface Testimonial {
   rating?: number;
 }
 
+// A story told in dated steps: how two people met, a wedding day's plan, a
+// company's milestones
+export interface TimelineItem {
+  id: string;
+  /** Free text, e.g. "Feb 2023" or "15:00" */
+  date: string;
+  title: string;
+  text?: string;
+  imageUrl?: string;
+}
+
+export interface TimelineBlock extends BaseBlock {
+  name: 'timeline';
+  data: {
+    title?: string;
+    items: TimelineItem[];
+  };
+}
+
+// A handwritten-style letter, in a sealed envelope the visitor taps to open
+export interface LetterBlock extends BaseBlock {
+  name: 'letter';
+  data: {
+    /** Who it's for, on the envelope */
+    to?: string;
+    body: string;
+    /** The signature under the letter */
+    from?: string;
+    /** In an envelope that opens on tap (default), or open from the start */
+    sealed?: boolean;
+    paper?: 'cream' | 'blush' | 'night';
+  };
+}
+
 export interface TestimonialsBlock extends BaseBlock {
   name: 'testimonials';
   data: {
@@ -539,7 +580,9 @@ export type BioBlock =
   | FormBlock
   | VideoBlock
   | BlogBlock
-  | TestimonialsBlock;
+  | TestimonialsBlock
+  | TimelineBlock
+  | LetterBlock;
 
 export const DEFAULT_OPENING_DAYS: OpeningDay[] = [1, 2, 3, 4, 5, 6, 0].map(day => ({
   day,

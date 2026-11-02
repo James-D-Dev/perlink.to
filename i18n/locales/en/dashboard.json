@@ -393,7 +393,11 @@
       },
       "gift-love": {
         "name": "Love room",
-        "description": "Surprise your partner with a 3D room of your photos, music and a love letter."
+        "description": "Surprise your partner: a love letter, the days you’ve been together, your story and your photos, in a 3D room."
+      },
+      "wedding-invite": {
+        "name": "Wedding invitation",
+        "description": "An online wedding invitation: a letter to your guests, the countdown, the day’s plan, the venue, RSVP and a QR for wedding gifts."
       },
       "blog": {
         "name": "Personal blog",

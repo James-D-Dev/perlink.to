@@ -25,7 +25,9 @@ export const BLOCK_CATALOG: BlockOption[] = [
   { id: 'products', key: 'products', icon: 'i-lucide-shopping-bag', group: 'business', keywords: 'shop store product sell order shopee tiktok shop lazada sản phẩm bán hàng đặt hàng cửa hàng' },
   { id: 'testimonials', key: 'testimonials', icon: 'i-lucide-quote', group: 'business', keywords: 'reviews feedback đánh giá cảm nhận khách hàng' },
   { id: 'vietqr', key: 'vietqr', icon: 'i-lucide-qr-code', group: 'extras', keywords: 'bank transfer payment donate qr chuyển khoản thanh toán ủng hộ ngân hàng' },
-  { id: 'birthday-countdown', key: 'birthdayCountdown', icon: 'i-lucide-cake', group: 'extras', keywords: 'countdown birthday event đếm ngược sinh nhật sự kiện' },
+  { id: 'birthday-countdown', key: 'birthdayCountdown', icon: 'i-lucide-cake', group: 'extras', keywords: 'countdown count up together anniversary birthday wedding event đếm ngược đếm ngày yêu kỷ niệm sinh nhật đám cưới sự kiện' },
+  { id: 'letter', key: 'letter', icon: 'i-lucide-mail-open', group: 'extras', keywords: 'letter love note envelope message invitation thư tình thư tay phong bì lời nhắn thiệp mời' },
+  { id: 'timeline', key: 'timeline', icon: 'i-lucide-milestone', group: 'content', keywords: 'timeline story milestones schedule history our story dòng thời gian câu chuyện kỷ niệm lịch trình cột mốc' },
 ]
 
 /** Icon tile colours by group */

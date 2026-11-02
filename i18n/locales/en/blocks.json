@@ -152,20 +152,31 @@
       "quickBarHelp": "Sticky Call, Directions and chat buttons at the bottom of the page. Chat uses your Zalo, WhatsApp or Telegram from the social icons block."
     },
     "birthday": {
-      "title": "Birthday countdown",
+      "title": "Countdown",
       "birthDate": "Birth date",
       "birthDatePlaceholder": "Select birth date",
       "label": "Label",
-      "labelPlaceholder": "e.g., My Birthday, John's Birthday",
+      "labelPlaceholder": "e.g. Lily’s birthday, Together for, Our wedding in",
       "theme": "Theme",
       "themes": {
         "classic": "Classic",
         "modern": "Modern",
         "minimal": "Minimal",
         "party": "Party",
-        "elegant": "Elegant"
+        "elegant": "Elegant",
+        "card": "Page cards",
+        "rose": "Rose",
+        "night": "Night"
       },
-      "showAge": "Show age (e.g., 'Turning 25')"
+      "showAge": "Show age (e.g., 'Turning 25')",
+      "sinceDate": "Start date",
+      "mode": "Count",
+      "modes": {
+        "until": "Count down",
+        "since": "Count up"
+      },
+      "repeat": "Every year",
+      "repeatHint": "For birthdays and anniversaries. Off: count to this one day, like a wedding."
     },
     "vietqr": {
       "title": "VietQR Payment",
@@ -232,8 +243,8 @@
           "description": "A bank QR code so people can pay or tip you."
         },
         "birthdayCountdown": {
-          "label": "Birthday countdown",
-          "description": "Days until your next birthday."
+          "label": "Countdown",
+          "description": "Days to a birthday or a wedding, or days together since a date."
         },
         "form": {
           "label": "Booking / contact form",
@@ -254,6 +265,14 @@
         "blog": {
           "label": "Latest posts",
           "description": "Your newest blog posts, linking to your blog."
+        },
+        "timeline": {
+          "label": "Timeline",
+          "description": "Your story in dated steps: how you met, the wedding day plan, milestones."
+        },
+        "letter": {
+          "label": "Letter",
+          "description": "A love letter or invitation in an envelope visitors tap to open."
         }
       },
       "searchPlaceholder": "Paste a link or search blocks…",
@@ -384,6 +403,39 @@
       "countLabel": "Posts to show",
       "hint": "Write posts in the Blog tab.",
       "empty": "No published posts yet — write one in the Blog tab."
+    },
+    "timeline": {
+      "title": "Timeline",
+      "count": "{n} step | {n} steps",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Our story",
+      "datePlaceholder": "Feb 2023",
+      "itemTitlePlaceholder": "What happened",
+      "textPlaceholder": "A few words about it (optional)",
+      "photo": "Photo",
+      "photoHint": "Add a photo (optional)",
+      "removePhoto": "Remove photo",
+      "photoFailed": "Couldn’t upload the photo",
+      "add": "Add a step",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "letter": {
+      "title": "Letter",
+      "to": "For",
+      "toPlaceholder": "Ethan",
+      "body": "Letter",
+      "bodyPlaceholder": "Write what you want to say…",
+      "from": "Signature",
+      "fromPlaceholder": "Love, Mia",
+      "paper": "Paper",
+      "papers": {
+        "cream": "Cream",
+        "blush": "Blush",
+        "night": "Night"
+      },
+      "sealed": "In an envelope",
+      "sealedHint": "Visitors tap the envelope to open the letter."
     }
   }
 }
