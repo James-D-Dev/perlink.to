@@ -1,10 +1,7 @@
 <template>
   <UDashboardPanel id="site-inbox">
     <template #header>
-      <UDashboardNavbar>
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+      <DashboardNavbar :mobile-title="t('dashboard.inbox.title')">
         <template #title>
           <SiteBreadcrumb :username="username" :page="t('dashboard.inbox.title')" />
         </template>
@@ -16,9 +13,10 @@
             icon="i-lucide-pencil"
             :label="t('dashboard.inbox.editSite')"
             size="sm"
+            :ui="{ label: 'max-lg:hidden' }"
           />
         </template>
-      </UDashboardNavbar>
+      </DashboardNavbar>
     </template>
 
     <template #body>

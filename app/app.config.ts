@@ -285,5 +285,12 @@ export default defineAppConfig({
     // iOS toggles are green when on
     switch: { defaultVariants: { color: 'success' } },
     dashboardNavbar: { slots: { root: 'dark:bg-paper/70 dark:backdrop-blur-xl dark:border-white/[0.08]' } },
+    // Under a frosted bar (DashboardNavbar) the page starts below it and
+    // scrolls beneath it
+    dashboardPanel: {
+      slots: {
+        root: '[&:has(>.pl-navbar)>[data-slot=body]]:pt-[calc(var(--ui-header-height)+1rem)] sm:[&:has(>.pl-navbar)>[data-slot=body]]:pt-[calc(var(--ui-header-height)+1.5rem)]',
+      },
+    },
   },
 })

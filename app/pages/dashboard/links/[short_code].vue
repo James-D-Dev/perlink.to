@@ -1,10 +1,7 @@
 <template>
   <UDashboardPanel id="link-detail" class="bg-background">
     <template #header>
-      <UDashboardNavbar title="Link Detail">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+      <DashboardNavbar title="Link Detail">
 
         <template #right>
           <UButton
@@ -12,9 +9,10 @@
             color="primary"
             icon="i-lucide-plus"
             label="Create Short Link"
+            :ui="{ label: 'max-lg:hidden' }"
           />
         </template>
-      </UDashboardNavbar>
+      </DashboardNavbar>
     </template>
 
     <template #body>

@@ -1,11 +1,8 @@
 <template>
   <UDashboardPanel id="admin-feedback">
     <template #header>
-      <UDashboardNavbar :title="t('dashboard.feedback.title')">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <DashboardNavbar :title="t('dashboard.feedback.title')">
+      </DashboardNavbar>
     </template>
     <template #body>
       <!-- Same frame and heading as Settings; the bar above names the page on phones -->

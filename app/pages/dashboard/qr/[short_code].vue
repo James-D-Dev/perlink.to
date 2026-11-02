@@ -1,11 +1,8 @@
 <template>
   <UDashboardPanel id="qr-customize">
     <template #header>
-      <UDashboardNavbar title="Customize QR Code">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <DashboardNavbar title="Customize QR Code">
+      </DashboardNavbar>
     </template>
 
     <template #body>

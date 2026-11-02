@@ -1,11 +1,8 @@
 <template>
   <UDashboardPanel id="help">
     <template #header>
-      <UDashboardNavbar title="Help & Support">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <DashboardNavbar title="Help & Support">
+      </DashboardNavbar>
     </template>
 
     <template #body>

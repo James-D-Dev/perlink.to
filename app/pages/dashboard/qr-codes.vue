@@ -1,11 +1,8 @@
 <template>
   <UDashboardPanel id="qr-codes">
     <template #header>
-      <UDashboardNavbar title="QR Codes">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <DashboardNavbar title="QR Codes">
+      </DashboardNavbar>
     </template>
 
     <template #body>

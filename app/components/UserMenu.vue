@@ -1,6 +1,16 @@
 <template>
-  <UDropdownMenu :items="items" :popper="{ placement: 'top' }">
+  <UDropdownMenu :items="items" :content="compact ? { side: 'bottom', align: 'end' } : { side: 'top' }">
+    <!-- The phone bar: just the round photo -->
     <UButton
+      v-if="compact"
+      :avatar="{ src: user?.avatar || undefined, alt: user?.name || 'User' }"
+      color="neutral"
+      variant="ghost"
+      square
+      :aria-label="user?.name || user?.username || 'Account'"
+    />
+    <UButton
+      v-else
       v-bind="{
         label: collapsed ? undefined : (user?.name || user?.username || 'User'),
         avatar: {
@@ -22,6 +32,8 @@ import type { User } from '#auth-utils'
 
 defineProps<{
   collapsed?: boolean
+  /** Only the photo, for the bar on top of phone pages */
+  compact?: boolean
 }>()
 
 const { user: sessionUser } = useUserSession()

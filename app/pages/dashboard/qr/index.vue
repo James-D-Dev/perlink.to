@@ -1,10 +1,7 @@
 <template>
   <UDashboardPanel id="qr-list">
     <template #header>
-      <UDashboardNavbar title="My QR Codes">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+      <DashboardNavbar title="My QR Codes">
 
         <template #right>
           <UButton
@@ -12,9 +9,10 @@
             color="primary"
             icon="i-lucide-plus"
             label="Create QR Code"
+            :ui="{ label: 'max-lg:hidden' }"
           />
         </template>
-      </UDashboardNavbar>
+      </DashboardNavbar>
     </template>
 
     <template #body>

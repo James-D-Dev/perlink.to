@@ -1,17 +1,14 @@
 <template>
   <UDashboardPanel id="bio-list">
     <template #header>
-      <UDashboardNavbar :title="t('dashboard.sites.title')">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+      <DashboardNavbar :title="t('dashboard.sites.title')">
 
         <template #right>
           <!-- The main site's address, always one click from sharing -->
           <button
             v-if="primary"
             type="button"
-            class="hidden items-center gap-2 rounded-full bg-sand px-3.5 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-sand-strong sm:inline-flex"
+            class="hidden items-center gap-2 rounded-full bg-sand px-3.5 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-sand-strong lg:inline-flex"
             :title="t('common.copyLink')"
             @click="copyUrl(primary.username)"
           >
@@ -20,7 +17,7 @@
             <UIcon name="i-lucide-copy" class="size-3.5 text-ink-muted" />
           </button>
         </template>
-      </UDashboardNavbar>
+      </DashboardNavbar>
     </template>
 
     <template #body>

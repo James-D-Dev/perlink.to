@@ -6,7 +6,7 @@
       v-model:collapsed="collapsed"
       collapsible
       mode="drawer"
-      :menu="{ direction: 'left', handle: false }"
+      :menu="{ direction: 'right', handle: false }"
       resizable
       :min-size="16"
       :max-size="16"

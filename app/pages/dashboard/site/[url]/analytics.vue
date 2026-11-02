@@ -1,10 +1,7 @@
 <template>
   <UDashboardPanel id="site-analytics">
     <template #header>
-      <UDashboardNavbar>
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+      <DashboardNavbar :mobile-title="t('common.analytics')">
         <template #title>
           <SiteBreadcrumb :username="username" :page="t('common.analytics')" />
         </template>
@@ -16,9 +13,10 @@
             icon="i-lucide-pencil"
             :label="t('dashboard.analyticsPage.editSite')"
             size="sm"
+            :ui="{ label: 'max-lg:hidden' }"
           />
         </template>
-      </UDashboardNavbar>
+      </DashboardNavbar>
     </template>
 
     <template #body>

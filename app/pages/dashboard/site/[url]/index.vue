@@ -3,7 +3,6 @@
     <template #header>
       <!-- Editor bar: where you are on the left, what you can do with the site on the right -->
       <div class="flex h-16 shrink-0 items-center gap-2 border-b border-line bg-paper px-3 sm:px-4">
-        <UDashboardSidebarToggle class="lg:hidden" />
         <UDashboardSidebarCollapse />
         <template v-if="step === 'edit' && existingBio?.username">
           <UTooltip :text="t('dashboard.sites.title')">
@@ -68,6 +67,8 @@
           </UTooltip>
         </template>
         <h1 v-else class="text-base font-semibold text-ink">{{ t('dashboard.editor.titleCreate') }}</h1>
+        <!-- Phones: the menu, which slides in from the right -->
+        <UDashboardSidebarToggle side="right" color="neutral" variant="ghost" :class="step !== 'edit' && 'ms-auto'" />
       </div>
     </template>
 

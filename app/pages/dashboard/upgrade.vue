@@ -1,11 +1,8 @@
 <template>
   <UDashboardPanel id="upgrade">
     <template #header>
-      <UDashboardNavbar :title="t('dashboard.upgrade.title')">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <DashboardNavbar :title="t('dashboard.upgrade.title')">
+      </DashboardNavbar>
     </template>
 
     <template #body>

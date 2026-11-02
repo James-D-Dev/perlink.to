@@ -1,13 +1,10 @@
 <template>
   <UDashboardPanel id="qr-create">
     <template #header>
-      <UDashboardNavbar title="Create a new QR Code">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+      <DashboardNavbar title="Create a new QR Code">
 
         <template #right> </template>
-      </UDashboardNavbar>
+      </DashboardNavbar>
     </template>
 
     <template #body>

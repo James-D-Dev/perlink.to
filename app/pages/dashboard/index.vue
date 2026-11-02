@@ -1,11 +1,8 @@
 <template>
   <UDashboardPanel id="create-site">
     <template #header>
-      <UDashboardNavbar :title="t('nav.home')">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <DashboardNavbar :title="t('nav.home')">
+      </DashboardNavbar>
     </template>
 
     <template #body>

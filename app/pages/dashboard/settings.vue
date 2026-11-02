@@ -1,11 +1,8 @@
 <template>
   <UDashboardPanel id="settings">
     <template #header>
-      <UDashboardNavbar :title="t('common.settings')">
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
-      </UDashboardNavbar>
+      <DashboardNavbar :title="t('common.settings')">
+      </DashboardNavbar>
     </template>
 
     <template #body>
