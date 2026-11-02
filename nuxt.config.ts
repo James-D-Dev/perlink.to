@@ -115,8 +115,8 @@ export default defineNuxtConfig({
         { name: "apple-mobile-web-app-title", content: "Perlink" },
       ],
       link: [
-        // Sites' theme fonts come from Google; Perlink's own are served from here
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        // Sites' theme fonts: their stylesheet is inlined into the page
+        // (server/plugins/inline-css.ts), the font files come from here
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
         {
           rel: "icon",

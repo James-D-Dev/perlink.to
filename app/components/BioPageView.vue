@@ -805,6 +805,31 @@ const fontsHref = computed(() => {
     t.typography.bioFontFamily,
   ]);
 });
+// The page's first big picture (a banner, or a full-width photo) is asked for
+// from the head, before the scripts, so it isn't queued behind them
+const leadPicture = computed(() => {
+  if (props.mode === "thumbnail" || props.mode === "preview") return null;
+  const layout = headerLayout.value;
+  if ((layout === "banner-circle" || layout === "banner-square") && theme.value.header?.bannerUrl) return theme.value.header.bannerUrl;
+  if ((layout === "cover" || layout === "image-overlay") && props.bioData.avatarUrl) return props.bioData.avatarUrl;
+  return null;
+});
+useHead({
+  link: computed(() => {
+    const href = leadPicture.value;
+    if (!href) return [];
+    const srcset = templatePhotoSrcset(href, "banner");
+    return [{
+      key: "lead-picture",
+      rel: "preload",
+      as: "image",
+      href,
+      fetchpriority: "high",
+      ...(srcset ? { imagesrcset: srcset, imagesizes: "(min-width: 768px) 576px, (min-width: 448px) 448px, 100vw" } : {}),
+    }];
+  }),
+});
+
 // Thumbnails (template galleries, the landing, the site list) get theirs
 // once the page is up, so a page full of them isn't held back by font files
 const lazyFonts = props.mode === "thumbnail";
