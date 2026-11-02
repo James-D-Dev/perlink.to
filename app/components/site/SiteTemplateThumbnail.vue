@@ -24,8 +24,11 @@ provide(TEMPLATE_PREVIEW_KEY, true)
 const props = withDefaults(defineProps<{
   template: PageTemplate
   scale?: number
+  /** The owner's own name, intro and photo in place of the sample ones (create flow) */
+  personal?: { title: string; bio: string; avatarUrl: string }
 }>(), {
   scale: 0.5,
+  personal: undefined,
 })
 
 // Dashboard previews follow the dashboard language; marketing pages their URL
@@ -42,9 +45,9 @@ function smallPhotos<T>(value: T): T {
 const bioData = computed<BioData>(() => {
   const content = localizeTemplateContent(props.template.build(), lang.value)
   return {
-    title: content.title,
-    bio: content.bio,
-    avatarUrl: smallPhotos(content.avatarUrl || ''),
+    title: props.personal?.title || content.title,
+    bio: props.personal ? props.personal.bio : content.bio,
+    avatarUrl: props.personal ? props.personal.avatarUrl : smallPhotos(content.avatarUrl || ''),
     templateId: 'modern',
     themeConfig: smallPhotos({ ...content.themeConfig, showShare: false }),
     // Numbered ids, so the thumbnail renders the same on the server and in the

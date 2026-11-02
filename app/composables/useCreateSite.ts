@@ -34,13 +34,29 @@ async function temporaryAddress(base: string) {
  */
 export function useCreateSite() {
   const { locale } = useI18n()
+  const { upload } = useAvatarUpload()
 
-  async function createSite(options: { username?: string; templateId?: string }) {
+  async function createSite(options: {
+    username?: string
+    templateId?: string
+    /** The owner's own name, intro and photo (the create flow), over the template's samples */
+    title?: string
+    bio?: string
+    avatarFile?: File | null
+  }) {
     const template = options.templateId ? PAGE_TEMPLATES.find(t => t.id === options.templateId) : undefined
     const username = options.username || await temporaryAddress(template?.id ?? 'site')
     const tempAddress = !options.username
+    const personal = options.title !== undefined
 
-    await $fetch('/api/bio', { method: 'POST', body: { username } })
+    const created = await $fetch<{ bioPage?: { id: string } }>('/api/bio', { method: 'POST', body: { username } })
+
+    // Their photo goes up once the site exists (uploads are kept per site);
+    // without one the page shows their initial, not a stranger's sample photo
+    let avatarUrl: string | undefined
+    if (options.avatarFile && created?.bioPage?.id) {
+      avatarUrl = await upload(options.avatarFile, created.bioPage.id).catch(() => undefined)
+    }
 
     if (template) {
       // Vietnamese users get Vietnamese sample content and site language
@@ -48,9 +64,9 @@ export function useCreateSite() {
       await $fetch(`/api/admin/bio/${username}`, {
         method: 'PUT' as const,
         body: {
-          title: content.title,
-          bio: content.bio,
-          avatarUrl: content.avatarUrl,
+          title: personal ? options.title : content.title,
+          bio: personal ? options.bio ?? '' : content.bio,
+          avatarUrl: personal ? avatarUrl ?? '' : content.avatarUrl,
           blocks: content.blocks,
           themeConfig: { ...content.themeConfig, pageMode: content.themeConfig.pageMode ?? '2d', room: content.room, ...(tempAddress ? { tempAddress: true } : {}) },
         },

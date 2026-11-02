@@ -29,7 +29,7 @@
 
       <template #default="{ collapsed }">
         <UButton
-          to="/dashboard/create"
+          to="/dashboard/new"
           size="lg"
           icon="i-lucide-plus"
           :label="collapsed ? undefined : t('nav.createSite')"

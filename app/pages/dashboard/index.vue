@@ -189,8 +189,6 @@ useSeoMeta({ title: () => `${t('nav.home')} — Perlink`, robots: 'noindex, nofo
 const initialSlug = computed(() => (typeof route.query.input === 'string' ? route.query.input.toLowerCase() : ''))
 
 const category = ref<TemplateCategory | 'all'>('all')
-const toast = useToast()
-const { createSite } = useCreateSite()
 
 const chips = computed(() => [
   { id: 'all' as const, label: t('dashboard.home.all'), icon: 'i-lucide-layout-grid', count: PAGE_TEMPLATES.length },
@@ -228,28 +226,20 @@ onMounted(async () => {
   sitesLoaded.value = true
 })
 
-// One click: the site is made with a temporary address and opens in the
-// editor, which asks for a real address before publishing
+// A template opens the create flow with it chosen; nothing is made until
+// the owner has named the site and picked its address
 const creatingId = ref<string | null>(null)
-async function useTemplate(id: string) {
-  if (creatingId.value) return
+function useTemplate(id: string) {
   creatingId.value = id
-  try {
-    const username = await createSite({ templateId: id })
-    await navigateTo(`/dashboard/site/${username}`)
-  } catch (error: any) {
-    creatingId.value = null
-    if (useUpgradePrompt().fromError(error)) return
-    toast.add({ title: t('dashboard.claim.createFailed'), description: error?.data?.statusMessage || error?.message, color: 'error' })
-  }
+  navigateTo({ path: '/dashboard/new', query: { template: id } })
 }
 
-// "Use this template" on a template's preview page lands here
+// "Use this template" on a template's preview page, and an address claimed
+// on the landing page, land here and go on to the create flow
 onMounted(() => {
-  const id = typeof route.query.template === 'string' ? route.query.template : ''
-  if (!id || !PAGE_TEMPLATES.some(item => item.id === id)) return
-  // Off the address first, so coming back here doesn't make another site
-  navigateTo({ query: { ...route.query, template: undefined } }, { replace: true })
-  useTemplate(id)
+  const template = typeof route.query.template === 'string' ? route.query.template : ''
+  const address = initialSlug.value
+  if (!template && !address) return
+  navigateTo({ path: '/dashboard/new', query: { ...(template ? { template } : {}), ...(address ? { address } : {}) } }, { replace: true })
 })
 </script>

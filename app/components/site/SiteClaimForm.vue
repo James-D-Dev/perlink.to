@@ -62,7 +62,6 @@ const emit = defineEmits<{ created: [username: string] }>()
 
 const toast = useToast()
 const { t, locale } = useI18n()
-const { createSite } = useCreateSite()
 const inputRef = ref<HTMLInputElement | null>(null)
 const slug = ref(props.initialSlug)
 // Types out example names, brands and shops while the box is empty
@@ -140,26 +139,10 @@ async function submit() {
     inputRef.value?.focus()
     return
   }
+  // On to the create flow with the address chosen (a template too, if given)
   creating.value = true
-  const username = slug.value
-  try {
-    await createSite({ username, templateId: props.templateId })
-
-    emit('created', username)
-    toast.add({ title: t('dashboard.claim.ready'), description: `perlink.to/${username}`, color: 'success' })
-    await navigateTo(`/dashboard/site/${username}`)
-  } catch (error: any) {
-    if (useUpgradePrompt().fromError(error)) return
-    toast.add({
-      title: t('dashboard.claim.createFailed'),
-      description: error?.data?.statusMessage || error?.message,
-      color: 'error',
-    })
-    // The name may have been taken in the meantime
-    status.value = 'checking'
-    check(username)
-  } finally {
-    creating.value = false
-  }
+  emit('created', slug.value)
+  await navigateTo({ path: '/dashboard/new', query: { address: slug.value, ...(props.templateId ? { template: props.templateId } : {}) } })
+  creating.value = false
 }
 </script>

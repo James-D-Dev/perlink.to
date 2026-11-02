@@ -2,7 +2,7 @@
   <!-- "New site", first in the list, shaped like the site cards: what a site
        can hold drifts up through the picture, the words sit on the strip below -->
   <NuxtLink
-    to="/dashboard"
+    to="/dashboard/new"
     class="new-site group relative flex flex-col overflow-hidden rounded-3xl bg-paper ring-1 ring-line transition [--float-scale:0.7] hover:-translate-y-0.5 hover:shadow-xl sm:[--float-scale:0.85]"
   >
     <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-line bg-gradient-to-b from-[#fff6ee] via-[#fcf0f4] to-[#eef1ff] dark:from-[#1c1613] dark:via-[#1b1320] dark:to-[#11141f]">

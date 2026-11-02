@@ -835,7 +835,7 @@ const siteMenu = computed(() => [
     }),
   ],
   [
-    { label: t("nav.createSite"), icon: "i-lucide-plus", to: "/dashboard/create" },
+    { label: t("nav.createSite"), icon: "i-lucide-plus", to: "/dashboard/new" },
     { label: t("dashboard.sites.title"), icon: "i-lucide-layout-grid", to: "/dashboard/site" },
   ],
 ]);
