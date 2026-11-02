@@ -26,9 +26,8 @@ export default defineNuxtConfig({
     // in the perlink_lang cookie by plugins/language.ts, and signing in
     // brings the account's language with it.
     detectBrowserLanguage: false,
-    // The locale files are compiled at build time, so the browser doesn't
-    // need vue-i18n's message compiler (about 17 KB of the startup script)
-    bundle: { dropMessageCompiler: true },
+    // Keep vue-i18n's message compiler: the locale files reach the browser as
+    // plain JSON, so without it "{name}" and plural forms show as written
   },
 
   // Public runtime config only (private secrets handled by nuxt-auth-utils)
