@@ -481,6 +481,126 @@
       "invite-year-end-party": {
         "name": "Year-end party invitation",
         "description": "A company year-end party or gala: countdown, programme, dress code, RSVP and photos."
+      },
+      "personal-neon": {
+        "name": "Neon developer",
+        "description": "A dark, glowing page for developers and tech creators: projects, a timeline and an aurora sky."
+      },
+      "personal-editorial": {
+        "name": "Editorial portfolio",
+        "description": "Magazine-style for models, stylists and creative directors: a full-bleed portrait, campaigns and bookings."
+      },
+      "personal-resume": {
+        "name": "Online CV",
+        "description": "A clean CV to send with job applications: experience, skills, recommendations and a CV download."
+      },
+      "personal-nomad": {
+        "name": "Digital nomad",
+        "description": "For remote workers and travellers: days on the road, places you’ve worked from, field notes and gear."
+      },
+      "personal-aesthetic": {
+        "name": "Pastel aesthetic",
+        "description": "Soft and sticker-bold for Gen Z creators: pastel gradient, pill links, presets to sell and lo-fi music."
+      },
+      "photographer": {
+        "name": "Photographer",
+        "description": "Gallery first, on a dark frame: your work, sessions with prices and a booking form."
+      },
+      "tattoo-studio": {
+        "name": "Tattoo studio",
+        "description": "Bold and dark for tattoo artists: fresh and healed work, prices, aftercare and consultations."
+      },
+      "hair-salon": {
+        "name": "Hair salon",
+        "description": "Warm and colourful for hair salons: services with prices, fresh looks, reviews and online booking."
+      },
+      "makeup-artist": {
+        "name": "Makeup artist",
+        "description": "Elegant for makeup artists: bridal and event packages, a lookbook, reviews and checking a date."
+      },
+      "homestay": {
+        "name": "Pine forest homestay",
+        "description": "A cosy homestay in the hills: rooms with nightly prices, a day at the house, guest reviews and booking by date."
+      },
+      "villa-resort": {
+        "name": "Luxury pool villa",
+        "description": "Dark and elegant for pool villas and resorts: villas with prices, the stay, a gallery and booking."
+      },
+      "hostel": {
+        "name": "Backpacker hostel",
+        "description": "Loud and friendly: beds with prices, what’s free, this week’s pub crawl and travellers’ reviews."
+      },
+      "tour-guide": {
+        "name": "Tours & travel guide",
+        "description": "For guides and small agencies: tours with prices, a day’s itinerary, photos, reviews and booking."
+      },
+      "language-center": {
+        "name": "English centre",
+        "description": "Courses with fees, the road to IELTS, student results, an open day and a free placement test."
+      },
+      "online-course": {
+        "name": "Online course",
+        "description": "Dark and modern for course creators: the course for sale, week-by-week lessons, results and an early-bird countdown."
+      },
+      "kindergarten": {
+        "name": "Kindergarten",
+        "description": "Soft and playful: a day at school, monthly fees, parents’ words, an open day and visit booking."
+      },
+      "music-school": {
+        "name": "Music school",
+        "description": "Ivory and piano red on staff lines: lessons with prices, the winter recital, photos and a free trial."
+      },
+      "pet-rescue": {
+        "name": "Pet rescue & adoption",
+        "description": "Pets looking for a home, how adoption works, an adoption form and donations by QR."
+      },
+      "running-club": {
+        "name": "Running club",
+        "description": "Neon on black: the next group run, a race countdown, the weekly schedule and sign-ups."
+      },
+      "class-reunion": {
+        "name": "Class reunion",
+        "description": "On notebook paper: an invitation letter, countdown, the dinner, then-and-now memories, RSVP and the class fund."
+      },
+      "volunteer-group": {
+        "name": "Volunteer group",
+        "description": "Fresh ocean colours: your impact in numbers, the next activity, sign-ups and donations."
+      },
+      "creative-agency": {
+        "name": "Creative agency",
+        "description": "A bold, poster-like page for a design or marketing studio: services, case studies, how you work and a project brief."
+      },
+      "interior-design": {
+        "name": "Interior design studio",
+        "description": "A quiet, magazine-like page for an interior studio: projects, services by the square metre and a consultation booking."
+      },
+      "consulting": {
+        "name": "Consulting & law firm",
+        "description": "A sober navy-and-gold page for consultants, lawyers and accountants: practice areas with fees and a consultation booking."
+      },
+      "yoga-studio": {
+        "name": "Yoga studio",
+        "description": "A soft, slow page for a yoga studio: class passes, the week’s schedule, photos, a free trial class and calm music."
+      },
+      "clinic": {
+        "name": "Family clinic",
+        "description": "A clean, reassuring page for a clinic or family doctor: services with prices, opening hours, appointments and one-tap call."
+      },
+      "nutritionist": {
+        "name": "Nutritionist & meal plans",
+        "description": "A fresh, colourful page for a nutritionist: meal plans to order, how it works, client results and a free call."
+      },
+      "fashion-boutique": {
+        "name": "Fashion boutique",
+        "description": "A black-and-white editorial page for a local clothing brand: new drops with sale prices, a lookbook and your stores."
+      },
+      "handmade-shop": {
+        "name": "Handmade & ceramics shop",
+        "description": "An earthy, warm page for a handmade shop: pieces to order, a pottery workshop to book and the studio story."
+      },
+      "skincare-shop": {
+        "name": "Skincare brand",
+        "description": "A soft, glowing pastel page for a skincare brand: products and bundles, a morning routine, reviews and a free skin consult."
       }
     },
     "categories": {

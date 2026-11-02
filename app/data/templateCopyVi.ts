@@ -1,6 +1,9 @@
 import type { BioBlock } from '~/types/bio'
 import type { PageTemplateContent } from './pageTemplates'
 import { MORE_VI } from './pageTemplatesMore'
+import { PERSONAL_CREATIVE_VI } from './templatesExtra/personalCreative'
+import { PLACES_LEARNING_VI } from './templatesExtra/placesLearning'
+import { BUSINESS_HEALTH_SHOP_VI } from './templatesExtra/businessHealthShop'
 
 // Vietnamese sample content for the page templates. Templates are written in
 // English; for Vietnamese users every sample string is swapped for its
@@ -137,7 +140,9 @@ const VI: Record<string, string> = {
 const VND_PRICES: Record<string, string> = { '250': '2,500,000', '600': '6,000,000', '450': '4,500,000' }
 
 function translate<T>(value: T): T {
-  if (typeof value === 'string') return (VI[value] ?? MORE_VI[value] ?? value) as T
+  if (typeof value === 'string') {
+    return (VI[value] ?? MORE_VI[value] ?? PERSONAL_CREATIVE_VI[value] ?? PLACES_LEARNING_VI[value] ?? BUSINESS_HEALTH_SHOP_VI[value] ?? value) as T
+  }
   if (Array.isArray(value)) return value.map(translate) as T
   if (value && typeof value === 'object') {
     return Object.fromEntries(Object.entries(value).map(([key, inner]) =>

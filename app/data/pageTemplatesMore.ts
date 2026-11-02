@@ -16,25 +16,25 @@ function s(en: string, vi: string) {
   return en
 }
 
-type Blocks = Omit<BioBlock, 'index' | 'hidden'>[]
+export type Blocks = Omit<BioBlock, 'index' | 'hidden'>[]
 
-function reviews(...items: [string, string, string?][]) {
+export function reviews(...items: [string, string, string?][]) {
   return items.map(([quote, author, detail]) => ({ id: nanoid(6), quote, author, detail, rating: 5 }))
 }
 
-function hours(open: string, close: string, closedDays: number[] = []) {
+export function hours(open: string, close: string, closedDays: number[] = []) {
   return DEFAULT_OPENING_DAYS.map(d => ({ ...d, open, close, closed: closedDays.includes(d.day) }))
 }
 
-const booking = (date = true, time = true, guests = false) =>
+export const booking = (date = true, time = true, guests = false) =>
   ({ phone: true, email: false, date, time, guests, message: true })
 
 // ---- 3D rooms, reused with each template's colours ----
 
-type Obj = Omit<RoomObject, 'id' | 'scale'>
+export type Obj = Omit<RoomObject, 'id' | 'scale'>
 
 /** A shop or salon: counter, shelves and a lit sign that links somewhere */
-function shopRoom(wall: string, floor: string, accent: string, label: string, extra: Obj[] = []) {
+export function shopRoom(wall: string, floor: string, accent: string, label: string, extra: Obj[] = []) {
   return room({ wallColor: wall, floorColor: floor, floorMaterial: 'wood', trimColor: '#ffffff' }, [
     { type: 'neon-sign', position: [0.2, 2.1, -3], rotation: 0, wall: 'back', color: accent, link: { label, url: '' } },
     { type: 'cabinet', position: [0.2, 0, -2.6], rotation: 0, color: accent },
@@ -50,7 +50,7 @@ function shopRoom(wall: string, floor: string, accent: string, label: string, ex
 }
 
 /** A calm lounge: sofa, low table with candles, warm lamps */
-function loungeRoom(wall: string, floor: string, accent: string, label: string, extra: Obj[] = []) {
+export function loungeRoom(wall: string, floor: string, accent: string, label: string, extra: Obj[] = []) {
   return room({ wallColor: wall, floorColor: floor, floorMaterial: 'wood', trimColor: '#f5f0e8' }, [
     { type: 'picture-frame', position: [0, 1.7, -3], rotation: 0, wall: 'back', color: accent, link: { label, url: '' } },
     { type: 'string-lights', position: [0, 2.6, -3], rotation: 0, wall: 'back', color: '#ffe8a3' },
@@ -67,7 +67,7 @@ function loungeRoom(wall: string, floor: string, accent: string, label: string, 
 }
 
 /** A workroom: desk, laptop with a link, books and frames */
-function studioRoom(wall: string, floor: string, accent: string, label: string, extra: Obj[] = []) {
+export function studioRoom(wall: string, floor: string, accent: string, label: string, extra: Obj[] = []) {
   return room({ wallColor: wall, floorColor: floor, floorMaterial: 'wood', trimColor: '#ffffff' }, [
     { type: 'window', position: [0.8, 1.6, -3], rotation: 0, wall: 'back' },
     { type: 'desk', position: [0.8, 0, -2.6], rotation: 0 },
@@ -84,7 +84,7 @@ function studioRoom(wall: string, floor: string, accent: string, label: string, 
 }
 
 /** A night spot: neon, string lights, a bar of low tables */
-function nightRoom(wall: string, accent: string, label: string, extra: Obj[] = []) {
+export function nightRoom(wall: string, accent: string, label: string, extra: Obj[] = []) {
   return room({ wallColor: wall, floorColor: '#2b2b30', floorMaterial: 'concrete', trimColor: '#44444c' }, [
     { type: 'neon-sign', position: [0.4, 2, -3], rotation: 0, wall: 'back', color: accent, link: { label, url: '' } },
     { type: 'string-lights', position: [-3, 2.5, 0], rotation: 0, wall: 'left', color: accent },
@@ -104,7 +104,7 @@ function nightRoom(wall: string, accent: string, label: string, extra: Obj[] = [
  * A gift room: opens straight in 3D with music on, framed photos on the
  * walls and the guestbook on, so friends leave wishes and gifts in front of it
  */
-function giftRoom(wall: string, floor: string, accent: string, sign: string, photos: string[], mode: 'day' | 'night', trackId: string, extra: Obj[] = []): RoomConfig {
+export function giftRoom(wall: string, floor: string, accent: string, sign: string, photos: string[], mode: 'day' | 'night', trackId: string, extra: Obj[] = []): RoomConfig {
   const base = room({ wallColor: wall, floorColor: floor, floorMaterial: 'wood', trimColor: '#ffffff' }, [
     { type: 'neon-sign', position: [0.9, 2.05, -3], rotation: 0, wall: 'back', color: accent, link: { label: sign, url: '' } },
     { type: 'string-lights', position: [0, 2.65, -3], rotation: 0, wall: 'back', color: '#ffe8a3' },
@@ -236,7 +236,7 @@ const GIFT_TEMPLATES: PageTemplate[] = [
 // Pages that open in 2D, with music from the first tap and the 3D room one
 // tap away
 
-const RSVP_FIELDS = { phone: true, email: false, date: false, time: false, guests: true, message: true }
+export const RSVP_FIELDS = { phone: true, email: false, date: false, time: false, guests: true, message: true }
 
 const LOVE_TEMPLATES: PageTemplate[] = [
   {

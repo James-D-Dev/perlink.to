@@ -155,7 +155,8 @@
               class="absolute inset-0 flex flex-col items-center justify-center"
               style="background: rgba(0, 0, 0, 0.35)"
             >
-              <component :is="nameTag" :style="{ ...nameStyle, textAlign: 'center' }" class="mb-1">
+              <!-- On the darkened photo the name is always white -->
+              <component :is="nameTag" :style="{ ...nameStyle, color: '#ffffff', textShadow: '0 2px 18px rgb(0 0 0 / 0.45)', textAlign: 'center' }" class="mb-1">
                 {{ bioData.title || username }}
               </component>
             </div>
