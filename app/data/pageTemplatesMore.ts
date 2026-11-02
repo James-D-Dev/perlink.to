@@ -172,12 +172,12 @@ const GIFT_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: s('For you, Ethan ❤️', 'Gửi Ethan của em ❤️'),
       bio: s('Every day with you is my favourite day.', 'Mỗi ngày bên anh đều là ngày em thích nhất.'),
-      avatarUrl: photo('event-1'),
+      avatarUrl: photo('love-avatar'),
       themeConfig: {
         ...look({
           bg: '#24101E', text: '#FFE9F0', accent: '#FF5C8A', onAccent: '#FFFFFF', surface: '#33182B', radius: 22, shadow: 'md',
           nameFont: 'Dancing Script, cursive', nameWeight: '700', nameSize: '2.5rem', bodyFont: 'Nunito, sans-serif',
-          header: 'banner-circle', banner: photo('photo-3'), link: 'centered', social: 'soft', gap: 'relaxed',
+          header: 'banner-circle', banner: photo('love-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
         }),
         pageMode: '3d',
       },
@@ -185,15 +185,15 @@ const GIFT_TEMPLATES: PageTemplate[] = [
         { name: 'letter', data: { to: s('Ethan', 'anh'), body: s('Thank you for every ordinary day that felt special with you.\nI made this little room to keep our favourite moments in one place. Walk around, open the photos, and leave me a message.\nI love you, today and every day after.', 'Cảm ơn anh vì những ngày bình thường mà ở bên anh lại thành đặc biệt.\nEm làm căn phòng nhỏ này để giữ những khoảnh khắc mình thích nhất. Anh đi một vòng, xem ảnh rồi để lại cho em một lời nhắn nhé.\nEm yêu anh, hôm nay và cả những ngày sau nữa.'), from: s('Love, Mia', 'Thương anh, Mia'), sealed: true, paper: 'blush' } },
         { name: 'birthday-countdown', data: { birthDate: '2024-02-14', theme: 'card', showAge: false, label: s('Together for', 'Mình đã bên nhau'), mode: 'since' } },
         { name: 'timeline', data: { title: s('Our love story', 'Chuyện của chúng mình'), items: [
-          { id: nanoid(6), date: s('Feb 2024', 'Tháng 2, 2024'), title: s('The first coffee', 'Ly cà phê đầu tiên'), text: s('You were late, and I didn’t mind at all.', 'Anh đến trễ, mà em chẳng giận chút nào.') },
-          { id: nanoid(6), date: s('Summer 2024', 'Hè 2024'), title: s('Our first trip', 'Chuyến đi đầu tiên'), text: s('Sunburn, street food and a sunset we still talk about.', 'Cháy nắng, ăn vặt và một hoàng hôn tới giờ vẫn nhắc.'), imageUrl: photo('photo-1') },
-          { id: nanoid(6), date: s('Dec 2024', 'Tháng 12, 2024'), title: s('Our first Christmas', 'Giáng sinh đầu tiên'), text: s('Fairy lights, hot cocoa and your terrible singing.', 'Đèn lấp lánh, ca cao nóng và giọng hát “khó nghe” của anh.') },
+          { id: nanoid(6), date: s('Feb 2024', 'Tháng 2, 2024'), title: s('The first coffee', 'Ly cà phê đầu tiên'), text: s('You were late, and I didn’t mind at all.', 'Anh đến trễ, mà em chẳng giận chút nào.'), imageUrl: photo('love-1') },
+          { id: nanoid(6), date: s('Summer 2024', 'Hè 2024'), title: s('Our first trip', 'Chuyến đi đầu tiên'), text: s('Sunburn, street food and a sunset we still talk about.', 'Cháy nắng, ăn vặt và một hoàng hôn tới giờ vẫn nhắc.'), imageUrl: photo('love-2') },
+          { id: nanoid(6), date: s('Dec 2024', 'Tháng 12, 2024'), title: s('Our first Christmas', 'Giáng sinh đầu tiên'), text: s('Fairy lights, hot cocoa and your terrible singing.', 'Đèn lấp lánh, ca cao nóng và giọng hát “khó nghe” của anh.'), imageUrl: photo('love-5') },
           { id: nanoid(6), date: s('Today', 'Hôm nay'), title: s('Still choosing you', 'Vẫn chọn anh'), text: s('And tomorrow, and the day after.', 'Ngày mai, và mãi về sau.') },
         ] } },
-        { name: 'image-album', data: { title: s('Us', 'Chúng mình'), images: album('photo-2', 'event-4', 'photo-cover', 'photo-avatar'), layout: 'grid' } },
+        { name: 'image-album', data: { title: s('Us', 'Chúng mình'), images: album('love-6', 'love-7', 'love-4', 'love-3'), layout: 'grid' } },
         { name: 'links', data: { title: s('Our song', 'Bài hát của tụi mình'), items: links([s('Play our song 🎵', 'Nghe bài hát của tụi mình 🎵'), 'https://open.spotify.com']) } },
       ] as Blocks),
-      room: giftRoom('#3a1a2c', '#8a5a44', '#ff5c8a', s('Love you', 'Yêu anh'), ['event-1', 'photo-1', 'photo-2'], 'night', 'fairytale-quest'),
+      room: giftRoom('#3a1a2c', '#8a5a44', '#ff5c8a', s('Love you', 'Yêu anh'), ['love-avatar', 'love-2', 'love-6'], 'night', 'fairytale-quest'),
     }),
   },
   {
@@ -1077,11 +1077,11 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     build: () => ({
       title: s('Mia turns 30!', 'Mia tròn 30 tuổi!'),
       bio: s('Come celebrate with cake, games and good friends.', 'Đến chung vui cùng bánh kem, trò chơi và bạn bè nhé.'),
-      avatarUrl: photo('birthday-avatar'),
+      avatarUrl: photo('party-avatar'),
       themeConfig: look({
         bg: '#FFF1C1', text: '#4C1D95', accent: '#F43F5E', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 999, shadow: 'md',
         nameFont: 'Pacifico, cursive', nameWeight: '400', nameSize: '2.25rem', bodyFont: 'Nunito, sans-serif',
-        header: 'banner-circle', banner: photo('birthday-cover'), link: 'centered', social: 'filled',
+        header: 'banner-circle', banner: photo('party-cover'), link: 'centered', social: 'filled',
       }),
       blocks: withIndex([
         { name: 'birthday-countdown', data: { birthDate: '2027-03-15', theme: 'party', showAge: false, label: s('Party starts in', 'Còn bao lâu nữa') } },
@@ -1090,7 +1090,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         ]) } },
         { name: 'contact', data: { title: s('Where', 'Địa điểm'), address: SAMPLE_ADDRESS } },
         { name: 'form', data: { title: s('Are you coming?', 'Bạn có đến không?'), kind: 'booking', fields: { phone: true, email: false, date: false, time: false, guests: true, message: true }, submitLabel: s('I’ll be there', 'Mình sẽ đến') } },
-        { name: 'image-album', data: { images: album('birthday-1', 'birthday-2'), layout: 'grid' } },
+        { name: 'image-album', data: { images: album('birthday-1', 'birthday-2', 'birthday-cover', 'birthday-avatar'), layout: 'grid' } },
       ] as Blocks),
       room: loungeRoom('#ffe4ef', '#e8c4a0', '#f43f5e', s('RSVP', 'Xác nhận tham dự')),
     }),

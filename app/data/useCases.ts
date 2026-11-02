@@ -42,7 +42,7 @@ export const USE_CASES: UseCase[] = [
     en: {
       label: 'Birthday website',
       metaTitle: 'Make a Birthday Website as a Gift, Free | Perlink',
-      metaDescription: 'Make a birthday website for someone you love: a sealed letter, a countdown, your best moments, photos and a 3D room full of wishes. Free, no code, ready in minutes.',
+      metaDescription: 'Make a birthday website for someone you love: a sealed letter, a countdown, your best moments, photos and a 3D room full of wishes. Free, no code.',
       eyebrow: 'Birthday website',
       title: 'A birthday website they’ll open again and again',
       intro: 'Write a letter in an envelope they tap to open, count down to the big day, line up your best moments and photos, and let friends leave wishes in a 3D room. Send one link: perlink.to/their-name.',
@@ -77,8 +77,8 @@ export const USE_CASES: UseCase[] = [
     },
     vi: {
       label: 'Thiệp sinh nhật online',
-      metaTitle: 'Tạo thiệp sinh nhật online, web tặng sinh nhật miễn phí | Perlink',
-      metaDescription: 'Tạo thiệp sinh nhật online tặng người thân, bạn bè, người yêu: lá thư đóng dấu, đếm ngược, kỷ niệm, album ảnh và phòng 3D đầy lời chúc. Miễn phí, không cần code.',
+      metaTitle: 'Tạo thiệp sinh nhật online miễn phí, web tặng quà | Perlink',
+      metaDescription: 'Tạo thiệp sinh nhật online tặng bạn bè, người yêu: lá thư đóng dấu, đếm ngược, kỷ niệm, album ảnh và phòng 3D đầy lời chúc. Miễn phí, không cần code.',
       eyebrow: 'Thiệp sinh nhật online',
       title: 'Thiệp sinh nhật online, mở ra là muốn xem lại',
       intro: 'Viết một lá thư trong phong bì chạm để mở, đếm ngược đến ngày sinh nhật, kể lại những kỷ niệm đẹp kèm ảnh, và để bạn bè gửi lời chúc trong một căn phòng 3D. Chỉ cần gửi một link: perlink.to/tên-người-ấy.',
@@ -119,7 +119,7 @@ export const USE_CASES: UseCase[] = [
     en: {
       label: 'Website for your partner',
       metaTitle: 'Make a Love Website for Your Partner, Free | Perlink',
-      metaDescription: 'Make a website for your boyfriend or girlfriend: a love letter, the days you’ve been together, your story, your photos and a 3D room. Perfect for Valentine’s Day and anniversaries.',
+      metaDescription: 'Make a website for your partner: a love letter, the days you’ve been together, your story, photos and a 3D room. For Valentine’s Day or an anniversary.',
       eyebrow: 'A website for your partner',
       title: 'A love website for the one you love',
       intro: 'A love letter in a sealed envelope, a counter of the days you’ve been together, your story from the first date, your photos and a little 3D room with your song. For Valentine’s Day, an anniversary or just because.',
@@ -154,8 +154,8 @@ export const USE_CASES: UseCase[] = [
     },
     vi: {
       label: 'Web tặng người yêu',
-      metaTitle: 'Tạo web tặng người yêu, thiệp tình yêu online miễn phí | Perlink',
-      metaDescription: 'Tạo website tặng người yêu: thư tình đóng dấu, đếm ngày yêu nhau, chuyện tình của hai bạn, album ảnh và phòng 3D có nhạc. Quà Valentine, kỷ niệm ngày yêu. Miễn phí.',
+      metaTitle: 'Tạo web tặng người yêu miễn phí, quà Valentine | Perlink',
+      metaDescription: 'Tạo website tặng người yêu: thư tình, đếm ngày yêu nhau, chuyện của hai bạn, album ảnh và phòng 3D có nhạc. Quà Valentine, kỷ niệm ngày yêu. Miễn phí.',
       eyebrow: 'Web tặng người yêu',
       title: 'Món quà là cả một trang web về hai bạn',
       intro: 'Một lá thư tình trong phong bì có dấu sáp, bộ đếm số ngày yêu nhau, chuyện của hai bạn từ buổi hẹn đầu, album ảnh và căn phòng 3D nhỏ có bài hát của hai người. Cho Valentine, ngày kỷ niệm, hay chỉ vì yêu.',
@@ -196,7 +196,7 @@ export const USE_CASES: UseCase[] = [
     en: {
       label: 'QR code menu',
       metaTitle: 'Free QR Code Menu for Restaurants & Cafés | Perlink',
-      metaDescription: 'Make a digital menu with a QR code for your restaurant, café or bar. Prices, photos, opening hours, map and table booking. Change prices any time without reprinting. Free.',
+      metaDescription: 'Make a digital menu with a QR code for your restaurant, café or bar: prices, photos, opening hours, map and table booking. Edit it without reprinting.',
       eyebrow: 'QR code menu',
       title: 'A QR code menu you can change in a minute',
       intro: 'Put your menu online with prices and photos, print one QR code for the tables, and update dishes and prices from your phone whenever you like. Guests also find your opening hours, address and a form to book a table.',
@@ -232,7 +232,7 @@ export const USE_CASES: UseCase[] = [
     vi: {
       label: 'Menu online, menu QR',
       metaTitle: 'Tạo menu online, menu QR code miễn phí cho quán | Perlink',
-      metaDescription: 'Tạo menu online có mã QR cho nhà hàng, quán cà phê, quán nhậu. Giá, ảnh món, giờ mở cửa, bản đồ và đặt bàn. Đổi giá bất cứ lúc nào, không cần in lại. Miễn phí.',
+      metaDescription: 'Tạo menu online có mã QR cho nhà hàng, quán cà phê, quán nhậu: giá, ảnh món, giờ mở cửa, bản đồ, đặt bàn. Đổi giá bất cứ lúc nào, không cần in lại.',
       eyebrow: 'Menu online',
       title: 'Menu QR cho quán, sửa giá trong một phút',
       intro: 'Đưa menu lên mạng với giá và ảnh món, in một mã QR dán lên bàn, rồi cập nhật món và giá ngay trên điện thoại bất cứ lúc nào. Khách còn xem được giờ mở cửa, địa chỉ và đặt bàn trước.',
@@ -273,7 +273,7 @@ export const USE_CASES: UseCase[] = [
     en: {
       label: 'Free link in bio',
       metaTitle: 'Free Link in Bio Page for Instagram & TikTok | Perlink',
-      metaDescription: 'Make a free link in bio page for Instagram, TikTok and YouTube. All your links, socials, products and videos at perlink.to/you, with click analytics and a 3D room.',
+      metaDescription: 'Make a free link in bio page for Instagram, TikTok and YouTube: your links, socials, products and videos at perlink.to/you, with click analytics.',
       eyebrow: 'Free link in bio',
       title: 'One link for your bio, with everything behind it',
       intro: 'Your links, social profiles, products, videos and latest posts on one page at perlink.to/you. Put it in your Instagram, TikTok or YouTube bio, see what people click, and give fans a 3D room to explore.',
@@ -308,8 +308,8 @@ export const USE_CASES: UseCase[] = [
     },
     vi: {
       label: 'Tạo link bio miễn phí',
-      metaTitle: 'Tạo link bio miễn phí cho TikTok, Instagram, Facebook | Perlink',
-      metaDescription: 'Tạo link bio miễn phí: gom tất cả liên kết, mạng xã hội, sản phẩm và video vào một trang perlink.to/tên-bạn. Có thống kê lượt bấm và phòng 3D. Giao diện tiếng Việt.',
+      metaTitle: 'Tạo link bio miễn phí cho TikTok, Instagram | Perlink',
+      metaDescription: 'Tạo link bio miễn phí: gom liên kết, mạng xã hội, sản phẩm và video vào một trang perlink.to/tên-bạn. Có thống kê lượt bấm và phòng 3D.',
       eyebrow: 'Link bio miễn phí',
       title: 'Một link trong bio, chứa mọi thứ bạn có',
       intro: 'Liên kết, mạng xã hội, sản phẩm, video và bài viết mới nhất trên một trang tại perlink.to/tên-bạn. Dán vào bio TikTok, Instagram hay Facebook, xem người ta bấm vào đâu, và cho fan một căn phòng 3D để khám phá.',
@@ -350,7 +350,7 @@ export const USE_CASES: UseCase[] = [
     en: {
       label: 'Wedding website',
       metaTitle: 'Free Wedding Website & Online Invitation with RSVP | Perlink',
-      metaDescription: 'Make a wedding website and online invitation: a sealed letter to your guests, a countdown, the day’s schedule, venue map, RSVP and a QR code for wedding gifts. Free.',
+      metaDescription: 'Make a wedding website and online invitation: a letter to your guests, a countdown, the day’s schedule, venue map, RSVP and a QR code for gifts. Free.',
       eyebrow: 'Wedding website',
       title: 'Your wedding invitation, as a website',
       intro: 'Send guests one link with everything: an invitation letter they tap to open, a countdown to the day, the schedule, the venue on a map, an RSVP form and a QR code for gifts. Update it any time; the link stays the same.',
@@ -385,7 +385,7 @@ export const USE_CASES: UseCase[] = [
     },
     vi: {
       label: 'Thiệp cưới online',
-      metaTitle: 'Tạo thiệp cưới online miễn phí, có xác nhận tham dự | Perlink',
+      metaTitle: 'Tạo thiệp cưới online miễn phí, có RSVP | Perlink',
       metaDescription: 'Tạo thiệp cưới online: thư mời đóng dấu, đếm ngược ngày cưới, lịch trình, bản đồ địa điểm, xác nhận tham dự và mã QR mừng cưới. Miễn phí, không cần code.',
       eyebrow: 'Thiệp cưới online',
       title: 'Thiệp cưới online, gửi một link là đủ',
@@ -427,7 +427,7 @@ export const USE_CASES: UseCase[] = [
     en: {
       label: 'Personal website',
       metaTitle: 'Free Personal Website Builder, No Code | Perlink',
-      metaDescription: 'Make a free personal website: about you, your work, a blog, links and a contact form at perlink.to/you. Mobile-first, found on Google, with a 3D room. No code.',
+      metaDescription: 'Make a free personal website: about you, your work, a blog, links and a contact form at perlink.to/you. Made for phones, ready for Google. No code.',
       eyebrow: 'Personal website',
       title: 'A personal website in minutes, not weekends',
       intro: 'Introduce yourself, show your work, write a blog and let people reach you, all at perlink.to/you. It’s fast on phones, ready for Google, and doubles as a 3D room people can walk around.',
@@ -463,7 +463,7 @@ export const USE_CASES: UseCase[] = [
     vi: {
       label: 'Website cá nhân',
       metaTitle: 'Tạo website cá nhân miễn phí, không cần code | Perlink',
-      metaDescription: 'Tạo website cá nhân miễn phí: giới thiệu bản thân, dự án, blog, liên kết và form liên hệ tại perlink.to/tên-bạn. Đẹp trên điện thoại, lên Google, có phòng 3D.',
+      metaDescription: 'Tạo website cá nhân miễn phí: giới thiệu bản thân, dự án, blog, liên kết và form liên hệ tại perlink.to/tên-bạn. Đẹp trên điện thoại, lên Google.',
       eyebrow: 'Website cá nhân',
       title: 'Website cá nhân trong vài phút, không phải vài tuần',
       intro: 'Giới thiệu bản thân, khoe dự án, viết blog và để mọi người liên hệ với bạn, tất cả tại perlink.to/tên-bạn. Tải nhanh trên điện thoại, sẵn sàng cho Google, lại vừa là một căn phòng 3D để dạo quanh.',
@@ -504,7 +504,7 @@ export const USE_CASES: UseCase[] = [
     en: {
       label: 'Homestay website',
       metaTitle: 'Free Website for Homestays & Small Hotels | Perlink',
-      metaDescription: 'Make a website for your homestay or small hotel: rooms with nightly prices, photos, a booking form, map, Zalo and a QR code for deposits. Take direct bookings. Free.',
+      metaDescription: 'Make a website for your homestay or small hotel: rooms with nightly prices, photos, booking requests, map and a QR code for deposits. Free.',
       eyebrow: 'Homestay website',
       title: 'A homestay website that takes direct bookings',
       intro: 'Show your rooms with photos and nightly prices, let guests send booking requests with dates and number of guests, and take deposits by bank QR. Share one link on Facebook, Zalo, TikTok and Google Maps.',
@@ -540,7 +540,7 @@ export const USE_CASES: UseCase[] = [
     vi: {
       label: 'Website homestay',
       metaTitle: 'Tạo website homestay, khách sạn mini miễn phí | Perlink',
-      metaDescription: 'Tạo website cho homestay, khách sạn mini: phòng kèm giá theo đêm, ảnh, form đặt phòng, bản đồ, Zalo và mã QR nhận cọc. Khách đặt trực tiếp, không mất hoa hồng. Miễn phí.',
+      metaDescription: 'Tạo website homestay, khách sạn mini: phòng và giá theo đêm, ảnh, đặt phòng, bản đồ, mã QR nhận cọc. Khách đặt trực tiếp, không mất hoa hồng.',
       eyebrow: 'Website homestay',
       title: 'Website homestay để khách đặt phòng trực tiếp',
       intro: 'Giới thiệu phòng với ảnh và giá theo đêm, để khách gửi yêu cầu đặt phòng kèm ngày và số người, nhận cọc qua mã VietQR. Chia sẻ một link trên Facebook, Zalo, TikTok và Google Maps.',

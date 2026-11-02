@@ -296,6 +296,7 @@
             <BioImageAlbum
               :data="{ images: block.data.images, layout: block.data.layout || 'vertical' } as any"
               :radius="panelStyle.borderRadius"
+              :label="block.data.title || bioData.title || username"
             />
           </section>
 

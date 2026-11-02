@@ -10,7 +10,7 @@
         tabindex="0"
         class="relative aspect-square cursor-pointer overflow-hidden"
         :style="{ borderRadius: radius }"
-        :aria-label="image.alt || `${index + 1} / ${sortedImages.length}`"
+        :aria-label="altFor(image, index) || `${index + 1} / ${sortedImages.length}`"
         @click="openLightbox(index)"
         @keydown.enter="openLightbox(index)"
       >
@@ -27,7 +27,7 @@
         tabindex="0"
         class="mb-2 block w-full cursor-pointer overflow-hidden break-inside-avoid"
         :style="{ borderRadius: radius }"
-        :aria-label="image.alt || `${index + 1} / ${sortedImages.length}`"
+        :aria-label="altFor(image, index) || `${index + 1} / ${sortedImages.length}`"
         @click="openLightbox(index)"
         @keydown.enter="openLightbox(index)"
       >
@@ -46,7 +46,7 @@
       >
         <img
           :src="image.url"
-          :alt="image.alt || data?.title || ''"
+          :alt="altFor(image, index)"
           class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
@@ -71,7 +71,7 @@
       >
         <img
           :src="item.url"
-          :alt="item.alt || data?.title || ''"
+          :alt="altFor(item, sortedImages.findIndex(i => i.url === item.url))"
           class="w-full h-full object-cover"
           loading="lazy"
         />
@@ -90,7 +90,7 @@
           <div class="relative">
             <img
               v-if="currentImage"
-              :alt="currentImage.alt || data?.title || ''"
+              :alt="altFor(currentImage, currentIndex)"
               :src="currentImage.url"
               class="w-full h-auto max-h-[80vh] object-contain rounded-lg"
             />
@@ -130,9 +130,18 @@ import type { ImageAlbumBlock, ImageAlbumImage, ImageAlbumLayout } from '~/types
 const props = withDefaults(defineProps<{
   data?: ImageAlbumBlock;
   radius?: string;
+  /** What the photos are of (the album's or the page's title), for photos without alt text */
+  label?: string;
 }>(), {
   radius: '8px',
 });
+
+// "Rooms 2 / 3" when a photo has no alt text of its own
+function altFor(image: { alt?: string }, index: number) {
+  if (image.alt) return image.alt;
+  const label = props.label || props.data?.title || '';
+  return label ? `${label} ${index + 1} / ${sortedImages.value.length}` : '';
+}
 
 const prevIcon = 'i-lucide-chevron-left';
 const nextIcon = 'i-lucide-chevron-right';
