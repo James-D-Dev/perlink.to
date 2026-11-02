@@ -64,7 +64,13 @@
         "evening": "Chào buổi tối, {name}",
         "morningPlain": "Chào buổi sáng",
         "afternoonPlain": "Chào buổi chiều",
-        "eveningPlain": "Chào buổi tối"
+        "eveningPlain": "Chào buổi tối",
+        "line": {
+          "morning": "Một ngày mới. Hôm nay bạn làm gì nào? ☕",
+          "afternoon": "Tiếp tục nào, các trang của bạn ở ngay đây.",
+          "evening": "Cập nhật nhanh một chút trước bữa tối nhé.",
+          "night": "Thức khuya à? Các trang của bạn vẫn ở đây. 🌙"
+        }
       },
       "week": {
         "heading": "7 ngày qua",
@@ -77,7 +83,8 @@
         "nudgeText": "Dán link vào bio Instagram, TikTok, Facebook hoặc in mã QR để khách tìm thấy bạn.",
         "goodTitle": "Trang của bạn đang có khách ghé thăm",
         "goodText": "Chia sẻ thêm để nhiều người biết đến bạn hơn."
-      }
+      },
+      "filterLabel": "Hiển thị"
     },
     "editor": {
       "titleCreate": "Tạo trang",

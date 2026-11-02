@@ -64,7 +64,13 @@
         "evening": "Good evening, {name}",
         "morningPlain": "Good morning",
         "afternoonPlain": "Good afternoon",
-        "eveningPlain": "Good evening"
+        "eveningPlain": "Good evening",
+        "line": {
+          "morning": "A fresh start. What will you make today? ☕",
+          "afternoon": "Keep it going: your sites are one tap away.",
+          "evening": "Wind down with a quick update before dinner.",
+          "night": "Burning the midnight oil? Your sites are right here. 🌙"
+        }
       },
       "week": {
         "heading": "In the last 7 days",
@@ -77,7 +83,8 @@
         "nudgeText": "Paste it into your Instagram, TikTok or Facebook bio, or print the QR code so people find you.",
         "goodTitle": "People are visiting your site",
         "goodText": "Share it again to reach even more."
-      }
+      },
+      "filterLabel": "Show"
     },
     "editor": {
       "titleCreate": "Create a site",

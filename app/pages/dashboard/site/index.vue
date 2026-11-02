@@ -22,20 +22,27 @@
 
     <template #body>
       <div ref="content" class="mx-auto w-full max-w-5xl space-y-10 py-2 sm:py-4">
-        <h1 class="text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">{{ greeting }}</h1>
+        <DashboardGreeting :title="greeting" :subtitle="t(`dashboard.sites.greeting.line.${dayPart()}`)" />
 
         <!-- Sites -->
         <section class="space-y-4">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 class="text-lg font-semibold text-ink">{{ t('dashboard.sites.heading') }}</h2>
               <p v-if="!loading && bioPages.length" class="text-sm text-ink-muted">
                 {{ t('dashboard.sites.count', bioPages.length) }} · {{ t('dashboard.sites.liveCount', { n: liveCount }) }}
               </p>
             </div>
-            <div v-if="bioPages.length > 1" class="flex w-full items-center gap-2 sm:w-auto">
+            <div v-if="bioPages.length > 1" class="flex w-full items-center gap-2 md:w-auto">
+              <!-- Phones and small tablets: All / Live / Draft as a select, so the search keeps its room -->
+              <USelect
+                v-model="statusFilter"
+                :items="filterItems"
+                class="w-36 shrink-0 md:hidden"
+                :aria-label="t('dashboard.sites.filterLabel')"
+              />
               <!-- All | Live | Draft -->
-              <div class="flex shrink-0 rounded-full bg-sand p-1" role="tablist">
+              <div class="hidden shrink-0 rounded-full bg-sand p-1 md:flex" role="tablist">
                 <button
                   v-for="f in FILTERS"
                   :key="f"
@@ -56,7 +63,7 @@
                 v-model="searchQuery"
                 :placeholder="t('dashboard.sites.search')"
                 icon="i-lucide-search"
-                class="min-w-0 flex-1 sm:w-64 sm:flex-none"
+                class="min-w-0 flex-1 md:w-64 md:flex-none"
               />
             </div>
           </div>
@@ -252,6 +259,12 @@ const filteredBioPages = computed(() => {
 });
 
 const greeting = useGreeting();
+const filterItems = computed(() =>
+  FILTERS.map((f) => ({
+    value: f,
+    label: `${t(`dashboard.sites.${f}`)} · ${f === "all" ? bioPages.value.length : f === "live" ? liveCount.value : bioPages.value.length - liveCount.value}`,
+  })),
+);
 
 // The site shown in the header pill and used for nudges: the latest edited
 const primary = computed(() =>
