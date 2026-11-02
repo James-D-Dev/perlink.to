@@ -121,11 +121,12 @@ const props = defineProps<{
   subtitle?: string
   /** The page's content width, so the words line up with it */
   width?: string
-  /** The scene; the owner's time of day by default */
-  part?: DayPart
+  /** The scene; the owner's time of day by default. Not called "part": a
+   *  prop and a local of one name resolve differently in production builds */
+  scene?: DayPart
 }>()
 
-const part = computed(() => props.part ?? dayPart())
+const part = computed<DayPart>(() => props.scene ?? dayPart())
 
 // Text that reads on each sky
 const INK: Record<DayPart, string> = { morning: '#4a2614', afternoon: '#0f2f4d', evening: '#fff4ec', night: '#eef0ff' }
