@@ -5,12 +5,13 @@
        it; the words line up with the page below -->
   <section
     class="greeting relative isolate -mx-4 -mt-[calc(var(--ui-header-height)+1rem)] shrink-0 overflow-hidden rounded-b-3xl sm:-mx-6 sm:-mt-[calc(var(--ui-header-height)+1.5rem)]"
-    :class="`greeting--${part}`"
+    :class="`greeting--${part ?? 'pending'}`"
   >
     <!-- The art sits below the bar (the bar only shows the sky) and keeps its
          shape at the right; bands and stars run past the left edge of the
          view box to fill wide banners -->
     <svg
+      v-if="part"
       class="pointer-events-none absolute inset-x-0 bottom-0 top-(--ui-header-height) -z-10 h-[calc(100%-var(--ui-header-height))] w-full"
       viewBox="0 0 400 150"
       preserveAspectRatio="xMaxYMid meet"
@@ -100,11 +101,11 @@
     <div class="mx-auto w-full px-4 pb-7 pt-[calc(var(--ui-header-height)+1.5rem)] sm:px-6 sm:pb-9 sm:pt-[calc(var(--ui-header-height)+2rem)]" :class="width">
       <!-- The greeting, then the name on a line of its own; each stays on one
            line, a long name ends in an ellipsis -->
-      <h1 class="relative max-w-[72%] text-2xl font-semibold leading-tight tracking-tight sm:text-[28px]" :style="{ color: INK[part] }">
+      <h1 class="relative max-w-[72%] text-2xl font-semibold leading-tight tracking-tight sm:text-[28px]" :style="{ color: part ? INK[part] : undefined }">
         <span class="block truncate">{{ title }}<template v-if="name">,</template></span>
         <span v-if="name" class="block truncate">{{ name }}</span>
       </h1>
-      <p v-if="subtitle" class="relative mt-2 text-sm" :style="{ color: INK[part], opacity: 0.8 }">{{ subtitle }}</p>
+      <p v-if="subtitle" class="relative mt-2 text-sm" :style="{ color: part ? INK[part] : undefined, opacity: 0.8 }">{{ subtitle }}</p>
       <slot />
     </div>
   </section>
@@ -126,7 +127,12 @@ const props = defineProps<{
   scene?: DayPart
 }>()
 
-const part = computed<DayPart>(() => props.scene ?? dayPart())
+// The visitor's clock, from mount on: the page is also drawn on the server,
+// whose hour (UTC) would pick another scene, and a class drawn there isn't
+// corrected when the page comes alive
+const clockPart = ref<DayPart | null>(null)
+onMounted(() => (clockPart.value = dayPart()))
+const part = computed<DayPart | null>(() => props.scene ?? clockPart.value)
 
 // Text that reads on each sky
 const INK: Record<DayPart, string> = { morning: '#4a2614', afternoon: '#0f2f4d', evening: '#fff4ec', night: '#eef0ff' }
@@ -157,6 +163,9 @@ function cloud(x: number, y: number, s: number) {
 </script>
 
 <style scoped>
+/* Until the visitor's hour is known: a calm sky that fades into the scene */
+.greeting { transition: background 0.4s ease; }
+.greeting--pending { background: linear-gradient(120deg, #e9e4f2, #d9dcef); color: #1c1a17; }
 .greeting--morning { background: linear-gradient(120deg, #ffe9d6 0%, #ffd9c2 45%, #ffc9a8 100%); }
 .greeting--afternoon { background: linear-gradient(120deg, #e3f2ff 0%, #c4e3ff 50%, #9fd0ff 100%); }
 .greeting--evening { background: linear-gradient(160deg, #3b1d5a 0%, #a23f6b 55%, #f08a5d 100%); }
