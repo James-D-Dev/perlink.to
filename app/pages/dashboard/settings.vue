@@ -11,7 +11,7 @@
     <template #body>
       <div class="mx-auto w-full max-w-2xl space-y-6 py-2 sm:py-4">
         <!-- The bar above names the page on phones -->
-        <h1 class="mk-display hidden text-3xl text-ink sm:block sm:text-4xl">{{ t('common.settings') }}</h1>
+        <h1 class="hidden text-2xl font-semibold tracking-tight text-ink sm:block sm:text-[28px]">{{ t('common.settings') }}</h1>
 
         <div v-if="loading" class="space-y-3">
           <USkeleton v-for="i in 3" :key="i" class="h-28 w-full rounded-xl" />

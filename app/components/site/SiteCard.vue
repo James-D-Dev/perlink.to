@@ -1,7 +1,11 @@
 <template>
-  <article class="group relative flex aspect-[4/5] flex-col overflow-hidden rounded-3xl bg-sand ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
-    <!-- The site itself, scaled down; the whole card opens the editor -->
-    <NuxtLink :to="editTo" class="absolute inset-0" :aria-label="t('dashboard.sites.edit')">
+  <!-- A gallery card: the site's picture on top, its name and state on a
+       plain strip below (no text over the picture). The whole card opens the
+       editor; the buttons sit above that link -->
+  <article class="group relative flex flex-col overflow-hidden rounded-3xl bg-paper ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl">
+    <NuxtLink :to="editTo" class="absolute inset-0 z-10 rounded-3xl" :aria-label="`${t('dashboard.sites.edit')}: ${site.title || site.username}`" />
+
+    <div class="relative aspect-[4/3] overflow-hidden border-b border-line bg-sand">
       <!-- The site's snapshot; a site without one renders its page once, which is then snapshotted -->
       <img
         v-if="picture"
@@ -9,7 +13,7 @@
         :alt="site.title || site.username"
         loading="lazy"
         decoding="async"
-        class="absolute inset-0 size-full object-cover object-top"
+        class="absolute inset-0 size-full object-cover object-top transition duration-500 group-hover:scale-[1.02]"
       >
       <div v-else ref="frame" class="pointer-events-none absolute inset-0 overflow-hidden" :style="{ background: previewBg }" aria-hidden="true" inert>
         <!-- Rendered at phone width, then scaled to the card; only once the card is on screen -->
@@ -17,56 +21,47 @@
           <BioPageView ref="page" :bio-data="bioData" :username="site.username" mode="thumbnail" />
         </div>
       </div>
-    </NuxtLink>
+    </div>
 
-    <!-- Status, top left: solid light colours in both themes, since it sits
-         on the site's own picture (not the dark dashboard's emerald wash) -->
-    <span
-      class="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium shadow-sm sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-xs"
-      :class="site.isPublished ? 'bg-[#ecfdf5] text-[#047857]' : 'bg-white text-[#57524c]'"
-    >
-      <span class="size-1.5 rounded-full" :class="site.isPublished ? 'bg-[#10b981]' : 'bg-[#a8a29e]'" />
-      {{ site.isPublished ? t('dashboard.sites.live') : t('dashboard.sites.draft') }}
-    </span>
-
-    <!-- Name and actions over a fade at the bottom, dark enough under the
-         name that the page's own text doesn't show through it -->
-    <!-- Phones (two columns): name and the menu only; the card itself opens
-         the editor, and sharing is in the menu -->
-    <div class="pointer-events-none relative mt-auto bg-gradient-to-t from-black/95 from-40% via-black/75 to-transparent px-3 pb-3 pt-14 sm:px-4 sm:pb-4 sm:pt-20">
-      <div class="flex items-end gap-2">
-        <div class="min-w-0 flex-1 text-white">
-          <h3 class="truncate text-sm font-semibold leading-tight sm:text-lg">{{ site.title || site.username }}</h3>
-          <p class="truncate text-[11px] text-white/75 sm:text-xs">perlink.to/{{ site.username }}</p>
-        </div>
-        <div class="pointer-events-auto flex shrink-0 items-center gap-1.5">
-          <UTooltip :text="t('dashboard.editor.share')">
-            <button
-              type="button"
-              class="hidden size-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/30 sm:flex"
-              :aria-label="t('dashboard.editor.share')"
-              @click="$emit('share')"
-            >
-              <UIcon name="i-lucide-share" class="size-4" />
-            </button>
-          </UTooltip>
-          <UDropdownMenu :items="menuItems" :content="{ align: 'end' }" :ui="{ content: 'w-52' }">
-            <button
-              type="button"
-              class="relative flex size-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/30 sm:size-10"
-              :aria-label="t('blocks.editor.menu.more')"
-            >
-              <UIcon name="i-lucide-ellipsis" class="size-4" />
-              <span v-if="site.unreadRequests" class="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold">{{ site.unreadRequests }}</span>
-            </button>
-          </UDropdownMenu>
-          <NuxtLink
-            :to="editTo"
-            class="hidden h-10 items-center rounded-full bg-white px-4 text-sm font-semibold text-[#0c0b0a] transition hover:bg-white/90 sm:flex"
+    <div class="flex items-center gap-2 p-3 sm:gap-3 sm:p-4">
+      <div class="min-w-0 flex-1">
+        <h3 class="truncate text-sm font-semibold text-ink sm:text-base">{{ site.title || site.username }}</h3>
+        <!-- Live or draft as a dot before the address -->
+        <p class="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-ink-muted">
+          <span
+            class="size-1.5 shrink-0 rounded-full"
+            :class="site.isPublished ? 'bg-emerald-500' : 'bg-ink-faint'"
+            :title="site.isPublished ? t('dashboard.sites.live') : t('dashboard.sites.draft')"
+          />
+          <span v-if="!site.isPublished" class="shrink-0">{{ t('dashboard.sites.draft') }} ·</span>
+          <span class="truncate">perlink.to/{{ site.username }}</span>
+        </p>
+      </div>
+      <div class="relative z-20 flex shrink-0 items-center gap-0.5">
+        <!-- Phones: sharing is in the menu -->
+        <UTooltip :text="t('dashboard.editor.share')">
+          <UButton
+            icon="i-lucide-share"
+            color="neutral"
+            variant="ghost"
+            class="hidden sm:inline-flex"
+            :aria-label="t('dashboard.editor.share')"
+            @click="$emit('share')"
+          />
+        </UTooltip>
+        <UDropdownMenu :items="menuItems" :content="{ align: 'end' }" :ui="{ content: 'w-52' }">
+          <UButton
+            icon="i-lucide-ellipsis"
+            color="neutral"
+            variant="ghost"
+            class="relative"
+            :aria-label="t('blocks.editor.menu.more')"
           >
-            {{ t('dashboard.sites.edit') }}
-          </NuxtLink>
-        </div>
+            <template #trailing>
+              <span v-if="site.unreadRequests" class="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">{{ site.unreadRequests }}</span>
+            </template>
+          </UButton>
+        </UDropdownMenu>
       </div>
     </div>
   </article>

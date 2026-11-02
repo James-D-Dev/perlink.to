@@ -11,7 +11,7 @@
     <template #body>
       <div class="mx-auto w-full max-w-6xl py-2 sm:py-6">
         <div class="mb-8 max-w-xl">
-          <h1 class="mk-display text-4xl sm:text-5xl">{{ t('dashboard.upgrade.heading') }}</h1>
+          <h1 class="text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">{{ t('dashboard.upgrade.heading') }}</h1>
           <p class="mt-3 text-muted">{{ t('dashboard.upgrade.intro') }}</p>
         </div>
 

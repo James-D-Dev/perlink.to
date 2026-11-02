@@ -47,15 +47,14 @@
       </section>
     </Transition>
 
-    <!-- The site editor puts its 3D room button here; help opens from the
-         sidebar there, and on wide screens, where the sidebar shows Help -->
+    <!-- Public pages only: the dashboard opens help from its sidebar (and
+         the phone menu), so no button floats over its cards -->
     <UButton
-      v-if="!aboveActionBar"
+      v-if="launcher"
       size="lg"
       square
       :icon="open ? 'i-lucide-x' : 'i-lucide-circle-help'"
-      class="shadow-[0_8px_24px_-6px_rgb(0_102_214/0.45)] transition-[translate,opacity] duration-300 lg:hidden"
-      :class="tucked && !open && 'pointer-events-none translate-y-24 opacity-0'"
+      class="shadow-[0_8px_24px_-6px_rgb(0_102_214/0.45)]"
       :aria-expanded="open"
       :aria-label="open ? t('dashboard.help.close') : t('dashboard.help.ariaLabel')"
       @click="open = !open"
@@ -64,8 +63,10 @@
 </template>
 
 <script setup lang="ts">
-// The site editor has a sticky action bar at the bottom on small screens,
-// and its own floating button (3D room) instead of this one
+const props = withDefaults(defineProps<{ launcher?: boolean }>(), { launcher: true })
+const launcher = computed(() => props.launcher)
+
+// The site editor has a sticky action bar at the bottom on small screens
 const route = useRoute()
 const { t } = useI18n()
 const aboveActionBar = computed(() => /^\/dashboard\/site\/[^/]+\/?$/.test(route.path))
@@ -84,29 +85,5 @@ const answers = computed(() =>
   })),
 )
 
-watch(() => route.fullPath, () => {
-  open.value = false
-  tucked.value = false
-})
-
-// On phones the button steps aside while the page scrolls down (so it never
-// sits on a card's buttons), and comes back on the way up or at the end
-const tucked = ref(false)
-const lastTop = new WeakMap<EventTarget, number>()
-// Smooth scrolling moves a few pixels per event, so the travel in one
-// direction adds up before it counts
-let travel = 0
-function onScroll(event: Event) {
-  const el = event.target === document ? document.scrollingElement : event.target
-  if (!(el instanceof Element)) return
-  const top = el.scrollTop
-  const delta = top - (lastTop.get(el) ?? 0)
-  lastTop.set(el, top)
-  travel = Math.sign(delta) === Math.sign(travel) ? travel + delta : delta
-  const atEnd = el.scrollHeight - top - el.clientHeight < 48
-  if (atEnd || top < 80 || travel < -24) tucked.value = false
-  else if (travel > 24) tucked.value = true
-}
-onMounted(() => document.addEventListener('scroll', onScroll, { capture: true, passive: true }))
-onBeforeUnmount(() => document.removeEventListener('scroll', onScroll, { capture: true }))
+watch(() => route.fullPath, () => (open.value = false))
 </script>

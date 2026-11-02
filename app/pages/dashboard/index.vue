@@ -9,9 +9,10 @@
     </template>
 
     <template #body>
-      <!-- Hero: the full width of the page, right under the bar; its content
-           lines up with the page's (75rem: max-w-6xl plus the page padding) -->
-      <section class="relative isolate -mx-4 -mt-4 shrink-0 overflow-hidden border-b border-line bg-elevated sm:-mx-6 sm:-mt-6 dark:bg-[#171412]">
+      <!-- No sites yet: making one is the whole page, so a hero the full
+           width of the page, right under the bar; its content lines up with
+           the page's (75rem: max-w-6xl plus the page padding) -->
+      <section v-if="sitesLoaded && !sites.length" class="relative isolate -mx-4 -mt-4 shrink-0 overflow-hidden border-b border-line bg-elevated sm:-mx-6 sm:-mt-6 dark:bg-[#171412]">
         <!-- Same living backdrop as the landing hero -->
         <MarketingMkHeroBackdrop :fade="false" />
         <div class="pointer-events-none absolute inset-0 dark:bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgb(255_255_255/0.06),transparent)]" />
@@ -38,11 +39,19 @@
       </section>
 
       <div class="mx-auto w-full max-w-6xl space-y-10 py-2 sm:py-4">
+        <!-- Coming back: a greeting, and making another site is one line -->
+        <header v-if="!sitesLoaded || sites.length" class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">{{ greeting }}</h1>
+            <p class="mt-1 text-sm text-ink-muted">{{ t('dashboard.home.newSiteLine') }}</p>
+          </div>
+          <SiteClaimForm class="w-full lg:max-w-md" quiet :initial-slug="initialSlug" :autofocus="!!initialSlug" />
+        </header>
         <!-- The sites they already have (most recently edited first) -->
         <section v-if="sites.length" class="space-y-5">
           <div class="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 class="mk-display text-2xl sm:text-3xl dark:text-white">{{ t('dashboard.home.yourSites') }}</h2>
+              <h2 class="text-lg font-semibold text-ink sm:text-xl">{{ t('dashboard.home.yourSites') }}</h2>
               <p class="mt-1 text-sm text-muted dark:text-neutral-400">{{ t('dashboard.sites.count', sites.length) }}</p>
             </div>
             <UButton
@@ -84,7 +93,7 @@
         <section class="space-y-5">
           <div class="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 class="mk-display text-2xl sm:text-3xl dark:text-white">{{ t('dashboard.home.templatesHeading') }}</h2>
+              <h2 class="text-lg font-semibold text-ink sm:text-xl">{{ t('dashboard.home.templatesHeading') }}</h2>
               <p class="mt-1 text-sm text-muted dark:text-neutral-400">
                 {{ t('dashboard.home.templatesIntro', { n: PAGE_TEMPLATES.length }) }}
               </p>
@@ -207,6 +216,8 @@ function templateDescription(id: string) {
 
 // Their sites, newest edits first; the home shows the latest three
 const sites = ref<any[]>([])
+const sitesLoaded = ref(false)
+const greeting = useGreeting()
 const recentSites = computed(() =>
   [...sites.value].sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''))).slice(0, 4),
 )
@@ -214,6 +225,7 @@ const { qrSite, pendingSite, copyUrl, shareSite, publishSite, unpublishSite } = 
 onMounted(async () => {
   const res = await $fetch<{ success: boolean; bioPages?: any[] }>('/api/admin/bios').catch(() => null)
   if (res?.bioPages) sites.value = res.bioPages
+  sitesLoaded.value = true
 })
 
 // One click: the site is made with a temporary address and opens in the

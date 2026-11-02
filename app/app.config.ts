@@ -285,7 +285,5 @@ export default defineAppConfig({
     // iOS toggles are green when on
     switch: { defaultVariants: { color: 'success' } },
     dashboardNavbar: { slots: { root: 'dark:bg-paper/70 dark:backdrop-blur-xl dark:border-white/[0.08]' } },
-    // Room at the bottom on phones for the floating help button
-    dashboardPanel: { slots: { body: 'pb-24 sm:pb-6 lg:pb-6' } },
   },
 })

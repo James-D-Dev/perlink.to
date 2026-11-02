@@ -14,6 +14,7 @@
       "mySites": "My sites",
       "heading": "Create your site",
       "intro": "Claim an address, or tap a template below to start right away. You can pick the address later and change anything.",
+      "newSiteLine": "Pick an address for a new site, or start from a template below.",
       "templatesHeading": "Start from a template",
       "templatesIntro": "{n} templates, each with sample content, a theme and a matching 3D room.",
       "all": "All",

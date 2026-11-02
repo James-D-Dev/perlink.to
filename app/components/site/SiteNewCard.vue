@@ -1,54 +1,55 @@
 <template>
-  <!-- "New site", first in the list: what a site can hold drifts up behind it -->
+  <!-- "New site", first in the list, shaped like the site cards: what a site
+       can hold drifts up through the picture, the words sit on the strip below -->
   <NuxtLink
     to="/dashboard"
-    class="new-site group relative flex aspect-[4/5] [--float-scale:0.7] sm:[--float-scale:1] flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-[#fff6ee] via-[#fcf0f4] to-[#eef1ff] ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-xl dark:from-[#1c1613] dark:via-[#1b1320] dark:to-[#11141f] dark:ring-white/10"
+    class="new-site group relative flex flex-col overflow-hidden rounded-3xl bg-paper ring-1 ring-line transition [--float-scale:0.7] hover:-translate-y-0.5 hover:shadow-xl sm:[--float-scale:0.85]"
   >
-    <!-- Social networks and reactions rising through it, like on a live video -->
-    <div class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-      <!-- Room around each one (p-3) for its shadow: Safari clips a moving,
-           filtered element to its own box -->
-      <span
-        v-for="(b, i) in FLOATERS"
-        :key="i"
-        class="new-site-float absolute bottom-0 -ml-3 box-content p-3 drop-shadow-[0_6px_14px_rgb(0_0_0/0.22)]"
-        :style="{
-          left: `${b.x}%`,
-          width: `calc(${b.size}px * var(--float-scale))`,
-          height: `calc(${b.size}px * var(--float-scale))`,
-          animationDuration: `${b.duration}s`,
-          animationDelay: `${-b.delay}s`,
-          '--sway': `${b.sway}px`,
-        }"
-      >
-        <!-- Facebook, Instagram, YouTube: their own full-colour logos -->
-        <UIcon v-if="b.kind === 'logo'" :name="b.icon!" class="size-full" />
-        <!-- TikTok: the app icon, a white note edged cyan and red on black -->
-        <span v-else-if="b.kind === 'tiktok'" class="flex size-full items-center justify-center rounded-[28%] bg-[#010101]">
-          <UIcon name="i-simple-icons-tiktok" class="tiktok-note size-[58%] text-white" />
-        </span>
-        <!-- Love and like, as on the "Share your room" button -->
+    <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-line bg-gradient-to-b from-[#fff6ee] via-[#fcf0f4] to-[#eef1ff] dark:from-[#1c1613] dark:via-[#1b1320] dark:to-[#11141f]">
+      <!-- Social networks and reactions rising through it, like on a live video -->
+      <div class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+        <!-- Room around each one (p-3) for its shadow: Safari clips a moving,
+             filtered element to its own box -->
         <span
-          v-else
-          class="flex size-full items-center justify-center rounded-full border-2 border-white"
-          :style="{ background: REACTIONS[b.kind].background }"
+          v-for="(b, i) in FLOATERS"
+          :key="i"
+          class="new-site-float absolute bottom-0 -ml-3 box-content p-3 drop-shadow-[0_6px_14px_rgb(0_0_0/0.22)]"
+          :style="{
+            left: `${b.x}%`,
+            width: `calc(${b.size}px * var(--float-scale))`,
+            height: `calc(${b.size}px * var(--float-scale))`,
+            animationDuration: `${b.duration}s`,
+            animationDelay: `${-b.delay}s`,
+            '--sway': `${b.sway}px`,
+          }"
         >
-          <svg viewBox="0 0 24 24" class="size-[56%] fill-white"><path :d="REACTIONS[b.kind].path" /></svg>
+          <!-- Facebook, Instagram, YouTube: their own full-colour logos -->
+          <UIcon v-if="b.kind === 'logo'" :name="b.icon!" class="size-full" />
+          <!-- TikTok: the app icon, a white note edged cyan and red on black -->
+          <span v-else-if="b.kind === 'tiktok'" class="flex size-full items-center justify-center rounded-[28%] bg-[#010101]">
+            <UIcon name="i-simple-icons-tiktok" class="tiktok-note size-[58%] text-white" />
+          </span>
+          <!-- Love and like, as on the "Share your room" button -->
+          <span
+            v-else
+            class="flex size-full items-center justify-center rounded-full border-2 border-white"
+            :style="{ background: REACTIONS[b.kind].background }"
+          >
+            <svg viewBox="0 0 24 24" class="size-[56%] fill-white"><path :d="REACTIONS[b.kind].path" /></svg>
+          </span>
         </span>
-      </span>
-    </div>
+      </div>
 
-    <!-- The glow, the plus, the words, on a soft haze so nothing busy shows behind them -->
-    <div class="relative z-10 flex flex-col items-center gap-3 px-3 py-4 text-center sm:px-6">
-      <span class="absolute inset-0 -z-0 rounded-full bg-[radial-gradient(closest-side,rgb(255_255_255/0.85),transparent)] blur-md dark:bg-[radial-gradient(closest-side,rgb(20_16_24/0.85),transparent)]" aria-hidden="true" />
-      <span class="relative flex items-center justify-center">
-        <MarketingMkOrb palette="sunset" :size="84" />
-        <span class="absolute flex size-11 items-center justify-center rounded-full bg-white/90 text-[#1c1a17] shadow-lg transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110">
+      <span class="relative z-10 flex items-center justify-center">
+        <MarketingMkOrb palette="sunset" :size="72" />
+        <span class="absolute flex size-10 items-center justify-center rounded-full bg-white/90 text-[#1c1a17] shadow-lg transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110">
           <UIcon name="i-lucide-plus" class="size-5" />
         </span>
       </span>
-      <span class="relative text-base font-semibold text-ink">{{ t('dashboard.sites.newSite') }}</span>
-      <span class="relative hidden max-w-[12rem] text-xs text-ink-muted sm:block">{{ t('dashboard.sites.newSiteHint') }}</span>
+    </div>
+    <div class="p-3 sm:p-4">
+      <p class="truncate text-sm font-semibold text-ink sm:text-base">{{ t('dashboard.sites.newSite') }}</p>
+      <p class="mt-0.5 truncate text-xs text-ink-muted">{{ t('dashboard.sites.newSiteHint') }}</p>
     </div>
   </NuxtLink>
 </template>

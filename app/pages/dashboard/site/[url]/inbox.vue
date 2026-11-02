@@ -25,7 +25,7 @@
       <div class="mx-auto w-full max-w-5xl space-y-4 py-2 sm:py-4">
         <div class="flex items-end justify-between gap-3">
           <div>
-            <h1 class="mk-display text-3xl text-ink">{{ t('dashboard.inbox.title') }}</h1>
+            <h1 class="text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">{{ t('dashboard.inbox.title') }}</h1>
             <p class="mt-1 text-sm text-ink-muted">
               <template v-if="!loading">{{ t('dashboard.inbox.unreadCount', { n: unread }, unread) }}</template>
             </p>

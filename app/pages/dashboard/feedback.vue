@@ -10,7 +10,7 @@
     <template #body>
       <!-- Same frame and heading as Settings; the bar above names the page on phones -->
       <div class="mx-auto w-full max-w-2xl space-y-6 py-2 sm:py-4">
-        <h1 class="mk-display hidden text-3xl text-ink sm:block sm:text-4xl">{{ t('dashboard.feedback.title') }}</h1>
+        <h1 class="hidden text-2xl font-semibold tracking-tight text-ink sm:block sm:text-[28px]">{{ t('dashboard.feedback.title') }}</h1>
 
         <!-- Feedback Form -->
         <UCard>

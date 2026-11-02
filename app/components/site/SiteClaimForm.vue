@@ -29,7 +29,7 @@
         <span class="sm:hidden">{{ t('dashboard.claim.submitShort') }}</span>
       </UButton>
     </div>
-    <p class="flex min-h-5 items-center gap-1.5 pl-1 text-xs" :class="messageClass">
+    <p v-if="!quiet || status !== 'idle'" class="flex min-h-5 items-center gap-1.5 pl-1 text-xs" :class="messageClass">
       <UIcon v-if="status === 'checking'" name="i-lucide-loader-circle" class="size-3.5 animate-spin" />
       <UIcon v-else-if="status === 'available'" name="i-lucide-circle-check" class="size-3.5" />
       <UIcon v-else-if="status === 'taken' || status === 'invalid'" name="i-lucide-circle-alert" class="size-3.5" />
@@ -48,11 +48,14 @@ const props = withDefaults(defineProps<{
   initialSlug?: string
   size?: 'md' | 'lg'
   autofocus?: boolean
+  /** No standing hint under the field: only what the check says, once something is typed */
+  quiet?: boolean
 }>(), {
   templateId: undefined,
   initialSlug: '',
   size: 'md',
   autofocus: false,
+  quiet: false,
 })
 
 const emit = defineEmits<{ created: [username: string] }>()

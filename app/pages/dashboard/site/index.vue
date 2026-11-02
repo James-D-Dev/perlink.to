@@ -25,7 +25,7 @@
 
     <template #body>
       <div ref="content" class="mx-auto w-full max-w-5xl space-y-10 py-2 sm:py-4">
-        <h1 class="mk-display text-3xl text-ink sm:text-4xl">{{ greeting }}</h1>
+        <h1 class="text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">{{ greeting }}</h1>
 
         <!-- Sites -->
         <section class="space-y-4">
@@ -65,14 +65,12 @@
           </div>
 
           <div v-if="loading" class="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3" aria-busy="true">
-            <div v-for="i in 2" :key="i" class="relative aspect-[4/5] overflow-hidden rounded-3xl">
-              <USkeleton class="absolute inset-0 rounded-3xl" />
-              <div class="absolute inset-x-3 bottom-3 flex items-end gap-2 sm:inset-x-4 sm:bottom-4">
-                <div class="min-w-0 flex-1 space-y-2">
-                  <USkeleton class="h-4 w-3/4 bg-paper/70 sm:h-5" />
-                  <USkeleton class="h-3 w-1/2 bg-paper/70" />
-                </div>
-                <USkeleton class="hidden h-10 w-16 rounded-full bg-paper/70 sm:block" />
+            <!-- The cards' shape: picture, then name and address -->
+            <div v-for="i in 3" :key="i" class="overflow-hidden rounded-3xl ring-1 ring-line">
+              <USkeleton class="aspect-[4/3] w-full rounded-none" />
+              <div class="space-y-2 p-3 sm:p-4">
+                <USkeleton class="h-4 w-3/4" />
+                <USkeleton class="h-3 w-1/2" />
               </div>
             </div>
           </div>
@@ -163,7 +161,7 @@
               </template>
               <template v-else-if="weekTotal === 0">
                 <div>
-                  <p class="mk-display text-2xl leading-tight text-ink">{{ t('dashboard.sites.week.nudgeTitle') }}</p>
+                  <p class="text-xl font-semibold leading-tight tracking-tight text-ink">{{ t('dashboard.sites.week.nudgeTitle') }}</p>
                   <p class="mt-2 text-sm text-ink-muted">{{ t('dashboard.sites.week.nudgeText') }}</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -173,7 +171,7 @@
               </template>
               <template v-else>
                 <div>
-                  <p class="mk-display text-2xl leading-tight text-ink">{{ t('dashboard.sites.week.goodTitle') }}</p>
+                  <p class="text-xl font-semibold leading-tight tracking-tight text-ink">{{ t('dashboard.sites.week.goodTitle') }}</p>
                   <p class="mt-2 text-sm text-ink-muted">{{ t('dashboard.sites.week.goodText') }}</p>
                 </div>
                 <UButton v-if="primary" class="self-start" icon="i-lucide-share" :label="t('dashboard.editor.share')" @click="shareSite(primary)" />
@@ -256,13 +254,7 @@ const filteredBioPages = computed(() => {
   );
 });
 
-// "Good afternoon, Minh" by the owner's local time
-const greeting = computed(() => {
-  const hour = new Date().getHours();
-  const part = hour < 11 ? "morning" : hour < 18 ? "afternoon" : "evening";
-  const name = ((user.value as any)?.name || (user.value as any)?.username || "").trim();
-  return name ? t(`dashboard.sites.greeting.${part}`, { name }) : t(`dashboard.sites.greeting.${part}Plain`);
-});
+const greeting = useGreeting();
 
 // The site shown in the header pill and used for nudges: the latest edited
 const primary = computed(() =>

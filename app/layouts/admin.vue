@@ -91,7 +91,7 @@
     <slot />
     <BillingUpgradeDialog />
     <BillingCelebration />
-    <HelpCenter />
+    <HelpCenter :launcher="false" />
   </UDashboardGroup>
 </template>
 
