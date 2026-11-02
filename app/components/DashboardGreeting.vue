@@ -7,10 +7,11 @@
     class="greeting relative isolate -mx-4 -mt-[calc(var(--ui-header-height)+1rem)] shrink-0 overflow-hidden rounded-b-3xl sm:-mx-6 sm:-mt-[calc(var(--ui-header-height)+1.5rem)]"
     :class="`greeting--${part}`"
   >
-    <!-- The art keeps its shape at the right; bands and stars run past the
-         left edge of the view box to fill wide banners -->
+    <!-- The art sits below the bar (the bar only shows the sky) and keeps its
+         shape at the right; bands and stars run past the left edge of the
+         view box to fill wide banners -->
     <svg
-      class="pointer-events-none absolute inset-0 -z-10 size-full"
+      class="pointer-events-none absolute inset-x-0 bottom-0 top-(--ui-header-height) -z-10 h-[calc(100%-var(--ui-header-height))] w-full"
       viewBox="0 0 400 150"
       preserveAspectRatio="xMaxYMid meet"
       aria-hidden="true"
