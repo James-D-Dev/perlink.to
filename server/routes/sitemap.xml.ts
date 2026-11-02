@@ -1,13 +1,14 @@
 import { PAGE_TEMPLATES } from '../../app/data/pageTemplates'
+import { USE_CASE_PAIRS } from '../../app/data/useCases'
 import { getDB } from '../utils/db'
 
 const SITE = 'https://perlink.to'
 
 /** Public marketing pages, then every published site and its blog posts */
-const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/linktree-alternative', '/vi/thay-the-linktree', '/3d-portfolio', '/vi/portfolio-3d', '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
+const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/linktree-alternative', '/vi/thay-the-linktree', '/3d-portfolio', '/vi/portfolio-3d', ...USE_CASE_PAIRS.flat(), '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
 
 /** Pages with an address per language, linked to each other (hreflang) */
-const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/linktree-alternative', '/vi/thay-the-linktree'], ['/3d-portfolio', '/vi/portfolio-3d']]
+const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/linktree-alternative', '/vi/thay-the-linktree'], ['/3d-portfolio', '/vi/portfolio-3d'], ...USE_CASE_PAIRS]
 function languages(path: string) {
   const pair = LANG_PAIRS.find(p => p.includes(path))
   if (!pair) return ''

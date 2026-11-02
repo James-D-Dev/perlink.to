@@ -11,6 +11,7 @@ export const RESERVED_NAMES = new Set([
   'account', 'billing', 'status', 'perlink', 'www', 'app',
   // Marketing pages
   'vi', 'linktree-alternative', '3d-portfolio', 'portfolio-3d', 'vs', 'compare', 'alternatives',
+  'birthday-website', 'valentine-website', 'qr-menu', 'free-link-in-bio', 'wedding-website', 'personal-website', 'homestay-website',
 ])
 
 export function isReservedName(name: string) {

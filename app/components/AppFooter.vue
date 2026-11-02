@@ -1,7 +1,7 @@
 <template>
   <footer class="border-t border-line bg-paper">
     <div class="mx-auto max-w-6xl border-x border-line px-5 py-14 sm:px-8">
-      <div class="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+      <div class="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div class="max-w-xs">
           <AppLogo :size="26" />
           <p class="mt-4 text-sm leading-relaxed text-ink-muted">
@@ -28,6 +28,8 @@
 </template>
 
 <script setup lang="ts">
+import { USE_CASES } from '~/data/useCases'
+
 const year = new Date().getFullYear()
 
 const { copy, anchor, lang } = useMarketingLang()
@@ -51,6 +53,10 @@ const columns = computed(() => {
         { label: f.linktree, to: lang.value === 'vi' ? '/vi/thay-the-linktree' : '/linktree-alternative' },
         { label: f.faq, to: anchor('faq') },
       ],
+    },
+    {
+      title: f.make,
+      links: USE_CASES.map(item => ({ label: item[lang.value].label, to: item.path[lang.value] })),
     },
     {
       title: f.legal,

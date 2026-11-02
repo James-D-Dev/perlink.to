@@ -1,4 +1,5 @@
 import { MARKETING_COPY, type MarketingLang } from '~/data/marketingCopy'
+import { USE_CASE_PAIRS } from '~/data/useCases'
 
 /**
  * Language of a marketing page, plus its copy and links that stay in the same
@@ -17,6 +18,7 @@ export const LANG_PAIRS: [string, string][] = [
   ['/templates', '/vi/templates'],
   ['/linktree-alternative', '/vi/thay-the-linktree'],
   ['/3d-portfolio', '/vi/portfolio-3d'],
+  ...USE_CASE_PAIRS,
 ]
 /** The same page in the other language, for paired pages; null otherwise */
 export function pairedPath(path: string) {
