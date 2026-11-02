@@ -28,7 +28,7 @@
           <NuxtLink :to="`/templates/${template.id}`" class="block" :aria-label="`${text.preview}: ${nameOf(template)}`">
             <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-sand">
               <div class="absolute inset-x-5 top-5 bottom-0 overflow-hidden rounded-t-xl ring-1 ring-line transition-transform duration-500 group-hover:-translate-y-1">
-                <SiteTemplateThumbnail :template="template" :scale="0.42" />
+                <LazySiteTemplateThumbnail hydrate-on-visible :template="template" :scale="0.42" />
               </div>
             </div>
           </NuxtLink>

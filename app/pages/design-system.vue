@@ -35,7 +35,7 @@
     </MarketingMkSection>
 
     <!-- Type -->
-    <MarketingMkSection title="Typography" description="Display: Inter Tight 300 with tight tracking. Body: Inter 400/500. Keep body copy at 15–18px with relaxed leading.">
+    <MarketingMkSection title="Typography" description="Display: the system typeface at 300 with tight tracking. Body: the system typeface at 400/500. Keep body copy at 15–18px with relaxed leading.">
       <div class="divide-y divide-line border-y border-line">
         <div v-for="sample in type" :key="sample.label" class="grid gap-2 py-6 sm:grid-cols-[180px_1fr] sm:items-baseline">
           <p class="text-xs text-ink-muted">{{ sample.label }}</p>

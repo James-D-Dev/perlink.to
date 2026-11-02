@@ -97,19 +97,9 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css", "animate.css/animate.min.css"],
 
-  // Perlink's own fonts, self-hosted by @nuxt/fonts (part of Nuxt UI): only
-  // the weights in use, upright, in the scripts English and Vietnamese need
-  fonts: {
-    defaults: {
-      styles: ["normal"],
-      subsets: ["latin", "latin-ext", "vietnamese"],
-    },
-    families: [
-      { name: "Inter", weights: [400, 500, 600, 700] },
-      { name: "Inter Tight", weights: [300, 400, 500, 600] },
-      { name: "Geist", weights: [600], subsets: ["latin"] },
-    ],
-  },
+  // No web fonts: text is set in the device's own typeface and the logo is
+  // drawn as paths (@nuxt/fonts, part of Nuxt UI, finds nothing to fetch)
+
   app: {
     head: {
       title: "Perlink — Personal websites and 3D worlds",

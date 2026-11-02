@@ -12,7 +12,7 @@
       @keydown.space.prevent="emit('select', template.id)"
     >
       <div class="relative h-40 border-b border-gray-200 dark:border-white/10">
-        <SiteTemplateThumbnail :template="template" :scale="0.36" />
+        <SiteTemplateThumbnail lazy :template="template" :scale="0.36" />
         <SiteTemplatePreviewButton :template-id="template.id" />
       </div>
       <div class="space-y-1 p-3">

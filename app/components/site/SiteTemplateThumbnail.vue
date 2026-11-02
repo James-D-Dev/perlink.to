@@ -1,7 +1,8 @@
 <template>
   <!-- A real, scaled-down render of the template page -->
-  <div class="relative h-full w-full overflow-hidden" :style="{ background: template.preview.bg }">
+  <div ref="box" class="relative h-full w-full overflow-hidden" :style="{ background: template.preview.bg }">
     <div
+      v-if="shown"
       class="pointer-events-none absolute left-0 top-0 origin-top-left"
       :style="{ width: `${100 / scale}%`, transform: `scale(${scale})` }"
       aria-hidden="true"
@@ -13,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
 import { stableBlockIds } from '~/data/templateKit'
 import type { BioData } from '~/types/bio'
 import { localizeTemplateContent } from '~/data/templateCopyVi'
@@ -26,10 +28,24 @@ const props = withDefaults(defineProps<{
   scale?: number
   /** The owner's own name, intro and photo in place of the sample ones (create flow) */
   personal?: { title: string; bio: string; avatarUrl: string }
+  /** Pages rendered in the browser (dashboard): build the page only once it
+   * nears the screen, so a grid of 35 doesn't render them all at once */
+  lazy?: boolean
 }>(), {
   scale: 0.5,
   personal: undefined,
+  lazy: false,
 })
+
+const box = ref<HTMLElement | null>(null)
+const shown = ref(!props.lazy)
+if (props.lazy) {
+  useIntersectionObserver(box, ([entry], observer) => {
+    if (!entry?.isIntersecting) return
+    shown.value = true
+    observer.disconnect()
+  }, { rootMargin: '300px' })
+}
 
 // Dashboard previews follow the dashboard language; marketing pages their URL
 const route = useRoute()

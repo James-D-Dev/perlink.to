@@ -133,7 +133,7 @@
               @keydown.space.prevent="useTemplate(template.id)"
             >
               <div class="relative aspect-[3/4] overflow-hidden border-b border-default dark:border-white/[0.08]">
-                <SiteTemplateThumbnail :template="template" :scale="0.4" class="transition duration-500 group-hover:scale-[1.03]" />
+                <SiteTemplateThumbnail lazy :template="template" :scale="0.4" class="transition duration-500 group-hover:scale-[1.03]" />
                 <SiteTemplatePreviewButton :template-id="template.id" />
                 <div
                   class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/0 to-transparent p-4 transition"

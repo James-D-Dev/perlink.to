@@ -105,7 +105,7 @@
             @click="state.templateId = template.id"
           >
             <div class="relative aspect-[3/4] overflow-hidden border-b border-line">
-              <SiteTemplateThumbnail :template="template" :scale="0.4" :personal="personal" />
+              <SiteTemplateThumbnail lazy :template="template" :scale="0.4" :personal="personal" />
               <span v-if="state.templateId === template.id" class="absolute right-2 top-2 flex size-7 items-center justify-center rounded-full bg-tint text-white shadow">
                 <UIcon name="i-lucide-check" class="size-4" />
               </span>

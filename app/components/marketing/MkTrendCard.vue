@@ -4,14 +4,16 @@
       <img
         v-if="trend.image"
         :src="trend.image"
-        :srcset="`${trend.image.replace(/\.webp$/, '-720.webp')} 720w, ${trend.image} 1440w`"
+        :srcset="`${trend.image.replace(/\.webp$/, '-720.webp')} 720w, ${trend.image.replace(/\.webp$/, '-1080.webp')} 1080w, ${trend.image} 1440w`"
+        width="1440"
+        height="757"
         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         :alt="`${trend.title} 3D world`"
         loading="lazy"
         class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
       >
       <div v-else-if="template" class="absolute inset-x-6 top-6 bottom-0 overflow-hidden rounded-t-xl shadow-[0_8px_30px_rgba(12,11,10,0.08)] ring-1 ring-line transition-transform duration-500 group-hover:-translate-y-1">
-        <SiteTemplateThumbnail :template="template" :scale="0.42" />
+        <LazySiteTemplateThumbnail hydrate-on-visible :template="template" :scale="0.42" />
       </div>
       <span class="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-paper/90 px-2.5 py-1 text-xs font-medium text-ink backdrop-blur">
         <UIcon :name="trend.kind === '3d' ? 'i-lucide-box' : 'i-lucide-layout-template'" class="size-3.5" />

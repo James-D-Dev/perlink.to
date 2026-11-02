@@ -32,7 +32,7 @@
 
       <!-- Showcase: switch between worlds -->
       <div class="px-5 pb-16 sm:px-8 md:pb-24">
-        <div class="mk-rise rounded-2xl bg-sand p-1.5" style="--rise-delay: 480ms">
+        <div class="mk-rise-solid rounded-2xl bg-sand p-1.5" style="--rise-delay: 480ms">
           <div class="grid grid-cols-2 gap-1 sm:grid-cols-4" role="tablist" :aria-label="c.hero.worldsLabel">
             <button
               v-for="(world, i) in showcase"
@@ -60,7 +60,9 @@
                 v-show="active === i"
                 :key="world.id"
                 :src="`${world.image}.webp`"
-                :srcset="`${world.image}-720.webp 720w, ${world.image}.webp 1440w`"
+                :srcset="`${world.image}-720.webp 720w, ${world.image}-1080.webp 1080w, ${world.image}.webp 1440w`"
+                width="1440"
+                height="757"
                 sizes="(min-width: 1280px) 1200px, 100vw"
                 :alt="c.hero.worldAlt(world.title)"
                 class="absolute inset-0 size-full object-cover"
@@ -102,7 +104,7 @@
           <div class="mt-8 flex flex-1 items-end justify-center">
             <div class="w-[62%] max-w-[260px] overflow-hidden rounded-t-[28px] border-x-[6px] border-t-[6px] border-ink bg-white shadow-[0_20px_50px_rgba(12,11,10,0.15)]">
               <div class="aspect-[3/4] w-full" role="img" :aria-label="c.twoWays.siteAlt">
-                <SiteTemplateThumbnail :template="showcaseTemplate" :scale="0.5" />
+                <LazySiteTemplateThumbnail hydrate-on-visible :template="showcaseTemplate" :scale="0.5" />
               </div>
             </div>
           </div>
@@ -111,7 +113,7 @@
           <p class="text-sm font-medium text-ink">{{ c.twoWays.world }}</p>
           <p class="mt-1 text-sm text-ink-muted">{{ c.twoWays.worldText }}</p>
           <div class="mt-8 flex flex-1 items-end">
-            <img src="/images/landing/sakura.webp" srcset="/images/landing/sakura-720.webp 720w, /images/landing/sakura.webp 1440w" sizes="(min-width: 768px) 50vw, 100vw" :alt="c.twoWays.worldAlt" class="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy">
+            <img src="/images/landing/sakura.webp" srcset="/images/landing/sakura-720.webp 720w, /images/landing/sakura-1080.webp 1080w, /images/landing/sakura.webp 1440w" width="1440" height="757" sizes="(min-width: 768px) 50vw, 100vw" :alt="c.twoWays.worldAlt" class="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy">
           </div>
         </div>
       </div>
@@ -128,7 +130,7 @@
         <article v-for="(template, i) in templates" :key="template.id" v-reveal="(i % 4) * 90" class="group">
           <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-sand">
             <div class="absolute inset-x-4 top-4 bottom-0 overflow-hidden rounded-t-xl ring-1 ring-line transition-transform duration-500 group-hover:-translate-y-1">
-              <SiteTemplateThumbnail :template="template" :scale="0.38" />
+              <LazySiteTemplateThumbnail hydrate-on-visible :template="template" :scale="0.38" />
             </div>
           </div>
           <h3 class="mt-3 text-sm font-medium text-ink">{{ c.templates.names[template.id]?.name ?? template.name }}</h3>
