@@ -273,6 +273,14 @@
         "letter": {
           "label": "Lá thư",
           "description": "Thư tình hay thiệp mời trong phong bì, khách chạm để mở."
+        },
+        "event": {
+          "label": "Thông tin sự kiện",
+          "description": "Ngày, giờ, địa điểm, kèm nút Thêm vào lịch và Chỉ đường."
+        },
+        "question": {
+          "label": "Câu hỏi",
+          "description": "“Làm người yêu anh nhé?” Nút Không chạy trốn, nút Có làm tim bay."
         }
       },
       "searchPlaceholder": "Dán link hoặc tìm khối…",
@@ -312,7 +320,8 @@
       "kind": "Loại",
       "kinds": {
         "booking": "Đặt chỗ",
-        "contact": "Liên hệ"
+        "contact": "Liên hệ",
+        "rsvp": "Xác nhận tham dự"
       },
       "fieldsLabel": "Các ô",
       "fieldsHelp": "Luôn hỏi họ tên.",
@@ -435,7 +444,51 @@
         "night": "Đêm"
       },
       "sealed": "Cho vào phong bì",
-      "sealedHint": "Khách chạm vào phong bì để mở thư."
+      "sealedHint": "Khách chạm vào phong bì để mở thư.",
+      "personal": "Tên khách theo link",
+      "personalHint": "Gửi mỗi khách một link riêng, phong bì sẽ ghi đúng tên người đó.",
+      "guestPlaceholder": "Tên khách mời",
+      "copyLink": "Sao chép link",
+      "linkCopied": "Đã sao chép link",
+      "cover": "Chữ trên phong bì",
+      "coverHelp": "Để trống thì hiện “Gửi …”.",
+      "coverPlaceholder": "Mở khi em nhớ anh"
+    },
+    "event": {
+      "title": "Thông tin sự kiện",
+      "name": "Sự kiện",
+      "namePlaceholder": "Tiệc cưới",
+      "date": "Ngày",
+      "startTime": "Bắt đầu",
+      "endTime": "Kết thúc",
+      "venue": "Địa điểm",
+      "venuePlaceholder": "Nhà hàng Rose Garden",
+      "address": "Địa chỉ",
+      "addressHelp": "Dùng để chỉ đường khi không có link bản đồ.",
+      "addressPlaceholder": "8 Đường Hồ, Quận 1",
+      "mapUrl": "Link bản đồ (không bắt buộc)",
+      "dressCode": "Trang phục",
+      "dressCodePlaceholder": "Tông màu pastel",
+      "note": "Ghi chú",
+      "notePlaceholder": "Có chỗ gửi xe dưới hầm",
+      "calendarNote": "Khách có thể lưu vào Google Calendar, lịch iPhone hoặc Outlook, và mở chỉ đường chỉ một chạm."
+    },
+    "question": {
+      "title": "Câu hỏi",
+      "question": "Câu hỏi",
+      "questionPlaceholder": "Làm người yêu anh nhé?",
+      "yesLabel": "Nút Có",
+      "yesPlaceholder": "Đồng ý",
+      "noLabel": "Nút Không",
+      "noPlaceholder": "Không",
+      "answer": "Sau khi bấm “Có”",
+      "answerPlaceholder": "Biết ngay mà! Tối nay 7 giờ nhé ❤️",
+      "playful": "Nút Không chạy trốn",
+      "playfulHint": "Nút Không né ngón tay, còn nút Có to dần mỗi lần.",
+      "idea1": "Làm người yêu anh nhé?",
+      "idea2": "Lấy anh nhé?",
+      "idea3": "Tha thứ cho anh nhé?",
+      "idea4": "Thứ Bảy này đi ăn tối với anh nhé?"
     }
   }
 }

@@ -12,9 +12,9 @@
 
     <div v-if="isActive" class="p-3 sm:p-4 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
       <UFormField :label="t('blocks.form.kind')">
-        <div class="flex gap-1">
+        <div class="flex flex-wrap gap-1">
           <UButton
-            v-for="kind in (['booking', 'contact'] as const)"
+            v-for="kind in (['booking', 'contact', 'rsvp'] as const)"
             :key="kind"
             size="sm"
             :color="data.kind === kind ? 'primary' : 'neutral'"

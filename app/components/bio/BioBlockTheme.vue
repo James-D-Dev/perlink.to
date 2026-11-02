@@ -263,6 +263,37 @@
                   </UFormField>
                 </div>
 
+                <!-- Background music -->
+                <div v-else-if="view === 'music'" class="space-y-2">
+                  <p class="text-sm text-muted">{{ t('theme.music.hint') }}</p>
+                  <div class="divide-y divide-line overflow-hidden rounded-2xl bg-paper ring-1 ring-line">
+                    <button type="button" class="flex w-full items-center gap-3 px-3 py-2.5 text-left" @click="setMusic(null)">
+                      <UIcon :name="!musicTrackId ? 'i-lucide-circle-check' : 'i-lucide-circle'" class="size-5 shrink-0" :class="!musicTrackId ? 'text-primary' : 'text-ink-faint'" />
+                      <span class="flex-1 text-sm font-medium text-ink">{{ t('theme.music.none') }}</span>
+                    </button>
+                    <div v-for="track in musicTracks" :key="track.id" class="flex items-center gap-3 px-3 py-2">
+                      <button type="button" class="flex min-w-0 flex-1 items-center gap-3 text-left" @click="setMusic(track.id)">
+                        <UIcon :name="musicTrackId === track.id ? 'i-lucide-circle-check' : 'i-lucide-circle'" class="size-5 shrink-0" :class="musicTrackId === track.id ? 'text-primary' : 'text-ink-faint'" />
+                        <span class="min-w-0">
+                          <span class="block truncate text-sm font-medium text-ink">{{ track.title }}</span>
+                          <span class="block text-xs text-ink-muted">{{ te(`room.music.moods.${track.id}`) ? t(`room.music.moods.${track.id}`) : track.mood }} · {{ track.duration }}</span>
+                        </span>
+                      </button>
+                      <UButton
+                        size="xs"
+                        :color="previewing === track.id ? 'primary' : 'neutral'"
+                        variant="soft"
+                        :icon="previewing === track.id ? 'i-lucide-pause' : 'i-lucide-play'"
+                        :aria-label="t('theme.music.preview', { title: track.title })"
+                        @click="togglePreview(track.id)"
+                      />
+                    </div>
+                  </div>
+                  <p class="px-1 text-xs text-muted">
+                    {{ t('room.music.creditPrefix') }} <a href="https://pixabay.com/music/" target="_blank" rel="noopener noreferrer" class="underline">Pixabay</a>.
+                  </p>
+                </div>
+
                 <!-- Effects -->
                 <div v-else-if="view === 'effects'" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <UFormField :label="t('theme.card.appearAnimation')">
@@ -282,6 +313,7 @@ import { THEME_PRESETS, type ThemePreset } from "~/data/themePresets";
 import { nameFontOptions, headingFontOptions, paragraphFontOptions, FONT_PAIRS, type FontOption } from "~/data/fontOptions";
 import { useGoogleFonts } from "~/composables/useGoogleFonts";
 import { backgroundCss } from "~/utils/themeBackground";
+import { ROOM_MUSIC, MUSIC_BY_ID } from "~/data/roomMusic";
 
 const { t, te } = useI18n();
 
@@ -305,7 +337,7 @@ const emit = defineEmits<{
   updateTheme: [patch: Partial<ThemeConfig>];
 }>();
 
-type DesignView = "root" | "theme" | "colors" | "text" | "cards" | "layout" | "effects";
+type DesignView = "root" | "theme" | "colors" | "text" | "cards" | "layout" | "effects" | "music";
 const view = ref<DesignView>("root");
 
 const viewTitle = computed(() =>
@@ -333,6 +365,7 @@ const rootRows = computed(() => {
     { view: "text" as const, label: t("theme.sections.text"), value: fontLabel(nameFont), swatchStyle: {}, icon: "", text: "Aa", textStyle: { fontFamily: nameFont, fontWeight: 600 } },
     { view: "cards" as const, label: t("theme.sections.cards"), value: t(`theme.card.styles.${tc.card.style || "filled"}`), swatchStyle: {}, icon: "i-lucide-rectangle-horizontal", text: "", textStyle: {} },
     { view: "layout" as const, label: t("theme.sections.layout"), value: linkLayoutOptions.value.find((o) => o.value === tc.link.layout)?.label ?? "", swatchStyle: {}, icon: "i-lucide-layout-template", text: "", textStyle: {} },
+    { view: "music" as const, label: t("theme.sections.music"), value: (tc.music?.trackId && MUSIC_BY_ID[tc.music.trackId]?.title) || t("theme.options.none"), swatchStyle: {}, icon: "i-lucide-music", text: "", textStyle: {} },
     { view: "effects" as const, label: t("theme.sections.effects"), value: tc.card.animationAppear && tc.card.animationAppear !== "none" ? t(`theme.animations.appear.${tc.card.animationAppear}`) : t("theme.options.none"), swatchStyle: {}, icon: "i-lucide-sparkles", text: "", textStyle: {} },
   ];
 });
@@ -400,6 +433,37 @@ const avatarRadius = (shape: string) =>
   shape === "circle" ? "9999px" : shape === "rounded" ? "8px" : "2px";
 
 const accent = computed(() => props.themeConfig.colors.primary || "#111827");
+
+// ---------- Background music ----------
+// The calm and festive tracks first: these suit a page more than game tunes
+const PAGE_FIRST = ["romantic-piano", "romantic-date", "love-acoustic", "cozy-love-lofi", "happy-birthday", "party-celebration"];
+const musicTracks = [...ROOM_MUSIC].sort((a, b) => {
+  const rank = (id: string) => (PAGE_FIRST.includes(id) ? PAGE_FIRST.indexOf(id) : PAGE_FIRST.length);
+  return rank(a.id) - rank(b.id);
+});
+const musicTrackId = computed(() => props.themeConfig.music?.trackId ?? null);
+function setMusic(trackId: string | null) {
+  emit("updateTheme", { music: { trackId } });
+}
+const previewing = ref<string | null>(null);
+let previewAudio: HTMLAudioElement | null = null;
+function togglePreview(id: string) {
+  previewAudio?.pause();
+  if (previewing.value === id) {
+    previewing.value = null;
+    return;
+  }
+  previewAudio = new Audio(MUSIC_BY_ID[id]!.src);
+  previewAudio.volume = 0.6;
+  previewAudio.onended = () => (previewing.value = null);
+  previewAudio.play().catch(() => (previewing.value = null));
+  previewing.value = id;
+}
+onBeforeUnmount(() => previewAudio?.pause());
+watch(view, () => {
+  previewAudio?.pause();
+  previewing.value = null;
+});
 
 // Small look-alikes of a card in each style, in the site's accent colour
 function cardPreviewStyle(style: string) {

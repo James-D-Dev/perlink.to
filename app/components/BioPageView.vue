@@ -15,6 +15,9 @@
       @click="sharePage"
     />
 
+    <!-- Background music, on the live site only -->
+    <BioPageMusic v-if="mode === 'view' && theme.music?.trackId" :track-id="theme.music.trackId" />
+
     <!-- Background layer (separate element so backdrop-filter on cards works) -->
     <!-- <div class="absolute inset-0" :style="bgLayerStyle" /> -->
     <!-- Video background -->
@@ -342,6 +345,24 @@
             :data="block.data"
             :heading-style="headingStyle"
             :accent-style="solidButtonStyle"
+          />
+          <!-- When and where -->
+          <BioEventDisplay
+            v-if="block.name === 'event' && block.data?.date"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :card-style="panelStyle"
+            :accent-style="solidButtonStyle"
+            :heading-style="headingStyle"
+          />
+          <!-- A question with a yes -->
+          <BioQuestionDisplay
+            v-if="block.name === 'question' && block.data?.question"
+            :id="blockDomId(block)"
+            :data="block.data"
+            :card-style="panelStyle"
+            :accent-style="solidButtonStyle"
+            :heading-style="headingStyle"
           />
           <!-- Menu Block -->
           <BioMenuDisplay
@@ -722,6 +743,8 @@ function hasContent(block: BioBlock): boolean {
     case "products": return !!d?.items?.some((i: any) => i.name);
     case "timeline": return !!d?.items?.some((i: any) => i.title);
     case "letter": return !!d?.body;
+    case "event": return !!d?.date;
+    case "question": return !!d?.question;
     default: return true;
   }
 }

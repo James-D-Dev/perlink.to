@@ -1,5 +1,6 @@
-// Background music for 3D rooms. Tracks are from Pixabay (Pixabay Content
-// License) and are served from /public/music; they stream only, no downloads.
+// Background music for 3D rooms and pages. Tracks are from Pixabay (Pixabay
+// Content License) and are served from /public/music; they stream only, no
+// downloads.
 
 export interface RoomMusicTrack {
   id: string
@@ -25,6 +26,13 @@ export const ROOM_MUSIC: RoomMusicTrack[] = [
   { id: 'fairytale-quest', title: 'Fairytale Quest', artist: 'Good_B_Music', duration: '2:21', mood: 'Dreamy', src: '/music/fairytale-quest.mp3', sourceUrl: 'https://pixabay.com/music/fantasy-dreamy-childrens-fairytail-quest-for-game-394561/' },
   { id: 'playful-kids', title: 'Playful & Carefree', artist: 'REDproductions', duration: '2:11', mood: 'Playful', src: '/music/playful-kids.mp3', sourceUrl: 'https://pixabay.com/music/upbeat-fun-kids-playful-comic-carefree-game-happy-positive-music-57026/' },
   { id: 'game-background', title: 'Game Background', artist: 'MaksymMalko', duration: '3:11', mood: 'Chill', src: '/music/game-background.mp3', sourceUrl: 'https://pixabay.com/music/video-games-game-gaming-background-music-385611/' },
+  // For love pages and invitations
+  { id: 'romantic-piano', title: 'Romantic Piano', artist: 'PaulYudin', duration: '2:10', mood: 'Romantic', src: '/music/romantic-piano.mp3', sourceUrl: 'https://pixabay.com/music/wedding-romantic-piano-164822/' },
+  { id: 'romantic-date', title: 'Romantic Date Piano', artist: 'alex-morgan', duration: '2:50', mood: 'Tender', src: '/music/romantic-date.mp3', sourceUrl: 'https://pixabay.com/music/instrumental-romantic-date-piano-548637/' },
+  { id: 'love-acoustic', title: 'Love Acoustic', artist: 'echoes_of_lumen', duration: '1:08', mood: 'Acoustic', src: '/music/love-acoustic.mp3', sourceUrl: 'https://pixabay.com/music/instrumental-love-acoustic-584895/' },
+  { id: 'cozy-love-lofi', title: 'Cozy Love', artist: 'Sonican', duration: '1:15', mood: 'Lo-fi', src: '/music/cozy-love-lofi.mp3', sourceUrl: 'https://pixabay.com/music/lofi-cozy-love-sentimental-lofi-loop-529336/' },
+  { id: 'happy-birthday', title: 'Happy Birthday', artist: 'Sub_Clair', duration: '2:01', mood: 'Birthday', src: '/music/happy-birthday.mp3', sourceUrl: 'https://pixabay.com/music/instrumental-happy-birthday-592177/' },
+  { id: 'party-celebration', title: 'Event Party Celebration', artist: 'MFCC', duration: '2:15', mood: 'Party', src: '/music/party-celebration.mp3', sourceUrl: 'https://pixabay.com/music/upbeat-event-party-celebration-music-244587/' },
 ]
 
 /** Turn on once the mp3 files are in /public/music */

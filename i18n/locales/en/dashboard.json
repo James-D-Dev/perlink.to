@@ -434,6 +434,46 @@
       "blog-diary": {
         "name": "Photo diary",
         "description": "Moody and cinematic: street photography and stories from the city."
+      },
+      "love-valentine": {
+        "name": "Will you be my Valentine?",
+        "description": "Ask the question: the “no” button runs away, “yes” fills the page with hearts. With a love letter and your photos."
+      },
+      "love-anniversary": {
+        "name": "Wedding anniversary",
+        "description": "For your husband or wife: the years you’ve been married, your years together, a letter and your wedding photos."
+      },
+      "love-open-when": {
+        "name": "“Open when…” letters",
+        "description": "Sealed letters for the moments you can’t be there: when you miss me, when you can’t sleep, on your birthday."
+      },
+      "love-long-distance": {
+        "name": "Long-distance love",
+        "description": "The days until you meet again, every time you’ve met, a letter and photos from your last trip."
+      },
+      "love-sorry": {
+        "name": "Make up after a fight",
+        "description": "An apology letter, your promises, the good times and a “forgive me?” with a runaway “no”."
+      },
+      "invite-wedding-red": {
+        "name": "Traditional wedding invitation",
+        "description": "Red and gold: both families, engagement and wedding party, RSVP and a QR for wedding gifts."
+      },
+      "invite-wedding-garden": {
+        "name": "Garden wedding invitation",
+        "description": "Light and modern in sage green: ceremony and reception, your story, dress code, RSVP and photos."
+      },
+      "invite-kids-birthday": {
+        "name": "Kid’s birthday invitation",
+        "description": "A first birthday or kid’s party: countdown, the party plan, the place, RSVP and photos."
+      },
+      "invite-grand-opening": {
+        "name": "Grand opening invitation",
+        "description": "Invite customers to your opening: programme, opening offers, map, directions and RSVP."
+      },
+      "invite-year-end-party": {
+        "name": "Year-end party invitation",
+        "description": "A company year-end party or gala: countdown, programme, dress code, RSVP and photos."
       }
     },
     "categories": {
@@ -481,7 +521,12 @@
       "order": "Order {code}",
       "payCod": "Cash on delivery",
       "payTransfer": "Bank transfer (check your bank account)",
-      "requestsTab": "Requests & orders"
+      "requestsTab": "Requests & orders",
+      "rsvpYes": "Coming",
+      "rsvpNo": "Not coming",
+      "rsvpComing": "reply coming | replies coming",
+      "rsvpPeople": "person in all | people in all",
+      "rsvpNotComing": "can’t make it | can’t make it"
     },
     "qr": {
       "open": "QR code",

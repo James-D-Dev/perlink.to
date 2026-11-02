@@ -7,9 +7,9 @@ Perlink is made for creators, restaurants, cafés, hotels, small shops, portfoli
 Key facts:
 
 - Address: each site lives at perlink.to/<name>. Names are 3–30 characters (lowercase letters, digits, hyphens, underscores).
-- Blocks: links, social profiles, menu with prices, products, opening hours, contact and map, forms (requests go to an inbox), photo albums, videos, testimonials, blog posts, VietQR bank-transfer codes, countdowns (to a date, or days since one), timelines, sealed letters.
+- Blocks: links, social profiles, menu with prices, products, opening hours, contact and map, forms (requests go to an inbox), photo albums, videos, testimonials, blog posts, VietQR bank-transfer codes, countdowns (to a date, or days since one), timelines, sealed letters (with each guest’s name from the link), event details with Add to calendar, RSVP replies, a yes/no question, background music.
 - 3D room: the page as a room on one of 11 lands (Sky island, Sakura, Crimson sakura, Mars, City, Winter, Autumn, Tropical beach, Fairy forest, Volcano, Zen garden), by day or night, with music, clickable objects and a guestbook. Owners can record a vertical room video for TikTok, Reels and Shorts.
-- Templates: 36 ready-made pages (portfolio, restaurant menu, hotel and homestay, café, creator, link in bio, services, events, blogs, shops and more).
+- Templates: 46 ready-made pages (portfolio, restaurant menu, hotel and homestay, café, creator, link in bio, services, wedding and party invitations, love pages, blogs, shops and more).
 - Analytics: visits and clicks per site; a QR code for each site.
 - Sign in with Google, Facebook or TikTok.
 - Languages: the editor and sites work in English and Vietnamese.

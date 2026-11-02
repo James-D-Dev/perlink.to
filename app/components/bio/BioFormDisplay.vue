@@ -7,7 +7,7 @@
 
     <div v-if="sent" class="mt-4 flex items-start gap-2 rounded-lg bg-current/5 p-3 text-sm">
       <UIcon name="i-lucide-circle-check" class="mt-0.5 size-4 shrink-0" />
-      <span>{{ data.successMessage || t('formSent') }}</span>
+      <span>{{ isRsvp && values.attending === 'no' ? t('rsvpSorry') : data.successMessage || (isRsvp ? t('rsvpThanks') : t('formSent')) }}</span>
     </div>
 
     <form v-else class="mt-4 space-y-3" @submit.prevent="submit">
@@ -18,6 +18,23 @@
         <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formName') }} *</span>
         <input v-model="values.name" required maxlength="120" autocomplete="name" :placeholder="t('formNameHint')" :class="inputClass">
       </label>
+
+      <!-- Invitations: coming or not, before anything else -->
+      <div v-if="isRsvp" class="grid grid-cols-2 gap-2" role="radiogroup" :aria-label="t('rsvpQuestion')">
+        <button
+          v-for="option in (['yes', 'no'] as const)"
+          :key="option"
+          type="button"
+          role="radio"
+          :aria-checked="values.attending === option"
+          class="flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all"
+          :style="values.attending === option ? buttonStyle : choiceStyle"
+          @click="values.attending = option"
+        >
+          <UIcon :name="option === 'yes' ? 'i-lucide-party-popper' : 'i-lucide-heart-crack'" class="size-4" />
+          {{ option === 'yes' ? t('rsvpYes') : t('rsvpNo') }}
+        </button>
+      </div>
 
       <div v-if="fields.phone || fields.email" class="grid gap-3" :class="fields.phone && fields.email && 'sm:grid-cols-2'">
         <label v-if="fields.phone" class="block">
@@ -36,12 +53,12 @@
         <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formDate') }}</span>
         <input v-model="values.date" type="date" :min="today" :class="[inputClass, pickerClass]">
       </label>
-      <div v-if="fields.time || fields.guests" class="grid gap-3" :class="fields.time && fields.guests && 'grid-cols-2'">
+      <div v-if="fields.time || showGuests" class="grid gap-3" :class="fields.time && showGuests && 'grid-cols-2'">
         <label v-if="fields.time" class="block min-w-0">
           <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formTime') }}</span>
           <input v-model="values.time" type="time" :class="[inputClass, pickerClass]">
         </label>
-        <label v-if="fields.guests" class="block min-w-0">
+        <label v-if="showGuests" class="block min-w-0">
           <span class="mb-1 block text-xs font-medium opacity-75">{{ t('formGuests') }}</span>
           <input v-model="values.guests" type="number" min="1" max="999" inputmode="numeric" placeholder="2" :class="inputClass">
         </label>
@@ -59,10 +76,10 @@
         type="submit"
         class="flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold disabled:opacity-60"
         :style="buttonStyle"
-        :disabled="sending || preview"
+        :disabled="sending || preview || (isRsvp && !values.attending)"
       >
         <UIcon v-if="sending" name="i-lucide-loader-circle" class="size-4 animate-spin" />
-        {{ sending ? t('formSending') : data.submitLabel || (data.kind === 'booking' ? t('formBook') : t('formSend')) }}
+        {{ sending ? t('formSending') : data.submitLabel || (data.kind === 'booking' ? t('formBook') : isRsvp ? t('rsvpSend') : t('formSend')) }}
       </button>
     </form>
   </section>
@@ -85,7 +102,16 @@ const props = defineProps<{
 const { t } = useSiteI18n()
 
 const fields = computed(() => props.data.fields ?? FORM_PRESETS.booking)
-const values = reactive<Record<string, string>>({ name: '', phone: '', email: '', date: '', time: '', guests: '', message: '' })
+const values = reactive<Record<string, string>>({ name: '', phone: '', email: '', date: '', time: '', guests: '', message: '', attending: '' })
+const isRsvp = computed(() => props.data.kind === 'rsvp')
+// A guest who isn't coming brings no one
+const showGuests = computed(() => fields.value.guests && !(isRsvp.value && values.attending === 'no'))
+// The choice not picked: the page's button colour, outlined
+const choiceStyle = computed(() => ({
+  borderRadius: props.buttonStyle.borderRadius,
+  border: `1.5px solid ${props.buttonStyle.backgroundColor ?? 'currentColor'}`,
+  color: 'inherit',
+}))
 const website = ref('')
 const sending = ref(false)
 const sent = ref(false)

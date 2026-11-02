@@ -504,7 +504,8 @@
       "text": "Text",
       "cards": "Cards & buttons",
       "layout": "Layout",
-      "effects": "Effects"
+      "effects": "Effects",
+      "music": "Background music"
     },
     "text": {
       "general": "Main font",
@@ -528,6 +529,11 @@
       "themeHint": "{n} ready-made looks",
       "customize": "Customize",
       "custom": "Custom"
+    },
+    "music": {
+      "hint": "Plays on your page from the visitor’s first tap (browsers don’t allow sound before that). Your 3D room keeps its own music.",
+      "none": "No music",
+      "preview": "Listen to {title}"
     }
   },
   "analytics": {

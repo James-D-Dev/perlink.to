@@ -27,6 +27,8 @@ export const BLOCK_CATALOG: BlockOption[] = [
   { id: 'vietqr', key: 'vietqr', icon: 'i-lucide-qr-code', group: 'extras', keywords: 'bank transfer payment donate qr chuyển khoản thanh toán ủng hộ ngân hàng' },
   { id: 'birthday-countdown', key: 'birthdayCountdown', icon: 'i-lucide-cake', group: 'extras', keywords: 'countdown count up together anniversary birthday wedding event đếm ngược đếm ngày yêu kỷ niệm sinh nhật đám cưới sự kiện' },
   { id: 'letter', key: 'letter', icon: 'i-lucide-mail-open', group: 'extras', keywords: 'letter love note envelope message invitation thư tình thư tay phong bì lời nhắn thiệp mời' },
+  { id: 'event', key: 'event', icon: 'i-lucide-calendar-heart', group: 'extras', keywords: 'event date time venue invitation wedding party ceremony add to calendar save the date sự kiện ngày giờ địa điểm thiệp mời đám cưới tiệc lễ' },
+  { id: 'question', key: 'question', icon: 'i-lucide-circle-help', group: 'extras', keywords: 'question yes no valentine will you be my proposal apology forgive câu hỏi đồng ý tỏ tình cầu hôn làm lành xin lỗi' },
   { id: 'timeline', key: 'timeline', icon: 'i-lucide-milestone', group: 'content', keywords: 'timeline story milestones schedule history our story dòng thời gian câu chuyện kỷ niệm lịch trình cột mốc' },
 ]
 

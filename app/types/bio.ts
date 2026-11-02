@@ -271,6 +271,8 @@ export interface ThemeConfig {
   /** On a page that opens in 2D: a "3D room" button that opens the room */
   roomButton?: boolean;
   room?: RoomConfig;
+  /** Background music on the page (the 3D room has its own); plays from the visitor's first tap */
+  music?: { trackId: string | null };
 }
 
 // ==================== Bio Blocks ====================
@@ -290,7 +292,9 @@ export type BlockName =
   | 'products'
   | 'blog'
   | 'timeline'
-  | 'letter';
+  | 'letter'
+  | 'event'
+  | 'question';
 
 export interface BaseBlock {
   /** Unique per page, so a page can hold several blocks of one type. Older pages get one on load */
@@ -450,7 +454,8 @@ export interface FormBlock extends BaseBlock {
   data: {
     title?: string;
     description?: string;
-    kind: 'booking' | 'contact';
+    /** 'rsvp': guests say whether they're coming, for invitations */
+    kind: 'booking' | 'contact' | 'rsvp';
     fields: FormFields;
     submitLabel?: string;
     successMessage?: string;
@@ -514,12 +519,51 @@ export interface LetterBlock extends BaseBlock {
   data: {
     /** Who it's for, on the envelope */
     to?: string;
+    /** Words on the envelope instead of "For …", e.g. "Open when you miss me" */
+    cover?: string;
     body: string;
     /** The signature under the letter */
     from?: string;
     /** In an envelope that opens on tap (default), or open from the start */
     sealed?: boolean;
     paper?: 'cream' | 'blush' | 'night';
+    /** The envelope greets the guest named in the link (?to=Name) */
+    personal?: boolean;
+  };
+}
+
+// When and where: a wedding ceremony, a party, an opening. Visitors can add
+// it to their calendar and get directions
+export interface EventBlock extends BaseBlock {
+  name: 'event';
+  data: {
+    /** What happens, e.g. "Wedding reception" */
+    name?: string;
+    /** YYYY-MM-DD */
+    date: string;
+    /** HH:MM, both optional; no start time makes it an all-day event */
+    startTime?: string;
+    endTime?: string;
+    venue?: string;
+    address?: string;
+    mapUrl?: string;
+    dressCode?: string;
+    note?: string;
+  };
+}
+
+// A question with two answers, e.g. "Will you be my Valentine?". The "no"
+// button runs away; "yes" sets off hearts and shows a message
+export interface QuestionBlock extends BaseBlock {
+  name: 'question';
+  data: {
+    question: string;
+    yesLabel?: string;
+    noLabel?: string;
+    /** Shown once they say yes */
+    answer?: string;
+    /** The "no" button dodges the finger (default) */
+    playful?: boolean;
   };
 }
 
@@ -582,7 +626,9 @@ export type BioBlock =
   | BlogBlock
   | TestimonialsBlock
   | TimelineBlock
-  | LetterBlock;
+  | LetterBlock
+  | EventBlock
+  | QuestionBlock;
 
 export const DEFAULT_OPENING_DAYS: OpeningDay[] = [1, 2, 3, 4, 5, 6, 0].map(day => ({
   day,

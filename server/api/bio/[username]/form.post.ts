@@ -6,7 +6,8 @@ import { emailEnabled, runInBackground } from '../../../utils/email'
 import { notifyOwnerOfRequest } from '../../../utils/formNotification'
 import { notifyOwnerTelegram } from '../../../utils/telegram'
 
-// A visitor sends a site's form (booking or contact request)
+// A visitor sends a site's form (booking or contact request, or a reply to
+// an invitation)
 
 const FIELDS = ['phone', 'email', 'date', 'time', 'guests', 'message'] as const
 
@@ -53,7 +54,16 @@ export default defineEventHandler(async (event) => {
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     throw createError({ statusCode: 422, statusMessage: 'Invalid email' })
   }
-  if (!data.phone && !data.email && !data.message) {
+  if (block.data?.kind === 'rsvp') {
+    // A reply to an invitation: coming or not is all it needs
+    const attending = values.attending
+    if (attending !== 'yes' && attending !== 'no') {
+      throw createError({ statusCode: 422, statusMessage: 'Please say whether you are coming' })
+    }
+    data.kind = 'rsvp'
+    data.attending = attending
+    if (attending === 'no') delete data.guests
+  } else if (!data.phone && !data.email && !data.message) {
     throw createError({ statusCode: 422, statusMessage: 'Please leave a way to reach you' })
   }
 

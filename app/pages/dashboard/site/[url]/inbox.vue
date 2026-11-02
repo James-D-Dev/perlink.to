@@ -59,6 +59,14 @@
           </button>
         </div>
 
+        <!-- Replies to an invitation, counted -->
+        <div v-if="view === 'requests' && rsvp.replies" class="grid grid-cols-3 gap-2">
+          <div v-for="stat in rsvpStats" :key="stat.label" class="rounded-2xl bg-sand px-4 py-3">
+            <p class="text-2xl font-semibold tabular-nums text-ink">{{ stat.value }}</p>
+            <p class="text-xs text-ink-muted">{{ stat.label }}</p>
+          </div>
+        </div>
+
         <!-- Get new requests on the phone -->
         <TelegramConnect compact />
 
@@ -90,6 +98,14 @@
                 <div class="flex flex-wrap items-baseline justify-between gap-x-3">
                   <p class="flex items-center gap-2 font-medium text-ink">
                     {{ item.data.name }}
+                    <span
+                      v-if="item.data.kind === 'rsvp'"
+                      class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ring-1"
+                      :class="item.data.attending === 'yes' ? 'bg-emerald-50 text-emerald-700 ring-emerald-200' : 'bg-sand text-ink-muted ring-line'"
+                    >
+                      <UIcon :name="item.data.attending === 'yes' ? 'i-lucide-check' : 'i-lucide-x'" class="size-3" />
+                      {{ item.data.attending === 'yes' ? t('dashboard.inbox.rsvpYes') : t('dashboard.inbox.rsvpNo') }}
+                    </span>
                     <span v-if="item.data.kind === 'order'" class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
                       <UIcon name="i-lucide-shopping-bag" class="size-3" />
                       {{ t('dashboard.inbox.order', { code: item.data.code }) }}
@@ -193,6 +209,23 @@ function setView(value: 'requests' | 'guestbook') {
   view.value = value
   history.replaceState(history.state, '', value === 'guestbook' ? '#guestbook' : location.pathname)
 }
+
+// Invitation replies: who's coming, how many people in all, who isn't
+const rsvp = computed(() => {
+  const replies = submissions.value.filter(s => s.data.kind === 'rsvp')
+  const coming = replies.filter(s => s.data.attending === 'yes')
+  return {
+    replies: replies.length,
+    coming: coming.length,
+    people: coming.reduce((sum, s) => sum + Math.max(1, Number(s.data.guests) || 1), 0),
+    notComing: replies.length - coming.length,
+  }
+})
+const rsvpStats = computed(() => [
+  { label: t('dashboard.inbox.rsvpComing', rsvp.value.coming), value: rsvp.value.coming },
+  { label: t('dashboard.inbox.rsvpPeople', rsvp.value.people), value: rsvp.value.people },
+  { label: t('dashboard.inbox.rsvpNotComing', rsvp.value.notComing), value: rsvp.value.notComing },
+])
 
 const visible = computed(() => (filter.value === 'unread' ? submissions.value.filter(s => !s.read) : submissions.value))
 

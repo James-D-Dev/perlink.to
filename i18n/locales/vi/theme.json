@@ -504,7 +504,8 @@
       "text": "Chữ",
       "cards": "Thẻ & nút",
       "layout": "Bố cục",
-      "effects": "Hiệu ứng"
+      "effects": "Hiệu ứng",
+      "music": "Nhạc nền"
     },
     "text": {
       "general": "Phông chữ chung",
@@ -528,6 +529,11 @@
       "themeHint": "{n} bộ màu, phông và kiểu thẻ phối sẵn",
       "customize": "Tùy chỉnh",
       "custom": "Tự phối"
+    },
+    "music": {
+      "hint": "Phát trên trang từ lần chạm đầu tiên của khách (trình duyệt không cho phát nhạc trước đó). Phòng 3D vẫn dùng nhạc riêng.",
+      "none": "Không có nhạc",
+      "preview": "Nghe thử {title}"
     }
   },
   "analytics": {

@@ -164,7 +164,13 @@
         "marimba-travel": "Tropical",
         "fairytale-quest": "Dreamy",
         "playful-kids": "Playful",
-        "game-background": "Chill"
+        "game-background": "Chill",
+        "romantic-piano": "Romantic",
+        "romantic-date": "Tender",
+        "love-acoustic": "Acoustic",
+        "cozy-love-lofi": "Lo-fi",
+        "happy-birthday": "Birthday",
+        "party-celebration": "Party"
       }
     },
     "categories": {

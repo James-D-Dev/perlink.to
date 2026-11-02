@@ -7,7 +7,7 @@
       v-if="sealed && !open"
       type="button"
       class="envelope group relative block w-full overflow-hidden text-center"
-      :aria-label="data.to ? t('letterFor', { name: data.to }) : t('letterOpen')"
+      :aria-label="envelopeText || t('letterOpen')"
       :aria-expanded="open"
       @click="open = true"
     >
@@ -16,7 +16,7 @@
         <span class="seal flex size-14 items-center justify-center rounded-full shadow-lg" :style="sealStyle" aria-hidden="true">
           <UIcon name="i-lucide-heart" class="size-6" />
         </span>
-        <span v-if="data.to" class="text-2xl leading-tight" :style="scriptStyle">{{ t('letterFor', { name: data.to }) }}</span>
+        <span v-if="envelopeText" class="text-2xl leading-tight" :style="scriptStyle">{{ envelopeText }}</span>
         <span class="inline-flex items-center gap-1.5 text-sm opacity-75 transition-opacity group-hover:opacity-100">
           <UIcon name="i-lucide-mail-open" class="size-4" />
           {{ t('letterOpen') }}
@@ -26,7 +26,7 @@
 
     <Transition name="letter-out" appear>
       <article v-if="!sealed || open" class="paper relative px-6 py-8 sm:px-8">
-        <p v-if="data.to" class="mb-4 text-2xl leading-tight" :style="scriptStyle">{{ t('letterFor', { name: data.to }) }}</p>
+        <p v-if="to" class="mb-4 text-2xl leading-tight" :style="scriptStyle">{{ t('letterFor', { name: to }) }}</p>
         <p class="whitespace-pre-line text-[16px] leading-[1.9]">{{ data.body }}</p>
         <p v-if="data.from" class="mt-6 text-right text-xl" :style="scriptStyle">{{ data.from }}</p>
       </article>
@@ -48,6 +48,17 @@ const { t } = useSiteI18n()
 const sealed = computed(() => props.data.sealed !== false)
 const paper = computed(() => props.data.paper || 'cream')
 const open = ref(false)
+
+// A link like perlink.to/linh-nam?to=Minh greets that guest by name
+const route = useRoute()
+const guest = computed(() => {
+  if (props.data.personal === false) return ''
+  const value = route.query.to
+  return (Array.isArray(value) ? value[0] : value)?.trim().slice(0, 60) ?? ''
+})
+const to = computed(() => guest.value || props.data.to)
+// The envelope: its own words, or who it's for
+const envelopeText = computed(() => props.data.cover?.trim() || (to.value ? t('letterFor', { name: to.value }) : ''))
 
 // Greeting and signature in the page's heading face (often a script)
 const scriptStyle = computed<CSSProperties>(() => ({ fontFamily: props.headingStyle?.fontFamily }))

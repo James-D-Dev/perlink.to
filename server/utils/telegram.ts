@@ -56,19 +56,23 @@ const COPY = {
   en: {
     order: (code: string) => `🛍 <b>New order ${code}</b>`,
     request: '📩 <b>New request</b>',
+    rsvp: '💌 <b>Reply to your invitation</b>',
     guestbook: (gift: string) => `💌 <b>New guestbook message</b> ${gift}`,
     on: (site: string) => `on perlink.to/${site}`,
-    labels: { product: 'Product', quantity: 'Quantity', total: 'Total', payment: 'Payment', name: 'Name', phone: 'Phone', email: 'Email', address: 'Address', date: 'Date', time: 'Time', guests: 'Guests', message: 'Message' } as Record<string, string>,
+    labels: { product: 'Product', quantity: 'Quantity', total: 'Total', payment: 'Payment', name: 'Name', attending: 'Coming', phone: 'Phone', email: 'Email', address: 'Address', date: 'Date', time: 'Time', guests: 'Guests', message: 'Message' } as Record<string, string>,
     payments: { cod: 'Cash on delivery', transfer: 'Bank transfer — check your bank account' } as Record<string, string>,
+    attending: { yes: '✅ Yes', no: '❌ Can’t make it' } as Record<string, string>,
     open: 'Open inbox',
   },
   vi: {
     order: (code: string) => `🛍 <b>Đơn hàng mới ${code}</b>`,
     request: '📩 <b>Yêu cầu mới</b>',
+    rsvp: '💌 <b>Khách trả lời thiệp mời</b>',
     guestbook: (gift: string) => `💌 <b>Lời chúc mới trong phòng 3D</b> ${gift}`,
     on: (site: string) => `trên perlink.to/${site}`,
-    labels: { product: 'Sản phẩm', quantity: 'Số lượng', total: 'Tổng tiền', payment: 'Thanh toán', name: 'Họ tên', phone: 'SĐT', email: 'Email', address: 'Địa chỉ', date: 'Ngày', time: 'Giờ', guests: 'Số khách', message: 'Lời nhắn' } as Record<string, string>,
+    labels: { product: 'Sản phẩm', quantity: 'Số lượng', total: 'Tổng tiền', payment: 'Thanh toán', name: 'Họ tên', attending: 'Tham dự', phone: 'SĐT', email: 'Email', address: 'Địa chỉ', date: 'Ngày', time: 'Giờ', guests: 'Số khách', message: 'Lời nhắn' } as Record<string, string>,
     payments: { cod: 'Thanh toán khi nhận hàng (COD)', transfer: 'Chuyển khoản — kiểm tra tài khoản ngân hàng' } as Record<string, string>,
+    attending: { yes: '✅ Có, sẽ đến', no: '❌ Không đến được' } as Record<string, string>,
     open: 'Mở Hộp thư',
   },
 }
@@ -89,12 +93,16 @@ export async function notifyOwnerTelegram(
   // In the owner's language (Settings), English by default
   const copy = COPY[toAppLanguage(owner.language)]
   const isOrder = data.kind === 'order'
-  const shown: Record<string, string> = { ...data, ...(isOrder && data.payment ? { payment: copy.payments[data.payment] ?? data.payment } : {}) }
+  const shown: Record<string, string> = {
+    ...data,
+    ...(isOrder && data.payment ? { payment: copy.payments[data.payment] ?? data.payment } : {}),
+    ...(data.attending ? { attending: copy.attending[data.attending] ?? data.attending } : {}),
+  }
   const lines = Object.keys(copy.labels)
     .filter(key => shown[key])
     .map(key => `<b>${escapeHtml(copy.labels[key]!)}:</b> ${escapeHtml(shown[key]!)}`)
   const isGuestbook = data.kind === 'guestbook'
-  const heading = isOrder ? copy.order(escapeHtml(data.code ?? '')) : isGuestbook ? copy.guestbook(escapeHtml(data.gift ?? '')) : copy.request
+  const heading = isOrder ? copy.order(escapeHtml(data.code ?? '')) : isGuestbook ? copy.guestbook(escapeHtml(data.gift ?? '')) : data.kind === 'rsvp' ? copy.rsvp : copy.request
   const html = `${heading} ${escapeHtml(copy.on(site.username))}\n\n${lines.join('\n')}`
   await sendTelegram(event, owner.telegram_chat_id, html, [
     { text: copy.open, url: `https://perlink.to/dashboard/site/${site.username}/inbox${isGuestbook ? '#guestbook' : ''}` },

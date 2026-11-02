@@ -17,6 +17,9 @@
       <UFormField :label="t('blocks.letter.to')">
         <UInput :model-value="data.to" :placeholder="t('blocks.letter.toPlaceholder')" class="w-full" @update:model-value="update({ to: String($event) })" />
       </UFormField>
+      <UFormField v-if="data.sealed !== false" :label="t('blocks.letter.cover')" :help="t('blocks.letter.coverHelp')">
+        <UInput :model-value="data.cover" :placeholder="t('blocks.letter.coverPlaceholder')" class="w-full" @update:model-value="update({ cover: String($event) })" />
+      </UFormField>
       <UFormField :label="t('blocks.letter.body')" required>
         <UTextarea :model-value="data.body" :placeholder="t('blocks.letter.bodyPlaceholder')" :rows="6" autoresize class="w-full" @update:model-value="update({ body: String($event) })" />
       </UFormField>
@@ -47,6 +50,22 @@
           <span class="block text-muted">{{ t('blocks.letter.sealedHint') }}</span>
         </span>
       </label>
+
+      <!-- One link per guest, with their name on the envelope -->
+      <div class="space-y-3 rounded-lg border border-default bg-default p-3 dark:border-white/10">
+        <label class="flex cursor-pointer items-start gap-3">
+          <USwitch :model-value="data.personal !== false" @update:model-value="update({ personal: Boolean($event) })" />
+          <span class="text-sm">
+            <span class="font-medium text-highlighted">{{ t('blocks.letter.personal') }}</span>
+            <span class="block text-muted">{{ t('blocks.letter.personalHint') }}</span>
+          </span>
+        </label>
+        <div v-if="data.personal !== false" class="flex gap-2">
+          <UInput v-model="guestName" :placeholder="t('blocks.letter.guestPlaceholder')" class="min-w-0 flex-1" />
+          <UButton :disabled="!guestName.trim()" icon="i-lucide-copy" :label="t('blocks.letter.copyLink')" color="neutral" variant="outline" @click="copyGuestLink" />
+        </div>
+        <p v-if="data.personal !== false && guestName.trim()" class="break-all text-xs text-muted">{{ guestLink }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -73,6 +92,20 @@ const data = computed<LetterBlock['data']>(() => ({ body: '', sealed: true, pape
 
 function update(patch: Partial<LetterBlock['data']>) {
   emit('update', { ...data.value, ...patch })
+}
+
+// The site's address with the guest's name, to send to each guest
+const route = useRoute()
+const toast = useToast()
+const guestName = ref('')
+const guestLink = computed(() => `https://perlink.to/${String(route.params.url || '')}?to=${encodeURIComponent(guestName.value.trim())}`)
+async function copyGuestLink() {
+  try {
+    await navigator.clipboard.writeText(guestLink.value)
+    toast.add({ title: t('blocks.letter.linkCopied'), color: 'success' })
+  } catch {
+    toast.add({ title: guestLink.value, color: 'neutral' })
+  }
 }
 
 const papers = computed(() => [

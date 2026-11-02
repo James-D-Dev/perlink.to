@@ -195,6 +195,24 @@
               @update="(data: BioBlock['data']) => replaceData(block.id, data)"
             />
 
+            <BioBlockEvent
+              v-if="block.name === 'event'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
+            <BioBlockQuestion
+              v-if="block.name === 'question'"
+              :is-active="activeBlock === block.id"
+              :blocks="[block]"
+              @toggle="$emit('toggleBlock', block.id)"
+              @remove="onRemoveBlock(block.id)"
+              @update="(data: BioBlock['data']) => replaceData(block.id, data)"
+            />
+
             <BioBlockContact
               v-if="block.name === 'contact'"
               :is-active="activeBlock === block.id"

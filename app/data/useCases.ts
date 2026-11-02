@@ -38,7 +38,7 @@ export const USE_CASES: UseCase[] = [
   {
     id: 'birthday',
     path: { en: '/birthday-website', vi: '/vi/thiep-sinh-nhat-online' },
-    templates: ['gift-birthday', 'birthday', 'gift-love', 'event'],
+    templates: ['gift-birthday', 'invite-kids-birthday', 'birthday', 'love-open-when'],
     en: {
       label: 'Birthday website',
       metaTitle: 'Make a Birthday Website as a Gift, Free | Perlink',
@@ -115,7 +115,7 @@ export const USE_CASES: UseCase[] = [
   {
     id: 'valentine',
     path: { en: '/valentine-website', vi: '/vi/web-tang-nguoi-yeu' },
-    templates: ['gift-love', 'gift-birthday', 'wedding-invite', 'personal'],
+    templates: ['love-valentine', 'gift-love', 'love-open-when', 'love-sorry'],
     en: {
       label: 'Website for your partner',
       metaTitle: 'Make a Love Website for Your Partner, Free | Perlink',
@@ -133,7 +133,7 @@ export const USE_CASES: UseCase[] = [
         { icon: 'i-lucide-milestone', title: 'Your story', text: 'The first coffee, the first trip, the first Christmas, each with a photo.' },
         { icon: 'i-lucide-images', title: 'Your photos', text: 'An album of the two of you that opens full screen.' },
         { icon: 'i-lucide-box', title: 'A room for two', text: 'A cosy 3D room at night with your photos on the walls and fairy lights.' },
-        { icon: 'i-lucide-music', title: 'Your song', text: 'Music in the room and a link to the song that’s yours.' },
+        { icon: 'i-lucide-circle-help', title: 'The question', text: '“Will you be my Valentine?” The No button runs away; Yes fills the page with hearts.' },
       ],
       templatesTitle: 'Templates for love',
       templatesText: 'Start from the love room, or from a birthday or wedding page.',
@@ -169,7 +169,7 @@ export const USE_CASES: UseCase[] = [
         { icon: 'i-lucide-milestone', title: 'Chuyện của hai bạn', text: 'Ly cà phê đầu tiên, chuyến đi đầu tiên, Giáng sinh đầu tiên, mỗi mốc một tấm ảnh.' },
         { icon: 'i-lucide-images', title: 'Ảnh hai bạn', text: 'Album ảnh đôi, bấm vào là xem toàn màn hình.' },
         { icon: 'i-lucide-box', title: 'Căn phòng cho hai người', text: 'Phòng 3D ấm cúng về đêm, ảnh treo tường và đèn nháy.' },
-        { icon: 'i-lucide-music', title: 'Bài hát của hai bạn', text: 'Nhạc trong phòng và link đến bài hát của riêng hai người.' },
+        { icon: 'i-lucide-circle-help', title: 'Câu hỏi tỏ tình', text: '“Làm người yêu anh nhé?” Nút Không chạy trốn, bấm Có là tim bay đầy trang.' },
       ],
       templatesTitle: 'Mẫu cho tình yêu',
       templatesText: 'Bắt đầu từ phòng tình yêu, hoặc từ mẫu sinh nhật, thiệp cưới.',
@@ -346,7 +346,7 @@ export const USE_CASES: UseCase[] = [
   {
     id: 'wedding',
     path: { en: '/wedding-website', vi: '/vi/thiep-cuoi-online' },
-    templates: ['wedding-invite', 'event', 'wedding-photo', 'gift-love'],
+    templates: ['wedding-invite', 'invite-wedding-red', 'invite-wedding-garden', 'love-anniversary'],
     en: {
       label: 'Wedding website',
       metaTitle: 'Free Wedding Website & Online Invitation with RSVP | Perlink',
@@ -360,10 +360,10 @@ export const USE_CASES: UseCase[] = [
       featuresText: 'One page answers when, where and how, so your phone can rest.',
       features: [
         { icon: 'i-lucide-mail-open', title: 'Invitation letter', text: 'A sealed envelope in your colours that guests tap to open.' },
-        { icon: 'i-lucide-timer', title: 'Countdown', text: 'Days, hours and minutes to the ceremony.' },
+        { icon: 'i-lucide-user-round-check', title: 'Each guest by name', text: 'Send every guest their own link and the envelope greets them by name. Music plays as they open it.' },
         { icon: 'i-lucide-milestone', title: 'The day’s schedule', text: 'Ceremony, reception, dinner and dancing, each with its time.' },
-        { icon: 'i-lucide-map-pin', title: 'Venue and map', text: 'The address with directions one tap away.' },
-        { icon: 'i-lucide-list-checks', title: 'RSVP', text: 'Guests confirm with their name, phone and party size; replies land in your inbox.' },
+        { icon: 'i-lucide-map-pin', title: 'Venue, map and calendar', text: 'Directions in one tap, and a button to save the date to their calendar.' },
+        { icon: 'i-lucide-list-checks', title: 'RSVP', text: 'Guests answer coming or not, with party size; your inbox counts who’s coming.' },
         { icon: 'i-lucide-qr-code', title: 'Gift QR code', text: 'A VietQR bank-transfer code for wedding gifts from guests far away.' },
       ],
       templatesTitle: 'Wedding templates',
@@ -396,10 +396,10 @@ export const USE_CASES: UseCase[] = [
       featuresText: 'Một trang trả lời khi nào, ở đâu, đi thế nào, để điện thoại của bạn được nghỉ.',
       features: [
         { icon: 'i-lucide-mail-open', title: 'Thư mời', text: 'Phong bì đóng dấu sáp theo màu cưới, khách chạm để mở.' },
-        { icon: 'i-lucide-timer', title: 'Đếm ngược ngày cưới', text: 'Ngày, giờ, phút đến hôn lễ.' },
+        { icon: 'i-lucide-user-round-check', title: 'Ghi đúng tên từng khách', text: 'Gửi mỗi khách một link riêng, phong bì ghi đúng tên người đó. Nhạc nền phát khi khách mở thiệp.' },
         { icon: 'i-lucide-milestone', title: 'Lịch trình', text: 'Lễ gia tiên, đón khách, tiệc cưới, giao lưu, mỗi mục một giờ.' },
-        { icon: 'i-lucide-map-pin', title: 'Địa điểm và bản đồ', text: 'Địa chỉ nhà hàng, chỉ đường chỉ một chạm.' },
-        { icon: 'i-lucide-list-checks', title: 'Xác nhận tham dự', text: 'Khách gửi tên, số điện thoại, số người đi cùng; phản hồi về hộp thư của bạn.' },
+        { icon: 'i-lucide-map-pin', title: 'Địa điểm, bản đồ, lịch', text: 'Chỉ đường một chạm, và nút lưu ngày cưới vào lịch điện thoại.' },
+        { icon: 'i-lucide-list-checks', title: 'Xác nhận tham dự', text: 'Khách chọn đến hay không, kèm số người; hộp thư tự đếm số khách sẽ đến.' },
         { icon: 'i-lucide-qr-code', title: 'Mã QR mừng cưới', text: 'Mã VietQR để khách ở xa gửi quà mừng qua chuyển khoản.' },
       ],
       templatesTitle: 'Mẫu thiệp cưới',

@@ -434,6 +434,46 @@
       "blog-diary": {
         "name": "Nhật ký ảnh",
         "description": "Trầm và điện ảnh: ảnh đường phố và câu chuyện thành phố."
+      },
+      "love-valentine": {
+        "name": "Tỏ tình: Làm người yêu anh nhé?",
+        "description": "Hỏi một câu: nút “Không” chạy trốn, bấm “Có” là tim bay đầy trang. Kèm thư tình và ảnh hai bạn."
+      },
+      "love-anniversary": {
+        "name": "Kỷ niệm ngày cưới",
+        "description": "Tặng chồng hoặc vợ: số ngày đã cưới, những năm bên nhau, một lá thư và ảnh cưới."
+      },
+      "love-open-when": {
+        "name": "Thư “Mở khi…”",
+        "description": "Những lá thư niêm phong cho lúc bạn không ở bên: khi nhớ anh, khi không ngủ được, vào sinh nhật."
+      },
+      "love-long-distance": {
+        "name": "Yêu xa",
+        "description": "Đếm ngày gặp lại, những lần đã gặp nhau, một lá thư và ảnh chuyến đi gần nhất."
+      },
+      "love-sorry": {
+        "name": "Làm lành sau khi giận",
+        "description": "Thư xin lỗi, những lời hứa, kỷ niệm vui và câu hỏi “Tha thứ cho anh nhé?” có nút Không chạy trốn."
+      },
+      "invite-wedding-red": {
+        "name": "Thiệp cưới truyền thống",
+        "description": "Đỏ và vàng: thông tin hai gia đình, lễ vu quy, tiệc cưới, xác nhận tham dự và mã QR mừng cưới."
+      },
+      "invite-wedding-garden": {
+        "name": "Thiệp cưới sân vườn",
+        "description": "Nhẹ nhàng, hiện đại, tông xanh lá: lễ cưới, tiệc tối, câu chuyện, trang phục, xác nhận tham dự."
+      },
+      "invite-kids-birthday": {
+        "name": "Thiệp sinh nhật bé",
+        "description": "Thôi nôi hay sinh nhật bé: đếm ngược, chương trình, địa điểm, xác nhận tham dự và ảnh."
+      },
+      "invite-grand-opening": {
+        "name": "Thiệp mời khai trương",
+        "description": "Mời khách đến ngày khai trương: chương trình, ưu đãi, bản đồ chỉ đường và xác nhận tham dự."
+      },
+      "invite-year-end-party": {
+        "name": "Thiệp mời tất niên",
+        "description": "Tiệc tất niên, gala công ty: đếm ngược, chương trình, dress code, xác nhận tham dự và ảnh."
       }
     },
     "categories": {
@@ -481,7 +521,12 @@
       "order": "Đơn {code}",
       "payCod": "Thanh toán khi nhận hàng",
       "payTransfer": "Chuyển khoản (kiểm tra tài khoản ngân hàng)",
-      "requestsTab": "Yêu cầu & đơn hàng"
+      "requestsTab": "Yêu cầu & đơn hàng",
+      "rsvpYes": "Sẽ đến",
+      "rsvpNo": "Không đến",
+      "rsvpComing": "khách sẽ đến | khách sẽ đến",
+      "rsvpPeople": "người tổng cộng | người tổng cộng",
+      "rsvpNotComing": "không đến được | không đến được"
     },
     "qr": {
       "open": "Mã QR",

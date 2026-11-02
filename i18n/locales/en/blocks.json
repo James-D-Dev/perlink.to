@@ -273,6 +273,14 @@
         "letter": {
           "label": "Letter",
           "description": "A love letter or invitation in an envelope visitors tap to open."
+        },
+        "event": {
+          "label": "Event details",
+          "description": "Date, time and place, with Add to calendar and Directions buttons."
+        },
+        "question": {
+          "label": "Question",
+          "description": "“Will you be my Valentine?” The No button runs away; Yes sets off hearts."
         }
       },
       "searchPlaceholder": "Paste a link or search blocks…",
@@ -312,7 +320,8 @@
       "kind": "Type",
       "kinds": {
         "booking": "Booking",
-        "contact": "Contact"
+        "contact": "Contact",
+        "rsvp": "Invitation reply (RSVP)"
       },
       "fieldsLabel": "Fields",
       "fieldsHelp": "Name is always asked.",
@@ -435,7 +444,51 @@
         "night": "Night"
       },
       "sealed": "In an envelope",
-      "sealedHint": "Visitors tap the envelope to open the letter."
+      "sealedHint": "Visitors tap the envelope to open the letter.",
+      "personal": "Guest name from the link",
+      "personalHint": "Send each guest their own link and the envelope greets them by name.",
+      "guestPlaceholder": "Guest’s name",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "cover": "On the envelope",
+      "coverHelp": "Leave empty to show “For …”.",
+      "coverPlaceholder": "Open when you miss me"
+    },
+    "event": {
+      "title": "Event details",
+      "name": "What’s happening",
+      "namePlaceholder": "Wedding reception",
+      "date": "Date",
+      "startTime": "Starts",
+      "endTime": "Ends",
+      "venue": "Venue",
+      "venuePlaceholder": "Rose Garden Hotel",
+      "address": "Address",
+      "addressHelp": "Used for directions when there’s no map link.",
+      "addressPlaceholder": "8 Lake Road, District 1",
+      "mapUrl": "Map link (optional)",
+      "dressCode": "Dress code",
+      "dressCodePlaceholder": "Pastel colours",
+      "note": "Note",
+      "notePlaceholder": "Parking in the basement",
+      "calendarNote": "Guests can save it to Google Calendar, Apple Calendar or Outlook, and open directions in one tap."
+    },
+    "question": {
+      "title": "Question",
+      "question": "Question",
+      "questionPlaceholder": "Will you be my Valentine?",
+      "yesLabel": "Yes button",
+      "yesPlaceholder": "Yes",
+      "noLabel": "No button",
+      "noPlaceholder": "No",
+      "answer": "After “yes”",
+      "answerPlaceholder": "I knew it! See you at 7 ❤️",
+      "playful": "The No button runs away",
+      "playfulHint": "It slips away from the finger and Yes grows each time.",
+      "idea1": "Will you be my Valentine?",
+      "idea2": "Will you marry me?",
+      "idea3": "Forgive me?",
+      "idea4": "Dinner with me this Saturday?"
     }
   }
 }

@@ -25,9 +25,10 @@ export function contactMapHref(data: { mapUrl?: string; address?: string }) {
   return ''
 }
 
-export const FORM_PRESETS: Record<'booking' | 'contact', FormFields> = {
+export const FORM_PRESETS: Record<'booking' | 'contact' | 'rsvp', FormFields> = {
   booking: { phone: true, email: false, date: true, time: true, guests: true, message: true },
   contact: { phone: true, email: true, date: false, time: false, guests: false, message: true },
+  rsvp: { phone: true, email: false, date: false, time: false, guests: true, message: true },
 }
 
 /** Starting data for a freshly added block */
@@ -43,6 +44,8 @@ export function emptyBlockData(name: BlockName): BioBlock['data'] {
     case 'testimonials': return { items: [] }
     case 'timeline': return { items: [] }
     case 'letter': return { body: '', sealed: true, paper: 'cream' }
+    case 'event': return { date: '' }
+    case 'question': return { question: '', playful: true }
     case 'products': return { layout: 'grid', items: [], ordering: true, askAddress: true, payment: 'both' }
     default: return {} as BioBlock['data']
   }

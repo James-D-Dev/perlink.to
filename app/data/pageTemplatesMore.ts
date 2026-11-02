@@ -232,6 +232,357 @@ const GIFT_TEMPLATES: PageTemplate[] = [
   },
 ]
 
+// ─── Love pages ───────────────────────────────────────────────────────────
+// Pages that open in 2D, with music from the first tap and the 3D room one
+// tap away
+
+const RSVP_FIELDS = { phone: true, email: false, date: false, time: false, guests: true, message: true }
+
+const LOVE_TEMPLATES: PageTemplate[] = [
+  {
+    id: 'love-valentine',
+    name: 'Will you be my Valentine?',
+    category: 'gifts',
+    description: 'Ask the question: the “no” button runs away, “yes” fills the page with hearts. With a love letter and your photos.',
+    icon: 'i-lucide-heart',
+    preview: { bg: '#FFE3EC', accent: '#E63962' },
+    build: () => ({
+      title: s('Hey Lan, a question for you…', 'Lan ơi, anh hỏi cái này…'),
+      bio: s('Read to the end. No pressure (there’s only one right answer).', 'Đọc đến cuối nha. Không ép đâu (chỉ có một đáp án đúng thôi).'),
+      avatarUrl: photo('val-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#FFE3EC', text: '#5A1430', accent: '#E63962', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 26, shadow: 'md',
+          nameFont: 'Pacifico, cursive', nameWeight: '400', nameSize: '2rem', headingFont: 'Pacifico, cursive', bodyFont: 'Quicksand, sans-serif',
+          header: 'banner-circle', banner: photo('val-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
+        }),
+        background: { type: 'effect', effectId: 'rose', color: '#FFE3EC' },
+        music: { trackId: 'cozy-love-lofi' },
+        roomButton: true,
+      },
+      blocks: withIndex([
+        { name: 'question', data: { question: s('Will you be my Valentine?', 'Làm người yêu anh nhé?'), yesLabel: s('Yes! 💘', 'Đồng ý! 💘'), noLabel: s('No', 'Không'), answer: s('I knew it! Saturday, 7 pm. I’ll pick you up 🌹', 'Biết ngay mà! Tối thứ Bảy, 7 giờ anh qua đón nhé 🌹'), playful: true } },
+        { name: 'letter', data: { to: s('Lan', 'Lan'), body: s('I’ve wanted to ask you this since the day we got lost looking for that tiny café.\nYou make ordinary days feel like something I want to remember. So I made you a page, because a text message felt too small.', 'Anh muốn hỏi em câu này từ hôm hai đứa lạc đường đi tìm quán cà phê bé xíu đó.\nỞ cạnh em, ngày bình thường cũng thành ngày đáng nhớ. Nên anh làm cho em một trang web, vì tin nhắn thì nhỏ quá.'), from: s('Yours, Minh', 'Minh của em'), sealed: true, paper: 'blush' } },
+        { name: 'image-album', data: { title: s('Us, so far', 'Tụi mình đến giờ'), images: album('val-1', 'val-2', 'val-3', 'love-6'), layout: 'grid' } },
+        { name: 'links', data: { title: s('Our playlist', 'Playlist của tụi mình'), items: links([s('Songs that remind me of you 🎧', 'Những bài làm anh nhớ em 🎧'), 'https://open.spotify.com']) } },
+      ] as Blocks),
+      room: giftRoom('#ffe3ec', '#e8c4a0', '#e63962', s('Be mine?', 'Yêu anh nhé?'), ['val-avatar', 'val-1', 'val-3'], 'night', 'cozy-love-lofi'),
+    }),
+  },
+  {
+    id: 'love-anniversary',
+    name: 'Wedding anniversary',
+    category: 'gifts',
+    description: 'For your husband or wife: the years you’ve been married, a timeline of your years together, a letter and your wedding photos.',
+    icon: 'i-lucide-gem',
+    preview: { bg: '#15120F', accent: '#D8B98A' },
+    build: () => ({
+      title: s('Five years, my love', 'Năm năm rồi, mình nhỉ'),
+      bio: s('Happy anniversary. I’d marry you all over again.', 'Chúc mừng kỷ niệm ngày cưới. Nếu được chọn lại, em vẫn chọn anh.'),
+      avatarUrl: photo('photo-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#15120F', text: '#F3E9DA', accent: '#D8B98A', onAccent: '#15120F', surface: '#1F1A15', border: '#3A3026', radius: 16, shadow: 'none',
+          nameFont: 'Great Vibes, cursive', nameWeight: '400', nameSize: '2.8rem', headingFont: 'Cormorant Garamond, serif', bodyFont: 'Lora, serif',
+          header: 'image-overlay', banner: photo('photo-3'), link: 'centered', social: 'outline', gap: 'relaxed',
+        }),
+        music: { trackId: 'romantic-piano' },
+        roomButton: true,
+      },
+      blocks: withIndex([
+        { name: 'birthday-countdown', data: { birthDate: '2021-11-20', theme: 'card', showAge: false, label: s('Married for', 'Mình đã cưới nhau được'), mode: 'since' } },
+        { name: 'letter', data: { to: s('my husband', 'chồng yêu'), body: s('Five years ago you promised to make me laugh every day. You kept your word, even on the hard days.\nThank you for the coffee in bed, for holding my hand at every check-up, for being the calm in our house.\nHere’s to the next fifty.', 'Năm năm trước anh hứa ngày nào cũng làm em cười. Anh giữ lời, kể cả những ngày khó khăn nhất.\nCảm ơn anh vì ly cà phê mỗi sáng, vì luôn nắm tay em mỗi lần đi khám, vì là sự bình yên của nhà mình.\nCòn năm mươi năm nữa nhé.'), from: s('Always yours, Hà', 'Mãi là của anh, Hà'), sealed: true, paper: 'night' } },
+        { name: 'timeline', data: { title: s('Our five years', 'Năm năm của tụi mình'), items: [
+          { id: nanoid(6), date: '2021', title: s('The wedding', 'Ngày cưới'), text: s('It rained in the morning and cleared up just in time.', 'Sáng mưa, rồi tạnh vừa kịp giờ làm lễ.'), imageUrl: photo('photo-avatar') },
+          { id: nanoid(6), date: '2022', title: s('Our first home', 'Căn nhà đầu tiên'), text: s('Two chairs, one table and a lot of plans.', 'Hai cái ghế, một cái bàn và thật nhiều dự định.') },
+          { id: nanoid(6), date: '2023', title: s('The trip by the sea', 'Chuyến đi biển'), text: s('Where we said we’d come back every year.', 'Nơi mình hẹn năm nào cũng quay lại.'), imageUrl: photo('photo-1') },
+          { id: nanoid(6), date: '2025', title: s('Our little one', 'Thiên thần nhỏ'), text: s('And suddenly our house got louder and happier.', 'Và nhà mình bỗng ồn ào và vui hơn hẳn.') },
+          { id: nanoid(6), date: '2026', title: s('Five years', 'Năm năm'), text: s('Still choosing you, every morning.', 'Sáng nào em cũng vẫn chọn anh.') },
+        ] } },
+        { name: 'image-album', data: { title: s('From our wedding album', 'Từ album cưới'), images: album('photo-2', 'photo-cover', 'event-1', 'photo-4'), layout: 'grid' } },
+      ] as Blocks),
+      room: giftRoom('#2a221b', '#6b4f3a', '#d8b98a', s('5 years', '5 năm'), ['photo-avatar', 'photo-2', 'photo-1'], 'night', 'romantic-piano'),
+    }),
+  },
+  {
+    id: 'love-open-when',
+    name: '“Open when…” letters',
+    category: 'gifts',
+    description: 'A stack of sealed letters for the moments you can’t be there: open when you miss me, when you can’t sleep, on your birthday.',
+    icon: 'i-lucide-mails',
+    preview: { bg: '#F4EDE1', accent: '#B5523B' },
+    build: () => ({
+      title: s('Letters for you, Mai', 'Thư cho em, Mai'),
+      bio: s('One for each moment. Open only when it’s time (I’ll know if you cheat).', 'Mỗi lá cho một khoảnh khắc. Đến lúc mới được mở nha (mở trước là anh biết đó).'),
+      avatarUrl: photo('letters-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#F4EDE1', text: '#3B2F2A', accent: '#B5523B', onAccent: '#FFFFFF', surface: '#FFFDF8', border: '#E6D9C3', radius: 14, shadow: 'sm',
+          nameFont: 'Dancing Script, cursive', nameWeight: '700', nameSize: '2.4rem', headingFont: 'Dancing Script, cursive', bodyFont: 'Lora, serif',
+          header: 'banner-circle', banner: photo('letters-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
+        }),
+        background: { type: 'solid', color: '#F4EDE1', pattern: { id: 'lines', color: '#B5523B' } },
+        music: { trackId: 'love-acoustic' },
+      },
+      blocks: withIndex([
+        { name: 'letter', data: { cover: s('Open when you miss me', 'Mở khi em nhớ anh'), to: s('Mai', 'Mai'), body: s('Close your eyes and count to ten. That’s about how long it takes me to think of you again.\nCall me. Whatever time it is, I’ll pick up.', 'Nhắm mắt lại, đếm đến mười. Chừng đó là đủ để anh lại nghĩ về em rồi.\nGọi anh đi. Mấy giờ anh cũng nghe máy.'), from: s('Minh', 'Minh'), sealed: true, paper: 'cream' } },
+        { name: 'letter', data: { cover: s('Open when you can’t sleep', 'Mở khi em không ngủ được'), to: s('Mai', 'Mai'), body: s('Put on the playlist below, drink some warm milk, and remember: tomorrow is a new page.\nYou did enough today. Rest.', 'Mở playlist bên dưới, uống ly sữa ấm, và nhớ rằng ngày mai là một trang mới.\nHôm nay em đã cố gắng đủ rồi. Ngủ ngon nha.'), from: s('Minh', 'Minh'), sealed: true, paper: 'night' } },
+        { name: 'letter', data: { cover: s('Open when we’ve had a fight', 'Mở khi mình giận nhau'), to: s('Mai', 'Mai'), body: s('I’m probably being stubborn right now. I’m sorry.\nWhatever it was, it’s smaller than us. Come here.', 'Chắc giờ anh đang cứng đầu lắm. Anh xin lỗi.\nChuyện gì thì cũng nhỏ hơn tụi mình. Lại đây nào.'), from: s('Minh', 'Minh'), sealed: true, paper: 'blush' } },
+        { name: 'letter', data: { cover: s('Open on your birthday', 'Mở vào sinh nhật em'), to: s('Mai', 'Mai'), body: s('Happy birthday to my favourite person.\nCheck the drawer under your desk. 🎁', 'Chúc mừng sinh nhật người anh thương nhất.\nMở ngăn kéo dưới bàn làm việc ra xem nhé. 🎁'), from: s('Minh', 'Minh'), sealed: true, paper: 'cream' } },
+        { name: 'links', data: { title: s('For sleepless nights', 'Cho những đêm khó ngủ'), items: links([s('Our sleepy playlist 🌙', 'Playlist ru ngủ 🌙'), 'https://open.spotify.com']) } },
+      ] as Blocks),
+      room: giftRoom('#f4ede1', '#c9a27e', '#b5523b', s('Open when…', 'Mở khi…'), ['letters-avatar', 'letters-1', 'love-1'], 'day', 'love-acoustic'),
+    }),
+  },
+  {
+    id: 'love-long-distance',
+    name: 'Long-distance love',
+    category: 'gifts',
+    description: 'For a love far away: the days until you meet again, the times you’ve met, a letter and the photos from your last trip.',
+    icon: 'i-lucide-plane',
+    preview: { bg: '#0F1433', accent: '#B9A7FF' },
+    build: () => ({
+      title: s('Hanoi ✈ Saigon', 'Hà Nội ✈ Sài Gòn'),
+      bio: s('1,137 km apart, and still the closest person to me.', 'Cách nhau 1.137 km, mà vẫn là người gần anh nhất.'),
+      avatarUrl: photo('ld-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#0F1433', text: '#ECE8FF', accent: '#B9A7FF', onAccent: '#15183A', surface: '#1A2050', radius: 20, shadow: 'glow',
+          nameFont: 'Dancing Script, cursive', nameWeight: '700', nameSize: '2.4rem', headingFont: 'Quicksand, sans-serif', bodyFont: 'Quicksand, sans-serif',
+          header: 'banner-circle', banner: photo('ld-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
+        }),
+        background: { type: 'effect', effectId: 'snow', color: '#0F1433' },
+        music: { trackId: 'romantic-date' },
+        roomButton: true,
+      },
+      blocks: withIndex([
+        { name: 'birthday-countdown', data: { birthDate: '2026-12-24', theme: 'card', showAge: false, label: s('Until I see you again', 'Còn bao lâu nữa mình gặp nhau'), mode: 'until', repeat: false } },
+        { name: 'letter', data: { to: s('my faraway girl', 'cô gái ở xa của anh'), body: s('Every night at ten, when we say goodnight on video, I count one day less.\nDistance is just a test, and we’re passing it. See you at the arrivals gate. I’ll be the one with the flowers.', 'Mỗi tối mười giờ, lúc mình chúc ngủ ngon qua video, anh lại gạch đi một ngày.\nKhoảng cách chỉ là bài kiểm tra, và tụi mình đang qua bài rất tốt. Hẹn em ở cổng đến. Người cầm hoa là anh đó.'), from: s('Your Huy', 'Huy của em'), sealed: true, paper: 'night' } },
+        { name: 'timeline', data: { title: s('Every time we met', 'Những lần mình gặp nhau'), items: [
+          { id: nanoid(6), date: s('March', 'Tháng 3'), title: s('The first flight', 'Chuyến bay đầu tiên'), text: s('Three days in Hanoi, and I missed my flight home on purpose.', 'Ba ngày ở Hà Nội, và anh cố tình lỡ chuyến bay về.'), imageUrl: photo('ld-2') },
+          { id: nanoid(6), date: s('June', 'Tháng 6'), title: s('Summer in Saigon', 'Mùa hè Sài Gòn'), text: s('Rain every afternoon, and we didn’t mind.', 'Chiều nào cũng mưa, mà hai đứa chẳng ai phàn nàn.') },
+          { id: nanoid(6), date: s('September', 'Tháng 9'), title: s('Halfway, in Da Nang', 'Gặp nhau ở Đà Nẵng'), text: s('We met in the middle, by the sea.', 'Mỗi người đi một nửa đường, gặp nhau bên biển.'), imageUrl: photo('ld-1') },
+          { id: nanoid(6), date: s('Christmas', 'Giáng sinh'), title: s('Next stop: you', 'Điểm đến tiếp theo: em'), text: s('Ticket booked. ✈', 'Vé đã đặt rồi. ✈') },
+        ] } },
+        { name: 'image-album', data: { title: s('Our last trip', 'Chuyến đi gần nhất'), images: album('love-2', 'love-7', 'love-4', 'love-cover'), layout: 'grid' } },
+      ] as Blocks),
+      room: giftRoom('#1a2050', '#3b3f6b', '#b9a7ff', s('See you soon', 'Sắp gặp rồi'), ['ld-avatar', 'ld-2', 'ld-1'], 'night', 'romantic-date'),
+    }),
+  },
+  {
+    id: 'love-sorry',
+    name: 'Make up after a fight',
+    category: 'gifts',
+    description: 'Say sorry properly: an apology letter, your promises, the good times and a “forgive me?” question with a runaway “no”.',
+    icon: 'i-lucide-heart-handshake',
+    preview: { bg: '#FFF1E6', accent: '#FF7A59' },
+    build: () => ({
+      title: s('I’m sorry, Vy 🥺', 'Anh xin lỗi, Vy 🥺'),
+      bio: s('I was wrong. Here’s my whole apology, with pictures.', 'Anh sai rồi. Đây là lời xin lỗi đầy đủ, có cả hình minh hoạ.'),
+      avatarUrl: photo('sorry-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#FFF1E6', text: '#4A2A22', accent: '#FF7A59', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 24, shadow: 'md',
+          nameFont: 'Pacifico, cursive', nameWeight: '400', nameSize: '2rem', headingFont: 'Quicksand, sans-serif', bodyFont: 'Quicksand, sans-serif',
+          header: 'banner-circle', banner: photo('sorry-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
+        }),
+        background: { type: 'gradient', color: '#FFF1E6', gradient: { style: 'mesh', from: '#FFD6C9', via: '#FFF1E6', to: '#FFE0EC' } },
+        music: { trackId: 'cozy-love-lofi' },
+      },
+      blocks: withIndex([
+        { name: 'letter', data: { to: s('Vy', 'Vy'), body: s('I shouldn’t have raised my voice, and I shouldn’t have gone quiet after.\nYou were right to be upset. I’m not making excuses, I’m making it right.', 'Anh không nên lớn tiếng, càng không nên im lặng sau đó.\nEm giận là đúng. Anh không biện minh đâu, anh sẽ sửa.'), from: s('Your (very sorry) Khoa', 'Khoa (biết lỗi rồi) của em'), sealed: true, paper: 'blush' } },
+        { name: 'timeline', data: { title: s('What I promise', 'Anh hứa'), items: [
+          { id: nanoid(6), date: '01', title: s('Listen first', 'Nghe em nói hết'), text: s('Before I answer, and without checking my phone.', 'Trước khi trả lời, và không cầm điện thoại.') },
+          { id: nanoid(6), date: '02', title: s('Never go to sleep angry', 'Không giận qua đêm'), text: s('We talk it out, even if it takes a while.', 'Nói chuyện cho xong, lâu mấy cũng được.') },
+          { id: nanoid(6), date: '03', title: s('Milk tea, every Friday', 'Trà sữa mỗi thứ Sáu'), text: s('Full sugar, extra pearls. As long as you like.', 'Đủ đường, thêm trân châu. Đến khi nào em chán thì thôi.') },
+        ] } },
+        { name: 'image-album', data: { title: s('Remember how happy we are?', 'Nhớ tụi mình vui thế này không?'), images: album('sorry-1', 'val-2', 'love-6', 'sorry-2'), layout: 'grid' } },
+        { name: 'question', data: { question: s('Forgive me?', 'Tha thứ cho anh nhé?'), yesLabel: s('Okay, fine 🙂', 'Thôi được rồi 🙂'), noLabel: s('No', 'Không'), answer: s('Thank you! Milk tea is on its way 🧋', 'Cảm ơn em! Trà sữa đang trên đường tới 🧋'), playful: true } },
+      ] as Blocks),
+      room: giftRoom('#fff1e6', '#e8c4a0', '#ff7a59', s('Sorry!', 'Xin lỗi!'), ['sorry-avatar', 'sorry-1', 'val-2'], 'day', 'cozy-love-lofi'),
+    }),
+  },
+]
+
+// ─── Invitations ──────────────────────────────────────────────────────────
+
+const INVITE_TEMPLATES: PageTemplate[] = [
+  {
+    id: 'invite-wedding-red',
+    name: 'Traditional wedding invitation',
+    category: 'events',
+    description: 'A Vietnamese wedding invitation in red and gold: both families, the engagement and the wedding party, RSVP and a QR for wedding gifts.',
+    icon: 'i-lucide-heart',
+    preview: { bg: '#7E1016', accent: '#E9C46A' },
+    build: () => ({
+      title: s('Thu Trang ❤ Đức Anh', 'Thu Trang ❤ Đức Anh'),
+      bio: s('Together with our families, we invite you to our wedding.', 'Trân trọng kính mời bạn đến dự lễ thành hôn của chúng mình.'),
+      avatarUrl: photo('vn-wedding-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#7E1016', text: '#FCEBD0', accent: '#E9C46A', onAccent: '#5E0B10', surface: '#8E1A20', border: '#C9A04E', radius: 14, shadow: 'none',
+          nameFont: 'Great Vibes, cursive', nameWeight: '400', nameSize: '2.6rem', headingFont: 'Playfair Display, serif', bodyFont: 'Lora, serif',
+          header: 'banner-circle', banner: photo('vn-wedding-cover'), link: 'centered', social: 'outline', gap: 'relaxed',
+        }),
+        background: { type: 'gradient', color: '#7E1016', gradient: { angle: 180, from: '#8E1B1F', to: '#5E0B10' } },
+        music: { trackId: 'romantic-piano' },
+      },
+      blocks: withIndex([
+        { name: 'letter', data: { to: s('our dear guest', 'quý khách'), body: s('Our families are delighted to announce the marriage of our children, Thu Trang and Đức Anh.\nWe would be honoured to have you with us to share this happy day.', 'Hai gia đình chúng tôi trân trọng báo tin vui lễ thành hôn của con chúng tôi: Thu Trang và Đức Anh.\nSự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.'), from: s('Thu Trang & Đức Anh', 'Thu Trang & Đức Anh'), sealed: true, paper: 'cream', personal: true } },
+        { name: 'text', data: { title: s('Our families', 'Hai gia đình'), content: s('The bride’s family\nMr Nguyễn Văn Hùng · Mrs Trần Thị Lan\nHanoi\n\nThe groom’s family\nMr Lê Minh Tuấn · Mrs Phạm Thu Hà\nNam Định', 'Nhà gái\nÔng Nguyễn Văn Hùng · Bà Trần Thị Lan\nHà Nội\n\nNhà trai\nÔng Lê Minh Tuấn · Bà Phạm Thu Hà\nNam Định'), align: 'center', style: 'card' } },
+        { name: 'birthday-countdown', data: { birthDate: '2026-12-20', theme: 'card', showAge: false, label: s('Our wedding day in', 'Còn bao lâu đến ngày vui'), mode: 'until', repeat: false } },
+        { name: 'event', data: { name: s('Engagement ceremony', 'Lễ Vu Quy'), date: '2026-12-20', startTime: '08:00', venue: s('The bride’s home', 'Tư gia nhà gái'), address: s('25 Hang Bac Street, Hoan Kiem, Hanoi', '25 Hàng Bạc, Hoàn Kiếm, Hà Nội') } },
+        { name: 'event', data: { name: s('Wedding party', 'Tiệc cưới'), date: '2026-12-20', startTime: '11:00', endTime: '14:00', venue: s('Golden Lotus Restaurant, Hall A', 'Nhà hàng Sen Vàng, sảnh A'), address: s('88 Tran Hung Dao, Hoan Kiem, Hanoi', '88 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội'), note: s('Guests are welcomed from 10:30.', 'Đón khách từ 10 giờ 30.') } },
+        { name: 'image-album', data: { title: s('Our wedding photos', 'Album ảnh cưới'), images: album('vn-wedding-1', 'vn-wedding-2', 'vn-wedding-3', 'vn-wedding-4'), layout: 'grid' } },
+        { name: 'form', data: { title: s('Will you join us?', 'Bạn sẽ đến chung vui chứ?'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('Send my reply', 'Gửi xác nhận') } },
+        { name: 'vietqr', data: {} },
+      ] as Blocks),
+      room: giftRoom('#8e1b1f', '#6b3a1f', '#e9c46a', s('Happy wedding', 'Song hỷ'), ['vn-wedding-avatar', 'vn-wedding-1', 'vn-wedding-2'], 'day', 'romantic-piano'),
+    }),
+  },
+  {
+    id: 'invite-wedding-garden',
+    name: 'Garden wedding invitation',
+    category: 'events',
+    description: 'A light, modern wedding invitation in sage green: ceremony and reception, your story, dress code, RSVP and photos.',
+    icon: 'i-lucide-flower-2',
+    preview: { bg: '#EEF1EA', accent: '#5F7F63' },
+    build: () => ({
+      title: s('Chloe & Daniel', 'Chloe & Daniel'),
+      bio: s('Saturday, 9 January 2027 · The Olive Garden, Da Lat', 'Thứ Bảy, 09.01.2027 · Vườn Ô Liu, Đà Lạt'),
+      avatarUrl: photo('garden-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#EEF1EA', text: '#2E3A2F', accent: '#5F7F63', onAccent: '#FFFFFF', surface: '#FFFFFF', border: '#D9E0D3', radius: 4, shadow: 'none',
+          nameFont: 'Birthstone, cursive', nameWeight: '400', nameSize: '3rem', headingFont: 'Cormorant Garamond, serif', bodyFont: 'Josefin Sans, sans-serif',
+          header: 'cover', banner: photo('garden-cover'), link: 'centered', social: 'outline', gap: 'relaxed',
+        }),
+        music: { trackId: 'love-acoustic' },
+      },
+      blocks: withIndex([
+        { name: 'text', data: { title: s('You’re invited', 'Trân trọng kính mời'), content: s('We’re getting married under the olive trees, and we’d love you to be there. Expect flowers, a long table, good wine and dancing until late.', 'Chúng mình sẽ cưới dưới hàng cây ô liu, và rất mong có bạn ở đó. Sẽ có hoa, một bàn tiệc dài, rượu ngon và nhảy đến khuya.'), align: 'center', style: 'plain' } },
+        { name: 'event', data: { name: s('Ceremony', 'Lễ cưới'), date: '2027-01-09', startTime: '16:00', endTime: '17:00', venue: s('The Olive Garden', 'Vườn Ô Liu'), address: s('12 Hoa Hong Street, Ward 4, Da Lat', '12 Hoa Hồng, Phường 4, Đà Lạt'), dressCode: s('Garden formal, soft colours', 'Lịch sự, tông màu nhẹ') } },
+        { name: 'event', data: { name: s('Dinner & dancing', 'Tiệc tối & khiêu vũ'), date: '2027-01-09', startTime: '18:00', endTime: '22:30', venue: s('The Glasshouse', 'Nhà kính'), address: s('12 Hoa Hong Street, Ward 4, Da Lat', '12 Hoa Hồng, Phường 4, Đà Lạt'), note: s('Da Lat gets cold at night: bring a jacket.', 'Đà Lạt về đêm khá lạnh, bạn mang theo áo khoác nhé.') } },
+        { name: 'timeline', data: { title: s('How we got here', 'Hành trình của chúng mình'), items: [
+          { id: nanoid(6), date: '2019', title: s('A rainy bookshop', 'Hiệu sách ngày mưa'), text: s('Same book, same shelf, same moment.', 'Cùng một cuốn sách, cùng một kệ, cùng một lúc.') },
+          { id: nanoid(6), date: '2023', title: s('Moving in', 'Về chung nhà'), text: s('Two cats, three plants, one tiny flat.', 'Hai con mèo, ba chậu cây, một căn hộ bé xíu.') },
+          { id: nanoid(6), date: '2026', title: s('The question', 'Lời cầu hôn'), text: s('Under the same olive tree we’re getting married beneath.', 'Dưới chính cây ô liu nơi chúng mình sẽ làm lễ.'), imageUrl: photo('garden-2') },
+        ] } },
+        { name: 'image-album', data: { title: s('Photos', 'Ảnh của chúng mình'), images: album('garden-1', 'garden-3', 'photo-2', 'florist-1'), layout: 'masonry' } },
+        { name: 'form', data: { title: s('Kindly reply by 15 December', 'Vui lòng xác nhận trước 15/12'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('Send reply', 'Gửi phản hồi') } },
+        { name: 'vietqr', data: {} },
+      ] as Blocks),
+      room: giftRoom('#eef1ea', '#c8b48f', '#5f7f63', s('Chloe + Daniel', 'Chloe + Daniel'), ['garden-avatar', 'garden-1', 'garden-2'], 'day', 'love-acoustic'),
+    }),
+  },
+  {
+    id: 'invite-kids-birthday',
+    name: 'Kid’s birthday invitation',
+    category: 'events',
+    description: 'A bright invitation to a first birthday or a kid’s party: countdown, the party plan, the place, RSVP and photos.',
+    icon: 'i-lucide-cake',
+    preview: { bg: '#FFF6D8', accent: '#3FA7D6' },
+    build: () => ({
+      title: s('Bông is turning one! 🎈', 'Bé Bông tròn 1 tuổi! 🎈'),
+      bio: s('Come and celebrate with cake, balloons and lots of giggles.', 'Mời cô chú, anh chị đến chung vui cùng bé: bánh kem, bóng bay và thật nhiều tiếng cười.'),
+      avatarUrl: photo('kids-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#FFF6D8', text: '#3A3A52', accent: '#3FA7D6', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 28, shadow: 'md',
+          nameFont: 'Pacifico, cursive', nameWeight: '400', nameSize: '2.1rem', headingFont: 'Comfortaa, sans-serif', bodyFont: 'Quicksand, sans-serif',
+          header: 'banner-circle', banner: photo('kids-cover'), link: 'centered', social: 'filled', gap: 'normal',
+        }),
+        background: { type: 'solid', color: '#FFF6D8', pattern: { id: 'dots', color: '#F4A259' } },
+        music: { trackId: 'happy-birthday' },
+      },
+      blocks: withIndex([
+        { name: 'birthday-countdown', data: { birthDate: '2026-12-06', theme: 'party', showAge: false, label: s('Party starts in', 'Còn bao lâu đến tiệc'), mode: 'until', repeat: false } },
+        { name: 'event', data: { name: s('Bông’s first birthday', 'Sinh nhật đầu tiên của Bông'), date: '2026-12-06', startTime: '10:00', endTime: '13:00', venue: s('Sunny Kids Café', 'Sunny Kids Café'), address: s('45 Nguyen Van Huong, Thao Dien, Thu Duc', '45 Nguyễn Văn Hưởng, Thảo Điền, Thủ Đức'), note: s('There’s a play area, so bring socks for the little ones.', 'Có khu vui chơi, các bé nhớ mang tất nhé.') } },
+        { name: 'timeline', data: { title: s('The plan', 'Chương trình'), items: [
+          { id: nanoid(6), date: '10:00', title: s('Welcome & games', 'Đón khách & trò chơi') },
+          { id: nanoid(6), date: '10:45', title: s('The first-birthday pick', 'Bé bốc thôi nôi'), text: s('Will it be the pen, the book or the stethoscope?', 'Bé sẽ chọn bút, sách hay ống nghe?') },
+          { id: nanoid(6), date: '11:15', title: s('Cake & candles', 'Cắt bánh & thổi nến') },
+          { id: nanoid(6), date: '11:30', title: s('Lunch', 'Ăn trưa') },
+        ] } },
+        { name: 'image-album', data: { title: s('One year of Bông', 'Một năm của Bông'), images: album('kids-1', 'kids-2', 'kids-avatar', 'kids-cover'), layout: 'grid' } },
+        { name: 'form', data: { title: s('Will you come?', 'Gia đình bạn sẽ đến chứ?'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('We’ll be there', 'Gửi xác nhận') } },
+      ] as Blocks),
+      room: giftRoom('#fff6d8', '#e8c4a0', '#3fa7d6', s('Happy 1st!', 'Mừng 1 tuổi!'), ['kids-avatar', 'kids-1', 'kids-2'], 'day', 'happy-birthday'),
+    }),
+  },
+  {
+    id: 'invite-grand-opening',
+    name: 'Grand opening invitation',
+    category: 'events',
+    description: 'Invite customers and partners to your opening: the day’s programme, opening offers, map and directions, RSVP.',
+    icon: 'i-lucide-store',
+    preview: { bg: '#121212', accent: '#D4AF37' },
+    build: () => ({
+      title: s('Mộc Coffee · Grand opening', 'Mộc Coffee · Khai trương'),
+      bio: s('Our doors open on Saturday 28 November. Come for the first cup on us.', 'Thứ Bảy 28/11, Mộc chính thức mở cửa. Ghé uống ly đầu tiên, Mộc mời.'),
+      avatarUrl: photo('cafe-avatar'),
+      themeConfig: {
+        ...look({
+          bg: '#121212', text: '#F5EFE6', accent: '#D4AF37', onAccent: '#121212', surface: '#1C1C1C', border: '#3A3220', radius: 6, shadow: 'none',
+          nameFont: 'Playfair Display, serif', nameWeight: '600', nameSize: '2rem', tracking: '0.02em', headingFont: 'Playfair Display, serif', bodyFont: 'Be Vietnam Pro, sans-serif',
+          header: 'image-overlay', banner: photo('opening-cover'), link: 'centered', social: 'outline', gap: 'normal',
+        }),
+        music: { trackId: 'party-celebration' },
+      },
+      blocks: withIndex([
+        { name: 'event', data: { name: s('Grand opening', 'Lễ khai trương'), date: '2026-11-28', startTime: '08:00', endTime: '21:00', venue: 'Mộc Coffee', address: s('120 Le Loi, Ben Thanh, District 1, HCMC', '120 Lê Lợi, Bến Thành, Quận 1, TP.HCM'), note: s('Ribbon cutting at 8:30 with a lion dance.', 'Cắt băng lúc 8 giờ 30, có múa lân.') } },
+        { name: 'text', data: { title: s('Opening offers', 'Ưu đãi khai trương'), content: s('☕ Your first drink is free, all day\n🎁 30% off every drink until 5 December\n🍪 A tote bag for the first 100 guests', '☕ Ly đầu tiên miễn phí, cả ngày\n🎁 Giảm 30% mọi đồ uống đến hết 5/12\n🍪 Tặng túi vải cho 100 khách đầu tiên'), align: 'center', style: 'card' } },
+        { name: 'timeline', data: { title: s('Programme', 'Chương trình'), items: [
+          { id: nanoid(6), date: '08:00', title: s('Doors open', 'Mở cửa đón khách') },
+          { id: nanoid(6), date: '08:30', title: s('Ribbon cutting & lion dance', 'Cắt băng khánh thành & múa lân'), imageUrl: photo('opening-1') },
+          { id: nanoid(6), date: '15:00', title: s('Latte art show', 'Biểu diễn latte art') },
+          { id: nanoid(6), date: '19:00', title: s('Acoustic night', 'Đêm nhạc acoustic') },
+        ] } },
+        { name: 'image-album', data: { title: s('A first look', 'Không gian quán'), images: album('cafe-1', 'cafe-2', 'cafe-3', 'cafe-4'), layout: 'grid' } },
+        { name: 'form', data: { title: s('Let us know you’re coming', 'Báo trước để Mộc giữ chỗ'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('I’ll come', 'Tôi sẽ đến') } },
+        { name: 'contact', data: { title: s('Find us', 'Đường đến quán'), address: s('120 Le Loi, Ben Thanh, District 1, HCMC', '120 Lê Lợi, Bến Thành, Quận 1, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
+      ] as Blocks),
+      room: loungeRoom('#1c1c1c', '#5b4636', '#d4af37', s('Grand opening', 'Khai trương')),
+    }),
+  },
+  {
+    id: 'invite-year-end-party',
+    name: 'Year-end party invitation',
+    category: 'events',
+    description: 'A company year-end party or gala: countdown, the evening’s programme, dress code, RSVP and last year’s photos.',
+    icon: 'i-lucide-sparkles',
+    preview: { bg: '#0B1026', accent: '#E8C26A' },
+    build: () => ({
+      title: s('Year-end Gala 2026', 'Tiệc Tất Niên 2026'),
+      bio: s('Thank you for an amazing year. Let’s celebrate it together.', 'Cảm ơn một năm tuyệt vời. Cùng nhau ăn mừng nhé!'),
+      avatarUrl: photo('gala-2'),
+      themeConfig: {
+        ...look({
+          bg: '#0B1026', text: '#F2EEE3', accent: '#E8C26A', onAccent: '#0B1026', surface: '#141B3D', border: '#2B3366', radius: 12, shadow: 'glow',
+          nameFont: 'Playfair Display, serif', nameWeight: '700', nameSize: '2.2rem', headingFont: 'Playfair Display, serif', bodyFont: 'Be Vietnam Pro, sans-serif',
+          header: 'image-overlay', banner: photo('gala-cover'), link: 'centered', social: 'outline', gap: 'normal',
+        }),
+        background: { type: 'effect', effectId: 'snow', color: '#0B1026' },
+        music: { trackId: 'party-celebration' },
+      },
+      blocks: withIndex([
+        { name: 'birthday-countdown', data: { birthDate: '2027-01-22', theme: 'card', showAge: false, label: s('The party starts in', 'Còn bao lâu đến tiệc'), mode: 'until', repeat: false } },
+        { name: 'event', data: { name: s('Year-end Gala', 'Tiệc Tất Niên'), date: '2027-01-22', startTime: '18:00', endTime: '22:00', venue: s('Riverside Palace, Grand Ballroom', 'Riverside Palace, sảnh Grand'), address: s('360D Ben Van Don, District 4, HCMC', '360D Bến Vân Đồn, Quận 4, TP.HCM'), dressCode: s('Black & gold', 'Đen & vàng ánh kim') } },
+        { name: 'timeline', data: { title: s('Tonight', 'Chương trình'), items: [
+          { id: nanoid(6), date: '18:00', title: s('Check-in & photo wall', 'Check-in & chụp ảnh') },
+          { id: nanoid(6), date: '18:45', title: s('Opening speech', 'Phát biểu khai mạc') },
+          { id: nanoid(6), date: '19:15', title: s('Dinner & team awards', 'Tiệc tối & vinh danh tập thể') },
+          { id: nanoid(6), date: '20:30', title: s('Lucky draw', 'Bốc thăm may mắn'), text: s('First prize: a trip for two to Phu Quoc.', 'Giải nhất: chuyến du lịch Phú Quốc cho hai người.') },
+          { id: nanoid(6), date: '21:00', title: s('Music & dancing', 'Văn nghệ & giao lưu') },
+        ] } },
+        { name: 'form', data: { title: s('Please reply by 15 January', 'Vui lòng xác nhận trước 15/01'), kind: 'rsvp', fields: { ...RSVP_FIELDS, guests: false }, submitLabel: s('Send reply', 'Gửi xác nhận') } },
+        { name: 'image-album', data: { title: s('Last year’s party', 'Tất niên năm ngoái'), images: album('gala-1', 'gala-3', 'gala-2', 'bar-1'), layout: 'grid' } },
+      ] as Blocks),
+      room: loungeRoom('#141b3d', '#3a2f24', '#e8c26a', s('Cheers to 2026', 'Mừng năm 2026')),
+    }),
+  },
+]
+
 // ─── Personal blog ───────────────────────────────────────────────
 const BLOG_TEMPLATE: PageTemplate = {
   id: 'blog',
@@ -566,6 +917,8 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
 
 export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
   ...GIFT_TEMPLATES,
+  ...LOVE_TEMPLATES,
+  ...INVITE_TEMPLATES,
   BLOG_TEMPLATE,
   ...BLOGGER_TEMPLATES,
   // ─── Beauty ───────────────────────────────────────────────────
