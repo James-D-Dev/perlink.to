@@ -1,7 +1,12 @@
 <template>
   <!-- The greeting on a small moving scene for the time of day: a sunrise,
        the afternoon sun, a sunset over the sea, or the moon and stars -->
-  <section class="greeting relative isolate overflow-hidden rounded-3xl" :class="`greeting--${part}`">
+  <!-- Full width, starting under the frosted bar so the sky shows through
+       it; the words line up with the page below -->
+  <section
+    class="greeting relative isolate -mx-4 -mt-[calc(var(--ui-header-height)+1rem)] shrink-0 overflow-hidden rounded-b-3xl sm:-mx-6 sm:-mt-[calc(var(--ui-header-height)+1.5rem)]"
+    :class="`greeting--${part}`"
+  >
     <!-- The art keeps its shape at the right; bands and stars run past the
          left edge of the view box to fill wide banners -->
     <svg
@@ -91,7 +96,7 @@
       </g>
     </svg>
 
-    <div class="px-5 py-6 sm:px-7 sm:py-8">
+    <div class="mx-auto w-full px-4 pb-7 pt-[calc(var(--ui-header-height)+1.5rem)] sm:px-6 sm:pb-9 sm:pt-[calc(var(--ui-header-height)+2rem)]" :class="width">
       <!-- The greeting, then the name on a line of its own; each stays on one
            line, a long name ends in an ellipsis -->
       <h1 class="relative max-w-[72%] text-2xl font-semibold leading-tight tracking-tight sm:text-[28px]" :style="{ color: INK[part] }">
@@ -113,6 +118,8 @@ const props = defineProps<{
   /** The owner's name, on its own line */
   name?: string
   subtitle?: string
+  /** The page's content width, so the words line up with it */
+  width?: string
   /** The scene; the owner's time of day by default */
   part?: DayPart
 }>()
