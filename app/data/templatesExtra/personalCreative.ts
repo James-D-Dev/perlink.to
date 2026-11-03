@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import type { MenuSection } from '~/types/bio'
 import type { PageTemplate } from '../pageTemplates'
-import { SAMPLE_PHONE, album, links, look, menu, photo, social, withIndex } from '../templateKit'
+import { SAMPLE_PHONE, album, links, look, menu, noteCopy, photo, social, withIndex } from '../templateKit'
 import { type Blocks, booking, hours, loungeRoom, nightRoom, reviews, shopRoom, studioRoom } from '../pageTemplatesMore'
 
 // Personal pages, creatives and beauty. Sample text in English with its
@@ -11,6 +11,7 @@ import { type Blocks, booking, hours, loungeRoom, nightRoom, reviews, shopRoom, 
 export const PERSONAL_CREATIVE_VI: Record<string, string> = {}
 function s(en: string, vi: string) {
   PERSONAL_CREATIVE_VI[en] = vi
+  noteCopy(en, vi)
   return en
 }
 

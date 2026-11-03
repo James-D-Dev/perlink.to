@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     if (bioPages.length) {
       try {
         const rows = await getDB(event)
-          .prepare(`SELECT bio_page_id AS id, COUNT(*) AS n FROM form_submissions WHERE read_at IS NULL AND bio_page_id IN (${bioPages.map(() => '?').join(',')}) GROUP BY bio_page_id`)
+          .prepare(`SELECT bio_page_id AS id, COUNT(*) AS n FROM form_submissions WHERE read_at IS NULL AND COALESCE(json_extract(data, '$.kind'), '') != 'subscribe' AND bio_page_id IN (${bioPages.map(() => '?').join(',')}) GROUP BY bio_page_id`)
           .bind(...bioPages.map(p => p.id))
           .all<{ id: string; n: number }>()
         for (const row of rows.results ?? []) unread[row.id] = row.n

@@ -82,6 +82,28 @@ export function look(l: Look): ThemeConfig {
   }
 }
 
+// The Vietnamese of the template being built. Each template carries its own
+// wording, so two templates can say the same English differently (and a
+// shared table never overrides a template's choice)
+let buildingCopy: Record<string, string> | null = null
+
+/** Called by each template file's s(en, vi) */
+export function noteCopy(en: string, vi: string) {
+  if (buildingCopy) buildingCopy[en] = vi
+}
+
+/** Runs a template's build and hands back its content with its own Vietnamese */
+export function withOwnCopy<T extends object>(build: () => T): T & { copy: Record<string, string> } {
+  const outer = buildingCopy
+  buildingCopy = {}
+  try {
+    const content = build()
+    return { ...content, copy: buildingCopy }
+  } finally {
+    buildingCopy = outer
+  }
+}
+
 // Sample photos from Pexels (free to use, no attribution required)
 // WebP, sized for phones (covers 1000 px, avatars 400 px); the original JPEGs
 // stay for sites made before
@@ -104,10 +126,11 @@ export function withIndex(blocks: Omit<BioBlock, 'index' | 'hidden'>[]): BioBloc
   return blocks.map((b, index) => ({ ...b, id: nanoid(8), index, hidden: false }) as BioBlock)
 }
 
-export function menu(sections: { name: string; items: [string, string, string?, string?][] }[]): MenuSection[] {
+export function menu(sections: { name: string; priceSuffix?: string; items: [string, string, string?, string?][] }[]): MenuSection[] {
   return sections.map(s => ({
     id: nanoid(6),
     name: s.name,
+    ...(s.priceSuffix ? { priceSuffix: s.priceSuffix } : {}),
     items: s.items.map(([name, price, description, tag]) => ({ id: nanoid(6), name, price, description, tag })),
   }))
 }

@@ -138,7 +138,12 @@ export default defineNuxtConfig({
   routeRules: {
     // "/" is rendered per request: on a site's own domain it shows that site
     "/vi": { prerender: true },
-    "/dashboard/site/**": { ssr: false },
+    // The dashboard is drawn in the browser only (a page's `ssr: false` in
+    // definePageMeta does nothing): it shows the owner's clock, time zone and
+    // saved choices, which the server can't know, and a class drawn from the
+    // server's UTC hour isn't corrected when the page comes alive
+    "/dashboard": { ssr: false },
+    "/dashboard/**": { ssr: false },
     // Sites used to live under /dashboard/bio
     "/dashboard/bio": { redirect: { to: "/dashboard/site", statusCode: 301 } },
     "/dashboard/bio/**": { redirect: { to: "/dashboard/site/**", statusCode: 301 } },

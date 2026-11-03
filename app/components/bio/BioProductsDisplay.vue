@@ -38,8 +38,9 @@
               <span v-else class="truncate">{{ option.values.map(v => v.label).join(' · ') }}</span>
             </template>
           </div>
-          <p v-if="item.price" class="mt-auto flex flex-wrap items-baseline gap-x-1.5 pt-1 tabular-nums">
-            <span class="font-bold">{{ formatVnd(item.price) }}</span>
+          <!-- One price, or "From …" when choices cost different amounts -->
+          <p v-if="shownPrice(item).amount" class="mt-auto flex flex-wrap items-baseline gap-x-1.5 pt-1 tabular-nums">
+            <span class="font-bold">{{ shownPrice(item).from ? t('priceFrom', { price: formatVnd(shownPrice(item).amount) }) : formatVnd(shownPrice(item).amount) }}</span>
             <span v-if="discount(item)" class="text-xs line-through opacity-50">{{ formatVnd(item.comparePrice!) }}</span>
           </p>
 
@@ -77,6 +78,7 @@
 <script setup lang="ts">
 import type { ProductItem, ProductsBlock } from '~/types/bio'
 import { formatVnd } from '#shared/plans'
+import { hasOptionPrices, priceRange } from '#shared/productPrice'
 
 const props = defineProps<{
   data: ProductsBlock['data']
@@ -99,8 +101,18 @@ const items = computed(() => (props.data.items || []).filter(i => i.name))
 const isSoldOut = (item: ProductItem) => !!item.soldOut || item.stock === 0
 const fewLeft = (item: ProductItem) => !isSoldOut(item) && typeof item.stock === 'number' && item.stock > 0 && item.stock <= 5
 
-const discount = (item: ProductItem) =>
-  item.price && item.comparePrice && item.comparePrice > item.price ? Math.round((1 - item.price / item.comparePrice) * 100) : 0
+// Choices with their own prices: the lowest, with "From" when they differ
+function shownPrice(item: ProductItem) {
+  if (!hasOptionPrices(item)) return { amount: item.price || 0, from: false }
+  const { min, max } = priceRange(item)
+  return { amount: min, from: max > min }
+}
+
+// The discount is against the lowest price the buyer can pay
+const discount = (item: ProductItem) => {
+  const price = shownPrice(item).amount
+  return price && item.comparePrice && item.comparePrice > price ? Math.round((1 - price / item.comparePrice) * 100) : 0
+}
 
 function onStoreClick(event: MouseEvent) {
   if (props.preview) {

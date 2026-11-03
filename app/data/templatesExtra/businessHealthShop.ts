@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import type { ProductItem, ProductOption } from '~/types/bio'
 import type { PageTemplate } from '../pageTemplates'
-import { SAMPLE_ADDRESS, SAMPLE_PHONE, album, look, menu, photo, social, withIndex } from '../templateKit'
+import { SAMPLE_ADDRESS, SAMPLE_PHONE, album, look, menu, noteCopy, photo, social, withIndex } from '../templateKit'
 import { type Blocks, booking, hours, loungeRoom, reviews, shopRoom, studioRoom } from '../pageTemplatesMore'
 
 // Businesses, health and shops. Sample text in English with its Vietnamese next to it:
@@ -10,6 +10,7 @@ import { type Blocks, booking, hours, loungeRoom, reviews, shopRoom, studioRoom 
 export const BUSINESS_HEALTH_SHOP_VI: Record<string, string> = {}
 function s(en: string, vi: string) {
   BUSINESS_HEALTH_SHOP_VI[en] = vi
+  noteCopy(en, vi)
   return en
 }
 

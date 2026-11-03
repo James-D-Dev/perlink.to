@@ -139,15 +139,16 @@ const VI: Record<string, string> = {
 // Freelancer prices in dollars, in đồng for Vietnamese users
 const VND_PRICES: Record<string, string> = { '250': '2,500,000', '600': '6,000,000', '450': '4,500,000' }
 
-function translate<T>(value: T): T {
+function translate<T>(value: T, own: Record<string, string> = {}): T {
   if (typeof value === 'string') {
-    return (VI[value] ?? MORE_VI[value] ?? PERSONAL_CREATIVE_VI[value] ?? PLACES_LEARNING_VI[value] ?? BUSINESS_HEALTH_SHOP_VI[value] ?? value) as T
+    // The template's own wording first, then the shared tables
+    return (own[value] ?? VI[value] ?? MORE_VI[value] ?? PERSONAL_CREATIVE_VI[value] ?? PLACES_LEARNING_VI[value] ?? BUSINESS_HEALTH_SHOP_VI[value] ?? value) as T
   }
-  if (Array.isArray(value)) return value.map(translate) as T
+  if (Array.isArray(value)) return value.map(item => translate(item, own)) as T
   if (value && typeof value === 'object') {
     return Object.fromEntries(Object.entries(value).map(([key, inner]) =>
       // ids and links stay as they are
-      [key, key === 'id' || key === 'url' || key === 'imageUrl' ? inner : translate(inner)],
+      [key, key === 'id' || key === 'url' || key === 'imageUrl' ? inner : translate(inner, own)],
     )) as T
   }
   return value
@@ -156,8 +157,9 @@ function translate<T>(value: T): T {
 /** Template content for a language; English is returned unchanged */
 export function localizeTemplateContent(content: PageTemplateContent, lang: string): PageTemplateContent {
   if (lang !== 'vi') return content
+  const own = content.copy ?? {}
   const blocks = (content.blocks.map((block) => {
-    const data = translate(block.data) as any
+    const data = translate(block.data, own) as any
     if (block.name === 'menu' && data.currency === '$') {
       data.currency = '₫'
       for (const section of data.sections ?? []) {
@@ -168,8 +170,8 @@ export function localizeTemplateContent(content: PageTemplateContent, lang: stri
   })) as BioBlock[]
   return {
     ...content,
-    title: translate(content.title),
-    bio: translate(content.bio),
+    title: translate(content.title, own),
+    bio: translate(content.bio, own),
     blocks,
     themeConfig: { ...content.themeConfig, language: 'vi' },
   }

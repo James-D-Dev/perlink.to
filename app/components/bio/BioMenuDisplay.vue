@@ -10,7 +10,7 @@
       <!-- List: one card per section with rows -->
       <div v-if="data.layout !== 'cards'" class="divide-y divide-current/10 overflow-hidden px-4" :style="cardStyle">
         <div v-for="item in section.items" :key="item.id" class="flex gap-3 py-3.5" :class="item.soldOut && 'opacity-55'">
-          <button v-if="item.imageUrl" type="button" class="group relative size-16 shrink-0 overflow-hidden rounded-lg" :aria-label="`${t('viewPhoto')}: ${item.name}`" @click="viewing = item">
+          <button v-if="item.imageUrl" type="button" class="group relative size-16 shrink-0 overflow-hidden rounded-lg" :aria-label="`${t('viewPhoto')}: ${item.name}`" @click="viewing = { ...item, suffix: section.priceSuffix }">
             <img :src="item.imageUrl" :alt="item.name" class="size-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
           </button>
           <div class="min-w-0 flex-1">
@@ -19,7 +19,7 @@
               <span v-if="item.soldOut" class="shrink-0 rounded-full border border-current/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">{{ t('soldOut') }}</span>
               <span v-else-if="item.tag" class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" :style="tagStyle">{{ item.tag }}</span>
               <span class="flex-1 border-b border-dotted border-current/25" />
-              <p v-if="item.price" class="shrink-0 font-semibold tabular-nums" :class="item.soldOut && 'line-through'">{{ formatPrice(item.price) }}</p>
+              <p v-if="item.price" class="shrink-0 font-semibold tabular-nums" :class="item.soldOut && 'line-through'">{{ formatPrice(item.price, section.priceSuffix) }}</p>
             </div>
             <p v-if="item.description" class="mt-0.5 text-sm opacity-75">{{ item.description }}</p>
           </div>
@@ -29,7 +29,7 @@
       <!-- Cards: one card per item (e.g. hotel rooms) -->
       <div v-else class="grid grid-cols-1 gap-2.5 @md:grid-cols-2">
         <div v-for="item in section.items" :key="item.id" class="overflow-hidden" :class="item.soldOut && 'opacity-55'" :style="cardStyle">
-          <button v-if="item.imageUrl" type="button" class="group block w-full overflow-hidden" :aria-label="`${t('viewPhoto')}: ${item.name}`" @click="viewing = item">
+          <button v-if="item.imageUrl" type="button" class="group block w-full overflow-hidden" :aria-label="`${t('viewPhoto')}: ${item.name}`" @click="viewing = { ...item, suffix: section.priceSuffix }">
             <img :src="item.imageUrl" :alt="item.name" class="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy">
           </button>
           <div class="space-y-1 p-4">
@@ -39,7 +39,7 @@
               <span v-else-if="item.tag" class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" :style="tagStyle">{{ item.tag }}</span>
             </div>
             <p v-if="item.description" class="text-sm opacity-70">{{ item.description }}</p>
-            <p v-if="item.price" class="pt-1.5 font-semibold tabular-nums" :class="item.soldOut && 'line-through'">{{ formatPrice(item.price) }}</p>
+            <p v-if="item.price" class="pt-1.5 font-semibold tabular-nums" :class="item.soldOut && 'line-through'">{{ formatPrice(item.price, section.priceSuffix) }}</p>
           </div>
         </div>
       </div>
@@ -63,7 +63,7 @@
           <div class="mt-4 max-w-md text-center">
             <p class="text-lg font-semibold">{{ viewing.name }}</p>
             <p v-if="viewing.description" class="mt-1 text-sm text-white/70">{{ viewing.description }}</p>
-            <p v-if="viewing.price" class="mt-2 inline-block rounded-full bg-white/15 px-3 py-1 text-sm font-semibold tabular-nums">{{ formatPrice(viewing.price) }}</p>
+            <p v-if="viewing.price" class="mt-2 inline-block rounded-full bg-white/15 px-3 py-1 text-sm font-semibold tabular-nums">{{ formatPrice(viewing.price, viewing.suffix) }}</p>
           </div>
         </div>
       </Transition>
@@ -93,7 +93,7 @@ const tagStyle = computed(() => {
 })
 
 // The photo open full screen
-const viewing = ref<MenuItem | null>(null)
+const viewing = ref<(MenuItem & { suffix?: string }) | null>(null)
 function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') viewing.value = null
 }
@@ -110,8 +110,9 @@ const sections = computed(() =>
     .filter(s => s.items.length),
 )
 
-function formatPrice(price: string) {
-  return formatListPrice(price, props.data.currency, props.data.priceSuffix || '')
+// A section's own suffix ("/ month") wins over the list's
+function formatPrice(price: string, sectionSuffix?: string) {
+  return formatListPrice(price, props.data.currency, sectionSuffix?.trim() ? sectionSuffix : props.data.priceSuffix || '')
 }
 </script>
 

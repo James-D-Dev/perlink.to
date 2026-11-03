@@ -6,7 +6,7 @@ import { MORE_PAGE_TEMPLATES, MORE_VI, RSVP_FIELDS, reviews } from './pageTempla
 import { PERSONAL_CREATIVE_TEMPLATES } from './templatesExtra/personalCreative'
 import { PLACES_LEARNING_TEMPLATES } from './templatesExtra/placesLearning'
 import { BUSINESS_HEALTH_SHOP_TEMPLATES } from './templatesExtra/businessHealthShop'
-import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, photo, room, social, withIndex } from './templateKit'
+import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, noteCopy, photo, room, social, withIndex, withOwnCopy } from './templateKit'
 
 // Starter pages by industry. Applying a template fills the page with sample
 // content, a matching theme and a matching 3D room (used if 3D mode is on).
@@ -15,6 +15,7 @@ import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links,
 // files (the older strings are translated in templateCopyVi)
 function s(en: string, vi: string) {
   MORE_VI[en] = vi
+  noteCopy(en, vi)
   return en
 }
 
@@ -42,6 +43,8 @@ export interface PageTemplateContent {
   blocks: BioBlock[]
   themeConfig: ThemeConfig
   room: RoomConfig
+  /** The template's own Vietnamese for its sample text (from s(en, vi)) */
+  copy?: Record<string, string>
 }
 
 export type TemplateCategory = 'gifts' | 'blog' | 'personal' | 'food' | 'beauty' | 'health' | 'shop' | 'education' | 'hospitality' | 'business' | 'creative' | 'events' | 'community'
@@ -493,4 +496,5 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
   ...PERSONAL_CREATIVE_TEMPLATES,
   ...PLACES_LEARNING_TEMPLATES,
   ...BUSINESS_HEALTH_SHOP_TEMPLATES,
-]
+  // Each build carries the template's own Vietnamese
+].map(template => ({ ...template, build: () => withOwnCopy(template.build) }))

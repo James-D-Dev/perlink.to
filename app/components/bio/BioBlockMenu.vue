@@ -53,6 +53,13 @@
             class="flex-1"
             @update:model-value="updateSection(sIndex, { name: String($event) })"
           />
+          <UInput
+            :model-value="section.priceSuffix"
+            :placeholder="data.priceSuffix || t('blocks.menu.sectionSuffixPlaceholder')"
+            :aria-label="t('blocks.menu.sectionSuffix')"
+            class="w-28"
+            @update:model-value="updateSection(sIndex, { priceSuffix: String($event) })"
+          />
           <UButton variant="ghost" color="neutral" size="xs" icon="i-lucide-trash-2" @click="removeSection(sIndex)" />
         </div>
 

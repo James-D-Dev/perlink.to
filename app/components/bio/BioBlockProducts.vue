@@ -162,6 +162,37 @@
                   {{ value.label }}
                 </label>
               </div>
+              <!-- Prices per choice: e.g. a 20 cm cake costs more than a 16 cm one -->
+              <div v-if="option.values.length && (pricing.has(option.id) || option.values.some(v => v.price))" class="space-y-1.5 rounded-md bg-elevated/50 p-2 dark:bg-white/[0.03]">
+                <p class="text-xs font-medium text-highlighted">{{ t('blocks.products.choicePrice') }}</p>
+                <div v-for="(value, vi) in option.values" :key="value.id" class="flex items-center gap-2">
+                  <span class="w-24 shrink-0 truncate text-xs">{{ value.label }}</span>
+                  <UInput
+                    :model-value="value.price"
+                    type="number"
+                    min="0"
+                    step="1000"
+                    inputmode="numeric"
+                    size="sm"
+                    :placeholder="item.price ? String(item.price) : t('blocks.products.choicePricePlaceholder')"
+                    class="min-w-0 flex-1"
+                    @update:model-value="setValuePrice(index, oi, vi, $event)"
+                  >
+                    <template #trailing><span class="text-xs text-muted">đ</span></template>
+                  </UInput>
+                </div>
+                <p class="text-xs text-muted">{{ t('blocks.products.choicePriceHint') }}</p>
+              </div>
+              <UButton
+                v-else-if="option.values.length"
+                size="xs"
+                variant="link"
+                color="neutral"
+                icon="i-lucide-tag"
+                :label="t('blocks.products.choicePriceAdd')"
+                class="px-0"
+                @click="pricing.add(option.id)"
+              />
             </div>
 
             <div class="flex flex-wrap gap-1.5">
@@ -301,6 +332,16 @@ function setValues(index: number, oi: number, text: string) {
   const values = labels.map(label => option.values.find(v => v.label === label) ?? { id: nanoid(5), label, ...(swatches ? { color: '#d6d3d1' } : {}) })
   updateOption(index, oi, { values })
 }
+// Option groups showing their per-choice prices (also any that already have one)
+const pricing = reactive(new Set<string>())
+function setValuePrice(index: number, oi: number, vi: number, raw: unknown) {
+  const option = data.value.items[index]?.options?.[oi]
+  if (!option) return
+  const amount = Math.round(Number(raw))
+  const price = Number.isFinite(amount) && amount > 0 ? amount : undefined
+  updateOption(index, oi, { values: option.values.map((v, i) => (i === vi ? { ...v, price } : v)) })
+}
+
 function setColor(index: number, oi: number, vi: number, color: string) {
   const option = data.value.items[index]?.options?.[oi]
   if (!option) return

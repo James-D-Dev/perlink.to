@@ -7,6 +7,7 @@ import { notifyOwnerOfRequest } from '../../../utils/formNotification'
 import { notifyOwnerTelegram } from '../../../utils/telegram'
 import { generateVietQR, getBankByBIN } from '../../../utils/vietqr'
 import { formatVnd } from '#shared/plans'
+import { unitPrice } from '#shared/productPrice'
 
 // A visitor orders a product from a site's products block. The order lands
 // in the site's inbox; paying by transfer gets a VietQR for the site's own
@@ -50,12 +51,15 @@ export default defineEventHandler(async (event) => {
   if (stock !== undefined && body.quantity > stock) throw createError({ statusCode: 409, statusMessage: `Only ${stock} left` })
 
   // Every option group of the product needs one of its own values
+  const options = (Array.isArray(product.options) ? product.options : []) as { id: string; name: string; values?: { id: string; label: string; price?: number }[] }[]
   const picked: string[] = []
-  for (const option of (Array.isArray(product.options) ? product.options : []) as { id: string; name: string; values?: { id: string; label: string }[] }[]) {
+  const chosen: Record<string, string> = {}
+  for (const option of options) {
     if (!option?.values?.length) continue
     const value = option.values.find(v => v.id === body.options?.[option.id])
     if (!value) throw createError({ statusCode: 422, statusMessage: `Please choose ${String(option.name).toLowerCase()}` })
     picked.push(String(value.label))
+    chosen[option.id] = value.id
   }
 
   const payment = block.data.payment ?? 'both'
@@ -78,7 +82,9 @@ export default defineEventHandler(async (event) => {
     .first<{ n: number }>()
   if ((recent?.n ?? 0) >= MAX_PER_WINDOW) throw createError({ statusCode: 429, statusMessage: 'Too many orders, please try again later' })
 
-  const price = Number(product.price) || 0
+  // The page's own prices: a priced choice (e.g. a bigger size) replaces the
+  // product's price
+  const price = unitPrice({ price: product.price, options }, chosen)
   const total = price * body.quantity
   const code = 'DH' + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => CODE_ALPHABET[b % CODE_ALPHABET.length]).join('')
 

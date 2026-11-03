@@ -14,7 +14,7 @@
       <UFormField :label="t('blocks.form.kind')">
         <div class="flex flex-wrap gap-1">
           <UButton
-            v-for="kind in (['booking', 'stay', 'contact', 'rsvp'] as const)"
+            v-for="kind in (['booking', 'stay', 'contact', 'rsvp', 'subscribe'] as const)"
             :key="kind"
             size="sm"
             :color="data.kind === kind ? 'primary' : 'neutral'"
@@ -33,7 +33,13 @@
         <UInput :model-value="data.description" :placeholder="t('blocks.form.descriptionPlaceholder')" class="w-full" @update:model-value="update({ description: String($event) })" />
       </UFormField>
 
-      <UFormField :label="t('blocks.form.fieldsLabel')" :help="t('blocks.form.fieldsHelp')">
+      <!-- A newsletter has no fields to pick: just the email -->
+      <div v-if="data.kind === 'subscribe'" class="flex items-start gap-2 rounded-lg border border-default bg-default p-3 text-xs text-muted dark:border-white/10">
+        <UIcon name="i-lucide-mail-plus" class="mt-0.5 size-4 shrink-0" />
+        <span>{{ t('blocks.form.subscribeHint') }}</span>
+      </div>
+
+      <UFormField v-else :label="t('blocks.form.fieldsLabel')" :help="t('blocks.form.fieldsHelp')">
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
           <label
             v-for="field in FIELD_KEYS"
@@ -50,6 +56,16 @@
           <li v-if="fields.checkout" class="flex gap-1.5"><UIcon name="i-lucide-bed-double" class="mt-0.5 size-3.5 shrink-0" />{{ t('blocks.form.checkoutHint') }}</li>
           <li v-if="fields.time || fields.date" class="flex gap-1.5"><UIcon name="i-lucide-clock" class="mt-0.5 size-3.5 shrink-0" />{{ t('blocks.form.hoursHint') }}</li>
         </ul>
+      </UFormField>
+
+      <!-- The picker's own words: "Pick a package", "Which pet would you like to meet?" -->
+      <UFormField v-if="data.kind !== 'subscribe' && fields.service" :label="t('blocks.form.serviceLabel')" :help="t('blocks.form.serviceLabelHelp')">
+        <UInput
+          :model-value="data.serviceLabel"
+          :placeholder="data.kind === 'stay' ? t('blocks.form.serviceLabelStay') : t('blocks.form.serviceLabelPlaceholder')"
+          class="w-full"
+          @update:model-value="update({ serviceLabel: String($event) })"
+        />
       </UFormField>
 
       <div class="grid gap-3 sm:grid-cols-2">

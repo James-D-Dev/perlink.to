@@ -44,7 +44,9 @@ export function formatListPrice(price: string, currency?: string, suffix = '') {
   return `${before ? c : ''}${shown}${before ? '' : ` ${c}`}${suffix}`
 }
 
-export const FORM_PRESETS: Record<'booking' | 'contact' | 'rsvp' | 'stay', FormFields> = {
+export const FORM_PRESETS: Record<'booking' | 'contact' | 'rsvp' | 'stay' | 'subscribe', FormFields> = {
+  // A newsletter: just the email
+  subscribe: { phone: false, email: true, date: false, time: false, guests: false, message: false },
   booking: { phone: true, email: false, date: true, time: true, guests: true, message: true, service: true },
   contact: { phone: true, email: true, date: false, time: false, guests: false, message: true },
   rsvp: { phone: true, email: false, date: false, time: false, guests: true, message: true },

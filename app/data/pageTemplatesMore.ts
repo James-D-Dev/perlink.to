@@ -3,7 +3,7 @@ import type { BioBlock, MenuSection, ProductItem, ProductOption } from '~/types/
 import type { RoomConfig, RoomObject } from '~/types/room'
 import { DEFAULT_OPENING_DAYS } from '~/types/bio'
 import type { PageTemplate } from './pageTemplates'
-import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, photo, room, social, withIndex } from './templateKit'
+import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, noteCopy, photo, room, social, withIndex } from './templateKit'
 
 // More starter pages, for the kinds of small businesses and moments that use
 // a one-page site most in Vietnam. Sample text is written in English with its
@@ -13,6 +13,7 @@ import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links,
 export const MORE_VI: Record<string, string> = {}
 function s(en: string, vi: string) {
   MORE_VI[en] = vi
+  noteCopy(en, vi)
   return en
 }
 
@@ -616,7 +617,7 @@ const BLOG_TEMPLATE: PageTemplate = {
     blocks: withIndex([
       { name: 'text', data: { title: s('Hello, I\'m glad you\'re here', 'Chào bạn, rất vui vì bạn ghé'), content: s('I write about the books I read, the places I go and the small things that make a day good. New posts every week.', 'Mình viết về những cuốn sách đã đọc, những nơi đã đi và những điều nhỏ làm nên một ngày đẹp. Mỗi tuần một bài mới.'), align: 'center', style: 'plain' } },
       { name: 'blog', data: { title: s('Latest posts', 'Bài viết mới'), count: 5, samples: [{ title: s('The books that got me through this year', 'Những cuốn sách đưa mình qua năm nay'), coverUrl: photo('personal-work-1'), minutes: 6 }, { title: s('Notes from a slow week in Da Lat', 'Ghi chép một tuần chậm ở Đà Lạt'), coverUrl: photo('personal-work-2'), minutes: 5 }, { title: s('Why I started writing again', 'Vì sao mình bắt đầu viết lại'), coverUrl: photo('personal-work-3'), minutes: 4 }] } },
-      { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+      { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
       { name: 'social', data: { links: social('instagram', 'threads', 'facebook') } },
     ] as Blocks),
     room: room({ wallColor: '#efe6d8', floorColor: '#8a6a4a', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -664,7 +665,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         { name: 'blog', data: { title: s('Latest from the road', 'Mới nhất từ những chuyến đi'), count: 5, samples: [{ title: s('Three days around Lago di Braies on a budget', '3 ngày quanh hồ Braies với chi phí tiết kiệm'), coverUrl: photo('blog-travel-1'), minutes: 6 }, { title: s('Sunrise balloons over Cappadocia: what to know', 'Ngắm khinh khí cầu ở Cappadocia: cần biết gì'), coverUrl: photo('blog-travel-2'), minutes: 5 }, { title: s('Machu Picchu without the crowds', 'Machu Picchu vắng người: đi lúc nào?'), coverUrl: photo('blog-travel-3'), minutes: 7 }] } },
         { name: 'image-album', data: { title: s('Recent trips', 'Những chuyến đi gần đây'), images: album('nomad-3', 'tour-1', 'villa-4'), layout: 'carousel' } },
         { name: 'links', data: { items: links([s('My packing list', 'Danh sách đồ mang theo'), ''], [s('Work with me', 'Hợp tác cùng mình'), '']) } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'youtube', 'tiktok') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#e8f4fb', floorColor: '#b08968', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -701,7 +702,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         { name: 'blog', data: { title: s('New recipes', 'Công thức mới'), count: 5, samples: [{ title: s('Crispy banh xeo at home, step by step', 'Bánh xèo giòn tại nhà, từng bước một'), coverUrl: photo('street-2'), minutes: 8 }, { title: s('The croissant I baked 20 times', 'Chiếc croissant mình nướng 20 lần'), coverUrl: photo('bakery-1'), minutes: 6 }, { title: s('Saigon street snacks under 30k', 'Món ăn vặt Sài Gòn dưới 30 nghìn'), coverUrl: photo('street-1'), minutes: 4 }] } },
         { name: 'image-album', data: { title: s('From my kitchen', 'Từ căn bếp của Mia'), images: album('restaurant-cover', 'nutri-1', 'bakery-3', 'street-3'), layout: 'grid' } },
         { name: 'text', data: { title: s('Cook along', 'Nấu cùng Mia'), content: s('Every Sunday a new recipe, tested three times in my small kitchen. Ask me anything in the comments.', 'Mỗi Chủ nhật một công thức mới, đã thử ba lần trong căn bếp nhỏ. Có gì thắc mắc cứ hỏi Mia nhé.'), align: 'center', style: 'plain' } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'facebook') } },
       ] as Blocks),
       room: room({ wallColor: '#f6e7d8', floorColor: '#9c6644', floorMaterial: 'tile', trimColor: '#ffffff' }, [
@@ -736,7 +737,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
       blocks: withIndex([
         { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 5, samples: [{ title: s('Building a blog with Nuxt in a weekend', 'Dựng blog bằng Nuxt trong một cuối tuần'), coverUrl: photo('blog-tech-1'), minutes: 9 }, { title: s('My 2026 dev setup', 'Bộ đồ nghề lập trình 2026 của mình'), coverUrl: photo('blog-tech-2'), minutes: 5 }, { title: s('Prompting tips that actually save time', 'Mẹo dùng AI thật sự tiết kiệm thời gian'), coverUrl: photo('neon-1'), minutes: 6 }] } },
         { name: 'links', data: { items: links(['GitHub', 'https://github.com'], [s('My dev setup', 'Bộ đồ nghề của mình'), '']) } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'image-album', data: { title: s('Side projects', 'Dự án cá nhân'), images: album('neon-2', 'neon-3'), layout: 'grid' } },
         { name: 'social', data: { links: social('github', 'linkedin', 'youtube') } },
       ] as Blocks),
@@ -775,7 +776,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         { name: 'image-album', data: { images: album('edit-1', 'edit-3', 'boutique-2'), layout: 'carousel' } },
         { name: 'blog', data: { title: s('Journal', 'Nhật ký'), count: 5, samples: [{ title: s('10 pieces, 30 outfits: my capsule wardrobe', '10 món đồ, 30 bộ: tủ đồ tối giản của mình'), coverUrl: photo('blog-fashion-1'), minutes: 5 }, { title: s('A 5-minute morning skincare routine', 'Chăm da buổi sáng chỉ 5 phút'), coverUrl: photo('blog-fashion-3'), minutes: 4 }, { title: s('Wearing red, without overthinking it', 'Mặc đồ đỏ mà không ngại'), coverUrl: photo('blog-fashion-2'), minutes: 3 }] } },
         { name: 'links', data: { items: links([s('Collaborations', 'Hợp tác'), '']) } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'threads', 'shopee', 'tiktokshop') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#fde2ef', floorColor: '#f5e6ea', floorMaterial: 'carpet', trimColor: '#ffffff' }, [
@@ -811,7 +812,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         { name: 'text', data: { title: s('Breathe in', 'Hít một hơi thật sâu'), content: s('Short practices you can do before breakfast, and what I learned from ten years on the mat.', 'Những bài tập ngắn làm trước bữa sáng, và điều mình học được sau mười năm tập yoga.'), align: 'center', style: 'plain' } },
         { name: 'blog', data: { title: s('From the journal', 'Từ nhật ký'), count: 5, samples: [{ title: s('A 10-minute yoga flow for busy mornings', 'Bài yoga 10 phút cho buổi sáng bận rộn'), coverUrl: photo('blog-wellness-2'), minutes: 4 }, { title: s('Breathing to fall asleep faster', 'Hít thở để ngủ ngon hơn'), coverUrl: photo('blog-wellness-1'), minutes: 3 }, { title: s('What a month without sugar taught me', 'Một tháng không đường dạy mình điều gì'), coverUrl: photo('nutri-1'), minutes: 6 }] } },
         { name: 'image-album', data: { images: album('yoga-2', 'yoga-3'), layout: 'grid' } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'youtube', 'spotify') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#eef5e9', floorColor: '#c9b28f', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -847,7 +848,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         { name: 'blog', data: { title: s('Our latest stories', 'Chuyện nhà mới nhất'), count: 5, samples: [{ title: s('Surviving the 4-month sleep regression', 'Vượt qua giai đoạn khủng hoảng ngủ 4 tháng'), coverUrl: photo('blog-family-1'), minutes: 7 }, { title: s('First foods: our baby-led weaning week', 'Tuần đầu ăn dặm tự chỉ huy của bé'), coverUrl: photo('blog-family-2'), minutes: 5 }, { title: s('Packing for a trip with two kids', 'Đi du lịch cùng hai bé cần mang gì'), coverUrl: photo('kids-2'), minutes: 6 }] } },
         { name: 'image-album', data: { images: album('kinder-2', 'kids-1'), layout: 'grid' } },
         { name: 'links', data: { items: links([s('Baby gear I love', 'Đồ cho bé mình tin dùng'), ''], [s('Join our parents group', 'Tham gia nhóm bố mẹ'), '']) } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'shopee') } },
       ] as Blocks),
       room: room({ wallColor: '#fde7f1', floorColor: '#f1e4d3', floorMaterial: 'carpet', trimColor: '#ffffff' }, [
@@ -882,7 +883,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         { name: 'text', data: { title: s('Start here', 'Bắt đầu từ đây'), content: s('New to personal finance? Read these first: budgeting, an emergency fund and your first investment.', 'Mới tìm hiểu tài chính cá nhân? Đọc mấy bài này trước: lập ngân sách, quỹ dự phòng và khoản đầu tư đầu tiên.'), align: 'left', style: 'plain' } },
         { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 10, samples: [{ title: s('The 50/30/20 budget, done the simple way', 'Quy tắc ngân sách 50/30/20 làm cho đơn giản'), coverUrl: photo('blog-growth-1'), minutes: 6 }, { title: s('How much should your emergency fund be?', 'Quỹ dự phòng nên có bao nhiêu?'), coverUrl: photo('blog-growth-cover'), minutes: 5 }, { title: s('5 books that changed how I spend', '5 cuốn sách thay đổi cách mình tiêu tiền'), coverUrl: photo('cv-1'), minutes: 7 }] } },
         { name: 'links', data: { items: links([s('Free budget template', 'Mẫu ngân sách miễn phí'), ''], [s('Books I recommend', 'Sách nên đọc'), '']) } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('linkedin', 'facebook', 'youtube') } },
       ] as Blocks),
       room: room({ wallColor: '#ecefe6', floorColor: '#7c5c45', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -919,7 +920,7 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         { name: 'image-album', data: { images: album('street-cover', 'street-1', 'bar-2'), layout: 'grid' } },
         { name: 'blog', data: { title: s('Stories', 'Câu chuyện'), count: 5, samples: [{ title: s('A rainy night on Bui Vien, on film', 'Một đêm mưa ở Bùi Viện, chụp phim'), coverUrl: photo('blog-diary-2'), minutes: 4 }, { title: s("The motorbikes of Hanoi's Old Quarter", 'Những chiếc xe máy phố cổ Hà Nội'), coverUrl: photo('blog-diary-1'), minutes: 5 }, { title: s('Plastic stools and late-night conversations', 'Ghế nhựa và những câu chuyện đêm khuya'), coverUrl: photo('blog-diary-3'), minutes: 4 }] } },
         { name: 'links', data: { items: links([s('Prints for sale', 'Bán ảnh in'), ''], [s('Photo walks', 'Dạo phố chụp ảnh'), '']) } },
-        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'subscribe', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'threads') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#1c1917', floorColor: '#2a2420', floorMaterial: 'concrete', trimColor: '#44403c' }, [
@@ -1130,9 +1131,9 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       }),
       blocks: withIndex([
         { name: 'menu', data: { title: s('Membership', 'Gói tập'), currency: '₫', layout: 'cards', sections: withPhotos(menu([
-          { name: s('Monthly', 'Theo tháng'), items: [
-            [s('Basic', 'Cơ bản'), '450,000', s('Gym floor, 6am to 10pm · per month', 'Khu tập tự do, 6h đến 22h · mỗi tháng')],
-            [s('Plus', 'Nâng cao'), '750,000', s('Gym, group classes and sauna · per month', 'Gym, lớp nhóm và xông hơi · mỗi tháng'), s('Best value', 'Đáng tiền nhất')],
+          { name: s('Monthly', 'Theo tháng'), priceSuffix: s(' / month', ' / tháng'), items: [
+            [s('Basic', 'Cơ bản'), '450,000', s('Gym floor, 6am to 10pm', 'Khu tập tự do, 6h đến 22h')],
+            [s('Plus', 'Nâng cao'), '750,000', s('Gym, group classes and sauna', 'Gym, lớp nhóm và xông hơi'), s('Best value', 'Đáng tiền nhất')],
           ] },
           { name: s('Coaching', 'Huấn luyện'), items: [
             [s('Personal training · 12 sessions', 'PT 1 kèm 1 · 12 buổi'), '3,500,000', s('Body scan, meal guide and a coach in your pocket on Zalo', 'Đo InBody, hướng dẫn ăn uống và HLV theo sát qua Zalo'), s('Results', 'Có kết quả')],
@@ -1269,8 +1270,20 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
           ] },
         ]), 'bakery-1', 'bakery-2', 'bakery-3') } },
         { name: 'products', data: { title: s('Birthday cakes', 'Bánh sinh nhật'), layout: 'grid', ordering: true, askAddress: true, payment: 'cod', items: [
-          product(s('Fresh cream cake · 16 cm', 'Bánh kem tươi · 16 cm'), 350000, 'birthday-avatar', { description: s('Serves 6–8. Name and candles free.', 'Cho 6–8 người. Tặng viết tên và nến.'), tag: s('Order 2 days ahead', 'Đặt trước 2 ngày'), options: [opt(s('Flavour', 'Vị'), [s('Chocolate', 'Sô-cô-la'), '#5b3a29'], [s('Strawberry', 'Dâu tây'), '#f4a6b7'], [s('Matcha', 'Trà xanh'), '#9bb36b'])] }),
-          product(s('Party cake · 20 cm', 'Bánh tiệc · 20 cm'), 520000, 'party-avatar', { description: s('Serves 10–14, two layers.', 'Cho 10–14 người, hai tầng nhân.'), options: [opt(s('Flavour', 'Vị'), [s('Chocolate', 'Sô-cô-la'), '#5b3a29'], [s('Mango passion', 'Xoài chanh dây'), '#f6b545'])], stock: 3 }),
+          // One cake, priced by size: the card reads "From 350.000đ"
+          product(s('Fresh cream birthday cake', 'Bánh kem tươi sinh nhật'), 350000, 'birthday-avatar', {
+            description: s('Name and candles free. 16 cm serves 6–8, 20 cm 10–14, 24 cm 16–20.', 'Tặng viết tên và nến. 16 cm cho 6–8 người, 20 cm cho 10–14, 24 cm cho 16–20.'),
+            tag: s('Order 2 days ahead', 'Đặt trước 2 ngày'),
+            options: [
+              { id: nanoid(6), name: s('Cake size', 'Cỡ bánh'), values: [
+                { id: nanoid(6), label: '16 cm', price: 350000 },
+                { id: nanoid(6), label: '20 cm', price: 520000 },
+                { id: nanoid(6), label: '24 cm', price: 690000 },
+              ] },
+              opt(s('Flavour', 'Vị'), [s('Chocolate', 'Sô-cô-la'), '#5b3a29'], [s('Strawberry', 'Dâu tây'), '#f4a6b7'], [s('Matcha', 'Trà xanh'), '#9bb36b'], [s('Mango passion', 'Xoài chanh dây'), '#f6b545']),
+            ],
+          }),
+          product(s('Party box: cake, candles and hats', 'Combo tiệc: bánh, nến và mũ'), 650000, 'party-avatar', { description: s('A 20 cm cake, number candles, 10 party hats and a banner.', 'Bánh 20 cm, nến số, 10 mũ sinh nhật và dây chữ.'), options: [opt(s('Flavour', 'Vị'), [s('Chocolate', 'Sô-cô-la'), '#5b3a29'], [s('Mango passion', 'Xoài chanh dây'), '#f6b545'])], stock: 3 }),
         ] } },
         { name: 'form', data: { title: s('Design your own cake', 'Đặt bánh theo mẫu riêng'), description: s('Send the size, flavour and the words to write; attach a photo on Zalo.', 'Gửi cỡ bánh, vị và chữ cần viết, ảnh mẫu gửi qua Zalo nhé.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
         faq(s('Ordering cakes', 'Đặt bánh cần biết'), s('📅 Order 2 days ahead; same-day cakes only while they last.\n🚚 Delivery in the city 20,000–40,000, free over 500,000.\n❄️ Fresh cream cakes keep 2 days in the fridge.\n🕯️ Candles, a knife and a card come with every cake.', '📅 Đặt trước 2 ngày, bánh trong ngày tuỳ còn hàng.\n🚚 Giao nội thành 20.000–40.000, miễn phí đơn từ 500.000.\n❄️ Bánh kem tươi giữ được 2 ngày trong tủ lạnh.\n🕯️ Mỗi bánh kèm nến, dao cắt và thiệp.')),
@@ -1544,7 +1557,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       blocks: withIndex([
         { name: 'social', data: { links: social('spotify', 'youtube', 'instagram', 'tiktok') } },
         { name: 'video', data: { title: s('Latest set', 'Set nhạc mới nhất'), url: '' } },
-        { name: 'event', data: { name: s('Saturday night · Rooftop Club', 'Đêm thứ Bảy · Rooftop Club'), date: '2026-11-14', startTime: '22:00', endTime: '23:59', venue: 'Rooftop Club', address: s('76 Le Lai, District 1, HCMC', '76 Lê Lai, Quận 1, TP.HCM'), note: s('Guest list until 23:00, message me on Instagram.', 'Có guest list đến 23 giờ, nhắn mình qua Instagram.') } },
+        { name: 'event', data: { name: s('Saturday night · Rooftop Club', 'Đêm thứ Bảy · Rooftop Club'), date: '2026-11-14', startTime: '22:00', endTime: '03:00', venue: 'Rooftop Club', address: s('76 Le Lai, District 1, HCMC', '76 Lê Lai, Quận 1, TP.HCM'), note: s('Guest list until 23:00, message me on Instagram.', 'Có guest list đến 23 giờ, nhắn mình qua Instagram.') } },
         { name: 'event', data: { name: s('Beach Festival · sunset set', 'Lễ hội biển · set hoàng hôn'), date: '2026-11-20', startTime: '17:30', endTime: '19:00', venue: s('My Khe Beach', 'Bãi biển Mỹ Khê'), address: s('Vo Nguyen Giap, Son Tra, Da Nang', 'Võ Nguyên Giáp, Sơn Trà, Đà Nẵng') } },
         { name: 'image-album', data: { images: album('dj-1', 'dj-2', 'dj-3'), layout: 'grid' } },
         { name: 'menu', data: { title: s('Book a set', 'Gói biểu diễn'), currency: '₫', layout: 'list', sections: menu([

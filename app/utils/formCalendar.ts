@@ -18,7 +18,13 @@ export interface CalendarEntry {
 
 const compact = (value: string) => value.replace(/[-:]/g, '')
 
-function nextDay(date: string) {
+const toMinutes = (value: string) => {
+  const [h, m] = value.split(':').map(Number)
+  return (h ?? 0) * 60 + (m ?? 0)
+}
+const clock = (minutes: number) => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`
+
+export function nextDay(date: string) {
   const [y, m, d] = date.split('-').map(Number)
   const next = new Date(y!, m! - 1, d! + 1)
   return `${next.getFullYear()}${String(next.getMonth() + 1).padStart(2, '0')}${String(next.getDate()).padStart(2, '0')}`
@@ -29,8 +35,12 @@ function span(entry: CalendarEntry) {
     return { start: compact(entry.date), end: entry.endDate ? compact(entry.endDate) : nextDay(entry.date), allDay: true }
   }
   const [h, m] = entry.time.split(':').map(Number)
-  const end = entry.endTime || `${String(Math.min(23, (h ?? 0) + 1)).padStart(2, '0')}:${String(m ?? 0).padStart(2, '0')}`
-  return { start: `${compact(entry.date)}T${compact(entry.time)}00`, end: `${compact(entry.date)}T${compact(end)}00`, allDay: false }
+  // An hour when no end is given; an end at or before the start is the next day
+  const startMinutes = (h ?? 0) * 60 + (m ?? 0)
+  const endMinutes = entry.endTime ? toMinutes(entry.endTime) : startMinutes + 60
+  const overnight = endMinutes <= startMinutes || endMinutes >= 24 * 60
+  const end = entry.endTime || clock(endMinutes % (24 * 60))
+  return { start: `${compact(entry.date)}T${compact(entry.time)}00`, end: `${overnight ? nextDay(entry.date) : compact(entry.date)}T${compact(end)}00`, allDay: false }
 }
 
 export function googleCalendarUrl(entry: CalendarEntry) {

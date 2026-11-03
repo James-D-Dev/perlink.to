@@ -28,7 +28,7 @@
               <template v-if="!loading">{{ t('dashboard.inbox.unreadCount', { n: unread }, unread) }}</template>
             </p>
           </div>
-          <div v-if="view === 'requests' && submissions.length" class="inline-flex rounded-full bg-sand p-0.5">
+          <div v-if="view === 'requests' && requests.length" class="inline-flex rounded-full bg-sand p-0.5">
             <button
               v-for="option in filters"
               :key="option.value"
@@ -42,7 +42,7 @@
           </div>
         </div>
 
-        <!-- Requests and orders, or the 3D room's guestbook -->
+        <!-- Requests and orders, newsletter subscribers, or the 3D room's guestbook -->
         <div class="flex gap-1 border-b border-line">
           <button
             v-for="tab in views"
@@ -70,6 +70,34 @@
 
         <SiteGuestbook v-if="view === 'guestbook'" :username="username" />
 
+        <!-- Newsletter subscribers: emails to copy or download -->
+        <template v-else-if="view === 'subscribers'">
+          <div v-if="!subscribers.length" class="flex flex-col items-center rounded-3xl bg-sand px-6 py-14 text-center">
+            <span class="flex size-12 items-center justify-center rounded-full bg-paper ring-1 ring-line">
+              <UIcon name="i-lucide-mail-plus" class="size-5 text-ink-soft" />
+            </span>
+            <h3 class="mt-4 font-medium text-ink">{{ t('dashboard.inbox.subscribersEmptyTitle') }}</h3>
+            <p class="mt-1 max-w-sm text-sm text-ink-muted">{{ t('dashboard.inbox.subscribersEmptyText') }}</p>
+          </div>
+          <div v-else class="overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line p-4">
+              <p class="text-sm text-ink-muted">{{ t('dashboard.inbox.subscribersCount', { n: subscribers.length }, subscribers.length) }}</p>
+              <div class="flex flex-wrap gap-1.5">
+                <UButton size="xs" color="neutral" variant="outline" :icon="copiedAll ? 'i-lucide-check' : 'i-lucide-copy'" :label="copiedAll ? t('dashboard.inbox.copied') : t('dashboard.inbox.copyEmails')" @click="copyEmails" />
+                <UButton size="xs" icon="i-lucide-download" :label="t('dashboard.inbox.exportCsv')" @click="exportCsv" />
+              </div>
+            </div>
+            <ul class="divide-y divide-line">
+              <li v-for="item in subscribers" :key="item.id" class="flex items-center gap-3 px-4 py-2.5">
+                <UIcon name="i-lucide-mail" class="size-4 shrink-0 text-ink-muted" />
+                <a :href="`mailto:${item.data.email}`" class="min-w-0 flex-1 truncate text-sm text-ink hover:underline">{{ item.data.email }}</a>
+                <span class="shrink-0 text-xs text-ink-muted">{{ formatWhen(item.createdAt) }}</span>
+                <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-trash-2" :aria-label="t('common.delete')" @click="remove(item)" />
+              </li>
+            </ul>
+          </div>
+        </template>
+
         <div v-else-if="loading" class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
           <div v-for="i in 3" :key="i" class="space-y-2 p-4">
             <USkeleton class="h-4 w-40" />
@@ -78,7 +106,7 @@
         </div>
 
         <!-- Empty -->
-        <div v-else-if="!submissions.length" class="flex flex-col items-center rounded-3xl bg-sand px-6 py-14 text-center">
+        <div v-else-if="!requests.length" class="flex flex-col items-center rounded-3xl bg-sand px-6 py-14 text-center">
           <span class="flex size-12 items-center justify-center rounded-full bg-paper ring-1 ring-line">
             <UIcon name="i-lucide-inbox" class="size-5 text-ink-soft" />
           </span>
@@ -208,22 +236,54 @@ useSeoMeta({ title: () => `${t('dashboard.inbox.title')} Â· ${username.value} â€
 
 const loading = ref(true)
 const submissions = ref<Submission[]>([])
-const unread = computed(() => submissions.value.filter(s => !s.read).length)
+// Newsletter sign-ups live in their own tab; they aren't requests to answer
+const requests = computed(() => submissions.value.filter(s => s.data.kind !== 'subscribe'))
+const subscribers = computed(() => submissions.value.filter(s => s.data.kind === 'subscribe'))
+const unread = computed(() => requests.value.filter(s => !s.read).length)
 
 const filter = ref<'all' | 'unread'>('all')
 const filters = computed(() => [
   { value: 'all' as const, label: t('dashboard.inbox.all') },
   { value: 'unread' as const, label: t('dashboard.inbox.unread') },
 ])
-// #guestbook opens the guestbook tab (links from Telegram)
-const view = ref<'requests' | 'guestbook'>(route.hash === '#guestbook' ? 'guestbook' : 'requests')
+// #guestbook and #subscribers open those tabs (links from Telegram)
+type InboxView = 'requests' | 'subscribers' | 'guestbook'
+const view = ref<InboxView>(route.hash === '#guestbook' ? 'guestbook' : route.hash === '#subscribers' ? 'subscribers' : 'requests')
 const views = computed(() => [
   { value: 'requests' as const, label: t('dashboard.inbox.requestsTab'), icon: 'i-lucide-inbox' },
+  // Only once someone has subscribed (or the link asked for it)
+  ...(subscribers.value.length || view.value === 'subscribers'
+    ? [{ value: 'subscribers' as const, label: `${t('dashboard.inbox.subscribersTab')} (${subscribers.value.length})`, icon: 'i-lucide-mail-plus' }]
+    : []),
   { value: 'guestbook' as const, label: t('dashboard.guestbook.tab'), icon: 'i-lucide-book-heart' },
 ])
-function setView(value: 'requests' | 'guestbook') {
+function setView(value: InboxView) {
   view.value = value
-  history.replaceState(history.state, '', value === 'guestbook' ? '#guestbook' : location.pathname)
+  history.replaceState(history.state, '', value === 'requests' ? location.pathname : `#${value}`)
+}
+
+// ---------- Subscribers: copy or download ----------
+const copiedAll = ref(false)
+async function copyEmails() {
+  try {
+    await navigator.clipboard.writeText(subscribers.value.map(s => s.data.email).join('\n'))
+    copiedAll.value = true
+    setTimeout(() => (copiedAll.value = false), 1800)
+  } catch {
+    toast.add({ title: t('common.error'), color: 'error' })
+  }
+}
+function exportCsv() {
+  // UTF-8 with a BOM, so Excel shows accents; dates in UTC like the database
+  const escape = (value: string) => (/[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value)
+  const rows = [['email', 'subscribed_at'], ...subscribers.value.map(s => [s.data.email ?? '', `${s.createdAt.replace(' ', 'T')}Z`])]
+  const csv = `\uFEFF${rows.map(row => row.map(escape).join(',')).join('\r\n')}`
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${username.value}-subscribers.csv`
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 // Invitation replies: who's coming, how many people in all, who isn't
@@ -243,7 +303,7 @@ const rsvpStats = computed(() => [
   { label: t('dashboard.inbox.rsvpNotComing', rsvp.value.notComing), value: rsvp.value.notComing },
 ])
 
-const visible = computed(() => (filter.value === 'unread' ? submissions.value.filter(s => !s.read) : submissions.value))
+const visible = computed(() => (filter.value === 'unread' ? requests.value.filter(s => !s.read) : requests.value))
 
 const dateLocale = computed(() => (locale.value === 'vi' ? 'vi-VN' : 'en-GB'))
 

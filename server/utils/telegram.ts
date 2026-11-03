@@ -61,6 +61,7 @@ const COPY = {
     stay: '🛏 <b>New room booking</b>',
     booking: '📅 <b>New booking</b>',
     answer: '💘 <b>Someone said YES</b>',
+    subscribe: '📬 <b>New subscriber</b>',
     guestbook: (gift: string) => `💌 <b>New guestbook message</b> ${gift}`,
     on: (site: string) => `on perlink.to/${site}`,
     labels: { product: 'Product', quantity: 'Quantity', total: 'Total', payment: 'Payment', question: 'Question', name: 'Name', attending: 'Coming', service: 'Service', phone: 'Phone', email: 'Email', address: 'Address', date: 'Date', checkout: 'Check-out', nights: 'Nights', time: 'Time', guests: 'Guests', message: 'Message' } as Record<string, string>,
@@ -75,6 +76,7 @@ const COPY = {
     stay: '🛏 <b>Đặt phòng mới</b>',
     booking: '📅 <b>Lịch hẹn mới</b>',
     answer: '💘 <b>Người ấy đã đồng ý</b>',
+    subscribe: '📬 <b>Người đăng ký nhận tin mới</b>',
     guestbook: (gift: string) => `💌 <b>Lời chúc mới trong phòng 3D</b> ${gift}`,
     on: (site: string) => `trên perlink.to/${site}`,
     labels: { product: 'Sản phẩm', quantity: 'Số lượng', total: 'Tổng tiền', payment: 'Thanh toán', question: 'Câu hỏi', name: 'Họ tên', attending: 'Tham dự', service: 'Dịch vụ', phone: 'SĐT', email: 'Email', address: 'Địa chỉ', date: 'Ngày', checkout: 'Trả phòng', nights: 'Số đêm', time: 'Giờ', guests: 'Số khách', message: 'Lời nhắn' } as Record<string, string>,
@@ -107,9 +109,13 @@ export async function notifyOwnerTelegram(
     ...(data.date && data.checkout ? { nights: String(stayNights(data.date, data.checkout)) } : {}),
   }
   const isAnswer = data.kind === 'answer'
-  // A "yes" to a question: just the question, no contact details
+  const isSubscriber = data.kind === 'subscribe'
+  // A "yes" to a question: just the question, no contact details; a
+  // subscriber: just the email, on one line
   const lines = isAnswer
     ? (data.question ? [`“${escapeHtml(data.question)}”`] : [])
+    : isSubscriber
+      ? [escapeHtml(data.email ?? '')]
     : Object.keys(copy.labels)
         .filter(key => shown[key])
         .map(key => `<b>${escapeHtml(copy.labels[key]!)}:</b> ${escapeHtml(shown[key]!)}`)
@@ -120,11 +126,12 @@ export async function notifyOwnerTelegram(
       ? copy.guestbook(escapeHtml(data.gift ?? ''))
       : data.kind === 'rsvp' ? copy.rsvp
         : isAnswer ? copy.answer
+          : isSubscriber ? copy.subscribe
           : data.kind === 'stay' ? copy.stay
             : data.kind === 'booking' && data.date ? copy.booking
               : copy.request
   const html = `${heading} ${escapeHtml(copy.on(site.username))}\n\n${lines.join('\n')}`
   await sendTelegram(event, owner.telegram_chat_id, html, [
-    { text: copy.open, url: `https://perlink.to/dashboard/site/${site.username}/inbox${isGuestbook ? '#guestbook' : ''}` },
+    { text: copy.open, url: `https://perlink.to/dashboard/site/${site.username}/inbox${isGuestbook ? '#guestbook' : isSubscriber ? '#subscribers' : ''}` },
   ])
 }

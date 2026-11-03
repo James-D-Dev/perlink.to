@@ -107,6 +107,8 @@
       "currency": "Tiền tệ",
       "priceSuffix": "Hậu tố giá",
       "priceSuffixPlaceholder": "VD: /đêm",
+      "sectionSuffix": "Hậu tố giá cho nhóm này",
+      "sectionSuffixPlaceholder": "Hậu tố",
       "layout": "Bố cục",
       "layouts": {
         "list": "Danh sách",
@@ -326,8 +328,14 @@
         "booking": "Đặt chỗ",
         "contact": "Liên hệ",
         "rsvp": "Xác nhận tham dự",
-        "stay": "Đặt phòng (lưu trú)"
+        "stay": "Đặt phòng (lưu trú)",
+        "subscribe": "Đăng ký nhận tin"
       },
+      "subscribeHint": "Khách chỉ để lại email. Người đăng ký có tab riêng trong Hộp thư, nơi bạn sao chép toàn bộ email hoặc tải file CSV cho công cụ gửi mail.",
+      "serviceLabel": "Tiêu đề ô chọn",
+      "serviceLabelHelp": "Để trống thì hiện “Dịch vụ”.",
+      "serviceLabelPlaceholder": "VD: Chọn gói",
+      "serviceLabelStay": "VD: Bạn muốn phòng nào?",
       "fieldsLabel": "Các ô",
       "fieldsHelp": "Luôn hỏi họ tên.",
       "fields": {
@@ -424,6 +432,10 @@
       "addSize": "Size",
       "addColour": "Màu",
       "addOption": "Phân loại khác",
+      "choicePrice": "Giá cho từng lựa chọn",
+      "choicePriceAdd": "Giá riêng cho từng lựa chọn",
+      "choicePricePlaceholder": "Như giá sản phẩm",
+      "choicePriceHint": "Để trống thì dùng giá sản phẩm. Khách thấy “Từ …” trên thẻ và giá chính xác khi chọn.",
       "sizeName": "Size",
       "colourName": "Màu",
       "colourValues": "Đen, Trắng, Be"

@@ -73,6 +73,7 @@
 </template>
 
 <script setup lang="ts">
+import { nextDay } from '~/utils/formCalendar'
 import type { CSSProperties } from 'vue'
 import type { EventBlock } from '~/types/bio'
 
@@ -131,9 +132,12 @@ const day = computed(() => {
     full: d.toLocaleDateString(lang.value, { day: 'numeric', month: 'long', year: 'numeric' }),
   }
 })
+// A party until 2 am: the end is the next morning
+const endsNextDay = computed(() => !!props.data.startTime && !!props.data.endTime && props.data.endTime <= props.data.startTime)
 const hours = computed(() => {
   if (!props.data.startTime) return ''
-  return props.data.endTime ? `${time(props.data.startTime)} – ${time(props.data.endTime)}` : time(props.data.startTime)
+  if (!props.data.endTime) return time(props.data.startTime)
+  return `${time(props.data.startTime)} – ${time(props.data.endTime)}${endsNextDay.value ? ` (${t('eventNextDay')})` : ''}`
 })
 const mapHref = computed(() => contactMapHref({ mapUrl: props.data.mapUrl, address: props.data.address || props.data.venue }))
 
@@ -148,10 +152,16 @@ const span = computed(() => {
     return { start: compact(dateValue), end, allDay: true }
   }
   const start = `${compact(dateValue)}T${compact(props.data.startTime)}00`
-  // Two hours when no end time is given
+  // Two hours when no end time is given; an end at or before the start, or
+  // two hours that pass midnight, finish the next day
   const [h, m] = props.data.startTime.split(':').map(Number)
-  const endTime = props.data.endTime || `${String(Math.min(23, (h ?? 0) + 2)).padStart(2, '0')}:${String(m ?? 0).padStart(2, '0')}`
-  return { start, end: `${compact(dateValue)}T${compact(endTime)}00`, allDay: false }
+  const startMinutes = (h ?? 0) * 60 + (m ?? 0)
+  const [eh, em] = (props.data.endTime || '').split(':').map(Number)
+  const endMinutes = props.data.endTime ? (eh ?? 0) * 60 + (em ?? 0) : startMinutes + 120
+  const nextDayEnd = endMinutes <= startMinutes || endMinutes >= 24 * 60
+  const wrapped = endMinutes % (24 * 60)
+  const endTime = props.data.endTime || `${String(Math.floor(wrapped / 60)).padStart(2, '0')}:${String(wrapped % 60).padStart(2, '0')}`
+  return { start, end: `${nextDayEnd ? nextDay(dateValue) : compact(dateValue)}T${compact(endTime)}00`, allDay: false }
 })
 const title = computed(() => props.data.name || props.data.venue || 'Event')
 const where = computed(() => [props.data.venue, props.data.address].filter(Boolean).join(', '))

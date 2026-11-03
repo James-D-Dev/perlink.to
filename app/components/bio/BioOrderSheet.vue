@@ -105,9 +105,10 @@
                   </div>
                   <div class="min-w-0 flex-1">
                     <p class="line-clamp-2 text-[15px] font-semibold leading-snug">{{ product.name }}</p>
-                    <p v-if="product.price" class="mt-1 flex items-baseline gap-1.5 tabular-nums">
-                      <span class="font-bold text-[var(--accent)]">{{ formatVnd(product.price) }}</span>
-                      <span v-if="(product.comparePrice ?? 0) > product.price" class="text-xs text-black/35 line-through">{{ formatVnd(product.comparePrice!) }}</span>
+                    <!-- The price of what's chosen so far; "From …" until a priced choice is made -->
+                    <p v-if="unit" class="mt-1 flex items-baseline gap-1.5 tabular-nums">
+                      <span class="font-bold text-[var(--accent)]">{{ priceOpen ? t('priceFrom', { price: formatVnd(unit) }) : formatVnd(shownUnit) }}</span>
+                      <span v-if="(product.comparePrice ?? 0) > unit" class="text-xs text-black/35 line-through">{{ formatVnd(product.comparePrice!) }}</span>
                     </p>
                   </div>
                   <div class="flex shrink-0 flex-col items-center rounded-2xl bg-[#f5f4f2] p-1" :aria-label="t('orderQuantity')">
@@ -142,6 +143,7 @@
                     >
                       <span v-if="value.color" class="size-4 shrink-0 rounded-full ring-1 ring-black/15" :style="{ backgroundColor: value.color }" />
                       {{ value.label }}
+                      <span v-if="value.price" class="font-medium tabular-nums text-black/45">· {{ formatVnd(value.price) }}</span>
                     </button>
                   </div>
                 </div>
@@ -208,16 +210,16 @@
 
             <!-- Total and order -->
             <div class="border-t border-black/[0.06] bg-white/50 px-5 pb-5 pt-4 backdrop-blur-xl">
-              <div v-if="product.price" class="mb-3 flex items-baseline justify-between">
-                <span class="text-sm text-black/55">{{ t('orderTotal') }} · {{ form.quantity }} × {{ formatVnd(product.price) }}</span>
-                <span class="text-xl font-bold tabular-nums">{{ formatVnd(product.price * form.quantity) }}</span>
+              <div v-if="unit" class="mb-3 flex items-baseline justify-between gap-3">
+                <span class="min-w-0 truncate text-sm text-black/55">{{ t('orderTotal') }} · {{ form.quantity }} × {{ priceOpen ? t('priceFrom', { price: formatVnd(unit) }) : formatVnd(unit) }}</span>
+                <span class="shrink-0 text-xl font-bold tabular-nums">{{ priceOpen ? t('priceFrom', { price: formatVnd(shownTotal) }) : formatVnd(shownTotal) }}</span>
               </div>
               <button type="submit" class="cta" :disabled="sending || preview || !canSubmit">
                 <UIcon v-if="sending" name="i-lucide-loader-circle" class="size-5 animate-spin" />
                 <template v-else-if="missingOption">{{ t('orderChooseFirst', { name: missingOption.name.toLowerCase() }) }}</template>
                 <template v-else>
                   <UIcon name="i-lucide-shopping-bag" class="size-[18px]" />
-                  {{ t('orderPlace') }}<template v-if="product.price"> · {{ formatVnd(product.price * form.quantity) }}</template>
+                  {{ t('orderPlace') }}<template v-if="unit"> · {{ formatVnd(unit * form.quantity) }}</template>
                 </template>
               </button>
             </div>
@@ -231,6 +233,7 @@
 import qrcode from 'qrcode-generator'
 import type { ProductItem, ProductOption, ProductsBlock } from '~/types/bio'
 import { formatVnd } from '#shared/plans'
+import { hasOptionPrices, priceRange, unitPrice } from '#shared/productPrice'
 
 // Order form for one product (products block on the page, or a product
 // stand in the 3D room): quantity, contact, address, COD or transfer; after
@@ -306,6 +309,45 @@ const options = computed<ProductOption[]>(() => (product.value?.options ?? []).f
 const missingOption = computed(() => options.value.find(o => !o.values.some(v => v.id === choices[o.id])))
 const chosenLabel = (option: ProductOption) => option.values.find(v => v.id === choices[option.id])?.label ?? ''
 const variant = computed(() => options.value.map(chosenLabel).filter(Boolean).join(' · '))
+// The price follows the choices: a priced choice (a bigger size) replaces
+// the product's price. Until every priced group is chosen it reads "From …"
+const pricedGroups = computed(() => options.value.filter(o => o.values.some(v => v.price)))
+const priceOpen = computed(() => !!product.value && hasOptionPrices(product.value) && pricedGroups.value.some(o => !choices[o.id]))
+const unit = computed(() => {
+  if (!product.value) return 0
+  return priceOpen.value ? priceRange(product.value).min : unitPrice(product.value, choices)
+})
+
+// The shown unit price and total glide to their new value when a choice or
+// the quantity changes
+const shownUnit = useTween(unit)
+const shownTotal = useTween(computed(() => unit.value * form.quantity))
+
+function useTween(target: Ref<number>) {
+  const shown = ref(target.value)
+  let frame = 0
+  watch(target, (to) => {
+    if (import.meta.server) return
+    cancelAnimationFrame(frame)
+    const from = shown.value
+    if (from === to || !from || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      shown.value = to
+      return
+    }
+    const start = performance.now()
+    const step = (now: number) => {
+      const p = Math.min(1, (now - start) / 380)
+      const eased = 1 - Math.pow(1 - p, 3)
+      // Whole thousands while moving, the exact amount at the end
+      shown.value = p < 1 ? Math.round((from + (to - from) * eased) / 1000) * 1000 : to
+      if (p < 1) frame = requestAnimationFrame(step)
+    }
+    frame = requestAnimationFrame(step)
+  })
+  onBeforeUnmount(() => cancelAnimationFrame(frame))
+  return shown
+}
+
 // No more than what's left
 const maxQuantity = computed(() => Math.max(1, Math.min(99, typeof product.value?.stock === 'number' ? product.value.stock : 99)))
 

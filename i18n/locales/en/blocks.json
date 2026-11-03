@@ -107,6 +107,8 @@
       "currency": "Currency",
       "priceSuffix": "Price suffix",
       "priceSuffixPlaceholder": "e.g. /night",
+      "sectionSuffix": "Price suffix for this section",
+      "sectionSuffixPlaceholder": "Suffix",
       "layout": "Layout",
       "layouts": {
         "list": "List",
@@ -326,8 +328,14 @@
         "booking": "Booking",
         "contact": "Contact",
         "rsvp": "Invitation reply (RSVP)",
-        "stay": "Room booking (stay)"
+        "stay": "Room booking (stay)",
+        "subscribe": "Subscribe (newsletter)"
       },
+      "subscribeHint": "Visitors leave just their email. Subscribers get their own tab in your Inbox, where you can copy every address or download a CSV for your email tool.",
+      "serviceLabel": "Picker title",
+      "serviceLabelHelp": "Leave empty for “Service”.",
+      "serviceLabelPlaceholder": "e.g. Pick a package",
+      "serviceLabelStay": "e.g. Which room?",
       "fieldsLabel": "Fields",
       "fieldsHelp": "Name is always asked.",
       "fields": {
@@ -424,6 +432,10 @@
       "addSize": "Size",
       "addColour": "Colour",
       "addOption": "Other choice",
+      "choicePrice": "Price for each choice",
+      "choicePriceAdd": "Different price per choice",
+      "choicePricePlaceholder": "Same as the product",
+      "choicePriceHint": "Leave empty to keep the product price. Buyers see “From …” on the card and the exact price once they choose.",
       "sizeName": "Size",
       "colourName": "Colour",
       "colourValues": "Black, White, Beige"

@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import type { MenuSection } from '~/types/bio'
 import type { PageTemplate } from '../pageTemplates'
-import { SAMPLE_PHONE, album, links, look, menu, photo, social, withIndex } from '../templateKit'
+import { SAMPLE_PHONE, album, links, look, menu, noteCopy, photo, social, withIndex } from '../templateKit'
 import { type Blocks, RSVP_FIELDS, booking, giftRoom, hours, loungeRoom, nightRoom, reviews, studioRoom } from '../pageTemplatesMore'
 
 // Stays, travel, schools and communities. Sample text in English with its
@@ -11,6 +11,7 @@ import { type Blocks, RSVP_FIELDS, booking, giftRoom, hours, loungeRoom, nightRo
 export const PLACES_LEARNING_VI: Record<string, string> = {}
 function s(en: string, vi: string) {
   PLACES_LEARNING_VI[en] = vi
+  noteCopy(en, vi)
   return en
 }
 
@@ -165,7 +166,7 @@ export const PLACES_LEARNING_TEMPLATES: PageTemplate[] = [
         ]) } },
         { name: 'form', data: { title: s('Grab a bed', 'Giữ giường'), description: s('Pick your bed and dates; we reply on WhatsApp within the hour.', 'Chọn giường và ngày ở, tụi mình trả lời qua WhatsApp trong vòng một giờ.'), kind: 'stay', fields: { phone: true, email: false, date: true, time: false, guests: true, message: false, service: true, checkout: true }, submitLabel: s('Hold my bed', 'Giữ giường cho mình') } },
         { name: 'text', data: { title: s('Free, every day', 'Miễn phí mỗi ngày'), content: s('🍳 Breakfast till 10:00\n🚲 Bikes to borrow\n🍺 Free beer hour, 19:00–20:00\n🗺️ Walking tour of the old town', '🍳 Ăn sáng đến 10 giờ\n🚲 Mượn xe đạp\n🍺 Giờ bia miễn phí, 19:00–20:00\n🗺️ Tour đi bộ phố cổ'), align: 'left', style: 'card' } },
-        { name: 'event', data: { name: s('Friday pub crawl', 'Pub crawl tối thứ Sáu'), date: '2026-11-13', startTime: '20:00', endTime: '23:59', venue: s('Meet on the rooftop', 'Tập trung trên sân thượng'), address: s('48 Tran Phu, Hội An', '48 Trần Phú, Hội An'), dressCode: s('Whatever you packed', 'Mặc gì cũng được'), note: s('Three bars, one free shot at each.', 'Ba quán bar, mỗi quán một shot miễn phí.') } },
+        { name: 'event', data: { name: s('Friday pub crawl', 'Pub crawl tối thứ Sáu'), date: '2026-11-13', startTime: '20:00', endTime: '01:00', venue: s('Meet on the rooftop', 'Tập trung trên sân thượng'), address: s('48 Tran Phu, Hội An', '48 Trần Phú, Hội An'), dressCode: s('Whatever you packed', 'Mặc gì cũng được'), note: s('Three bars, one free shot at each.', 'Ba quán bar, mỗi quán một shot miễn phí.') } },
         { name: 'image-album', data: { title: s('Life at the hostel', 'Ở hostel vui thế nào'), images: album('hostel-2', 'blog-diary-1', 'blog-diary-3', 'tour-2'), layout: 'grid' } },
         faq(s('House rules & help', 'Nội quy & tiện ích'), s('🧳 Free luggage storage before check-in and after check-out\n🌙 24-hour reception, late arrivals are fine\n🧺 Laundry 40,000₫ a load, ready the same day\n🎟️ We book buses to Huế, Đà Nẵng and Hà Giang at local prices\n🔞 Dorms are for guests 18 and over', '🧳 Gửi hành lý miễn phí trước giờ nhận và sau giờ trả phòng\n🌙 Lễ tân 24 giờ, đến khuya vẫn nhận phòng\n🧺 Giặt đồ 40.000₫ một mẻ, lấy trong ngày\n🎟️ Đặt giúp vé xe đi Huế, Đà Nẵng, Hà Giang theo giá gốc\n🔞 Phòng tập thể dành cho khách từ 18 tuổi')),
         { name: 'testimonials', data: { title: s('Backpackers say', 'Dân phượt nói gì'), items: reviews(
@@ -471,7 +472,7 @@ export const PLACES_LEARNING_TEMPLATES: PageTemplate[] = [
           step('04', s('Welcome home', 'Về nhà mới'), s('We stay in touch for the first months.', 'Trạm vẫn theo dõi trong những tháng đầu.'), photo('pets-3')),
         ] } },
         faq(s('Adoption, honestly', 'Nhận nuôi, nói thật'), s('💉 Every pet is vaccinated, dewormed and neutered before going home\n💚 Adoption is free; a 500,000₫ donation is welcome but not required\n🏠 Renting? Fine, as long as your landlord agrees\n🔁 If it doesn’t work out, bring them back to us, never to the street', '💉 Bé nào về nhà cũng đã tiêm phòng, tẩy giun và triệt sản\n💚 Nhận nuôi miễn phí; ủng hộ 500.000₫ thì trạm rất cảm ơn, không bắt buộc\n🏠 Ở nhà thuê vẫn được, miễn chủ nhà đồng ý\n🔁 Nếu không hợp, hãy mang bé về trạm, đừng bỏ ra đường')),
-        { name: 'form', data: { title: s('Adoption form', 'Đơn nhận nuôi'), description: s('Tell us which friend you’d like to meet.', 'Cho trạm biết bạn muốn gặp bé nào nhé.'), kind: 'contact', fields: { phone: true, email: true, date: false, time: false, guests: false, message: true }, submitLabel: s('Send my application', 'Gửi đơn') } },
+        { name: 'form', data: { title: s('Adoption form', 'Đơn nhận nuôi'), description: s('Pick a friend and a day to visit; we’ll call to confirm.', 'Chọn bé và ngày bạn muốn ghé, trạm sẽ gọi xác nhận.'), kind: 'booking', serviceLabel: s('Which friend would you like to meet?', 'Bạn muốn gặp bé nào?'), fields: { phone: true, email: true, date: true, time: false, guests: false, message: true, service: true }, submitLabel: s('Send my application', 'Gửi đơn') } },
         { name: 'text', data: { title: s('Can’t adopt? You can still help', 'Chưa nhận nuôi được? Vẫn giúp được'), content: s('200,000₫ feeds a dog for a month. 500,000₫ pays for a sterilisation. Every transfer is posted in our monthly report.', '200.000₫ nuôi một bé trong một tháng. 500.000₫ cho một ca triệt sản. Mọi khoản ủng hộ đều được công khai trong báo cáo hằng tháng.'), align: 'center', style: 'card' } },
         { name: 'vietqr', data: {} },
         { name: 'testimonials', data: { title: s('Happy endings', 'Những cái kết đẹp'), items: reviews(

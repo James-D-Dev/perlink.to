@@ -44,10 +44,45 @@
         </div>
 
         <button type="button" class="mt-3 inline-flex items-center gap-1 text-sm font-medium underline-offset-4 opacity-80 hover:underline hover:opacity-100" @click="again">
-          <UIcon :name="isRsvp ? 'i-lucide-pencil' : 'i-lucide-plus'" class="size-3.5" />
-          {{ isRsvp ? t('formChangeReply') : view === 'remembered' ? t('formAnotherBooking') : t('formSendAnother') }}
+          <UIcon :name="isRsvp ? 'i-lucide-pencil' : isSubscribe ? 'i-lucide-at-sign' : 'i-lucide-plus'" class="size-3.5" />
+          {{ isRsvp ? t('formChangeReply') : isSubscribe ? t('subscribeAnother') : view === 'remembered' ? t('formAnotherBooking') : t('formSendAnother') }}
         </button>
       </div>
+
+      <!-- Newsletter: just an email, the field and the button on one line -->
+      <form v-else-if="isSubscribe" key="subscribe" class="mt-4" novalidate @submit.prevent="submit">
+        <input v-model="website" type="text" name="website" tabindex="-1" autocomplete="off" class="absolute -left-[9999px] h-0 w-0 opacity-0" aria-hidden="true">
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <label class="block min-w-0 flex-1">
+            <span class="sr-only">{{ t('formEmail') }}</span>
+            <input
+              v-model="values.email"
+              type="email"
+              inputmode="email"
+              required
+              maxlength="120"
+              autocomplete="email"
+              :placeholder="t('formEmailHint')"
+              :class="[inputClass, 'h-[44px]']"
+              :aria-invalid="!!errors.email"
+              :aria-describedby="errors.email ? `${uid}-email` : undefined"
+              @input="errors.email = ''"
+            >
+          </label>
+          <button
+            type="submit"
+            class="flex h-[44px] shrink-0 items-center justify-center gap-2 px-5 text-sm font-semibold transition-opacity disabled:opacity-60"
+            :style="buttonStyle"
+            :disabled="sending || preview"
+          >
+            <UIcon :name="sending ? 'i-lucide-loader-circle' : 'i-lucide-mail-plus'" class="size-4" :class="sending && 'animate-spin'" />
+            {{ sending ? t('formSending') : data.submitLabel || t('subscribeButton') }}
+          </button>
+        </div>
+        <span v-if="errors.email" :id="`${uid}-email`" :class="errorClass" role="alert">{{ errors.email }}</span>
+        <p v-if="error" class="mt-2 text-sm text-red-600" role="alert">{{ error }}</p>
+        <p v-if="preview" class="mt-2 text-xs opacity-60">{{ t('formPreview') }}</p>
+      </form>
 
       <form v-else key="form" class="mt-4 space-y-3" novalidate @submit.prevent="submit">
         <!-- Honeypot: hidden from people, bots fill it in -->
@@ -227,6 +262,7 @@ const uid = useId()
 
 const fields = computed(() => props.data.fields ?? FORM_PRESETS.booking)
 const isRsvp = computed(() => props.data.kind === 'rsvp')
+const isSubscribe = computed(() => props.data.kind === 'subscribe')
 const isStay = computed(() => props.data.kind === 'stay' || !!fields.value.checkout)
 
 interface FormValues { name: string; phone: string; email: string; date: string; checkout: string; time: string; guests: string; message: string; attending: string; service: string }
@@ -239,7 +275,7 @@ const view = ref<'form' | 'sent' | 'remembered'>('form')
 const pageBlocks = computed(() => (props.blocks ?? []).filter(b => !b.hidden))
 
 // ---------- Service: the page's own price list and products ----------
-const serviceLabel = computed(() => (isStay.value ? t('formRoom') : t('formService')))
+const serviceLabel = computed(() => props.data.serviceLabel?.trim() || (isStay.value ? t('formRoom') : t('formService')))
 const serviceGroups = computed(() => {
   const groups: { label: string; options: { value: string; label: string; disabled?: boolean }[] }[] = []
   for (const block of pageBlocks.value) {
@@ -248,7 +284,7 @@ const serviceGroups = computed(() => {
       for (const section of menu.sections ?? []) {
         const options = (section.items ?? []).filter(i => i.name?.trim()).map(item => ({
           value: item.name.trim(),
-          label: item.price ? `${item.name.trim()} · ${menuPrice(item.price, menu.currency, menu.priceSuffix)}` : item.name.trim(),
+          label: item.price ? `${item.name.trim()} · ${menuPrice(item.price, menu.currency, section.priceSuffix?.trim() ? section.priceSuffix : menu.priceSuffix)}` : item.name.trim(),
           disabled: !!item.soldOut,
         }))
         if (options.length) groups.push({ label: section.name || menu.title || serviceLabel.value, options })
@@ -347,7 +383,12 @@ const phoneOk = (value: string) => {
 function checkPhone() {
   errors.phone = values.phone.trim() && !phoneOk(values.phone.trim()) ? t('formPhoneInvalid') : ''
 }
+const emailOk = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)
 function validate() {
+  if (isSubscribe.value) {
+    errors.email = emailOk(values.email.trim()) ? '' : t('subscribeEmailInvalid')
+    return !errors.email
+  }
   errors.name = values.name.trim() ? '' : t('formNameRequired')
   checkPhone()
   errors.reach = !isRsvp.value && (fields.value.phone || fields.value.email) && !values.phone.trim() && !values.email.trim() && !values.message.trim()
@@ -366,11 +407,13 @@ async function submit() {
   if (!validate()) return
   sending.value = true
   error.value = ''
-  const payload: FormValues = {
-    ...values,
-    guests: showGuests.value ? String(guests.value) : '',
-    checkout: fields.value.checkout ? values.checkout : '',
-  }
+  const payload: FormValues = isSubscribe.value
+    ? { name: '', phone: '', email: values.email.trim(), date: '', checkout: '', time: '', guests: '', message: '', attending: '', service: '' }
+    : {
+        ...values,
+        guests: showGuests.value ? String(guests.value) : '',
+        checkout: fields.value.checkout ? values.checkout : '',
+      }
   try {
     await $fetch(`/api/bio/${props.username}/form`, {
       method: 'POST',
@@ -401,7 +444,9 @@ onMounted(() => {
 })
 
 function again() {
-  if (isRsvp.value) {
+  if (isSubscribe.value) {
+    values.email = ''
+  } else if (isRsvp.value) {
     // Change the reply: start from what they said
     for (const key of ['name', 'phone', 'email', 'guests', 'message', 'attending'] as const) values[key] = sentValues.value[key] ?? values[key] ?? ''
   } else {
@@ -416,9 +461,10 @@ function again() {
 const fmtDate = (value: string) => parseDate(value)?.toLocaleDateString(lang.value, { weekday: 'short', day: 'numeric', month: 'short' }) ?? value
 const peopleLabel = (n: number) => (n === 1 ? t('formPerson') : t('formPeople', { n }))
 
-const summaryIcon = computed(() => (isRsvp.value ? (sentValues.value.attending === 'no' ? 'i-lucide-heart' : 'i-lucide-party-popper') : 'i-lucide-check'))
+const summaryIcon = computed(() => (isSubscribe.value ? 'i-lucide-mail-check' : isRsvp.value ? (sentValues.value.attending === 'no' ? 'i-lucide-heart' : 'i-lucide-party-popper') : 'i-lucide-check'))
 const summaryTitle = computed(() => {
   const v = sentValues.value
+  if (isSubscribe.value) return view.value === 'remembered' ? t('subscribeRemembered') : props.data.successMessage || t('subscribeDone')
   if (view.value === 'remembered') {
     if (isRsvp.value) return `${t('formLastReply')}: ${v.attending === 'no' ? t('formNotComing') : t('formComing')}${v.attending !== 'no' && v.guests ? ` · ${peopleLabel(Number(v.guests))}` : ''}`
     return t('formLastRequest')
@@ -430,6 +476,10 @@ const summaryTitle = computed(() => {
 const summaryRows = computed(() => {
   const v = sentValues.value
   const rows: { key: string; icon: string; label: string; value: string }[] = []
+  if (isSubscribe.value) {
+    if (v.email) rows.push({ key: 'email', icon: 'i-lucide-mail', label: t('formEmail'), value: v.email })
+    return rows
+  }
   if (v.service) rows.push({ key: 'service', icon: isStay.value ? 'i-lucide-bed-double' : 'i-lucide-sparkles', label: serviceLabel.value, value: v.service })
   if (v.date && v.checkout) {
     const n = nightsBetween(v.date, v.checkout)
@@ -453,6 +503,7 @@ const pageEvent = computed(() => pageBlocks.value.find((b): b is EventBlock => b
 const calendarEntry = computed<CalendarEntry | null>(() => {
   const v = sentValues.value
   const site = props.siteTitle || props.username
+  if (isSubscribe.value) return null
   if (isRsvp.value) {
     if (v.attending !== 'yes' || !pageEvent.value) return null
     const e = pageEvent.value

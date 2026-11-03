@@ -399,6 +399,8 @@ export interface MenuSection {
   id: string;
   name: string;
   items: MenuItem[];
+  /** Overrides the list's suffix for this section, e.g. "/ month" for memberships */
+  priceSuffix?: string;
 }
 
 export interface MenuBlock extends BaseBlock {
@@ -466,11 +468,13 @@ export interface FormBlock extends BaseBlock {
   data: {
     title?: string;
     description?: string;
-    /** 'rsvp': guests say whether they're coming, for invitations; 'stay': a room booking with check-in and check-out */
-    kind: 'booking' | 'contact' | 'rsvp' | 'stay';
+    /** 'rsvp': guests say whether they're coming, for invitations; 'stay': a room booking with check-in and check-out; 'subscribe': an email for a newsletter */
+    kind: 'booking' | 'contact' | 'rsvp' | 'stay' | 'subscribe';
     fields: FormFields;
     submitLabel?: string;
     successMessage?: string;
+    /** The service picker's own words, e.g. "Pick a package" */
+    serviceLabel?: string;
   };
 }
 
@@ -614,6 +618,12 @@ export interface ProductOptionValue {
   label: string;
   /** A colour swatch, e.g. "#e8dcc8" */
   color?: string;
+  /**
+   * VND: this choice costs this much instead of the product's price (e.g. a
+   * 20 cm cake). When choices in several groups set a price, the last group
+   * (in the product's order) with a priced choice wins
+   */
+  price?: number;
 }
 
 export interface ProductOption {

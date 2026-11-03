@@ -7,10 +7,11 @@ import { notifyOwnerOfRequest } from '../../../utils/formNotification'
 import { notifyOwnerTelegram } from '../../../utils/telegram'
 
 // A visitor sends a site's form (a booking, a room for some nights, a
-// contact request, or a reply to an invitation)
+// contact request, a reply to an invitation, or an email for the newsletter)
 
 const FIELDS = ['phone', 'email', 'date', 'time', 'guests', 'message'] as const
 const DATE = /^\d{4}-\d{2}-\d{2}$/
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 /** The names a visitor can pick as a service: the page's price lists and products */
 function serviceNames(blocks: any[]) {
@@ -56,6 +57,46 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Form not found' })
   }
 
+  const db = getDB(event)
+  const ip = getRequestHeader(event, 'cf-connecting-ip')
+    || getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
+    || '0.0.0.0'
+  const ipHash = await hashIP(ip, bioPage.id)
+
+  // A few requests per visitor every few minutes is plenty
+  async function checkRate() {
+    const recent = await db
+      .prepare(`SELECT COUNT(*) AS n FROM form_submissions WHERE bio_page_id = ? AND ip_hash = ? AND created_at > datetime('now', ?)`)
+      .bind(bioPage!.id, ipHash, `-${WINDOW_MINUTES} minutes`)
+      .first<{ n: number }>()
+    if ((recent?.n ?? 0) >= MAX_PER_WINDOW) {
+      throw createError({ statusCode: 429, statusMessage: 'Too many requests, please try again later' })
+    }
+  }
+
+  // A newsletter sign-up: just a valid email, once per address
+  if (block.data?.kind === 'subscribe') {
+    const email = values.email?.trim().toLowerCase().slice(0, 120)
+    if (!email || !EMAIL.test(email)) {
+      throw createError({ statusCode: 422, statusMessage: 'Invalid email' })
+    }
+    await checkRate()
+    const already = await db
+      .prepare(`SELECT 1 AS found FROM form_submissions WHERE bio_page_id = ? AND json_extract(data, '$.kind') = 'subscribe' AND json_extract(data, '$.email') = ? LIMIT 1`)
+      .bind(bioPage.id, email)
+      .first<{ found: number }>()
+    if (already) return { success: true }
+    const data = { kind: 'subscribe', name: '', email }
+    await db
+      .prepare('INSERT INTO form_submissions (id, bio_page_id, block_id, data, ip_hash) VALUES (?, ?, ?, ?, ?)')
+      .bind(crypto.randomUUID(), bioPage.id, blockId, JSON.stringify(data), ipHash)
+      .run()
+    runInBackground(event, new BioRepository(event).incrementAction(bioPage.id, 'form'))
+    // A one-line Telegram note; no email per subscriber, that would be noise
+    runInBackground(event, notifyOwnerTelegram(event, bioPage, data))
+    return { success: true }
+  }
+
   // Keep only the fields this form asks for
   const enabled = block.data?.fields ?? {}
   const data: Record<string, string> = {}
@@ -66,7 +107,7 @@ export default defineEventHandler(async (event) => {
     const value = values[field]?.trim()
     if (enabled[field] && value) data[field] = value.slice(0, field === 'message' ? 2000 : 200)
   }
-  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+  if (data.email && !EMAIL.test(data.email)) {
     throw createError({ statusCode: 422, statusMessage: 'Invalid email' })
   }
   if (data.date && !DATE.test(data.date)) delete data.date
@@ -106,20 +147,7 @@ export default defineEventHandler(async (event) => {
     data.kind = ['booking', 'stay', 'contact'].includes(block.data?.kind) ? block.data.kind : 'booking'
   }
 
-  const db = getDB(event)
-  const ip = getRequestHeader(event, 'cf-connecting-ip')
-    || getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
-    || '0.0.0.0'
-  const ipHash = await hashIP(ip, bioPage.id)
-
-  // A few requests per visitor every few minutes is plenty
-  const recent = await db
-    .prepare(`SELECT COUNT(*) AS n FROM form_submissions WHERE bio_page_id = ? AND ip_hash = ? AND created_at > datetime('now', ?)`)
-    .bind(bioPage.id, ipHash, `-${WINDOW_MINUTES} minutes`)
-    .first<{ n: number }>()
-  if ((recent?.n ?? 0) >= MAX_PER_WINDOW) {
-    throw createError({ statusCode: 429, statusMessage: 'Too many requests, please try again later' })
-  }
+  await checkRate()
 
   await db
     .prepare('INSERT INTO form_submissions (id, bio_page_id, block_id, data, ip_hash) VALUES (?, ?, ?, ?, ?)')
