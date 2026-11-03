@@ -306,9 +306,10 @@
 
           <!-- VietQR Block -->
           <BioVietQRDisplay
-            v-if="block.name === 'vietqr' && block.data?.qrString"
+            v-if="block.name === 'vietqr' && (block.data?.qrString || isTemplateView)"
             :id="blockDomId(block)"
-            :data="block.data"
+            :data="block.data?.qrString ? block.data : SAMPLE_QR"
+            :sample="!block.data?.qrString"
             :card-style="panelStyle"
             :accent-style="solidButtonStyle"
           />
@@ -691,6 +692,11 @@ const isPreview = computed(() => props.mode === "preview");
 const nameTag = computed(() => (props.mode === "thumbnail" || props.mode === "template" ? "p" : "h1"));
 // Editor previews and template previews never send orders or forms
 const noSending = computed(() => props.mode === "preview" || props.mode === "template");
+
+// Template previews show a bank QR block before an account is added: a
+// sample (its code is just the Perlink address, not a payment)
+const isTemplateView = computed(() => props.mode === "template" || props.mode === "thumbnail");
+const SAMPLE_QR = { qrString: "https://perlink.to", bankName: "Vietcombank", accountNumber: "0123456789", accountName: "NGUYEN VAN A", theme: "vietnam" };
 
 // Product orders can be paid by transfer to the page's VietQR account
 const hasBankAccount = computed(() =>

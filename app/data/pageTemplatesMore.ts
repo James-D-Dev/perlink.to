@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import type { BioBlock } from '~/types/bio'
+import type { BioBlock, MenuSection, ProductItem, ProductOption } from '~/types/bio'
 import type { RoomConfig, RoomObject } from '~/types/room'
 import { DEFAULT_OPENING_DAYS } from '~/types/bio'
 import type { PageTemplate } from './pageTemplates'
@@ -148,6 +148,7 @@ const GIFT_TEMPLATES: PageTemplate[] = [
           header: 'banner-circle', banner: photo('birthday-cover'), link: 'centered', social: 'filled',
         }),
         pageMode: '3d',
+        music: { trackId: 'happy-birthday' },
       },
       blocks: withIndex([
         { name: 'letter', data: { to: s('Lily', 'Lily'), body: s('Happy birthday!\nWe made you a little room on the internet: walk around, open the photos, and read what everyone wrote for you.\nThank you for every laugh this year. Here’s to many more. 💛', 'Chúc mừng sinh nhật!\nTụi mình làm tặng bạn một căn phòng nhỏ trên mạng: đi một vòng, xem ảnh và đọc lời chúc mọi người gửi nhé.\nCảm ơn bạn vì bao nhiêu tiếng cười năm qua. Chúc bạn tuổi mới thật rực rỡ. 💛'), from: s('Your best friends', 'Hội bạn thân'), sealed: true, paper: 'blush' } },
@@ -157,9 +158,10 @@ const GIFT_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: s('Summer', 'Mùa hè'), title: s('Karaoke night', 'Đêm karaoke'), text: s('You sang every song. Every single one.', 'Bạn hát hết mọi bài. Không chừa bài nào.'), imageUrl: photo('birthday-1') },
           { id: nanoid(6), date: s('Today', 'Hôm nay'), title: s('Your birthday!', 'Sinh nhật bạn!'), text: s('Leave a wish in the room. 🎈', 'Để lại một lời chúc trong phòng nhé. 🎈') },
         ] } },
-        { name: 'image-album', data: { title: s('Memories', 'Kỷ niệm'), images: album('birthday-2', 'birthday-cover'), layout: 'grid' } },
+        { name: 'image-album', data: { title: s('Memories', 'Kỷ niệm'), images: album('birthday-2', 'party-cover', 'gala-2', 'party-avatar'), layout: 'grid' } },
+        { name: 'form', data: { title: s('Leave a birthday wish', 'Gửi lời chúc sinh nhật'), description: s('Your wish goes straight to Lily’s inbox.', 'Lời chúc của bạn gửi thẳng tới hộp thư của Lily.'), kind: 'contact', fields: { phone: false, email: false, date: false, time: false, guests: false, message: true }, submitLabel: s('Send my wish 🎈', 'Gửi lời chúc 🎈') } },
       ] as Blocks),
-      room: giftRoom('#ffe4ef', '#e8c4a0', '#e8457a', s('Happy birthday!', 'Chúc mừng sinh nhật!'), ['birthday-avatar', 'birthday-1', 'birthday-2'], 'day', 'playful-kids'),
+      room: giftRoom('#ffe4ef', '#e8c4a0', '#e8457a', s('Happy birthday!', 'Chúc mừng sinh nhật!'), ['birthday-avatar', 'birthday-1', 'birthday-2'], 'day', 'happy-birthday'),
     }),
   },
   {
@@ -180,6 +182,7 @@ const GIFT_TEMPLATES: PageTemplate[] = [
           header: 'banner-circle', banner: photo('love-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
         }),
         pageMode: '3d',
+        music: { trackId: 'romantic-date' },
       },
       blocks: withIndex([
         { name: 'letter', data: { to: s('Ethan', 'anh'), body: s('Thank you for every ordinary day that felt special with you.\nI made this little room to keep our favourite moments in one place. Walk around, open the photos, and leave me a message.\nI love you, today and every day after.', 'Cảm ơn anh vì những ngày bình thường mà ở bên anh lại thành đặc biệt.\nEm làm căn phòng nhỏ này để giữ những khoảnh khắc mình thích nhất. Anh đi một vòng, xem ảnh rồi để lại cho em một lời nhắn nhé.\nEm yêu anh, hôm nay và cả những ngày sau nữa.'), from: s('Love, Mia', 'Thương anh, Mia'), sealed: true, paper: 'blush' } },
@@ -191,9 +194,10 @@ const GIFT_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: s('Today', 'Hôm nay'), title: s('Still choosing you', 'Vẫn chọn anh'), text: s('And tomorrow, and the day after.', 'Ngày mai, và mãi về sau.') },
         ] } },
         { name: 'image-album', data: { title: s('Us', 'Chúng mình'), images: album('love-6', 'love-7', 'love-4', 'love-3'), layout: 'grid' } },
+        { name: 'question', data: { question: s('Dinner with me this Saturday?', 'Thứ Bảy này đi ăn tối với em nhé?'), yesLabel: s('Of course ❤️', 'Tất nhiên rồi ❤️'), noLabel: s('No', 'Không'), answer: s('Then it’s a date. 7 pm, I’ve already booked the table.', 'Vậy hẹn anh nhé. 7 giờ tối, em đặt bàn rồi.'), playful: true } },
         { name: 'links', data: { title: s('Our song', 'Bài hát của tụi mình'), items: links([s('Play our song 🎵', 'Nghe bài hát của tụi mình 🎵'), 'https://open.spotify.com']) } },
       ] as Blocks),
-      room: giftRoom('#3a1a2c', '#8a5a44', '#ff5c8a', s('Love you', 'Yêu anh'), ['love-avatar', 'love-2', 'love-6'], 'night', 'fairytale-quest'),
+      room: giftRoom('#3a1a2c', '#8a5a44', '#ff5c8a', s('Love you', 'Yêu anh'), ['love-avatar', 'love-2', 'love-6'], 'night', 'romantic-piano'),
     }),
   },
   {
@@ -207,12 +211,15 @@ const GIFT_TEMPLATES: PageTemplate[] = [
       title: s('Linh & Nam', 'Linh & Nam'),
       bio: s('We’re getting married · Saturday, 12 December 2026', 'Chúng mình về chung một nhà · Thứ Bảy, 12.12.2026'),
       avatarUrl: photo('event-avatar'),
-      themeConfig: look({
-        bg: '#FBF7F1', text: '#3D3027', accent: '#A8834F', onAccent: '#FFFFFF',
-        surface: '#FFFFFF', border: '#EADFCC', radius: 18, shadow: 'sm',
-        nameFont: 'Great Vibes, cursive', nameWeight: '400', nameSize: '3rem', headingFont: 'Cormorant Garamond, serif', bodyFont: 'Lora, serif',
-        header: 'banner-circle', banner: photo('event-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
-      }),
+      themeConfig: {
+        ...look({
+          bg: '#FBF7F1', text: '#3D3027', accent: '#A8834F', onAccent: '#FFFFFF',
+          surface: '#FFFFFF', border: '#EADFCC', radius: 18, shadow: 'sm',
+          nameFont: 'Great Vibes, cursive', nameWeight: '400', nameSize: '3rem', headingFont: 'Cormorant Garamond, serif', bodyFont: 'Lora, serif',
+          header: 'banner-circle', banner: photo('event-cover'), link: 'centered', social: 'soft', gap: 'relaxed',
+        }),
+        music: { trackId: 'romantic-piano' },
+      },
       blocks: withIndex([
         { name: 'letter', data: { to: s('our family and friends', 'gia đình và bạn bè'), body: s('With joy in our hearts, we invite you to celebrate our wedding.\nIt would mean the world to have you with us as we start this new chapter: a day of vows, good food, music and a garden full of flowers.\nPlease let us know if you can come by 30 November.', 'Với niềm hạnh phúc, chúng mình trân trọng mời bạn đến chung vui trong ngày cưới.\nSự hiện diện của bạn là niềm vinh hạnh lớn khi chúng mình bắt đầu một chặng đường mới: một ngày của lời hứa, bữa tiệc ấm cúng, âm nhạc và thật nhiều hoa.\nBạn xác nhận tham dự giúp chúng mình trước ngày 30/11 nhé.'), from: s('Linh & Nam', 'Linh & Nam'), sealed: true, paper: 'cream' } },
         { name: 'birthday-countdown', data: { birthDate: '2026-12-12', theme: 'card', showAge: false, label: s('The big day in', 'Còn bao lâu đến ngày cưới'), mode: 'until', repeat: false } },
@@ -222,8 +229,9 @@ const GIFT_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: '12:00', title: s('Wedding lunch', 'Tiệc cưới'), text: s('Grand ballroom, Rose Garden Hotel.', 'Sảnh chính, khách sạn Rose Garden.') },
           { id: nanoid(6), date: '14:00', title: s('Music & dancing', 'Âm nhạc & giao lưu') },
         ] } },
-        { name: 'contact', data: { title: s('Where', 'Địa điểm'), address: s('Rose Garden Hotel, 8 Lake Road', 'Khách sạn Rose Garden, 8 Đường Hồ') } },
-        { name: 'form', data: { title: s('Will you come?', 'Bạn sẽ đến chứ?'), kind: 'booking', fields: { phone: true, email: false, date: false, time: false, guests: true, message: true }, submitLabel: s('Count me in', 'Mình sẽ đến') } },
+        { name: 'event', data: { name: s('Family ceremony', 'Lễ gia tiên'), date: '2026-12-12', startTime: '09:00', endTime: '10:30', venue: s('The bride’s family home', 'Tư gia nhà gái'), address: s('14 Phan Dinh Phung, Ba Dinh, Hanoi', '14 Phan Đình Phùng, Ba Đình, Hà Nội') } },
+        { name: 'event', data: { name: s('Wedding lunch', 'Tiệc cưới'), date: '2026-12-12', startTime: '11:00', endTime: '14:30', venue: s('Rose Garden Hotel, Grand ballroom', 'Khách sạn Rose Garden, sảnh chính'), address: s('8 Lake Road, Tay Ho, Hanoi', '8 Đường Ven Hồ, Tây Hồ, Hà Nội'), dressCode: s('Soft neutrals and gold', 'Tông trung tính và vàng nhạt'), note: s('Parking in the hotel basement.', 'Gửi xe tại hầm khách sạn.') } },
+        { name: 'form', data: { title: s('Will you come?', 'Bạn sẽ đến chứ?'), description: s('Please reply by 30 November.', 'Bạn xác nhận giúp trước ngày 30/11 nhé.'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('Send my reply', 'Gửi xác nhận') } },
         { name: 'image-album', data: { title: s('Our photos', 'Ảnh cưới'), images: album('photo-1', 'photo-2', 'photo-avatar', 'photo-cover'), layout: 'grid' } },
         { name: 'vietqr', data: {} },
       ] as Blocks),
@@ -293,13 +301,14 @@ const LOVE_TEMPLATES: PageTemplate[] = [
         { name: 'birthday-countdown', data: { birthDate: '2021-11-20', theme: 'card', showAge: false, label: s('Married for', 'Mình đã cưới nhau được'), mode: 'since' } },
         { name: 'letter', data: { to: s('my husband', 'chồng yêu'), body: s('Five years ago you promised to make me laugh every day. You kept your word, even on the hard days.\nThank you for the coffee in bed, for holding my hand at every check-up, for being the calm in our house.\nHere’s to the next fifty.', 'Năm năm trước anh hứa ngày nào cũng làm em cười. Anh giữ lời, kể cả những ngày khó khăn nhất.\nCảm ơn anh vì ly cà phê mỗi sáng, vì luôn nắm tay em mỗi lần đi khám, vì là sự bình yên của nhà mình.\nCòn năm mươi năm nữa nhé.'), from: s('Always yours, Hà', 'Mãi là của anh, Hà'), sealed: true, paper: 'night' } },
         { name: 'timeline', data: { title: s('Our five years', 'Năm năm của tụi mình'), items: [
-          { id: nanoid(6), date: '2021', title: s('The wedding', 'Ngày cưới'), text: s('It rained in the morning and cleared up just in time.', 'Sáng mưa, rồi tạnh vừa kịp giờ làm lễ.'), imageUrl: photo('photo-avatar') },
+          { id: nanoid(6), date: '2021', title: s('The wedding', 'Ngày cưới'), text: s('It rained in the morning and cleared up just in time.', 'Sáng mưa, rồi tạnh vừa kịp giờ làm lễ.'), imageUrl: photo('event-2') },
           { id: nanoid(6), date: '2022', title: s('Our first home', 'Căn nhà đầu tiên'), text: s('Two chairs, one table and a lot of plans.', 'Hai cái ghế, một cái bàn và thật nhiều dự định.') },
           { id: nanoid(6), date: '2023', title: s('The trip by the sea', 'Chuyến đi biển'), text: s('Where we said we’d come back every year.', 'Nơi mình hẹn năm nào cũng quay lại.'), imageUrl: photo('photo-1') },
           { id: nanoid(6), date: '2025', title: s('Our little one', 'Thiên thần nhỏ'), text: s('And suddenly our house got louder and happier.', 'Và nhà mình bỗng ồn ào và vui hơn hẳn.') },
           { id: nanoid(6), date: '2026', title: s('Five years', 'Năm năm'), text: s('Still choosing you, every morning.', 'Sáng nào em cũng vẫn chọn anh.') },
         ] } },
         { name: 'image-album', data: { title: s('From our wedding album', 'Từ album cưới'), images: album('photo-2', 'photo-cover', 'event-1', 'photo-4'), layout: 'grid' } },
+        { name: 'event', data: { name: s('Our anniversary dinner', 'Bữa tối kỷ niệm của mình'), date: '2026-11-20', startTime: '19:00', endTime: '21:30', venue: s('La Maison Rooftop', 'Nhà hàng La Maison Rooftop'), address: s('22 Ly Tu Trong, District 1, HCMC', '22 Lý Tự Trọng, Quận 1, TP.HCM'), dressCode: s('The dress you wore when we met', 'Chiếc váy em mặc hôm mình gặp nhau'), note: s('Babysitter booked. Just bring yourself.', 'Đã nhờ người trông con rồi. Anh chỉ cần đến thôi.') } },
       ] as Blocks),
       room: giftRoom('#2a221b', '#6b4f3a', '#d8b98a', s('5 years', '5 năm'), ['photo-avatar', 'photo-2', 'photo-1'], 'night', 'romantic-piano'),
     }),
@@ -364,6 +373,7 @@ const LOVE_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: s('September', 'Tháng 9'), title: s('Halfway, in Da Nang', 'Gặp nhau ở Đà Nẵng'), text: s('We met in the middle, by the sea.', 'Mỗi người đi một nửa đường, gặp nhau bên biển.'), imageUrl: photo('ld-1') },
           { id: nanoid(6), date: s('Christmas', 'Giáng sinh'), title: s('Next stop: you', 'Điểm đến tiếp theo: em'), text: s('Ticket booked. ✈', 'Vé đã đặt rồi. ✈') },
         ] } },
+        { name: 'event', data: { name: s('I land in Saigon', 'Anh hạ cánh ở Sài Gòn'), date: '2026-12-24', startTime: '21:30', venue: s('Tan Son Nhat Airport, Domestic arrivals', 'Sân bay Tân Sơn Nhất, ga quốc nội'), address: s('Tan Son Nhat International Airport, Tan Binh, HCMC', 'Sân bay Tân Sơn Nhất, Tân Bình, TP.HCM'), note: s('Flight VN 227. Wait for me by gate 3.', 'Chuyến VN 227. Đợi anh ở cửa số 3 nhé.') } },
         { name: 'image-album', data: { title: s('Our last trip', 'Chuyến đi gần nhất'), images: album('love-2', 'love-7', 'love-4', 'love-cover'), layout: 'grid' } },
       ] as Blocks),
       room: giftRoom('#1a2050', '#3b3f6b', '#b9a7ff', s('See you soon', 'Sắp gặp rồi'), ['ld-avatar', 'ld-2', 'ld-1'], 'night', 'romantic-date'),
@@ -460,7 +470,7 @@ const INVITE_TEMPLATES: PageTemplate[] = [
         music: { trackId: 'love-acoustic' },
       },
       blocks: withIndex([
-        { name: 'text', data: { title: s('You’re invited', 'Trân trọng kính mời'), content: s('We’re getting married under the olive trees, and we’d love you to be there. Expect flowers, a long table, good wine and dancing until late.', 'Chúng mình sẽ cưới dưới hàng cây ô liu, và rất mong có bạn ở đó. Sẽ có hoa, một bàn tiệc dài, rượu ngon và nhảy đến khuya.'), align: 'center', style: 'plain' } },
+        { name: 'letter', data: { to: s('our dear friend', 'bạn thân mến'), body: s('We’re getting married under the olive trees, and we’d love you to be there. Expect flowers, a long table, good wine and dancing until late.', 'Chúng mình sẽ cưới dưới hàng cây ô liu, và rất mong có bạn ở đó. Sẽ có hoa, một bàn tiệc dài, rượu ngon và nhảy đến khuya.'), from: s('Chloe & Daniel', 'Chloe & Daniel'), sealed: true, paper: 'cream', personal: true } },
         { name: 'event', data: { name: s('Ceremony', 'Lễ cưới'), date: '2027-01-09', startTime: '16:00', endTime: '17:00', venue: s('The Olive Garden', 'Vườn Ô Liu'), address: s('12 Hoa Hong Street, Ward 4, Da Lat', '12 Hoa Hồng, Phường 4, Đà Lạt'), dressCode: s('Garden formal, soft colours', 'Lịch sự, tông màu nhẹ') } },
         { name: 'event', data: { name: s('Dinner & dancing', 'Tiệc tối & khiêu vũ'), date: '2027-01-09', startTime: '18:00', endTime: '22:30', venue: s('The Glasshouse', 'Nhà kính'), address: s('12 Hoa Hong Street, Ward 4, Da Lat', '12 Hoa Hồng, Phường 4, Đà Lạt'), note: s('Da Lat gets cold at night: bring a jacket.', 'Đà Lạt về đêm khá lạnh, bạn mang theo áo khoác nhé.') } },
         { name: 'timeline', data: { title: s('How we got here', 'Hành trình của chúng mình'), items: [
@@ -504,7 +514,7 @@ const INVITE_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: '11:15', title: s('Cake & candles', 'Cắt bánh & thổi nến') },
           { id: nanoid(6), date: '11:30', title: s('Lunch', 'Ăn trưa') },
         ] } },
-        { name: 'image-album', data: { title: s('One year of Bông', 'Một năm của Bông'), images: album('kids-1', 'kids-2', 'kids-avatar', 'kids-cover'), layout: 'grid' } },
+        { name: 'image-album', data: { title: s('One year of Bông', 'Một năm của Bông'), images: album('kids-1', 'kids-2', 'birthday-2'), layout: 'grid' } },
         { name: 'form', data: { title: s('Will you come?', 'Gia đình bạn sẽ đến chứ?'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('We’ll be there', 'Gửi xác nhận') } },
       ] as Blocks),
       room: giftRoom('#fff6d8', '#e8c4a0', '#3fa7d6', s('Happy 1st!', 'Mừng 1 tuổi!'), ['kids-avatar', 'kids-1', 'kids-2'], 'day', 'happy-birthday'),
@@ -541,6 +551,7 @@ const INVITE_TEMPLATES: PageTemplate[] = [
         { name: 'image-album', data: { title: s('A first look', 'Không gian quán'), images: album('cafe-1', 'cafe-2', 'cafe-3', 'cafe-4'), layout: 'grid' } },
         { name: 'form', data: { title: s('Let us know you’re coming', 'Báo trước để Mộc giữ chỗ'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('I’ll come', 'Tôi sẽ đến') } },
         { name: 'contact', data: { title: s('Find us', 'Đường đến quán'), address: s('120 Le Loi, Ben Thanh, District 1, HCMC', '120 Lê Lợi, Bến Thành, Quận 1, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'grabfood', 'googlemaps') } },
       ] as Blocks),
       room: loungeRoom('#1c1c1c', '#5b4636', '#d4af37', s('Grand opening', 'Khai trương')),
     }),
@@ -566,6 +577,7 @@ const INVITE_TEMPLATES: PageTemplate[] = [
         music: { trackId: 'party-celebration' },
       },
       blocks: withIndex([
+        { name: 'letter', data: { to: s('our team', 'cả nhà'), body: s('This year we shipped more, served more customers and laughed more than ever. None of it happens without you.\nJoin us for one evening of good food, awards and a lucky draw before we all go home for Tết.', 'Năm nay chúng ta làm được nhiều hơn, phục vụ nhiều khách hơn và cười nhiều hơn bao giờ hết. Không có ai trong số các bạn thì không có điều đó.\nHãy cùng nhau một buổi tối thật vui: tiệc ngon, vinh danh và bốc thăm may mắn trước khi ai cũng về quê ăn Tết.'), from: s('The board of directors', 'Ban Giám đốc'), sealed: true, paper: 'night', personal: true } },
         { name: 'birthday-countdown', data: { birthDate: '2027-01-22', theme: 'card', showAge: false, label: s('The party starts in', 'Còn bao lâu đến tiệc'), mode: 'until', repeat: false } },
         { name: 'event', data: { name: s('Year-end Gala', 'Tiệc Tất Niên'), date: '2027-01-22', startTime: '18:00', endTime: '22:00', venue: s('Riverside Palace, Grand Ballroom', 'Riverside Palace, sảnh Grand'), address: s('360D Ben Van Don, District 4, HCMC', '360D Bến Vân Đồn, Quận 4, TP.HCM'), dressCode: s('Black & gold', 'Đen & vàng ánh kim') } },
         { name: 'timeline', data: { title: s('Tonight', 'Chương trình'), items: [
@@ -576,7 +588,7 @@ const INVITE_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: '21:00', title: s('Music & dancing', 'Văn nghệ & giao lưu') },
         ] } },
         { name: 'form', data: { title: s('Please reply by 15 January', 'Vui lòng xác nhận trước 15/01'), kind: 'rsvp', fields: { ...RSVP_FIELDS, guests: false }, submitLabel: s('Send reply', 'Gửi xác nhận') } },
-        { name: 'image-album', data: { title: s('Last year’s party', 'Tất niên năm ngoái'), images: album('gala-1', 'gala-3', 'gala-2', 'bar-1'), layout: 'grid' } },
+        { name: 'image-album', data: { title: s('Last year’s party', 'Tất niên năm ngoái'), images: album('gala-1', 'gala-3', 'bar-2', 'bar-1'), layout: 'grid' } },
       ] as Blocks),
       room: loungeRoom('#141b3d', '#3a2f24', '#e8c26a', s('Cheers to 2026', 'Mừng năm 2026')),
     }),
@@ -604,6 +616,7 @@ const BLOG_TEMPLATE: PageTemplate = {
     blocks: withIndex([
       { name: 'text', data: { title: s('Hello, I\'m glad you\'re here', 'Chào bạn, rất vui vì bạn ghé'), content: s('I write about the books I read, the places I go and the small things that make a day good. New posts every week.', 'Mình viết về những cuốn sách đã đọc, những nơi đã đi và những điều nhỏ làm nên một ngày đẹp. Mỗi tuần một bài mới.'), align: 'center', style: 'plain' } },
       { name: 'blog', data: { title: s('Latest posts', 'Bài viết mới'), count: 5, samples: [{ title: s('The books that got me through this year', 'Những cuốn sách đưa mình qua năm nay'), coverUrl: photo('personal-work-1'), minutes: 6 }, { title: s('Notes from a slow week in Da Lat', 'Ghi chép một tuần chậm ở Đà Lạt'), coverUrl: photo('personal-work-2'), minutes: 5 }, { title: s('Why I started writing again', 'Vì sao mình bắt đầu viết lại'), coverUrl: photo('personal-work-3'), minutes: 4 }] } },
+      { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
       { name: 'social', data: { links: social('instagram', 'threads', 'facebook') } },
     ] as Blocks),
     room: room({ wallColor: '#efe6d8', floorColor: '#8a6a4a', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -649,8 +662,9 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
       },
       blocks: withIndex([
         { name: 'blog', data: { title: s('Latest from the road', 'Mới nhất từ những chuyến đi'), count: 5, samples: [{ title: s('Three days around Lago di Braies on a budget', '3 ngày quanh hồ Braies với chi phí tiết kiệm'), coverUrl: photo('blog-travel-1'), minutes: 6 }, { title: s('Sunrise balloons over Cappadocia: what to know', 'Ngắm khinh khí cầu ở Cappadocia: cần biết gì'), coverUrl: photo('blog-travel-2'), minutes: 5 }, { title: s('Machu Picchu without the crowds', 'Machu Picchu vắng người: đi lúc nào?'), coverUrl: photo('blog-travel-3'), minutes: 7 }] } },
-        { name: 'image-album', data: { images: album('blog-travel-1', 'blog-travel-2', 'blog-travel-3'), layout: 'carousel' } },
+        { name: 'image-album', data: { title: s('Recent trips', 'Những chuyến đi gần đây'), images: album('nomad-3', 'tour-1', 'villa-4'), layout: 'carousel' } },
         { name: 'links', data: { items: links([s('My packing list', 'Danh sách đồ mang theo'), ''], [s('Work with me', 'Hợp tác cùng mình'), '']) } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'youtube', 'tiktok') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#e8f4fb', floorColor: '#b08968', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -685,8 +699,9 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
       },
       blocks: withIndex([
         { name: 'blog', data: { title: s('New recipes', 'Công thức mới'), count: 5, samples: [{ title: s('Crispy banh xeo at home, step by step', 'Bánh xèo giòn tại nhà, từng bước một'), coverUrl: photo('street-2'), minutes: 8 }, { title: s('The croissant I baked 20 times', 'Chiếc croissant mình nướng 20 lần'), coverUrl: photo('bakery-1'), minutes: 6 }, { title: s('Saigon street snacks under 30k', 'Món ăn vặt Sài Gòn dưới 30 nghìn'), coverUrl: photo('street-1'), minutes: 4 }] } },
-        { name: 'image-album', data: { images: album('street-1', 'bakery-1', 'cafe-2', 'street-2'), layout: 'grid' } },
+        { name: 'image-album', data: { title: s('From my kitchen', 'Từ căn bếp của Mia'), images: album('restaurant-cover', 'nutri-1', 'bakery-3', 'street-3'), layout: 'grid' } },
         { name: 'text', data: { title: s('Cook along', 'Nấu cùng Mia'), content: s('Every Sunday a new recipe, tested three times in my small kitchen. Ask me anything in the comments.', 'Mỗi Chủ nhật một công thức mới, đã thử ba lần trong căn bếp nhỏ. Có gì thắc mắc cứ hỏi Mia nhé.'), align: 'center', style: 'plain' } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'youtube', 'facebook') } },
       ] as Blocks),
       room: room({ wallColor: '#f6e7d8', floorColor: '#9c6644', floorMaterial: 'tile', trimColor: '#ffffff' }, [
@@ -719,9 +734,10 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         background: { type: 'effect', effectId: 'neural', color: '#0B1020' },
       },
       blocks: withIndex([
-        { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 5, samples: [{ title: s('Building a blog with Nuxt in a weekend', 'Dựng blog bằng Nuxt trong một cuối tuần'), coverUrl: photo('blog-tech-1'), minutes: 9 }, { title: s('My 2026 dev setup', 'Bộ đồ nghề lập trình 2026 của mình'), coverUrl: photo('blog-tech-2'), minutes: 5 }, { title: s('Prompting tips that actually save time', 'Mẹo dùng AI thật sự tiết kiệm thời gian'), coverUrl: photo('blog-tech-cover'), minutes: 6 }] } },
-        { name: 'links', data: { items: links(['GitHub', 'https://github.com'], [s('My dev setup', 'Bộ đồ nghề của mình'), ''], [s('Newsletter', 'Bản tin hàng tuần'), '']) } },
-        { name: 'image-album', data: { images: album('blog-tech-1', 'blog-tech-2'), layout: 'grid' } },
+        { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 5, samples: [{ title: s('Building a blog with Nuxt in a weekend', 'Dựng blog bằng Nuxt trong một cuối tuần'), coverUrl: photo('blog-tech-1'), minutes: 9 }, { title: s('My 2026 dev setup', 'Bộ đồ nghề lập trình 2026 của mình'), coverUrl: photo('blog-tech-2'), minutes: 5 }, { title: s('Prompting tips that actually save time', 'Mẹo dùng AI thật sự tiết kiệm thời gian'), coverUrl: photo('neon-1'), minutes: 6 }] } },
+        { name: 'links', data: { items: links(['GitHub', 'https://github.com'], [s('My dev setup', 'Bộ đồ nghề của mình'), '']) } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'image-album', data: { title: s('Side projects', 'Dự án cá nhân'), images: album('neon-2', 'neon-3'), layout: 'grid' } },
         { name: 'social', data: { links: social('github', 'linkedin', 'youtube') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#141a2e', floorColor: '#22283d', floorMaterial: 'concrete', trimColor: '#334155' }, [
@@ -756,10 +772,11 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         background: { type: 'gradient', color: '#FFF5FA', gradient: { style: 'mesh', from: '#FFC6E0', via: '#E9D5FF', to: '#FFE4CC' } },
       },
       blocks: withIndex([
-        { name: 'image-album', data: { images: album('blog-fashion-1', 'blog-fashion-2', 'blog-fashion-3'), layout: 'carousel' } },
+        { name: 'image-album', data: { images: album('edit-1', 'edit-3', 'boutique-2'), layout: 'carousel' } },
         { name: 'blog', data: { title: s('Journal', 'Nhật ký'), count: 5, samples: [{ title: s('10 pieces, 30 outfits: my capsule wardrobe', '10 món đồ, 30 bộ: tủ đồ tối giản của mình'), coverUrl: photo('blog-fashion-1'), minutes: 5 }, { title: s('A 5-minute morning skincare routine', 'Chăm da buổi sáng chỉ 5 phút'), coverUrl: photo('blog-fashion-3'), minutes: 4 }, { title: s('Wearing red, without overthinking it', 'Mặc đồ đỏ mà không ngại'), coverUrl: photo('blog-fashion-2'), minutes: 3 }] } },
-        { name: 'links', data: { items: links([s('Shop my looks', 'Mua đồ mình mặc'), ''], [s('Collaborations', 'Hợp tác'), '']) } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'threads') } },
+        { name: 'links', data: { items: links([s('Collaborations', 'Hợp tác'), '']) } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'threads', 'shopee', 'tiktokshop') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#fde2ef', floorColor: '#f5e6ea', floorMaterial: 'carpet', trimColor: '#ffffff' }, [
         { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#BE185D' },
@@ -792,8 +809,9 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
       },
       blocks: withIndex([
         { name: 'text', data: { title: s('Breathe in', 'Hít một hơi thật sâu'), content: s('Short practices you can do before breakfast, and what I learned from ten years on the mat.', 'Những bài tập ngắn làm trước bữa sáng, và điều mình học được sau mười năm tập yoga.'), align: 'center', style: 'plain' } },
-        { name: 'blog', data: { title: s('From the journal', 'Từ nhật ký'), count: 5, samples: [{ title: s('A 10-minute yoga flow for busy mornings', 'Bài yoga 10 phút cho buổi sáng bận rộn'), coverUrl: photo('blog-wellness-2'), minutes: 4 }, { title: s('Breathing to fall asleep faster', 'Hít thở để ngủ ngon hơn'), coverUrl: photo('blog-wellness-1'), minutes: 3 }, { title: s('What a month without sugar taught me', 'Một tháng không đường dạy mình điều gì'), coverUrl: photo('blog-wellness-cover'), minutes: 6 }] } },
-        { name: 'image-album', data: { images: album('blog-wellness-1', 'blog-wellness-2'), layout: 'grid' } },
+        { name: 'blog', data: { title: s('From the journal', 'Từ nhật ký'), count: 5, samples: [{ title: s('A 10-minute yoga flow for busy mornings', 'Bài yoga 10 phút cho buổi sáng bận rộn'), coverUrl: photo('blog-wellness-2'), minutes: 4 }, { title: s('Breathing to fall asleep faster', 'Hít thở để ngủ ngon hơn'), coverUrl: photo('blog-wellness-1'), minutes: 3 }, { title: s('What a month without sugar taught me', 'Một tháng không đường dạy mình điều gì'), coverUrl: photo('nutri-1'), minutes: 6 }] } },
+        { name: 'image-album', data: { images: album('yoga-2', 'yoga-3'), layout: 'grid' } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'youtube', 'spotify') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#eef5e9', floorColor: '#c9b28f', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -826,10 +844,11 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         background: { type: 'gradient', color: '#FFF7FB', gradient: { style: 'mesh', from: '#FBCFE8', via: '#BAE6FD', to: '#FEF3C7' } },
       },
       blocks: withIndex([
-        { name: 'blog', data: { title: s('Our latest stories', 'Chuyện nhà mới nhất'), count: 5, samples: [{ title: s('Surviving the 4-month sleep regression', 'Vượt qua giai đoạn khủng hoảng ngủ 4 tháng'), coverUrl: photo('blog-family-1'), minutes: 7 }, { title: s('First foods: our baby-led weaning week', 'Tuần đầu ăn dặm tự chỉ huy của bé'), coverUrl: photo('blog-family-2'), minutes: 5 }, { title: s('Packing for a trip with two kids', 'Đi du lịch cùng hai bé cần mang gì'), coverUrl: photo('blog-family-cover'), minutes: 6 }] } },
-        { name: 'image-album', data: { images: album('blog-family-1', 'blog-family-2'), layout: 'grid' } },
+        { name: 'blog', data: { title: s('Our latest stories', 'Chuyện nhà mới nhất'), count: 5, samples: [{ title: s('Surviving the 4-month sleep regression', 'Vượt qua giai đoạn khủng hoảng ngủ 4 tháng'), coverUrl: photo('blog-family-1'), minutes: 7 }, { title: s('First foods: our baby-led weaning week', 'Tuần đầu ăn dặm tự chỉ huy của bé'), coverUrl: photo('blog-family-2'), minutes: 5 }, { title: s('Packing for a trip with two kids', 'Đi du lịch cùng hai bé cần mang gì'), coverUrl: photo('kids-2'), minutes: 6 }] } },
+        { name: 'image-album', data: { images: album('kinder-2', 'kids-1'), layout: 'grid' } },
         { name: 'links', data: { items: links([s('Baby gear I love', 'Đồ cho bé mình tin dùng'), ''], [s('Join our parents group', 'Tham gia nhóm bố mẹ'), '']) } },
-        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok') } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'shopee') } },
       ] as Blocks),
       room: room({ wallColor: '#fde7f1', floorColor: '#f1e4d3', floorMaterial: 'carpet', trimColor: '#ffffff' }, [
         { type: 'blog-board', position: [0.4, 1.7, -3], rotation: 0, wall: 'back', color: '#EC4899' },
@@ -861,8 +880,9 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
       },
       blocks: withIndex([
         { name: 'text', data: { title: s('Start here', 'Bắt đầu từ đây'), content: s('New to personal finance? Read these first: budgeting, an emergency fund and your first investment.', 'Mới tìm hiểu tài chính cá nhân? Đọc mấy bài này trước: lập ngân sách, quỹ dự phòng và khoản đầu tư đầu tiên.'), align: 'left', style: 'plain' } },
-        { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 10, samples: [{ title: s('The 50/30/20 budget, done the simple way', 'Quy tắc ngân sách 50/30/20 làm cho đơn giản'), coverUrl: photo('blog-growth-1'), minutes: 6 }, { title: s('How much should your emergency fund be?', 'Quỹ dự phòng nên có bao nhiêu?'), coverUrl: photo('blog-growth-cover'), minutes: 5 }, { title: s('5 books that changed how I spend', '5 cuốn sách thay đổi cách mình tiêu tiền'), coverUrl: photo('blog-growth-1'), minutes: 7 }] } },
+        { name: 'blog', data: { title: s('Latest posts', 'Bài mới'), count: 10, samples: [{ title: s('The 50/30/20 budget, done the simple way', 'Quy tắc ngân sách 50/30/20 làm cho đơn giản'), coverUrl: photo('blog-growth-1'), minutes: 6 }, { title: s('How much should your emergency fund be?', 'Quỹ dự phòng nên có bao nhiêu?'), coverUrl: photo('blog-growth-cover'), minutes: 5 }, { title: s('5 books that changed how I spend', '5 cuốn sách thay đổi cách mình tiêu tiền'), coverUrl: photo('cv-1'), minutes: 7 }] } },
         { name: 'links', data: { items: links([s('Free budget template', 'Mẫu ngân sách miễn phí'), ''], [s('Books I recommend', 'Sách nên đọc'), '']) } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('linkedin', 'facebook', 'youtube') } },
       ] as Blocks),
       room: room({ wallColor: '#ecefe6', floorColor: '#7c5c45', floorMaterial: 'wood', trimColor: '#ffffff' }, [
@@ -896,9 +916,10 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
         background: { type: 'effect', effectId: 'stars', color: '#0F0F10' },
       },
       blocks: withIndex([
-        { name: 'image-album', data: { images: album('blog-diary-1', 'blog-diary-2', 'blog-diary-3'), layout: 'grid' } },
+        { name: 'image-album', data: { images: album('street-cover', 'street-1', 'bar-2'), layout: 'grid' } },
         { name: 'blog', data: { title: s('Stories', 'Câu chuyện'), count: 5, samples: [{ title: s('A rainy night on Bui Vien, on film', 'Một đêm mưa ở Bùi Viện, chụp phim'), coverUrl: photo('blog-diary-2'), minutes: 4 }, { title: s("The motorbikes of Hanoi's Old Quarter", 'Những chiếc xe máy phố cổ Hà Nội'), coverUrl: photo('blog-diary-1'), minutes: 5 }, { title: s('Plastic stools and late-night conversations', 'Ghế nhựa và những câu chuyện đêm khuya'), coverUrl: photo('blog-diary-3'), minutes: 4 }] } },
         { name: 'links', data: { items: links([s('Prints for sale', 'Bán ảnh in'), ''], [s('Photo walks', 'Dạo phố chụp ảnh'), '']) } },
+        { name: 'form', data: { title: s('Get new posts by email', 'Nhận bài mới qua email'), description: s('One email when there’s something new. No spam, unsubscribe any time.', 'Có bài mới là nhận một email. Không spam, huỷ lúc nào cũng được.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: false }, submitLabel: s('Subscribe', 'Đăng ký') } },
         { name: 'social', data: { links: social('instagram', 'threads') } },
       ] as Blocks),
       room: { ...room({ wallColor: '#1c1917', floorColor: '#2a2420', floorMaterial: 'concrete', trimColor: '#44403c' }, [
@@ -915,6 +936,35 @@ const BLOGGER_TEMPLATES: PageTemplate[] = [
   },
 ]
 
+// ---- Helpers for the business templates below ----
+
+/** A photo for each price-list item, in order (undefined skips one) */
+function withPhotos(sections: MenuSection[], ...names: (string | undefined)[]): MenuSection[] {
+  let i = 0
+  return sections.map(section => ({
+    ...section,
+    items: section.items.map((item) => {
+      const name = names[i++]
+      return name ? { ...item, imageUrl: photo(name) } : item
+    }),
+  }))
+}
+
+/** A product to order on the page */
+function product(name: string, price: number, image: string, extra: Partial<ProductItem> = {}): ProductItem {
+  return { id: nanoid(6), name, price, imageUrl: photo(image), ...extra }
+}
+
+/** A product option, e.g. opt('Size', 'S', 'M') or opt('Colour', ['Sand', '#d8c3a5']) */
+function opt(name: string, ...values: (string | [string, string])[]): ProductOption {
+  return { id: nanoid(6), name, values: values.map(v => (Array.isArray(v) ? { id: nanoid(6), label: v[0], color: v[1] } : { id: nanoid(6), label: v })) }
+}
+
+/** The questions every owner answers in chat, on a card */
+const faq = (title: string, content: string) => ({ name: 'text' as const, data: { title, content, align: 'left' as const, style: 'card' as const } })
+
+const step = (date: string, title: string, text?: string) => ({ id: nanoid(6), date, title, text })
+
 export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
   ...GIFT_TEMPLATES,
   ...LOVE_TEMPLATES,
@@ -930,8 +980,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-flower-2',
     preview: { bg: '#EEF1EA', accent: '#6B7F65' },
     build: () => ({
-      title: s('Your Spa', 'Spa của bạn'),
-      bio: s('A quiet place to slow down. Massage, facials and body care.', 'Nơi yên tĩnh để chậm lại. Massage, chăm sóc da mặt và cơ thể.'),
+      title: s('Lá Spa · Massage & Facial', 'Lá Spa · Massage & Chăm sóc da'),
+      bio: s('A quiet place to slow down in District 3. Massage, facials and body care.', 'Góc yên tĩnh giữa Quận 3 để chậm lại. Massage, chăm sóc da mặt và cơ thể.'),
       avatarUrl: photo('spa-avatar'),
       themeConfig: look({
         bg: '#EEF1EA', text: '#2F3A2F', accent: '#6B7F65', onAccent: '#FFFFFF', surface: '#F8F9F5', radius: 20,
@@ -940,22 +990,29 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       }),
       blocks: withIndex([
         { name: 'text', data: { title: s('Welcome', 'Chào mừng'), content: s('Natural oils, warm stones and therapists with ten years of experience. Every visit starts with a cup of herbal tea.', 'Tinh dầu thiên nhiên, đá nóng và kỹ thuật viên hơn mười năm kinh nghiệm. Mỗi lần ghé đều bắt đầu bằng một tách trà thảo mộc.'), align: 'center', style: 'plain' } },
-        { name: 'menu', data: { title: s('Treatments', 'Liệu trình'), currency: '₫', layout: 'cards', sections: menu([
-          { name: '', items: [
-            [s('Aroma massage', 'Massage tinh dầu'), '450,000', s('60 minutes, full body', '60 phút, toàn thân'), s('Popular', 'Bán chạy')],
-            [s('Hot stone massage', 'Massage đá nóng'), '600,000', s('90 minutes', '90 phút')],
-            [s('Facial care', 'Chăm sóc da mặt'), '380,000', s('Cleanse, mask and massage', 'Làm sạch, đắp mặt nạ và massage')],
-            [s('Foot reflexology', 'Bấm huyệt chân'), '250,000', s('45 minutes', '45 phút')],
+        { name: 'menu', data: { title: s('Treatments', 'Liệu trình'), currency: '₫', layout: 'cards', sections: withPhotos(menu([
+          { name: s('Massage', 'Massage'), items: [
+            [s('Aroma massage', 'Massage tinh dầu'), '450,000', s('60 minutes, full body, your choice of oil', '60 phút toàn thân, tự chọn tinh dầu'), s('Popular', 'Bán chạy')],
+            [s('Hot stone massage', 'Massage đá nóng'), '600,000', s('90 minutes, basalt stones for tight shoulders', '90 phút, đá bazan làm mềm vai gáy')],
+            [s('Foot reflexology', 'Bấm huyệt chân'), '250,000', s('45 minutes, with a herbal foot soak', '45 phút, kèm ngâm chân thảo mộc')],
           ] },
-        ]) } },
-        { name: 'image-album', data: { images: album('spa-1', 'spa-2', 'spa-3'), layout: 'carousel' } },
+          { name: s('Face & body', 'Da mặt & cơ thể'), items: [
+            [s('Hydrating facial', 'Chăm sóc da cấp ẩm'), '380,000', s('Cleanse, gentle peel, mask and lymph massage', 'Làm sạch, tẩy da chết dịu nhẹ, mặt nạ và massage nâng cơ')],
+            [s('Couple’s retreat', 'Liệu trình cho hai người'), '1,100,000', s('Two 90-minute massages side by side, with tea and fruit', 'Hai suất massage 90 phút cùng phòng, kèm trà và trái cây'), s('For two', 'Cho cặp đôi')],
+          ] },
+        ]), 'spa-1', 'spa-2', 'spa-3', 'skin-1', 'skin-4') } },
+        { name: 'form', data: { title: s('Book a treatment', 'Đặt lịch'), description: s('Pick a treatment and a time; we confirm on Zalo within 15 minutes.', 'Chọn liệu trình và giờ, spa xác nhận qua Zalo trong 15 phút.'), kind: 'booking', fields: booking(true, true, true) } },
+        { name: 'products', data: { title: s('Gift a treatment', 'Tặng một liệu trình'), layout: 'list', ordering: true, askAddress: false, payment: 'cod', items: [
+          product(s('Gift card · Aroma massage', 'Thẻ quà · Massage tinh dầu'), 450000, 'letters-1', { description: s('Valid for 6 months, picked up at the spa in a gift box', 'Hạn dùng 6 tháng, nhận tại spa kèm hộp quà'), tag: s('Gift idea', 'Ý tưởng quà tặng') }),
+        ] } },
+        faq(s('Good to know', 'Cần biết trước khi đến'), s('🛵 Free motorbike parking in front; cars at the building next door.\n⏰ Arrive 10 minutes early for tea and a short consultation.\n🔁 Need to move your booking? Tell us 2 hours ahead, no charge.\n🌸 Pregnant guests: ask for our gentle prenatal massage.', '🛵 Giữ xe máy miễn phí trước cửa, ô tô gửi toà nhà bên cạnh.\n⏰ Đến sớm 10 phút để uống trà và được tư vấn.\n🔁 Cần đổi lịch? Báo trước 2 tiếng, không mất phí.\n🌸 Mẹ bầu vui lòng báo để spa chuẩn bị liệu trình nhẹ nhàng.')),
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('09:00', '21:00'), note: s('Last booking one hour before closing.', 'Nhận khách cuối trước giờ đóng cửa một tiếng.') } },
-        { name: 'form', data: { title: s('Book a treatment', 'Đặt lịch'), description: s('We’ll confirm your time by phone.', 'Chúng tôi sẽ gọi xác nhận giờ hẹn.'), kind: 'booking', fields: booking(true, true, true) } },
         { name: 'testimonials', data: { title: s('From our guests', 'Khách nói gì'), items: reviews(
-          [s('The calmest hour of my month. Lovely staff.', 'Một tiếng thư thái nhất trong tháng. Nhân viên rất dễ thương.'), 'Sarah K.', s('Google review', 'Đánh giá Google')],
+          [s('The calmest hour of my month. Lovely staff.', 'Một tiếng thư thái nhất trong tháng. Nhân viên rất dễ thương.'), 'Thảo N.', s('Google review', 'Đánh giá Google')],
           [s('Best hot stone massage in town.', 'Massage đá nóng ngon nhất thành phố.'), 'Anna L.'],
+          [s('Booked for my mum’s birthday, she loved the gift box.', 'Đặt tặng mẹ dịp sinh nhật, mẹ rất thích hộp quà.'), 'Minh Q.', s('Bought a gift card', 'Mua thẻ quà tặng')],
         ) } },
-        { name: 'contact', data: { title: s('Visit the spa', 'Ghé spa'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
+        { name: 'contact', data: { title: s('Visit the spa', 'Ghé spa'), address: s('56 Tran Quoc Thao, District 3, HCMC', '56 Trần Quốc Thảo, Quận 3, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'zalo', 'googlemaps') } },
       ] as Blocks),
       room: loungeRoom('#e3e8dc', '#c9b79c', '#6b7f65', s('Book a treatment', 'Đặt lịch')),
@@ -969,8 +1026,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-sparkles',
     preview: { bg: '#FFE4F1', accent: '#EC4899' },
     build: () => ({
-      title: s('Your Nail Studio', 'Tiệm nail của bạn'),
-      bio: s('Gel, nail art and pedicure. Clean tools, cute designs.', 'Sơn gel, vẽ móng và chăm sóc chân. Dụng cụ sạch, mẫu xinh.'),
+      title: s('Mây Nail Studio', 'Mây Nail Studio'),
+      bio: s('Gel, nail art and pedicure in Phu Nhuan. Sterilised tools, new designs every week.', 'Sơn gel, vẽ móng và chăm sóc chân ở Phú Nhuận. Dụng cụ tiệt trùng, mẫu mới mỗi tuần.'),
       avatarUrl: photo('nail-avatar'),
       themeConfig: look({
         bg: '#FFE9F3', text: '#5B1340', accent: '#EC4899', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 999,
@@ -979,13 +1036,29 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       }),
       blocks: withIndex([
         { name: 'menu', data: { title: s('Price list', 'Bảng giá'), currency: '₫', layout: 'list', sections: menu([
-          { name: s('Hands', 'Tay'), items: [[s('Basic manicure', 'Cắt da, sơn thường'), '80,000'], [s('Gel polish', 'Sơn gel'), '150,000', '', s('Popular', 'Bán chạy')], [s('Nail art (per nail)', 'Vẽ móng (mỗi móng)'), '20,000']] },
-          { name: s('Feet', 'Chân'), items: [[s('Pedicure', 'Chăm sóc chân'), '120,000'], [s('Gel pedicure', 'Sơn gel chân'), '180,000']] },
+          { name: s('Hands', 'Tay'), items: [
+            [s('Basic manicure', 'Cắt da, sơn thường'), '80,000', s('Shape, cuticles and regular polish', 'Dũa form, cắt da và sơn thường')],
+            [s('Gel polish', 'Sơn gel'), '150,000', s('Lasts 3 weeks, free fix within 5 days', 'Bền 3 tuần, sửa miễn phí trong 5 ngày'), s('Popular', 'Bán chạy')],
+            [s('Builder gel extensions', 'Úp móng gel'), '280,000', s('Natural length or almond', 'Dáng tự nhiên hoặc hạnh nhân')],
+            [s('Nail art (per nail)', 'Vẽ móng (mỗi móng)'), '20,000', s('Chrome, cat-eye, hand-painted flowers', 'Tráng gương, mắt mèo, vẽ hoa tay')],
+          ] },
+          { name: s('Feet', 'Chân'), items: [
+            [s('Pedicure', 'Chăm sóc chân'), '120,000', s('Soak, scrub and polish', 'Ngâm, tẩy da chết và sơn')],
+            [s('Gel pedicure', 'Sơn gel chân'), '180,000'],
+          ] },
+          { name: s('Combos', 'Combo'), items: [
+            [s('Hands & feet gel', 'Gel tay + chân'), '290,000', s('Save 40,000', 'Tiết kiệm 40.000'), s('Best value', 'Đáng tiền nhất')],
+          ] },
         ]) } },
         { name: 'image-album', data: { title: s('Recent designs', 'Mẫu mới làm'), images: album('nail-1', 'nail-2', 'nail-3'), layout: 'grid' } },
-        { name: 'form', data: { title: s('Book a seat', 'Đặt lịch làm móng'), kind: 'booking', fields: booking() } },
+        { name: 'form', data: { title: s('Book a seat', 'Đặt lịch làm móng'), description: s('Pick your service; send a photo of the design you like on Zalo.', 'Chọn dịch vụ, gửi ảnh mẫu bạn thích qua Zalo nhé.'), kind: 'booking', fields: booking() } },
+        faq(s('Before you come', 'Trước khi đến tiệm'), s('✨ Every tool is sterilised; files and buffers are single-use.\n💅 Removing old gel from another salon: 30,000.\n🕒 Gel with art takes about 75 minutes.\n🎁 Your 6th visit gets free nail art.', '✨ Dụng cụ tiệt trùng, dũa và phao dùng một lần.\n💅 Phá gel cũ từ tiệm khác: 30.000.\n🕒 Sơn gel kèm vẽ mất khoảng 75 phút.\n🎁 Lần thứ 6 được tặng vẽ móng.')),
+        { name: 'testimonials', data: { title: s('Happy hands', 'Khách khen'), items: reviews(
+          [s('My gel lasted almost four weeks. The cat-eye is gorgeous.', 'Sơn gel giữ gần bốn tuần, màu mắt mèo đẹp mê.'), 'Linh T.', s('Google review', 'Đánh giá Google')],
+          [s('Clean, quiet and they never rush you.', 'Sạch, yên tĩnh và không bao giờ làm vội.'), 'Hà P.'],
+        ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('09:00', '20:30') } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
+        { name: 'contact', data: { address: s('112 Phan Xich Long, Phu Nhuan, HCMC', '112 Phan Xích Long, Phú Nhuận, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo', 'googlemaps') } },
       ] as Blocks),
       room: shopRoom('#ffd6e8', '#e8c4a0', '#ec4899', s('See our designs', 'Xem mẫu móng')),
@@ -999,8 +1072,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-scissors',
     preview: { bg: '#18181B', accent: '#D4A373' },
     build: () => ({
-      title: s('Your Salon', 'Salon tóc của bạn'),
-      bio: s('Cuts, color and styling for everyone. Walk-ins welcome.', 'Cắt, nhuộm và tạo kiểu cho mọi người. Khách vãng lai luôn được chào đón.'),
+      title: s('Old Town Barber', 'Old Town Barber'),
+      bio: s('Classic cuts, fades and hot-towel shaves in Hanoi’s Old Quarter. Book to skip the queue.', 'Cắt cổ điển, fade và cạo mặt khăn nóng giữa Phố Cổ Hà Nội. Đặt lịch để khỏi chờ.'),
       avatarUrl: photo('hair-avatar'),
       themeConfig: look({
         bg: '#18181B', text: '#F4F4F5', accent: '#D4A373', onAccent: '#18181B', surface: '#27272A', border: '#3F3F46', radius: 6,
@@ -1009,18 +1082,30 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       }),
       blocks: withIndex([
         { name: 'menu', data: { title: s('Services', 'Dịch vụ'), currency: '₫', layout: 'list', sections: menu([
-          { name: '', items: [
-            [s('Haircut', 'Cắt tóc'), '120,000', s('Wash and style included', 'Gồm gội và tạo kiểu')],
-            [s('Color', 'Nhuộm'), '450,000', s('From, depending on length', 'Từ, tùy độ dài')],
-            [s('Perm', 'Uốn'), '550,000'],
-            [s('Beard trim', 'Tỉa râu'), '60,000'],
+          { name: s('Cuts', 'Cắt'), items: [
+            [s('Signature cut', 'Cắt tóc signature'), '150,000', s('Consult, cut, wash, style and a head massage', 'Tư vấn, cắt, gội, tạo kiểu và massage đầu'), s('Popular', 'Bán chạy')],
+            [s('Skin fade', 'Fade sát da'), '180,000', s('Sharp fade with razor line-up', 'Fade mượt, vuốt viền dao cạo')],
+            [s('Kids’ cut (under 10)', 'Cắt tóc bé (dưới 10 tuổi)'), '90,000'],
+          ] },
+          { name: s('Shave & beard', 'Cạo & râu'), items: [
+            [s('Hot-towel shave', 'Cạo mặt khăn nóng'), '120,000', s('Straight razor, hot towels, aftershave balm', 'Dao cạo thẳng, khăn nóng, dưỡng sau cạo')],
+            [s('Beard trim & shape', 'Tỉa & tạo dáng râu'), '80,000'],
+          ] },
+          { name: s('Colour & perm', 'Nhuộm & uốn'), items: [
+            [s('Grey blending', 'Nhuộm phủ bạc tự nhiên'), '350,000'],
+            [s('Texture perm', 'Uốn phồng tạo kiểu'), '550,000', s('Lasts about 3 months', 'Giữ nếp khoảng 3 tháng')],
           ] },
         ]) } },
-        { name: 'image-album', data: { title: s('Our work', 'Tác phẩm'), images: album('hair-1', 'hair-2', 'hair-3'), layout: 'grid' } },
-        { name: 'form', data: { title: s('Book a chair', 'Đặt lịch'), kind: 'booking', fields: booking() } },
+        { name: 'image-album', data: { title: s('Fresh cuts', 'Kiểu tóc mới cắt'), images: album('hair-1', 'hair-2', 'hair-3'), layout: 'grid' } },
+        { name: 'form', data: { title: s('Book a chair', 'Đặt lịch'), description: s('Choose your service and barber time; we hold your chair for 10 minutes.', 'Chọn dịch vụ và giờ, ghế được giữ cho bạn 10 phút.'), kind: 'booking', fields: booking() } },
+        faq(s('House rules', 'Lưu ý nhỏ'), s('🪒 Walk-ins welcome, but bookings go first.\n🍺 A free cold drink with every cut.\n🛵 Park your bike in the alley, we’ll watch it.\n💳 Cash, bank transfer or card.', '🪒 Khách vãng lai vẫn được phục vụ, khách đặt lịch được ưu tiên.\n🍺 Tặng một lon nước mát mỗi lần cắt.\n🛵 Gửi xe trong hẻm, tiệm trông giúp.\n💳 Nhận tiền mặt, chuyển khoản hoặc thẻ.')),
+        { name: 'testimonials', data: { title: s('From the chair', 'Khách nói gì'), items: reviews(
+          [s('Best fade I’ve had in Hanoi, and the hot towel is pure bliss.', 'Kiểu fade đẹp nhất mình từng cắt ở Hà Nội, khăn nóng phê thật sự.'), 'Đức A.', s('Google review', 'Đánh giá Google')],
+          [s('Brought my son too. Patient and quick.', 'Dẫn cả con trai đi cắt, thợ kiên nhẫn và nhanh.'), 'Tom R.'],
+        ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('08:30', '20:00', [1]) } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook') } },
+        { name: 'contact', data: { address: s('27 Hang Bac, Hoan Kiem, Hanoi', '27 Hàng Bạc, Hoàn Kiếm, Hà Nội'), phone: SAMPLE_PHONE, quickBar: true } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'googlemaps') } },
       ] as Blocks),
       room: shopRoom('#2a2a30', '#5c4a3a', '#d4a373', s('Book a chair', 'Đặt lịch')),
     }),
@@ -1035,8 +1120,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-dumbbell',
     preview: { bg: '#0B0B0F', accent: '#A3E635' },
     build: () => ({
-      title: s('Your Gym', 'Phòng gym của bạn'),
-      bio: s('Strength, cardio and coaching. Train with people who care.', 'Tập tạ, cardio và huấn luyện 1 kèm 1. Tập cùng những người tận tâm.'),
+      title: s('IronHouse Gym', 'IronHouse Gym'),
+      bio: s('Strength, cardio and coaching in Thao Dien. Your first session is free.', 'Tập tạ, cardio và huấn luyện 1 kèm 1 tại Thảo Điền. Buổi đầu miễn phí.'),
       avatarUrl: photo('gym-avatar'),
       themeConfig: look({
         bg: '#0B0B0F', text: '#F4F4F5', accent: '#A3E635', onAccent: '#0B0B0F', surface: '#18181B', radius: 10,
@@ -1044,22 +1129,26 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-square', banner: photo('gym-cover'), avatar: 'rounded', link: 'centered', social: 'outline',
       }),
       blocks: withIndex([
-        { name: 'menu', data: { title: s('Membership', 'Gói tập'), currency: '₫', priceSuffix: s(' / month', ' / tháng'), layout: 'cards', sections: menu([
-          { name: '', items: [
-            [s('Basic', 'Cơ bản'), '450,000', s('Gym floor, 6am to 10pm', 'Khu tập tự do, 6h đến 22h')],
-            [s('Plus', 'Nâng cao'), '750,000', s('Gym and group classes', 'Gym và các lớp nhóm'), s('Best value', 'Đáng tiền nhất')],
-            [s('Personal training', 'Huấn luyện cá nhân'), '3,500,000', s('12 sessions with a coach', '12 buổi với huấn luyện viên')],
+        { name: 'menu', data: { title: s('Membership', 'Gói tập'), currency: '₫', layout: 'cards', sections: withPhotos(menu([
+          { name: s('Monthly', 'Theo tháng'), items: [
+            [s('Basic', 'Cơ bản'), '450,000', s('Gym floor, 6am to 10pm · per month', 'Khu tập tự do, 6h đến 22h · mỗi tháng')],
+            [s('Plus', 'Nâng cao'), '750,000', s('Gym, group classes and sauna · per month', 'Gym, lớp nhóm và xông hơi · mỗi tháng'), s('Best value', 'Đáng tiền nhất')],
           ] },
-        ]) } },
-        { name: 'form', data: { title: s('Book a free trial', 'Đăng ký tập thử miễn phí'), description: s('One free session, no card needed.', 'Một buổi miễn phí, không cần trả trước.'), kind: 'booking', fields: booking(true, true), submitLabel: s('Claim my trial', 'Nhận buổi tập thử') } },
-        { name: 'image-album', data: { images: album('gym-1', 'gym-2', 'gym-3'), layout: 'carousel' } },
+          { name: s('Coaching', 'Huấn luyện'), items: [
+            [s('Personal training · 12 sessions', 'PT 1 kèm 1 · 12 buổi'), '3,500,000', s('Body scan, meal guide and a coach in your pocket on Zalo', 'Đo InBody, hướng dẫn ăn uống và HLV theo sát qua Zalo'), s('Results', 'Có kết quả')],
+          ] },
+        ]), 'gym-1', 'gym-2', 'gym-3') } },
+        { name: 'form', data: { title: s('Book a free trial', 'Đăng ký tập thử miễn phí'), description: s('One free session with a coach, no card needed.', 'Một buổi miễn phí có HLV kèm, không cần trả trước.'), kind: 'booking', fields: booking(true, true), submitLabel: s('Claim my trial', 'Nhận buổi tập thử') } },
+        { name: 'event', data: { name: s('Saturday bootcamp · free for everyone', 'Bootcamp thứ Bảy · miễn phí cho mọi người'), date: '2026-11-14', startTime: '07:00', endTime: '08:00', venue: s('IronHouse rooftop', 'Sân thượng IronHouse'), address: s('15 Thao Dien, Thu Duc, HCMC', '15 Thảo Điền, Thủ Đức, TP.HCM'), dressCode: s('Trainers and a water bottle', 'Giày thể thao và bình nước'), note: s('Bring a friend; both of you get a week pass.', 'Rủ một người bạn, cả hai được tặng vé tập 1 tuần.') } },
         { name: 'testimonials', data: { title: s('Member results', 'Kết quả hội viên'), items: reviews(
-          [s('Lost 8 kg in four months with my coach. Never felt stronger.', 'Giảm 8 kg sau bốn tháng tập với HLV. Chưa bao giờ thấy khỏe như vậy.'), 'Ryan M.'],
+          [s('Lost 8 kg in four months with my coach. Never felt stronger.', 'Giảm 8 kg sau bốn tháng tập với HLV. Chưa bao giờ thấy khỏe như vậy.'), 'Huy N.', s('PT member', 'Hội viên PT')],
           [s('Clean, friendly and open early.', 'Sạch sẽ, thân thiện và mở cửa sớm.'), 'Grace T.'],
+          [s('The sauna after leg day is everything.', 'Xông hơi sau buổi tập chân là chân ái.'), 'Vy L.'],
         ) } },
+        faq(s('Questions we get a lot', 'Câu hỏi hay gặp'), s('🧺 Towels, lockers and showers are included.\n⏸️ Travelling? Pause your membership up to 30 days a year.\n🅿️ Free parking for bikes and cars in the basement.\n👟 Beginners welcome: every new member gets a free intro session.', '🧺 Có sẵn khăn, tủ đồ và phòng tắm.\n⏸️ Đi công tác? Bảo lưu gói tập tối đa 30 ngày mỗi năm.\n🅿️ Gửi xe máy và ô tô miễn phí dưới hầm.\n👟 Người mới tập được hướng dẫn miễn phí một buổi.')),
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('06:00', '22:00') } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'zalo') } },
+        { name: 'contact', data: { address: s('15 Thao Dien, Thu Duc, HCMC', '15 Thảo Điền, Thủ Đức, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
+        { name: 'social', data: { links: social('facebook', 'instagram', 'tiktok', 'zalo', 'googlemaps') } },
       ] as Blocks),
       room: nightRoom('#1c1c22', '#a3e635', s('Book a free trial', 'Đăng ký tập thử miễn phí')),
     }),
@@ -1072,8 +1161,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-stethoscope',
     preview: { bg: '#F3F6FA', accent: '#0369A1' },
     build: () => ({
-      title: s('Your Dental Clinic', 'Nha khoa của bạn'),
-      bio: s('Gentle care for the whole family, with modern equipment.', 'Chăm sóc răng nhẹ nhàng cho cả gia đình, trang thiết bị hiện đại.'),
+      title: s('Sao Mai Dental', 'Nha khoa Sao Mai'),
+      bio: s('Gentle dental care for the whole family, with clear prices before any treatment.', 'Chăm sóc răng nhẹ nhàng cho cả gia đình, báo giá rõ ràng trước khi điều trị.'),
       avatarUrl: photo('dental-avatar'),
       themeConfig: look({
         bg: '#F3F6FA', text: '#0F2A43', accent: '#0369A1', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 14, shadow: 'sm',
@@ -1083,21 +1172,27 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       blocks: withIndex([
         { name: 'text', data: { title: s('About the clinic', 'Về phòng khám'), content: s('Licensed dentists, sterilised tools and clear prices before any treatment.', 'Bác sĩ có chứng chỉ hành nghề, dụng cụ tiệt trùng và báo giá rõ ràng trước khi điều trị.'), align: 'center', style: 'plain' } },
         { name: 'menu', data: { title: s('Treatments & prices', 'Dịch vụ'), currency: '₫', layout: 'list', sections: menu([
-          { name: '', items: [
-            [s('Check-up and cleaning', 'Khám và lấy cao răng'), '300,000'],
-            [s('Whitening', 'Tẩy trắng răng'), '2,500,000'],
-            [s('Filling', 'Trám răng'), '400,000', s('Per tooth', 'Mỗi răng')],
-            [s('Braces consultation', 'Tư vấn niềng răng'), '0', s('Free', 'Miễn phí')],
+          { name: s('General', 'Tổng quát'), items: [
+            [s('Check-up and cleaning', 'Khám và lấy cao răng'), '300,000', s('Includes an X-ray if needed', 'Gồm chụp phim nếu cần'), s('Popular', 'Bán chạy')],
+            [s('Filling', 'Trám răng'), '400,000', s('Per tooth, tooth-coloured composite', 'Mỗi răng, vật liệu composite cùng màu răng')],
+            [s('Wisdom tooth removal', 'Nhổ răng khôn'), '1,500,000', s('From, with a 3D scan first', 'Từ, có chụp phim 3D trước')],
+          ] },
+          { name: s('Cosmetic & braces', 'Thẩm mỹ & niềng'), items: [
+            [s('Whitening', 'Tẩy trắng răng'), '2,500,000', s('One visit, up to 8 shades lighter', 'Một lần hẹn, trắng hơn đến 8 tông')],
+            [s('Clear aligners', 'Niềng trong suốt'), '45,000,000', s('From, pay monthly at 0%', 'Từ, trả góp 0%')],
+            [s('Braces consultation', 'Tư vấn niềng răng'), s('Free', 'Miễn phí'), s('Scan and plan, no obligation', 'Quét răng và lên kế hoạch, không bắt buộc làm')],
           ] },
         ]) } },
-        { name: 'form', data: { title: s('Book an appointment', 'Đặt lịch khám'), kind: 'booking', fields: booking() } },
-        { name: 'hours', data: { title: s('Clinic hours', 'Giờ làm việc'), days: hours('08:00', '19:00', [0]) } },
-        { name: 'image-album', data: { images: album('dental-1', 'dental-2'), layout: 'grid' } },
-        { name: 'testimonials', data: { items: reviews(
-          [s('Painless and very clear about costs.', 'Không đau và báo giá rất rõ ràng.'), 'James P.', s('Google review', 'Đánh giá Google')],
+        { name: 'form', data: { title: s('Book an appointment', 'Đặt lịch khám'), description: s('Pick a treatment and a time; our receptionist calls to confirm.', 'Chọn dịch vụ và giờ khám, lễ tân sẽ gọi xác nhận.'), kind: 'booking', fields: booking() } },
+        { name: 'hours', data: { title: s('Clinic hours', 'Giờ làm việc'), days: hours('08:00', '19:00', [0]), note: s('Toothache on a Sunday? Call the hotline, a dentist is on call.', 'Đau răng ngày Chủ nhật? Gọi hotline, luôn có bác sĩ trực.') } },
+        faq(s('Patients often ask', 'Bệnh nhân thường hỏi'), s('💳 Braces and implants can be paid monthly at 0% interest.\n🧾 Every treatment comes with a written quote first.\n👶 Children from 3 years old, with a gentle first visit.\n🅿️ Free parking for bikes; cars at the market lot next door.', '💳 Niềng răng và cấy ghép có thể trả góp 0%.\n🧾 Mọi điều trị đều có báo giá bằng văn bản trước.\n👶 Nhận khám trẻ từ 3 tuổi, buổi đầu làm quen nhẹ nhàng.\n🅿️ Gửi xe máy miễn phí, ô tô gửi bãi chợ bên cạnh.')),
+        { name: 'image-album', data: { title: s('Inside the clinic', 'Không gian phòng khám'), images: album('dental-1', 'dental-2', 'clinic-2'), layout: 'grid' } },
+        { name: 'testimonials', data: { title: s('Patient reviews', 'Đánh giá của bệnh nhân'), items: reviews(
+          [s('Painless and very clear about costs.', 'Không đau và báo giá rất rõ ràng.'), 'Phương A.', s('Google review', 'Đánh giá Google')],
+          [s('My daughter wasn’t scared at all. Thank you, doctor.', 'Con gái mình không sợ chút nào. Cảm ơn bác sĩ.'), 'Chị Hạnh', s('Parent', 'Phụ huynh')],
         ) } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('facebook', 'zalo') } },
+        { name: 'contact', data: { address: s('210 Nguyen Trai, Thanh Xuan, Hanoi', '210 Nguyễn Trãi, Thanh Xuân, Hà Nội'), phone: SAMPLE_PHONE, quickBar: true } },
+        { name: 'social', data: { links: social('facebook', 'zalo', 'googlemaps') } },
       ] as Blocks),
       room: studioRoom('#e8f1f8', '#c7d2dc', '#0369a1', s('Book an appointment', 'Đặt lịch khám')),
     }),
@@ -1112,8 +1207,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-graduation-cap',
     preview: { bg: '#FFF9E6', accent: '#2563EB' },
     build: () => ({
-      title: s('Your Learning Centre', 'Trung tâm của bạn'),
-      bio: s('English and maths for ages 6 to 15. Small classes, real progress.', 'Tiếng Anh và Toán cho bé 6 đến 15 tuổi. Lớp nhỏ, tiến bộ thật.'),
+      title: s('Bright Minds Learning Centre', 'Trung tâm Bright Minds'),
+      bio: s('English and maths for ages 6 to 15 in Cau Giay. Small classes, real progress.', 'Tiếng Anh và Toán cho bé 6 đến 15 tuổi tại Cầu Giấy. Lớp nhỏ, tiến bộ thật.'),
       avatarUrl: photo('tutor-avatar'),
       themeConfig: look({
         bg: '#FFF9E6', text: '#1E3A8A', accent: '#2563EB', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 16, shadow: 'sm',
@@ -1121,20 +1216,27 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-circle', banner: photo('tutor-cover'), link: 'centered', social: 'filled',
       }),
       blocks: withIndex([
-        { name: 'menu', data: { title: s('Courses', 'Khóa học'), currency: '₫', priceSuffix: s(' / month', ' / tháng'), layout: 'cards', sections: menu([
+        { name: 'menu', data: { title: s('Courses', 'Khóa học'), currency: '₫', layout: 'cards', sections: withPhotos(menu([
           { name: '', items: [
-            [s('English for kids', 'Tiếng Anh thiếu nhi'), '1,200,000', s('8 lessons, max 8 students', '8 buổi, tối đa 8 học viên'), s('New term', 'Khai giảng')],
-            [s('Maths booster', 'Toán nâng cao'), '1,000,000', s('8 lessons', '8 buổi')],
+            [s('English for kids', 'Tiếng Anh thiếu nhi'), '1,200,000', s('8 lessons a month, max 8 students, Cambridge Starters to Flyers', '8 buổi mỗi tháng, tối đa 8 học viên, lộ trình Cambridge Starters đến Flyers'), s('New term', 'Khai giảng')],
+            [s('Maths booster', 'Toán nâng cao'), '1,000,000', s('8 lessons a month, grades 3 to 9', '8 buổi mỗi tháng, lớp 3 đến lớp 9')],
             [s('One-to-one tutoring', 'Gia sư 1 kèm 1'), '300,000', s('Per hour, at home or online', 'Mỗi giờ, tại nhà hoặc online')],
           ] },
-        ]) } },
+        ]), 'tutor-1', 'tutor-2', 'course-2') } },
+        { name: 'timeline', data: { title: s('How a term works', 'Một khoá học diễn ra thế nào'), items: [
+          step(s('Week 0', 'Tuần 0'), s('Free placement test', 'Kiểm tra đầu vào miễn phí'), s('45 minutes, results the same day', '45 phút, có kết quả trong ngày')),
+          step(s('Every class', 'Mỗi buổi'), s('Notes to parents on Zalo', 'Nhận xét gửi phụ huynh qua Zalo'), s('What they learnt and what to practise at home', 'Con học gì và nên ôn gì ở nhà')),
+          step(s('Week 6', 'Tuần 6'), s('Mid-term check', 'Kiểm tra giữa khoá')),
+          step(s('Week 12', 'Tuần 12'), s('Report and a little ceremony', 'Báo cáo và lễ tổng kết nho nhỏ')),
+        ] } },
+        { name: 'form', data: { title: s('Book a free placement test', 'Đăng ký kiểm tra đầu vào miễn phí'), description: s('Pick a course and a time that suits your child.', 'Chọn khoá học và giờ phù hợp với bé.'), kind: 'booking', fields: booking(true, true), submitLabel: s('Book the test', 'Đăng ký kiểm tra') } },
         { name: 'testimonials', data: { title: s('What parents say', 'Phụ huynh nói gì'), items: reviews(
           [s('My son went from shy to confident in one term.', 'Con tôi từ rụt rè trở nên tự tin chỉ sau một khóa.'), s('Ms Laura', 'Chị Laura'), s('Parent', 'Phụ huynh')],
           [s('Teachers send notes after every class.', 'Giáo viên gửi nhận xét sau mỗi buổi học.'), s('Mr David', 'Anh David'), s('Parent', 'Phụ huynh')],
         ) } },
-        { name: 'form', data: { title: s('Book a free placement test', 'Đăng ký kiểm tra đầu vào miễn phí'), kind: 'contact', fields: { phone: true, email: false, date: false, time: false, guests: false, message: true }, submitLabel: s('Send', 'Gửi đăng ký') } },
-        { name: 'image-album', data: { images: album('tutor-1', 'tutor-2'), layout: 'grid' } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
+        faq(s('Parents often ask', 'Phụ huynh thường hỏi'), s('👩‍🏫 Every teacher has an IELTS 7.5+ or a teaching degree.\n🔁 Missed a class? Join a make-up lesson the same week.\n💸 Siblings get 10% off.\n🚗 Pick-up area at the gate, staff walk younger kids out.', '👩‍🏫 Giáo viên có IELTS 7.5+ hoặc bằng sư phạm.\n🔁 Nghỉ một buổi? Học bù trong cùng tuần.\n💸 Anh chị em học cùng giảm 10%.\n🚗 Có khu đón trước cổng, nhân viên dắt các bé nhỏ ra tận nơi.')),
+        { name: 'hours', data: { title: s('Office hours', 'Giờ làm việc'), days: hours('08:00', '20:30', [0]) } },
+        { name: 'contact', data: { address: s('68 Tran Thai Tong, Cau Giay, Hanoi', '68 Trần Thái Tông, Cầu Giấy, Hà Nội'), phone: SAMPLE_PHONE, quickBar: true } },
         { name: 'social', data: { links: social('facebook', 'zalo', 'youtube') } },
       ] as Blocks),
       room: studioRoom('#fff4cc', '#d9b98c', '#2563eb', s('See our courses', 'Xem khóa học')),
@@ -1150,8 +1252,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-croissant',
     preview: { bg: '#FFF7E6', accent: '#D98E04' },
     build: () => ({
-      title: s('Your Bakery', 'Tiệm bánh của bạn'),
-      bio: s('Fresh bread every morning, cakes made to order.', 'Bánh mì nóng mỗi sáng, bánh kem làm theo yêu cầu.'),
+      title: s('Bơ & Bột Bakery', 'Tiệm bánh Bơ & Bột'),
+      bio: s('Fresh bread every morning, birthday cakes made to order in Da Nang.', 'Bánh mì nóng mỗi sáng, bánh kem sinh nhật làm theo yêu cầu tại Đà Nẵng.'),
       avatarUrl: photo('bakery-avatar'),
       themeConfig: look({
         bg: '#FFF7E6', text: '#5A3A1A', accent: '#D98E04', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 18, shadow: 'sm',
@@ -1159,18 +1261,21 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-circle', banner: photo('bakery-cover'), link: 'centered', social: 'soft',
       }),
       blocks: withIndex([
-        { name: 'menu', data: { title: s('Today’s bakes', 'Bánh hôm nay'), currency: '₫', layout: 'cards', sections: menu([
+        { name: 'menu', data: { title: s('Today’s bakes', 'Bánh hôm nay'), currency: '₫', layout: 'cards', sections: withPhotos(menu([
           { name: '', items: [
-            [s('Butter croissant', 'Croissant bơ'), '35,000', '', s('Top seller', 'Bán chạy')],
-            [s('Sourdough loaf', 'Bánh mì men tự nhiên'), '90,000'],
-            [s('Tiramisu slice', 'Tiramisu'), '55,000'],
-            [s('Birthday cake (16 cm)', 'Bánh sinh nhật (16 cm)'), '350,000', s('Order two days ahead', 'Đặt trước hai ngày')],
+            [s('Butter croissant', 'Croissant bơ'), '35,000', s('French butter, out of the oven at 7:00', 'Bơ Pháp, ra lò lúc 7 giờ'), s('Top seller', 'Bán chạy')],
+            [s('Sourdough loaf', 'Bánh mì men tự nhiên'), '90,000', s('48-hour ferment, crackly crust', 'Ủ 48 giờ, vỏ giòn rụm')],
+            [s('Tiramisu slice', 'Tiramisu'), '55,000', s('Mascarpone and Da Lat coffee', 'Mascarpone và cà phê Đà Lạt')],
           ] },
-        ]) } },
-        { name: 'image-album', data: { images: album('bakery-1', 'bakery-2', 'bakery-3'), layout: 'carousel' } },
-        { name: 'form', data: { title: s('Order a cake', 'Đặt bánh'), description: s('Tell us the size, flavour and the name to write.', 'Cho chúng tôi biết cỡ bánh, vị và tên cần viết.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
+        ]), 'bakery-1', 'bakery-2', 'bakery-3') } },
+        { name: 'products', data: { title: s('Birthday cakes', 'Bánh sinh nhật'), layout: 'grid', ordering: true, askAddress: true, payment: 'cod', items: [
+          product(s('Fresh cream cake · 16 cm', 'Bánh kem tươi · 16 cm'), 350000, 'birthday-avatar', { description: s('Serves 6–8. Name and candles free.', 'Cho 6–8 người. Tặng viết tên và nến.'), tag: s('Order 2 days ahead', 'Đặt trước 2 ngày'), options: [opt(s('Flavour', 'Vị'), [s('Chocolate', 'Sô-cô-la'), '#5b3a29'], [s('Strawberry', 'Dâu tây'), '#f4a6b7'], [s('Matcha', 'Trà xanh'), '#9bb36b'])] }),
+          product(s('Party cake · 20 cm', 'Bánh tiệc · 20 cm'), 520000, 'party-avatar', { description: s('Serves 10–14, two layers.', 'Cho 10–14 người, hai tầng nhân.'), options: [opt(s('Flavour', 'Vị'), [s('Chocolate', 'Sô-cô-la'), '#5b3a29'], [s('Mango passion', 'Xoài chanh dây'), '#f6b545'])], stock: 3 }),
+        ] } },
+        { name: 'form', data: { title: s('Design your own cake', 'Đặt bánh theo mẫu riêng'), description: s('Send the size, flavour and the words to write; attach a photo on Zalo.', 'Gửi cỡ bánh, vị và chữ cần viết, ảnh mẫu gửi qua Zalo nhé.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
+        faq(s('Ordering cakes', 'Đặt bánh cần biết'), s('📅 Order 2 days ahead; same-day cakes only while they last.\n🚚 Delivery in the city 20,000–40,000, free over 500,000.\n❄️ Fresh cream cakes keep 2 days in the fridge.\n🕯️ Candles, a knife and a card come with every cake.', '📅 Đặt trước 2 ngày, bánh trong ngày tuỳ còn hàng.\n🚚 Giao nội thành 20.000–40.000, miễn phí đơn từ 500.000.\n❄️ Bánh kem tươi giữ được 2 ngày trong tủ lạnh.\n🕯️ Mỗi bánh kèm nến, dao cắt và thiệp.')),
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('06:30', '20:00') } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
+        { name: 'contact', data: { address: s('45 Le Duan, Hai Chau, Da Nang', '45 Lê Duẩn, Hải Châu, Đà Nẵng'), phone: SAMPLE_PHONE, quickBar: true } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'zalo', 'grabfood', 'shopeefood') } },
       ] as Blocks),
       room: shopRoom('#fdeccb', '#c99a6b', '#d98e04', s('Order a cake', 'Đặt bánh')),
@@ -1184,8 +1289,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-soup',
     preview: { bg: '#FFF4D6', accent: '#DC2626' },
     build: () => ({
-      title: s('Your Food Stall', 'Quán ăn vặt của bạn'),
-      bio: s('Grilled rice paper, banh mi and cold drinks. Open every evening.', 'Bánh tráng nướng, bánh mì và nước mát. Mở cửa mỗi tối.'),
+      title: s('Cô Ba Street Snacks', 'Ăn vặt Cô Ba'),
+      bio: s('Grilled rice paper, banh mi and cold drinks by Ben Thanh market. Open every evening.', 'Bánh tráng nướng, bánh mì và nước mát gần chợ Bến Thành. Mở cửa mỗi tối.'),
       avatarUrl: photo('street-avatar'),
       themeConfig: look({
         bg: '#FFF4D6', text: '#3B1D0E', accent: '#DC2626', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 14, shadow: 'md',
@@ -1193,18 +1298,19 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-circle', banner: photo('street-cover'), link: 'centered', social: 'filled',
       }),
       blocks: withIndex([
-        { name: 'menu', data: { title: s('Menu', 'Thực đơn'), currency: '₫', layout: 'list', sections: menu([
+        { name: 'menu', data: { title: s('Menu', 'Thực đơn'), currency: '₫', layout: 'list', sections: withPhotos(menu([
           { name: s('Snacks', 'Món ăn'), items: [
-            [s('Grilled rice paper', 'Bánh tráng nướng'), '25,000', s('Egg, pork floss, spring onion', 'Trứng, ruốc, hành lá'), s('Must try', 'Phải thử')],
-            [s('Banh mi with pâté', 'Bánh mì pate'), '20,000'],
-            [s('Fried fish balls', 'Cá viên chiên'), '30,000'],
+            [s('Grilled rice paper', 'Bánh tráng nướng'), '25,000', s('Egg, pork floss, spring onion, chilli mayo', 'Trứng, ruốc, hành lá, sốt mayo cay'), s('Must try', 'Phải thử')],
+            [s('Banh mi with pâté', 'Bánh mì pate'), '20,000', s('Homemade pâté, pickles, coriander', 'Pate nhà làm, đồ chua, ngò')],
+            [s('Fried fish balls', 'Cá viên chiên'), '30,000', s('With sweet chilli and tamarind sauce', 'Chấm tương ớt và nước me')],
+            [s('Mixed rice paper salad', 'Bánh tráng trộn'), '25,000', s('Mango, quail eggs, beef jerky', 'Xoài, trứng cút, khô bò'), s('Spicy', 'Cay')],
           ] },
-          { name: s('Drinks', 'Đồ uống'), items: [[s('Kumquat iced tea', 'Trà tắc'), '15,000'], [s('Sugarcane juice', 'Nước mía'), '15,000']] },
-        ]) } },
-        { name: 'vietqr', data: {} },
+          { name: s('Drinks', 'Đồ uống'), items: [[s('Kumquat iced tea', 'Trà tắc'), '15,000'], [s('Sugarcane juice', 'Nước mía'), '15,000'], [s('Coconut jelly', 'Rau câu dừa'), '20,000']] },
+        ]), 'street-1', 'street-2', 'street-3') } },
+        faq(s('Good to know', 'Cần biết'), s('🌧️ Open rain or shine, with a canopy for 20 people.\n🛵 Ordering for the office? Message us for 10+ portions and we’ll deliver.\n📲 Pay with cash or bank QR at the stall.', '🌧️ Mưa nắng vẫn bán, có mái che cho 20 khách.\n🛵 Đặt cho văn phòng? Nhắn trước từ 10 phần, quán giao tận nơi.\n📲 Trả tiền mặt hoặc quét mã QR tại quầy.')),
         { name: 'hours', data: { title: s('Open', 'Giờ bán'), days: hours('16:00', '23:00') } },
-        { name: 'image-album', data: { images: album('street-1', 'street-2', 'street-3'), layout: 'grid' } },
-        { name: 'contact', data: { title: s('Find us', 'Địa chỉ'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
+        { name: 'vietqr', data: {} },
+        { name: 'contact', data: { title: s('Find us', 'Địa chỉ'), address: s('Corner of Le Thanh Ton & Phan Boi Chau, District 1, HCMC', 'Góc Lê Thánh Tôn & Phan Bội Châu, Quận 1, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
         { name: 'social', data: { links: social('tiktok', 'facebook', 'zalo', 'grabfood', 'shopeefood') } },
       ] as Blocks),
       room: nightRoom('#3a1f1a', '#fbbf24', s('See the menu', 'Xem thực đơn')),
@@ -1218,8 +1324,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-martini',
     preview: { bg: '#0E0E0E', accent: '#C9A45C' },
     build: () => ({
-      title: s('Your Bar', 'Quán bar của bạn'),
-      bio: s('Signature cocktails, vinyl and late nights.', 'Cocktail đặc trưng, nhạc vinyl và những đêm muộn.'),
+      title: s('The Lantern Room', 'The Lantern Room'),
+      bio: s('Signature cocktails, vinyl and late nights above Nguyen Hue.', 'Cocktail đặc trưng, nhạc vinyl và những đêm muộn trên phố Nguyễn Huệ.'),
       avatarUrl: photo('bar-avatar'),
       themeConfig: look({
         bg: '#0E0E0E', text: '#F2EDE4', accent: '#C9A45C', onAccent: '#0E0E0E', surface: '#0E0E0E', border: '#3A3326', radius: 2,
@@ -1232,12 +1338,19 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
             [s('Saigon Sour', 'Saigon Sour'), '180,000', s('Rum, passion fruit, lime', 'Rum, chanh dây, chanh'), s('House pick', 'Gợi ý')],
             [s('Lotus Martini', 'Lotus Martini'), '200,000', s('Gin, lotus tea, vermouth', 'Gin, trà sen, vermouth')],
           ] },
-          { name: s('Classics', 'Cổ điển'), items: [[s('Negroni', 'Negroni'), '170,000'], [s('Old Fashioned', 'Old Fashioned'), '170,000']] },
+          { name: s('Classics', 'Cổ điển'), items: [[s('Negroni', 'Negroni'), '170,000'], [s('Old Fashioned', 'Old Fashioned'), '170,000'], [s('Espresso Martini', 'Espresso Martini'), '180,000', s('With Vietnamese robusta', 'Pha cà phê robusta Việt')]] },
+          { name: s('No alcohol', 'Không cồn'), items: [[s('Lychee & rose spritz', 'Spritz vải hoa hồng'), '110,000']] },
         ]) } },
         { name: 'image-album', data: { images: album('bar-1', 'bar-2', 'bar-3'), layout: 'grid' } },
-        { name: 'form', data: { title: s('Reserve a table', 'Đặt bàn'), kind: 'booking', fields: booking(true, true, true, false) } },
+        { name: 'event', data: { name: s('Live jazz · every Friday', 'Nhạc jazz sống · tối thứ Sáu'), date: '2026-11-13', startTime: '21:00', endTime: '23:30', venue: 'The Lantern Room', address: s('3rd floor, 42 Nguyen Hue, District 1, HCMC', 'Tầng 3, 42 Nguyễn Huệ, Quận 1, TP.HCM'), dressCode: s('Smart casual', 'Lịch sự, thoải mái'), note: s('No cover charge. Book a table, the sofas go first.', 'Không thu phí vào cửa. Nên đặt bàn trước, sofa hết rất nhanh.') } },
+        { name: 'form', data: { title: s('Reserve a table', 'Đặt bàn'), description: s('Tables are held for 15 minutes past your time.', 'Bàn được giữ 15 phút sau giờ hẹn.'), kind: 'booking', fields: booking(true, true, true, false) } },
+        faq(s('Before you come', 'Trước khi đến'), s('🔞 Guests 18 and over; please bring ID.\n👟 Smart casual: no flip-flops or sports vests.\n🎂 Celebrating? Tell us in your booking and we’ll bring a candle.', '🔞 Khách từ 18 tuổi, vui lòng mang theo giấy tờ.\n👟 Trang phục lịch sự: không dép lê, không áo ba lỗ.\n🎂 Có dịp đặc biệt? Ghi chú khi đặt bàn, quán sẽ chuẩn bị nến.')),
+        { name: 'testimonials', data: { title: s('Guests say', 'Khách nói gì'), items: reviews(
+          [s('The Saigon Sour is the best drink in District 1.', 'Saigon Sour là ly ngon nhất Quận 1.'), 'Khánh V.', s('Google review', 'Đánh giá Google')],
+          [s('Great music, kind bartenders, view over the walking street.', 'Nhạc hay, bartender dễ thương, nhìn xuống phố đi bộ.'), 'Emma S.'],
+        ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('18:00', '01:00') } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
+        { name: 'contact', data: { address: s('3rd floor, 42 Nguyen Hue, District 1, HCMC', 'Tầng 3, 42 Nguyễn Huệ, Quận 1, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
         { name: 'social', data: { links: social('instagram', 'facebook', 'googlemaps') } },
       ] as Blocks),
       room: nightRoom('#141414', '#c9a45c', s('Reserve a table', 'Đặt bàn')),
@@ -1253,8 +1366,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-flower',
     preview: { bg: '#FDF2F4', accent: '#5B8C51' },
     build: () => ({
-      title: s('Your Flower Shop', 'Tiệm hoa của bạn'),
-      bio: s('Fresh bouquets for birthdays, openings and just because.', 'Hoa tươi cho sinh nhật, khai trương và những ngày bình thường.'),
+      title: s('Hoa Nhà Mint', 'Hoa Nhà Mint'),
+      bio: s('Fresh bouquets for birthdays, openings and just because. Same-day delivery in Hanoi.', 'Hoa tươi cho sinh nhật, khai trương và những ngày bình thường. Giao trong ngày nội thành Hà Nội.'),
       avatarUrl: photo('florist-avatar'),
       themeConfig: look({
         bg: '#FDF2F4', text: '#3F1D2B', accent: '#5B8C51', onAccent: '#FFFFFF', surface: '#FFFFFF', border: '#F3C6D2', radius: 18,
@@ -1262,17 +1375,20 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-circle', banner: photo('florist-cover'), link: 'centered', social: 'outline',
       }),
       blocks: withIndex([
-        { name: 'menu', data: { title: s('Bouquets', 'Bó hoa'), currency: '₫', layout: 'cards', sections: menu([
-          { name: '', items: [
-            [s('Pastel bouquet', 'Bó hoa pastel'), '450,000', s('Roses and baby’s breath', 'Hồng và baby')],
-            [s('Sunflower bunch', 'Bó hướng dương'), '350,000', '', s('Popular', 'Bán chạy')],
-            [s('Opening flower stand', 'Kệ hoa khai trương'), '1,500,000', s('Order a day ahead', 'Đặt trước một ngày')],
-          ] },
-        ]) } },
-        { name: 'image-album', data: { title: s('From the shop', 'Ở tiệm'), images: album('florist-1', 'florist-2', 'florist-3'), layout: 'grid' } },
-        { name: 'form', data: { title: s('Order flowers', 'Đặt hoa'), description: s('Tell us the date, budget and who they are for.', 'Cho chúng tôi biết ngày nhận, ngân sách và người nhận.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
+        { name: 'products', data: { title: s('Bouquets', 'Bó hoa'), layout: 'grid', ordering: true, askAddress: true, payment: 'cod', items: [
+          product(s('Pastel bouquet', 'Bó hoa pastel'), 450000, 'florist-1', { description: s('Garden roses and baby’s breath', 'Hồng vườn và baby'), tag: s('Popular', 'Bán chạy'), options: [opt(s('Wrap', 'Giấy gói'), [s('Kraft', 'Giấy kraft'), '#c9a27e'], [s('Blush', 'Hồng phấn'), '#f6c9d4'], [s('White', 'Trắng'), '#f7f5f0'])] }),
+          product(s('Sunflower bunch', 'Bó hướng dương'), 350000, 'florist-2', { description: s('Five sunflowers with eucalyptus', 'Năm bông hướng dương kèm lá bạch đàn'), options: [opt(s('Wrap', 'Giấy gói'), [s('Kraft', 'Giấy kraft'), '#c9a27e'], [s('White', 'Trắng'), '#f7f5f0'])] }),
+          product(s('Peony box', 'Hộp hoa mẫu đơn'), 890000, 'event-2', { description: s('Imported peonies, in season until December', 'Mẫu đơn nhập, chỉ có đến tháng 12'), tag: s('Seasonal', 'Theo mùa'), stock: 2 }),
+          product(s('Opening flower stand', 'Kệ hoa khai trương'), 1500000, 'florist-3', { description: s('1.6 m stand with a ribbon and your message', 'Kệ cao 1,6 m kèm băng rôn lời chúc'), tag: s('Order a day ahead', 'Đặt trước một ngày') }),
+        ] } },
+        { name: 'form', data: { title: s('Something special in mind?', 'Muốn một bó hoa riêng?'), description: s('Tell us the date, budget and who they are for; we send a sketch on Zalo.', 'Cho tiệm biết ngày nhận, ngân sách và người nhận, tiệm gửi mẫu qua Zalo.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
+        faq(s('Delivery & care', 'Giao hoa & giữ hoa'), s('🚚 Same-day delivery in the inner city for orders before 15:00 (30,000).\n💌 A handwritten card is free; write your message in the order note.\n📸 We send a photo before the flowers leave the shop.\n💧 Trim the stems and change the water every two days.', '🚚 Giao trong ngày nội thành cho đơn trước 15 giờ (30.000).\n💌 Tặng thiệp viết tay, ghi lời nhắn ở phần ghi chú.\n📸 Tiệm gửi ảnh hoa trước khi giao.\n💧 Cắt gốc và thay nước hai ngày một lần để hoa tươi lâu.')),
+        { name: 'testimonials', data: { title: s('Kind words', 'Khách gửi lời'), items: reviews(
+          [s('Ordered at noon, my mum had them by 4 pm. So pretty.', 'Đặt lúc trưa, 4 giờ chiều mẹ đã nhận được. Đẹp lắm.'), 'Ngọc H.', s('Google review', 'Đánh giá Google')],
+          [s('They sent a photo first, exactly as I hoped.', 'Tiệm gửi ảnh trước, đúng y như mình mong.'), 'Bảo T.'],
+        ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('07:00', '21:00') } },
-        { name: 'contact', data: { address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
+        { name: 'contact', data: { address: s('19 Hang Chuoi, Hai Ba Trung, Hanoi', '19 Hàng Chuối, Hai Bà Trưng, Hà Nội'), phone: SAMPLE_PHONE, quickBar: true } },
         { name: 'social', data: { links: social('facebook', 'instagram', 'zalo', 'shopee') } },
       ] as Blocks),
       room: shopRoom('#fbe4ea', '#d8b49a', '#5b8c51', s('Order flowers', 'Đặt hoa'), [
@@ -1289,8 +1405,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-shopping-bag',
     preview: { bg: '#FAFAFA', accent: '#0A0A0A' },
     build: () => ({
-      title: s('Your Shop', 'Shop của bạn'),
-      bio: s('Everyday clothes in soft colors. New drops every Friday.', 'Quần áo hằng ngày tông màu dịu. Hàng mới mỗi thứ Sáu.'),
+      title: s('SOFT DAYS', 'SOFT DAYS'),
+      bio: s('Everyday clothes in soft colours, sewn in Saigon. New drops every Friday, COD nationwide.', 'Quần áo hằng ngày tông màu dịu, may tại Sài Gòn. Hàng mới mỗi thứ Sáu, ship COD toàn quốc.'),
       avatarUrl: photo('shop-avatar'),
       themeConfig: look({
         bg: '#FAFAFA', text: '#0A0A0A', accent: '#0A0A0A', onAccent: '#FFFFFF', surface: '#FFFFFF', border: '#E5E5E5', radius: 0,
@@ -1298,15 +1414,18 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-square', banner: photo('shop-cover'), avatar: 'square', link: 'centered', social: 'plain',
       }),
       blocks: withIndex([
-        { name: 'links', data: { items: links([s('Shop on Shopee', 'Mua trên Shopee'), ''], [s('Shop on TikTok Shop', 'Mua trên TikTok Shop'), ''], [s('Size guide', 'Bảng size'), '']) } },
-        { name: 'menu', data: { title: s('Best sellers', 'Bán chạy'), currency: '₫', layout: 'cards', sections: menu([
-          { name: '', items: [
-            [s('Linen shirt', 'Áo sơ mi linen'), '320,000'],
-            [s('Wide-leg trousers', 'Quần ống rộng'), '380,000', '', s('New', 'Mới')],
-            [s('Knit cardigan', 'Áo khoác len'), '450,000'],
-          ] },
-        ]) } },
-        { name: 'image-album', data: { title: s('Lookbook', 'Lookbook'), images: album('shop-1', 'shop-2', 'shop-3'), layout: 'masonry' } },
+        { name: 'products', data: { title: s('Best sellers', 'Bán chạy'), layout: 'grid', ordering: true, askAddress: true, payment: 'cod', items: [
+          product(s('Linen shirt', 'Áo sơ mi linen'), 320000, 'shop-1', { description: s('Breathable, relaxed fit', 'Thoáng mát, dáng suông'), options: [opt(s('Size', 'Size'), 'S', 'M', 'L', 'XL'), opt(s('Colour', 'Màu'), [s('Oat', 'Màu yến mạch'), '#e8dcc8'], [s('Sage', 'Xanh xô thơm'), '#a7b49b'])] }),
+          product(s('Wide-leg trousers', 'Quần ống rộng'), 380000, 'shop-2', { description: s('High waist, soft drape', 'Cạp cao, vải rủ mềm'), tag: s('New', 'Mới'), options: [opt(s('Size', 'Size'), 'S', 'M', 'L'), opt(s('Colour', 'Màu'), [s('Black', 'Đen'), '#1c1c1c'], [s('Cream', 'Kem'), '#efe6d6'])] }),
+          product(s('Knit cardigan', 'Áo khoác len'), 450000, 'shop-3', { description: s('Chunky knit, pearl buttons', 'Len dày, cúc ngọc trai'), options: [opt(s('Size', 'Size'), 'Free size')], stock: 4, comparePrice: 520000 }),
+        ] } },
+        { name: 'text', data: { title: s('Size guide', 'Bảng size'), content: s('S · 42–48 kg · height up to 1m58\nM · 48–55 kg · 1m55–1m63\nL · 55–62 kg · 1m60–1m68\nXL · 62–70 kg · 1m65–1m72\nNot sure? Send us your height and weight on Zalo.', 'S · 42–48 kg · cao đến 1m58\nM · 48–55 kg · 1m55–1m63\nL · 55–62 kg · 1m60–1m68\nXL · 62–70 kg · 1m65–1m72\nPhân vân? Nhắn chiều cao, cân nặng qua Zalo để shop tư vấn.'), align: 'left', style: 'card' } },
+        faq(s('Shipping & returns', 'Giao hàng & đổi trả'), s('🚚 COD nationwide, 2–4 days; free shipping over 500,000.\n🔁 Exchange size or colour within 7 days, tags on.\n📦 Check the parcel before paying.', '🚚 Ship COD toàn quốc 2–4 ngày, miễn phí ship đơn từ 500.000.\n🔁 Đổi size, đổi màu trong 7 ngày, còn tag.\n📦 Được kiểm tra hàng trước khi thanh toán.')),
+        { name: 'image-album', data: { title: s('Lookbook', 'Lookbook'), images: album('blog-fashion-1', 'blog-fashion-2', 'blog-fashion-3'), layout: 'masonry' } },
+        { name: 'testimonials', data: { title: s('Customer reviews', 'Khách đã mua'), items: reviews(
+          [s('The linen shirt is even softer than the photos. Ordering a second colour.', 'Áo linen mềm hơn cả trong ảnh, đặt thêm màu thứ hai.'), 'Trâm L.', s('Bought on Shopee', 'Mua trên Shopee')],
+          [s('Exchanged a size in two days, no fuss.', 'Đổi size trong hai ngày, rất nhanh gọn.'), 'Quỳnh A.'],
+        ) } },
         { name: 'contact', data: { title: s('Questions?', 'Cần tư vấn?'), phone: SAMPLE_PHONE } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo', 'shopee', 'tiktokshop', 'lazada') } },
       ] as Blocks),
@@ -1323,8 +1442,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-house',
     preview: { bg: '#F5F1E8', accent: '#1B2A41' },
     build: () => ({
-      title: s('Your Name · Real Estate', 'Tên bạn · Bất động sản'),
-      bio: s('Apartments and houses in the city. Honest advice, fast viewings.', 'Căn hộ và nhà phố trong thành phố. Tư vấn thật, xem nhà nhanh.'),
+      title: s('Trần Minh · Real Estate', 'Trần Minh · Bất động sản'),
+      bio: s('Apartments and townhouses in Thu Duc and District 7. Honest advice, viewings within 24 hours.', 'Căn hộ và nhà phố Thủ Đức, Quận 7. Tư vấn thật, xem nhà trong 24 giờ.'),
       avatarUrl: photo('realestate-avatar'),
       themeConfig: look({
         bg: '#F5F1E8', text: '#1B2A41', accent: '#1B2A41', onAccent: '#F5F1E8', surface: '#FFFFFF', radius: 6,
@@ -1332,19 +1451,29 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-square', banner: photo('realestate-cover'), avatar: 'rounded', link: 'centered', social: 'filled', titleAlign: 'left',
       }),
       blocks: withIndex([
-        { name: 'menu', data: { title: s('Featured listings', 'Căn nổi bật'), currency: '₫', layout: 'cards', sections: menu([
-          { name: '', items: [
-            [s('2-bed apartment, river view', 'Căn hộ 2 phòng ngủ, view sông'), '4.2 tỷ', s('75 m², District 2', '75 m², Quận 2'), s('New', 'Mới')],
-            [s('Townhouse with garden', 'Nhà phố có sân vườn'), '9.8 tỷ', s('4 floors, 5 bedrooms', '4 tầng, 5 phòng ngủ')],
-            [s('Studio for rent', 'Studio cho thuê'), '8 triệu/tháng', s('Furnished, near the centre', 'Đầy đủ nội thất, gần trung tâm')],
+        { name: 'menu', data: { title: s('Featured listings', 'Căn nổi bật'), currency: '', layout: 'cards', sections: withPhotos(menu([
+          { name: s('For sale', 'Đang bán'), items: [
+            [s('2-bed apartment, river view', 'Căn hộ 2 phòng ngủ, view sông'), s('4.2 billion ₫', '4,2 tỷ'), s('75 m², pink book, Thao Dien', '75 m², sổ hồng, Thảo Điền'), s('New', 'Mới')],
+            [s('Townhouse with garden', 'Nhà phố có sân vườn'), s('9.8 billion ₫', '9,8 tỷ'), s('4 floors, 5 bedrooms, 6 m road', '4 tầng, 5 phòng ngủ, đường 6 m')],
           ] },
-        ]) } },
-        { name: 'image-album', data: { images: album('realestate-1', 'realestate-2', 'realestate-3'), layout: 'carousel' } },
-        { name: 'form', data: { title: s('Request a viewing', 'Đặt lịch xem nhà'), kind: 'booking', fields: booking(true, true) } },
-        { name: 'testimonials', data: { items: reviews(
-          [s('Found our flat in two weeks. Very patient.', 'Tìm được căn hộ chỉ sau hai tuần. Rất kiên nhẫn.'), 'Gia đình anh Phúc'],
+          { name: s('For rent', 'Cho thuê'), items: [
+            [s('Studio for rent', 'Studio cho thuê'), s('8 million ₫ / month', '8 triệu/tháng'), s('Furnished, 10 minutes to District 1', 'Đầy đủ nội thất, 10 phút vào Quận 1')],
+          ] },
+        ]), 'realestate-1', 'realestate-2', 'realestate-3') } },
+        { name: 'form', data: { title: s('Request a viewing', 'Đặt lịch xem nhà'), description: s('Pick the home and a time; I confirm within the hour.', 'Chọn căn và giờ xem, tôi xác nhận trong vòng một giờ.'), kind: 'booking', fields: booking(true, true) } },
+        { name: 'timeline', data: { title: s('How I work', 'Quy trình làm việc'), items: [
+          step('01', s('A 20-minute call', 'Gọi trao đổi 20 phút'), s('Budget, area, must-haves', 'Ngân sách, khu vực, điều bắt buộc')),
+          step('02', s('A shortlist in 48 hours', 'Danh sách căn phù hợp trong 48 giờ'), s('Only homes I have seen myself', 'Chỉ những căn tôi đã tận mắt xem')),
+          step('03', s('Viewings', 'Đi xem nhà')),
+          step('04', s('Legal check & handover', 'Kiểm tra pháp lý & bàn giao'), s('Pink book, contract and notary, start to finish', 'Sổ hồng, hợp đồng, công chứng, từ đầu đến cuối')),
+        ] } },
+        { name: 'image-album', data: { title: s('Inside the river-view flat', 'Bên trong căn view sông'), images: album('interior-1', 'interior-3', 'interior-2'), layout: 'carousel' } },
+        faq(s('Buyers often ask', 'Khách mua thường hỏi'), s('💼 Buyers pay no fee; sellers pay 1% on success.\n📄 Every listing has its legal papers checked before I show it.\n🏦 I can introduce you to banks for a home loan up to 70%.', '💼 Người mua không mất phí, người bán trả 1% khi giao dịch thành công.\n📄 Mọi căn đều được kiểm tra pháp lý trước khi giới thiệu.\n🏦 Hỗ trợ kết nối ngân hàng vay đến 70% giá trị nhà.')),
+        { name: 'testimonials', data: { title: s('Clients say', 'Khách hàng nói gì'), items: reviews(
+          [s('Found our flat in two weeks. Very patient.', 'Tìm được căn hộ chỉ sau hai tuần. Rất kiên nhẫn.'), s('Phuc’s family', 'Gia đình anh Phúc'), s('Bought in Thao Dien', 'Mua căn hộ Thảo Điền')],
+          [s('Sold our townhouse above asking, and handled all the paperwork.', 'Bán được nhà phố cao hơn giá kỳ vọng, lo trọn giấy tờ.'), s('Ms Lan', 'Cô Lan'), s('Seller', 'Người bán')],
         ) } },
-        { name: 'contact', data: { phone: SAMPLE_PHONE, email: 'hello@yourname.vn' } },
+        { name: 'contact', data: { phone: SAMPLE_PHONE, email: 'minh.tran@example.vn', quickBar: true } },
         { name: 'social', data: { links: social('facebook', 'zalo', 'youtube') } },
       ] as Blocks),
       room: loungeRoom('#ece6da', '#a98a6a', '#1b2a41', s('See listings', 'Xem nhà')),
@@ -1360,8 +1489,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-camera',
     preview: { bg: '#FBF8F2', accent: '#2C2620' },
     build: () => ({
-      title: s('Your Studio', 'Studio của bạn'),
-      bio: s('Wedding and pre-wedding photos with a natural, film-like feel.', 'Ảnh cưới và pre-wedding phong cách tự nhiên, màu phim.'),
+      title: s('Lumière Wedding Studio', 'Lumière Wedding Studio'),
+      bio: s('Wedding and pre-wedding photos with a natural, film-like feel. Saigon, Da Lat and anywhere you love.', 'Ảnh cưới và pre-wedding phong cách tự nhiên, màu phim. Sài Gòn, Đà Lạt và bất cứ nơi nào bạn yêu.'),
       avatarUrl: photo('photo-avatar'),
       themeConfig: look({
         bg: '#FBF8F2', text: '#2C2620', accent: '#2C2620', onAccent: '#FBF8F2', surface: '#FBF8F2', border: '#D9CFC1', radius: 2,
@@ -1375,13 +1504,23 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
             [s('Pre-wedding', 'Pre-wedding'), '8,000,000', s('One location, 60 edited photos', 'Một địa điểm, 60 ảnh chỉnh sửa')],
             [s('Wedding day', 'Ngày cưới'), '12,000,000', s('Ceremony and party, full gallery', 'Lễ và tiệc, trọn bộ ảnh'), s('Most booked', 'Được chọn nhiều')],
             [s('Album add-on', 'Album in'), '3,000,000', s('30 × 30 cm, 40 pages', '30 × 30 cm, 40 trang')],
+            [s('Da Lat pre-wedding trip', 'Pre-wedding Đà Lạt'), '15,000,000', s('Two days, three locations, travel included', 'Hai ngày, ba địa điểm, đã gồm chi phí di chuyển'), s('Limited dates', 'Ít lịch trống')],
           ] },
         ]) } },
+        { name: 'timeline', data: { title: s('From hello to album', 'Từ lúc nhắn tin đến khi nhận album'), items: [
+          step('01', s('Coffee and a mood board', 'Cà phê và lên ý tưởng'), s('We plan locations, outfits and light together', 'Cùng chọn địa điểm, trang phục và giờ đẹp')),
+          step('02', s('A 30% deposit holds your date', 'Đặt cọc 30% để giữ ngày')),
+          step('03', s('The shoot', 'Ngày chụp'), s('Relaxed, no stiff poses', 'Thoải mái, không tạo dáng gượng')),
+          step('04', s('Sneak peek in 3 days, full gallery in 4 weeks', 'Ảnh xem trước sau 3 ngày, trọn bộ sau 4 tuần')),
+        ] } },
         { name: 'testimonials', data: { title: s('Kind words', 'Lời cảm ơn'), items: reviews(
           [s('We cried looking at the photos. Thank you!', 'Hai đứa đã khóc khi xem ảnh. Cảm ơn bạn rất nhiều!'), 'Lily & Ben'],
+          [s('They made my shy husband laugh all day. The photos show it.', 'Ông xã nhà mình vốn ngại ống kính mà cười suốt buổi. Ảnh nói lên tất cả.'), 'Thu & Nam', s('Pre-wedding in Da Lat', 'Pre-wedding Đà Lạt')],
         ) } },
-        { name: 'form', data: { title: s('Check your date', 'Hỏi lịch trống'), kind: 'booking', fields: { phone: true, email: true, date: true, time: false, guests: false, message: true }, submitLabel: s('Ask about my date', 'Gửi câu hỏi') } },
-        { name: 'social', data: { links: social('instagram', 'facebook', 'tiktok') } },
+        { name: 'form', data: { title: s('Check your date', 'Hỏi lịch trống'), description: s('Wedding season fills up fast; ask early and we hold your date for 3 days.', 'Mùa cưới kín lịch rất nhanh, hỏi sớm để được giữ ngày 3 hôm.'), kind: 'booking', fields: { phone: true, email: true, date: true, time: false, guests: false, message: true, service: true }, submitLabel: s('Ask about my date', 'Gửi câu hỏi') } },
+        faq(s('Couples often ask', 'Các cặp đôi thường hỏi'), s('💍 A 30% deposit holds your date; the rest on the shoot day.\n🚗 Travel outside the city is quoted per trip.\n🖼️ You get every edited photo in full resolution, no watermarks.\n☔ Rain? We move the shoot for free.', '💍 Cọc 30% để giữ ngày, phần còn lại thanh toán vào ngày chụp.\n🚗 Chụp ngoài thành phố báo giá theo chuyến.\n🖼️ Nhận toàn bộ ảnh đã chỉnh, độ phân giải gốc, không đóng dấu.\n☔ Trời mưa? Dời lịch miễn phí.')),
+        { name: 'vietqr', data: {} },
+        { name: 'social', data: { links: social('instagram', 'facebook', 'tiktok', 'behance') } },
       ] as Blocks),
       room: studioRoom('#f3ede4', '#c8a27a', '#2c2620', s('See the portfolio', 'Xem tác phẩm')),
     }),
@@ -1394,8 +1533,8 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
     icon: 'i-lucide-music',
     preview: { bg: '#12002B', accent: '#F472B6' },
     build: () => ({
-      title: s('Your Artist Name', 'Nghệ danh của bạn'),
-      bio: s('DJ and producer. House, disco and late-night sets.', 'DJ và nhà sản xuất âm nhạc. House, disco và những set nhạc đêm.'),
+      title: s('DJ KAI', 'DJ KAI'),
+      bio: s('DJ and producer from Saigon. House, disco and late-night sets for clubs, brands and weddings.', 'DJ và nhà sản xuất âm nhạc từ Sài Gòn. House, disco và những set nhạc đêm cho club, thương hiệu và tiệc cưới.'),
       avatarUrl: photo('dj-avatar'),
       themeConfig: look({
         bg: '#12002B', text: '#FDF4FF', accent: '#F472B6', onAccent: '#12002B', surface: '#12002B', border: '#F472B6', radius: 14,
@@ -1405,15 +1544,21 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       blocks: withIndex([
         { name: 'social', data: { links: social('spotify', 'youtube', 'instagram', 'tiktok') } },
         { name: 'video', data: { title: s('Latest set', 'Set nhạc mới nhất'), url: '' } },
-        { name: 'links', data: { items: links([s('Listen on Spotify', 'Nghe trên Spotify'), ''], [s('Press kit', 'Hồ sơ nghệ sĩ'), '']) } },
-        { name: 'menu', data: { title: s('Upcoming shows', 'Lịch diễn sắp tới'), currency: '', layout: 'list', sections: menu([
+        { name: 'event', data: { name: s('Saturday night · Rooftop Club', 'Đêm thứ Bảy · Rooftop Club'), date: '2026-11-14', startTime: '22:00', endTime: '23:59', venue: 'Rooftop Club', address: s('76 Le Lai, District 1, HCMC', '76 Lê Lai, Quận 1, TP.HCM'), note: s('Guest list until 23:00, message me on Instagram.', 'Có guest list đến 23 giờ, nhắn mình qua Instagram.') } },
+        { name: 'event', data: { name: s('Beach Festival · sunset set', 'Lễ hội biển · set hoàng hôn'), date: '2026-11-20', startTime: '17:30', endTime: '19:00', venue: s('My Khe Beach', 'Bãi biển Mỹ Khê'), address: s('Vo Nguyen Giap, Son Tra, Da Nang', 'Võ Nguyên Giáp, Sơn Trà, Đà Nẵng') } },
+        { name: 'image-album', data: { images: album('dj-1', 'dj-2', 'dj-3'), layout: 'grid' } },
+        { name: 'menu', data: { title: s('Book a set', 'Gói biểu diễn'), currency: '₫', layout: 'list', sections: menu([
           { name: '', items: [
-            [s('Saturday · Rooftop Club', 'Thứ Bảy · Rooftop Club'), '22:00', s('Ho Chi Minh City', 'TP. Hồ Chí Minh')],
-            [s('Next Friday · Beach Festival', 'Thứ Sáu tới · Lễ hội biển'), '20:00', s('Da Nang', 'Đà Nẵng'), s('Tickets', 'Có vé')],
+            [s('Club night · 3 hours', 'Club · 3 tiếng'), '12,000,000', s('Own controller, rider on request', 'Tự mang controller, rider gửi theo yêu cầu')],
+            [s('Brand event · 2 hours', 'Sự kiện thương hiệu · 2 tiếng'), '15,000,000', s('Playlist planned with your team', 'Lên playlist cùng đội của bạn')],
+            [s('Wedding party · 4 hours', 'Tiệc cưới · 4 tiếng'), '18,000,000', s('Sound system and MC support included', 'Đã gồm âm thanh và hỗ trợ MC'), s('Popular', 'Bán chạy')],
           ] },
         ]) } },
-        { name: 'image-album', data: { images: album('dj-1', 'dj-2', 'dj-3'), layout: 'grid' } },
-        { name: 'form', data: { title: s('Book me', 'Mời biểu diễn'), kind: 'booking', fields: { phone: true, email: true, date: true, time: false, guests: true, message: true } } },
+        { name: 'form', data: { title: s('Book me', 'Mời biểu diễn'), description: s('Tell me the date, the crowd and the vibe; I reply within a day.', 'Cho mình biết ngày, khách mời và không khí mong muốn, mình trả lời trong một ngày.'), kind: 'booking', fields: { phone: true, email: true, date: true, time: false, guests: true, message: true, service: true } } },
+        { name: 'testimonials', data: { title: s('Promoters say', 'Đối tác nói gì'), items: reviews(
+          [s('Packed the dance floor until closing, two weekends in a row.', 'Sàn nhảy kín người đến giờ đóng cửa, hai cuối tuần liền.'), 'Rooftop Club', s('Venue', 'Địa điểm')],
+          [s('Read the room perfectly at our launch party.', 'Bắt nhịp khách mời rất chuẩn ở tiệc ra mắt sản phẩm.'), s('Brand team, Sài Gòn', 'Đội thương hiệu, Sài Gòn')],
+        ) } },
       ] as Blocks),
       room: nightRoom('#1a0638', '#f472b6', s('Latest set', 'Set nhạc mới nhất')),
     }),
@@ -1431,18 +1576,24 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
       title: s('Mia turns 30!', 'Mia tròn 30 tuổi!'),
       bio: s('Come celebrate with cake, games and good friends.', 'Đến chung vui cùng bánh kem, trò chơi và bạn bè nhé.'),
       avatarUrl: photo('party-avatar'),
-      themeConfig: look({
-        bg: '#FFF1C1', text: '#4C1D95', accent: '#F43F5E', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 999, shadow: 'md',
-        nameFont: 'Pacifico, cursive', nameWeight: '400', nameSize: '2.25rem', bodyFont: 'Nunito, sans-serif',
-        header: 'banner-circle', banner: photo('party-cover'), link: 'centered', social: 'filled',
-      }),
+      themeConfig: {
+        ...look({
+          bg: '#FFF1C1', text: '#4C1D95', accent: '#F43F5E', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 999, shadow: 'md',
+          nameFont: 'Pacifico, cursive', nameWeight: '400', nameSize: '2.25rem', bodyFont: 'Nunito, sans-serif',
+          header: 'banner-circle', banner: photo('party-cover'), link: 'centered', social: 'filled',
+        }),
+        music: { trackId: 'party-celebration' },
+      },
       blocks: withIndex([
-        { name: 'birthday-countdown', data: { birthDate: '2027-03-15', theme: 'party', showAge: false, label: s('Party starts in', 'Còn bao lâu nữa') } },
-        { name: 'menu', data: { title: s('The plan', 'Lịch trình'), currency: '', layout: 'list', sections: menu([
-          { name: '', items: [[s('Welcome drinks', 'Đón khách'), '18:00'], [s('Dinner', 'Ăn tối'), '19:00'], [s('Cake and games', 'Cắt bánh và trò chơi'), '20:30']] },
-        ]) } },
-        { name: 'contact', data: { title: s('Where', 'Địa điểm'), address: SAMPLE_ADDRESS } },
-        { name: 'form', data: { title: s('Are you coming?', 'Bạn có đến không?'), kind: 'booking', fields: { phone: true, email: false, date: false, time: false, guests: true, message: true }, submitLabel: s('I’ll be there', 'Mình sẽ đến') } },
+        { name: 'letter', data: { to: s('my favourite people', 'hội bạn thân yêu'), body: s('Thirty! I’d like to spend the night with the people who made the last ten years so good.\nThere will be tacos, a ridiculous cake and a playlist you’re allowed to add to.', 'Ba mươi rồi! Mình muốn đón tuổi mới cùng những người làm mười năm qua thật vui.\nSẽ có đồ ăn ngon, một chiếc bánh siêu “lố” và playlist ai cũng được thêm bài.'), from: s('Mia', 'Mia'), sealed: true, paper: 'blush', personal: true } },
+        { name: 'birthday-countdown', data: { birthDate: '2027-03-15', theme: 'party', showAge: false, label: s('Party starts in', 'Còn bao lâu nữa'), mode: 'until', repeat: false } },
+        { name: 'event', data: { name: s('Mia’s 30th', 'Sinh nhật 30 của Mia'), date: '2027-03-15', startTime: '18:00', endTime: '23:00', venue: s('Sky Garden rooftop', 'Sân thượng Sky Garden'), address: s('9 Thai Van Lung, District 1, HCMC', '9 Thái Văn Lung, Quận 1, TP.HCM'), dressCode: s('Anything with sparkle', 'Có chút lấp lánh là được') } },
+        { name: 'timeline', data: { title: s('The plan', 'Lịch trình'), items: [
+          { id: nanoid(6), date: '18:00', title: s('Welcome drinks', 'Đón khách') },
+          { id: nanoid(6), date: '19:00', title: s('Dinner', 'Ăn tối'), text: s('Tacos, grilled seafood and a vegetarian table.', 'Tacos, hải sản nướng và một bàn món chay.') },
+          { id: nanoid(6), date: '20:30', title: s('Cake and games', 'Cắt bánh và trò chơi'), text: s('Bring your best karaoke song.', 'Chuẩn bị sẵn bài karaoke tủ nhé.') },
+        ] } },
+        { name: 'form', data: { title: s('Are you coming?', 'Bạn có đến không?'), description: s('Tell me by 10 March so I can book enough seats.', 'Báo mình trước 10/3 để mình đặt đủ chỗ nhé.'), kind: 'rsvp', fields: RSVP_FIELDS, submitLabel: s('I’ll be there', 'Mình sẽ đến') } },
         { name: 'image-album', data: { images: album('birthday-1', 'birthday-2', 'birthday-cover', 'birthday-avatar'), layout: 'grid' } },
       ] as Blocks),
       room: loungeRoom('#ffe4ef', '#e8c4a0', '#f43f5e', s('RSVP', 'Xác nhận tham dự')),
@@ -1465,13 +1616,20 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         header: 'banner-circle', banner: photo('charity-cover'), link: 'centered', social: 'soft',
       }),
       blocks: withIndex([
-        { name: 'text', data: { title: s('Our goal', 'Mục tiêu'), content: s('500 coats and 300 school bags before December. Every gift is photographed and reported back.', '500 áo ấm và 300 cặp sách trước tháng Mười Hai. Mọi phần quà đều được chụp ảnh và báo cáo lại.'), align: 'center', style: 'plain' } },
-        { name: 'vietqr', data: {} },
+        { name: 'text', data: { title: s('Our goal', 'Mục tiêu'), content: s('500 coats and 300 school bags for children in Ha Giang before December.\nSo far: 312 coats and 180 bags. Every gift is photographed and reported back.', '500 áo ấm và 300 cặp sách cho các em ở Hà Giang trước tháng Mười Hai.\nĐến nay: 312 áo và 180 cặp. Mọi phần quà đều được chụp ảnh và báo cáo lại.'), align: 'center', style: 'card' } },
+        { name: 'birthday-countdown', data: { birthDate: '2026-12-12', theme: 'card', showAge: false, label: s('Until the trip to Ha Giang', 'Còn bao lâu đến chuyến đi Hà Giang'), mode: 'until', repeat: false } },
         { name: 'menu', data: { title: s('What your gift buys', 'Số tiền bạn góp'), currency: '₫', layout: 'list', sections: menu([
-          { name: '', items: [[s('One warm coat', 'Một chiếc áo ấm'), '150,000'], [s('A school bag with books', 'Một cặp sách kèm vở'), '200,000'], [s('A winter kit', 'Một bộ quà mùa đông'), '500,000']] },
+          { name: '', items: [[s('One warm coat', 'Một chiếc áo ấm'), '150,000', s('Lined, waterproof, sized for ages 6–12', 'Có lót, chống nước, cỡ cho bé 6–12 tuổi')], [s('A school bag with books', 'Một cặp sách kèm vở'), '200,000'], [s('A winter kit', 'Một bộ quà mùa đông'), '500,000', s('Coat, boots, blanket and a bag', 'Áo, ủng, chăn và cặp sách'), s('Most chosen', 'Nhiều người chọn')]] },
         ]) } },
-        { name: 'image-album', data: { title: s('Last trip', 'Chuyến đi trước'), images: album('charity-1', 'charity-2'), layout: 'grid' } },
-        { name: 'links', data: { items: links([s('Monthly report', 'Báo cáo hằng tháng'), ''], [s('Volunteer with us', 'Đăng ký tình nguyện'), '']) } },
+        { name: 'vietqr', data: {} },
+        faq(s('Where the money goes', 'Tiền ủng hộ đi đâu'), s('🧾 A separate account, statement posted on our fanpage every month.\n📸 Every gift is handed over with a photo and the child’s first name.\n📮 Want to send clothes instead? Drop them at our office from 9:00 to 17:00.', '🧾 Tài khoản riêng, sao kê đăng trên fanpage hằng tháng.\n📸 Mỗi phần quà trao tận tay đều có ảnh và tên bé.\n📮 Muốn gửi quần áo? Mang đến văn phòng từ 9 giờ đến 17 giờ.')),
+        { name: 'timeline', data: { title: s('Updates', 'Cập nhật'), items: [
+          step(s('October', 'Tháng 10'), s('Fund opens', 'Mở quỹ'), s('Goal: 500 coats, 300 bags', 'Mục tiêu: 500 áo, 300 cặp')),
+          step(s('November', 'Tháng 11'), s('312 coats bought from a factory in Ha Dong', 'Đã mua 312 áo từ xưởng ở Hà Đông')),
+          step(s('12 December', '12 tháng 12'), s('Trip to Meo Vac', 'Chuyến đi Mèo Vạc'), s('Volunteers welcome, three days', 'Chào đón tình nguyện viên, ba ngày')),
+        ] } },
+        { name: 'image-album', data: { title: s('Last trip', 'Chuyến đi trước'), images: album('charity-1', 'charity-2', 'volunteer-2'), layout: 'grid' } },
+        { name: 'form', data: { title: s('Join the trip', 'Đi cùng chuyến này'), description: s('We need drivers, a nurse and people who love kids.', 'Cần tài xế, một bạn y tá và những người yêu trẻ con.'), kind: 'rsvp', fields: { ...RSVP_FIELDS, guests: false }, submitLabel: s('Count me in', 'Mình tham gia') } },
         { name: 'social', data: { links: social('facebook', 'zalo', 'youtube') } },
       ] as Blocks),
       room: studioRoom('#e6eed6', '#b9a37f', '#7a9a3b', s('Donate', 'Ủng hộ')),

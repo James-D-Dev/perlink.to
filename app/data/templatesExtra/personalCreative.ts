@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid'
+import type { MenuSection } from '~/types/bio'
 import type { PageTemplate } from '../pageTemplates'
 import { SAMPLE_PHONE, album, links, look, menu, photo, social, withIndex } from '../templateKit'
 import { type Blocks, booking, hours, loungeRoom, nightRoom, reviews, shopRoom, studioRoom } from '../pageTemplatesMore'
@@ -12,6 +13,18 @@ function s(en: string, vi: string) {
   PERSONAL_CREATIVE_VI[en] = vi
   return en
 }
+
+/** A price list whose items can carry a photo: [name, price, description?, tag?, photo?] */
+function priced(sections: { name: string; items: [string, string, string?, string?, string?][] }[]): MenuSection[] {
+  return sections.map(section => ({
+    id: nanoid(6),
+    name: section.name,
+    items: section.items.map(([name, price, description, tag, image]) => ({ id: nanoid(6), name, price, description, tag, imageUrl: image ? photo(image) : undefined })),
+  }))
+}
+
+/** The questions every owner answers again and again, as one card */
+const faq = (title: string, content: string) => ({ name: 'text' as const, data: { title, content, align: 'left' as const, style: 'card' as const } })
 
 export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
   // ─── Personal ───────────────────────────────────────────────────────────
@@ -48,8 +61,19 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: '2024', title: s('Indie hacker year', 'Một năm làm sản phẩm riêng'), text: s('Launched three tiny apps; one paid my rent.', 'Ra mắt ba app nhỏ; một cái đủ trả tiền nhà.') },
           { id: nanoid(6), date: '2021', title: s('First job, first bug in production', 'Công việc đầu tiên, bug production đầu tiên'), text: s('Learned more that night than in four years of school.', 'Học được trong đêm đó nhiều hơn bốn năm đại học.') },
         ] } },
-        { name: 'image-album', data: { title: s('Desk & late nights', 'Góc làm việc & những đêm muộn'), images: album('neon-1', 'neon-3', 'neon-cover'), layout: 'masonry' } },
-        { name: 'form', data: { title: s('Got a project?', 'Có dự án cần làm?'), description: s('Tell me what you’re building. I reply within two days.', 'Kể mình nghe bạn đang làm gì. Mình trả lời trong hai ngày.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: true }, submitLabel: s('Send it', 'Gửi đi') } },
+        { name: 'image-album', data: { title: s('Desk & late nights', 'Góc làm việc & những đêm muộn'), images: album('neon-1', 'neon-3', 'blog-tech-1', 'blog-tech-2'), layout: 'masonry' } },
+        { name: 'menu', data: { title: s('Work with me', 'Làm việc cùng mình'), currency: '₫', layout: 'list', sections: menu([
+          { name: '', items: [
+            [s('Landing page that loads in 1 second', 'Landing page tải dưới 1 giây'), s('from 15,000,000', 'từ 15.000.000'), s('Design to launch in 2 weeks', 'Từ thiết kế đến lên sóng trong 2 tuần')],
+            [s('3D product viewer', 'Trình xem sản phẩm 3D'), s('from 25,000,000', 'từ 25.000.000'), s('Three.js, works on cheap phones', 'Three.js, chạy mượt cả trên máy yếu'), s('Often chosen', 'Hay được chọn')],
+            [s('Code review & mentoring', 'Review code & kèm cặp'), s('800,000 / hour', '800.000 / giờ'), s('For juniors and small teams', 'Cho bạn mới vào nghề và nhóm nhỏ')],
+          ] },
+        ]) } },
+        { name: 'testimonials', data: { title: s('From clients', 'Khách hàng nói'), items: reviews(
+          [s('Shipped our 3D configurator two weeks early, and it flies on old Androids.', 'Bàn giao trình cấu hình 3D sớm hai tuần, chạy mượt cả trên Android cũ.'), 'Quỳnh Anh', s('PM, Nội thất Gỗ Việt', 'PM, Nội thất Gỗ Việt')],
+          [s('Clear estimates, daily updates, zero drama.', 'Báo giá rõ ràng, cập nhật mỗi ngày, không rắc rối.'), 'Daniel P.', s('Founder, Kite Labs', 'Nhà sáng lập, Kite Labs')],
+        ) } },
+        { name: 'form', data: { title: s('Got a project?', 'Có dự án cần làm?'), description: s('Pick what you need and tell me what you’re building. I reply within two days.', 'Chọn dịch vụ và kể mình nghe bạn đang làm gì. Mình trả lời trong hai ngày.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: true, service: true }, submitLabel: s('Send it', 'Gửi đi') } },
         { name: 'social', data: { links: social('github', 'linkedin', 'twitter', 'youtube') } },
       ] as Blocks),
       room: nightRoom('#0b0b14', '#00f0ff', s('Hire me', 'Thuê mình')),
@@ -76,6 +100,7 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
       },
       blocks: withIndex([
         { name: 'text', data: { title: s('As seen in', 'Xuất hiện trên'), content: 'VOGUE · ELLE · HARPER’S BAZAAR · L’OFFICIEL', align: 'left', style: 'plain' } },
+        { name: 'text', data: { title: s('Measurements', 'Số đo'), content: s('Height 176 · Bust 82 · Waist 60 · Hips 89\nShoes 39 · Hair dark brown · Eyes brown\nLanguages: Vietnamese, English, French', 'Chiều cao 176 · Ngực 82 · Eo 60 · Hông 89\nGiày 39 · Tóc nâu đậm · Mắt nâu\nNgôn ngữ: Tiếng Việt, Tiếng Anh, Tiếng Pháp'), align: 'left', style: 'card' } },
         { name: 'image-album', data: { title: s('Recent editorials', 'Bộ ảnh gần đây'), images: album('edit-cover', 'edit-2', 'edit-1', 'edit-3', 'edit-4'), layout: 'masonry' } },
         { name: 'timeline', data: { title: s('Campaigns', 'Chiến dịch'), items: [
           { id: nanoid(6), date: s('Spring 2026', 'Xuân 2026'), title: s('“Red Season”, lead model', '“Mùa Đỏ”, người mẫu chính'), text: s('A capsule shot in one day in an empty theatre.', 'Bộ sưu tập chụp trong một ngày ở một nhà hát trống.') },
@@ -85,6 +110,9 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
         { name: 'links', data: { title: s('Agency & comp card', 'Agency & comp card'), items: links(
           [s('Download comp card (PDF)', 'Tải comp card (PDF)'), 'https://example.com'],
           [s('Represented by Muse Models', 'Đại diện bởi Muse Models'), 'https://example.com'],
+        ) } },
+        { name: 'testimonials', data: { title: s('Worked with', 'Đã hợp tác'), items: reviews(
+          [s('Lena brings the idea to the set, not just the pose. Our best campaign this year.', 'Lena mang ý tưởng đến trường quay, không chỉ là dáng chụp. Chiến dịch tốt nhất năm của chúng tôi.'), 'Hà Trần', s('Creative lead, Silk & Stone', 'Trưởng nhóm sáng tạo, Silk & Stone')],
         ) } },
         { name: 'form', data: { title: s('Bookings', 'Đặt lịch làm việc'), description: s('Shoots, campaigns and creative direction.', 'Chụp ảnh, chiến dịch và chỉ đạo sáng tạo.'), kind: 'contact', fields: { phone: true, email: true, date: true, time: false, guests: false, message: true }, submitLabel: s('Send a request', 'Gửi yêu cầu') } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'pinterest') } },
@@ -122,6 +150,8 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: '2021 – 2024', title: s('Content marketer, Nova Shop', 'Content marketer, Nova Shop'), text: s('SEO, email and TikTok content for 1,200 products.', 'SEO, email và nội dung TikTok cho 1.200 sản phẩm.') },
           { id: nanoid(6), date: '2016 – 2020', title: s('BA in Marketing, Foreign Trade University', 'Cử nhân Marketing, Đại học Ngoại thương'), text: s('Graduated with distinction.', 'Tốt nghiệp loại giỏi.') },
         ] } },
+        { name: 'text', data: { title: s('What I’m looking for', 'Vị trí tôi đang tìm'), content: s('Marketing lead or senior growth role · Hanoi or remote · Available from January 2027', 'Trưởng nhóm marketing hoặc growth cấp cao · Hà Nội hoặc làm từ xa · Có thể bắt đầu từ tháng 1/2027'), align: 'left', style: 'card' } },
+        { name: 'image-album', data: { title: s('Campaign snapshots', 'Một vài chiến dịch'), images: album('cv-1', 'cv-2', 'personal-work-3'), layout: 'grid' } },
         { name: 'text', data: { title: s('Skills', 'Kỹ năng'), content: s('SEO & content strategy · Meta & TikTok ads · Google Analytics 4 · Email automation · Figma · English (IELTS 7.5)', 'Chiến lược SEO & nội dung · Quảng cáo Meta & TikTok · Google Analytics 4 · Email tự động · Figma · Tiếng Anh (IELTS 7.5)'), align: 'left', style: 'card' } },
         { name: 'testimonials', data: { title: s('Recommendations', 'Nhận xét từ đồng nghiệp'), items: reviews(
           [s('Ha turns vague goals into plans that work. The best marketer I’ve managed.', 'Hà biến những mục tiêu mơ hồ thành kế hoạch chạy được. Người làm marketing giỏi nhất tôi từng quản lý.'), 'Tuan Pham', s('Head of Growth, Lumen Edu', 'Trưởng phòng Growth, Lumen Edu')],
@@ -161,16 +191,21 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), date: '2024', title: s('Lisbon, Portugal', 'Lisbon, Bồ Đào Nha'), text: s('Hills, tiles and very fast internet.', 'Đồi dốc, gạch men và mạng cực nhanh.') },
           { id: nanoid(6), date: '2023', title: s('Day one: Bali', 'Ngày đầu tiên: Bali'), text: s('Quit the office, kept the laptop.', 'Bỏ văn phòng, giữ lại laptop.') },
         ] } },
-        { name: 'image-album', data: { title: s('Recent frames', 'Khung hình gần đây'), images: album('nomad-cover', 'nomad-4', 'nomad-2', 'nomad-3'), layout: 'carousel' } },
+        { name: 'image-album', data: { title: s('Recent frames', 'Khung hình gần đây'), images: album('nomad-cover', 'nomad-4', 'blog-travel-2'), layout: 'carousel' } },
         { name: 'blog', data: { title: s('Field notes', 'Ghi chép dọc đường'), count: 5, samples: [
-          { title: s('How I find coworking spaces in a new city', 'Cách mình tìm chỗ coworking ở thành phố mới'), coverUrl: photo('nomad-1'), minutes: 5 },
-          { title: s('My one-bag packing list', 'Danh sách đồ gói gọn trong một ba lô'), coverUrl: photo('nomad-2'), minutes: 4 },
-          { title: s('Working across 7 time zones without burning out', 'Làm việc lệch 7 múi giờ mà không kiệt sức'), coverUrl: photo('nomad-4'), minutes: 7 },
+          { title: s('How I find coworking spaces in a new city', 'Cách mình tìm chỗ coworking ở thành phố mới'), coverUrl: photo('nomad-2'), minutes: 5 },
+          { title: s('My one-bag packing list', 'Danh sách đồ gói gọn trong một ba lô'), coverUrl: photo('blog-travel-1'), minutes: 4 },
+          { title: s('Working across 7 time zones without burning out', 'Làm việc lệch 7 múi giờ mà không kiệt sức'), coverUrl: photo('blog-travel-3'), minutes: 7 },
         ] } },
+        { name: 'products', data: { title: s('Tools I made', 'Đồ mình tự làm'), layout: 'grid', ordering: true, askAddress: false, payment: 'transfer', items: [
+          { id: nanoid(6), name: s('Nomad Notion planner', 'Notion planner cho dân du mục'), price: 99000, imageUrl: photo('personal-work-1'), description: s('Budgets, visas and coworkings in one place', 'Ngân sách, visa và chỗ coworking trong một trang'), tag: s('Best seller', 'Bán chạy') },
+          { id: nanoid(6), name: s('1:1 call: going remote', 'Gọi 1:1: bắt đầu làm từ xa'), price: 450000, imageUrl: photo('personal-work-3'), description: s('45 minutes, your questions, my honest answers', '45 phút, bạn hỏi gì mình trả lời thật') },
+        ] } },
+        { name: 'vietqr', data: {} },
         { name: 'links', data: { title: s('Useful things', 'Đồ nghề hữu ích'), items: links(
           [s('My remote work gear', 'Bộ đồ nghề làm việc từ xa'), 'https://example.com'],
-          [s('Free Notion travel planner', 'Mẫu Notion lên kế hoạch du lịch (miễn phí)'), 'https://example.com'],
         ) } },
+        { name: 'form', data: { title: s('Say hi or pitch a collab', 'Chào hỏi hoặc rủ hợp tác'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: true }, submitLabel: s('Send', 'Gửi') } },
         { name: 'social', data: { links: social('instagram', 'youtube', 'tiktok') } },
       ] as Blocks),
       room: studioRoom('#f2ebdd', '#b98b5e', '#e0662b', s('Field notes', 'Ghi chép dọc đường')),
@@ -207,8 +242,10 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
           { id: nanoid(6), name: s('Film print set', 'Bộ ảnh in film'), price: 149000, comparePrice: 189000, imageUrl: photo('aes-2') },
           { id: nanoid(6), name: s('Phone wallpapers', 'Hình nền điện thoại'), price: 39000, imageUrl: photo('aes-1') },
         ] } },
-        { name: 'image-album', data: { title: s('camera roll', 'cuộn phim'), images: album('aes-1', 'aes-2', 'aes-3', 'aes-avatar'), layout: 'grid' } },
-        { name: 'text', data: { title: s('collabs ♡', 'hợp tác ♡'), content: s('I work with soft, kind brands: skincare, stationery, slow fashion. Say hi by email!', 'Mình hợp tác với các thương hiệu dịu dàng: skincare, văn phòng phẩm, thời trang chậm. Gửi email cho mình nha!'), align: 'center', style: 'card' } },
+        { name: 'text', data: { title: s('how to get your preset ♡', 'nhận preset thế nào ♡'), content: s('order → transfer with your order code → the download link arrives in your inbox within the hour ☁️', 'đặt hàng → chuyển khoản ghi mã đơn → link tải về hộp thư trong vòng một giờ ☁️'), align: 'center', style: 'card' } },
+        { name: 'vietqr', data: {} },
+        { name: 'image-album', data: { title: s('camera roll', 'cuộn phim'), images: album('blog-fashion-cover', 'creator-art-2'), layout: 'grid' } },
+        { name: 'form', data: { title: s('collabs ♡', 'hợp tác ♡'), description: s('I work with soft, kind brands: skincare, stationery, slow fashion.', 'Mình hợp tác với các thương hiệu dịu dàng: skincare, văn phòng phẩm, thời trang chậm.'), kind: 'contact', fields: { phone: false, email: true, date: false, time: false, guests: false, message: true }, submitLabel: s('send ♡', 'gửi ♡') } },
         { name: 'social', data: { links: social('tiktok', 'instagram', 'pinterest', 'spotify') } },
       ] as Blocks),
       room: studioRoom('#ffe4f1', '#e8c4a0', '#ff7ab8', s('little shop', 'tiệm nhỏ')),
@@ -236,19 +273,21 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
         music: { trackId: 'game-background' },
       },
       blocks: withIndex([
-        { name: 'image-album', data: { title: s('Recent work', 'Tác phẩm gần đây'), images: album('photog-1', 'photog-2', 'photog-3', 'photog-4', 'photog-cover'), layout: 'masonry' } },
-        { name: 'menu', data: { title: s('Sessions & prints', 'Gói chụp & ảnh in'), currency: '₫', layout: 'cards', sections: menu([
+        { name: 'image-album', data: { title: s('Recent work', 'Tác phẩm chọn lọc'), images: album('photog-1', 'photog-4', 'blog-travel-cover', 'blog-travel-3'), layout: 'masonry' } },
+        { name: 'menu', data: { title: s('Sessions & prints', 'Gói chụp & ảnh in'), currency: '₫', layout: 'cards', sections: priced([
           { name: '', items: [
-            [s('Portrait session', 'Chụp chân dung'), '1,500,000', s('1 hour, 25 edited photos', '1 giờ, 25 ảnh đã chỉnh')],
-            [s('Couple & pre-wedding', 'Ảnh đôi & pre-wedding'), '4,500,000', s('Half a day in Da Lat, 60 photos', 'Nửa ngày ở Đà Lạt, 60 ảnh'), s('Most chosen', 'Được chọn nhiều')],
-            [s('Fine-art print, 40×60', 'Ảnh in fine-art 40×60'), '600,000', s('Museum paper, signed', 'Giấy bảo tàng, có chữ ký')],
+            [s('Portrait session', 'Chụp chân dung'), '1,500,000', s('1 hour, 25 edited photos', '1 giờ, 25 ảnh đã chỉnh'), undefined, 'photog-2'],
+            [s('Couple & pre-wedding', 'Ảnh đôi & pre-wedding'), '4,500,000', s('Half a day in Da Lat, 60 photos', 'Nửa ngày ở Đà Lạt, 60 ảnh'), s('Most chosen', 'Được chọn nhiều'), 'photo-2'],
+            [s('Fine-art print, 40×60', 'Ảnh in fine-art 40×60'), '600,000', s('Museum paper, signed', 'Giấy bảo tàng, có chữ ký'), undefined, 'photog-3'],
           ] },
         ]) } },
+        faq(s('Before your shoot', 'Trước buổi chụp'), s('📅 Edited photos in 7 days, in a private online gallery\n👗 Outfit and location ideas sent a week before\n🌧️ Rain? We move the date for free\n💳 30% deposit to hold the date', '📅 Nhận ảnh đã chỉnh sau 7 ngày, trong album online riêng\n👗 Gửi gợi ý trang phục và địa điểm trước một tuần\n🌧️ Trời mưa được dời lịch miễn phí\n💳 Cọc 30% để giữ ngày')),
         { name: 'testimonials', data: { title: s('Words from clients', 'Lời khách gửi'), items: reviews(
           [s('He found light where we saw fog. Our favourite photos ever.', 'Anh ấy tìm ra ánh sáng giữa màn sương. Bộ ảnh tụi mình thích nhất.'), 'Mai & Huy', s('Pre-wedding, 2025', 'Pre-wedding, 2025')],
           [s('Calm, patient and so good with nervous people.', 'Điềm tĩnh, kiên nhẫn và rất biết cách giúp người ngại chụp.'), 'Anna L.', s('Portrait session', 'Chụp chân dung')],
         ) } },
         { name: 'form', data: { title: s('Book a shoot', 'Đặt lịch chụp'), description: s('Tell me the date and the kind of photos you want.', 'Cho mình biết ngày và kiểu ảnh bạn muốn.'), kind: 'booking', fields: booking(true, false, false) } },
+        { name: 'vietqr', data: {} },
         { name: 'social', data: { links: social('instagram', 'pinterest', 'youtube') } },
       ] as Blocks),
       room: studioRoom('#141414', '#3a3a3a', '#f2f2f2', s('Book a shoot', 'Đặt lịch chụp')),
@@ -281,14 +320,16 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
             [s('Small piece (under 5 cm)', 'Hình nhỏ (dưới 5 cm)'), '800,000', s('Fine-line or minimal', 'Fine-line hoặc tối giản')],
             [s('Medium (hand-sized)', 'Hình vừa (cỡ bàn tay)'), '2,500,000', s('Custom design included', 'Đã gồm thiết kế riêng')],
             [s('Full day session', 'Phiên xăm cả ngày'), '7,000,000', s('Sleeves and back pieces', 'Kín tay, kín lưng')],
-            [s('Cover-up consultation', 'Tư vấn xăm che'), '0', s('Free, by appointment', 'Miễn phí, theo lịch hẹn')],
+            [s('Cover-up consultation', 'Tư vấn xăm che'), s('Free', 'Miễn phí'), s('By appointment', 'Theo lịch hẹn')],
           ] },
         ]) } },
         { name: 'text', data: { title: s('Aftercare', 'Chăm sóc sau xăm'), content: s('Keep the film on for 2 days, wash gently twice a day, a thin layer of balm, no sun or swimming for 2 weeks. Questions? Message us anytime.', 'Giữ màng bọc 2 ngày, rửa nhẹ ngày hai lần, thoa mỏng kem dưỡng, tránh nắng và bơi trong 2 tuần. Có thắc mắc cứ nhắn cho tụi mình.'), align: 'left', style: 'card' } },
+        faq(s('Studio rules', 'Quy định của studio'), s('🪪 18+ only, bring your ID\n🧼 Single-use needles and vegan inks, always\n💳 A 500,000₫ deposit books your session and goes towards the price\n✏️ Free touch-up within 3 months', '🪪 Chỉ nhận khách từ 18 tuổi, mang theo CCCD\n🧼 Kim dùng một lần, mực thuần chay\n💳 Cọc 500.000₫ để giữ lịch, trừ vào giá hình\n✏️ Dặm lại miễn phí trong 3 tháng')),
         { name: 'form', data: { title: s('Book a consultation', 'Đặt lịch tư vấn'), description: s('Send your idea, size and placement. We reply with a sketch plan.', 'Gửi ý tưởng, kích thước và vị trí. Tụi mình sẽ trả lời kèm hướng phác thảo.'), kind: 'booking', fields: booking(true, false, false) } },
+        { name: 'vietqr', data: {} },
         { name: 'hours', data: { title: s('Studio hours', 'Giờ làm việc'), days: hours('12:00', '21:00', [1]), note: s('By appointment; walk-ins on Fridays.', 'Theo lịch hẹn; thứ Sáu nhận khách vãng lai.') } },
         { name: 'contact', data: { title: s('The studio', 'Studio'), address: s('41 Phan Xich Long, Phu Nhuan, HCMC', '41 Phan Xích Long, Phú Nhuận, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'googlemaps') } },
       ] as Blocks),
       room: nightRoom('#120d0b', '#c8102e', s('Book a consultation', 'Đặt lịch tư vấn')),
     }),
@@ -321,7 +362,7 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
             [s('Women’s cut & blow-dry', 'Cắt & sấy tạo kiểu nữ'), '250,000'],
             [s('Men’s cut', 'Cắt tóc nam'), '150,000'],
           ] },
-          { name: s('Colour', 'Nhuộm'), items: [
+          { name: s('Colour services', 'Nhuộm'), items: [
             [s('Single colour', 'Nhuộm một màu'), '650,000', s('From, depends on length', 'Từ, tuỳ độ dài tóc')],
             [s('Balayage', 'Balayage'), '1,500,000', s('Hand-painted, includes toner', 'Vẽ tay, đã gồm phủ màu'), s('Signature', 'Đặc trưng')],
             [s('Vivid colours (pink, red, blue…)', 'Màu nổi (hồng, đỏ, xanh…)'), '1,800,000'],
@@ -330,15 +371,16 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
             [s('Keratin treatment', 'Phục hồi keratin'), '1,200,000', s('Smooth and shiny for 3 months', 'Mượt bóng suốt 3 tháng')],
           ] },
         ]) } },
-        { name: 'image-album', data: { title: s('Fresh from the chair', 'Vừa rời ghế salon'), images: album('salon-1', 'salon-2', 'salon-3', 'salon-avatar'), layout: 'carousel' } },
+        { name: 'image-album', data: { title: s('Fresh from the chair', 'Vừa rời ghế salon'), images: album('salon-1', 'salon-2', 'salon-3', 'hair-1'), layout: 'carousel' } },
         { name: 'testimonials', data: { title: s('Happy heads', 'Khách nói gì'), items: reviews(
           [s('Finally a pink that didn’t fade in a week!', 'Cuối cùng cũng có màu hồng không phai sau một tuần!'), 'Trang N.', s('Google review', 'Đánh giá Google')],
           [s('They listened, then did even better than my photo.', 'Các bạn lắng nghe rồi làm còn đẹp hơn ảnh mẫu.'), 'Phuong L.', s('Regular since 2023', 'Khách quen từ 2023')],
         ) } },
+        faq(s('Before you come', 'Trước khi đến'), s('⏱️ Balayage and vivid colours take 3–4 hours: book a morning slot\n📸 Bring a photo of the look you love\n🧴 Free aftercare shampoo with every colour\n⏰ Running late? We hold your chair for 15 minutes', '⏱️ Balayage và màu nổi mất 3–4 tiếng, nên đặt buổi sáng\n📸 Mang theo ảnh kiểu tóc bạn thích\n🧴 Tặng dầu gội giữ màu khi nhuộm\n⏰ Đến trễ? Salon giữ chỗ 15 phút')),
         { name: 'form', data: { title: s('Book your chair', 'Đặt lịch làm tóc'), description: s('Pick a time; we’ll confirm on Zalo.', 'Chọn giờ, tụi mình sẽ xác nhận qua Zalo.'), kind: 'booking', fields: booking(true, true, false) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('09:00', '20:00', [1]) } },
         { name: 'contact', data: { title: s('Come see us', 'Ghé salon'), address: s('18 Ly Tu Trong, District 1, HCMC', '18 Lý Tự Trọng, Quận 1, TP.HCM'), phone: SAMPLE_PHONE, quickBar: true } },
-        { name: 'social', data: { links: social('instagram', 'tiktok', 'zalo', 'facebook') } },
+        { name: 'social', data: { links: social('instagram', 'tiktok', 'zalo', 'facebook', 'googlemaps') } },
       ] as Blocks),
       room: shopRoom('#fff4ee', '#d9b8a0', '#e2463b', s('Book your chair', 'Đặt lịch làm tóc')),
     }),
@@ -364,20 +406,22 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
         music: { trackId: 'romantic-piano' },
       },
       blocks: withIndex([
-        { name: 'menu', data: { title: s('Makeup packages', 'Gói trang điểm'), currency: '₫', layout: 'cards', sections: menu([
+        { name: 'menu', data: { title: s('Makeup packages', 'Gói trang điểm'), currency: '₫', layout: 'cards', sections: priced([
           { name: '', items: [
-            [s('Bridal makeup & hair', 'Trang điểm & làm tóc cô dâu'), '2,500,000', s('Trial included, touch-ups all day', 'Đã gồm thử trước, dặm lại cả ngày'), s('Top pick', 'Đặt nhiều nhất')],
-            [s('Engagement day', 'Lễ ăn hỏi, vu quy'), '1,800,000', s('Ao dai look, hair styling', 'Phong cách áo dài, búi tóc')],
+            [s('Bridal makeup & hair', 'Trang điểm & làm tóc cô dâu'), '2,500,000', s('Trial included, touch-ups all day', 'Đã gồm thử trước, dặm lại cả ngày'), s('Top pick', 'Đặt nhiều nhất'), 'makeup-1'],
+            [s('Engagement day', 'Lễ ăn hỏi, vu quy'), '1,800,000', s('Ao dai look, hair styling', 'Phong cách áo dài, búi tóc'), undefined, 'vn-wedding-4'],
             [s('Event & party', 'Sự kiện & tiệc'), '900,000', s('90 minutes', '90 phút')],
             [s('Personal makeup class', 'Lớp tự trang điểm 1-1'), '1,500,000', s('3 hours, your own products', '3 giờ, dùng mỹ phẩm của bạn')],
           ] },
         ]) } },
-        { name: 'image-album', data: { title: s('Lookbook', 'Lookbook'), images: album('makeup-1', 'makeup-4', 'makeup-3', 'makeup-2', 'makeup-cover'), layout: 'masonry' } },
+        { name: 'image-album', data: { title: s('Lookbook', 'Lookbook'), images: album('makeup-4', 'makeup-3', 'makeup-2'), layout: 'masonry' } },
         { name: 'testimonials', data: { title: s('From my brides', 'Cô dâu nói gì'), items: reviews(
           [s('I cried twice and my makeup didn’t move. Magic.', 'Mình khóc hai lần mà lớp trang điểm vẫn y nguyên. Như phép thuật.'), 'Thao V.', s('Bride, October 2025', 'Cô dâu, tháng 10/2025')],
           [s('Soft, glowing and exactly me, just better.', 'Nhẹ nhàng, rạng rỡ, vẫn là mình mà đẹp hơn.'), 'Hanh P.', s('Engagement day look', 'Lễ ăn hỏi')],
         ) } },
+        faq(s('Brides often ask', 'Cô dâu hay hỏi'), s('🚗 Outside Hanoi? Travel is 300,000₫ plus transport\n🌅 Early ceremonies welcome, from 4:30 am\n💄 High-end, skin-friendly products; tell me about allergies\n💳 A 30% deposit holds your date', '🚗 Ngoài Hà Nội: phụ phí 300.000₫ cộng chi phí đi lại\n🌅 Nhận lễ sớm, từ 4 giờ 30 sáng\n💄 Mỹ phẩm cao cấp, dịu da; dị ứng gì nhớ báo trước\n💳 Cọc 30% để giữ ngày')),
         { name: 'form', data: { title: s('Check my date', 'Kiểm tra lịch trống'), description: s('Wedding season fills up fast. Send your date and I’ll confirm within a day.', 'Mùa cưới kín lịch rất nhanh. Gửi ngày của bạn, mình xác nhận trong một ngày.'), kind: 'booking', fields: booking(true, true, false), submitLabel: s('See if I’m free', 'Kiểm tra lịch') } },
+        { name: 'vietqr', data: {} },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo') } },
       ] as Blocks),
       room: loungeRoom('#24171e', '#6b4a52', '#e9b4c8', s('Bridal', 'Cô dâu')),

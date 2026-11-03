@@ -2,6 +2,10 @@
   <!-- The themed QR card, then the details to type by hand, each copyable,
        and a clean QR picture to save and open from a banking app -->
   <section class="flex flex-col items-center gap-3">
+    <!-- Template previews: a sample until the owner adds their account -->
+    <span v-if="sample" class="inline-flex items-center gap-1.5 rounded-full bg-current/10 px-3 py-1 text-xs font-medium">
+      <UIcon name="i-lucide-info" class="size-3.5 opacity-70" />{{ t('qrSample') }}
+    </span>
     <ClientOnly>
       <QRCodeWithTheme
         :qr-string="data.qrString!"
@@ -17,7 +21,7 @@
       </template>
     </ClientOnly>
 
-    <div v-if="rows.length" class="w-full overflow-hidden" :style="cardStyle">
+    <div v-if="rows.length && !sample" class="w-full overflow-hidden" :style="cardStyle">
       <dl class="divide-y divide-current/10">
         <div v-for="row in rows" :key="row.key" class="flex items-center gap-3 px-4 py-3">
           <dt class="w-28 shrink-0 text-[13px] opacity-65">{{ row.label }}</dt>
@@ -74,6 +78,8 @@ import { formatVnd } from '#shared/plans'
 
 const props = defineProps<{
   data: VietQRInfo
+  /** Sample details on a template preview: nothing to copy or save */
+  sample?: boolean
   cardStyle?: CSSProperties
   /** The page's filled button */
   accentStyle?: CSSProperties

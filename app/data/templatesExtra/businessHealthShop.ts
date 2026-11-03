@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import type { ProductItem, ProductOption } from '~/types/bio'
 import type { PageTemplate } from '../pageTemplates'
-import { SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, photo, social, withIndex } from '../templateKit'
+import { SAMPLE_ADDRESS, SAMPLE_PHONE, album, look, menu, photo, social, withIndex } from '../templateKit'
 import { type Blocks, booking, hours, loungeRoom, reviews, shopRoom, studioRoom } from '../pageTemplatesMore'
 
 // Businesses, health and shops. Sample text in English with its Vietnamese next to it:
@@ -26,6 +26,9 @@ const step = (date: string, title: string, text?: string) => ({ id: nanoid(6), d
 function opt(name: string, ...values: (string | [string, string])[]): ProductOption {
   return { id: nanoid(6), name, values: values.map(v => (Array.isArray(v) ? { id: nanoid(6), label: v[0], color: v[1] } : { id: nanoid(6), label: v })) }
 }
+
+/** The questions every owner answers again and again, as one card */
+const faq = (title: string, content: string) => ({ name: 'text' as const, data: { title, content, align: 'left' as const, style: 'card' as const } })
 
 /** Extra fields for the products made by products(), in the same order */
 function withDetails(items: ProductItem[], ...details: Partial<ProductItem>[]): ProductItem[] {
@@ -62,7 +65,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
             [s('Website design & build', 'Thiết kế & làm website'), s('from 40,000,000', 'từ 40.000.000'), s('Design, build and launch in 6 weeks', 'Thiết kế, lập trình và ra mắt trong 6 tuần')],
           ] },
         ]) } },
-        { name: 'image-album', data: { title: s('Recent work', 'Dự án gần đây'), images: album('agency-1', 'agency-3', 'agency-2', 'agency-cover'), layout: 'masonry' } },
+        { name: 'image-album', data: { title: s('Recent work', 'Dự án gần đây'), images: album('agency-1', 'agency-3', 'agency-2', 'creator-art-1'), layout: 'masonry' } },
         { name: 'timeline', data: { title: s('How we work', 'Cách chúng tôi làm việc'), items: [
           step('01', s('Brief', 'Brief'), s('A 45-minute call to understand the goal, not just the logo.', 'Một cuộc gọi 45 phút để hiểu mục tiêu, không chỉ cái logo.')),
           step('02', s('Strategy', 'Chiến lược'), s('Audience, voice and the one idea worth remembering.', 'Khách hàng, giọng nói và một ý tưởng đáng nhớ.')),
@@ -73,7 +76,8 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('They turned our tiny café into a brand people queue for.', 'Họ biến quán cà phê nhỏ của tôi thành thương hiệu khách xếp hàng chờ.'), 'Linh Trần', s('Founder, Mây Coffee', 'Nhà sáng lập, Mây Coffee')],
           [s('Fast, sharp and honest about what wouldn’t work.', 'Nhanh, sắc sảo và thẳng thắn với những gì không hiệu quả.'), 'David Lee', s('CMO, Finly', 'CMO, Finly')],
         ) } },
-        { name: 'form', data: { title: s('Start a project', 'Bắt đầu dự án'), description: s('Tell us what you’re making and your budget. We reply within a day.', 'Kể cho chúng tôi bạn đang làm gì và ngân sách. Chúng tôi trả lời trong một ngày.'), kind: 'contact', fields: { phone: true, email: true, date: false, time: false, guests: false, message: true }, submitLabel: s('Send the brief', 'Gửi brief') } },
+        faq(s('Before we start', 'Trước khi bắt đầu'), s('💬 The first call is free and there’s no pitch deck\n🧾 A fixed quote within 48 hours, paid in three milestones\n🔁 Two rounds of changes are included in every package\n📁 You own every file, including the source files', '💬 Cuộc gọi đầu tiên miễn phí, không cần chuẩn bị gì\n🧾 Báo giá trọn gói trong 48 giờ, thanh toán ba đợt\n🔁 Mỗi gói đã gồm hai vòng chỉnh sửa\n📁 Bàn giao toàn bộ file, kể cả file gốc')),
+        { name: 'form', data: { title: s('Start a project', 'Bắt đầu dự án'), description: s('Pick a service, tell us what you’re making and your budget. We reply within a day.', 'Chọn dịch vụ, kể cho chúng tôi bạn đang làm gì và ngân sách. Chúng tôi trả lời trong một ngày.'), kind: 'contact', fields: { phone: true, email: true, date: false, time: false, guests: false, message: true, service: true }, submitLabel: s('Send the brief', 'Gửi brief') } },
         { name: 'social', data: { links: social('behance', 'instagram', 'linkedin', 'facebook') } },
       ] as Blocks),
       room: studioRoom('#fff4d6', '#c9b38e', '#ff4d2e', s('Start a project', 'Bắt đầu dự án'), [
@@ -116,10 +120,13 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
         ] } },
         { name: 'testimonials', data: { items: reviews(
           [s('Our 70 m² flat feels twice the size, and finally like home.', 'Căn hộ 70 m² rộng gấp đôi cảm giác, và cuối cùng cũng thật sự là nhà.'), 'Hà & Quân', s('Apartment, Thao Dien', 'Căn hộ Thảo Điền')],
+          [s('On budget, on time, and they hid every cable.', 'Đúng ngân sách, đúng hẹn, giấu gọn từng sợi dây điện.'), 'Chị Thảo', s('Townhouse, Gò Vấp', 'Nhà phố Gò Vấp')],
         ) } },
+        faq(s('Common questions', 'Câu hỏi thường gặp'), s('📐 The site visit and first ideas are free within the city\n💰 Most apartments land between 300 and 600 million đồng, all in\n🗓️ Concept in 3 weeks, build in 8–10 weeks\n🛠️ One year of free fixes after handover', '📐 Khảo sát và ý tưởng ban đầu miễn phí trong nội thành\n💰 Đa số căn hộ trọn gói từ 300 đến 600 triệu đồng\n🗓️ Ý tưởng trong 3 tuần, thi công 8–10 tuần\n🛠️ Bảo hành miễn phí một năm sau bàn giao')),
         { name: 'form', data: { title: s('Book a free consultation', 'Đặt lịch tư vấn miễn phí'), kind: 'booking', fields: booking(true, true, false), submitLabel: s('Book a visit', 'Đặt lịch khảo sát') } },
-        { name: 'contact', data: { title: s('The studio', 'Studio'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
-        { name: 'social', data: { links: social('instagram', 'pinterest', 'facebook') } },
+        { name: 'hours', data: { title: s('Studio hours', 'Giờ làm việc'), days: hours('08:30', '18:00', [0]) } },
+        { name: 'contact', data: { title: s('The studio', 'Studio'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, quickBar: true } },
+        { name: 'social', data: { links: social('instagram', 'pinterest', 'facebook', 'googlemaps') } },
       ] as Blocks),
       room: loungeRoom('#efe7dc', '#b48a62', '#a4683f', s('Our projects', 'Dự án'), [
         { type: 'bookshelf', position: [2.3, 0, -2.8], rotation: 0 },
@@ -162,9 +169,11 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('They set up our company in a week and still answer our questions on Zalo.', 'Họ lập công ty cho chúng tôi trong một tuần và vẫn trả lời câu hỏi qua Zalo.'), 'Minh Khoa', s('Founder, Lumi Tea', 'Nhà sáng lập, Lumi Tea')],
           [s('The only accountants who explained our taxes in plain words.', 'Đơn vị kế toán duy nhất giải thích thuế cho chúng tôi bằng lời dễ hiểu.'), 'Sarah Kim', s('Director, Kim Trading', 'Giám đốc, Kim Trading')],
         ) } },
+        faq(s('What to prepare', 'Cần chuẩn bị gì'), s('🪪 ID or passport of every founder\n🏢 The office address and its lease\n📝 Your business lines; we help pick the right codes\n🌏 Foreign investors: proof of funds, translated by us', '🪪 CCCD hoặc hộ chiếu của các thành viên sáng lập\n🏢 Địa chỉ trụ sở và hợp đồng thuê\n📝 Ngành nghề kinh doanh; chúng tôi giúp chọn mã ngành phù hợp\n🌏 Nhà đầu tư nước ngoài: chứng minh tài chính, chúng tôi dịch giúp')),
         { name: 'form', data: { title: s('Book a consultation', 'Đặt lịch tư vấn'), kind: 'booking', fields: booking(true, true, false), submitLabel: s('Request a call', 'Yêu cầu gọi lại') } },
         { name: 'hours', data: { title: s('Office hours', 'Giờ làm việc'), days: hours('08:30', '17:30', [0, 6]) } },
-        { name: 'contact', data: { title: s('Our office', 'Văn phòng'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, email: 'hello@example.com' } },
+        { name: 'contact', data: { title: s('Our office', 'Văn phòng'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, email: 'hello@example.com', quickBar: true } },
+        { name: 'social', data: { links: social('linkedin', 'zalo', 'facebook') } },
       ] as Blocks),
       room: studioRoom('#15243a', '#5a4632', '#c9a45c', s('Book a consultation', 'Đặt lịch tư vấn'), [
         { type: 'bookshelf', position: [2.3, 0, -2.8], rotation: 0 },
@@ -206,13 +215,16 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           step(s('Tue · Thu 18:30', 'T3 · T5 18:30'), s('Hatha & breath', 'Hatha & hơi thở')),
           step(s('Sat 9:00', 'T7 9:00'), s('Yin & sound bath', 'Yin & tắm âm thanh'), s('90 minutes of deep rest.', '90 phút thả lỏng sâu.')),
         ] } },
-        { name: 'image-album', data: { title: s('Inside the studio', 'Bên trong studio'), images: album('yoga-1', 'yoga-2', 'yoga-3', 'yoga-cover'), layout: 'carousel' } },
+        { name: 'image-album', data: { title: s('Inside the studio', 'Bên trong studio'), images: album('yoga-1', 'yoga-2', 'yoga-3', 'blog-wellness-2'), layout: 'carousel' } },
         { name: 'testimonials', data: { items: reviews(
           [s('My back pain is gone and my mornings feel lighter.', 'Hết đau lưng, buổi sáng thấy nhẹ nhõm hẳn.'), 'Thu Hà', s('Member for a year', 'Học viên một năm')],
+          [s('I’d never done yoga. Nobody made me feel slow.', 'Mình chưa tập yoga bao giờ. Không ai làm mình thấy mình chậm.'), 'Minh Khang', s('Beginner', 'Người mới')],
         ) } },
+        faq(s('First class?', 'Buổi đầu tiên?'), s('🧘 Beginners welcome in every class except Advanced Flow\n🧺 Mats, blocks and towels are here; just bring water\n🍽️ Eat lightly two hours before\n🔁 Cancel up to 4 hours before and keep your class', '🧘 Người mới học được mọi lớp, trừ Advanced Flow\n🧺 Có sẵn thảm, gạch và khăn, chỉ cần mang nước\n🍽️ Ăn nhẹ trước hai tiếng\n🔁 Huỷ trước 4 tiếng không mất buổi')),
         { name: 'form', data: { title: s('Your first class is free', 'Buổi đầu tiên miễn phí'), kind: 'booking', fields: booking(true, true, false), submitLabel: s('Save my mat', 'Giữ chỗ cho tôi') } },
         { name: 'hours', data: { title: s('Studio hours', 'Giờ mở cửa'), days: hours('06:00', '20:30') } },
         { name: 'contact', data: { title: s('Find the studio', 'Đường đến studio'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, quickBar: true } },
+        { name: 'social', data: { links: social('instagram', 'facebook', 'zalo', 'googlemaps') } },
       ] as Blocks),
       room: loungeRoom('#efe8dc', '#c8ad8a', '#7e8f6a', s('Book a class', 'Đặt lớp'), [
         { type: 'plant', position: [1.4, 0, -2.4], rotation: 0, color: '#7e8f6a' },
@@ -239,7 +251,6 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
         background: { type: 'solid', color: '#F2F9F8', pattern: { id: 'dots', color: '#0E9F8E' } },
       },
       blocks: withIndex([
-        { name: 'links', data: { items: links([s('Book an appointment', 'Đặt lịch khám'), ''], [s('Chat with a nurse on Zalo', 'Nhắn y tá qua Zalo'), '']) } },
         { name: 'menu', data: { title: s('Services & prices', 'Dịch vụ & bảng giá'), currency: '₫', layout: 'list', sections: menu([
           { name: s('Check-ups', 'Khám bệnh'), items: [
             [s('General consultation', 'Khám tổng quát'), '300,000'],
@@ -258,7 +269,9 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('In and out in 30 minutes with test results.', 'Khám và có kết quả xét nghiệm chỉ trong 30 phút.'), 'Peter W.', s('Google review', 'Đánh giá Google')],
         ) } },
         { name: 'image-album', data: { title: s('Our clinic', 'Phòng khám'), images: album('clinic-1', 'clinic-2', 'clinic-3'), layout: 'grid' } },
+        faq(s('Before your visit', 'Trước khi đến khám'), s('🪪 Bring your ID and any recent test results\n💳 Private insurance accepted: Bảo Việt, PVI, Liberty\n🧒 A play corner and a paediatrician every afternoon\n🩺 Results by Zalo, with the doctor’s notes', '🪪 Mang CCCD và kết quả xét nghiệm gần nhất (nếu có)\n💳 Nhận bảo hiểm tư nhân: Bảo Việt, PVI, Liberty\n🧒 Có góc chơi cho bé, bác sĩ nhi khám mỗi chiều\n🩺 Gửi kết quả qua Zalo kèm lời dặn của bác sĩ')),
         { name: 'contact', data: { title: s('Visit the clinic', 'Đến phòng khám'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE, quickBar: true } },
+        { name: 'social', data: { links: social('zalo', 'facebook', 'googlemaps') } },
       ] as Blocks),
       room: studioRoom('#eef8f6', '#c9d6d2', '#0e9f8e', s('Book an appointment', 'Đặt lịch khám'), [
         { type: 'cabinet', position: [-1.9, 0, -2.6], rotation: 0, color: '#ffffff' },
@@ -289,7 +302,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('7-day lean plan', 'Gói giữ dáng 7 ngày'), 1450000, 'nutri-2', s('14 meals, delivered fresh every morning', '14 bữa, giao tươi mỗi sáng'), s('Best seller', 'Bán chạy'), 1650000],
           [s('Muscle gain week', 'Tuần tăng cơ'), 1690000, 'nutri-3', s('High protein, 2 meals a day', 'Giàu đạm, 2 bữa mỗi ngày')],
           [s('Green salad box', 'Hộp salad xanh'), 89000, 'nutri-1', s('Single meal, order by 9 pm', 'Bữa lẻ, đặt trước 21 giờ')],
-          [s('1:1 consultation', 'Tư vấn 1:1'), 500000, 'nutri-avatar', s('60 minutes and a personal plan', '60 phút và thực đơn riêng')],
+          [s('1:1 consultation', 'Tư vấn 1:1'), 500000, 'blog-food-cover', s('60 minutes and a personal plan', '60 phút và thực đơn riêng')],
         ) } },
         { name: 'timeline', data: { title: s('How it works', 'Bắt đầu thế nào'), items: [
           step('1', s('Tell me your goal', 'Cho mình biết mục tiêu'), s('Lose weight, gain energy or eat cleaner.', 'Giảm cân, khoẻ hơn hay ăn sạch hơn.')),
@@ -300,6 +313,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('Down 6 kg in two months and I never felt hungry.', 'Giảm 6 kg trong hai tháng mà chưa từng thấy đói.'), 'Hoàng Yến', s('Lean plan', 'Gói giữ dáng')],
           [s('Finally lunches I look forward to at the office.', 'Cuối cùng cũng có bữa trưa văn phòng đáng mong chờ.'), 'Bảo Long', s('Muscle gain week', 'Tuần tăng cơ')],
         ) } },
+        faq(s('Delivery & meals', 'Giao hàng & bữa ăn'), s('🛵 Free delivery before 8 am in Districts 1, 3, 7, Bình Thạnh and Phú Nhuận\n🥜 Tell us your allergies; every box is labelled\n❄️ Keeps 2 days in the fridge, microwave-safe boxes\n⏸️ Pause your plan any day with a message by 6 pm', '🛵 Giao miễn phí trước 8 giờ sáng ở Quận 1, 3, 7, Bình Thạnh, Phú Nhuận\n🥜 Báo trước nếu dị ứng; hộp nào cũng ghi rõ thành phần\n❄️ Bảo quản tủ lạnh 2 ngày, hộp dùng được lò vi sóng\n⏸️ Tạm dừng gói bất cứ ngày nào, nhắn trước 18 giờ')),
         { name: 'form', data: { title: s('Book a free 15-minute call', 'Đặt cuộc gọi miễn phí 15 phút'), kind: 'booking', fields: booking(true, true, false), submitLabel: s('Book my call', 'Đặt lịch gọi') } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'zalo', 'facebook') } },
         { name: 'vietqr', data: {} },
@@ -339,8 +353,13 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           { options: [opt(s('Size', 'Size'), 'S', 'M', 'L', 'XL'), opt(s('Colour', 'Màu'), [s('White', 'Trắng'), '#f5f3ee'], [s('Sky', 'Xanh trời'), '#a9c7e3'])] },
           { options: [opt(s('Size', 'Size'), 'S', 'M', 'L'), opt(s('Colour', 'Màu'), [s('Cream', 'Kem'), '#efe6d6'], [s('Olive', 'Xanh ô liu'), '#7c7a52'])] },
         ) } },
-        { name: 'image-album', data: { title: s('Lookbook · Autumn', 'Lookbook · Thu'), images: album('boutique-3', 'boutique-cover', 'boutique-1', 'boutique-2'), layout: 'masonry' } },
-        { name: 'text', data: { title: s('Size & exchange', 'Size & đổi trả'), content: s('Free exchange within 7 days. Message us your height and weight and we’ll pick your size.', 'Đổi miễn phí trong 7 ngày. Nhắn chiều cao, cân nặng để được chọn size giúp.'), align: 'center', style: 'card' } },
+        { name: 'image-album', data: { title: s('Lookbook · Autumn', 'Lookbook · Thu'), images: album('blog-fashion-1', 'blog-fashion-2', 'blog-fashion-3'), layout: 'masonry' } },
+        faq(s('Size & exchange', 'Size & đổi trả'), s('📏 S: 45–50 kg · M: 50–56 kg · L: 56–62 kg · XL: 62–68 kg\n💬 Unsure? Message your height and weight and we’ll pick for you\n🔁 Free exchange within 7 days, tags on\n🚚 Free shipping from 500,000₫, COD nationwide', '📏 S: 45–50 kg · M: 50–56 kg · L: 56–62 kg · XL: 62–68 kg\n💬 Phân vân? Nhắn chiều cao, cân nặng để được chọn size giúp\n🔁 Đổi miễn phí trong 7 ngày, còn nguyên tag\n🚚 Miễn phí giao hàng từ 500.000₫, COD toàn quốc')),
+        { name: 'testimonials', data: { title: s('Worn by you', 'Khách mặc thật'), items: reviews(
+          [s('The linen dress is even softer than it looks. Ordered a second colour.', 'Đầm lanh mềm hơn cả trong ảnh. Đã đặt thêm màu thứ hai.'), 'Thanh Vy', s('Linen wrap dress · M', 'Đầm lanh quấn · M')],
+          [s('They picked my size from a message and it fits perfectly.', 'Shop chọn size giúp qua tin nhắn mà mặc vừa in.'), 'Ngọc Mai', s('Everyday shirt · S', 'Sơ mi hằng ngày · S')],
+        ) } },
+        { name: 'vietqr', data: {} },
         { name: 'hours', data: { title: s('Showroom', 'Showroom'), days: hours('10:00', '21:30') } },
         { name: 'contact', data: { title: s('Visit the showroom', 'Ghé showroom'), address: SAMPLE_ADDRESS, phone: SAMPLE_PHONE } },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'zalo', 'shopee', 'tiktokshop') } },
@@ -380,10 +399,14 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
         { name: 'event', data: { name: s('Pottery workshop', 'Workshop làm gốm'), date: '2026-11-29', startTime: '14:00', endTime: '17:00', venue: s('Đất Lành studio', 'Xưởng Đất Lành'), address: SAMPLE_ADDRESS, note: s('550,000 ₫ per person, clay and firing included. Take home what you make.', '550.000 ₫ một người, gồm đất và nung. Mang về sản phẩm bạn làm.') } },
         { name: 'form', data: { title: s('Book a workshop seat', 'Giữ chỗ workshop'), kind: 'booking', fields: booking(true, false, true, false), submitLabel: s('Book my seat', 'Giữ chỗ') } },
         { name: 'text', data: { title: s('Our story', 'Câu chuyện của xưởng'), content: s('Two sisters, one kiln and clay from the Red River. Everything is thrown by hand and glazed in small batches.', 'Hai chị em, một lò nung và đất từ sông Hồng. Mọi sản phẩm đều vuốt tay và tráng men theo mẻ nhỏ.'), align: 'center', style: 'plain' } },
-        { name: 'image-album', data: { title: s('In the studio', 'Trong xưởng'), images: album('craft-cover', 'craft-2', 'craft-3', 'craft-1'), layout: 'grid' } },
-        { name: 'video', data: { title: s('A day at the wheel', 'Một ngày bên bàn xoay'), url: '' } },
-        { name: 'social', data: { links: social('instagram', 'facebook', 'tiktok', 'shopee') } },
+        { name: 'testimonials', data: { title: s('In your kitchens', 'Gốm trong bếp nhà bạn'), items: reviews(
+          [s('My morning coffee tastes better in this mug. I’m sure of it.', 'Cà phê sáng uống bằng cốc này ngon hơn hẳn. Chắc chắn luôn.'), 'Hải Yến', s('Speckled mug', 'Cốc men lấm tấm')],
+          [s('The workshop was the calmest three hours of my month.', 'Buổi workshop là ba tiếng thư thái nhất trong tháng của mình.'), 'Duy Anh', s('Pottery workshop', 'Workshop làm gốm')],
+        ) } },
+        faq(s('Shipping & care', 'Giao hàng & bảo quản'), s('📦 Packed in rice husk and double boxes; breakage replaced free\n🎁 Custom names or logos from 20 pieces\n🍽️ Dishwasher and microwave safe\n🚚 2–4 days nationwide', '📦 Gói bằng trấu và hai lớp hộp; vỡ được đổi mới miễn phí\n🎁 Khắc tên, logo theo yêu cầu từ 20 sản phẩm\n🍽️ Dùng được máy rửa bát và lò vi sóng\n🚚 Giao toàn quốc 2–4 ngày')),
+        { name: 'hours', data: { title: s('Studio open days', 'Giờ mở xưởng'), days: hours('09:00', '17:30', [1]) } },
         { name: 'vietqr', data: {} },
+        { name: 'social', data: { links: social('instagram', 'facebook', 'tiktok', 'shopee', 'googlemaps') } },
       ] as Blocks),
       room: shopRoom('#efe2d1', '#a87b56', '#b65e3c', s('Shop ceramics', 'Mua gốm'), [
         { type: 'plant', position: [1.2, 0, -1.6], rotation: 0, color: '#8a9a5b' },
@@ -405,7 +428,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
         ...look({
           bg: '#F6F0FF', text: '#2E1F47', accent: '#7C5CFF', onAccent: '#FFFFFF', surface: '#FFFFFF', radius: 24, shadow: 'glow',
           nameFont: 'Comfortaa, sans-serif', nameWeight: '700', nameSize: '2.2rem', headingFont: 'Comfortaa, sans-serif', bodyFont: 'Nunito, sans-serif',
-          header: 'banner-circle', banner: photo('skin-cover'), link: 'centered', social: 'soft',
+          header: 'banner-circle', banner: photo('skin-1'), link: 'centered', social: 'soft',
         }),
         background: { type: 'effect', effectId: 'aurora', color: '#F6F0FF' },
       },
@@ -415,7 +438,7 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('Cloud cleanser', 'Sữa rửa mặt Cloud'), 260000, 'skin-avatar', s('Low pH, for every skin type', 'pH thấp, cho mọi loại da')],
           [s('Daily sunscreen SPF 50', 'Kem chống nắng SPF 50'), 320000, 'skin-2', s('No white cast', 'Không vệt trắng')],
           [s('Glow routine set', 'Bộ chu trình Glow'), 890000, 'skin-3', s('Cleanser, serum, sunscreen', 'Sữa rửa mặt, serum, chống nắng'), s('Save 10%', 'Tiết kiệm 10%'), 970000],
-        ).map((item, i) => (i === 0 ? { ...item, options: [opt(s('Size', 'Dung tích'), '30 ml', '50 ml')] } : i === 3 ? { ...item, stock: 4 } : item)) } },
+        ).map((item, i) => (i === 0 ? { ...item, options: [opt(s('Volume', 'Dung tích'), '30 ml', '50 ml')] } : i === 3 ? { ...item, stock: 4 } : item)) } },
         { name: 'timeline', data: { title: s('Your morning routine', 'Chu trình buổi sáng'), items: [
           step(s('Step 1', 'Bước 1'), s('Cleanse', 'Làm sạch'), s('A pea-sized drop of Cloud cleanser.', 'Một lượng nhỏ sữa rửa mặt Cloud.')),
           step(s('Step 2', 'Bước 2'), s('Treat', 'Đặc trị'), s('Three drops of Calm serum, pat in.', 'Ba giọt serum dịu da, vỗ nhẹ.'), ),
@@ -425,9 +448,9 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
           [s('My redness calmed down in two weeks.', 'Da bớt ửng đỏ chỉ sau hai tuần.'), 'Phương Linh', s('Calm serum', 'Serum dịu da')],
           [s('The first sunscreen that doesn’t sting my eyes.', 'Kem chống nắng đầu tiên không làm cay mắt.'), 'Tú Anh', s('Daily sunscreen', 'Kem chống nắng')],
         ) } },
-        { name: 'image-album', data: { title: s('#GlowLabSkin', '#GlowLabSkin'), images: album('skin-1', 'skin-4', 'skin-2', 'skin-3'), layout: 'grid' } },
+        faq(s('Is it right for me?', 'Có hợp với da mình không?'), s('🌿 Fragrance-free and alcohol-free, tested on sensitive skin\n🤰 Safe during pregnancy (no retinol, no salicylic acid)\n🧪 Patch test on your jaw for 24 hours first\n↩️ Opened and didn’t suit you? Return within 14 days', '🌿 Không hương liệu, không cồn, đã thử trên da nhạy cảm\n🤰 Dùng được khi mang thai (không retinol, không BHA)\n🧪 Thử trước ở vùng quai hàm 24 giờ\n↩️ Đã mở mà không hợp? Đổi trả trong 14 ngày')),
         { name: 'form', data: { title: s('Free skin consult', 'Tư vấn da miễn phí'), description: s('Tell us your skin type and concerns; we reply with a routine.', 'Cho chúng tôi biết loại da và vấn đề, chúng tôi gửi bạn chu trình phù hợp.'), kind: 'contact', fields: { phone: true, email: false, date: false, time: false, guests: false, message: true }, submitLabel: s('Get my routine', 'Nhận chu trình') } },
-        { name: 'links', data: { items: links([s('Shop on Shopee', 'Mua trên Shopee'), ''], [s('Shop on TikTok Shop', 'Mua trên TikTok Shop'), '']) } },
+        { name: 'vietqr', data: {} },
         { name: 'social', data: { links: social('instagram', 'tiktok', 'facebook', 'shopee', 'tiktokshop', 'lazada') } },
       ] as Blocks),
       room: shopRoom('#f3ecff', '#d9cbe8', '#7c5cff', s('Shop Glow Lab', 'Mua Glow Lab'), [
