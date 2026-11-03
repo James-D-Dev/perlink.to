@@ -576,9 +576,13 @@ const props = defineProps<{
 const emit = defineEmits<{ selectBlock: [blockId: string] }>();
 
 // In the editor preview a tap picks the block to edit instead of following links
+// In the editor's preview a click picks the block to edit: it stops here,
+// so photos don't open full screen, envelopes don't open, order sheets
+// don't pop up (those are for the live page)
 function onPreviewClick(event: MouseEvent, blockId: string) {
   if (props.mode !== "preview") return;
   event.preventDefault();
+  event.stopPropagation();
   emit("selectBlock", blockId);
 }
 
