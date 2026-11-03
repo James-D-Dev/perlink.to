@@ -68,10 +68,18 @@
               <tr v-for="record in rows" :key="record.type + record.name">
                 <td class="px-3 py-2 font-medium">{{ record.type }}</td>
                 <td class="px-3 py-2">
-                  <button type="button" class="break-all text-left font-mono hover:underline" @click="copy(record.short)">{{ record.short }}</button>
+                  <div class="flex items-start gap-1">
+                    <span class="min-w-0 break-all font-mono">{{ record.short }}</span>
+                    <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-copy" class="-my-1 shrink-0" :aria-label="t('common.copy')" @click="copy(record.short)" />
+                  </div>
                   <p v-if="record.short !== record.name" class="mt-0.5 break-all text-[10px] text-dimmed">{{ record.name }}</p>
                 </td>
-                <td class="px-3 py-2"><button type="button" class="break-all text-left font-mono hover:underline" @click="copy(record.value)">{{ record.value }}</button></td>
+                <td class="px-3 py-2">
+                  <div class="flex items-start gap-1">
+                    <span class="min-w-0 break-all font-mono">{{ record.value }}</span>
+                    <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-copy" class="-my-1 shrink-0" :aria-label="t('common.copy')" @click="copy(record.value)" />
+                  </div>
+                </td>
                 <td v-if="dns" class="px-3 py-2">
                   <UTooltip :text="t(`dashboard.domain.check_${record.check}`)">
                     <UIcon

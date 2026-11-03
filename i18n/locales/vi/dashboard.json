@@ -770,7 +770,7 @@
         "error": "Kiểm tra lại DNS"
       },
       "open": "Mở",
-      "instructions": "Thêm các bản ghi sau ở nơi quản lý DNS của tên miền (bấm vào tên hoặc giá trị để sao chép):",
+      "instructions": "Thêm các bản ghi sau ở nơi quản lý DNS của tên miền:",
       "type": "Loại",
       "name": "Tên",
       "value": "Giá trị",

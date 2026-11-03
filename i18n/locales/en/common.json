@@ -20,7 +20,8 @@
     "auto": "Auto",
     "optional": "Optional",
     "confirm": "Confirm",
-    "back": "Back"
+    "back": "Back",
+    "copy": "Copy"
   },
   "menu": {
     "account": "My account",

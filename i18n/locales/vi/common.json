@@ -20,7 +20,8 @@
     "auto": "Tự động",
     "optional": "Không bắt buộc",
     "confirm": "Xác nhận",
-    "back": "Quay lại"
+    "back": "Quay lại",
+    "copy": "Sao chép"
   },
   "menu": {
     "account": "Tài khoản",

@@ -770,7 +770,7 @@
         "error": "Check your DNS"
       },
       "open": "Open",
-      "instructions": "Add these records where your domain's DNS is managed (click a name or value to copy it):",
+      "instructions": "Add these records where your domain's DNS is managed:",
       "type": "Type",
       "name": "Name",
       "value": "Value",
