@@ -9,7 +9,7 @@
             <p class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-lime-100 ring-1 ring-white/20 backdrop-blur">
               <UIcon name="i-lucide-badge-dollar-sign" class="size-3.5" />{{ text.eyebrow }}
             </p>
-            <h1 class="mk-display mt-5 pr-10 text-[40px] leading-[1.05] sm:text-6xl">{{ text.title }}</h1>
+            <h1 class="mk-display mt-5 pr-10 text-[40px] leading-[1.05] sm:text-6xl"><template v-for="(part, i) in text.title.split(`${PCT}%`)" :key="i"><span v-if="i" class="bg-gradient-to-r from-amber-200 via-amber-300 to-yellow-200 bg-clip-text font-extrabold text-transparent drop-shadow-[0_2px_12px_rgba(252,211,77,0.45)]">{{ PCT }}%</span>{{ part }}</template></h1>
             <p class="mt-5 max-w-xl text-base leading-relaxed text-emerald-50/80 sm:text-lg">{{ text.intro }}</p>
             <div class="mt-8 flex flex-wrap gap-3">
               <a :href="signupUrl" target="_blank" rel="noopener" class="inline-flex h-12 items-center gap-2 rounded-full bg-amber-300 px-6 text-[15px] font-semibold text-amber-950 shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:bg-amber-200">
@@ -20,8 +20,8 @@
               </NuxtLink>
             </div>
             <div class="mt-10 grid grid-cols-3 gap-2 sm:gap-3">
-              <div v-for="stat in text.stats" :key="stat.label" class="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur-md sm:p-4">
-                <p class="text-xl font-semibold sm:text-3xl">{{ stat.value }}</p>
+              <div v-for="(stat, i) in text.stats" :key="stat.label" class="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur-md sm:p-4">
+                <p class="text-xl font-semibold sm:text-3xl" :class="i === 0 && 'font-extrabold text-amber-300'">{{ stat.value }}</p>
                 <p class="mt-1 text-[11px] leading-tight text-emerald-50/70 sm:text-sm">{{ stat.label }}</p>
               </div>
             </div>

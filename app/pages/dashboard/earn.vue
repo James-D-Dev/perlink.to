@@ -13,7 +13,7 @@
             <UIcon name="i-lucide-badge-dollar-sign" class="size-3.5" />{{ t('dashboard.earn.eyebrow') }}
           </p>
           <h1 class="mt-4 max-w-[15ch] pr-10 text-[28px] font-semibold leading-tight tracking-tight sm:max-w-md sm:text-4xl">
-            {{ t('dashboard.earn.headline', { percent: AFFILIATE_COMMISSION }) }}
+            <template v-for="(part, i) in t('dashboard.earn.headline', { percent: AFFILIATE_COMMISSION }).split(`${AFFILIATE_COMMISSION}%`)" :key="i"><span v-if="i" class="bg-gradient-to-r from-amber-200 via-amber-300 to-yellow-200 bg-clip-text font-extrabold text-transparent drop-shadow-[0_2px_12px_rgba(252,211,77,0.45)]">{{ AFFILIATE_COMMISSION }}%</span>{{ part }}</template>
           </h1>
           <p class="mt-3 max-w-md text-sm leading-relaxed text-emerald-50/80">{{ t('dashboard.earn.intro', { days: AFFILIATE_COOKIE_DAYS }) }}</p>
           <p class="mt-4 inline-flex items-center gap-2 rounded-2xl bg-amber-300 px-3.5 py-2 text-sm font-semibold text-amber-950 shadow-lg shadow-black/20">
@@ -21,7 +21,7 @@
           </p>
           <div class="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
             <div v-for="stat in stats" :key="stat.label" class="rounded-2xl bg-white/10 px-3 py-3 ring-1 ring-white/15 backdrop-blur-md sm:px-4">
-              <p class="text-lg font-semibold tabular-nums sm:text-2xl">{{ stat.value }}</p>
+              <p class="text-lg font-semibold tabular-nums sm:text-2xl" :class="stat.highlight && 'font-extrabold text-amber-300'">{{ stat.value }}</p>
               <p class="text-[11px] leading-tight text-emerald-50/70 sm:text-xs">{{ stat.label }}</p>
             </div>
           </div>
@@ -117,7 +117,7 @@ async function save() {
 }
 
 const stats = computed(() => [
-  { label: t('dashboard.earn.statCommission'), value: `${AFFILIATE_COMMISSION}%` },
+  { label: t('dashboard.earn.statCommission'), value: `${AFFILIATE_COMMISSION}%`, highlight: true },
   { label: t('dashboard.earn.statMonths'), value: t('dashboard.earn.forever') },
   { label: t('dashboard.earn.statSignups'), value: String(signups.value) },
 ])
