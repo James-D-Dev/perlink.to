@@ -266,8 +266,8 @@ export const BUSINESS_HEALTH_SHOP_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Book an appointment', 'Đặt lịch khám'), description: s('Pick a time; we confirm by phone within 15 minutes.', 'Chọn giờ khám, chúng tôi gọi xác nhận trong 15 phút.'), kind: 'booking', fields: booking(true, true, false), submitLabel: s('Book my visit', 'Đặt lịch') } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('07:00', '20:00', [0]), note: s('Sunday mornings for emergencies only.', 'Sáng Chủ nhật chỉ nhận ca cấp cứu.') } },
         { name: 'testimonials', data: { items: reviews(
-          [s('Kind doctors, no rushing, and they explain everything to my kids.', 'Bác sĩ tận tình, không vội vàng, giải thích kỹ cho cả con tôi.'), 'Ngọc Anh', s('Google review', 'Đánh giá Google')],
-          [s('In and out in 30 minutes with test results.', 'Khám và có kết quả xét nghiệm chỉ trong 30 phút.'), 'Peter W.', s('Google review', 'Đánh giá Google')],
+          [s('Kind doctors, no rushing, and they explain everything to my kids.', 'Bác sĩ tận tình, không vội vàng, giải thích kỹ cho cả con tôi.'), 'Ngọc Anh', s('Sample review', 'Đánh giá mẫu')],
+          [s('In and out in 30 minutes with test results.', 'Khám và có kết quả xét nghiệm chỉ trong 30 phút.'), 'Peter W.', s('Sample review', 'Đánh giá mẫu')],
         ) } },
         { name: 'image-album', data: { title: s('Our clinic', 'Phòng khám'), images: album('clinic-1', 'clinic-2', 'clinic-3'), layout: 'grid' } },
         faq(s('Before your visit', 'Trước khi đến khám'), s('🪪 Bring your ID and any recent test results\n💳 Private insurance accepted: Bảo Việt, PVI, Liberty\n🧒 A play corner and a paediatrician every afternoon\n🩺 Results by Zalo, with the doctor’s notes', '🪪 Mang CCCD và kết quả xét nghiệm gần nhất (nếu có)\n💳 Nhận bảo hiểm tư nhân: Bảo Việt, PVI, Liberty\n🧒 Có góc chơi cho bé, bác sĩ nhi khám mỗi chiều\n🩺 Gửi kết quả qua Zalo kèm lời dặn của bác sĩ')),

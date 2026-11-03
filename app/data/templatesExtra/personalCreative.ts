@@ -374,7 +374,7 @@ export const PERSONAL_CREATIVE_TEMPLATES: PageTemplate[] = [
         ]) } },
         { name: 'image-album', data: { title: s('Fresh from the chair', 'Vừa rời ghế salon'), images: album('salon-1', 'salon-2', 'salon-3', 'hair-1'), layout: 'carousel' } },
         { name: 'testimonials', data: { title: s('Happy heads', 'Khách nói gì'), items: reviews(
-          [s('Finally a pink that didn’t fade in a week!', 'Cuối cùng cũng có màu hồng không phai sau một tuần!'), 'Trang N.', s('Google review', 'Đánh giá Google')],
+          [s('Finally a pink that didn’t fade in a week!', 'Cuối cùng cũng có màu hồng không phai sau một tuần!'), 'Trang N.', s('Sample review', 'Đánh giá mẫu')],
           [s('They listened, then did even better than my photo.', 'Các bạn lắng nghe rồi làm còn đẹp hơn ảnh mẫu.'), 'Phuong L.', s('Regular since 2023', 'Khách quen từ 2023')],
         ) } },
         faq(s('Before you come', 'Trước khi đến'), s('⏱️ Balayage and vivid colours take 3–4 hours: book a morning slot\n📸 Bring a photo of the look you love\n🧴 Free aftercare shampoo with every colour\n⏰ Running late? We hold your chair for 15 minutes', '⏱️ Balayage và màu nổi mất 3–4 tiếng, nên đặt buổi sáng\n📸 Mang theo ảnh kiểu tóc bạn thích\n🧴 Tặng dầu gội giữ màu khi nhuộm\n⏰ Đến trễ? Salon giữ chỗ 15 phút')),

@@ -33,7 +33,7 @@
           <div class="mt-8 flex flex-1 items-end justify-center">
             <div class="w-[62%] max-w-[260px] overflow-hidden rounded-t-[28px] border-x-[6px] border-t-[6px] border-ink bg-white shadow-[0_20px_50px_rgba(12,11,10,0.15)]">
               <div class="aspect-[3/4] w-full" role="img" :aria-label="text.pageAlt">
-                <LazySiteTemplateThumbnail hydrate-on-visible :template="portfolioTemplate" :scale="0.5" />
+                <LazySiteTemplateThumbnail hydrate-on-visible sample :template="portfolioTemplate" :scale="0.5" />
               </div>
             </div>
           </div>
@@ -74,7 +74,7 @@
         <NuxtLink v-for="(template, i) in portfolioTemplates" :key="template.id" v-reveal="(i % 4) * 90" :to="`/templates/${template.id}`" class="group block">
           <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-sand">
             <div class="absolute inset-x-4 top-4 bottom-0 overflow-hidden rounded-t-xl ring-1 ring-line transition-transform duration-500 group-hover:-translate-y-1">
-              <LazySiteTemplateThumbnail hydrate-on-visible :template="template" :scale="0.38" />
+              <LazySiteTemplateThumbnail hydrate-on-visible sample :template="template" :scale="0.38" />
             </div>
           </div>
           <h3 class="mt-3 text-sm font-medium text-ink">{{ copy.templates.names[template.id]?.name ?? template.name }}</h3>

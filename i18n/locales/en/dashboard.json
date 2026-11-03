@@ -843,7 +843,7 @@
       "startFree": "Start free",
       "contact": "Contact us to upgrade",
       "contactNote": "Online checkout is coming soon. Until then, contact us and we will upgrade your account.",
-      "payNote": "Monthly or yearly subscription, cancel any time. Your plan turns on as soon as the payment goes through.",
+      "payNote": "Monthly or yearly subscription, cancel any time. Your plan turns on as soon as the payment goes through. Every account can also try Plus free once for 7 days, no card needed.",
       "status": {
         "free": "You're on the Free plan",
         "paid": "You're on {plan}",

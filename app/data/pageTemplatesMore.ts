@@ -1009,7 +1009,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         faq(s('Good to know', 'Cần biết trước khi đến'), s('🛵 Free motorbike parking in front; cars at the building next door.\n⏰ Arrive 10 minutes early for tea and a short consultation.\n🔁 Need to move your booking? Tell us 2 hours ahead, no charge.\n🌸 Pregnant guests: ask for our gentle prenatal massage.', '🛵 Giữ xe máy miễn phí trước cửa, ô tô gửi toà nhà bên cạnh.\n⏰ Đến sớm 10 phút để uống trà và được tư vấn.\n🔁 Cần đổi lịch? Báo trước 2 tiếng, không mất phí.\n🌸 Mẹ bầu vui lòng báo để spa chuẩn bị liệu trình nhẹ nhàng.')),
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('09:00', '21:00'), note: s('Last booking one hour before closing.', 'Nhận khách cuối trước giờ đóng cửa một tiếng.') } },
         { name: 'testimonials', data: { title: s('From our guests', 'Khách nói gì'), items: reviews(
-          [s('The calmest hour of my month. Lovely staff.', 'Một tiếng thư thái nhất trong tháng. Nhân viên rất dễ thương.'), 'Thảo N.', s('Google review', 'Đánh giá Google')],
+          [s('The calmest hour of my month. Lovely staff.', 'Một tiếng thư thái nhất trong tháng. Nhân viên rất dễ thương.'), 'Thảo N.', s('Sample review', 'Đánh giá mẫu')],
           [s('Best hot stone massage in town.', 'Massage đá nóng ngon nhất thành phố.'), 'Anna L.'],
           [s('Booked for my mum’s birthday, she loved the gift box.', 'Đặt tặng mẹ dịp sinh nhật, mẹ rất thích hộp quà.'), 'Minh Q.', s('Bought a gift card', 'Mua thẻ quà tặng')],
         ) } },
@@ -1055,7 +1055,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Book a seat', 'Đặt lịch làm móng'), description: s('Pick your service; send a photo of the design you like on Zalo.', 'Chọn dịch vụ, gửi ảnh mẫu bạn thích qua Zalo nhé.'), kind: 'booking', fields: booking() } },
         faq(s('Before you come', 'Trước khi đến tiệm'), s('✨ Every tool is sterilised; files and buffers are single-use.\n💅 Removing old gel from another salon: 30,000.\n🕒 Gel with art takes about 75 minutes.\n🎁 Your 6th visit gets free nail art.', '✨ Dụng cụ tiệt trùng, dũa và phao dùng một lần.\n💅 Phá gel cũ từ tiệm khác: 30.000.\n🕒 Sơn gel kèm vẽ mất khoảng 75 phút.\n🎁 Lần thứ 6 được tặng vẽ móng.')),
         { name: 'testimonials', data: { title: s('Happy hands', 'Khách khen'), items: reviews(
-          [s('My gel lasted almost four weeks. The cat-eye is gorgeous.', 'Sơn gel giữ gần bốn tuần, màu mắt mèo đẹp mê.'), 'Linh T.', s('Google review', 'Đánh giá Google')],
+          [s('My gel lasted almost four weeks. The cat-eye is gorgeous.', 'Sơn gel giữ gần bốn tuần, màu mắt mèo đẹp mê.'), 'Linh T.', s('Sample review', 'Đánh giá mẫu')],
           [s('Clean, quiet and they never rush you.', 'Sạch, yên tĩnh và không bao giờ làm vội.'), 'Hà P.'],
         ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('09:00', '20:30') } },
@@ -1101,7 +1101,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Book a chair', 'Đặt lịch'), description: s('Choose your service and barber time; we hold your chair for 10 minutes.', 'Chọn dịch vụ và giờ, ghế được giữ cho bạn 10 phút.'), kind: 'booking', fields: booking() } },
         faq(s('House rules', 'Lưu ý nhỏ'), s('🪒 Walk-ins welcome, but bookings go first.\n🍺 A free cold drink with every cut.\n🛵 Park your bike in the alley, we’ll watch it.\n💳 Cash, bank transfer or card.', '🪒 Khách vãng lai vẫn được phục vụ, khách đặt lịch được ưu tiên.\n🍺 Tặng một lon nước mát mỗi lần cắt.\n🛵 Gửi xe trong hẻm, tiệm trông giúp.\n💳 Nhận tiền mặt, chuyển khoản hoặc thẻ.')),
         { name: 'testimonials', data: { title: s('From the chair', 'Khách nói gì'), items: reviews(
-          [s('Best fade I’ve had in Hanoi, and the hot towel is pure bliss.', 'Kiểu fade đẹp nhất mình từng cắt ở Hà Nội, khăn nóng phê thật sự.'), 'Đức A.', s('Google review', 'Đánh giá Google')],
+          [s('Best fade I’ve had in Hanoi, and the hot towel is pure bliss.', 'Kiểu fade đẹp nhất mình từng cắt ở Hà Nội, khăn nóng phê thật sự.'), 'Đức A.', s('Sample review', 'Đánh giá mẫu')],
           [s('Brought my son too. Patient and quick.', 'Dẫn cả con trai đi cắt, thợ kiên nhẫn và nhanh.'), 'Tom R.'],
         ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('08:30', '20:00', [1]) } },
@@ -1189,7 +1189,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         faq(s('Patients often ask', 'Bệnh nhân thường hỏi'), s('💳 Braces and implants can be paid monthly at 0% interest.\n🧾 Every treatment comes with a written quote first.\n👶 Children from 3 years old, with a gentle first visit.\n🅿️ Free parking for bikes; cars at the market lot next door.', '💳 Niềng răng và cấy ghép có thể trả góp 0%.\n🧾 Mọi điều trị đều có báo giá bằng văn bản trước.\n👶 Nhận khám trẻ từ 3 tuổi, buổi đầu làm quen nhẹ nhàng.\n🅿️ Gửi xe máy miễn phí, ô tô gửi bãi chợ bên cạnh.')),
         { name: 'image-album', data: { title: s('Inside the clinic', 'Không gian phòng khám'), images: album('dental-1', 'dental-2', 'clinic-2'), layout: 'grid' } },
         { name: 'testimonials', data: { title: s('Patient reviews', 'Đánh giá của bệnh nhân'), items: reviews(
-          [s('Painless and very clear about costs.', 'Không đau và báo giá rất rõ ràng.'), 'Phương A.', s('Google review', 'Đánh giá Google')],
+          [s('Painless and very clear about costs.', 'Không đau và báo giá rất rõ ràng.'), 'Phương A.', s('Sample review', 'Đánh giá mẫu')],
           [s('My daughter wasn’t scared at all. Thank you, doctor.', 'Con gái mình không sợ chút nào. Cảm ơn bác sĩ.'), 'Chị Hạnh', s('Parent', 'Phụ huynh')],
         ) } },
         { name: 'contact', data: { address: s('210 Nguyen Trai, Thanh Xuan, Hanoi', '210 Nguyễn Trãi, Thanh Xuân, Hà Nội'), phone: SAMPLE_PHONE, quickBar: true } },
@@ -1359,7 +1359,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Reserve a table', 'Đặt bàn'), description: s('Tables are held for 15 minutes past your time.', 'Bàn được giữ 15 phút sau giờ hẹn.'), kind: 'booking', fields: booking(true, true, true, false) } },
         faq(s('Before you come', 'Trước khi đến'), s('🔞 Guests 18 and over; please bring ID.\n👟 Smart casual: no flip-flops or sports vests.\n🎂 Celebrating? Tell us in your booking and we’ll bring a candle.', '🔞 Khách từ 18 tuổi, vui lòng mang theo giấy tờ.\n👟 Trang phục lịch sự: không dép lê, không áo ba lỗ.\n🎂 Có dịp đặc biệt? Ghi chú khi đặt bàn, quán sẽ chuẩn bị nến.')),
         { name: 'testimonials', data: { title: s('Guests say', 'Khách nói gì'), items: reviews(
-          [s('The Saigon Sour is the best drink in District 1.', 'Saigon Sour là ly ngon nhất Quận 1.'), 'Khánh V.', s('Google review', 'Đánh giá Google')],
+          [s('The Saigon Sour is the best drink in District 1.', 'Saigon Sour là ly ngon nhất Quận 1.'), 'Khánh V.', s('Sample review', 'Đánh giá mẫu')],
           [s('Great music, kind bartenders, view over the walking street.', 'Nhạc hay, bartender dễ thương, nhìn xuống phố đi bộ.'), 'Emma S.'],
         ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('18:00', '01:00') } },
@@ -1397,7 +1397,7 @@ export const MORE_PAGE_TEMPLATES: PageTemplate[] = [
         { name: 'form', data: { title: s('Something special in mind?', 'Muốn một bó hoa riêng?'), description: s('Tell us the date, budget and who they are for; we send a sketch on Zalo.', 'Cho tiệm biết ngày nhận, ngân sách và người nhận, tiệm gửi mẫu qua Zalo.'), kind: 'booking', fields: { phone: true, email: false, date: true, time: true, guests: false, message: true }, submitLabel: s('Send order', 'Gửi đơn') } },
         faq(s('Delivery & care', 'Giao hoa & giữ hoa'), s('🚚 Same-day delivery in the inner city for orders before 15:00 (30,000).\n💌 A handwritten card is free; write your message in the order note.\n📸 We send a photo before the flowers leave the shop.\n💧 Trim the stems and change the water every two days.', '🚚 Giao trong ngày nội thành cho đơn trước 15 giờ (30.000).\n💌 Tặng thiệp viết tay, ghi lời nhắn ở phần ghi chú.\n📸 Tiệm gửi ảnh hoa trước khi giao.\n💧 Cắt gốc và thay nước hai ngày một lần để hoa tươi lâu.')),
         { name: 'testimonials', data: { title: s('Kind words', 'Khách gửi lời'), items: reviews(
-          [s('Ordered at noon, my mum had them by 4 pm. So pretty.', 'Đặt lúc trưa, 4 giờ chiều mẹ đã nhận được. Đẹp lắm.'), 'Ngọc H.', s('Google review', 'Đánh giá Google')],
+          [s('Ordered at noon, my mum had them by 4 pm. So pretty.', 'Đặt lúc trưa, 4 giờ chiều mẹ đã nhận được. Đẹp lắm.'), 'Ngọc H.', s('Sample review', 'Đánh giá mẫu')],
           [s('They sent a photo first, exactly as I hoped.', 'Tiệm gửi ảnh trước, đúng y như mình mong.'), 'Bảo T.'],
         ) } },
         { name: 'hours', data: { title: s('Opening hours', 'Giờ mở cửa'), days: hours('07:00', '21:00') } },

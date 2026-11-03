@@ -14,8 +14,8 @@ export function planFeatures(plan: PlanId, t: Translate) {
   ]
   list.push(Number.isFinite(limits.posts) ? f('posts', { n: limits.posts }) : f('postsUnlimited'))
   if (limits.proThemes) list.push(f('proThemes'))
-  // Only what works today: domains as coming soon, the badge stays for everyone for now
-  if (limits.customDomain) list.push(CUSTOM_DOMAINS_LIVE ? f('customDomains', { n: limits.domains }, limits.domains) : f('customDomainsSoon'))
+  // Only what works today: domains are listed once they can be connected
+  if (limits.customDomain && CUSTOM_DOMAINS_LIVE) list.push(f('customDomains', { n: limits.domains }, limits.domains))
   if (limits.removeBranding && !BRANDING_FOR_ALL) list.push(f('removeBranding'))
   const years = Math.round(limits.analyticsDays / 365)
   list.push(years >= 2 ? f('analyticsYears', { n: years }) : years === 1 ? f('analyticsYear') : f('analytics', { n: limits.analyticsDays }))

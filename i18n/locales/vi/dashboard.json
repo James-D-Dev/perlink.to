@@ -843,7 +843,7 @@
       "startFree": "Bắt đầu miễn phí",
       "contact": "Liên hệ nâng cấp",
       "contactNote": "Thanh toán online sắp mở. Trong lúc chờ, hãy liên hệ để được nâng cấp.",
-      "payNote": "Thuê bao theo tháng hoặc năm, huỷ bất cứ lúc nào. Gói bật ngay khi thanh toán thành công.",
+      "payNote": "Thuê bao theo tháng hoặc năm, huỷ bất cứ lúc nào. Gói bật ngay khi thanh toán thành công. Mỗi tài khoản được dùng thử Plus miễn phí một lần trong 7 ngày, không cần thẻ.",
       "status": {
         "free": "Bạn đang dùng gói Miễn phí",
         "paid": "Bạn đang dùng gói {plan}",

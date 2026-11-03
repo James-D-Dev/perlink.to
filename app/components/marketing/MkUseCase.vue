@@ -15,7 +15,7 @@
         <NuxtLink :to="`/templates/${heroTemplate.id}`" class="flex justify-center rounded-2xl bg-sand px-6 pt-10">
           <div class="w-[68%] max-w-[300px] overflow-hidden rounded-t-[32px] border-x-[7px] border-t-[7px] border-ink bg-white shadow-[0_20px_50px_rgba(12,11,10,0.15)]">
             <div class="aspect-[9/16] w-full" role="img" :aria-label="text.heroAlt">
-              <LazySiteTemplateThumbnail hydrate-on-visible :template="heroTemplate" :scale="0.55" />
+              <LazySiteTemplateThumbnail hydrate-on-visible sample :template="heroTemplate" :scale="0.55" />
             </div>
           </div>
         </NuxtLink>
@@ -39,7 +39,7 @@
         <NuxtLink v-for="(template, i) in templates" :key="template.id" v-reveal="(i % 4) * 90" :to="`/templates/${template.id}`" class="group block">
           <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-sand">
             <div class="absolute inset-x-4 top-4 bottom-0 overflow-hidden rounded-t-xl ring-1 ring-line transition-transform duration-500 group-hover:-translate-y-1">
-              <LazySiteTemplateThumbnail hydrate-on-visible :template="template" :scale="0.38" />
+              <LazySiteTemplateThumbnail hydrate-on-visible sample :template="template" :scale="0.38" />
             </div>
           </div>
           <h3 class="mt-3 text-sm font-medium text-ink">{{ copy.templates.names[template.id]?.name ?? template.name }}</h3>

@@ -10,6 +10,11 @@
     >
       <BioPageView :bio-data="bioData" :username="template.id" mode="thumbnail" />
     </div>
+    <!-- Marketing pages: make clear the prices and reviews inside are made up -->
+    <span
+      v-if="sample"
+      class="pointer-events-none absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white backdrop-blur"
+    >{{ sampleLabel }}</span>
   </div>
 </template>
 
@@ -31,11 +36,15 @@ const props = withDefaults(defineProps<{
   /** Pages rendered in the browser (dashboard): build the page only once it
    * nears the screen, so a grid of 35 doesn't render them all at once */
   lazy?: boolean
+  /** Show a "Sample" tag over the preview (marketing pages) */
+  sample?: boolean
 }>(), {
   scale: 0.5,
   personal: undefined,
   lazy: false,
+  sample: false,
 })
+
 
 const box = ref<HTMLElement | null>(null)
 const shown = ref(!props.lazy)
@@ -52,6 +61,7 @@ const route = useRoute()
 const { locale } = useI18n()
 const { lang: marketingLang } = useMarketingLang()
 const lang = computed(() => (route.path.startsWith('/dashboard') ? locale.value : marketingLang.value))
+const sampleLabel = computed(() => (lang.value === 'vi' ? 'Nội dung mẫu' : 'Sample content'))
 
 /** Template photos swapped for their small versions (480 px), anywhere in a value */
 function smallPhotos<T>(value: T): T {

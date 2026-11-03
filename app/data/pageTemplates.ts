@@ -160,7 +160,7 @@ const BASE_TEMPLATES: PageTemplate[] = [
           },
         },
         { name: 'testimonials', data: { title: s('What diners say', 'Thực khách nói gì'), items: reviews(
-          [s('The broth tastes like my grandmother’s. We come every Sunday.', 'Nước dùng y như bà nội nấu. Chủ nhật nào nhà mình cũng ghé.'), 'Hương N.', s('Google review', 'Đánh giá Google')],
+          [s('The broth tastes like my grandmother’s. We come every Sunday.', 'Nước dùng y như bà nội nấu. Chủ nhật nào nhà mình cũng ghé.'), 'Hương N.', s('Sample review', 'Đánh giá mẫu')],
           [s('Best bánh xèo in District 1, and the staff remember our order.', 'Bánh xèo ngon nhất Quận 1, nhân viên còn nhớ cả món quen.'), 'Daniel K.', s('Regular since 2022', 'Khách quen từ 2022')],
           [s('Booked a table for 12 on the page; everything was ready when we arrived.', 'Đặt bàn 12 người ngay trên trang, đến nơi là mọi thứ đã sẵn sàng.'), 'Thảo V.', s('Birthday dinner', 'Tiệc sinh nhật')],
         ) } },
@@ -277,7 +277,7 @@ const BASE_TEMPLATES: PageTemplate[] = [
         },
         { name: 'image-album', data: { title: 'Inside the café', images: album('cafe-1', 'cafe-2', 'cafe-3', 'cafe-4'), layout: 'grid' } },
         { name: 'testimonials', data: { title: s('Regulars say', 'Khách quen nói gì'), items: reviews(
-          [s('The salted cream coffee is worth crossing the city for.', 'Cà phê muối ở đây đáng để băng qua cả thành phố.'), 'Linh P.', s('Google review', 'Đánh giá Google')],
+          [s('The salted cream coffee is worth crossing the city for.', 'Cà phê muối ở đây đáng để băng qua cả thành phố.'), 'Linh P.', s('Sample review', 'Đánh giá mẫu')],
           [s('Quiet in the mornings, good Wi-Fi and plugs at every table. My office now.', 'Buổi sáng yên tĩnh, Wi-Fi mạnh, bàn nào cũng có ổ cắm. Giờ là văn phòng của mình.'), 'Tom R.', s('Remote worker', 'Làm việc từ xa')],
         ) } },
         { name: 'hours', data: { title: 'Opening hours', days: DEFAULT_OPENING_DAYS.map(d => ({ ...d, open: '07:00', close: '21:30' })), note: s('Kitchen closes at 20:30.', 'Bếp nhận món đến 20:30.') } },
