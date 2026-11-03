@@ -3,6 +3,8 @@ import type { PlanFeature, PlanId, PlanLimits } from '#shared/plans'
 export interface BillingInfo {
   plan: PlanId
   expiresAt: string | null
+  /** monthly | annual, for a paid plan */
+  period?: string | null
   limits: PlanLimits
   sites: number
   /** Live sites, which the plan's site limit counts (drafts are free) */

@@ -34,6 +34,12 @@ export default defineEventHandler(async (event) => {
   return {
     plan: account.plan,
     expiresAt: account.plan === 'free' ? null : account.expiresAt,
+    // Monthly or annual: the running subscription's, else the latest payment for this plan (bank transfers)
+    period: account.plan === 'free'
+      ? null
+      : (subscription && subscription.status !== 'expired' && subscription.plan === account.plan
+          ? subscription.period
+          : (payments.results ?? []).find(p => p.status === 'paid' && p.plan === account.plan)?.period ?? null),
     limits: PLAN_LIMITS[account.plan],
     sites: sites?.n ?? 0,
     // The plan's site limit counts live sites

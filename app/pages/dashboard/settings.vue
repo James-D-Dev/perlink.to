@@ -50,7 +50,10 @@
               <h2 class="text-sm font-medium text-ink">{{ t('dashboard.account.plan') }}</h2>
               <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.billing.status.sites', { used: account.liveSites ?? account.sites, max: siteLimit >= 1000 ? '∞' : siteLimit }) }}</p>
               <div class="mt-3 flex items-center justify-between gap-3">
-                <span class="text-lg font-semibold text-ink">{{ t(`dashboard.billing.plans.${account.plan}.name`) }}</span>
+                <span class="flex min-w-0 items-center gap-2">
+                  <span class="text-lg font-semibold text-ink">{{ t(`dashboard.billing.plans.${account.plan}.name`) }}</span>
+                  <span v-if="period" class="rounded-full bg-sand px-2 py-0.5 text-xs font-medium text-ink-muted">{{ t(`dashboard.billing.${period}`) }}</span>
+                </span>
                 <UButton to="/dashboard/upgrade" size="sm" color="neutral" variant="outline" :label="t('dashboard.account.seePlans')" />
               </div>
               <p v-if="(account.liveSites ?? account.sites) > siteLimit" class="mt-3 text-xs leading-relaxed text-warning">{{ t('dashboard.billing.status.overLimit', { used: account.liveSites ?? account.sites, max: siteLimit }) }}</p>
@@ -153,6 +156,13 @@ const name = ref('')
 // sign-in gave (so the field never looks empty while the menu shows a name)
 const { user: sessionUser } = useUserSession()
 const savedName = computed(() => account.value?.name || sessionUser.value?.name || '')
+// Monthly or annual, for a paid plan
+const billing = useBilling()
+onMounted(() => billing.ensure())
+const period = computed(() => {
+  const value = billing.info.value?.period
+  return value === 'monthly' || value === 'annual' ? value : null
+})
 const siteLimit = computed(() => PLAN_LIMITS[isPlanId(account.value?.plan) ? account.value!.plan as PlanId : 'free'].sites)
 
 onMounted(async () => {

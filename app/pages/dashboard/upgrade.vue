@@ -14,13 +14,14 @@
 
         <!-- Where the account stands -->
         <div v-if="info" class="mb-8 grid gap-3 lg:grid-cols-2">
-          <div class="flex items-center gap-4 rounded-3xl bg-paper ring-1 ring-line p-5">
+          <div class="flex flex-wrap items-center gap-4 rounded-3xl bg-paper ring-1 ring-line p-5">
             <div class="flex size-11 shrink-0 items-center justify-center rounded-xl" :class="info.plan === 'free' ? 'bg-sand text-ink-muted' : 'bg-gradient-to-br from-amber-400 to-pink-500 text-white'">
               <UIcon :name="info.plan === 'free' ? 'i-lucide-user' : 'i-lucide-crown'" class="size-5" />
             </div>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <p class="font-medium text-ink">
                 {{ info.plan === 'free' ? t('dashboard.billing.status.free') : t('dashboard.billing.status.paid', { plan: t(`dashboard.billing.plans.${info.plan}.name`) }) }}
+                <span v-if="info.period === 'monthly' || info.period === 'annual'" class="ml-1 rounded-full bg-sand px-2 py-0.5 align-middle text-xs font-medium text-ink-muted">{{ t(`dashboard.billing.${info.period}`) }}</span>
               </p>
               <p class="mt-0.5 text-sm text-ink-muted">
                 <template v-if="info.expiresAt">{{ t('dashboard.billing.status.until', { date: formatDate(info.expiresAt) }) }} · </template>
@@ -32,7 +33,7 @@
             </div>
             <UButton
               v-if="info.subscription?.portalUrl"
-              class="ml-auto shrink-0"
+              class="w-full justify-center sm:ml-auto sm:w-auto sm:shrink-0"
               size="sm"
               color="neutral"
               variant="outline"
