@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { getDB } from "../../../utils/db"
 import { requireSuperadmin } from "../../../utils/superadmin"
 
-const PLANS = ['free', 'starter', 'plus', 'pro'] as const
+const PLANS = ['free', 'starter', 'plus'] as const
 
 const bodySchema = z.object({
   email: z.string().trim().toLowerCase().email(),

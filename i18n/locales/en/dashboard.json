@@ -825,10 +825,6 @@
         "plus": {
           "name": "Plus",
           "description": "For shops and small businesses"
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "For agencies and professionals"
         }
       },
       "features": {

@@ -3,7 +3,7 @@ import { PAID_PLANS, type BillingPeriod, type PaidPlanId } from '#shared/plans'
 
 // Lemon Squeezy sells the plans as subscriptions (card, PayPal, Apple Pay),
 // as Merchant of Record. Its products are named after the plans ("Starter",
-// "Plus", "Pro") with a monthly and a yearly variant; those are found through
+// "Plus") with a monthly and a yearly variant; those are found through
 // the API, so only the API key and the webhook secret need setting up.
 
 const API = 'https://api.lemonsqueezy.com/v1'

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { getDB } from '../../utils/db'
 import { cryptoWallet, newPaymentCode, paymentMethods, transferDetails } from '../../utils/billing'
-import { PAID_PLANS, PLAN_PRICES, PLAN_PRICES_USD, onSale, type PaidPlanId } from '#shared/plans'
+import { PAID_PLANS, PLAN_PRICES, PLAN_PRICES_USD, type PaidPlanId } from '#shared/plans'
 import { CRYPTO_NETWORKS } from '#shared/crypto'
 
 const bodySchema = z.object({
@@ -20,7 +20,6 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.safeParse(await readBody(event))
   if (!body.success) throw createError({ statusCode: 400, statusMessage: 'Choose a plan' })
   const { plan, period, method } = body.data
-  if (!onSale(plan as PaidPlanId)) throw createError({ statusCode: 403, statusMessage: 'This plan is coming soon' })
   if (!paymentMethods(event)[method]) throw createError({ statusCode: 503, statusMessage: 'This way of paying is not available yet' })
   const amount = PLAN_PRICES[plan as PaidPlanId][period]
   const amountUsd = PLAN_PRICES_USD[plan as PaidPlanId][period]

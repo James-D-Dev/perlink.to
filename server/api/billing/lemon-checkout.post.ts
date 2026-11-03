@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { getDB } from '../../utils/db'
 import { createLemonCheckout, lemonEnabled } from '../../utils/lemon'
-import { PAID_PLANS, onSale, type PaidPlanId } from '#shared/plans'
+import { PAID_PLANS, type PaidPlanId } from '#shared/plans'
 
 const bodySchema = z.object({
   plan: z.enum(PAID_PLANS as [string, ...string[]]),
@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.safeParse(await readBody(event))
   if (!body.success) throw createError({ statusCode: 400, statusMessage: 'Choose a plan' })
   const plan = body.data.plan as PaidPlanId
-  if (!onSale(plan)) throw createError({ statusCode: 403, statusMessage: 'This plan is coming soon' })
 
   const running = await getDB(event)
     .prepare(`SELECT portal_url FROM subscriptions WHERE user_id = ? AND status IN ('on_trial', 'active', 'past_due', 'paused') ORDER BY updated_at DESC LIMIT 1`)

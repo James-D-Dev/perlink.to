@@ -56,10 +56,6 @@
           <MarketingMkButton v-else-if="!loggedIn" :to="`/login?redirect=${encodeURIComponent(`/dashboard/upgrade?plan=${plan}`)}`" :variant="isPopular(plan) ? 'inverse' : 'solid'" block>
             {{ t('dashboard.billing.choose', { plan: t(`dashboard.billing.plans.${plan}.name`) }) }}
           </MarketingMkButton>
-          <!-- Not sold yet (see PRO_ON_SALE) -->
-          <MarketingMkButton v-else-if="!onSale(plan)" variant="outline" block disabled>
-            {{ t('dashboard.billing.comingSoon') }}
-          </MarketingMkButton>
           <MarketingMkButton v-else-if="checkoutEnabled" :variant="isPopular(plan) ? 'inverse' : 'solid'" block @click="buy(plan)">
             {{ currentPlan === plan ? t('dashboard.billing.renew') : t('dashboard.billing.choose', { plan: t(`dashboard.billing.plans.${plan}.name`) }) }}
           </MarketingMkButton>
@@ -79,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { PLAN_ORDER, PLAN_PRICES, PLAN_PRICES_USD, formatUsd, formatVnd, onSale, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
+import { PLAN_ORDER, PLAN_PRICES, PLAN_PRICES_USD, formatUsd, formatVnd, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
 
 // Plan cards for /pricing and the dashboard upgrade page. Signed in, a paid
 // plan opens the bank-transfer checkout.
@@ -110,8 +106,7 @@ const currentPlan = computed(() => (mounted.value && loggedIn.value ? info.value
 const checkoutEnabled = computed(() => mounted.value && !!info.value?.checkoutEnabled)
 const highlight = computed(() => props.highlight)
 
-// Plans not on sale yet (Pro, see PRO_ON_SALE) stay off the page
-const shownPlans = PLAN_ORDER.filter(plan => plan === 'free' || onSale(plan as PaidPlanId))
+const shownPlans = PLAN_ORDER
 const isPopular = (plan: PlanId) => plan === 'plus'
 const muted = (plan: PlanId) => (isPopular(plan) ? 'text-paper/60' : 'text-ink-muted')
 

@@ -54,28 +54,12 @@ export const PLANS = {
     ],
     popular: true,
   },
-  pro: {
-    id: 'pro',
-    name: 'Pro',
-    price: 29,
-    priceAnnual: 348,
-    description: 'For professionals',
-    features: [
-      'Unlimited pages',
-      'Custom CSS themes',
-      'Team (5 members)',
-      'Advanced analytics',
-      'API access',
-      'Priority support',
-    ],
-  },
 } as const
 
 export const PLAN_OPTIONS: SelectItem[] = [
   { label: PLANS.free.name, value: PLANS.free.id },
   { label: PLANS.starter.name, value: PLANS.starter.id },
   { label: PLANS.plus.name, value: PLANS.plus.id },
-  { label: PLANS.pro.name, value: PLANS.pro.id },
 ]
 
 export const PLAN_OPTIONS_WITH_ALL: SelectItem[] = [
@@ -83,7 +67,7 @@ export const PLAN_OPTIONS_WITH_ALL: SelectItem[] = [
   ...PLAN_OPTIONS,
 ]
 
-export type PlanId = 'free' | 'starter' | 'plus' | 'pro'
+export type PlanId = 'free' | 'starter' | 'plus'
 
 export function usePlans() {
   return {
@@ -96,7 +80,6 @@ export function usePlans() {
         free: 'neutral',
         starter: 'primary',
         plus: 'secondary',
-        pro: 'warning',
       }
       return colors[(planId || 'free') as PlanId] || 'neutral'
     },

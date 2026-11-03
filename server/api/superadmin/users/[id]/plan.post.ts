@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { plan } = body
   
-  if (!plan || !['free', 'starter', 'plus', 'pro'].includes(plan)) {
+  if (!plan || !['free', 'starter', 'plus'].includes(plan)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid plan' })
   }
   

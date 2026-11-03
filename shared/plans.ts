@@ -2,12 +2,12 @@
 // upgrade prompts) and the server (checks before creating, publishing,
 // connecting a domain), so the two never disagree.
 
-export type PlanId = 'free' | 'starter' | 'plus' | 'pro'
+export type PlanId = 'free' | 'starter' | 'plus'
 export type PaidPlanId = Exclude<PlanId, 'free'>
 export type BillingPeriod = 'monthly' | 'annual'
 
-export const PLAN_ORDER: PlanId[] = ['free', 'starter', 'plus', 'pro']
-export const PAID_PLANS: PaidPlanId[] = ['starter', 'plus', 'pro']
+export const PLAN_ORDER: PlanId[] = ['free', 'starter', 'plus']
+export const PAID_PLANS: PaidPlanId[] = ['starter', 'plus']
 
 export interface PlanLimits {
   /** How many sites the account can have */
@@ -30,14 +30,12 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50 },
   starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100 },
   plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity },
-  // Fair limits, so one very large account can't cost more than it pays
-  pro: { sites: 100, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095, posts: Infinity },
 }
 
 /**
  * Every site shows the "Made with Perlink" badge (and room videos the
  * watermark), whatever the plan, until buying plans and paying work end to
- * end. Set to false to let Plus and Pro remove it again (removeBranding).
+ * end. Set to false to let Plus remove it again (removeBranding).
  */
 export const BRANDING_FOR_ALL = true
 
@@ -50,21 +48,10 @@ export const CUSTOM_DOMAINS_LIVE = true
 /** Whether a site on this plan shows the Perlink badge */
 export const showsBranding = (plan: PlanId | null | undefined) => BRANDING_FOR_ALL || !plan || !PLAN_LIMITS[plan].removeBranding
 
-/**
- * Pro can be bought once what it promises works: custom domains connected
- * (docs/custom-domains.md) and BRANDING_FOR_ALL off. Until then its card says
- * "coming soon" and checkout refuses it.
- */
-export const PRO_ON_SALE = false
-
-/** Whether a plan can be bought online right now */
-export const onSale = (plan: PaidPlanId) => plan !== 'pro' || PRO_ON_SALE
-
 /** Prices in VND, in line with the USD ones (about 25,000đ a dollar); a year costs ten months */
 export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
   starter: { monthly: 150_000, annual: 1_500_000 },
   plus: { monthly: 300_000, annual: 3_000_000 },
-  pro: { monthly: 750_000, annual: 7_500_000 },
 }
 
 /**
@@ -76,7 +63,6 @@ export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
 export const PLAN_PRICES_USD: Record<PaidPlanId, Record<BillingPeriod, number>> = {
   starter: { monthly: 6, annual: 60 },
   plus: { monthly: 12, annual: 120 },
-  pro: { monthly: 30, annual: 300 },
 }
 
 /** Whole dollars as "$6", anything else with cents */
@@ -104,11 +90,13 @@ export function isPlanId(value: unknown): value is PlanId {
 
 /** The cheapest plan that has a feature (or room for this many sites) */
 export function minPlanFor(feature: PlanFeature, sites = 0): PlanId {
-  return PLAN_ORDER.find(id => feature === 'sites' ? PLAN_LIMITS[id].sites >= sites : PLAN_LIMITS[id][feature]) ?? 'pro'
+  return PLAN_ORDER.find(id => feature === 'sites' ? PLAN_LIMITS[id].sites >= sites : PLAN_LIMITS[id][feature]) ?? 'plus'
 }
 
 /** The plan that counts right now: a paid plan past its end date is free again */
 export function effectivePlan(plan: string | null | undefined, expiresAt: string | null | undefined, now = Date.now()): PlanId {
+  // Pro was retired; anyone still on it keeps Plus until their period ends
+  if (plan === 'pro') plan = 'plus'
   if (!isPlanId(plan)) return 'free'
   if (plan !== 'free' && expiresAt && Date.parse(expiresAt) <= now) return 'free'
   return plan

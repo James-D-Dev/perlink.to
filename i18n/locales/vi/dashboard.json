@@ -825,10 +825,6 @@
         "plus": {
           "name": "Plus",
           "description": "Cho shop và doanh nghiệp nhỏ"
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "Cho agency và chuyên nghiệp"
         }
       },
       "features": {

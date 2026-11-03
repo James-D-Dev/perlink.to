@@ -1,6 +1,6 @@
 import { requireSuperadmin } from '../../utils/superadmin'
 import { lemonApi, lemonCatalog, lemonConfig } from '../../utils/lemon'
-import { onSale, PAID_PLANS } from '#shared/plans'
+import { PAID_PLANS } from '#shared/plans'
 
 // Lemon Squeezy status for Superadmin → Settings: the store, and which
 // product variant each plan sells through (looked up fresh)
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
       configured: true,
       hasWebhookSecret: !!config.webhookSecret,
       store: { id: found.storeId, name: store.data.attributes.name, domain: store.data.attributes.domain },
-      plans: PAID_PLANS.filter(onSale).flatMap(plan => (['monthly', 'annual'] as const).map(period => ({ plan, period, variantId: found.variants[`${plan}:${period}`] ?? null }))),
+      plans: PAID_PLANS.flatMap(plan => (['monthly', 'annual'] as const).map(period => ({ plan, period, variantId: found.variants[`${plan}:${period}`] ?? null }))),
       products: products.data.map(p => ({
         id: p.id,
         name: p.attributes.name,

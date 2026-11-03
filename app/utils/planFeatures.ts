@@ -19,6 +19,5 @@ export function planFeatures(plan: PlanId, t: Translate) {
   if (limits.removeBranding && !BRANDING_FOR_ALL) list.push(f('removeBranding'))
   const years = Math.round(limits.analyticsDays / 365)
   list.push(years >= 2 ? f('analyticsYears', { n: years }) : years === 1 ? f('analyticsYear') : f('analytics', { n: limits.analyticsDays }))
-  if (plan === 'pro') list.push(f('support'))
   return list
 }
