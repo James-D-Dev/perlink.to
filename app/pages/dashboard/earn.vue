@@ -7,16 +7,22 @@
     <template #body>
       <div class="mx-auto w-full max-w-3xl space-y-4 py-2 sm:py-4">
         <!-- The offer -->
-        <div class="relative isolate overflow-hidden rounded-3xl bg-ink p-6 text-paper sm:p-8">
-          <p class="text-sm font-medium text-paper/60">{{ t('dashboard.earn.eyebrow') }}</p>
-          <h1 class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+        <div class="relative isolate overflow-hidden rounded-3xl p-6 text-white shadow-[0_24px_60px_-24px_rgba(4,120,87,0.7)] sm:p-8">
+          <MarketingMkMoneyBackdrop />
+          <p class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-lime-100 ring-1 ring-white/20 backdrop-blur">
+            <UIcon name="i-lucide-badge-dollar-sign" class="size-3.5" />{{ t('dashboard.earn.eyebrow') }}
+          </p>
+          <h1 class="mt-4 max-w-[15ch] pr-10 text-[28px] font-semibold leading-tight tracking-tight sm:max-w-md sm:text-4xl">
             {{ t('dashboard.earn.headline', { percent: AFFILIATE_COMMISSION }) }}
           </h1>
-          <p class="mt-3 max-w-xl text-sm leading-relaxed text-paper/70">{{ t('dashboard.earn.intro', { days: AFFILIATE_COOKIE_DAYS }) }}</p>
-          <div class="mt-5 grid gap-3 sm:grid-cols-3">
-            <div v-for="stat in stats" :key="stat.label" class="rounded-2xl bg-paper/10 px-4 py-3">
-              <p class="text-xl font-semibold tabular-nums">{{ stat.value }}</p>
-              <p class="text-xs text-paper/60">{{ stat.label }}</p>
+          <p class="mt-3 max-w-md text-sm leading-relaxed text-emerald-50/80">{{ t('dashboard.earn.intro', { days: AFFILIATE_COOKIE_DAYS }) }}</p>
+          <p class="mt-4 inline-flex items-center gap-2 rounded-2xl bg-amber-300 px-3.5 py-2 text-sm font-semibold text-amber-950 shadow-lg shadow-black/20">
+            <UIcon name="i-lucide-trending-up" class="size-4" />{{ t('dashboard.earn.example', { amount: exampleAmount }) }}
+          </p>
+          <div class="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
+            <div v-for="stat in stats" :key="stat.label" class="rounded-2xl bg-white/10 px-3 py-3 ring-1 ring-white/15 backdrop-blur-md sm:px-4">
+              <p class="text-lg font-semibold tabular-nums sm:text-2xl">{{ stat.value }}</p>
+              <p class="text-[11px] leading-tight text-emerald-50/70 sm:text-xs">{{ stat.label }}</p>
             </div>
           </div>
         </div>
@@ -72,6 +78,7 @@
 
 <script setup lang="ts">
 import { AFFILIATE_COMMISSION, AFFILIATE_COOKIE_DAYS, affiliateLink } from '#shared/affiliate'
+import { PLAN_PRICES_USD, formatUsd } from '#shared/plans'
 
 definePageMeta({ colorMode: 'light', layout: 'admin', middleware: 'auth', ssr: false })
 
@@ -114,6 +121,9 @@ const stats = computed(() => [
   { label: t('dashboard.earn.statMonths'), value: t('dashboard.earn.forever') },
   { label: t('dashboard.earn.statSignups'), value: String(signups.value) },
 ])
+
+// 10 people on Plus, paying annually: what that brings in each year
+const exampleAmount = formatUsd(Math.round(10 * PLAN_PRICES_USD.plus.annual * AFFILIATE_COMMISSION / 100))
 
 const links = computed(() => (code.value
   ? [

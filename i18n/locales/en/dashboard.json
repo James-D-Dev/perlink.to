@@ -1126,7 +1126,7 @@
       "title": "Earn with Perlink",
       "eyebrow": "Affiliate program",
       "headline": "Earn {percent}% of every payment, for life",
-      "intro": "Share Perlink with your followers, clients or friends. When someone you send buys Starter or Plus within {days} days, you earn a share of every payment they make, renewals included, for as long as they stay. Lemon Squeezy tracks the sales and pays you.",
+      "intro": "Share Perlink with your followers, clients or friends. When someone you send buys a paid plan within {days} days, you earn a share of every payment they make, renewals included, for as long as they stay. Lemon Squeezy tracks the sales and pays you.",
       "statCommission": "Commission",
       "statMonths": "Paid on",
       "statSignups": "Sign-ups you brought",
@@ -1149,7 +1149,8 @@
       "dashboard": "See your sales and payouts",
       "rules": "No spam, no fake reviews, no ads on the Perlink name, and no buying through your own link.",
       "rulesLink": "Program rules",
-      "forever": "Every renewal"
+      "forever": "Every renewal",
+      "example": "10 friends on Plus annually = {amount} a year for you"
     }
   }
 }

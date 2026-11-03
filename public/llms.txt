@@ -23,7 +23,6 @@ Key facts:
 - [Pricing](https://perlink.to/pricing): plans and what each includes
 - [Trends](https://perlink.to/trends): popular 3D worlds and website styles
 - [3D portfolio website](https://perlink.to/3d-portfolio): a portfolio page plus a 3D room, without code ([Vietnamese](https://perlink.to/vi/portfolio-3d))
-- [Linktree alternative](https://perlink.to/linktree-alternative): how Perlink compares with Linktree ([Vietnamese](https://perlink.to/vi/thay-the-linktree))
 - [Birthday website](https://perlink.to/birthday-website): a birthday surprise with a sealed letter, countdown, memories and a 3D room of wishes ([Vietnamese](https://perlink.to/vi/thiep-sinh-nhat-online))
 - [Website for your partner](https://perlink.to/valentine-website): a love letter, days together, your story and photos ([Vietnamese](https://perlink.to/vi/web-tang-nguoi-yeu))
 - [Wedding website](https://perlink.to/wedding-website): an online invitation with schedule, venue, RSVP and a gift QR code ([Vietnamese](https://perlink.to/vi/thiep-cuoi-online))
