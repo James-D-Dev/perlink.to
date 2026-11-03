@@ -91,7 +91,8 @@ const { loggedIn } = useUserSession()
 const { info, ensure } = useBilling()
 
 const periods: BillingPeriod[] = ['monthly', 'annual']
-const period = ref<BillingPeriod>('monthly')
+// Annual first: it's the better deal (2 months free)
+const period = ref<BillingPeriod>('annual')
 const buying = ref<PaidPlanId | null>(null)
 const checkoutOpen = ref(false)
 
