@@ -12,6 +12,9 @@ export const AFFILIATE_COOKIE_DAYS = 30
 
 export const AFFILIATE_COOKIE = 'pl_aff'
 
+/** The store's slug in Lemon Squeezy's tracking script (Settings → Affiliates) */
+export const LEMON_AFFILIATE_STORE = 'perlink-to'
+
 /** Lemon Squeezy affiliate codes: letters, numbers, - and _ */
 export const isAffiliateCode = (value: unknown): value is string =>
   typeof value === 'string' && /^[A-Za-z0-9_-]{2,40}$/.test(value)

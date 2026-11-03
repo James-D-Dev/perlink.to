@@ -1,4 +1,4 @@
-import { AFFILIATE_COOKIE, AFFILIATE_COOKIE_DAYS, isAffiliateCode } from '#shared/affiliate'
+import { AFFILIATE_COOKIE, AFFILIATE_COOKIE_DAYS, LEMON_AFFILIATE_STORE, isAffiliateCode } from '#shared/affiliate'
 
 // Remembers who sent a visitor, for the affiliate program (shared/affiliate):
 // an affiliate link (?aff=CODE), or a "Made with Perlink" badge on a site
@@ -20,6 +20,16 @@ export default defineNuxtPlugin(() => {
     } catch {
       // Not an affiliate's site
     }
+  }
+
+  // Lemon Squeezy's own tracking script counts affiliate clicks; on
+  // perlink.to only, never on sites' own domains
+  if (/(^|\.)perlink\.to$/.test(location.hostname)) {
+    ;(window as any).lemonSqueezyAffiliateConfig = { store: LEMON_AFFILIATE_STORE }
+    const script = document.createElement('script')
+    script.src = 'https://lmsqueezy.com/affiliate.js'
+    script.defer = true
+    document.head.appendChild(script)
   }
 
   const router = useRouter()
