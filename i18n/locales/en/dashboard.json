@@ -864,8 +864,8 @@
       "monthly": "Monthly",
       "annual": "Yearly",
       "annualSave": "2 months free",
-      "perMonth": "/month",
-      "billedYearly": "{amount} per year",
+      "perMonth": "/mo",
+      "billedYearly": "{amount} billed annually",
       "recommended": "Popular",
       "current": "Your current plan",
       "choose": "Choose {plan}",
@@ -1009,7 +1009,13 @@
         "pastDue": "Payment failed · update your card",
         "manage": "Manage subscription"
       },
-      "usdNoteBank": "Prices in US dollars; taxes may apply at checkout. In Vietnam you can also pay by bank transfer (VietQR) in VND."
+      "usdNoteBank": "Prices in US dollars; taxes may apply at checkout. In Vietnam you can also pay by bank transfer (VietQR) in VND.",
+      "switch": {
+        "title": "Switch to {plan}?",
+        "text": "Your subscription changes from {from} to {to} right away. Lemon Squeezy adjusts the price difference on your next bill.",
+        "confirm": "Switch plan",
+        "done": "You’re now on {plan}"
+      }
     },
     "telegram": {
       "title": "Telegram notifications",

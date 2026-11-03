@@ -38,7 +38,8 @@
           <span class="mk-display text-4xl" :class="isPopular(plan) && 'text-paper'">{{ monthlyPrice(plan) }}</span>
           <span class="text-sm" :class="muted(plan)">{{ t('dashboard.billing.perMonth') }}</span>
         </p>
-        <p class="mt-1 h-4 text-xs" :class="isPopular(plan) ? 'text-paper/50' : 'text-ink-faint'">
+        <!-- Paying yearly: the amount the checkout charges, plainly -->
+        <p class="mt-1 h-5 text-sm" :class="isPopular(plan) ? 'text-paper/60' : 'text-ink-muted'">
           <template v-if="plan !== 'free' && period === 'annual'">{{ t('dashboard.billing.billedYearly', { amount: usd ? formatUsd(PLAN_PRICES_USD[plan].annual) : formatVnd(PLAN_PRICES[plan].annual) }) }}</template>
         </p>
 

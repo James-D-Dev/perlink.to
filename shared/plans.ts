@@ -79,7 +79,7 @@ export const PLAN_PRICES_USD: Record<PaidPlanId, Record<BillingPeriod, number>> 
 }
 
 /** Whole dollars as "$6", anything else with cents */
-export const formatUsd = (amount: number) => `$${Number.isInteger(amount) ? amount : amount.toFixed(2)}`
+export const formatUsd = (amount: number) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: Number.isInteger(amount) ? 0 : 2, maximumFractionDigits: 2 })}`
 
 export const PERIOD_MONTHS: Record<BillingPeriod, number> = { monthly: 1, annual: 12 }
 

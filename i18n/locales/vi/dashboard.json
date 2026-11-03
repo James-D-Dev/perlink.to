@@ -865,7 +865,7 @@
       "annual": "Theo năm",
       "annualSave": "Tiết kiệm 2 tháng",
       "perMonth": "/tháng",
-      "billedYearly": "{amount} mỗi năm",
+      "billedYearly": "Thanh toán {amount} mỗi năm",
       "recommended": "Phổ biến",
       "current": "Gói hiện tại",
       "choose": "Chọn {plan}",
@@ -1009,7 +1009,13 @@
         "pastDue": "Thanh toán lỗi · hãy cập nhật thẻ",
         "manage": "Quản lý thuê bao"
       },
-      "usdNoteBank": "Giá theo đô la Mỹ, có thể cộng thuế khi thanh toán. Tại Việt Nam bạn cũng có thể chuyển khoản (VietQR) bằng VND."
+      "usdNoteBank": "Giá theo đô la Mỹ, có thể cộng thuế khi thanh toán. Tại Việt Nam bạn cũng có thể chuyển khoản (VietQR) bằng VND.",
+      "switch": {
+        "title": "Chuyển sang gói {plan}?",
+        "text": "Gói của bạn đổi từ {from} sang {to} ngay bây giờ. Lemon Squeezy tính phần chênh lệch vào hoá đơn kỳ sau.",
+        "confirm": "Đổi gói",
+        "done": "Bạn đã chuyển sang gói {plan}"
+      }
     },
     "telegram": {
       "title": "Thông báo qua Telegram",

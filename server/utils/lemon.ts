@@ -103,6 +103,30 @@ export async function createLemonCheckout(event: H3Event, input: { userId: strin
   return url.toString()
 }
 
+interface SubscriptionAttributes { variant_id: number; status: string; urls?: { customer_portal?: string | null } }
+
+/** A subscription's customer portal link; the one webhooks send expires after a day, so ask for a fresh one */
+export async function lemonPortalUrl(event: H3Event, subscriptionId: string) {
+  const res = await lemonApi<{ data: JsonApiItem<SubscriptionAttributes> }>(event, `/subscriptions/${subscriptionId}`)
+  return res.data.attributes.urls?.customer_portal ?? null
+}
+
+/**
+ * Move a running subscription to another plan or period. Lemon Squeezy
+ * prorates the difference onto the next bill; the subscription_updated
+ * webhook then switches the account's plan.
+ */
+export async function switchLemonSubscription(event: H3Event, subscriptionId: string, plan: PaidPlanId, period: BillingPeriod) {
+  const { variants } = await lemonCatalog(event)
+  const variantId = variants[`${plan}:${period}`]
+  if (!variantId) return false
+  await lemonApi(event, `/subscriptions/${subscriptionId}`, {
+    method: 'PATCH',
+    body: { data: { type: 'subscriptions', id: subscriptionId, attributes: { variant_id: Number(variantId) } } },
+  })
+  return true
+}
+
 /** Webhooks are signed: hex HMAC-SHA256 of the raw body with the signing secret */
 export async function verifyLemonSignature(event: H3Event, rawBody: string, signature: string | undefined) {
   const secret = lemonConfig(event).webhookSecret
