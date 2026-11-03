@@ -6,6 +6,8 @@ type Translate = (...args: any[]) => string
 /** What a plan includes, as the pricing cards and the upgrade celebration list it */
 export function planFeatures(plan: PlanId, t: Translate) {
   const limits = PLAN_LIMITS[plan]
+  // Max: what Plus has, and people to help (its larger limits aren't listed)
+  if (plan === 'max') return [f('everythingPlus'), f('support'), f('setupHelp')]
   const f = (key: string, params: Record<string, unknown> = {}, n?: number) => (n === undefined ? t(`dashboard.billing.features.${key}`, params) : t(`dashboard.billing.features.${key}`, params, n))
   const list = [
     f('sites', { n: limits.sites }, limits.sites),

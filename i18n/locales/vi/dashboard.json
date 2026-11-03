@@ -834,6 +834,10 @@
         "plus": {
           "name": "Plus",
           "description": "Cho shop và doanh nghiệp nhỏ"
+        },
+        "max": {
+          "name": "Max",
+          "description": "Cho agency và doanh nghiệp đang lớn"
         }
       },
       "features": {
@@ -844,7 +848,7 @@
         "removeBranding": "Gỡ dòng “Tạo bằng Perlink”",
         "analytics": "Thống kê {n} ngày",
         "analyticsYear": "Thống kê 1 năm",
-        "support": "Hỗ trợ ưu tiên qua Zalo",
+        "support": "Hỗ trợ trực tuyến ưu tiên",
         "customDomains": "{n} tên miền riêng",
         "customDomainsSoon": "Tên miền riêng (sắp có)",
         "analyticsYears": "Thống kê {n} năm",
@@ -853,7 +857,9 @@
         "tracking": "Facebook & TikTok Pixel, Google Analytics",
         "protect": "Trang có mật khẩu và hẹn giờ mở",
         "orders": "Theo dõi đơn hàng (mới, đã xác nhận, đang giao)",
-        "cleanVideo": "Video phòng 3D không watermark"
+        "cleanVideo": "Video phòng 3D không watermark",
+        "everythingPlus": "Mọi thứ của gói Plus",
+        "setupHelp": "Hỗ trợ dựng trang: chúng tôi dựng trang trong trình chỉnh sửa với nội dung của bạn"
       },
       "monthly": "Theo tháng",
       "annual": "Theo năm",

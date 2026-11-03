@@ -54,12 +54,25 @@ export const PLANS = {
     ],
     popular: true,
   },
+  max: {
+    id: 'max',
+    name: 'Max',
+    price: 100,
+    priceAnnual: 1000,
+    description: 'For agencies and growing businesses',
+    features: [
+      'Everything in Plus',
+      'Priority online support',
+      'Setup help',
+    ],
+  },
 } as const
 
 export const PLAN_OPTIONS: SelectItem[] = [
   { label: PLANS.free.name, value: PLANS.free.id },
   { label: PLANS.starter.name, value: PLANS.starter.id },
   { label: PLANS.plus.name, value: PLANS.plus.id },
+  { label: PLANS.max.name, value: PLANS.max.id },
 ]
 
 export const PLAN_OPTIONS_WITH_ALL: SelectItem[] = [
@@ -67,7 +80,7 @@ export const PLAN_OPTIONS_WITH_ALL: SelectItem[] = [
   ...PLAN_OPTIONS,
 ]
 
-export type PlanId = 'free' | 'starter' | 'plus'
+export type PlanId = 'free' | 'starter' | 'plus' | 'max'
 
 export function usePlans() {
   return {
@@ -80,6 +93,7 @@ export function usePlans() {
         free: 'neutral',
         starter: 'primary',
         plus: 'secondary',
+        max: 'warning',
       }
       return colors[(planId || 'free') as PlanId] || 'neutral'
     },

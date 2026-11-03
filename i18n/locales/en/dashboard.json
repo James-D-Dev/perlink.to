@@ -834,6 +834,10 @@
         "plus": {
           "name": "Plus",
           "description": "For shops and small businesses"
+        },
+        "max": {
+          "name": "Max",
+          "description": "For agencies and growing businesses"
         }
       },
       "features": {
@@ -844,7 +848,7 @@
         "removeBranding": "Remove “Made with Perlink”",
         "analytics": "{n}-day analytics",
         "analyticsYear": "1 year of analytics",
-        "support": "Priority support",
+        "support": "Prioritized online support",
         "customDomains": "{n} custom domain | {n} custom domains",
         "customDomainsSoon": "Custom domains (coming soon)",
         "analyticsYears": "{n} years of analytics",
@@ -853,7 +857,9 @@
         "tracking": "Facebook & TikTok pixels, Google Analytics",
         "protect": "Password-protected and scheduled pages",
         "orders": "Order tracking (new, confirmed, shipped)",
-        "cleanVideo": "3D room videos without watermark"
+        "cleanVideo": "3D room videos without watermark",
+        "everythingPlus": "Everything in Plus",
+        "setupHelp": "Setup help: we set up your sites in the editor with your content"
       },
       "monthly": "Monthly",
       "annual": "Yearly",

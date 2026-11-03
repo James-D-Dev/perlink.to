@@ -2,12 +2,12 @@
 // upgrade prompts) and the server (checks before creating, publishing,
 // connecting a domain), so the two never disagree.
 
-export type PlanId = 'free' | 'starter' | 'plus'
+export type PlanId = 'free' | 'starter' | 'plus' | 'max'
 export type PaidPlanId = Exclude<PlanId, 'free'>
 export type BillingPeriod = 'monthly' | 'annual'
 
-export const PLAN_ORDER: PlanId[] = ['free', 'starter', 'plus']
-export const PAID_PLANS: PaidPlanId[] = ['starter', 'plus']
+export const PLAN_ORDER: PlanId[] = ['free', 'starter', 'plus', 'max']
+export const PAID_PLANS: PaidPlanId[] = ['starter', 'plus', 'max']
 
 export interface PlanLimits {
   /** How many sites the account can have */
@@ -38,6 +38,9 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50, tracking: false, protect: false, orders: false, cleanVideo: false },
   starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100, tracking: true, protect: true, orders: true, cleanVideo: true },
   plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true },
+  // Max: room for agencies and chains (not listed on the pricing page), plus
+  // priority support and setup help (planFeatures)
+  max: { sites: 50, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true },
 }
 
 /**
@@ -59,7 +62,8 @@ export const showsBranding = (plan: PlanId | null | undefined) => BRANDING_FOR_A
 /** Prices in VND, in line with the USD ones (about 25,000đ a dollar); a year costs ten months */
 export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
   starter: { monthly: 150_000, annual: 1_500_000 },
-  plus: { monthly: 300_000, annual: 3_000_000 },
+  plus: { monthly: 500_000, annual: 5_000_000 },
+  max: { monthly: 2_500_000, annual: 25_000_000 },
 }
 
 /**
@@ -70,7 +74,8 @@ export const PLAN_PRICES: Record<PaidPlanId, Record<BillingPeriod, number>> = {
  */
 export const PLAN_PRICES_USD: Record<PaidPlanId, Record<BillingPeriod, number>> = {
   starter: { monthly: 6, annual: 60 },
-  plus: { monthly: 12, annual: 120 },
+  plus: { monthly: 20, annual: 200 },
+  max: { monthly: 100, annual: 1000 },
 }
 
 /** Whole dollars as "$6", anything else with cents */

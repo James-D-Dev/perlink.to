@@ -63,7 +63,7 @@ const schema = z.object({
   email: z.string().trim().email('Enter a valid email'),
   name: z.string().trim().max(100).optional(),
   username: z.string().trim().regex(/^[a-zA-Z0-9_]{3,20}$/, '3–20 letters, numbers or underscores').optional().or(z.literal('')),
-  plan: z.enum(['free', 'starter', 'plus']),
+  plan: z.enum(['free', 'starter', 'plus', 'max']),
 });
 
 type Schema = z.output<typeof schema>
