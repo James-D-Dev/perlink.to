@@ -10,7 +10,7 @@
         <div class="relative isolate overflow-hidden rounded-3xl bg-ink p-6 text-paper sm:p-8">
           <p class="text-sm font-medium text-paper/60">{{ t('dashboard.earn.eyebrow') }}</p>
           <h1 class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-            {{ t('dashboard.earn.headline', { percent: AFFILIATE_COMMISSION, months: AFFILIATE_MONTHS }) }}
+            {{ t('dashboard.earn.headline', { percent: AFFILIATE_COMMISSION }) }}
           </h1>
           <p class="mt-3 max-w-xl text-sm leading-relaxed text-paper/70">{{ t('dashboard.earn.intro', { days: AFFILIATE_COOKIE_DAYS }) }}</p>
           <div class="mt-5 grid gap-3 sm:grid-cols-3">
@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { AFFILIATE_COMMISSION, AFFILIATE_COOKIE_DAYS, AFFILIATE_MONTHS, affiliateLink } from '#shared/affiliate'
+import { AFFILIATE_COMMISSION, AFFILIATE_COOKIE_DAYS, affiliateLink } from '#shared/affiliate'
 
 definePageMeta({ colorMode: 'light', layout: 'admin', middleware: 'auth', ssr: false })
 
@@ -111,7 +111,7 @@ async function save() {
 
 const stats = computed(() => [
   { label: t('dashboard.earn.statCommission'), value: `${AFFILIATE_COMMISSION}%` },
-  { label: t('dashboard.earn.statMonths'), value: t('dashboard.earn.months', { n: AFFILIATE_MONTHS }) },
+  { label: t('dashboard.earn.statMonths'), value: t('dashboard.earn.forever') },
   { label: t('dashboard.earn.statSignups'), value: String(signups.value) },
 ])
 

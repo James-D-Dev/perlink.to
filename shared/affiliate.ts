@@ -4,9 +4,9 @@
 // program's settings in Lemon Squeezy (Affiliates → Settings).
 
 /** Share of each payment an affiliate earns */
-export const AFFILIATE_COMMISSION = 30
-/** For how many months of a subscription */
-export const AFFILIATE_MONTHS = 12
+export const AFFILIATE_COMMISSION = 20
+// Recurring: on the first payment and every renewal, for as long as the
+// customer stays subscribed (Lemon Squeezy: Subscription commission on)
 /** How long a click counts */
 export const AFFILIATE_COOKIE_DAYS = 30
 

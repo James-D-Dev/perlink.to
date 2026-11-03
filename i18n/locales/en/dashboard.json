@@ -1113,11 +1113,10 @@
     "earn": {
       "title": "Earn with Perlink",
       "eyebrow": "Affiliate program",
-      "headline": "Earn {percent}% of every payment, for {months} months",
-      "intro": "Share Perlink with your followers, clients or friends. When someone you send buys Starter or Plus within {days} days, you earn a share of each payment they make. Lemon Squeezy tracks the sales and pays you.",
+      "headline": "Earn {percent}% of every payment, for life",
+      "intro": "Share Perlink with your followers, clients or friends. When someone you send buys Starter or Plus within {days} days, you earn a share of every payment they make, renewals included, for as long as they stay. Lemon Squeezy tracks the sales and pays you.",
       "statCommission": "Commission",
-      "statMonths": "Paid for",
-      "months": "{n} months",
+      "statMonths": "Paid on",
       "statSignups": "Sign-ups you brought",
       "step": "Step {n}",
       "joinTitle": "Join the program on Lemon Squeezy",
@@ -1137,7 +1136,8 @@
       "badge": "Your sites’ “Made with Perlink” badge now carries your code too: anyone who signs up from your page counts for you.",
       "dashboard": "See your sales and payouts",
       "rules": "No spam, no fake reviews, no ads on the Perlink name, and no buying through your own link.",
-      "rulesLink": "Program rules"
+      "rulesLink": "Program rules",
+      "forever": "Every renewal"
     }
   }
 }

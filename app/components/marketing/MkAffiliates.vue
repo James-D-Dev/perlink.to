@@ -68,30 +68,30 @@
 <script setup lang="ts">
 // The affiliate program: /affiliates and /vi/cong-tac-vien. Run by Lemon
 // Squeezy; the numbers come from shared/affiliate.
-import { AFFILIATE_COMMISSION as PCT, AFFILIATE_COOKIE_DAYS as DAYS, AFFILIATE_MONTHS as MONTHS } from '#shared/affiliate'
+import { AFFILIATE_COMMISSION as PCT, AFFILIATE_COOKIE_DAYS as DAYS } from '#shared/affiliate'
 
 const { lang } = useMarketingLang()
 const signupUrl = useRuntimeConfig().public.affiliateSignupUrl as string
 
 const TEXT = {
   en: {
-    metaTitle: `Perlink Affiliate Program: Earn ${PCT}% Recurring | Perlink`,
-    metaDescription: `Earn ${PCT}% of every payment for ${MONTHS} months when people you send buy a Perlink plan. Free to join, paid by Lemon Squeezy.`,
+    metaTitle: `Perlink Affiliate Program: Earn ${PCT}% Recurring, for Life | Perlink`,
+    metaDescription: `Earn ${PCT}% of every payment, for as long as they stay subscribed, when people you send buy a Perlink plan. Free to join, paid by Lemon Squeezy.`,
     eyebrow: 'Affiliate program',
-    title: `Share Perlink, earn ${PCT}% for ${MONTHS} months`,
-    intro: `Send people to Perlink with your link. When they buy Starter or Plus within ${DAYS} days, you earn ${PCT}% of each payment for their first ${MONTHS} months. Lemon Squeezy tracks every sale and pays you.`,
+    title: `Share Perlink, earn ${PCT}% for life`,
+    intro: `Send people to Perlink with your link. When they buy Starter or Plus within ${DAYS} days, you earn ${PCT}% of every payment they make, renewals included, for as long as they stay subscribed. Lemon Squeezy tracks every sale and pays you.`,
     join: 'Become an affiliate',
     dashboard: 'Your affiliate page',
     stats: [
       { value: `${PCT}%`, label: 'of every payment' },
-      { value: `${MONTHS} mo`, label: 'of recurring commission' },
+      { value: 'For life', label: 'on every renewal' },
       { value: `${DAYS} days`, label: 'for a click to count' },
     ],
     stepsTitle: 'How it works',
     steps: [
       { title: 'Join on Lemon Squeezy', text: 'Sign up with your email. Lemon Squeezy runs the program: it counts your sales and pays you by PayPal or bank.' },
       { title: 'Share your link', text: 'Add your code in Perlink (Dashboard → Earn) and share your links. Your own sites’ “Made with Perlink” badge carries your code too.' },
-      { title: 'Get paid', text: `Every time someone you sent pays for Starter or Plus, ${PCT}% is yours, for up to ${MONTHS} months.` },
+      { title: 'Get paid', text: `Every time someone you sent pays for Starter or Plus, ${PCT}% is yours, every month or year they renew.` },
     ],
     whoTitle: 'Made for',
     who: [
@@ -114,29 +114,29 @@ const TEXT = {
     faq: [
       { q: 'Does it cost anything to join?', a: 'No. Joining is free, and you don’t need a paid Perlink plan.' },
       { q: 'How and when am I paid?', a: 'Lemon Squeezy pays affiliates by PayPal or bank transfer once your earnings pass its payout threshold. You see every sale in your Lemon Squeezy affiliate dashboard.' },
-      { q: 'What counts as a sale?', a: `Someone who follows your link and buys Starter or Plus by card or PayPal within ${DAYS} days. You earn on each of their payments for the first ${MONTHS} months.` },
+      { q: 'What counts as a sale?', a: `Someone who follows your link and buys Starter or Plus by card or PayPal within ${DAYS} days. You earn on every payment they make after that, for as long as they stay subscribed.` },
       { q: 'Do I earn from free sign-ups?', a: 'Not directly, but we remember who brought each account: if they upgrade later, the sale is yours.' },
       { q: 'What does the badge do?', a: 'Perlink sites show a “Made with Perlink” badge. Once you add your code, the badge on your own sites sends visitors to Perlink with your code.' },
     ],
   },
   vi: {
-    metaTitle: `Cộng tác viên Perlink: Nhận ${PCT}% hoa hồng định kỳ | Perlink`,
-    metaDescription: `Nhận ${PCT}% mỗi khoản thanh toán trong ${MONTHS} tháng khi người bạn giới thiệu mua gói Perlink. Đăng ký miễn phí, Lemon Squeezy trả tiền.`,
+    metaTitle: `Cộng tác viên Perlink: Nhận ${PCT}% hoa hồng trọn đời | Perlink`,
+    metaDescription: `Nhận ${PCT}% mỗi khoản thanh toán, chừng nào khách còn dùng, khi người bạn giới thiệu mua gói Perlink. Đăng ký miễn phí, Lemon Squeezy trả tiền.`,
     eyebrow: 'Chương trình cộng tác viên',
-    title: `Giới thiệu Perlink, nhận ${PCT}% trong ${MONTHS} tháng`,
-    intro: `Gửi mọi người tới Perlink bằng link của bạn. Khi họ mua gói Starter hoặc Plus trong vòng ${DAYS} ngày, bạn nhận ${PCT}% mỗi lần họ thanh toán trong ${MONTHS} tháng đầu. Lemon Squeezy theo dõi từng đơn và trả tiền cho bạn.`,
+    title: `Giới thiệu Perlink, nhận ${PCT}% trọn đời`,
+    intro: `Gửi mọi người tới Perlink bằng link của bạn. Khi họ mua gói Starter hoặc Plus trong vòng ${DAYS} ngày, bạn nhận ${PCT}% mỗi lần họ thanh toán, kể cả các lần gia hạn, chừng nào họ còn dùng. Lemon Squeezy theo dõi từng đơn và trả tiền cho bạn.`,
     join: 'Đăng ký làm cộng tác viên',
     dashboard: 'Trang cộng tác viên của bạn',
     stats: [
       { value: `${PCT}%`, label: 'mỗi khoản thanh toán' },
-      { value: `${MONTHS} tháng`, label: 'hoa hồng định kỳ' },
+      { value: 'Trọn đời', label: 'mỗi lần khách gia hạn' },
       { value: `${DAYS} ngày`, label: 'để một lượt bấm được tính' },
     ],
     stepsTitle: 'Cách hoạt động',
     steps: [
       { title: 'Đăng ký trên Lemon Squeezy', text: 'Đăng ký bằng email. Lemon Squeezy vận hành chương trình: đếm doanh số và trả tiền cho bạn qua PayPal hoặc ngân hàng.' },
       { title: 'Chia sẻ link', text: 'Thêm mã vào Perlink (Dashboard → Kiếm tiền) rồi chia sẻ link. Huy hiệu “Made with Perlink” trên trang của bạn cũng mang mã của bạn.' },
-      { title: 'Nhận tiền', text: `Mỗi lần người bạn giới thiệu thanh toán gói Starter hoặc Plus, ${PCT}% là của bạn, trong tối đa ${MONTHS} tháng.` },
+      { title: 'Nhận tiền', text: `Mỗi lần người bạn giới thiệu thanh toán gói Starter hoặc Plus, ${PCT}% là của bạn, mỗi tháng hoặc mỗi năm họ gia hạn.` },
     ],
     whoTitle: 'Dành cho',
     who: [
@@ -159,7 +159,7 @@ const TEXT = {
     faq: [
       { q: 'Tham gia có mất phí không?', a: 'Không. Đăng ký miễn phí và không cần dùng gói trả phí của Perlink.' },
       { q: 'Tôi được trả tiền thế nào, khi nào?', a: 'Lemon Squeezy trả cho cộng tác viên qua PayPal hoặc chuyển khoản khi thu nhập đạt ngưỡng thanh toán của họ. Bạn xem từng đơn trong trang cộng tác viên của Lemon Squeezy.' },
-      { q: 'Thế nào được tính là một đơn?', a: `Người bấm link của bạn và mua gói Starter hoặc Plus bằng thẻ hoặc PayPal trong vòng ${DAYS} ngày. Bạn nhận hoa hồng mỗi lần họ thanh toán trong ${MONTHS} tháng đầu.` },
+      { q: 'Thế nào được tính là một đơn?', a: `Người bấm link của bạn và mua gói Starter hoặc Plus bằng thẻ hoặc PayPal trong vòng ${DAYS} ngày. Bạn nhận hoa hồng mỗi lần họ thanh toán sau đó, chừng nào họ còn dùng.` },
       { q: 'Người đăng ký miễn phí có được tính không?', a: 'Không trực tiếp, nhưng Perlink ghi nhớ ai mang tới mỗi tài khoản: nếu sau này họ nâng cấp, đơn đó là của bạn.' },
       { q: 'Huy hiệu dùng để làm gì?', a: 'Các trang Perlink có huy hiệu “Made with Perlink”. Khi bạn thêm mã, huy hiệu trên trang của bạn sẽ đưa khách tới Perlink kèm mã của bạn.' },
     ],

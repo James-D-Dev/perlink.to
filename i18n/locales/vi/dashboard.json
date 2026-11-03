@@ -1113,11 +1113,10 @@
     "earn": {
       "title": "Kiếm tiền cùng Perlink",
       "eyebrow": "Chương trình cộng tác viên",
-      "headline": "Nhận {percent}% mỗi khoản thanh toán, trong {months} tháng",
-      "intro": "Giới thiệu Perlink cho người theo dõi, khách hàng hay bạn bè. Khi người bạn giới thiệu mua gói Starter hoặc Plus trong vòng {days} ngày, bạn nhận một phần mỗi lần họ thanh toán. Lemon Squeezy theo dõi doanh số và trả tiền cho bạn.",
+      "headline": "Nhận {percent}% mỗi khoản thanh toán, trọn đời",
+      "intro": "Giới thiệu Perlink cho người theo dõi, khách hàng hay bạn bè. Khi người bạn giới thiệu mua gói Starter hoặc Plus trong vòng {days} ngày, bạn nhận một phần mỗi lần họ thanh toán, kể cả các lần gia hạn, chừng nào họ còn dùng. Lemon Squeezy theo dõi doanh số và trả tiền cho bạn.",
       "statCommission": "Hoa hồng",
-      "statMonths": "Trả trong",
-      "months": "{n} tháng",
+      "statMonths": "Trả cho",
       "statSignups": "Người đăng ký bạn mang tới",
       "step": "Bước {n}",
       "joinTitle": "Tham gia chương trình trên Lemon Squeezy",
@@ -1137,7 +1136,8 @@
       "badge": "Huy hiệu “Made with Perlink” trên các trang của bạn giờ cũng mang mã của bạn: ai đăng ký từ trang của bạn đều được tính cho bạn.",
       "dashboard": "Xem doanh số và tiền nhận",
       "rules": "Không spam, không đánh giá giả, không chạy quảng cáo bằng tên Perlink, và không tự mua qua link của mình.",
-      "rulesLink": "Quy định chương trình"
+      "rulesLink": "Quy định chương trình",
+      "forever": "Mọi lần gia hạn"
     }
   }
 }
