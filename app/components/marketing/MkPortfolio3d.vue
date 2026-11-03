@@ -200,7 +200,7 @@ const TEXT = {
       { q: 'Can I show my own projects and photos?', a: 'Yes. Add photo albums, videos, links and descriptions to the page, and hang your pictures in the 3D room.' },
       { q: 'Does it work on phones?', a: 'Yes. The page is built for phones first, and the 3D room adjusts its quality to the device so it stays smooth.' },
       { q: 'Will people who don’t want 3D still see my work?', a: 'Yes. Your portfolio is a normal web page first; the 3D room is one tap away. You can also make the room open first.' },
-      { q: 'Can I use my own domain?', a: 'Custom domains are coming soon. For now your portfolio lives at perlink.to/yourname, which you choose.' },
+      { q: 'Can I use my own domain?', a: 'Yes, on the Plus plan. Your portfolio also lives at perlink.to/yourname, which you choose, and it keeps working after you connect your domain.' },
     ],
   },
   vi: {
@@ -255,7 +255,7 @@ const TEXT = {
       { q: 'Tôi có đưa dự án và ảnh của mình lên được không?', a: 'Được. Thêm album ảnh, video, liên kết và mô tả vào trang, và treo ảnh của bạn trong phòng 3D.' },
       { q: 'Có chạy trên điện thoại không?', a: 'Có. Trang được làm cho điện thoại trước tiên, phòng 3D tự chỉnh chất lượng theo máy để luôn mượt.' },
       { q: 'Người không thích 3D có xem được tác phẩm không?', a: 'Được. Portfolio của bạn trước hết là một trang web bình thường; phòng 3D chỉ cách một lần chạm. Bạn cũng có thể cho phòng mở trước.' },
-      { q: 'Tôi có dùng tên miền riêng được không?', a: 'Tên miền riêng sắp ra mắt. Hiện portfolio của bạn ở perlink.to/tên-bạn, do bạn tự chọn.' },
+      { q: 'Tôi có dùng tên miền riêng được không?', a: 'Được, với gói Plus. Portfolio của bạn cũng có địa chỉ perlink.to/tên-bạn do bạn tự chọn, địa chỉ này vẫn hoạt động sau khi nối tên miền riêng.' },
     ],
   },
 }
