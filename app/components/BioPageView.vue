@@ -768,6 +768,8 @@ const solidButtonStyle = computed(() => {
 
 // Sticky Call / Directions / chat buttons, switched on in the contact block
 const quickActions = computed(() => {
+  // Not on the small pictures of a page (site cards, template thumbnails)
+  if (props.mode === "thumbnail") return [];
   const contact = sortedBlocks.value.find((b) => b.name === "contact" && b.data?.quickBar);
   if (!contact || contact.name !== "contact") return [];
   const data = contact.data;

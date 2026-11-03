@@ -126,6 +126,13 @@
         <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">{{ text.address.title }}</h1>
         <p class="mt-2 text-ink-muted">{{ text.address.lead }}</p>
 
+        <!-- A full plan: the last step is where it matters -->
+        <div v-if="atSiteLimit" class="mt-6 flex flex-wrap items-center gap-3 rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-200">
+          <UIcon name="i-lucide-circle-alert" class="size-5 shrink-0 text-amber-700" />
+          <p class="min-w-0 flex-1 text-sm text-amber-900">{{ text.limit(billing!.limits.sites) }}</p>
+          <UButton to="/dashboard/upgrade" size="sm" :label="text.seePlans" />
+        </div>
+
         <div class="mt-8 flex items-center rounded-2xl bg-paper px-4 ring-1 ring-line transition focus-within:ring-2 focus-within:ring-tint">
           <span class="shrink-0 text-lg text-ink-muted">perlink.to/</span>
           <input
@@ -186,15 +193,26 @@
 
     <!-- Back and Continue, always at hand -->
     <footer v-if="stepIndex >= 0" class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/90 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+      <p v-if="atSiteLimit" class="flex items-center gap-1.5 border-b border-line px-4 py-2 text-xs text-ink-muted sm:hidden">
+        <UIcon name="i-lucide-circle-alert" class="size-3.5 shrink-0 text-amber-600" />
+        <span class="min-w-0 flex-1">{{ text.limitShort(billing!.limits.sites) }}</span>
+        <NuxtLink to="/dashboard/upgrade" class="shrink-0 font-medium text-ink underline underline-offset-2">{{ text.seePlans }}</NuxtLink>
+      </p>
       <div class="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-3 px-4 sm:h-20 sm:px-6">
         <UButton v-if="stepIndex > 0" color="neutral" variant="ghost" icon="i-lucide-arrow-left" :label="text.back" @click="back" />
         <span v-else />
+        <!-- A full plan, said where the button is -->
+        <p v-if="atSiteLimit" class="hidden min-w-0 flex-1 items-center justify-end gap-1.5 text-right text-xs text-ink-muted sm:flex">
+          <UIcon name="i-lucide-circle-alert" class="size-3.5 shrink-0 text-amber-600" />
+          <span class="truncate">{{ text.limitShort(billing!.limits.sites) }}</span>
+          <NuxtLink to="/dashboard/upgrade" class="shrink-0 font-medium text-ink underline underline-offset-2">{{ text.seePlans }}</NuxtLink>
+        </p>
         <UButton
           size="lg"
           :loading="creating"
           :disabled="!canContinue"
-          :trailing-icon="step === 'address' ? 'i-lucide-sparkles' : 'i-lucide-arrow-right'"
-          :label="step === 'address' ? text.create : text.next"
+          :trailing-icon="step === 'address' ? (atSiteLimit ? 'i-lucide-crown' : 'i-lucide-sparkles') : 'i-lucide-arrow-right'"
+          :label="step === 'address' ? (atSiteLimit ? text.upgradeToCreate : text.create) : text.next"
           @click="next"
         />
       </div>
@@ -236,6 +254,8 @@ const TEXT = {
     create: 'Create my site',
     seePlans: 'See plans',
     limit: (n: number) => `Your plan has room for ${n} sites and they're all in use. Upgrade, or delete a site, to make another.`,
+    limitShort: (n: number) => `All ${n} sites on your plan are in use. Keep designing; upgrade to publish this one.`,
+    upgradeToCreate: 'Upgrade to create',
     goal: { title: 'What is your site for?', lead: 'We’ll suggest the templates and blocks that fit. You can change everything later.' },
     basics: {
       title: 'Tell visitors who you are',
@@ -269,6 +289,8 @@ const TEXT = {
     create: 'Tạo trang của tôi',
     seePlans: 'Xem các gói',
     limit: (n: number) => `Gói của bạn có ${n} trang và đã dùng hết. Nâng cấp hoặc xoá bớt một trang để tạo trang mới.`,
+    limitShort: (n: number) => `Gói của bạn đã dùng hết ${n} trang. Cứ thiết kế tiếp, nâng cấp khi tạo trang này.`,
+    upgradeToCreate: 'Nâng cấp để tạo trang',
     goal: { title: 'Trang của bạn dùng để làm gì?', lead: 'Perlink sẽ gợi ý mẫu và khối nội dung phù hợp. Mọi thứ đều sửa lại được sau.' },
     basics: {
       title: 'Giới thiệu đôi chút về bạn',
@@ -378,8 +400,9 @@ function chooseGoal(id: SiteGoalId) {
   next()
 }
 
+// A full plan doesn't stop anyone designing: only the last step (creating)
+// turns into an upgrade, and what they filled in is kept for after it
 const canContinue = computed(() => {
-  if (atSiteLimit.value) return false
   if (step.value === 'goal') return !!state.goal
   if (step.value === 'basics') return !!state.title.trim()
   if (step.value === 'look') return !!state.templateId
@@ -389,7 +412,11 @@ const canContinue = computed(() => {
 
 function next() {
   if (!canContinue.value) return
-  if (step.value === 'address') return create()
+  if (step.value === 'address') {
+    if (atSiteLimit.value) navigateTo('/dashboard/upgrade')
+    else create()
+    return
+  }
   go(STEPS[stepIndex.value + 1]!)
 }
 function back() {

@@ -540,6 +540,8 @@
               </p>
               <BioTemplatePicker class="!grid-cols-2" @select="confirmApplyTemplate" />
             </div>
+
+            <SiteDeleteZone v-if="existingBio?.username" :username="existingBio.username" />
             </div>
             <div v-if="activeTab === 'settings'" class="hidden lg:block lg:col-span-5">
               <div class="sticky top-0">
