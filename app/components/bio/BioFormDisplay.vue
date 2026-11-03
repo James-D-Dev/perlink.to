@@ -265,13 +265,8 @@ const serviceGroups = computed(() => {
   return groups
 })
 
-// Like the price list shows it: "250,000 ₫", "$12", "/night"
-function menuPrice(price: string, currency?: string, suffix = '') {
-  const c = currency?.trim()
-  if (!c || price.includes(c)) return `${price}${suffix}`
-  const before = ['$', '€', '£', '¥'].includes(c)
-  return `${before ? c : ''}${price}${before ? '' : ` ${c}`}${suffix}`
-}
+// Like the price list shows it: "250.000 ₫", "$12", "/night"
+const menuPrice = (price: string, currency?: string, suffix = '') => formatListPrice(price, currency, suffix)
 
 // ---------- Dates and opening hours ----------
 // The visitor's clock, once mounted: the server's date can differ around midnight

@@ -111,12 +111,7 @@ const sections = computed(() =>
 )
 
 function formatPrice(price: string) {
-  const currency = props.data.currency?.trim()
-  const suffix = props.data.priceSuffix || ''
-  if (!currency || price.includes(currency)) return `${price}${suffix}`
-  // Symbols like $ € go before the number, codes and ₫ after
-  const before = ['$', '€', '£', '¥'].includes(currency)
-  return `${before ? currency : ''}${price}${before ? '' : ` ${currency}`}${suffix}`
+  return formatListPrice(price, props.data.currency, props.data.priceSuffix || '')
 }
 </script>
 

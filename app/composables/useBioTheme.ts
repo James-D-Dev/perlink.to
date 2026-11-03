@@ -18,6 +18,10 @@ function mergeWithDefault(theme: Partial<ThemeConfig> | undefined | null): Theme
     page: { ...DEFAULT_THEME.page!, ...theme.page },
     language: theme.language,
     showShare: theme.showShare ?? DEFAULT_THEME.showShare,
+    // Page-level settings the page view reads directly
+    music: theme.music,
+    pageMode: theme.pageMode,
+    roomButton: theme.roomButton,
   }
 }
 

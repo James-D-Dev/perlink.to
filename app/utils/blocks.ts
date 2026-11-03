@@ -25,6 +25,25 @@ export function contactMapHref(data: { mapUrl?: string; address?: string }) {
   return ''
 }
 
+/**
+ * A price from a price list as visitors read it: "250,000" with ₫ becomes
+ * "250.000 ₫" (Vietnamese grouping), "$12" stays a symbol before the number,
+ * words ("From 99k", "Free") are shown as written
+ */
+export function formatListPrice(price: string, currency?: string, suffix = '') {
+  const c = currency?.trim()
+  let shown = price.trim()
+  const dong = !c || /^(₫|đ|vnd|vnđ)$/i.test(c)
+  // Plain amounts with thousand separators: regroup the Vietnamese way for đồng
+  if (dong && /^\d{1,3}([.,\s]\d{3})+$|^\d{4,}$/.test(shown)) {
+    shown = Number(shown.replace(/[.,\s]/g, '')).toLocaleString('vi-VN')
+  }
+  if (!c || shown.includes(c)) return `${shown}${suffix}`
+  // Symbols like $ € go before the number, codes and ₫ after
+  const before = ['$', '€', '£', '¥'].includes(c)
+  return `${before ? c : ''}${shown}${before ? '' : ` ${c}`}${suffix}`
+}
+
 export const FORM_PRESETS: Record<'booking' | 'contact' | 'rsvp' | 'stay', FormFields> = {
   booking: { phone: true, email: false, date: true, time: true, guests: true, message: true, service: true },
   contact: { phone: true, email: true, date: false, time: false, guests: false, message: true },
