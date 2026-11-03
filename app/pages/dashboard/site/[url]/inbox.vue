@@ -116,7 +116,7 @@
         </div>
 
         <ul v-else class="divide-y divide-line overflow-hidden rounded-3xl bg-paper ring-1 ring-line">
-          <li v-if="!visible.length" class="p-6 text-center text-sm text-ink-muted">{{ t('dashboard.inbox.noUnread') }}</li>
+          <li v-if="!visible.length" class="p-6 text-center text-sm text-ink-muted">{{ filter === 'orders' ? t('dashboard.inbox.noOpenOrders') : t('dashboard.inbox.noUnread') }}</li>
           <li v-for="item in visible" :key="item.id" class="p-4" :class="!item.read && 'bg-sand/40'">
             <div class="flex items-start gap-3">
               <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-ink'" />
@@ -184,6 +184,16 @@
                   <UButton v-if="item.data.phone" :to="`tel:${item.data.phone.replace(/\s+/g, '')}`" size="xs" icon="i-lucide-phone" :label="item.data.phone" />
                   <UButton v-if="item.data.email" :to="`mailto:${item.data.email}`" size="xs" color="neutral" variant="outline" icon="i-lucide-mail" :label="item.data.email" />
                   <div class="flex-1" />
+                  <!-- Where the order is (paid plans; free shows the prompt) -->
+                  <USelect
+                    v-if="item.data.kind === 'order'"
+                    :model-value="item.status ?? 'new'"
+                    :items="statusItems"
+                    size="xs"
+                    class="w-40"
+                    :ui="{ base: statusClass(item.status) }"
+                    @update:model-value="setStatus(item, $event as OrderStatus)"
+                  />
                   <UButton
                     size="xs"
                     color="neutral"
@@ -218,12 +228,16 @@ definePageMeta({
   ssr: false,
 })
 
+type OrderStatus = 'new' | 'confirmed' | 'shipped' | 'done' | 'cancelled'
+
 interface Submission {
   id: string
   blockId: string | null
   data: Record<string, string>
   read: boolean
   createdAt: string
+  /** Orders only */
+  status?: OrderStatus | null
 }
 
 const { t, locale } = useI18n()
@@ -241,10 +255,15 @@ const requests = computed(() => submissions.value.filter(s => s.data.kind !== 's
 const subscribers = computed(() => submissions.value.filter(s => s.data.kind === 'subscribe'))
 const unread = computed(() => requests.value.filter(s => !s.read).length)
 
-const filter = ref<'all' | 'unread'>('all')
+const filter = ref<'all' | 'unread' | 'orders'>('all')
+// Orders still to handle: new, confirmed or on their way
+const openOrders = computed(() => requests.value.filter(s => s.data.kind === 'order' && !['done', 'cancelled'].includes(s.status ?? 'new')))
 const filters = computed(() => [
   { value: 'all' as const, label: t('dashboard.inbox.all') },
   { value: 'unread' as const, label: t('dashboard.inbox.unread') },
+  ...(requests.value.some(s => s.data.kind === 'order')
+    ? [{ value: 'orders' as const, label: `${t('dashboard.inbox.openOrders')} (${openOrders.value.length})` }]
+    : []),
 ])
 // #guestbook and #subscribers open those tabs (links from Telegram)
 type InboxView = 'requests' | 'subscribers' | 'guestbook'
@@ -303,7 +322,34 @@ const rsvpStats = computed(() => [
   { label: t('dashboard.inbox.rsvpNotComing', rsvp.value.notComing), value: rsvp.value.notComing },
 ])
 
-const visible = computed(() => (filter.value === 'unread' ? requests.value.filter(s => !s.read) : requests.value))
+const visible = computed(() =>
+  filter.value === 'unread' ? requests.value.filter(s => !s.read) : filter.value === 'orders' ? openOrders.value : requests.value,
+)
+
+// ---------- Orders: where each one is ----------
+const ORDER_STATUSES: OrderStatus[] = ['new', 'confirmed', 'shipped', 'done', 'cancelled']
+const statusItems = computed(() => ORDER_STATUSES.map(value => ({ label: t(`dashboard.inbox.status.${value}`), value })))
+function statusClass(status?: OrderStatus | null) {
+  return {
+    new: 'text-sky-700',
+    confirmed: 'text-violet-700',
+    shipped: 'text-amber-700',
+    done: 'text-emerald-700',
+    cancelled: 'text-ink-muted line-through',
+  }[status ?? 'new']
+}
+const upgrade = useUpgradePrompt()
+async function setStatus(item: Submission, status: OrderStatus) {
+  const before = item.status
+  item.status = status
+  item.read = true
+  try {
+    await $fetch(`/api/admin/bio/${username.value}/inbox/${item.id}`, { method: 'PATCH', body: { status } })
+  } catch (error: any) {
+    item.status = before
+    if (!upgrade.fromError(error)) toast.add({ title: t('common.error'), color: 'error' })
+  }
+}
 
 const dateLocale = computed(() => (locale.value === 'vi' ? 'vi-VN' : 'en-GB'))
 

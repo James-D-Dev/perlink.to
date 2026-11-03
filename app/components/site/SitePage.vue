@@ -22,8 +22,10 @@
       <Meta property="og:type" content="website" />
 
       <Link v-if="!error" rel="canonical" :href="metaUrl" />
-      <!-- An address nobody uses: not for search results -->
-      <Meta v-if="error" name="robots" content="noindex" />
+      <!-- An address nobody uses, or a private site: not for search results -->
+      <Meta v-if="error || gate?.kind === 'password'" name="robots" content="noindex" />
+      <!-- Google Search Console ownership check (paid plans) -->
+      <Meta v-if="tracking?.gsc" name="google-site-verification" :content="tracking.gsc" />
       <Meta name="mobile-web-app-capable" content="yes" />
       <Meta name="apple-mobile-web-app-title" content="Perlink" />
       <Meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -52,6 +54,17 @@
 
       <!-- Missing: an invitation to claim the address -->
       <LazySiteNotFound v-else-if="error" :name="username" />
+
+      <!-- Private: a password, or a countdown to the opening time -->
+      <LazySiteGate
+        v-else-if="bioPage && gate"
+        :username="bioPage.username"
+        :title="bioPage.title || bioPage.username"
+        :avatar-url="bioPage.avatarUrl"
+        :lang="siteLang"
+        :gate="gate"
+        :colors="bioPage.themeConfig?.colors"
+      />
 
       <!-- 3D room. The loader covers it from the first paint (it's in the
            server HTML) until the viewer has mounted and the loader's intro
@@ -111,6 +124,7 @@
 
 <script setup lang="ts">
 import type { BioBlock, BioData, ThemeConfig } from "~/types/bio";
+import { cleanTracking } from "#shared/tracking";
 import { DEFAULT_THEME } from "~/types/bio";
 import { normalizeRoom, type RoomConfig } from "~/types/room";
 const props = defineProps<{
@@ -131,6 +145,8 @@ interface ApiBioPage {
   viewCount: number;
   blocks?: BioBlock[];
   showBranding?: boolean;
+  /** Set when the site is private right now: only name, photo and colours come with it */
+  gate?: { kind: "password" } | { kind: "schedule"; opensAt: string };
 }
 
 const username = props.username;
@@ -141,6 +157,7 @@ const { data, pending, error } = await useFetch<{ bioPage: ApiBioPage }>(
 );
 
 const bioPage = computed(() => data.value?.bioPage);
+const gate = computed(() => bioPage.value?.gate);
 
 // Owner's own title/description/image, or sensible defaults (utils/siteSeo)
 const seo = computed(() => siteSeo(bioPage.value ?? {}, bioPage.value?.username ?? username, props.domain));
@@ -221,4 +238,27 @@ function onViewerMounted() {
 }
 
 // Bio page view tracking is now handled server-side in /api/bio/[username].get.ts
+
+// The owner's pixels and Google Analytics (paid plans). The server only sends
+// IDs in each provider's format, and they're checked again here, so the
+// snippets below never carry anything else
+const tracking = computed(() => (gate.value ? null : cleanTracking(bioPage.value?.themeConfig?.tracking)));
+useHead({
+  script: computed(() => {
+    const t = tracking.value;
+    if (!t) return [];
+    const tags: { key: string; src?: string; async?: boolean; innerHTML?: string }[] = [];
+    if (t.ga4) {
+      tags.push({ key: "ga4-src", src: `https://www.googletagmanager.com/gtag/js?id=${t.ga4}`, async: true });
+      tags.push({ key: "ga4", innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${t.ga4}');` });
+    }
+    if (t.metaPixel) {
+      tags.push({ key: "meta-pixel", innerHTML: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${t.metaPixel}');fbq('track','PageView');` });
+    }
+    if (t.tiktokPixel) {
+      tags.push({ key: "tiktok-pixel", innerHTML: `!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load('${t.tiktokPixel}');ttq.page()}(window,document,'ttq');` });
+    }
+    return tags;
+  }),
+});
 </script>

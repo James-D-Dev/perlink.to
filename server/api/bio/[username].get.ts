@@ -1,7 +1,9 @@
 import { BioRepository, publicBioPage } from '../../repositories/bioRepository'
 import { AnalyticsRepository } from '../../repositories/analyticsRepository'
 import { getAccountPlan } from '../../utils/plan'
-import { showsBranding } from '#shared/plans'
+import { PLAN_LIMITS, showsBranding } from '#shared/plans'
+import { cleanTracking } from '#shared/tracking'
+import { gatedBioPage, siteGate } from '../../utils/siteAccess'
 import { isBot, parseDevice, hashIP, parseReferrer, parseUTMParams, detectSourceType } from '../../services/analytics'
 
 export default defineEventHandler(async (event) => {
@@ -26,8 +28,18 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // A password or an opening time: only the name and photo until then
+  const gate = await siteGate(event, bioPage)
+  if (gate) {
+    setResponseHeader(event, 'Cache-Control', 'private, no-store')
+    return { bioPage: gatedBioPage(bioPage, gate) }
+  }
+
   // Free sites carry the "Made with Perlink" badge
   const ownerPlan = await getAccountPlan(event, bioPage.userId).catch(() => null)
+  // Pixels and Google tags run while the plan has them, and only as valid IDs
+  const tracking = ownerPlan && PLAN_LIMITS[ownerPlan.plan].tracking ? cleanTracking(bioPage.themeConfig?.tracking) : null
+  bioPage.themeConfig = { ...bioPage.themeConfig, tracking: tracking ?? undefined }
   // Template sample photos saved as JPG (sites made before their WebP
   // versions) go out as the WebP ones, a third of the size
   const page = JSON.parse(JSON.stringify({ ...publicBioPage(bioPage), showBranding: showsBranding(ownerPlan?.plan) })

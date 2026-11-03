@@ -484,6 +484,25 @@
               />
             </div>
 
+            <!-- Password and opening time -->
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
+              <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.privacy.heading') }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.privacy.text') }}</p>
+              <SitePrivacySettings
+                v-if="existingBio?.username"
+                :bio-data="bioData"
+                :username="existingBio.username"
+                @update-theme="handleUpdateTheme"
+              />
+            </div>
+
+            <!-- Pixels and Google tags -->
+            <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
+              <h3 class="font-semibold text-highlighted dark:text-white mb-1">{{ t('dashboard.tracking.heading') }}</h3>
+              <p class="text-sm text-muted dark:text-neutral-400 mb-4">{{ t('dashboard.tracking.text') }}</p>
+              <SiteTrackingSettings :bio-data="bioData" @update-theme="handleUpdateTheme" />
+            </div>
+
             <!-- Share Button Toggle -->
             <div class="rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6">
               <div class="flex items-center justify-between">

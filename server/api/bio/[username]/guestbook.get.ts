@@ -1,3 +1,4 @@
+import { requireSiteOpen } from '../../../utils/siteAccess'
 import { BioRepository } from '../../../repositories/bioRepository'
 import { getDB } from '../../../utils/db'
 import { GUESTBOOK_LIMITS, type GuestbookEntry } from '#shared/guestbook'
@@ -7,6 +8,7 @@ export default defineEventHandler(async (event) => {
   const username = getRouterParam(event, 'username')
   const bioPage = username ? await new BioRepository(event).findByUsername(username) : null
   if (!bioPage?.isPublished) throw createError({ statusCode: 404, statusMessage: 'Site not found' })
+  await requireSiteOpen(event, bioPage)
   if ((bioPage.themeConfig as { room?: { guestbook?: boolean } })?.room?.guestbook === false) return { enabled: false, entries: [] }
 
   const db = getDB(event)

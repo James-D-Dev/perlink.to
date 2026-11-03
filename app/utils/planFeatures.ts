@@ -14,6 +14,10 @@ export function planFeatures(plan: PlanId, t: Translate) {
   ]
   list.push(Number.isFinite(limits.posts) ? f('posts', { n: limits.posts }) : f('postsUnlimited'))
   if (limits.proThemes) list.push(f('proThemes'))
+  if (limits.tracking) list.push(f('tracking'))
+  if (limits.protect) list.push(f('protect'))
+  if (limits.orders) list.push(f('orders'))
+  if (limits.cleanVideo) list.push(f('cleanVideo'))
   // Only what works today: domains are listed once they can be connected
   if (limits.customDomain && CUSTOM_DOMAINS_LIVE) list.push(f('customDomains', { n: limits.domains }, limits.domains))
   if (limits.removeBranding && !BRANDING_FOR_ALL) list.push(f('removeBranding'))

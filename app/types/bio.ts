@@ -271,6 +271,10 @@ export interface ThemeConfig {
   /** Language of the words visitors see, e.g. "vi" (see utils/siteI18n) */
   language?: string;
   seo?: ThemeSeo;
+  /** Pixels and Google tags (paid plans, shared/tracking) */
+  tracking?: import("#shared/tracking").SiteTracking;
+  /** The site stays behind a countdown until this time (ISO, paid plans) */
+  opensAt?: string;
   showShare?: boolean;
   /** The ready-made theme last picked, for showing its name */
   presetId?: string;

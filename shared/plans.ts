@@ -24,12 +24,20 @@ export interface PlanLimits {
   analyticsDays: number
   /** Published blog posts per account (Infinity: no limit) */
   posts: number
+  /** Facebook / TikTok pixels, Google Analytics and Search Console on the site */
+  tracking: boolean
+  /** A password on the site, or a time it opens at */
+  protect: boolean
+  /** Order statuses (new, confirmed, shipped…) in the inbox */
+  orders: boolean
+  /** Room videos without the Perlink watermark */
+  cleanVideo: boolean
 }
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
-  free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50 },
-  starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100 },
-  plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity },
+  free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50, tracking: false, protect: false, orders: false, cleanVideo: false },
+  starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100, tracking: true, protect: true, orders: true, cleanVideo: true },
+  plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true },
 }
 
 /**
@@ -82,7 +90,7 @@ export const PRO_THEME_IDS = new Set([
   'latte', 'sunset-mesh', 'meadow', 'cotton-candy', 'cyber', 'lixi', 'party',
 ])
 
-export type PlanFeature = 'sites' | 'customDomain' | 'proThemes' | 'removeBranding'
+export type PlanFeature = 'sites' | 'customDomain' | 'proThemes' | 'removeBranding' | 'tracking' | 'protect' | 'orders' | 'cleanVideo'
 
 export function isPlanId(value: unknown): value is PlanId {
   return typeof value === 'string' && (PLAN_ORDER as string[]).includes(value)

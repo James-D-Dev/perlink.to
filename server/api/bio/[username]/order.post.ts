@@ -8,6 +8,7 @@ import { notifyOwnerTelegram } from '../../../utils/telegram'
 import { generateVietQR, getBankByBIN } from '../../../utils/vietqr'
 import { formatVnd } from '#shared/plans'
 import { unitPrice } from '#shared/productPrice'
+import { adjustStock } from '../../../utils/orders'
 
 // A visitor orders a product from a site's products block. The order lands
 // in the site's inbox; paying by transfer gets a VietQR for the site's own
@@ -102,10 +103,22 @@ export default defineEventHandler(async (event) => {
     ...(body.address ? { address: body.address } : {}),
     ...(body.note ? { message: body.note } : {}),
   }
-  await db
-    .prepare('INSERT INTO form_submissions (id, bio_page_id, block_id, data, ip_hash) VALUES (?, ?, ?, ?, ?)')
-    .bind(crypto.randomUUID(), bioPage.id, body.blockId, JSON.stringify(data), ipHash)
-    .run()
+  // Counted stock goes down with the order (and back up if it's cancelled)
+  const took = stock !== undefined ? -(await adjustStock(event, bioPage.id, body.blockId, product.id, -body.quantity)) : 0
+  const id = crypto.randomUUID()
+  const meta = JSON.stringify({ productId: product.id, quantity: body.quantity, took })
+  try {
+    await db
+      .prepare('INSERT INTO form_submissions (id, bio_page_id, block_id, data, ip_hash, status, meta) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .bind(id, bioPage.id, body.blockId, JSON.stringify(data), ipHash, 'new', meta)
+      .run()
+  } catch {
+    // Before migration 0037: no status or meta columns
+    await db
+      .prepare('INSERT INTO form_submissions (id, bio_page_id, block_id, data, ip_hash) VALUES (?, ?, ?, ?, ?)')
+      .bind(id, bioPage.id, body.blockId, JSON.stringify(data), ipHash)
+      .run()
+  }
 
   runInBackground(event, new BioRepository(event).incrementAction(bioPage.id, 'order'))
   if (emailEnabled(event)) runInBackground(event, notifyOwnerOfRequest(event, bioPage, data))

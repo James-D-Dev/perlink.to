@@ -678,7 +678,16 @@
       "nights": "{n} night | {n} nights",
       "kindBooking": "Booking",
       "kindStay": "Room",
-      "kindContact": "Message"
+      "kindContact": "Message",
+      "openOrders": "Orders to handle",
+      "noOpenOrders": "No orders waiting. Nice work!",
+      "status": {
+        "new": "🆕 New",
+        "confirmed": "✅ Confirmed",
+        "shipped": "🚚 Shipped",
+        "done": "🎉 Done",
+        "cancelled": "✖ Cancelled"
+      }
     },
     "qr": {
       "open": "QR code",
@@ -840,7 +849,11 @@
         "customDomainsSoon": "Custom domains (coming soon)",
         "analyticsYears": "{n} years of analytics",
         "posts": "{n} blog posts",
-        "postsUnlimited": "Unlimited blog posts"
+        "postsUnlimited": "Unlimited blog posts",
+        "tracking": "Facebook & TikTok pixels, Google Analytics",
+        "protect": "Password-protected and scheduled pages",
+        "orders": "Order tracking (new, confirmed, shipped)",
+        "cleanVideo": "3D room videos without watermark"
       },
       "monthly": "Monthly",
       "annual": "Yearly",
@@ -948,6 +961,22 @@
         "posts": {
           "title": "You’ve used your posts",
           "text": "The {plan} plan publishes more posts, with Pro themes and more."
+        },
+        "tracking": {
+          "title": "Ad pixels and Google Analytics come with {plan}",
+          "text": "Measure your ads and visitors with Facebook Pixel, TikTok Pixel, Google Analytics and Search Console."
+        },
+        "protect": {
+          "title": "Private pages come with {plan}",
+          "text": "Lock your page with a password, or have it open by itself at the time you choose."
+        },
+        "orders": {
+          "title": "Order tracking comes with {plan}",
+          "text": "Mark each order as confirmed, shipped, done or cancelled; cancelled orders go back into stock."
+        },
+        "cleanVideo": {
+          "title": "Videos without watermark come with {plan}",
+          "text": "Your room videos won’t show “Made with Perlink”."
         }
       },
       "history": "Payment history",
@@ -1047,6 +1076,39 @@
       "addImage": "Add an image",
       "uploadFailed": "Couldn’t upload the image",
       "notFound": "Post not found"
+    },
+    "tracking": {
+      "heading": "Ad pixels & Google",
+      "text": "Measure your ads and visitors with your own Facebook, TikTok and Google accounts.",
+      "locked": "Pixels and Google Analytics come with Starter and Plus.",
+      "upgrade": "Upgrade",
+      "invalid": "That doesn’t look right. It should look like {example}",
+      "note": "Paste the ID or the whole snippet, we keep just the ID. Tags run on your live site, not in this editor, and go live when you publish.",
+      "help": {
+        "metaPixel": "Events Manager → Data sources → your pixel → the 15–16 digit ID.",
+        "tiktokPixel": "TikTok Ads Manager → Tools → Events → Web events → the pixel ID.",
+        "ga4": "Google Analytics → Admin → Data streams → the Measurement ID (G-…).",
+        "gsc": "Search Console → Add property (URL prefix) → HTML tag → the content=\"…\" value."
+      }
+    },
+    "privacy": {
+      "heading": "Private page",
+      "text": "Only people with the password can open it, or it opens by itself at a time you choose. Handy for weddings, surprises and launches.",
+      "locked": "Passwords and opening times come with Starter and Plus.",
+      "passwordLabel": "Password",
+      "on": "On",
+      "setPassword": "Choose a password (4+ characters)",
+      "newPassword": "New password",
+      "lock": "Lock the page",
+      "change": "Change",
+      "remove": "Remove password",
+      "passwordHelp": "Applies right away. Visitors enter it once per browser; changing it asks everyone again.",
+      "saved": "The page is password protected",
+      "removed": "The password is removed",
+      "opensLabel": "Opens at",
+      "clear": "Clear",
+      "opensHelp": "Until then visitors see a countdown. Goes live when you publish.",
+      "opensSet": "Visitors see a countdown until {date}. Goes live when you publish."
     }
   }
 }

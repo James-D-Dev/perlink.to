@@ -1,3 +1,4 @@
+import { requireSiteOpen } from '../../../../utils/siteAccess'
 import { getDB } from '../../../../utils/db'
 import { BioRepository } from '../../../../repositories/bioRepository'
 import { blogSite, toPostSummary, type PostRow } from '../../../../utils/posts'
@@ -7,6 +8,7 @@ import { autoExcerpt, parsePostDoc, postText } from '#shared/postContent'
 export default defineEventHandler(async (event) => {
   const site = await new BioRepository(event).findByUsername(getRouterParam(event, 'username') ?? '')
   if (!site || !site.isPublished) throw createError({ statusCode: 404, statusMessage: 'Site not found' })
+  await requireSiteOpen(event, site)
   const limit = Math.min(Math.max(Number(getQuery(event).limit) || 50, 1), 100)
   const { results } = await getDB(event)
     .prepare(`SELECT * FROM posts WHERE bio_page_id = ? AND status = 'published' ORDER BY published_at DESC LIMIT ?`)

@@ -25,8 +25,10 @@ export const COOKIES: LegalDocs = {
             ['nuxt-session', 'Keeps you signed in (Perlink, essential)'],
             ['perlink_lang', 'Remembers your language (Perlink, functional)'],
             ['__cf_bm and similar', 'Protects the site from bots and attacks (Cloudflare, essential)'],
+            ['pl_unlock_…', 'Keeps a password-protected site open after you enter its password, for 30 days (Perlink, essential)'],
           ] },
           'Websites built with Perlink may embed content from other services (for example YouTube videos, Google Maps or Spotify). Those services can set their own cookies under their own policies.',
+          'A site’s owner can also add their own Facebook Pixel, TikTok Pixel or Google Analytics to their site. Those tags set cookies for the owner’s ad and analytics accounts, under those services’ policies; the site’s owner is responsible for them. Perlink’s own pages never use them.',
         ],
       },
       {
@@ -89,8 +91,10 @@ export const COOKIES: LegalDocs = {
             ['nuxt-session', 'Giữ trạng thái đăng nhập (Perlink, bắt buộc)'],
             ['perlink_lang', 'Ghi nhớ ngôn ngữ bạn chọn (Perlink, chức năng)'],
             ['__cf_bm và tương tự', 'Bảo vệ trang khỏi bot và tấn công (Cloudflare, bắt buộc)'],
+            ['pl_unlock_…', 'Giữ trang có mật khẩu mở sau khi bạn nhập đúng mật khẩu, trong 30 ngày (Perlink, bắt buộc)'],
           ] },
           'Trang tạo bằng Perlink có thể nhúng nội dung từ dịch vụ khác (ví dụ video YouTube, Google Maps, Spotify). Các dịch vụ đó có thể đặt cookie riêng theo chính sách của họ.',
+          'Chủ trang cũng có thể tự gắn Facebook Pixel, TikTok Pixel hoặc Google Analytics của họ vào trang. Các mã này đặt cookie cho tài khoản quảng cáo và thống kê của chủ trang, theo chính sách của các dịch vụ đó; chủ trang chịu trách nhiệm về chúng. Các trang của chính Perlink không dùng các mã này.',
         ],
       },
       {

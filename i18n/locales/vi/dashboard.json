@@ -678,7 +678,16 @@
       "nights": "{n} đêm | {n} đêm",
       "kindBooking": "Lịch hẹn",
       "kindStay": "Đặt phòng",
-      "kindContact": "Liên hệ"
+      "kindContact": "Liên hệ",
+      "openOrders": "Đơn cần xử lý",
+      "noOpenOrders": "Không còn đơn nào chờ. Tuyệt!",
+      "status": {
+        "new": "🆕 Mới",
+        "confirmed": "✅ Đã xác nhận",
+        "shipped": "🚚 Đang giao",
+        "done": "🎉 Hoàn tất",
+        "cancelled": "✖ Đã huỷ"
+      }
     },
     "qr": {
       "open": "Mã QR",
@@ -840,7 +849,11 @@
         "customDomainsSoon": "Tên miền riêng (sắp có)",
         "analyticsYears": "Thống kê {n} năm",
         "posts": "{n} bài blog",
-        "postsUnlimited": "Blog không giới hạn bài"
+        "postsUnlimited": "Blog không giới hạn bài",
+        "tracking": "Facebook & TikTok Pixel, Google Analytics",
+        "protect": "Trang có mật khẩu và hẹn giờ mở",
+        "orders": "Theo dõi đơn hàng (mới, đã xác nhận, đang giao)",
+        "cleanVideo": "Video phòng 3D không watermark"
       },
       "monthly": "Theo tháng",
       "annual": "Theo năm",
@@ -948,6 +961,22 @@
         "posts": {
           "title": "Bạn đã dùng hết số bài đăng",
           "text": "Gói {plan} cho bạn đăng nhiều bài hơn, kèm theme Pro và nhiều hơn nữa."
+        },
+        "tracking": {
+          "title": "Pixel quảng cáo và Google Analytics có trong gói {plan}",
+          "text": "Đo hiệu quả quảng cáo và lượt khách bằng Facebook Pixel, TikTok Pixel, Google Analytics và Search Console."
+        },
+        "protect": {
+          "title": "Trang riêng tư có trong gói {plan}",
+          "text": "Khoá trang bằng mật khẩu, hoặc hẹn giờ để trang tự mở đúng lúc bạn chọn."
+        },
+        "orders": {
+          "title": "Theo dõi đơn hàng có trong gói {plan}",
+          "text": "Đánh dấu từng đơn là đã xác nhận, đang giao, hoàn tất hay đã huỷ; đơn huỷ được cộng lại vào kho."
+        },
+        "cleanVideo": {
+          "title": "Video không watermark có trong gói {plan}",
+          "text": "Video phòng 3D của bạn sẽ không có dòng “Made with Perlink”."
         }
       },
       "history": "Lịch sử thanh toán",
@@ -1047,6 +1076,39 @@
       "addImage": "Chèn ảnh",
       "uploadFailed": "Không tải được ảnh lên",
       "notFound": "Không tìm thấy bài viết"
+    },
+    "tracking": {
+      "heading": "Pixel quảng cáo & Google",
+      "text": "Đo hiệu quả quảng cáo và lượt khách bằng tài khoản Facebook, TikTok và Google của bạn.",
+      "locked": "Pixel và Google Analytics có trong gói Starter và Plus.",
+      "upgrade": "Nâng cấp",
+      "invalid": "Mã chưa đúng. Mã đúng có dạng {example}",
+      "note": "Dán mã hoặc cả đoạn code, Perlink chỉ giữ lại mã. Mã chạy trên trang đang hoạt động (không chạy trong trình chỉnh sửa) và có hiệu lực khi bạn xuất bản.",
+      "help": {
+        "metaPixel": "Events Manager → Nguồn dữ liệu → pixel của bạn → mã 15–16 chữ số.",
+        "tiktokPixel": "TikTok Ads Manager → Công cụ → Sự kiện → Sự kiện web → mã pixel.",
+        "ga4": "Google Analytics → Quản trị → Luồng dữ liệu → Mã đo lường (G-…).",
+        "gsc": "Search Console → Thêm thuộc tính (Tiền tố URL) → Thẻ HTML → giá trị trong content=\"…\"."
+      }
+    },
+    "privacy": {
+      "heading": "Trang riêng tư",
+      "text": "Chỉ người có mật khẩu mới mở được, hoặc trang tự mở đúng lúc bạn hẹn. Hợp cho thiệp cưới, quà bất ngờ và ra mắt sản phẩm.",
+      "locked": "Mật khẩu và hẹn giờ mở có trong gói Starter và Plus.",
+      "passwordLabel": "Mật khẩu",
+      "on": "Đang bật",
+      "setPassword": "Đặt mật khẩu (từ 4 ký tự)",
+      "newPassword": "Mật khẩu mới",
+      "lock": "Khoá trang",
+      "change": "Đổi",
+      "remove": "Gỡ mật khẩu",
+      "passwordHelp": "Có hiệu lực ngay. Khách nhập một lần trên mỗi trình duyệt; đổi mật khẩu thì mọi người phải nhập lại.",
+      "saved": "Trang đã được khoá bằng mật khẩu",
+      "removed": "Đã gỡ mật khẩu",
+      "opensLabel": "Mở lúc",
+      "clear": "Xoá",
+      "opensHelp": "Trước giờ đó, khách thấy đồng hồ đếm ngược. Có hiệu lực khi bạn xuất bản.",
+      "opensSet": "Khách thấy đồng hồ đếm ngược tới {date}. Có hiệu lực khi bạn xuất bản."
     }
   }
 }

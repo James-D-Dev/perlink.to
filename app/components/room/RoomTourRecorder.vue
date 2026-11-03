@@ -65,8 +65,8 @@
                   <UButton :icon="withMusic ? 'i-lucide-music' : 'i-lucide-volume-x'" color="neutral" :variant="withMusic ? 'soft' : 'ghost'" size="lg" :class="!withMusic && 'opacity-60'" :aria-label="t('room.tour.music')" :aria-pressed="withMusic" @click="withMusic = !withMusic" />
                 </UTooltip>
               </div>
-              <!-- The "remove it" offer, only while paid plans can remove it -->
-              <p v-if="watermark && !BRANDING_FOR_ALL" class="flex items-start gap-2 text-xs text-white/60">
+              <!-- The "remove it" offer: paid plans record without it -->
+              <p v-if="watermark" class="flex items-start gap-2 text-xs text-white/60">
                 <UIcon name="i-lucide-crown" class="mt-0.5 size-3.5 shrink-0 text-amber-400" />
                 <span>{{ t('room.tour.watermark') }} <NuxtLink to="/dashboard/upgrade" class="font-medium text-white underline">{{ t('room.tour.removeWatermark') }}</NuxtLink></span>
               </p>
@@ -112,7 +112,7 @@ import type { RoomConfig } from '~/types/room'
 import { RoomScene, TOUR_STYLES, type TourStyle } from '~/utils/room/RoomScene'
 import { getDaylight, type DaylightState } from '~/utils/room/daylight'
 import { MUSIC_BY_ID } from '~/data/roomMusic'
-import { BRANDING_FOR_ALL, showsBranding } from '#shared/plans'
+import { PLAN_LIMITS } from '#shared/plans'
 
 // Records a vertical "room tour" video (1080x1920) for TikTok, Reels and
 // Shorts: the camera sweeps through the room, with the site's name, its
@@ -169,7 +169,8 @@ const videoUrl = ref('')
 
 const track = computed(() => (props.room.music?.trackId ? MUSIC_BY_ID[props.room.music.trackId] : undefined))
 // Free plans carry a small Perlink mark
-const watermark = computed(() => showsBranding(billing.value?.plan))
+// Paid plans record without the "Made with Perlink" watermark
+const watermark = computed(() => !PLAN_LIMITS[billing.value?.plan ?? 'free'].cleanVideo)
 const link = computed(() => `perlink.to/${props.username}`)
 const postText = computed(() => t('room.tour.postText', { link: link.value }))
 

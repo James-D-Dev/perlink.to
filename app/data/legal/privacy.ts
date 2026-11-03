@@ -54,7 +54,8 @@ export const PRIVACY: LegalDocs = {
         id: 'public',
         title: 'Public content',
         blocks: [
-          'Sites and 3D worlds you publish are public by design: anyone with the link can see them. Do not put sensitive personal information on a public page.',
+          'Sites and 3D worlds you publish are public by design: anyone with the link can see them, unless you protect the site with a password. Do not put sensitive personal information on a public page.',
+          'If you add your own Facebook Pixel, TikTok Pixel or Google Analytics to your site, those services receive data about your visitors under their own terms, and you are responsible for telling your visitors and getting any consent your local law requires.',
         ],
       },
       {
@@ -158,7 +159,8 @@ export const PRIVACY: LegalDocs = {
         id: 'public',
         title: 'Nội dung công khai',
         blocks: [
-          'Trang và thế giới 3D bạn xuất bản là công khai: ai có link đều xem được. Đừng đặt thông tin cá nhân nhạy cảm lên trang công khai.',
+          'Trang và thế giới 3D bạn xuất bản là công khai: ai có link đều xem được, trừ khi bạn khoá trang bằng mật khẩu. Đừng đặt thông tin cá nhân nhạy cảm lên trang công khai.',
+          'Nếu bạn gắn Facebook Pixel, TikTok Pixel hoặc Google Analytics của mình vào trang, các dịch vụ đó nhận dữ liệu về khách xem trang theo điều khoản của họ, và bạn có trách nhiệm thông báo cho khách cũng như xin sự đồng ý nếu luật nơi bạn hoạt động yêu cầu.',
         ],
       },
       {
