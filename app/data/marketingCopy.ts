@@ -103,7 +103,7 @@ const en = {
   },
   trends: {
     eyebrow: 'Trends',
-    title: 'What people are building',
+    title: 'Popular styles to start from',
     description: 'Popular worlds and site styles to start from this season.',
     all: 'All trends',
     world: '3D world',
@@ -313,7 +313,7 @@ const vi: MarketingCopy = {
   },
   trends: {
     eyebrow: 'Xu hướng',
-    title: 'Mọi người đang tạo gì',
+    title: 'Phong cách được chọn nhiều',
     description: 'Những thế giới và kiểu trang được yêu thích mùa này để bạn bắt đầu.',
     all: 'Tất cả xu hướng',
     world: 'Thế giới 3D',

@@ -3,7 +3,7 @@
     <MarketingMkSection :ruled="false">
       <div class="max-w-2xl">
         <p class="mk-eyebrow mb-4">Trends</p>
-        <h1 class="mk-display text-[44px] sm:text-6xl">What people are building</h1>
+        <h1 class="mk-display text-[44px] sm:text-6xl">Popular styles to start from</h1>
         <p class="mt-5 text-lg text-ink-muted">Popular 3D worlds and site styles to start from. Pick one you like, then make it yours.</p>
       </div>
 

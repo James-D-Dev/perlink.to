@@ -149,6 +149,9 @@ export default defineNuxtConfig({
     "/dashboard/bio/**": { redirect: { to: "/dashboard/site/**", statusCode: 301 } },
     // Old user dashboard URLs
     "/admin": { redirect: { to: "/dashboard", statusCode: 301 } },
+    // The FAQ is a section of the home page
+    "/faq": { redirect: { to: "/#faq", statusCode: 301 } },
+    "/vi/faq": { redirect: { to: "/vi#faq", statusCode: 301 } },
     // Short links and QR codes are no longer offered (existing ones still resolve)
     "/dashboard/links": { redirect: { to: "/dashboard", statusCode: 302 } },
     "/dashboard/links/**": { redirect: { to: "/dashboard", statusCode: 302 } },
