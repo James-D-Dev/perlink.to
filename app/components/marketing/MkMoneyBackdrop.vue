@@ -24,7 +24,7 @@
     <span
       v-for="coin in COINS"
       :key="coin.class"
-      class="mb-float absolute flex items-center justify-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 font-bold text-amber-900 shadow-[0_8px_24px_-6px_rgba(0,0,0,0.5),inset_0_-3px_0_rgba(0,0,0,0.15),inset_0_2px_0_rgba(255,255,255,0.6)] ring-2 ring-amber-300/70"
+      class="mb-float absolute flex items-center justify-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 font-bold text-[#78350f] shadow-[0_8px_24px_-6px_rgba(0,0,0,0.5),inset_0_-3px_0_rgba(0,0,0,0.15),inset_0_2px_0_rgba(255,255,255,0.6)] ring-2 ring-amber-300/70"
       :class="coin.class"
       :style="{ animationDelay: coin.delay }"
     >$</span>
@@ -33,7 +33,7 @@
     <span
       v-for="note in NOTES"
       :key="note.class"
-      class="mb-float absolute flex items-center justify-center rounded-md bg-gradient-to-br from-emerald-200 to-emerald-400 font-bold text-emerald-800 shadow-[0_10px_24px_-8px_rgba(0,0,0,0.55)] ring-1 ring-emerald-100/70"
+      class="mb-float absolute flex items-center justify-center rounded-md bg-gradient-to-br from-emerald-200 to-emerald-400 font-bold text-[#065f46] shadow-[0_10px_24px_-8px_rgba(0,0,0,0.55)] ring-1 ring-emerald-100/70"
       :class="note.class"
       :style="{ animationDelay: note.delay }"
     >

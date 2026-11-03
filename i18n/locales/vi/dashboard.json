@@ -1128,7 +1128,7 @@
       "headline": "Nhận {percent}% mỗi khoản thanh toán, trọn đời",
       "intro": "Giới thiệu Perlink cho người theo dõi, khách hàng hay bạn bè. Khi người bạn giới thiệu mua một gói trả phí trong vòng {days} ngày, bạn nhận một phần mỗi lần họ thanh toán, kể cả các lần gia hạn, chừng nào họ còn dùng. Lemon Squeezy theo dõi doanh số và trả tiền cho bạn.",
       "statCommission": "Hoa hồng",
-      "statMonths": "Trả cho",
+      "statMonths": "mỗi lần gia hạn",
       "statSignups": "Người đăng ký bạn mang tới",
       "step": "Bước {n}",
       "joinTitle": "Tham gia chương trình trên Lemon Squeezy",
@@ -1149,7 +1149,7 @@
       "dashboard": "Xem doanh số và tiền nhận",
       "rules": "Không spam, không đánh giá giả, không chạy quảng cáo bằng tên Perlink, và không tự mua qua link của mình.",
       "rulesLink": "Quy định chương trình",
-      "forever": "Mọi lần gia hạn",
+      "forever": "Trọn đời",
       "example": "10 người dùng Plus theo năm = {amount} mỗi năm cho bạn"
     }
   }

@@ -12,7 +12,7 @@
             <h1 class="mk-display mt-5 pr-10 text-[40px] leading-[1.05] sm:text-6xl"><template v-for="(part, i) in text.title.split(`${PCT}%`)" :key="i"><span v-if="i" class="bg-gradient-to-r from-amber-200 via-amber-300 to-yellow-200 bg-clip-text font-extrabold text-transparent drop-shadow-[0_2px_12px_rgba(252,211,77,0.45)]">{{ PCT }}%</span>{{ part }}</template></h1>
             <p class="mt-5 max-w-xl text-base leading-relaxed text-emerald-50/80 sm:text-lg">{{ text.intro }}</p>
             <div class="mt-8 flex flex-wrap gap-3">
-              <a :href="signupUrl" target="_blank" rel="noopener" class="inline-flex h-12 items-center gap-2 rounded-full bg-amber-300 px-6 text-[15px] font-semibold text-amber-950 shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:bg-amber-200">
+              <a :href="signupUrl" target="_blank" rel="noopener" class="inline-flex h-12 items-center gap-2 rounded-full bg-amber-300 px-6 text-[15px] font-semibold text-[#422006] shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:bg-amber-200">
                 {{ text.join }}<UIcon name="i-lucide-arrow-up-right" class="size-4" />
               </a>
               <NuxtLink to="/dashboard/earn" class="inline-flex h-12 items-center rounded-full bg-white/10 px-6 text-[15px] font-medium text-white ring-1 ring-white/30 backdrop-blur transition hover:bg-white/20">
@@ -21,7 +21,7 @@
             </div>
             <div class="mt-10 grid grid-cols-3 gap-2 sm:gap-3">
               <div v-for="(stat, i) in text.stats" :key="stat.label" class="rounded-2xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur-md sm:p-4">
-                <p class="text-xl font-semibold sm:text-3xl" :class="i === 0 && 'font-extrabold text-amber-300'">{{ stat.value }}</p>
+                <p class="text-xl font-semibold sm:text-3xl" :class="i === 0 && 'font-extrabold text-[#fcd34d]'">{{ stat.value }}</p>
                 <p class="mt-1 text-[11px] leading-tight text-emerald-50/70 sm:text-sm">{{ stat.label }}</p>
               </div>
             </div>

@@ -16,12 +16,12 @@
             <template v-for="(part, i) in t('dashboard.earn.headline', { percent: AFFILIATE_COMMISSION }).split(`${AFFILIATE_COMMISSION}%`)" :key="i"><span v-if="i" class="bg-gradient-to-r from-amber-200 via-amber-300 to-yellow-200 bg-clip-text font-extrabold text-transparent drop-shadow-[0_2px_12px_rgba(252,211,77,0.45)]">{{ AFFILIATE_COMMISSION }}%</span>{{ part }}</template>
           </h1>
           <p class="mt-3 max-w-md text-sm leading-relaxed text-emerald-50/80">{{ t('dashboard.earn.intro', { days: AFFILIATE_COOKIE_DAYS }) }}</p>
-          <p class="mt-4 inline-flex items-center gap-2 rounded-2xl bg-amber-300 px-3.5 py-2 text-sm font-semibold text-amber-950 shadow-lg shadow-black/20">
+          <p class="mt-4 inline-flex items-center gap-2 rounded-2xl bg-[#fcd34d] px-3.5 py-2 text-sm font-semibold text-[#422006] shadow-lg shadow-black/20">
             <UIcon name="i-lucide-trending-up" class="size-4" />{{ t('dashboard.earn.example', { amount: exampleAmount }) }}
           </p>
           <div class="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
             <div v-for="stat in stats" :key="stat.label" class="rounded-2xl bg-white/10 px-3 py-3 ring-1 ring-white/15 backdrop-blur-md sm:px-4">
-              <p class="text-lg font-semibold tabular-nums sm:text-2xl" :class="stat.highlight && 'font-extrabold text-amber-300'">{{ stat.value }}</p>
+              <p class="text-base font-semibold leading-tight tabular-nums sm:text-2xl" :class="stat.highlight && 'font-extrabold text-[#fcd34d]'">{{ stat.value }}</p>
               <p class="text-[11px] leading-tight text-emerald-50/70 sm:text-xs">{{ stat.label }}</p>
             </div>
           </div>
