@@ -3,7 +3,8 @@
        is in the dashboard (or right away, if they're here when it's approved) -->
   <AppSheet v-model:open="open" :title="t('dashboard.billing.celebrate.title')" :ui="{ content: 'max-w-sm overflow-hidden' }" @after:leave="markSeen">
     <template #content>
-      <div v-if="shown" class="relative overflow-hidden text-center">
+      <!-- At most the screen's height: the list scrolls, the button stays at the bottom -->
+      <div v-if="shown" class="relative flex max-h-[calc(100dvh-5rem)] flex-col overflow-hidden text-center sm:max-h-[min(88dvh,780px)]">
         <!-- Confetti -->
         <div class="pointer-events-none absolute inset-x-0 top-0 h-full" aria-hidden="true">
           <span
@@ -14,7 +15,7 @@
           />
         </div>
 
-        <div class="relative px-6 pb-6 pt-10">
+        <div class="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-2 pt-8 sm:pt-10">
           <div class="pop mx-auto flex size-20 items-center justify-center rounded-[26px] bg-gradient-to-br from-amber-300 via-orange-400 to-pink-500 text-white shadow-[0_16px_40px_-10px_rgb(236_72_153/0.6)]">
             <UIcon name="i-lucide-crown" class="size-10" />
           </div>
@@ -33,8 +34,10 @@
               </li>
             </ul>
           </div>
+        </div>
 
-          <UButton block size="xl" class="mt-5 justify-center" :label="t('dashboard.billing.celebrate.start')" @click="open = false" />
+        <div class="relative shrink-0 px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 sm:pb-6">
+          <UButton block size="xl" class="justify-center" :label="t('dashboard.billing.celebrate.start')" @click="open = false" />
         </div>
       </div>
     </template>
