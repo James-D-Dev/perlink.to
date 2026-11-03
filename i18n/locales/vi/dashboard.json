@@ -770,7 +770,7 @@
         "error": "Kiểm tra lại DNS"
       },
       "open": "Mở",
-      "instructions": "Thêm các bản ghi sau ở nơi bạn mua tên miền (bấm vào giá trị để sao chép):",
+      "instructions": "Thêm các bản ghi sau ở nơi quản lý DNS của tên miền (bấm vào tên hoặc giá trị để sao chép):",
       "type": "Loại",
       "name": "Tên",
       "value": "Giá trị",
@@ -779,7 +779,22 @@
       "nowActive": "Tên miền đã hoạt động",
       "remove": "Gỡ tên miền",
       "removeTitle": "Gỡ tên miền này?",
-      "removeText": "Trang vẫn ở địa chỉ perlink.to."
+      "removeText": "Trang vẫn ở địa chỉ perlink.to.",
+      "detected": "DNS của tên miền đang được quản lý ở {provider}. Hãy thêm các bản ghi ở đó.",
+      "pickProvider": "Bạn quản lý DNS của tên miền ở đâu?",
+      "openProvider": "Mở {provider}",
+      "otherProvider": "Nơi khác",
+      "found": "Đã thấy",
+      "check_ok": "Đã thấy, đúng rồi",
+      "check_missing": "Chưa thấy",
+      "check_doubled": "Bị lặp tên miền hai lần",
+      "check_other": "Tên này đang có bản ghi khác",
+      "doubledHelp": "Trang quản lý DNS của bạn tự thêm “.{zone}” vào cuối, nên tên bản ghi bị lặp hai lần. Hãy sửa tên thành phần ngắn như ở trên.",
+      "otherHelp": "Tên này đã có bản ghi khác, hoặc đang bật proxy. Xoá bản ghi A/AAAA/CNAME cũ của tên này, và trên Cloudflare chuyển Proxy status sang “DNS only” (đám mây xám).",
+      "tips": {
+        "cloudflare": "Trên Cloudflare, chuyển Proxy status của bản ghi CNAME sang “DNS only” (đám mây xám).",
+        "short": "Điền tên ngắn vào ô Name/Host: hầu hết trang quản lý DNS tự thêm tên miền của bạn vào cuối."
+      }
     },
     "address": {
       "title": "Địa chỉ trang",

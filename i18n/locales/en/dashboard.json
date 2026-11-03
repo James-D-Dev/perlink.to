@@ -770,7 +770,7 @@
         "error": "Check your DNS"
       },
       "open": "Open",
-      "instructions": "Add these records at the company where you bought the domain (click a value to copy it):",
+      "instructions": "Add these records where your domain's DNS is managed (click a name or value to copy it):",
       "type": "Type",
       "name": "Name",
       "value": "Value",
@@ -779,7 +779,22 @@
       "nowActive": "Your domain is live",
       "remove": "Remove domain",
       "removeTitle": "Remove this domain?",
-      "removeText": "The site stays at its perlink.to address."
+      "removeText": "The site stays at its perlink.to address.",
+      "detected": "Your domain's DNS is managed at {provider}. Add the records there.",
+      "pickProvider": "Where do you manage your domain's DNS?",
+      "openProvider": "Open {provider}",
+      "otherProvider": "Somewhere else",
+      "found": "Found",
+      "check_ok": "Found, all good",
+      "check_missing": "Not found yet",
+      "check_doubled": "Added with the domain twice",
+      "check_other": "Something else is at this name",
+      "doubledHelp": "Your DNS panel adds “.{zone}” by itself, so the record ended up with it twice. Edit the name to just the short part shown above.",
+      "otherHelp": "Another record already uses this name, or it is proxied. Delete the old A/AAAA/CNAME record for it, and on Cloudflare set Proxy status to “DNS only” (grey cloud).",
+      "tips": {
+        "cloudflare": "On Cloudflare, set Proxy status to “DNS only” (grey cloud) for the CNAME.",
+        "short": "Enter the short name in the Name/Host field: most DNS panels add your domain by themselves."
+      }
     },
     "address": {
       "title": "Site address",
