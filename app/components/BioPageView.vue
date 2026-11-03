@@ -901,11 +901,33 @@ if (lazyFonts) {
 <style>
 /* Editor preview: the block being edited, and a hand cursor over the rest */
 .pv-clickable > * { cursor: pointer; }
+/* The block picked in the editor: a highlight that breathes in and out with
+   a glow for 3 seconds, then steps aside so the block can be seen as it is.
+   Picking another block plays it there */
 .pv-active > *,
 .pv-active-self {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid transparent;
   outline-offset: 6px;
   border-radius: 12px;
+  animation: pv-highlight 3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes pv-highlight {
+  0% { outline-color: rgb(59 130 246 / 0); box-shadow: 0 0 0 0 rgb(59 130 246 / 0); transform: scale(1); }
+  12% { outline-color: rgb(59 130 246 / 1); box-shadow: 0 0 0 4px rgb(59 130 246 / 0.18), 0 0 28px 4px rgb(59 130 246 / 0.45); transform: scale(1.025); }
+  30% { transform: scale(0.995); }
+  45% { box-shadow: 0 0 0 4px rgb(59 130 246 / 0.12), 0 0 18px 2px rgb(59 130 246 / 0.3); transform: scale(1.012); }
+  60% { transform: scale(1); }
+  80% { outline-color: rgb(59 130 246 / 0.9); box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1), 0 0 14px 0 rgb(59 130 246 / 0.22); }
+  100% { outline-color: rgb(59 130 246 / 0); box-shadow: 0 0 0 0 rgb(59 130 246 / 0); transform: scale(1); }
+}
+/* The header spans the preview: glow only, no zoom */
+.pv-active-self { animation-name: pv-highlight-still; }
+@keyframes pv-highlight-still {
+  0%, 100% { outline-color: rgb(59 130 246 / 0); }
+  12%, 80% { outline-color: rgb(59 130 246 / 1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-active > * { animation-name: pv-highlight-still; }
 }
 /* The header runs the full width of the preview, so its outline goes on the
    inside instead of being cut off at the sides */
