@@ -36,7 +36,7 @@
           <p class="mt-1 text-sm text-ink-muted">{{ t('dashboard.earn.codeText') }}</p>
           <form class="mt-4 flex flex-col gap-2 sm:flex-row" @submit.prevent="save">
             <UInput v-model="codeInput" :placeholder="t('dashboard.earn.codePlaceholder')" icon="i-lucide-ticket" autocomplete="off" class="min-w-0 flex-1" />
-            <UButton type="submit" :loading="saving" :disabled="codeInput.trim() === (code ?? '')" :label="t('common.save')" />
+            <UButton type="submit" class="justify-center" :loading="saving" :disabled="codeInput.trim() === (code ?? '')" :label="t('common.save')" />
           </form>
         </div>
 
