@@ -90,7 +90,7 @@ const api = computed(() => `/api/admin/bio/${props.username}/domain`)
 async function load(manual = false) {
   if (manual) checking.value = true
   try {
-    const response = await $fetch<{ enabled: boolean; domain: DomainInfo | null }>(api.value)
+    const response = await $fetch<{ enabled: boolean; domain: DomainInfo | null }>(api.value, { query: manual ? { recheck: 1 } : undefined })
     enabled.value = response.enabled
     domain.value = response.domain
     if (manual && response.domain?.status === 'active') toast.add({ title: t('dashboard.domain.nowActive'), color: 'success' })

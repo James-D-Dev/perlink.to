@@ -1,8 +1,9 @@
 import { getDB } from '../../../../../utils/db'
 import { requireOwnedSite } from '../../../../../utils/ownedSite'
-import { cfGetHostname, customDomainsEnabled, domainRecords, domainStatus } from '../../../../../utils/customDomains'
+import { cfGetHostname, cfRecheckHostname, customDomainsEnabled, domainRecords, domainStatus } from '../../../../../utils/customDomains'
 
-// The site's own domain, refreshing its status from Cloudflare while pending
+// The site's own domain, refreshing its status from Cloudflare while pending.
+// ?recheck=1 (the "Check again" button) makes Cloudflare validate right away.
 export default defineEventHandler(async (event) => {
   const site = await requireOwnedSite(event)
   const enabled = customDomainsEnabled(event)
@@ -19,7 +20,8 @@ export default defineEventHandler(async (event) => {
   let records = row.verification ? JSON.parse(row.verification) : domainRecords(event, row.hostname)
   if (enabled && row.cf_hostname_id && status !== 'active') {
     try {
-      const cfHostname = await cfGetHostname(event, row.cf_hostname_id)
+      const recheck = getQuery(event).recheck === '1'
+      const cfHostname = await (recheck ? cfRecheckHostname : cfGetHostname)(event, row.cf_hostname_id)
       status = domainStatus(cfHostname)
       records = domainRecords(event, row.hostname, cfHostname)
       await db.prepare(`UPDATE custom_domains SET status = ?, verification = ?, updated_at = datetime('now') WHERE id = ?`)

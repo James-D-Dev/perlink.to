@@ -42,6 +42,11 @@ export const cfCreateHostname = (event: H3Event, hostname: string) =>
 
 export const cfGetHostname = (event: H3Event, id: string) => cf<CfHostname>(event, 'GET', `/${id}`)
 
+/** Ask Cloudflare to check the DNS records again now, instead of waiting for its
+ * own retries, which back off to hours apart */
+export const cfRecheckHostname = (event: H3Event, id: string) =>
+  cf<CfHostname>(event, 'PATCH', `/${id}`, { ssl: { method: 'txt', type: 'dv', settings: { min_tls_version: '1.2' } } })
+
 export async function cfDeleteHostname(event: H3Event, id: string) {
   try {
     await cf(event, 'DELETE', `/${id}`)
