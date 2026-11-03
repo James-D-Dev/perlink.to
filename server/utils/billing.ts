@@ -2,6 +2,7 @@ import type { H3Event } from 'h3'
 import { generateVietQR, getBankByBIN } from './vietqr'
 import { lemonEnabled } from './lemon'
 import { isEvmAddress } from '#shared/crypto'
+import { getFlag } from './appSettings'
 
 // Payment codes go in the transfer note: "PL" and 8 letters/digits that
 // can't be misread (no 0/O, 1/I/L)
@@ -59,12 +60,13 @@ export function cryptoWallet(event: H3Event) {
  * businesses); the wallet secret stays so it can be turned back on */
 export const CRYPTO_PAYMENTS_ON = false
 
-/** Ways to pay that are set up */
-export function paymentMethods(event: H3Event) {
+/** Ways to pay that are set up and switched on */
+export async function paymentMethods(event: H3Event) {
   return {
     // Card / PayPal through Lemon Squeezy
     card: lemonEnabled(event),
-    bank: !!billingAccount(event),
+    // VietQR transfers, switched on in Superadmin → Settings
+    bank: !!billingAccount(event) && await getFlag(event, 'bank_payments'),
     crypto: CRYPTO_PAYMENTS_ON && !!cryptoWallet(event),
   }
 }

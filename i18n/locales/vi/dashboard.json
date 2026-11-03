@@ -960,7 +960,7 @@
         "refunded": "Đã hoàn tiền"
       },
       "comingSoon": "Sắp mở bán",
-      "usdNote": "Giá theo đô la Mỹ, có thể cộng thuế khi thanh toán. Tại Việt Nam bạn cũng có thể chuyển khoản (VietQR) bằng VND.",
+      "usdNote": "Giá theo đô la Mỹ, có thể cộng thuế khi thanh toán.",
       "celebrate": {
         "title": "Chúc mừng! 🎉",
         "text": "Bạn đã nâng cấp lên gói {plan}.",
@@ -973,7 +973,8 @@
         "ends": "Đã huỷ · kết thúc ngày {date}",
         "pastDue": "Thanh toán lỗi · hãy cập nhật thẻ",
         "manage": "Quản lý thuê bao"
-      }
+      },
+      "usdNoteBank": "Giá theo đô la Mỹ, có thể cộng thuế khi thanh toán. Tại Việt Nam bạn cũng có thể chuyển khoản (VietQR) bằng VND."
     },
     "telegram": {
       "title": "Thông báo qua Telegram",

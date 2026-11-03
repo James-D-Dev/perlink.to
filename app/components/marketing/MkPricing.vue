@@ -56,7 +56,7 @@
           <MarketingMkButton v-else-if="!loggedIn" :to="`/login?redirect=${encodeURIComponent(`/dashboard/upgrade?plan=${plan}`)}`" :variant="isPopular(plan) ? 'inverse' : 'solid'" block>
             {{ t('dashboard.billing.choose', { plan: t(`dashboard.billing.plans.${plan}.name`) }) }}
           </MarketingMkButton>
-          <MarketingMkButton v-else-if="checkoutEnabled" :variant="isPopular(plan) ? 'inverse' : 'solid'" block @click="buy(plan)">
+          <MarketingMkButton v-else-if="checkoutEnabled" :variant="isPopular(plan) ? 'inverse' : 'solid'" block :disabled="opening" @click="buy(plan)">
             {{ currentPlan === plan ? t('dashboard.billing.renew') : t('dashboard.billing.choose', { plan: t(`dashboard.billing.plans.${plan}.name`) }) }}
           </MarketingMkButton>
           <MarketingMkButton v-else :href="upgradeMail(plan)" :variant="isPopular(plan) ? 'inverse' : 'solid'" block>
@@ -67,7 +67,7 @@
     </div>
     <p class="mt-6 text-center text-xs text-ink-faint">
       {{ loggedIn && !checkoutEnabled && info ? t('dashboard.billing.contactNote') : t('dashboard.billing.payNote') }}
-      <template v-if="usd"><br>{{ t('dashboard.billing.usdNote') }}</template>
+      <template v-if="usd"><br>{{ t(methods?.bank ? 'dashboard.billing.usdNoteBank' : 'dashboard.billing.usdNote') }}</template>
     </p>
 
     <BillingCheckoutDialog v-if="buying" v-model:open="checkoutOpen" :plan="buying" :period="period" />
@@ -78,7 +78,8 @@
 import { PLAN_ORDER, PLAN_PRICES, PLAN_PRICES_USD, formatUsd, formatVnd, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
 
 // Plan cards for /pricing and the dashboard upgrade page. Signed in, a paid
-// plan opens the bank-transfer checkout.
+// plan opens Lemon Squeezy's checkout, or a dialog to choose how to pay when
+// VietQR bank transfers are on too.
 const props = defineProps<{
   /** Plan to draw attention to, e.g. the one an upgrade prompt asked for */
   highlight?: PlanId
@@ -106,12 +107,16 @@ const currentPlan = computed(() => (mounted.value && loggedIn.value ? info.value
 const checkoutEnabled = computed(() => mounted.value && !!info.value?.checkoutEnabled)
 const highlight = computed(() => props.highlight)
 
+// Which ways to pay are on, for the note under the cards (signed out too)
+const { data: methods } = useFetch<{ card: boolean; bank: boolean }>('/api/billing/methods', { key: 'billing-methods' })
+
 const shownPlans = PLAN_ORDER
 const isPopular = (plan: PlanId) => plan === 'plus'
 const muted = (plan: PlanId) => (isPopular(plan) ? 'text-paper/60' : 'text-ink-muted')
 
-// English shows dollars; payment itself is still in VND (see PLAN_PRICES_USD)
-const usd = computed(() => locale.value === 'en')
+// Dollars, what Lemon Squeezy charges; VND only for Vietnamese while VietQR
+// bank transfers are on
+const usd = computed(() => locale.value === 'en' || methods.value?.bank === false)
 
 function monthlyPrice(plan: PlanId) {
   if (usd.value) {
@@ -126,7 +131,15 @@ function monthlyPrice(plan: PlanId) {
 
 const features = (plan: PlanId) => planFeatures(plan, t)
 
-function buy(plan: Exclude<PlanId, 'free'>) {
+// With card as the only way to pay, the button goes straight to Lemon
+// Squeezy's checkout; otherwise the dialog lets them pick
+const { opening, payByCard } = useCardCheckout()
+function buy(plan: PaidPlanId) {
+  const available = info.value?.paymentMethods
+  if (available?.card && !available.bank && !available.crypto) {
+    payByCard(plan, period.value)
+    return
+  }
   buying.value = plan
   checkoutOpen.value = true
 }

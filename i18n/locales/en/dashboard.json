@@ -960,7 +960,7 @@
         "refunded": "Refunded"
       },
       "comingSoon": "Coming soon",
-      "usdNote": "Prices in US dollars; taxes may apply at checkout. In Vietnam you can also pay by bank transfer (VietQR) in VND.",
+      "usdNote": "Prices in US dollars; taxes may apply at checkout.",
       "celebrate": {
         "title": "Congratulations! 🎉",
         "text": "You’re now on the {plan} plan.",
@@ -973,7 +973,8 @@
         "ends": "Canceled · ends on {date}",
         "pastDue": "Payment failed · update your card",
         "manage": "Manage subscription"
-      }
+      },
+      "usdNoteBank": "Prices in US dollars; taxes may apply at checkout. In Vietnam you can also pay by bank transfer (VietQR) in VND."
     },
     "telegram": {
       "title": "Telegram notifications",

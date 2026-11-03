@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   const body = bodySchema.safeParse(await readBody(event))
   if (!body.success) throw createError({ statusCode: 400, statusMessage: 'Choose a plan' })
   const { plan, period, method } = body.data
-  if (!paymentMethods(event)[method]) throw createError({ statusCode: 503, statusMessage: 'This way of paying is not available yet' })
+  if (!(await paymentMethods(event))[method]) throw createError({ statusCode: 503, statusMessage: 'This way of paying is not available yet' })
   const amount = PLAN_PRICES[plan as PaidPlanId][period]
   const amountUsd = PLAN_PRICES_USD[plan as PaidPlanId][period]
 

@@ -253,28 +253,9 @@ function copy(text: string) {
   toast.add({ title: t('dashboard.billing.checkout.copied'), description: text })
 }
 
-// Card: off to Lemon Squeezy's checkout, which brings them back to the plans
-// page; someone already subscribed changes plan in their subscription page
-const openingCard = ref(false)
-async function payByCard() {
-  openingCard.value = true
-  try {
-    const res = await $fetch<{ url?: string; portalUrl?: string }>('/api/billing/lemon-checkout', {
-      method: 'POST',
-      body: { plan: props.plan, period: props.period },
-    })
-    if (res.portalUrl) {
-      toast.add({ title: t('dashboard.billing.checkout.cardPortal') })
-      window.open(res.portalUrl, '_blank', 'noopener')
-      openingCard.value = false
-    } else if (res.url) {
-      window.location.href = res.url
-    }
-  } catch (error: any) {
-    toast.add({ title: t('dashboard.billing.checkout.failed'), description: error?.data?.statusMessage, color: 'error' })
-    openingCard.value = false
-  }
-}
+// Card: off to Lemon Squeezy's checkout (useCardCheckout)
+const { opening: openingCard, payByCard: openCardCheckout } = useCardCheckout()
+const payByCard = () => openCardCheckout(props.plan, props.period)
 
 async function start() {
   // Nothing to set up for card: the checkout opens from the button

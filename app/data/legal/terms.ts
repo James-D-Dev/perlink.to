@@ -85,10 +85,10 @@ export const TERMS: LegalDocs = {
         title: 'Plans, payments and renewal',
         blocks: [
           { list: [
-            'Perlink is software sold as a subscription. There is a free plan and paid plans (Starter and Plus); prices and what each plan includes are on the [pricing page](/pricing). Prices are shown in US dollars, and in Vietnamese đồng (VND) for customers in Vietnam.',
+            'Perlink is software sold as a subscription. There is a free plan and paid plans (Starter and Plus); prices and what each plan includes are on the [pricing page](/pricing). Prices are shown in US dollars, and in Vietnamese đồng (VND) for customers in Vietnam when bank transfer is offered.',
             'Our order process is conducted by our online reseller **Lemon Squeezy**, which is the Merchant of Record for all our orders. Lemon Squeezy handles payment, billing, sales tax and invoices, and provides all customer service inquiries and handles returns for those orders.',
             'Monthly and yearly subscriptions **renew automatically** at the end of each period until you cancel. You can cancel at any time from your account or the receipt email; the plan then stays active until the end of the period you paid for and is not charged again.',
-            'Customers in Vietnam may instead pay by local bank transfer (VietQR). Those plans are paid in advance for one month or one year and do not renew on their own.',
+            'When it is offered at checkout, customers in Vietnam may instead pay by local bank transfer (VietQR). Those plans are paid in advance for one month or one year and do not renew on their own.',
             'Paid features are delivered digitally: they turn on in your account as soon as the payment is confirmed. Nothing is shipped.',
             'When a plan ends, the account returns to the free plan. Your sites stay online, but paid features (such as switching to Pro themes or publishing extra sites) stop until you renew.',
             'Each account can try the Plus plan free once, for 7 days, with no payment details.',
@@ -233,10 +233,10 @@ export const TERMS: LegalDocs = {
         title: 'Gói dịch vụ, thanh toán và gia hạn',
         blocks: [
           { list: [
-            'Perlink là phần mềm bán theo hình thức thuê bao. Có gói Miễn phí và các gói trả phí (Starter và Plus); giá và quyền lợi từng gói có ở [trang Bảng giá](/pricing). Giá hiển thị bằng đô la Mỹ, và bằng đồng Việt Nam (VND) cho khách tại Việt Nam.',
+            'Perlink là phần mềm bán theo hình thức thuê bao. Có gói Miễn phí và các gói trả phí (Starter và Plus); giá và quyền lợi từng gói có ở [trang Bảng giá](/pricing). Giá hiển thị bằng đô la Mỹ, và bằng đồng Việt Nam (VND) cho khách tại Việt Nam khi có hình thức chuyển khoản.',
             'Việc đặt mua được thực hiện qua đại lý bán lại trực tuyến **Lemon Squeezy**, đơn vị bán hàng chính thức (Merchant of Record) cho mọi đơn hàng của chúng tôi. Lemon Squeezy xử lý thanh toán, hoá đơn, thuế bán hàng, hỗ trợ khách hàng và hoàn trả cho các đơn đó.',
             'Thuê bao theo tháng hoặc theo năm **tự gia hạn** khi hết kỳ cho đến khi bạn huỷ. Bạn có thể huỷ bất cứ lúc nào trong tài khoản hoặc từ email biên nhận; gói vẫn dùng được đến hết kỳ đã trả và không bị trừ tiền thêm.',
-            'Khách tại Việt Nam có thể thanh toán bằng chuyển khoản ngân hàng (VietQR). Các gói này trả trước theo tháng hoặc năm và không tự gia hạn.',
+            'Khi trang thanh toán có hình thức này, khách tại Việt Nam có thể thanh toán bằng chuyển khoản ngân hàng (VietQR). Các gói này trả trước theo tháng hoặc năm và không tự gia hạn.',
             'Tính năng trả phí được giao dưới dạng số: bật ngay trong tài khoản khi thanh toán được xác nhận. Không có hàng hoá vận chuyển.',
             'Khi gói hết hạn, tài khoản về gói Miễn phí. Trang vẫn hoạt động, nhưng tính năng trả phí (như đổi sang theme Pro hay xuất bản thêm trang) tạm dừng đến khi gia hạn.',
             'Mỗi tài khoản được dùng thử gói Plus miễn phí một lần trong 7 ngày, không cần thông tin thanh toán.',

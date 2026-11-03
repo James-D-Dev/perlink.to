@@ -27,6 +27,35 @@
           </p>
         </UCard>
 
+        <!-- Ways to pay for plans -->
+        <UCard :ui="superadminPanelUi">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-wallet" class="size-5 text-primary" />
+              <h2 class="font-medium">Payment methods</h2>
+            </div>
+          </template>
+          <div class="space-y-4 text-sm">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="font-medium">Card / PayPal (Lemon Squeezy)</p>
+                <p class="text-muted">{{ payments?.card ? 'On: set up with NUXT_LEMON_API_KEY.' : 'Off: add NUXT_LEMON_API_KEY to turn it on.' }}</p>
+              </div>
+              <UBadge :color="payments?.card ? 'success' : 'neutral'" variant="subtle" :label="payments?.card ? 'On' : 'Off'" />
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="font-medium">VietQR bank transfer (VND)</p>
+                <p class="text-muted">
+                  When off, the plan buttons go straight to Lemon Squeezy's checkout and prices show in US dollars.
+                  <template v-if="payments && !payments.bankConfigured"><br>No bank account is set up, so it stays off even when switched on.</template>
+                </p>
+              </div>
+              <USwitch :model-value="payments?.bank ?? false" :loading="savingPayments" :disabled="!payments" @update:model-value="setBank" />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Lemon Squeezy: card / PayPal subscriptions -->
         <UCard :ui="superadminPanelUi">
           <template #header>
@@ -151,6 +180,21 @@ async function sendTestEmail() {
     emailTest.value = { ok: false, transport: null, error: error?.data?.statusMessage || 'Request failed' }
   } finally {
     sendingTest.value = false
+  }
+}
+
+const { data: payments, refresh: refreshPayments } = useFetch<{ bank: boolean; bankConfigured: boolean; card: boolean }>('/api/superadmin/settings/payments', { server: false })
+const savingPayments = ref(false)
+async function setBank(bank: boolean) {
+  savingPayments.value = true
+  try {
+    await $fetch('/api/superadmin/settings/payments', { method: 'POST', body: { bank } })
+    await refreshPayments()
+    toast.add({ title: bank ? 'VietQR bank transfer is on' : 'VietQR bank transfer is off', color: 'success' })
+  } catch (error: any) {
+    toast.add({ title: 'Failed', description: error?.data?.statusMessage, color: 'error' })
+  } finally {
+    savingPayments.value = false
   }
 }
 

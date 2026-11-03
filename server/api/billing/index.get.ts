@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   const db = getDB(event)
   const account = await getAccountPlan(event, user.id)
+  const methods = await paymentMethods(event)
   const [sites, payments, celebrate, subscription] = await Promise.all([
     db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN is_published = 1 THEN 1 ELSE 0 END) AS live FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number; live: number | null }>(),
     db.prepare(`SELECT id, plan, period, amount, amount_usd, method, code, status, created_at, paid_at FROM payments WHERE user_id = ? AND status != 'pending' ORDER BY created_at DESC LIMIT 10`)
@@ -35,8 +36,8 @@ export default defineEventHandler(async (event) => {
     // The plan's site limit counts live sites
     liveSites: sites?.live ?? 0,
     canTrial: !account.trialUsed && account.plan === 'free',
-    checkoutEnabled: Object.values(paymentMethods(event)).some(Boolean),
-    paymentMethods: paymentMethods(event),
+    checkoutEnabled: Object.values(methods).some(Boolean),
+    paymentMethods: methods,
     celebrate: celebrate ? { paymentId: celebrate.id, plan: celebrate.plan } : null,
     subscription: subscription && subscription.status !== 'expired'
       ? { plan: subscription.plan, period: subscription.period, status: subscription.status, renewsAt: subscription.renews_at, endsAt: subscription.ends_at, portalUrl: subscription.portal_url }
