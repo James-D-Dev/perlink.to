@@ -817,7 +817,7 @@
         }
       },
       "features": {
-        "sites": "{n} trang | {n} trang",
+        "sites": "{n} trang hiển thị, nháp không giới hạn | {n} trang hiển thị, nháp không giới hạn",
         "basics": "Mọi mẫu trang và 50 theme",
         "room": "Thế giới 3D cho trang",
         "proThemes": "20 theme Pro (kính, ánh kim, cá tính)",
@@ -848,8 +848,8 @@
         "free": "Bạn đang dùng gói Miễn phí",
         "paid": "Bạn đang dùng gói {plan}",
         "until": "Đến {date}",
-        "sites": "Đang dùng {used}/{max} trang",
-        "overLimit": "Bạn có {used} trang, gói hiện tại gồm {max}. Tất cả vẫn hoạt động bình thường; muốn thêm trang mới, hãy nâng cấp hoặc xoá bớt."
+        "sites": "{used}/{max} trang đang hiển thị",
+        "overLimit": "Bạn đang có {used} trang hiển thị, gói hiện tại gồm {max}. Các trang này vẫn hoạt động bình thường, và bạn vẫn tạo, sửa trang nháp thoải mái; muốn xuất bản thêm, hãy nâng cấp hoặc ẩn bớt một trang."
       },
       "trial": {
         "title": "Dùng thử Plus 7 ngày, miễn phí",
@@ -916,8 +916,8 @@
       },
       "prompt": {
         "sites": {
-          "title": "Bạn đã dùng hết số trang",
-          "text": "Gói {plan} cho bạn tạo tới {n} trang, kèm theme Pro và nhiều hơn nữa."
+          "title": "Đã dùng hết số trang hiển thị",
+          "text": "Trang này đã được lưu nháp. Gói {plan} cho tới {n} trang hiển thị cùng lúc, kèm theme Pro và nhiều hơn nữa. Hoặc ẩn bớt một trang khác để xuất bản trang này."
         },
         "customDomain": {
           "title": "Tên miền riêng có từ gói {plan}",

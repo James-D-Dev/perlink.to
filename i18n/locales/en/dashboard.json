@@ -817,7 +817,7 @@
         }
       },
       "features": {
-        "sites": "{n} site | {n} sites",
+        "sites": "{n} live site, unlimited drafts | {n} live sites, unlimited drafts",
         "basics": "Every template and 50 themes",
         "room": "A 3D world for your page",
         "proThemes": "20 Pro themes (glass, luxe, bold)",
@@ -848,8 +848,8 @@
         "free": "You're on the Free plan",
         "paid": "You're on {plan}",
         "until": "Until {date}",
-        "sites": "Using {used}/{max} sites",
-        "overLimit": "You have {used} sites and your plan includes {max}. They all stay online; to add another, upgrade or delete one."
+        "sites": "{used}/{max} live sites",
+        "overLimit": "{used} of your sites are live and your plan includes {max}. They all stay online, and you can make and edit as many drafts as you like; to put another one live, upgrade or take one offline."
       },
       "trial": {
         "title": "Try Plus free for 7 days",
@@ -916,8 +916,8 @@
       },
       "prompt": {
         "sites": {
-          "title": "You've used all your sites",
-          "text": "{plan} lets you have up to {n} sites, plus Pro themes and more."
+          "title": "All your live sites are in use",
+          "text": "This site is saved as a draft. {plan} lets up to {n} sites be live at once, plus Pro themes and more. Or take another site offline to publish this one."
         },
         "customDomain": {
           "title": "Custom domains come with {plan}",

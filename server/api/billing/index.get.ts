@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const db = getDB(event)
   const account = await getAccountPlan(event, user.id)
   const [sites, payments, celebrate, subscription] = await Promise.all([
-    db.prepare('SELECT COUNT(*) AS n FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number }>(),
+    db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN is_published = 1 THEN 1 ELSE 0 END) AS live FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number; live: number | null }>(),
     db.prepare(`SELECT id, plan, period, amount, amount_usd, method, code, status, created_at, paid_at FROM payments WHERE user_id = ? AND status != 'pending' ORDER BY created_at DESC LIMIT 10`)
       .bind(user.id)
       .all<{ id: string; plan: string; period: string; amount: number; amount_usd: number | null; method: string; code: string; status: string; created_at: string; paid_at: string | null }>(),
@@ -32,6 +32,8 @@ export default defineEventHandler(async (event) => {
     expiresAt: account.plan === 'free' ? null : account.expiresAt,
     limits: PLAN_LIMITS[account.plan],
     sites: sites?.n ?? 0,
+    // The plan's site limit counts live sites
+    liveSites: sites?.live ?? 0,
     canTrial: !account.trialUsed && account.plan === 'free',
     checkoutEnabled: Object.values(paymentMethods(event)).some(Boolean),
     paymentMethods: paymentMethods(event),

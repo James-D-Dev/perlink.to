@@ -42,10 +42,28 @@ export async function requirePlanFeature(event: H3Event, userId: string, feature
   return plan
 }
 
-/** Before creating a site: is there room for one more? */
-export async function requireRoomForSite(event: H3Event, userId: string) {
-  const { plan } = await getAccountPlan(event, userId)
+/**
+ * Plans count live sites: anyone can make and edit drafts, and only going
+ * live needs room on the plan. This cap only stops runaway accounts.
+ */
+export const MAX_SITES_PER_ACCOUNT = 100
+
+/** Before creating a site (a draft) */
+export async function requireRoomForDraft(event: H3Event, userId: string) {
   const count = await getDB(event).prepare('SELECT COUNT(*) AS n FROM bio_pages WHERE user_id = ?').bind(userId).first<{ n: number }>()
+  if ((count?.n ?? 0) >= MAX_SITES_PER_ACCOUNT) {
+    throw createError({ statusCode: 429, statusMessage: 'You have reached the maximum number of sites. Delete a few to make more.' })
+  }
+}
+
+/** Before a site goes live: does the plan have room for one more live site? Re-publishing a live site is always fine */
+export async function requireRoomToPublish(event: H3Event, userId: string, site: { id: string; isPublished: boolean }) {
+  if (site.isPublished) return
+  const { plan } = await getAccountPlan(event, userId)
+  const count = await getDB(event)
+    .prepare('SELECT COUNT(*) AS n FROM bio_pages WHERE user_id = ? AND is_published = 1 AND id != ?')
+    .bind(userId, site.id)
+    .first<{ n: number }>()
   const n = count?.n ?? 0
   if (n >= PLAN_LIMITS[plan].sites) planRequired('sites', n + 1)
 }

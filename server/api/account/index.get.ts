@@ -12,7 +12,8 @@ export default defineEventHandler(async (event) => {
     .bind(user.id)
     .first<{ id: string; email: string | null; name: string | null; avatar: string | null; plan: string | null; plan_expires_at: string | null; created_at: string; language: string | null }>()
   if (!profile) throw createError({ statusCode: 404, statusMessage: 'Profile not found' })
-  const sites = await db.prepare('SELECT COUNT(*) AS n FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number }>()
+  // The plan's limit counts live sites
+  const sites = await db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN is_published = 1 THEN 1 ELSE 0 END) AS live FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number; live: number | null }>()
   return {
     success: true,
     account: {
@@ -23,6 +24,7 @@ export default defineEventHandler(async (event) => {
       createdAt: profile.created_at,
       language: toAppLanguage(profile.language),
       sites: sites?.n ?? 0,
+      liveSites: sites?.live ?? 0,
     },
   }
 })

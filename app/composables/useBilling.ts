@@ -5,6 +5,8 @@ export interface BillingInfo {
   expiresAt: string | null
   limits: PlanLimits
   sites: number
+  /** Live sites, which the plan's site limit counts (drafts are free) */
+  liveSites?: number
   canTrial: boolean
   checkoutEnabled: boolean
   /** Ways to pay that are set up */

@@ -26,9 +26,9 @@
         <p class="mt-2 text-ink-muted">{{ text.goal.lead }}</p>
 
         <!-- No room left on the plan: say so before they fill anything in -->
-        <div v-if="atSiteLimit" class="mt-6 flex flex-wrap items-center gap-3 rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-200">
-          <UIcon name="i-lucide-circle-alert" class="size-5 shrink-0 text-amber-700" />
-          <p class="min-w-0 flex-1 text-sm text-amber-900">{{ text.limit(billing!.limits.sites) }}</p>
+        <div v-if="atSiteLimit" class="mt-6 flex flex-wrap items-center gap-3 rounded-2xl bg-sky-50 p-4 ring-1 ring-sky-200">
+          <UIcon name="i-lucide-info" class="size-5 shrink-0 text-sky-700" />
+          <p class="min-w-0 flex-1 text-sm text-sky-900">{{ text.limit(billing!.limits.sites) }}</p>
           <UButton to="/dashboard/upgrade" size="sm" :label="text.seePlans" />
         </div>
 
@@ -61,13 +61,16 @@
         <div class="mt-8 flex items-center gap-4">
           <button
             type="button"
-            class="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sand text-2xl font-semibold text-ink-soft ring-1 ring-line transition hover:ring-ink-faint"
+            class="group relative size-20 shrink-0 rounded-full"
             :aria-label="text.basics.photo"
             @click="photoInput?.click()"
           >
-            <img v-if="avatarPreview" :src="avatarPreview" alt="" class="size-full object-cover">
-            <template v-else>{{ initial }}</template>
-            <span class="absolute bottom-0 right-0 flex size-7 items-center justify-center rounded-full bg-ink text-paper ring-2 ring-paper">
+            <!-- The photo is clipped to the circle; the camera badge sits over its edge, whole -->
+            <span class="flex size-full items-center justify-center overflow-hidden rounded-full bg-sand text-2xl font-semibold text-ink-soft ring-1 ring-line transition group-hover:ring-ink-faint">
+              <img v-if="avatarPreview" :src="avatarPreview" alt="" class="size-full object-cover">
+              <template v-else>{{ initial }}</template>
+            </span>
+            <span class="absolute -bottom-0.5 -right-0.5 flex size-7 items-center justify-center rounded-full bg-ink text-paper ring-2 ring-paper">
               <UIcon name="i-lucide-camera" class="size-3.5" />
             </span>
           </button>
@@ -127,9 +130,9 @@
         <p class="mt-2 text-ink-muted">{{ text.address.lead }}</p>
 
         <!-- A full plan: the last step is where it matters -->
-        <div v-if="atSiteLimit" class="mt-6 flex flex-wrap items-center gap-3 rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-200">
-          <UIcon name="i-lucide-circle-alert" class="size-5 shrink-0 text-amber-700" />
-          <p class="min-w-0 flex-1 text-sm text-amber-900">{{ text.limit(billing!.limits.sites) }}</p>
+        <div v-if="atSiteLimit" class="mt-6 flex flex-wrap items-center gap-3 rounded-2xl bg-sky-50 p-4 ring-1 ring-sky-200">
+          <UIcon name="i-lucide-info" class="size-5 shrink-0 text-sky-700" />
+          <p class="min-w-0 flex-1 text-sm text-sky-900">{{ text.limit(billing!.limits.sites) }}</p>
           <UButton to="/dashboard/upgrade" size="sm" :label="text.seePlans" />
         </div>
 
@@ -194,7 +197,7 @@
     <!-- Back and Continue, always at hand -->
     <footer v-if="stepIndex >= 0" class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/90 pb-[env(safe-area-inset-bottom)] backdrop-blur">
       <p v-if="atSiteLimit" class="flex items-center gap-1.5 border-b border-line px-4 py-2 text-xs text-ink-muted sm:hidden">
-        <UIcon name="i-lucide-circle-alert" class="size-3.5 shrink-0 text-amber-600" />
+        <UIcon name="i-lucide-info" class="size-3.5 shrink-0 text-sky-600" />
         <span class="min-w-0 flex-1">{{ text.limitShort(billing!.limits.sites) }}</span>
         <NuxtLink to="/dashboard/upgrade" class="shrink-0 font-medium text-ink underline underline-offset-2">{{ text.seePlans }}</NuxtLink>
       </p>
@@ -203,7 +206,7 @@
         <span v-else />
         <!-- A full plan, said where the button is -->
         <p v-if="atSiteLimit" class="hidden min-w-0 flex-1 items-center justify-end gap-1.5 text-right text-xs text-ink-muted sm:flex">
-          <UIcon name="i-lucide-circle-alert" class="size-3.5 shrink-0 text-amber-600" />
+          <UIcon name="i-lucide-info" class="size-3.5 shrink-0 text-sky-600" />
           <span class="truncate">{{ text.limitShort(billing!.limits.sites) }}</span>
           <NuxtLink to="/dashboard/upgrade" class="shrink-0 font-medium text-ink underline underline-offset-2">{{ text.seePlans }}</NuxtLink>
         </p>
@@ -211,8 +214,8 @@
           size="lg"
           :loading="creating"
           :disabled="!canContinue"
-          :trailing-icon="step === 'address' ? (atSiteLimit ? 'i-lucide-crown' : 'i-lucide-sparkles') : 'i-lucide-arrow-right'"
-          :label="step === 'address' ? (atSiteLimit ? text.upgradeToCreate : text.create) : text.next"
+          :trailing-icon="step === 'address' ? 'i-lucide-sparkles' : 'i-lucide-arrow-right'"
+          :label="step === 'address' ? text.create : text.next"
           @click="next"
         />
       </div>
@@ -253,9 +256,8 @@ const TEXT = {
     next: 'Continue',
     create: 'Create my site',
     seePlans: 'See plans',
-    limit: (n: number) => `Your plan has room for ${n} sites and they're all in use. Upgrade, or delete a site, to make another.`,
-    limitShort: (n: number) => `All ${n} sites on your plan are in use. Keep designing; upgrade to publish this one.`,
-    upgradeToCreate: 'Upgrade to create',
+    limit: (n: number) => `Your plan has ${n} live ${n === 1 ? 'site' : 'sites'} and they're all in use. You can still make and edit this site; it stays a draft until you upgrade or take another site offline.`,
+    limitShort: (n: number) => `Your ${n} live ${n === 1 ? 'site is' : 'sites are'} in use: this one will be saved as a draft.`,
     goal: { title: 'What is your site for?', lead: 'We’ll suggest the templates and blocks that fit. You can change everything later.' },
     basics: {
       title: 'Tell visitors who you are',
@@ -288,9 +290,8 @@ const TEXT = {
     next: 'Tiếp tục',
     create: 'Tạo trang của tôi',
     seePlans: 'Xem các gói',
-    limit: (n: number) => `Gói của bạn có ${n} trang và đã dùng hết. Nâng cấp hoặc xoá bớt một trang để tạo trang mới.`,
-    limitShort: (n: number) => `Gói của bạn đã dùng hết ${n} trang. Cứ thiết kế tiếp, nâng cấp khi tạo trang này.`,
-    upgradeToCreate: 'Nâng cấp để tạo trang',
+    limit: (n: number) => `Gói của bạn cho ${n} trang đang hiển thị và đã dùng hết. Bạn vẫn tạo và chỉnh sửa trang này bình thường; trang sẽ ở dạng nháp cho tới khi bạn nâng cấp hoặc ẩn bớt một trang khác.`,
+    limitShort: (n: number) => `Đã dùng hết ${n} trang hiển thị: trang này sẽ lưu nháp.`,
     goal: { title: 'Trang của bạn dùng để làm gì?', lead: 'Perlink sẽ gợi ý mẫu và khối nội dung phù hợp. Mọi thứ đều sửa lại được sau.' },
     basics: {
       title: 'Giới thiệu đôi chút về bạn',
@@ -400,8 +401,6 @@ function chooseGoal(id: SiteGoalId) {
   next()
 }
 
-// A full plan doesn't stop anyone designing: only the last step (creating)
-// turns into an upgrade, and what they filled in is kept for after it
 const canContinue = computed(() => {
   if (step.value === 'goal') return !!state.goal
   if (step.value === 'basics') return !!state.title.trim()
@@ -412,11 +411,7 @@ const canContinue = computed(() => {
 
 function next() {
   if (!canContinue.value) return
-  if (step.value === 'address') {
-    if (atSiteLimit.value) navigateTo('/dashboard/upgrade')
-    else create()
-    return
-  }
+  if (step.value === 'address') return create()
   go(STEPS[stepIndex.value + 1]!)
 }
 function back() {
@@ -499,7 +494,8 @@ watch([step, () => state.title], async ([current]) => {
 // ---------- Plan room ----------
 const { info: billing, ensure: ensureBilling } = useBilling()
 onMounted(() => ensureBilling())
-const atSiteLimit = computed(() => !!billing.value && billing.value.sites >= billing.value.limits.sites)
+// Every live site on the plan is in use: a new site stays a draft (a heads-up, never a block)
+const atSiteLimit = computed(() => !!billing.value && (billing.value.liveSites ?? billing.value.sites) >= billing.value.limits.sites)
 
 // ---------- Make it ----------
 const { createSite } = useCreateSite()

@@ -1,5 +1,5 @@
 import { BioRepository, type CreateBioPageInput } from '../../../../repositories/bioRepository'
-import { requireThemeAllowed } from '../../../../utils/plan'
+import { requireRoomToPublish, requireThemeAllowed } from '../../../../utils/plan'
 import { requireNotRemoved } from '../../../../utils/moderation'
 
 export default defineEventHandler(async (event) => {
@@ -43,6 +43,8 @@ export default defineEventHandler(async (event) => {
   }
 
   await requireNotRemoved(event, bioPage.id)
+  // A new site goes live only if the plan has room for another live site
+  await requireRoomToPublish(event, user.id, bioPage)
   // What goes live is the draft's theme, or the current one
   await requireThemeAllowed(event, user.id, (bioPage.draft?.themeConfig ?? bioPage.themeConfig) as { presetId?: string }, bioPage.isPublished ? bioPage.themeConfig as { presetId?: string } : null)
 

@@ -1,5 +1,5 @@
 import { BioRepository } from '../../repositories/bioRepository'
-import { requireThemeAllowed } from '../../utils/plan'
+import { requireRoomToPublish, requireThemeAllowed } from '../../utils/plan'
 import { requireNotRemoved } from '../../utils/moderation'
 
 export default defineEventHandler(async (event) => {
@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
   }
 
   await requireNotRemoved(event, existing.id)
+  await requireRoomToPublish(event, user.id, existing)
   await requireThemeAllowed(event, user.id, (existing.draft?.themeConfig ?? existing.themeConfig) as { presetId?: string }, existing.isPublished ? existing.themeConfig as { presetId?: string } : null)
   const bioPage = await bioRepo.publish(existing.id)
 

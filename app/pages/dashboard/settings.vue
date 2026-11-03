@@ -48,12 +48,12 @@
             </div>
             <div class="bg-paper p-5">
               <h2 class="text-sm font-medium text-ink">{{ t('dashboard.account.plan') }}</h2>
-              <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.billing.status.sites', { used: account.sites, max: siteLimit >= 1000 ? '∞' : siteLimit }) }}</p>
+              <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.billing.status.sites', { used: account.liveSites ?? account.sites, max: siteLimit >= 1000 ? '∞' : siteLimit }) }}</p>
               <div class="mt-3 flex items-center justify-between gap-3">
                 <span class="text-lg font-semibold text-ink">{{ t(`dashboard.billing.plans.${account.plan}.name`) }}</span>
                 <UButton to="/dashboard/upgrade" size="sm" color="neutral" variant="outline" :label="t('dashboard.account.seePlans')" />
               </div>
-              <p v-if="account.sites > siteLimit" class="mt-3 text-xs leading-relaxed text-warning">{{ t('dashboard.billing.status.overLimit', { used: account.sites, max: siteLimit }) }}</p>
+              <p v-if="(account.liveSites ?? account.sites) > siteLimit" class="mt-3 text-xs leading-relaxed text-warning">{{ t('dashboard.billing.status.overLimit', { used: account.liveSites ?? account.sites, max: siteLimit }) }}</p>
             </div>
           </section>
 
@@ -129,6 +129,8 @@ interface Account {
   plan: string
   createdAt: string
   sites: number
+  /** Live sites, which the plan counts */
+  liveSites?: number
 }
 
 const { t, locale, locales, setLocale } = useI18n()

@@ -1,7 +1,7 @@
 import { BioRepository } from '../../repositories/bioRepository'
 import { z } from 'zod'
 import { isReservedName } from '../../utils/reservedNames'
-import { requireRoomForSite } from '../../utils/plan'
+import { requireRoomForDraft } from '../../utils/plan'
 
 const createBioSchema = z.object({
   // Addresses are lowercase (as when one is changed), so MyShop and myshop
@@ -57,7 +57,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     const bioRepo = new BioRepository(event)
-    await requireRoomForSite(event, user.id)
+    // New sites are drafts; the plan counts live sites (see publish)
+    await requireRoomForDraft(event, user.id)
 
     if (isReservedName(result.data.username)) {
       throw createError({ statusCode: 400, statusMessage: 'This name is reserved' })
