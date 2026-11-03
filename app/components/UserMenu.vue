@@ -22,7 +22,18 @@
       variant="ghost"
       class="w-full"
       :block="collapsed"
-    />
+      :ui="{ label: 'truncate' }"
+    >
+      <!-- The account's plan, as a small chip after the name -->
+      <template v-if="!collapsed && plan" #trailing>
+        <span
+          class="ms-auto shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ring-1"
+          :class="PLAN_CHIP[plan]"
+        >
+          {{ t(`dashboard.billing.plans.${plan}.name`) }}
+        </span>
+      </template>
+    </UButton>
   </UDropdownMenu>
 </template>
 
@@ -50,6 +61,16 @@ const handleSignOut = async () => {
 }
 
 const { t, locale, locales, setLocale } = useI18n()
+
+// The plan chip next to the name (the dashboard layout loads the billing info)
+const { info: billing } = useBilling()
+const plan = computed(() => billing.value?.plan)
+const PLAN_CHIP: Record<string, string> = {
+  free: 'bg-sand text-ink-muted ring-line',
+  starter: 'bg-sky-50 text-sky-700 ring-sky-200',
+  plus: 'bg-ink text-paper ring-ink',
+  max: 'bg-gradient-to-r from-amber-400 to-pink-500 text-white ring-transparent',
+}
 
 const items = computed<DropdownMenuItem[][]>(() => [
   [{
