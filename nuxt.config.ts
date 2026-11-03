@@ -90,6 +90,9 @@ export default defineNuxtConfig({
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
       oauthGoogleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID || "",
+      // Where people sign up as affiliates: the store's Lemon Squeezy
+      // affiliate page (Affiliates → Share your affiliate link in Lemon Squeezy)
+      affiliateSignupUrl: "https://store.perlink.to/affiliates",
     },
   },
 

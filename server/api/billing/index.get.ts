@@ -1,3 +1,4 @@
+import { rememberReferral } from '../../utils/affiliate'
 import { getDB } from '../../utils/db'
 import { getAccountPlan } from '../../utils/plan'
 import { paymentMethods } from '../../utils/billing'
@@ -11,6 +12,8 @@ export default defineEventHandler(async (event) => {
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   const db = getDB(event)
   const account = await getAccountPlan(event, user.id)
+  // A new account remembers the affiliate link it came through
+  await rememberReferral(event, user.id)
   const methods = await paymentMethods(event)
   const [sites, payments, celebrate, subscription] = await Promise.all([
     db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN is_published = 1 THEN 1 ELSE 0 END) AS live FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number; live: number | null }>(),

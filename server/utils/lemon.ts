@@ -72,7 +72,7 @@ export async function lemonCatalog(event: H3Event, fresh = false): Promise<Catal
 }
 
 /** A hosted checkout for this plan, tagged with the account so the webhook can find it */
-export async function createLemonCheckout(event: H3Event, input: { userId: string; email?: string | null; name?: string | null; plan: PaidPlanId; period: BillingPeriod; redirectUrl: string }) {
+export async function createLemonCheckout(event: H3Event, input: { userId: string; email?: string | null; name?: string | null; plan: PaidPlanId; period: BillingPeriod; redirectUrl: string; affiliate?: string | null }) {
   const { storeId, variants } = await lemonCatalog(event)
   const variantId = variants[`${input.plan}:${input.period}`]
   if (!variantId) return null
@@ -85,7 +85,7 @@ export async function createLemonCheckout(event: H3Event, input: { userId: strin
           checkout_data: {
             email: input.email || undefined,
             name: input.name || undefined,
-            custom: { user_id: input.userId, plan: input.plan, period: input.period },
+            custom: { user_id: input.userId, plan: input.plan, period: input.period, ...(input.affiliate ? { aff: input.affiliate } : {}) },
           },
           product_options: { redirect_url: input.redirectUrl, enabled_variants: [Number(variantId)] },
           checkout_options: { embed: false },
@@ -97,7 +97,10 @@ export async function createLemonCheckout(event: H3Event, input: { userId: strin
       },
     },
   })
-  return res.data.attributes.url
+  // The affiliate who sent them: Lemon Squeezy credits the sale through ?aff=
+  const url = new URL(res.data.attributes.url)
+  if (input.affiliate) url.searchParams.set('aff', input.affiliate)
+  return url.toString()
 }
 
 /** Webhooks are signed: hex HMAC-SHA256 of the raw body with the signing secret */

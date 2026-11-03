@@ -1109,6 +1109,35 @@
       "clear": "Xoá",
       "opensHelp": "Trước giờ đó, khách thấy đồng hồ đếm ngược. Có hiệu lực khi bạn xuất bản.",
       "opensSet": "Khách thấy đồng hồ đếm ngược tới {date}. Có hiệu lực khi bạn xuất bản."
+    },
+    "earn": {
+      "title": "Kiếm tiền cùng Perlink",
+      "eyebrow": "Chương trình cộng tác viên",
+      "headline": "Nhận {percent}% mỗi khoản thanh toán, trong {months} tháng",
+      "intro": "Giới thiệu Perlink cho người theo dõi, khách hàng hay bạn bè. Khi người bạn giới thiệu mua gói Starter hoặc Plus trong vòng {days} ngày, bạn nhận một phần mỗi lần họ thanh toán. Lemon Squeezy theo dõi doanh số và trả tiền cho bạn.",
+      "statCommission": "Hoa hồng",
+      "statMonths": "Trả trong",
+      "months": "{n} tháng",
+      "statSignups": "Người đăng ký bạn mang tới",
+      "step": "Bước {n}",
+      "joinTitle": "Tham gia chương trình trên Lemon Squeezy",
+      "joinText": "Lemon Squeezy vận hành chương trình cộng tác viên của chúng tôi: đếm doanh số, hiện thu nhập và trả tiền cho bạn qua PayPal hoặc ngân hàng. Đăng ký bằng email, miễn phí.",
+      "join": "Đăng ký làm cộng tác viên",
+      "codeTitle": "Thêm mã cộng tác viên",
+      "codeText": "Khi được duyệt, Lemon Squeezy cho bạn một link có đuôi ?aff=… Dán cả link hoặc chỉ mã vào đây.",
+      "codePlaceholder": "ví dụ abc123 hoặc cả link của bạn",
+      "saved": "Đã lưu mã cộng tác viên",
+      "cleared": "Đã gỡ mã cộng tác viên",
+      "shareTitle": "Chia sẻ link của bạn",
+      "shareText": "Đặt vào bio, bài đăng, video hay email. Trang nào cũng được.",
+      "shareLocked": "Thêm mã trước để có link của bạn.",
+      "linkHome": "Trang chủ",
+      "linkPricing": "Bảng giá",
+      "linkTemplates": "Mẫu trang",
+      "badge": "Huy hiệu “Made with Perlink” trên các trang của bạn giờ cũng mang mã của bạn: ai đăng ký từ trang của bạn đều được tính cho bạn.",
+      "dashboard": "Xem doanh số và tiền nhận",
+      "rules": "Không spam, không đánh giá giả, không chạy quảng cáo bằng tên Perlink, và không tự mua qua link của mình.",
+      "rulesLink": "Quy định chương trình"
     }
   }
 }

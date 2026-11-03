@@ -18,6 +18,7 @@ export const LANG_PAIRS: [string, string][] = [
   ['/templates', '/vi/templates'],
   ['/linktree-alternative', '/vi/thay-the-linktree'],
   ['/3d-portfolio', '/vi/portfolio-3d'],
+  ['/affiliates', '/vi/cong-tac-vien'],
   ...USE_CASE_PAIRS,
 ]
 /** The same page in the other language, for paired pages; null otherwise */

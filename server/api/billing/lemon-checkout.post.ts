@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { getDB } from '../../utils/db'
 import { createLemonCheckout, lemonEnabled } from '../../utils/lemon'
 import { PAID_PLANS, type PaidPlanId } from '#shared/plans'
+import { checkoutAffiliate } from '../../utils/affiliate'
 
 const bodySchema = z.object({
   plan: z.enum(PAID_PLANS as [string, ...string[]]),
@@ -26,6 +27,7 @@ export default defineEventHandler(async (event) => {
   if (running?.portal_url) return { portalUrl: running.portal_url }
 
   const siteUrl = useRuntimeConfig(event).public.siteUrl
+  const affiliate = await checkoutAffiliate(event, user.id)
   try {
     const url = await createLemonCheckout(event, {
       userId: user.id,
@@ -34,6 +36,7 @@ export default defineEventHandler(async (event) => {
       plan,
       period: body.data.period,
       redirectUrl: `${siteUrl}/dashboard/upgrade?paid=1`,
+      affiliate,
     })
     if (!url) throw createError({ statusCode: 503, statusMessage: 'This plan is not on sale by card yet' })
     return { url }

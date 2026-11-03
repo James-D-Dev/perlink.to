@@ -1109,6 +1109,35 @@
       "clear": "Clear",
       "opensHelp": "Until then visitors see a countdown. Goes live when you publish.",
       "opensSet": "Visitors see a countdown until {date}. Goes live when you publish."
+    },
+    "earn": {
+      "title": "Earn with Perlink",
+      "eyebrow": "Affiliate program",
+      "headline": "Earn {percent}% of every payment, for {months} months",
+      "intro": "Share Perlink with your followers, clients or friends. When someone you send buys Starter or Plus within {days} days, you earn a share of each payment they make. Lemon Squeezy tracks the sales and pays you.",
+      "statCommission": "Commission",
+      "statMonths": "Paid for",
+      "months": "{n} months",
+      "statSignups": "Sign-ups you brought",
+      "step": "Step {n}",
+      "joinTitle": "Join the program on Lemon Squeezy",
+      "joinText": "Lemon Squeezy runs our affiliate program: it counts your sales, shows your earnings and pays you by PayPal or bank. Sign up with your email; it’s free.",
+      "join": "Become an affiliate",
+      "codeTitle": "Add your affiliate code",
+      "codeText": "Once approved, Lemon Squeezy gives you a link ending in ?aff=… Paste the link or just the code here.",
+      "codePlaceholder": "e.g. abc123 or your whole link",
+      "saved": "Your affiliate code is saved",
+      "cleared": "Your affiliate code is removed",
+      "shareTitle": "Share your links",
+      "shareText": "Put them in your bio, posts, videos or emails. Any page works.",
+      "shareLocked": "Add your code first to get your links.",
+      "linkHome": "Home page",
+      "linkPricing": "Pricing",
+      "linkTemplates": "Templates",
+      "badge": "Your sites’ “Made with Perlink” badge now carries your code too: anyone who signs up from your page counts for you.",
+      "dashboard": "See your sales and payouts",
+      "rules": "No spam, no fake reviews, no ads on the Perlink name, and no buying through your own link.",
+      "rulesLink": "Program rules"
     }
   }
 }
