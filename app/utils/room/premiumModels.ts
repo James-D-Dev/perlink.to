@@ -2230,6 +2230,113 @@ const PROPOSAL = premium('proposal', [
       bench.position.set(0, 0, KEY_Z + 0.75)
       parts.push(bench)
 
+      // ---------- The pianist ----------
+      // A stylised man in a black suit on the bench, back to the room,
+      // hands finding the keys that are playing (two-bone arms solved each
+      // frame), head nodding with the music
+      const suit = new THREE.MeshPhysicalMaterial({ color: '#141418', roughness: 0.55, sheen: 0.6, sheenColor: new THREE.Color('#4a4a55') })
+      const shirt = mat('#f6f4ef', { roughness: 0.6 })
+      const skin = mat('#e2b48f', { roughness: 0.7 })
+      const hair = mat('#1d1611', { roughness: 0.8 })
+      const shoe = shiny('#0b0b0c', { roughness: 0.25 })
+      const SEAT = 0.52
+      const BENCH_Z = KEY_Z + 0.75
+      const unitRod = (r1: number, r2: number, m: THREE.Material) => mesh(new THREE.CylinderGeometry(r2, r1, 1, 12).translate(0, 0.5, 0), m)
+      const unitLimb = (r: number, m: THREE.Material) => {
+        const limb = group(unitRod(r, r * 0.9, m))
+        limb.add(sphere(r, m, 0, 0, 0, 12))
+        return limb
+      }
+      /** Stretch a unit limb from a to b */
+      const place = (limb: THREE.Object3D, a: THREE.Vector3, b: THREE.Vector3) => {
+        limb.position.copy(a)
+        limb.quaternion.setFromUnitVectors(v3(0, 1, 0), b.clone().sub(a).normalize())
+        limb.scale.set(1, a.distanceTo(b), 1)
+      }
+      const pianist = group()
+      // Legs: thighs forward under the keyboard, shins down, shoes
+      for (const side of [-1, 1]) {
+        const hip = v3(side * 0.09, SEAT + 0.06, BENCH_Z - 0.02)
+        const knee = v3(side * 0.12, SEAT + 0.05, BENCH_Z - 0.4)
+        const ankle = v3(side * 0.13, 0.07, BENCH_Z - 0.36)
+        const thigh = unitLimb(0.065, suit)
+        place(thigh, hip, knee)
+        const shin = unitLimb(0.05, suit)
+        place(shin, knee, ankle)
+        pianist.add(thigh, shin, sphere(0.06, suit, knee.x, knee.y, knee.z, 12))
+        pianist.add(box(0.09, 0.06, 0.24, shoe, ankle.x, 0, ankle.z - 0.06))
+      }
+      // Hips and torso, leaning a little towards the keys
+      pianist.add(box(0.3, 0.12, 0.24, suit, 0, SEAT, BENCH_Z))
+      const torso = mesh(new THREE.CapsuleGeometry(0.13, 0.26, 6, 16), suit, 0, SEAT + 0.3, BENCH_Z + 0.01)
+      torso.scale.set(1.3, 1, 0.85)
+      torso.rotation.x = 0.12
+      pianist.add(torso)
+      // Collar, neck and head
+      pianist.add(mesh(new THREE.TorusGeometry(0.052, 0.018, 8, 20).rotateX(Math.PI / 2), shirt, 0, SEAT + 0.53, BENCH_Z - 0.02))
+      pianist.add(cyl(0.045, 0.05, 0.08, skin, 0, SEAT + 0.52, BENCH_Z - 0.02, 12))
+      const head = group(
+        sphere(0.1, skin, 0, 0.1, 0, 20),
+        // Short hair over the back and top
+        mesh(new THREE.SphereGeometry(0.106, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.62), hair, 0, 0.11, 0.005),
+        sphere(0.022, skin, -0.1, 0.09, 0, 8),
+        sphere(0.022, skin, 0.1, 0.09, 0, 8),
+      )
+      ;(head.children[1] as THREE.Mesh).rotation.x = 0.35
+      head.position.set(0, SEAT + 0.58, BENCH_Z - 0.03)
+      pianist.add(head)
+      // Arms: shoulders fixed, elbows and hands solved every frame
+      const UPPER = 0.29
+      const FORE = 0.28
+      const arms = [-1, 1].map((side) => {
+        const upper = unitLimb(0.045, suit)
+        const fore = unitLimb(0.038, suit)
+        const cuff = cyl(0.036, 0.036, 0.025, shirt, 0, 0, 0, 12)
+        const hand = group(box(0.075, 0.028, 0.09, skin, 0, -0.014, -0.03), box(0.02, 0.022, 0.04, skin, side * -0.04, -0.012, -0.01))
+        pianist.add(upper, fore, cuff, hand)
+        return { side, upper, fore, cuff, hand, shoulder: v3(side * 0.19, SEAT + 0.45, BENCH_Z - 0.01), x: side * 0.2 }
+      })
+      pianist.add(...arms.map(a => sphere(0.055, suit, a.shoulder.x, a.shoulder.y, a.shoulder.z, 12)))
+      const keyX = (i: number) => x0 + (i + 0.5) * keyW
+      const KEY_TOP = CASE_Y + 0.122
+      const solve = (arm: (typeof arms)[number], target: THREE.Vector3) => {
+        const S = arm.shoulder
+        const toT = target.clone().sub(S)
+        const d = Math.min(toT.length(), UPPER + FORE - 0.002)
+        const u = toT.normalize()
+        // Elbows out to the side and down
+        const pole = v3(arm.side * 1, -0.6, 0.3)
+        const w = pole.sub(u.clone().multiplyScalar(pole.dot(u))).normalize()
+        const along = (UPPER * UPPER - FORE * FORE + d * d) / (2 * d)
+        const up = Math.sqrt(Math.max(0, UPPER * UPPER - along * along))
+        const elbow = S.clone().addScaledVector(u, along).addScaledVector(w, up)
+        const wrist = S.clone().addScaledVector(u, d)
+        place(arm.upper, S, elbow)
+        place(arm.fore, elbow, wrist)
+        arm.cuff.position.copy(elbow.clone().lerp(wrist, 0.92))
+        arm.cuff.quaternion.copy(arm.fore.quaternion)
+        arm.hand.position.copy(wrist)
+        arm.hand.rotation.set(0, Math.atan2(wrist.x - elbow.x, -(wrist.z - elbow.z)) * -0.6, 0)
+      }
+      parts.push(animate(pianist, (t) => {
+        const playing = pianoState.playing
+        const step = Math.floor(t / BEAT)
+        const notes = playing ? notesAt(step) : []
+        const melody = playing ? notesAt(step - (step % 2))[1] : undefined
+        // Left hand on the chord, right hand on the melody; at rest they wait on middle C
+        const leftKey = notes[0] ?? 21
+        const rightKey = melody ?? 30
+        const targets = [keyX(leftKey), keyX(rightKey)]
+        arms.forEach((arm, i) => {
+          arm.x += (targets[i]! - arm.x) * (playing ? 0.35 : 0.08)
+          const press = playing ? depthOf(i === 0 ? leftKey : rightKey, t) : 0
+          solve(arm, v3(arm.x, KEY_TOP + 0.035 - press * 0.02, KEY_Z + 0.24))
+        })
+        head.rotation.x = playing ? 0.12 + Math.sin(t * Math.PI / BEAT / 2) * 0.05 : 0.05
+        head.rotation.z = playing ? Math.sin(t * 0.7) * 0.06 : 0
+        torso.rotation.z = playing ? Math.sin(t * 0.7) * 0.02 : 0
+      }))
+
       // Golden notes floating up while it plays
       const noteGeo = new THREE.SphereGeometry(0.02, 10, 8)
       noteGeo.scale(1.25, 0.85, 0.6)
