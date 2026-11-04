@@ -2,13 +2,13 @@ import { loadRoomStyleThumbnails, loadRoomThumbnails } from '~/utils/room/thumbn
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
 
 /** Reactive map of catalog type -> rendered thumbnail data URL (client only); `only` limits it to some types */
-export function useRoomThumbnails(only?: string[]) {
+export function useRoomThumbnails(only?: string[], size?: number) {
   const thumbnails = reactive<Record<string, string>>({})
 
   onMounted(() => {
     loadRoomThumbnails((type, url) => {
       thumbnails[type] = url
-    }, only).catch((error) => {
+    }, only, size).catch((error) => {
       console.error('Failed to render room thumbnails:', error)
     })
   })

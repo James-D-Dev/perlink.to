@@ -88,10 +88,11 @@ async function renderItem(renderer: RoomRenderer, item: CatalogItem): Promise<st
  * Get thumbnails for every catalog item. Calls onUpdate as each one becomes
  * available so the UI can fill in progressively.
  */
-export async function loadRoomThumbnails(onUpdate: (type: string, url: string) => void, only?: string[]) {
+export async function loadRoomThumbnails(onUpdate: (type: string, url: string) => void, only?: string[], size = SIZE) {
   // Decide WebGPU or WebGL before building anything (./gpu.ts)
   await loadGpuKit()
-  const cache = readCache()
+  // Big renders (product covers) aren't kept: only the editor's size is cached
+  const cache = size === SIZE ? readCache() : {}
   const missing: CatalogItem[] = []
   for (const item of ROOM_CATALOG) {
     if (only && !only.includes(item.type)) continue
@@ -106,7 +107,7 @@ export async function loadRoomThumbnails(onUpdate: (type: string, url: string) =
   const renderer = created.renderer
   await created.ready
   renderer.setPixelRatio(1)
-  renderer.setSize(SIZE, SIZE, false)
+  renderer.setSize(size, size, false)
   renderer.setClearColor(0x000000, 0)
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -124,7 +125,7 @@ export async function loadRoomThumbnails(onUpdate: (type: string, url: string) =
         console.error(`Failed to render thumbnail for ${item.type}:`, error)
       }
     }
-    writeCache(cache)
+    if (size === SIZE) writeCache(cache)
   } finally {
     renderer.dispose()
     renderer.forceContextLoss()

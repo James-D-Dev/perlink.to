@@ -29,7 +29,7 @@ export const ROOM_PACKS: RoomPack[] = [
     id: 'wedding',
     priceUsd: 6,
     items: ['vip-wedding-arch', 'vip-wedding-cake', 'vip-champagne-tower', 'vip-love-marquee', 'vip-candle-lanterns', 'vip-sparkler-fountain'],
-    colors: ['#fde68a', '#fecdd3', '#d6d3d1'],
+    colors: ['#b8925a', '#d79aa6', '#8c7a6e'],
     lemonMatch: 'wedding',
   },
   {
