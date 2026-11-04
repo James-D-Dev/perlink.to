@@ -345,7 +345,7 @@
       "vip-fireworks": "Fireworks show",
       "vip-display-podium": "Display podium",
       "vip-glass-cabinet": "Glass cabinet",
-      "vip-neon-open": "OPEN neon sign",
+      "vip-neon-open": "Neon sign",
       "vip-ad-screen": "Promo screen",
       "vip-checkout-counter": "Checkout counter",
       "vip-sale-banner": "Sale banner"
@@ -391,7 +391,14 @@
       "product": "Product on the stand",
       "pick": "Choose a product",
       "hint": "Visitors click the stand to see the product and order right in the room.",
-      "none": "This site has no products yet. Add a Products block to the page first."
+      "none": "This site has no products yet. Add a Products block to the page first.",
+      "products": "Products shown",
+      "productsAuto": "Your first products",
+      "productsHint": "Leave empty to show your shop's first products. Visitors click a product to order it right in the room.",
+      "text": "Words",
+      "textHint": "Up to {max} characters, in any language.",
+      "soldOut": "Sold out",
+      "buy": "Buy now"
     },
     "packs": {
       "valentine": {
@@ -439,7 +446,7 @@
       },
       "showroom": {
         "name": "Showroom",
-        "tagline": "Turn your room into a shop: a turning podium with your product, neon, promo screen and a till."
+        "tagline": "Turn your room into your shop: a glass cabinet and promo screen showing your real products (click to order), a neon sign and banner with your own words, a turning podium and a till."
       }
     },
     "market": {

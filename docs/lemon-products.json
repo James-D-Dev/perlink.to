@@ -80,8 +80,8 @@
       "price": 19,
       "currency": "USD",
       "pricing": "Single payment",
-      "action": "done (Test mode)",
-      "description": "Six animated 3D items to turn your Perlink room into a shop: a turning product podium, glass cabinet, OPEN neon, promo screen, till and sale banner.",
+      "action": "update description (Test mode)",
+      "description": "Six animated 3D items that turn your Perlink room into your own shop: a glass cabinet and promo screen showing your real products (visitors click to order), a neon sign and sale banner with your own words, a turning product podium and a till.",
       "taxCategory": "Software as a Service (SaaS)",
       "status": "Published",
       "image": "docs/lemon-covers/showroom.png"

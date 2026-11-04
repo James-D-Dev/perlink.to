@@ -134,3 +134,121 @@ export async function drawProductCard(product: ShopProduct, accent: string, sold
 /** Changes when anything drawn on the card changes */
 export const productSignature = (p: ShopProduct | undefined) =>
   p ? [p.name, p.price ?? '', p.comparePrice ?? '', p.imageUrl ?? '', p.soldOut ? 1 : 0, p.tag ?? ''].join('|') : ''
+
+/** Mixes a hex colour towards black (amount < 0) or white (amount > 0) */
+function shade(hex: string, amount: number) {
+  const n = /^#[0-9a-f]{6}$/i.test(hex) ? Number.parseInt(hex.slice(1), 16) : 0x1C1A17
+  const mix = (c: number) => Math.round(amount < 0 ? c * (1 + amount) : c + (255 - c) * amount)
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(mix)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+const SW = 1024
+const SH = 576
+
+/**
+ * A promo-screen slide for a product (16:9): its photo on the left, name,
+ * price and a "shop now" button on a background in the shop's colour.
+ */
+export async function drawProductSlide(product: ShopProduct, accent: string, labels: { soldOut: string; shopNow: string }): Promise<HTMLCanvasElement> {
+  const canvas = document.createElement('canvas')
+  canvas.width = SW
+  canvas.height = SH
+  const ctx = canvas.getContext('2d')!
+  const bg = ctx.createLinearGradient(0, 0, SW, SH)
+  bg.addColorStop(0, shade(accent, -0.55))
+  bg.addColorStop(1, shade(accent, -0.15))
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, SW, SH)
+  // Soft light blobs
+  for (const [x, y, r, a] of [[900, 60, 260, 0.14], [620, 560, 200, 0.1], [1000, 520, 120, 0.08]] as const) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+    g.addColorStop(0, `rgba(255,255,255,${a})`)
+    g.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, SW, SH)
+  }
+
+  // Photo in a rounded white frame
+  const P = 456
+  const px = 52
+  const py = (SH - P) / 2
+  ctx.save()
+  ctx.shadowColor = 'rgba(0,0,0,0.35)'
+  ctx.shadowBlur = 40
+  ctx.shadowOffsetY = 16
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.roundRect(px - 10, py - 10, P + 20, P + 20, 34)
+  ctx.fill()
+  ctx.restore()
+  ctx.save()
+  ctx.beginPath()
+  ctx.roundRect(px, py, P, P, 26)
+  ctx.clip()
+  const img = product.imageUrl ? await loadImage(product.imageUrl) : null
+  if (img) {
+    const scale = Math.max(P / img.width, P / img.height)
+    ctx.drawImage(img, px + (P - img.width * scale) / 2, py + (P - img.height * scale) / 2, img.width * scale, img.height * scale)
+  } else {
+    ctx.fillStyle = '#f3efe9'
+    ctx.fillRect(px, py, P, P)
+    ctx.font = '160px system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('🛍️', px + P / 2, py + P / 2)
+  }
+  ctx.restore()
+
+  // Words on the right
+  const x = px + P + 56
+  const maxW = SW - x - 48
+  let y = 150
+  const discount = product.price && product.comparePrice && product.comparePrice > product.price
+    ? Math.round((1 - product.price / product.comparePrice) * 100)
+    : 0
+  const badge = product.soldOut ? labels.soldOut : discount ? `-${discount}%` : product.tag?.trim()
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
+  if (badge) {
+    ctx.font = '800 34px Inter, system-ui, sans-serif'
+    const bw = ctx.measureText(badge).width + 40
+    ctx.fillStyle = product.soldOut ? '#52525b' : discount ? '#ef4444' : '#ffffff'
+    ctx.beginPath()
+    ctx.roundRect(x, y - 32, bw, 64, 32)
+    ctx.fill()
+    ctx.fillStyle = product.soldOut || discount ? '#ffffff' : shade(accent, -0.3)
+    ctx.fillText(badge, x + 20, y + 2)
+    y += 80
+  }
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '800 50px Inter, system-ui, sans-serif'
+  const lines = wrap(ctx, product.name, maxW, 3)
+  lines.forEach((line, i) => ctx.fillText(line, x, y + 40 + i * 60))
+  y += 40 + lines.length * 60 + 20
+  if (product.price) {
+    ctx.font = '900 72px Inter, system-ui, sans-serif'
+    const priceText = formatVnd(product.price)
+    ctx.fillText(priceText, x, y + 30)
+    if (discount) {
+      ctx.fillStyle = 'rgba(255,255,255,0.65)'
+      ctx.font = '600 32px Inter, system-ui, sans-serif'
+      const old = formatVnd(product.comparePrice!)
+      ctx.fillText(old, x, y + 78)
+      ctx.fillRect(x, y + 66, ctx.measureText(old).width, 3)
+    }
+  }
+  // "Shop now" button at the bottom
+  ctx.font = '800 32px Inter, system-ui, sans-serif'
+  const cta = `${labels.shopNow} →`
+  const cw = ctx.measureText(cta).width + 56
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.roundRect(x, SH - 132, cw, 76, 38)
+  ctx.fill()
+  ctx.fillStyle = shade(accent, -0.35)
+  ctx.textBaseline = 'middle'
+  ctx.fillText(cta, x + 28, SH - 92)
+  return canvas
+}

@@ -38,13 +38,28 @@ export interface CatalogItem {
   photo?: { width: number; height: number; center: [number, number, number] }
   /** Area that shows a product card (photo, name, price) from the site's products block */
   productCard?: { width: number; height: number; center: [number, number, number] }
+  /**
+   * Several product cards (e.g. a glass cabinet's shelves). They show the
+   * products picked for the object, or the shop's first products. Parts tagged
+   * `placeholderSlot = i` hide once card i is up.
+   */
+  productSlots?: { width: number; height: number; center: [number, number, number] }[]
+  /** A screen that cycles slides of the shop's products; parts tagged `placeholder` hide while it does */
+  productScreen?: { width: number; height: number; center: [number, number, number] }
+  /** Its words can be changed in the editor (neon sign, banner), up to `max` characters */
+  customText?: { default: string; max: number }
   /** Clicking it in the room opens the site's blog */
   opensBlog?: boolean
   /** Premium: comes in this pack (shared/roomPacks), bought once or with Max */
   pack?: string
   /** Clicking it in the room plays this track (from the room music library), e.g. the grand piano */
   music?: string
-  build: (color: string) => THREE.Group
+  build: (color: string, opts?: BuildOptions) => THREE.Group
+}
+
+export interface BuildOptions {
+  /** The object's own words, for items with `customText` */
+  text?: string
 }
 
 export const CATEGORY_LABELS: Record<CatalogCategory, string> = {

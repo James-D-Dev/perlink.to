@@ -9,6 +9,7 @@
       :products="shopProducts"
       :shop-accent="accent"
       :sold-out-label="t('soldOut')"
+      :buy-label="t('shopBuy')"
       @hover="onHover"
       @activate="onActivate"
       @guest-hover="onGuestHover"
@@ -457,9 +458,10 @@ function safeUrl(url: string) {
   return /^(https?:|mailto:|tel:)/i.test(url) ? url : `https://${url}`
 }
 
-function onHover(id: string | null, x: number, y: number) {
+function onHover(id: string | null, x: number, y: number, productId?: string) {
   const obj = id ? props.room.objects.find(o => o.id === id) : undefined
-  const product = obj?.productId ? shopById.value.get(obj.productId)?.product : undefined
+  const pick = productId ?? obj?.productId
+  const product = pick ? shopById.value.get(pick)?.product : undefined
   if (product) hovered.value = { label: product.price ? `${product.name} · ${formatVnd(product.price)}` : product.name, x, y }
   else if (obj?.image) hovered.value = { label: t('viewPhoto'), x, y }
   else if (obj && CATALOG_BY_TYPE[obj.type]?.opensBlog) hovered.value = { label: t('blog'), x, y }
@@ -481,9 +483,10 @@ const piano = useRoomPiano({
 // Picture frames with a photo open it in a popup; other linked objects open their link
 const photo = ref<RoomObject | null>(null)
 
-function onActivate(id: string) {
+function onActivate(id: string, productId?: string) {
   const obj = props.room.objects.find(o => o.id === id)
-  const shop = obj?.productId ? shopById.value.get(obj.productId) : undefined
+  const pick = productId ?? obj?.productId
+  const shop = pick ? shopById.value.get(pick) : undefined
   if (shop) {
     shopItem.value = shop
     hovered.value = null

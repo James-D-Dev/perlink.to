@@ -28,6 +28,7 @@ const props = withDefaults(defineProps<{
   products?: ShopProduct[]
   shopAccent?: string
   soldOutLabel?: string
+  buyLabel?: string
 }>(), {
   editable: false,
   preview: false,
@@ -40,8 +41,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   select: [id: string | null]
   objectChange: [changes: { id: string; patch: ObjectPatch }[]]
-  hover: [id: string | null, x: number, y: number]
-  activate: [id: string]
+  hover: [id: string | null, x: number, y: number, productId?: string]
+  activate: [id: string, productId?: string]
   stats: [stats: RoomSceneStats]
   guestActivate: [id: string]
   guestHover: [id: string | null, x: number, y: number]
@@ -61,13 +62,13 @@ onMounted(async () => {
     intro: props.intro,
     onSelect: id => emit('select', id),
     onObjectChange: changes => emit('objectChange', changes),
-    onHover: (id, x, y) => emit('hover', id, x, y),
-    onActivate: id => emit('activate', id),
+    onHover: (id, x, y, productId) => emit('hover', id, x, y, productId),
+    onActivate: (id, productId) => emit('activate', id, productId),
     onStats: stats => emit('stats', stats),
     onGuestActivate: id => emit('guestActivate', id),
     onGuestHover: (id, x, y) => emit('guestHover', id, x, y),
   })
-  if (props.products) scene.setProducts(props.products, props.shopAccent, props.soldOutLabel)
+  if (props.products) scene.setProducts(props.products, props.shopAccent, props.soldOutLabel, props.buyLabel)
   scene.setRoom(props.room)
   if (props.guests) scene.setGuests(props.guests)
   scene.select(props.selectedId)
@@ -84,7 +85,7 @@ watch(() => props.room, room => scene?.setRoom(room), { deep: true })
 watch(() => props.selectedId, id => scene?.select(id))
 // Gifts added after the room opened pop in
 watch(() => props.guests, guests => scene?.setGuests(guests ?? [], true))
-watch(() => [props.products, props.shopAccent] as const, ([products, accent]) => scene?.setProducts(products ?? [], accent, props.soldOutLabel), { deep: true })
+watch(() => [props.products, props.shopAccent] as const, ([products, accent]) => scene?.setProducts(products ?? [], accent, props.soldOutLabel, props.buyLabel), { deep: true })
 watch(() => [props.previewHour, props.forceMode], applyPreview)
 
 function applyPreview() {

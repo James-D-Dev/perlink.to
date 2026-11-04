@@ -64,6 +64,10 @@ export interface RoomObject {
   image?: string;
   /** Product stand: the product (from the site's products block) shown on it */
   productId?: string;
+  /** Several products (glass cabinet, promo screen); empty = the shop's first products */
+  productIds?: string[];
+  /** Its own words (neon sign, sale banner, promo screen headline) */
+  text?: string;
 }
 
 export interface RoomMusic {

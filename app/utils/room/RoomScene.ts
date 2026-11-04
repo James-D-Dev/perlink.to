@@ -11,7 +11,7 @@ import { compileOffscreen, createRoomRenderer, gpuKit, maxAnisotropy } from './g
 import { clearSceneryPreparer, setSceneryPreparer } from './natureModels'
 import type { Cinematic } from './cinematic'
 import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
-import { drawProductCard, productSignature, type ShopProduct } from './productCard'
+import { drawProductCard, drawProductSlide, productSignature, type ShopProduct } from './productCard'
 import type { GuestGiftType } from '#shared/guestbook'
 
 export { createFloorTexture } from './shell'
@@ -27,8 +27,9 @@ export interface RoomSceneOptions {
   onSelect?: (id: string | null) => void
   /** Objects moved by a drag: the dragged one plus anything resting on it */
   onObjectChange?: (changes: { id: string; patch: ObjectPatch }[]) => void
-  onHover?: (id: string | null, x: number, y: number) => void
-  onActivate?: (id: string) => void
+  /** productId: the product card or slide under the pointer, on objects that show several */
+  onHover?: (id: string | null, x: number, y: number, productId?: string) => void
+  onActivate?: (id: string, productId?: string) => void
   /** Called about once a second with rendering stats (editor FPS readout) */
   onStats?: (stats: RoomSceneStats) => void
   /** A visitor's guestbook gift was clicked (live page) */
@@ -151,6 +152,9 @@ export class RoomScene {
   private products = new Map<string, ShopProduct>()
   private shopAccent = '#e8457a'
   private soldOutLabel = 'Sold out'
+  private buyLabel = 'Buy now'
+  /** The product card hit by the last pickObject, if any */
+  private pickedProduct: string | undefined
   private entries = new Map<string, ObjectEntry>()
   private style?: RoomStyle
   private styleSignature = ''
@@ -434,10 +438,11 @@ export class RoomScene {
   }
 
   /** Products the stands can show (from the site's products block) */
-  setProducts(products: ShopProduct[], accent?: string, soldOutLabel?: string) {
+  setProducts(products: ShopProduct[], accent?: string, soldOutLabel?: string, buyLabel?: string) {
     this.products = new Map(products.map(p => [p.id, p]))
     if (accent) this.shopAccent = accent
     if (soldOutLabel) this.soldOutLabel = soldOutLabel
+    if (buyLabel) this.buyLabel = buyLabel
     // Stands whose product changed get redrawn
     if (this.room) this.syncObjects(this.room.objects)
     this.markActive()
@@ -894,7 +899,8 @@ export class RoomScene {
       if (!item) continue
       seen.add(data.id)
       const product = item.productCard && data.productId ? this.products.get(data.productId) : undefined
-      const signature = `${data.type}|${data.color || ''}|${data.image || ''}|${data.productId || ''}|${productSignature(product)}`
+      const several = this.productsFor(data, item).map(productSignature).join('~')
+      const signature = `${data.type}|${data.color || ''}|${data.image || ''}|${data.text || ''}|${data.productId || ''}|${productSignature(product)}|${several}`
       const existing = this.entries.get(data.id)
       if (existing && existing.signature === signature) {
         existing.data = data
@@ -920,7 +926,7 @@ export class RoomScene {
 
   private addEntry(data: RoomObject, item: CatalogItem, signature: string, animate: boolean) {
     const root = new THREE.Group()
-    const model = item.build(data.color || item.defaultColor)
+    const model = item.build(data.color || item.defaultColor, { text: data.text })
     root.add(model)
     root.userData.objectId = data.id
 
@@ -942,6 +948,9 @@ export class RoomScene {
     if (item.photo && data.image) this.addPhoto(model, item.photo, data.image)
     const product = item.productCard && data.productId ? this.products.get(data.productId) : undefined
     if (item.productCard && product) this.addProductCard(model, item.productCard, product)
+    const several = this.productsFor(data, item)
+    if (item.productSlots) several.forEach((p, i) => this.addProductCard(model, item.productSlots![i]!, p, i))
+    if (item.productScreen && several.length) this.addProductScreen(model, item.productScreen, several, ticks, data.text ? model.userData.headline : undefined)
     // Model-based items load asynchronously; pick up their glowing parts when ready
     ;(model.userData.ready as Promise<void> | undefined)?.then(collectMaterials).catch(() => {})
 
@@ -1080,11 +1089,12 @@ export class RoomScene {
   }
 
   /** Draws the product's card (photo, name, price) onto a stand */
-  private addProductCard(model: THREE.Group, slot: NonNullable<CatalogItem['productCard']>, product: ShopProduct) {
+  private addProductCard(model: THREE.Group, slot: NonNullable<CatalogItem['productCard']>, product: ShopProduct, slotIndex?: number) {
     const material = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.6 })
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(slot.width, slot.height), material)
     plane.position.set(...slot.center)
     plane.visible = false
+    plane.userData.productId = product.id
     model.add(plane)
     drawProductCard(product, this.shopAccent, this.soldOutLabel).then((canvas) => {
       if (this.disposed) return
@@ -1095,7 +1105,52 @@ export class RoomScene {
       material.needsUpdate = true
       plane.visible = true
       model.traverse((obj) => {
+        if (slotIndex === undefined ? obj.userData.placeholder : obj.userData.placeholderSlot === slotIndex) obj.visible = false
+      })
+      this.markActive()
+    }).catch(() => {})
+  }
+
+  /** The products shown on a cabinet or promo screen: the ones picked for it, or the shop's first ones */
+  private productsFor(data: RoomObject, item: CatalogItem): ShopProduct[] {
+    const room = item.productSlots?.length ?? (item.productScreen ? 8 : 0)
+    if (!room || !this.products.size) return []
+    const picked = data.productIds?.map(id => this.products.get(id)).filter((p): p is ShopProduct => !!p) ?? []
+    return (picked.length ? picked : [...this.products.values()]).slice(0, room)
+  }
+
+  /** A promo screen cycling slides of products (after the object's own headline, if it has one) */
+  private addProductScreen(model: THREE.Group, slot: NonNullable<CatalogItem['productScreen']>, products: ShopProduct[], ticks: ObjectEntry['ticks'], headline?: THREE.Texture) {
+    const material = new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: '#ffffff', emissiveIntensity: 0.85, roughness: 0.3 })
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(slot.width, slot.height), material)
+    plane.position.set(...slot.center)
+    plane.visible = false
+    model.add(plane)
+    Promise.all(products.map(p => drawProductSlide(p, this.shopAccent, { soldOut: this.soldOutLabel, shopNow: this.buyLabel }))).then((canvases) => {
+      if (this.disposed) return
+      const slides: { texture: THREE.Texture; productId?: string }[] = canvases.map((canvas, i) => {
+        const texture = new THREE.CanvasTexture(canvas)
+        texture.colorSpace = THREE.SRGBColorSpace
+        texture.anisotropy = maxAnisotropy(this.renderer)
+        return { texture, productId: products[i]!.id }
+      })
+      if (headline) slides.unshift({ texture: headline })
+      plane.visible = true
+      model.traverse((obj) => {
         if (obj.userData.placeholder) obj.visible = false
+      })
+      const SLIDE = 4
+      ticks.push((time) => {
+        const slide = slides[Math.floor(time / SLIDE) % slides.length]!
+        if (material.map !== slide.texture) {
+          material.map = slide.texture
+          material.emissiveMap = slide.texture
+          material.needsUpdate = true
+        }
+        plane.userData.productId = slide.productId
+        // A quick zoom-in as each slide starts
+        const p = (time % SLIDE) / SLIDE
+        plane.scale.setScalar(p < 0.05 ? 0.96 + (p / 0.05) * 0.04 : 1)
       })
       this.markActive()
     }).catch(() => {})
@@ -1240,10 +1295,27 @@ export class RoomScene {
 
   private pickObject(clientX: number, clientY: number): string | null {
     this.setPointer(clientX, clientY)
-    const hit = this.raycaster.intersectObjects(this.objectsGroup.children, true)[0]
-    let obj: THREE.Object3D | null = hit?.object ?? null
-    while (obj && !obj.userData.objectId) obj = obj.parent
-    return (obj?.userData.objectId as string) ?? null
+    const hits = this.raycaster.intersectObjects(this.objectsGroup.children, true)
+    const ownerOf = (o: THREE.Object3D | null) => {
+      let product: string | undefined
+      while (o && !o.userData.objectId) {
+        product ??= o.userData.productId as string | undefined
+        o = o.parent
+      }
+      return { id: (o?.userData.objectId as string | undefined) ?? null, product }
+    }
+    const first = ownerOf(hits[0]?.object ?? null)
+    // A product card behind a cabinet's glass still counts
+    this.pickedProduct = undefined
+    for (const hit of hits) {
+      const owner = ownerOf(hit.object)
+      if (owner.id !== first.id) break
+      if (owner.product) {
+        this.pickedProduct = owner.product
+        break
+      }
+    }
+    return first.id
   }
 
   private handlePointerDown = (e: PointerEvent) => {
@@ -1304,7 +1376,7 @@ export class RoomScene {
       this.select(id)
       this.options.onSelect?.(id)
     } else if (id) {
-      this.options.onActivate?.(id)
+      this.options.onActivate?.(id, this.pickedProduct && this.products.has(this.pickedProduct) ? this.pickedProduct : undefined)
     }
   }
 
@@ -1329,7 +1401,8 @@ export class RoomScene {
     }
     const id = this.pickObject(e.clientX, e.clientY)
     const data = id ? this.entries.get(id)?.data : undefined
-    const clickable = !!(data?.link?.url || data?.image || (data?.productId && this.products.has(data.productId)) || (data && (CATALOG_BY_TYPE[data.type]?.opensBlog || CATALOG_BY_TYPE[data.type]?.music)))
+    const product = this.pickedProduct && this.products.has(this.pickedProduct) ? this.pickedProduct : undefined
+    const clickable = !!(product || data?.link?.url || data?.image || (data?.productId && this.products.has(data.productId)) || (data && (CATALOG_BY_TYPE[data.type]?.opensBlog || CATALOG_BY_TYPE[data.type]?.music)))
     const rect = this.renderer.domElement.getBoundingClientRect()
     const guestId = clickable ? null : this.pickGuest(e.clientX, e.clientY)
     if (guestId !== this.hoveredGuest || guestId) {
@@ -1340,7 +1413,7 @@ export class RoomScene {
     const nextId = clickable ? id : null
     if (nextId !== this.hoveredId || nextId) {
       this.hoveredId = nextId
-      this.options.onHover?.(nextId, e.clientX - rect.left, e.clientY - rect.top)
+      this.options.onHover?.(nextId, e.clientX - rect.left, e.clientY - rect.top, product)
     }
   }
 

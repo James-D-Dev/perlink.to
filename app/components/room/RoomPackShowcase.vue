@@ -2,7 +2,15 @@
   <!-- A real 3D room set with a pack's items, moving: what you get, live -->
   <div class="relative h-full w-full overflow-hidden bg-[#0e0c14]">
     <ClientOnly>
-      <RoomCanvas :room="room" :force-mode="mode" @activate="onActivate" />
+      <RoomCanvas
+        :room="room"
+        :force-mode="mode"
+        :products="pack.id === 'showroom' ? demoProducts : undefined"
+        shop-accent="#be185d"
+        :sold-out-label="t('room.shop.soldOut')"
+        :buy-label="t('room.shop.buy')"
+        @activate="onActivate"
+      />
     </ClientOnly>
     <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-4">
       <p class="pointer-events-auto rounded-full bg-black/45 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
@@ -29,11 +37,12 @@
 import type { RoomPack, RoomPackId } from '#shared/roomPacks'
 import { createDefaultRoom, type LandId, type RoomConfig, type RoomObject } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
+import type { ShopProduct } from '~/utils/room/productCard'
 
 const props = defineProps<{ pack: RoomPack }>()
 const { t } = useI18n()
 
-type Spot = [type: string, x: number, y: number, z: number, rotation?: number, scale?: number]
+type Spot = [type: string, x: number, y: number, z: number, rotation?: number, scale?: number, productId?: string, text?: string]
 const TABLE = 'coffee-table'
 const TOP = 0.43
 const BACK = -2.5
@@ -51,9 +60,9 @@ const LAYOUTS: Record<RoomPackId, { spots: Spot[]; land: LandId; mode: 'day' | '
   showroom: {
     land: 'city', mode: 'night', wall: '#f4f2ee', floor: '#d8d2c8',
     spots: [
-      ['vip-neon-open', -1.2, 1.9, BACK], ['vip-ad-screen', 1.1, 1.65, BACK], ['vip-sale-banner', 1.1, 2.72, BACK],
-      ['vip-glass-cabinet', -1.9, 0, -2.2], ['vip-glass-cabinet', -0.9, 0, -2.2],
-      ['vip-display-podium', 0, 0, -0.6], ['vip-checkout-counter', 1.4, 0, 0.6, -90],
+      ['vip-neon-open', -0.9, 1.95, BACK, 0, 1, undefined, 'Perlink Shop'], ['vip-ad-screen', 1.1, 1.65, BACK], ['vip-sale-banner', 1.1, 2.72, BACK],
+      ['vip-glass-cabinet', -2.27, 0, -1.4, 90], ['vip-glass-cabinet', -2.27, 0, -0.4, 90],
+      ['vip-display-podium', 0, 0, -0.6, 0, 1, 'demo-0'], ['vip-checkout-counter', -1.4, 0, 1.2, 90],
     ],
   },
   valentine: {
@@ -101,6 +110,26 @@ const LAYOUTS: Record<RoomPackId, { spots: Spot[]; land: LandId; mode: 'day' | '
 
 const layout = computed(() => LAYOUTS[props.pack.id])
 
+// Showroom: a sample shop, so the cabinet, screen and podium show real-looking products
+const { locale } = useI18n()
+const DEMO: [en: string, vi: string, price: number, photo: string, comparePrice?: number, tag?: [string, string]][] = [
+  ['Linen wrap dress', 'Đầm lanh quấn', 590000, 'boutique-2', undefined, ['New', 'Mới']],
+  ['Calm serum', 'Serum dịu da', 390000, 'skin-cover', undefined, ['Best seller', 'Bán chạy']],
+  ['Plaid mini skirt', 'Chân váy kẻ caro', 390000, 'boutique-3', 490000],
+  ['Glow routine set', 'Bộ chu trình Glow', 890000, 'skin-3', 970000],
+  ['Everyday shirt', 'Sơ mi hằng ngày', 450000, 'boutique-1'],
+  ['Daily sunscreen SPF 50', 'Kem chống nắng SPF 50', 320000, 'skin-2'],
+  ['Speckled mug', 'Cốc men lấm tấm', 220000, 'craft-avatar'],
+]
+const demoProducts = computed<ShopProduct[]>(() => DEMO.map(([en, vi, price, photo, comparePrice, tag], i) => ({
+  id: `demo-${i}`,
+  name: locale.value === 'vi' ? vi : en,
+  price,
+  comparePrice,
+  imageUrl: `/images/templates/photos/${photo}-md.webp`,
+  tag: tag ? (locale.value === 'vi' ? tag[1] : tag[0]) : undefined,
+})))
+
 // Clicking the piano plays it, here too
 const piano = useRoomPiano()
 function onActivate(id: string) {
@@ -112,12 +141,14 @@ const mode = ref<'day' | 'night'>(layout.value.mode)
 
 const room = computed<RoomConfig>(() => {
   const base = createDefaultRoom()
-  const objects: RoomObject[] = layout.value.spots.map(([type, x, y, z, rotation = 0, scale = 1], i) => ({
+  const objects: RoomObject[] = layout.value.spots.map(([type, x, y, z, rotation = 0, scale = 1, productId, text], i) => ({
     id: `${type}-${i}`,
     type,
     position: [x, y, z],
     rotation,
     scale,
+    ...(productId && { productId }),
+    ...(text && { text }),
     ...(z === BACK && { wall: 'back' as const }),
   }))
   return {

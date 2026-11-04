@@ -151,6 +151,43 @@
                   <p class="text-xs text-muted">{{ products?.length ? t('room.shop.hint') : t('room.shop.none') }}</p>
                 </div>
 
+                <!-- Cabinet / promo screen: several products, or the shop's first ones -->
+                <div v-if="selectedItem.productSlots || selectedItem.productScreen" class="space-y-2">
+                  <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
+                    <UIcon name="i-lucide-shopping-bag" class="size-3.5" />
+                    {{ t('room.shop.products') }}
+                  </span>
+                  <USelectMenu
+                    v-if="products?.length"
+                    :model-value="selectedObject.productIds ?? []"
+                    :items="productOptions"
+                    value-key="value"
+                    multiple
+                    :placeholder="t('room.shop.productsAuto')"
+                    size="sm"
+                    class="w-full"
+                    @update:model-value="updateSelected({ productIds: ($event as string[]).slice(0, selectedItem.productSlots?.length ?? 8) })"
+                  />
+                  <p class="text-xs text-muted">{{ products?.length ? t('room.shop.productsHint') : t('room.shop.none') }}</p>
+                </div>
+
+                <!-- Its own words: neon sign, banner, promo screen headline -->
+                <div v-if="selectedItem.customText" class="space-y-2">
+                  <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
+                    <UIcon name="i-lucide-type" class="size-3.5" />
+                    {{ t('room.shop.text') }}
+                  </span>
+                  <UInput
+                    :model-value="selectedObject.text ?? ''"
+                    size="sm"
+                    class="w-full"
+                    :maxlength="selectedItem.customText.max"
+                    :placeholder="selectedItem.customText.default || t('room.shop.text')"
+                    @update:model-value="updateSelected({ text: String($event).slice(0, selectedItem.customText!.max) || undefined })"
+                  />
+                  <p class="text-xs text-muted">{{ t('room.shop.textHint', { max: selectedItem.customText.max }) }}</p>
+                </div>
+
                 <div v-if="selectedItem.photo" class="space-y-2">
                   <span class="flex items-center gap-1.5 text-xs font-medium text-muted">
                     <UIcon name="i-lucide-image" class="size-3.5" />

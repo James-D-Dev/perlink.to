@@ -2674,6 +2674,9 @@ const PROPOSAL = premium('proposal', [
 // Showroom
 // ======================================================================
 
+// Glass cabinet shelves that hold product cards
+const CABINET_SHELVES = [0.5, 0.92]
+
 const SHOWROOM = premium('showroom', [
   {
     type: 'vip-display-podium',
@@ -2729,6 +2732,8 @@ const SHOWROOM = premium('showroom', [
     icon: 'i-lucide-panels-top-left',
     defaultColor: '#1f1f24',
     light: { color: '#eaf4ff', intensity: 1.6, distance: 3, offset: [0, 1.2, 0.3] },
+    // Six of the shop's products, three on each middle shelf
+    productSlots: CABINET_SHELVES.flatMap(y => [-0.27, 0, 0.27].map(x => ({ width: 0.22, height: 0.3025, center: [x, y + 0.175, 0.02] as [number, number, number] }))),
     build: (color) => {
       // A tall display cabinet with LED-lit glass shelves full of products
       const frame = mat(color, { roughness: 0.35, metalness: 0.4 })
@@ -2755,6 +2760,9 @@ const SHOWROOM = premium('showroom', [
       const palette = ['#e85d8a', '#ffd166', '#06d6a0', '#3a86ff', '#ffffff', '#ff7a45', '#8338ec']
       for (const y of [0.12, ...shelfYs]) {
         let x = -W / 2 + 0.1
+        // On the product shelves, each item stands in for the card in its third
+        const shelf = CABINET_SHELVES.indexOf(y)
+        const from = parts.length
         while (x < W / 2 - 0.12) {
           const kind = Math.floor(rand() * 4)
           const c = palette[Math.floor(rand() * palette.length)]!
@@ -2777,6 +2785,12 @@ const SHOWROOM = premium('showroom', [
             x += 0.2
           }
         }
+        if (shelf >= 0) {
+          for (const part of parts.slice(from)) {
+            const third = Math.min(2, Math.max(0, Math.floor((part.position.x + (W - 0.08) / 2) / ((W - 0.08) / 3))))
+            part.userData.placeholderSlot = shelf * 3 + third
+          }
+        }
       }
       return group(...parts, animate(group(), (t) => {
         leds.forEach((m, i) => (m.emissiveIntensity *= 0.85 + 0.15 * Math.sin(t * 1.5 + i)))
@@ -2785,32 +2799,83 @@ const SHOWROOM = premium('showroom', [
   },
   {
     type: 'vip-neon-open',
-    name: 'OPEN neon sign',
+    name: 'Neon sign',
     icon: 'i-lucide-zap',
     defaultColor: '#ff3b6b',
     wallMounted: true,
+    customText: { default: 'OPEN', max: 16 },
     light: { color: '#ff5c8a', intensity: 1.8, distance: 3.5, offset: [0, 0, 0.35] },
-    build: (color) => {
+    build: (color, opts) => {
+      const text = opts?.text?.trim() || 'OPEN'
       const letterMat = glow(color, 1.4, 2.2)
       const borderMat = glow('#4dd8ff', 1.2, 2)
-      const parts: THREE.Object3D[] = [
-        box(1.25, 0.5, 0.015, mat('#15151c', { transparent: true, opacity: 0.35 }), 0, -0.25, 0.01),
-      ]
+      const parts: THREE.Object3D[] = []
       const tube = (a: THREE.Vector3, b: THREE.Vector3, m: THREE.Material, r: number) => {
         const t = rod(a, b, r, m, r, 8)
         t.castShadow = false
         return t
       }
-      // Letters, one per group so one of them can flicker
-      const letters: THREE.Group[] = [group(), group(), group(), group()]
-      for (const { a, b, letter } of textStrokes('OPEN', 0.28, 0.2, 0.06, -0.14)) {
-        a.z = b.z = 0.05
-        letters[letter]!.add(tube(a, b, letterMat, 0.012), sphere(0.012, letterMat, a.x, a.y, a.z, 8), sphere(0.012, letterMat, b.x, b.y, b.z, 8))
+      // Half the border's width: the sign grows with its words
+      let w = 0.58
+      let flick: (off: boolean) => void
+      if (text === 'OPEN') {
+        // Bent glass tubes, one group per letter so one of them can flicker
+        const letters: THREE.Group[] = [group(), group(), group(), group()]
+        for (const { a, b, letter } of textStrokes('OPEN', 0.28, 0.2, 0.06, -0.14)) {
+          a.z = b.z = 0.05
+          letters[letter]!.add(tube(a, b, letterMat, 0.012), sphere(0.012, letterMat, a.x, a.y, a.z, 8), sphere(0.012, letterMat, b.x, b.y, b.z, 8))
+        }
+        parts.push(...letters)
+        flick = off => (letters[1]!.visible = !off)
+      } else {
+        // Any words, in any language: outlined letters like bent neon tubes,
+        // a coloured halo round a bright white core
+        const H = 300
+        const font = `800 170px "Arial Rounded MT Bold", Nunito, "Segoe UI", Arial, sans-serif`
+        let width = 600
+        if (typeof document !== 'undefined') {
+          const probe = document.createElement('canvas').getContext('2d')!
+          probe.font = font
+          width = Math.ceil(probe.measureText(text).width) + 140
+        }
+        const tex = textTexture(width, H, (ctx) => {
+          ctx.font = font
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.lineJoin = 'round'
+          ctx.shadowColor = color
+          ctx.shadowBlur = 36
+          ctx.strokeStyle = color
+          ctx.lineWidth = 20
+          ctx.strokeText(text, width / 2, H / 2 + 8)
+          ctx.shadowBlur = 12
+          ctx.strokeText(text, width / 2, H / 2 + 8)
+          ctx.shadowBlur = 0
+          ctx.strokeStyle = 'rgba(255,255,255,0.92)'
+          ctx.lineWidth = 7
+          ctx.strokeText(text, width / 2, H / 2 + 8)
+        })
+        let planeH = 0.36
+        let planeW = planeH * width / H
+        if (planeW > 1.9) {
+          planeH *= 1.9 / planeW
+          planeW = 1.9
+        }
+        const signMat = glow('#ffffff', 1.3, 2)
+        signMat.map = tex
+        signMat.emissiveMap = tex
+        signMat.transparent = true
+        signMat.depthWrite = false
+        signMat.color.set(tex ? '#ffffff' : color)
+        const sign = mesh(new THREE.PlaneGeometry(planeW, planeH), signMat, 0, 0, 0.045)
+        sign.castShadow = false
+        parts.push(sign)
+        w = Math.max(0.4, planeW / 2 + 0.06)
+        flick = off => (sign.visible = !off)
       }
-      parts.push(...letters)
-      // A rounded border
+      // Smoked acrylic backing and a rounded border tube
+      parts.push(box(w * 2 + 0.09, 0.5, 0.015, mat('#15151c', { transparent: true, opacity: 0.35 }), 0, -0.25, 0.01))
       const r = 0.07
-      const w = 0.58
       const h = 0.21
       const corners: THREE.Vector3[] = []
       for (const [cx, cy, a0] of [[w - r, h - r, 0], [-w + r, h - r, Math.PI / 2], [-w + r, -h + r, Math.PI], [w - r, -h + r, Math.PI * 1.5]] as const) {
@@ -2819,12 +2884,13 @@ const SHOWROOM = premium('showroom', [
           corners.push(v3(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 0.04))
         }
       }
-      parts.push(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(corners, true), 120, 0.009, 8, true), borderMat))
+      parts.push(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(corners, true), 160, 0.009, 8, true), borderMat))
+      // Little brackets holding it off the wall
+      for (const x of [-w + 0.08, w - 0.08]) parts.push(cyl(0.008, 0.008, 0.04, metal('#c9c9d0', 0.3), x, h - 0.02, 0.02, 8).rotateX(Math.PI / 2))
       return group(...parts, animate(group(), (t) => {
-        // Every few seconds the "P" stutters, like a real old sign
+        // Every few seconds it stutters, like a real old sign
         const p = loop(t, 5)
-        const off = p > 0.8 && p < 0.9 && Math.sin(t * 60) > 0
-        letters[1]!.visible = !off
+        flick(p > 0.8 && p < 0.9 && Math.sin(t * 60) > 0)
         letterMat.emissiveIntensity *= 0.92 + 0.08 * Math.sin(t * 9)
       }))
     },
@@ -2835,10 +2901,14 @@ const SHOWROOM = premium('showroom', [
     icon: 'i-lucide-monitor-play',
     defaultColor: '#16161c',
     wallMounted: true,
-    build: (color) => {
-      // A slim wall screen cycling bright promo slides
+    customText: { default: '', max: 18 },
+    productScreen: { width: 1.1, height: 1.1 * 9 / 16, center: [0, 0, 0.034] },
+    build: (color, opts) => {
+      // A slim wall screen cycling bright promo slides. Its own headline goes
+      // first; with a shop, the scene swaps in slides of its products
+      const headline = opts?.text?.trim()
       const slides = [
-        { bg: ['#ff3b6b', '#ff9a3c'], big: 'SALE', small: 'UP TO 50% OFF' },
+        { bg: ['#ff3b6b', '#ff9a3c'], big: headline || 'SALE', small: headline ? '' : 'UP TO 50% OFF' },
         { bg: ['#3a86ff', '#8338ec'], big: 'NEW', small: 'JUST ARRIVED' },
         { bg: ['#06d6a0', '#118ab2'], big: 'FREE', small: 'SHIPPING TODAY' },
       ].map(sl => textTexture(512, 288, (ctx) => {
@@ -2855,18 +2925,26 @@ const SHOWROOM = premium('showroom', [
         }
         ctx.fillStyle = '#ffffff'
         ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         ctx.font = 'bold 130px Arial, sans-serif'
-        ctx.fillText(sl.big, 256, 165)
+        // Long headlines shrink to fit
+        const size = Math.min(130, 130 * 460 / Math.max(1, ctx.measureText(sl.big).width))
+        ctx.font = `bold ${size}px Arial, sans-serif`
+        ctx.fillText(sl.big, 256, sl.small ? 120 : 144)
         ctx.font = 'bold 30px Arial, sans-serif'
-        ctx.fillText(sl.small, 256, 225)
+        if (sl.small) ctx.fillText(sl.small, 256, 222)
       }))
       const screenMat = new THREE.MeshStandardMaterial({ color: '#ffffff', map: slides[0], emissive: '#ffffff', emissiveMap: slides[0], emissiveIntensity: 0.8, roughness: 0.3 })
       const W = 1.1
       const H = W * 9 / 16
       const screen = mesh(new THREE.PlaneGeometry(W, H), screenMat, 0, 0, 0.032)
       screen.castShadow = false
-      return group(
+      screen.userData.placeholder = true
+      const root = group(
         box(W + 0.04, H + 0.04, 0.03, mat(color, { roughness: 0.3, metalness: 0.4 }), 0, -(H + 0.04) / 2, 0.015),
+        // A thin glossy bezel highlight and a power light
+        box(W + 0.05, 0.006, 0.032, metal('#8a8a96', 0.25), 0, (H + 0.04) / 2 - 0.006, 0.015),
+        sphere(0.006, glow('#22e07a', 1.2, 1.6), W / 2 - 0.02, -(H + 0.04) / 2 + 0.01, 0.031, 8),
         screen,
         animate(group(), (t) => {
           const k = Math.floor(t / 3.5) % slides.length
@@ -2881,6 +2959,8 @@ const SHOWROOM = premium('showroom', [
           screen.scale.setScalar(p < 0.06 ? 0.96 + (p / 0.06) * 0.04 : 1)
         }),
       )
+      if (headline && slides[0]) root.userData.headline = slides[0]
+      return root
     },
   },
   {
@@ -2950,7 +3030,9 @@ const SHOWROOM = premium('showroom', [
     icon: 'i-lucide-badge-percent',
     defaultColor: '#e11d48',
     wallMounted: true,
-    build: (color) => {
+    customText: { default: 'SALE', max: 14 },
+    build: (color, opts) => {
+      const words = opts?.text?.trim() || 'SALE'
       // A big SALE banner with price tags swinging under it; every few
       // seconds it pops a burst of confetti
       const banner = textTexture(512, 200, (ctx) => {
@@ -2961,8 +3043,14 @@ const SHOWROOM = premium('showroom', [
         ctx.strokeRect(12, 12, 488, 176)
         ctx.fillStyle = '#ffffff'
         ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         ctx.font = 'bold 140px Arial, sans-serif'
-        ctx.fillText('SALE', 256, 150)
+        // Long words shrink to fit
+        const size = Math.min(140, 140 * 440 / Math.max(1, ctx.measureText(words).width))
+        ctx.font = `bold ${size}px Arial, sans-serif`
+        ctx.shadowColor = 'rgba(0,0,0,0.25)'
+        ctx.shadowOffsetY = 6
+        ctx.fillText(words, 256, 106)
       })
       const parts: THREE.Object3D[] = [
         box(1.04, 0.42, 0.02, mat(color, { roughness: 0.5 }), 0, -0.21, 0.01),

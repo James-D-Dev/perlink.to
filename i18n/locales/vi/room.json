@@ -345,7 +345,7 @@
       "vip-fireworks": "Màn pháo hoa",
       "vip-display-podium": "Bục trưng bày",
       "vip-glass-cabinet": "Tủ kính",
-      "vip-neon-open": "Biển neon OPEN",
+      "vip-neon-open": "Biển neon",
       "vip-ad-screen": "Màn hình quảng cáo",
       "vip-checkout-counter": "Quầy thu ngân",
       "vip-sale-banner": "Băng rôn SALE"
@@ -391,7 +391,14 @@
       "product": "Sản phẩm trên kệ",
       "pick": "Chọn sản phẩm",
       "hint": "Khách bấm vào kệ để xem sản phẩm và đặt hàng ngay trong phòng.",
-      "none": "Trang chưa có sản phẩm. Thêm khối Sản phẩm ở phần Nội dung của trang trước."
+      "none": "Trang chưa có sản phẩm. Thêm khối Sản phẩm ở phần Nội dung của trang trước.",
+      "products": "Sản phẩm hiển thị",
+      "productsAuto": "Các sản phẩm đầu tiên của shop",
+      "productsHint": "Để trống thì hiện các sản phẩm đầu tiên của shop. Khách bấm vào sản phẩm để đặt hàng ngay trong phòng.",
+      "text": "Chữ",
+      "textHint": "Tối đa {max} ký tự, viết bằng ngôn ngữ nào cũng được.",
+      "soldOut": "Hết hàng",
+      "buy": "Mua ngay"
     },
     "packs": {
       "valentine": {
@@ -439,7 +446,7 @@
       },
       "showroom": {
         "name": "Showroom",
-        "tagline": "Biến căn phòng thành cửa hàng: bục xoay trưng sản phẩm, neon, màn hình quảng cáo và quầy thu ngân."
+        "tagline": "Biến căn phòng thành cửa hàng của bạn: tủ kính và màn hình quảng cáo hiện sản phẩm thật (bấm là đặt hàng), biển neon và băng rôn ghi chữ của bạn, bục xoay và quầy thu ngân."
       }
     },
     "market": {
