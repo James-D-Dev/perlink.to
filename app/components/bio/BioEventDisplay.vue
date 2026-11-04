@@ -47,7 +47,7 @@
           {{ t('eventAddToCalendar') }}
         </button>
         <Transition name="menu">
-        <div v-if="calendarOpen" class="absolute inset-x-0 top-full z-10 mt-1.5 overflow-hidden rounded-xl bg-white text-left text-sm text-[#1c1a17] shadow-lg ring-1 ring-black/10">
+        <div v-if="calendarOpen" class="absolute inset-x-0 bottom-full z-10 mb-1.5 overflow-hidden rounded-xl bg-white text-left text-sm text-[#1c1a17] shadow-lg ring-1 ring-black/10">
           <a :href="googleHref" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-2.5 hover:bg-black/5" @click="calendarOpen = false">
             <UIcon name="i-lucide-calendar" class="size-4 opacity-60" />Google Calendar
           </a>
@@ -219,8 +219,8 @@ const chipStyle = computed<CSSProperties>(() => ({ backgroundColor: `color-mix(i
 <style scoped>
 .press { transition: transform 0.15s ease, filter 0.15s ease; -webkit-tap-highlight-color: transparent; }
 .press:active { transform: scale(0.97); filter: brightness(0.95); }
-.menu-enter-active, .menu-leave-active { transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: top center; }
-.menu-enter-from, .menu-leave-to { opacity: 0; transform: translateY(-4px) scale(0.97); }
+.menu-enter-active, .menu-leave-active { transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: bottom center; }
+.menu-enter-from, .menu-leave-to { opacity: 0; transform: translateY(4px) scale(0.97); }
 @media (prefers-reduced-motion: reduce) {
   .press, .menu-enter-active, .menu-leave-active { transition: none; }
 }
