@@ -1,7 +1,9 @@
 <template>
-  <!-- On template preview pages: what this is, and the way to use it -->
-  <div class="fixed inset-x-0 top-0 z-[60] flex justify-center px-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-    <div class="flex w-full max-w-xl items-center gap-3 rounded-full bg-white/80 py-1.5 pl-4 pr-1.5 text-[#0c0b0a] shadow-[inset_0_1px_0_rgb(255_255_255/0.85),0_10px_30px_-8px_rgb(0_0_0/0.3)] ring-1 ring-black/[0.06] backdrop-blur-xl">
+  <!-- On template preview pages: what this is, and the way to use it. A bar
+       across the bottom of the screen, clear of the home indicator; pages
+       leave room for it with <SiteTemplatePreviewSpacer /> -->
+  <div class="fixed inset-x-0 bottom-0 z-[60] border-t border-black/[0.08] bg-white/85 pb-[env(safe-area-inset-bottom)] text-[#0c0b0a] shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)] backdrop-blur-xl">
+    <div class="mx-auto flex h-16 w-full max-w-3xl items-center gap-3 px-4">
       <div class="min-w-0 flex-1 leading-tight">
         <p class="text-[11px] font-medium uppercase tracking-wide text-black/50">{{ t('dashboard.home.previewTitle') }}</p>
         <!-- The page's heading: the template's name -->

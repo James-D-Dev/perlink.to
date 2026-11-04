@@ -12,7 +12,8 @@
             <!-- Built from our own sample text with the safe renderer -->
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div class="blog-prose mt-6" :style="{ '--heading-font': headingStyle.fontFamily }" v-html="html" />
-          </div>
+            <SiteTemplatePreviewSpacer />
+  </div>
         </article>
 
         <nav v-if="older || newer" class="mt-4 grid gap-3 sm:grid-cols-2">

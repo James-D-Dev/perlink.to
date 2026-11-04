@@ -3,6 +3,7 @@
     <SiteTemplatePreviewBar :template-id="template.id" />
 
     <BioPageView :bio-data="bioData" :username="template.id" mode="template" />
+    <SiteTemplatePreviewSpacer />
   </div>
 </template>
 
