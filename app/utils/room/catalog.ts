@@ -7,7 +7,7 @@ import { attachNaturePieces, greenLeaves, type NaturePiece } from './natureModel
 // described by JSON (type + transform + color). Local origin is the center of
 // the object's base, facing +z. Wall-mounted models have their back on z = 0.
 
-export type CatalogCategory = 'shop' | 'furniture' | 'lighting' | 'decor' | 'wall' | 'tech' | 'dungeon'
+export type CatalogCategory = 'premium' | 'shop' | 'furniture' | 'lighting' | 'decor' | 'wall' | 'tech' | 'dungeon'
 
 export interface CatalogLight {
   color: string
@@ -39,10 +39,13 @@ export interface CatalogItem {
   productCard?: { width: number; height: number; center: [number, number, number] }
   /** Clicking it in the room opens the site's blog */
   opensBlog?: boolean
+  /** Premium: comes in this pack (shared/roomPacks), bought once or with Max */
+  pack?: string
   build: (color: string) => THREE.Group
 }
 
 export const CATEGORY_LABELS: Record<CatalogCategory, string> = {
+  premium: 'Premium',
   furniture: 'Furniture',
   lighting: 'Lighting',
   decor: 'Decor',
@@ -816,6 +819,274 @@ const GARDEN_ITEMS: CatalogItem[] = [
 ]
 
 ROOM_CATALOG.push(...GARDEN_ITEMS)
+
+// ---------- Premium: Valentine pack ----------
+// Sold as a pack (shared/roomPacks.ts). Hearts are extruded from one
+// outline; roses are small layered blooms.
+
+/** A heart outline about 0.9 wide and 0.75 tall, centred on the origin */
+function heartShape() {
+  const h = new THREE.Shape()
+  h.moveTo(0, 0.22)
+  h.bezierCurveTo(0, 0.27, -0.05, 0.4, -0.22, 0.4)
+  h.bezierCurveTo(-0.47, 0.4, -0.47, 0.12, -0.47, 0.12)
+  h.bezierCurveTo(-0.47, -0.04, -0.32, -0.2, 0, -0.38)
+  h.bezierCurveTo(0.32, -0.2, 0.47, -0.04, 0.47, 0.12)
+  h.bezierCurveTo(0.47, 0.12, 0.47, 0.4, 0.22, 0.4)
+  h.bezierCurveTo(0.05, 0.4, 0, 0.27, 0, 0.22)
+  return h
+}
+
+/** A puffy 3D heart of the given width and total thickness, facing +z */
+function heart(width: number, depth: number, material: THREE.Material, x = 0, y = 0, z = 0) {
+  // The outline is 0.94 wide; work in its units, then scale to `width`
+  const d = depth * 0.94 / width
+  const geometry = new THREE.ExtrudeGeometry(heartShape(), {
+    depth: d * 0.4,
+    bevelEnabled: true,
+    bevelThickness: d * 0.3,
+    bevelSize: 0.05,
+    bevelSegments: 6,
+    curveSegments: 24,
+  })
+  geometry.center()
+  const m = mesh(geometry, material, x, y, z)
+  m.scale.setScalar(width / 0.94)
+  return m
+}
+
+/** A rose bloom: a cup of petals around a curled centre */
+function rose(color: string, r: number, x: number, y: number, z: number) {
+  const petal = mat(color, { roughness: 0.55 })
+  const dark = mat(new THREE.Color(color).offsetHSL(0, 0.05, -0.12).getStyle(), { roughness: 0.6 })
+  const bloom = new THREE.Group()
+  const cup = mesh(new THREE.SphereGeometry(r, 16, 10, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.65), petal)
+  cup.rotation.x = Math.PI
+  cup.position.y = r * 0.35
+  const centre = mesh(new THREE.TorusKnotGeometry(r * 0.38, r * 0.16, 40, 6, 2, 3), dark, 0, r * 0.55, 0)
+  centre.rotation.x = Math.PI / 2
+  bloom.add(cup, centre)
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2
+    const outer = mesh(new THREE.SphereGeometry(r * 0.55, 10, 8), petal, Math.cos(a) * r * 0.75, r * 0.15, Math.sin(a) * r * 0.75)
+    outer.scale.set(1, 0.55, 0.7)
+    outer.rotation.y = -a
+    bloom.add(outer)
+  }
+  bloom.position.set(x, y, z)
+  return bloom
+}
+
+const STEM = '#3f7d3a'
+const PINK = '#ff8fb1'
+
+const PREMIUM_ITEMS: CatalogItem[] = [
+  {
+    type: 'vip-rose-bouquet',
+    name: 'Rose bouquet',
+    icon: 'i-lucide-flower',
+    category: 'premium',
+    pack: 'valentine',
+    defaultColor: '#d61f45',
+    attractsButterflies: true,
+    build: (color) => {
+      const glass = new THREE.MeshPhysicalMaterial({ color: '#e8f4f8', roughness: 0.05, transmission: 0.85, thickness: 0.05, transparent: true, opacity: 0.55 })
+      const parts: THREE.Object3D[] = [
+        mesh(new THREE.LatheGeometry([[0.0, 0], [0.11, 0], [0.13, 0.08], [0.09, 0.26], [0.1, 0.34], [0.09, 0.34]].map(([r, h]) => new THREE.Vector2(r, h)), 32), glass),
+        cyl(0.085, 0.1, 0.2, mat('#bfe3ea', { transparent: true, opacity: 0.35 }), 0, 0.02),
+        // A satin ribbon around the neck
+        mesh(new THREE.TorusGeometry(0.095, 0.018, 8, 32), mat('#ffffff', { roughness: 0.3 }), 0, 0.27, 0),
+      ]
+      parts[2]!.rotation.x = Math.PI / 2
+      const blooms: [number, number, number][] = [[0, 0.62, 0], [0.11, 0.57, 0.05], [-0.1, 0.58, 0.06], [0.06, 0.55, -0.1], [-0.07, 0.54, -0.09], [0.15, 0.5, -0.03], [-0.15, 0.5, 0.0]]
+      blooms.forEach(([x, y, z], i) => {
+        parts.push(cyl(0.007, 0.007, y - 0.25, mat(STEM), x * 0.5, 0.25, z * 0.5))
+        parts.push(rose(i % 3 === 2 ? PINK : color, 0.055, x, y, z))
+      })
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2
+        const leaf = mesh(new THREE.SphereGeometry(0.05, 8, 6), mat(STEM, { roughness: 0.8 }), Math.cos(a) * 0.14, 0.45, Math.sin(a) * 0.14)
+        leaf.scale.set(1.4, 0.3, 0.6)
+        leaf.rotation.y = -a
+        leaf.rotation.z = 0.5
+        parts.push(leaf)
+      }
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-heart-balloons',
+    name: 'Heart balloons',
+    icon: 'i-lucide-heart',
+    category: 'premium',
+    pack: 'valentine',
+    defaultColor: '#ff2e63',
+    build: (color) => {
+      const shiny = (c: string) => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.1 })
+      const balloons: [number, number, number, string, number][] = [
+        [0, 1.75, 0, color, 0.42],
+        [-0.3, 1.5, 0.08, PINK, 0.34],
+        [0.3, 1.55, -0.06, '#ffffff', 0.32],
+      ]
+      const parts: THREE.Object3D[] = [
+        // A little gift-box weight
+        box(0.16, 0.14, 0.16, mat(color, { roughness: 0.5 })),
+        box(0.17, 0.02, 0.04, mat('#ffd166'), 0, 0.14),
+        box(0.04, 0.02, 0.17, mat('#ffd166'), 0, 0.14),
+      ]
+      for (const [x, y, z, c, w] of balloons) {
+        const h = heart(w, w * 0.28, shiny(c), x, y, z)
+        h.rotation.y = x * 0.6
+        parts.push(h)
+        // String from the weight to the balloon's tip
+        const from = new THREE.Vector3(0, 0.15, 0)
+        const to = new THREE.Vector3(x, y - w * 0.42, z)
+        const string = mesh(new THREE.CylinderGeometry(0.003, 0.003, from.distanceTo(to), 4), mat('#f4f4f4'))
+        string.position.copy(from).add(to).multiplyScalar(0.5)
+        string.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), to.clone().sub(from).normalize())
+        parts.push(string)
+      }
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-rose-arch',
+    name: 'Rose arch',
+    icon: 'i-lucide-rainbow',
+    category: 'premium',
+    pack: 'valentine',
+    defaultColor: '#f2f0ea',
+    attractsButterflies: true,
+    build: (color) => {
+      const frame = mat(color, { roughness: 0.4, metalness: 0.3 })
+      const parts: THREE.Object3D[] = [
+        cyl(0.03, 0.03, 1.5, frame, -0.9, 0, 0),
+        cyl(0.03, 0.03, 1.5, frame, 0.9, 0, 0),
+        box(0.22, 0.05, 0.22, frame, -0.9, 0, 0),
+        box(0.22, 0.05, 0.22, frame, 0.9, 0, 0),
+      ]
+      const arc = mesh(new THREE.TorusGeometry(0.9, 0.03, 8, 48, Math.PI), frame, 0, 1.5, 0)
+      parts.push(arc)
+      // Roses and leaves climbing the frame
+      const climb = (x: number, y: number, i: number) => {
+        const leaf = mesh(new THREE.IcosahedronGeometry(0.07, 0), mat(i % 2 ? STEM : '#4f9447', { roughness: 0.9, flatShading: true }), x + (i % 2 ? 0.05 : -0.05), y - 0.04, i % 3 ? 0.04 : -0.04)
+        parts.push(leaf)
+        if (i % 2 === 0) parts.push(rose(i % 4 === 0 ? '#e0234e' : PINK, 0.06, x, y, 0.03))
+      }
+      for (let i = 0; i < 14; i++) {
+        const y = 0.25 + i * 0.09
+        climb(-0.9, y, i)
+        climb(0.9, y, i + 1)
+      }
+      for (let i = 0; i <= 18; i++) {
+        const a = (i / 18) * Math.PI
+        climb(Math.cos(a) * 0.9, 1.5 + Math.sin(a) * 0.9, i)
+      }
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-candle-heart',
+    name: 'Candle heart',
+    icon: 'i-lucide-flame',
+    category: 'premium',
+    pack: 'valentine',
+    defaultColor: '#fff3e0',
+    light: { color: '#ffb35c', intensity: 2.6, distance: 3.5, offset: [0, 0.25, 0], flicker: true },
+    build: (color) => {
+      const wax = mat(color, { roughness: 0.6 })
+      const flame = glow('#ffb347', 0.9)
+      const parts: THREE.Object3D[] = []
+      // Candles along the outline, lying flat on the floor (outline is 0.94 wide → about 1.3 m)
+      const points = heartShape().getSpacedPoints(22)
+      points.pop()
+      const k = 1.4
+      points.forEach((p, i) => {
+        const x = p.x * k
+        const z = -p.y * k
+        const h = 0.06 + (i % 3) * 0.02
+        parts.push(cyl(0.028, 0.03, h, wax, x, 0, z, 12))
+        const f = sphere(0.012, flame, x, h + 0.016, z)
+        f.scale.y = 1.7
+        parts.push(f)
+      })
+      // Rose petals scattered inside
+      const petal = mat('#c8102e', { roughness: 0.7 })
+      for (let i = 0; i < 26; i++) {
+        const a = i * 2.39996
+        const r = Math.sqrt(i / 26) * 0.32
+        const pm = mesh(new THREE.SphereGeometry(0.025, 8, 6), petal, Math.cos(a) * r, 0.005, Math.sin(a) * r * 0.85 - 0.02)
+        pm.scale.set(1, 0.15, 0.7)
+        pm.rotation.y = a
+        parts.push(pm)
+      }
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-neon-heart',
+    name: 'Neon heart',
+    icon: 'i-lucide-heart-pulse',
+    category: 'premium',
+    pack: 'valentine',
+    defaultColor: '#ff2d78',
+    wallMounted: true,
+    light: { color: '#ff5c9a', intensity: 2, distance: 3.5, offset: [0, 0, 0.35] },
+    build: (color) => {
+      const outline = heartShape().getSpacedPoints(80).map(p => new THREE.Vector3(p.x * 0.85, p.y * 0.85, 0.06))
+      const curve = new THREE.CatmullRomCurve3(outline, true)
+      const tube = mesh(new THREE.TubeGeometry(curve, 160, 0.022, 10, true), glow(color, 1))
+      const inner = heartShape().getSpacedPoints(60).map(p => new THREE.Vector3(p.x * 0.6, p.y * 0.6 + 0.02, 0.06))
+      const tube2 = mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(inner, true), 120, 0.012, 8, true), glow('#ffd1e3', 0.8))
+      const plate = box(0.95, 0.8, 0.015, mat('#1b1b24', { transparent: true, opacity: 0.3 }), 0, -0.4, 0.01)
+      return group(plate, tube, tube2)
+    },
+  },
+  {
+    type: 'vip-love-bear',
+    name: 'Teddy bear',
+    icon: 'i-lucide-heart-handshake',
+    category: 'premium',
+    pack: 'valentine',
+    defaultColor: '#c98b5b',
+    build: (color) => {
+      const fur = mat(color, { roughness: 0.95 })
+      const light = mat(new THREE.Color(color).offsetHSL(0, -0.1, 0.18).getStyle(), { roughness: 0.95 })
+      const dark = mat('#2a1d18', { roughness: 0.3 })
+      const ball = (r: number, m: THREE.Material, x: number, y: number, z: number, sx = 1, sy = 1, sz = 1) => {
+        const b = sphere(r, m, x, y, z)
+        b.scale.set(sx, sy, sz)
+        return b
+      }
+      return group(
+        // Body, sitting
+        ball(0.17, fur, 0, 0.18, 0, 1, 1.05, 0.9),
+        ball(0.11, light, 0, 0.17, 0.09, 1, 1.1, 0.6),
+        // Legs
+        ball(0.07, fur, -0.1, 0.06, 0.1, 1, 0.8, 1.4),
+        ball(0.07, fur, 0.1, 0.06, 0.1, 1, 0.8, 1.4),
+        ball(0.04, light, -0.1, 0.06, 0.2, 1, 1, 0.4),
+        ball(0.04, light, 0.1, 0.06, 0.2, 1, 1, 0.4),
+        // Head
+        ball(0.13, fur, 0, 0.43, 0.01),
+        ball(0.05, fur, -0.1, 0.54, 0, 1, 1, 0.6),
+        ball(0.05, fur, 0.1, 0.54, 0, 1, 1, 0.6),
+        ball(0.028, light, -0.1, 0.54, 0.02, 1, 1, 0.5),
+        ball(0.028, light, 0.1, 0.54, 0.02, 1, 1, 0.5),
+        ball(0.055, light, 0, 0.4, 0.11, 1.1, 0.85, 0.8),
+        ball(0.02, dark, 0, 0.42, 0.155),
+        ball(0.016, dark, -0.05, 0.47, 0.115),
+        ball(0.016, dark, 0.05, 0.47, 0.115),
+        // Arms around a red heart
+        ball(0.06, fur, -0.14, 0.24, 0.1, 0.8, 1.4, 0.8),
+        ball(0.06, fur, 0.14, 0.24, 0.1, 0.8, 1.4, 0.8),
+        heart(0.2, 0.07, new THREE.MeshPhysicalMaterial({ color: '#e0103a', roughness: 0.35, clearcoat: 0.6 }), 0, 0.22, 0.17),
+      )
+    },
+  },
+]
+
+ROOM_CATALOG.push(...PREMIUM_ITEMS)
 
 export const CATALOG_BY_TYPE: Record<string, CatalogItem> = Object.fromEntries(
   ROOM_CATALOG.map(item => [item.type, item]),

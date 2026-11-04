@@ -5,7 +5,7 @@ import { getDB } from '../utils/db'
 const SITE = 'https://perlink.to'
 
 /** Public marketing pages, then every published site and its blog posts */
-const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/3d-portfolio', '/vi/portfolio-3d', '/affiliates', '/vi/cong-tac-vien', ...USE_CASE_PAIRS.flat(), '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
+const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/3d-portfolio', '/vi/portfolio-3d', '/affiliates', '/vi/cong-tac-vien', '/marketplace', ...USE_CASE_PAIRS.flat(), '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
 
 /** Pages with an address per language, linked to each other (hreflang) */
 const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/3d-portfolio', '/vi/portfolio-3d'], ['/affiliates', '/vi/cong-tac-vien'], ...USE_CASE_PAIRS]

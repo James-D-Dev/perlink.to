@@ -1,4 +1,5 @@
 import { BioRepository, type CreateBioPageInput } from '../../../../repositories/bioRepository'
+import { requireRoomPacksAllowed } from '../../../../utils/roomPacks'
 import { requireRoomToPublish, requireThemeAllowed } from '../../../../utils/plan'
 import { requireNotRemoved } from '../../../../utils/moderation'
 
@@ -47,6 +48,7 @@ export default defineEventHandler(async (event) => {
   await requireRoomToPublish(event, user.id, bioPage)
   // What goes live is the draft's theme, or the current one
   await requireThemeAllowed(event, user.id, (bioPage.draft?.themeConfig ?? bioPage.themeConfig) as { presetId?: string }, bioPage.isPublished ? bioPage.themeConfig as { presetId?: string } : null)
+  await requireRoomPacksAllowed(event, user.id, (bioPage.draft?.themeConfig ?? bioPage.themeConfig) as any, bioPage.isPublished ? bioPage.themeConfig as any : null)
 
   try {
     // Publishing applies any saved draft to the live site

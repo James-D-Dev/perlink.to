@@ -10,7 +10,7 @@ import { DEFAULT_ROOM_STYLE } from '~/types/room'
 
 const SIZE = 192
 // Bump when catalog models change so cached thumbnails are regenerated
-const CACHE_KEY = 'perlink-room-thumbs-v9'
+const CACHE_KEY = 'perlink-room-thumbs-v11'
 
 let memoryCache: Record<string, string> | null = null
 
@@ -80,12 +80,13 @@ async function renderItem(renderer: RoomRenderer, item: CatalogItem): Promise<st
  * Get thumbnails for every catalog item. Calls onUpdate as each one becomes
  * available so the UI can fill in progressively.
  */
-export async function loadRoomThumbnails(onUpdate: (type: string, url: string) => void) {
+export async function loadRoomThumbnails(onUpdate: (type: string, url: string) => void, only?: string[]) {
   // Decide WebGPU or WebGL before building anything (./gpu.ts)
   await loadGpuKit()
   const cache = readCache()
   const missing: CatalogItem[] = []
   for (const item of ROOM_CATALOG) {
+    if (only && !only.includes(item.type)) continue
     if (cache[item.type]) onUpdate(item.type, cache[item.type]!)
     else missing.push(item)
   }

@@ -180,7 +180,8 @@
       "wall": "Tường",
       "tech": "Công nghệ",
       "dungeon": "Hầm ngục",
-      "shop": "Cửa hàng"
+      "shop": "Cửa hàng",
+      "premium": "Cao cấp"
     },
     "styles": {
       "cozy-wood": "Gỗ ấm cúng",
@@ -305,7 +306,13 @@
       "garden-rocks": "Đá sân vườn",
       "garden-pebble-tray": "Khay sỏi",
       "product-stand": "Kệ sản phẩm",
-      "blog-board": "Bảng tin blog"
+      "blog-board": "Bảng tin blog",
+      "vip-rose-bouquet": "Bó hoa hồng",
+      "vip-heart-balloons": "Bóng bay trái tim",
+      "vip-rose-arch": "Cổng hoa hồng",
+      "vip-candle-heart": "Nến trái tim",
+      "vip-neon-heart": "Đèn neon trái tim",
+      "vip-love-bear": "Gấu bông"
     },
     "tour": {
       "back": "Quay lại",
@@ -349,6 +356,55 @@
       "pick": "Chọn sản phẩm",
       "hint": "Khách bấm vào kệ để xem sản phẩm và đặt hàng ngay trong phòng.",
       "none": "Trang chưa có sản phẩm. Thêm khối Sản phẩm ở phần Nội dung của trang trước."
+    },
+    "packs": {
+      "valentine": {
+        "name": "Valentine",
+        "tagline": "Hoa hồng, nến và trái tim cho người bạn thương."
+      },
+      "badge": "Cao cấp",
+      "owned": "Đã sở hữu",
+      "included": "Có sẵn trong gói Max",
+      "buy": "Mua với giá {price}",
+      "oneTime": "Thanh toán một lần · dùng mãi mãi",
+      "items": "{n} món",
+      "trayLocked": "Món cao cấp: đặt thử vào phòng thoải mái, mua gói để xuất bản.",
+      "trayOwned": "Món cao cấp của bạn",
+      "seeMarket": "Cửa hàng",
+      "promptTitle": "Phòng của bạn có món cao cấp",
+      "promptText": "Mua gói để xuất bản phòng với các món này. Trả một lần, dùng mãi mãi cho mọi phòng bạn làm.",
+      "orMax": "Hoặc lên gói Max: có sẵn mọi gói",
+      "later": "Để sau",
+      "checkoutFailed": "Không mở được trang thanh toán",
+      "bought": "Gói {name} đã là của bạn",
+      "boughtText": "Các món đã sẵn sàng ở thẻ Cao cấp trong trình chỉnh phòng.",
+      "boughtPending": "Đã nhận thanh toán. Gói sẽ hiện sau vài giây.",
+      "signIn": "Đăng nhập để mua"
+    },
+    "market": {
+      "metaTitle": "Cửa hàng phòng 3D: Món đồ cao cấp cho phòng của bạn | Perlink",
+      "metaDescription": "Món đồ 3D cao cấp cho phòng Perlink: hoa hồng, nến, đèn neon trái tim và nhiều hơn nữa. Trả một lần, dùng mãi mãi, cho mọi phòng.",
+      "eyebrow": "Cửa hàng",
+      "title": "Làm căn phòng của bạn thật khó quên",
+      "intro": "Những món đồ 3D cao cấp dành cho những khoảnh khắc quan trọng. Trả một lần, giữ mãi mãi và dùng trong mọi phòng bạn làm.",
+      "maxNote": "Đang dùng gói Max? Bạn đã có sẵn mọi gói.",
+      "openEditor": "Mở trình chỉnh phòng",
+      "howTitle": "Cách hoạt động",
+      "how": [
+        {
+          "title": "Chọn gói",
+          "text": "Mỗi món được làm riêng cho phòng 3D và tự sáng lên vào ban đêm."
+        },
+        {
+          "title": "Trả một lần",
+          "text": "Thẻ, PayPal hoặc Apple Pay qua Lemon Squeezy. Không phải gói tháng."
+        },
+        {
+          "title": "Trang trí",
+          "text": "Tìm các món ở thẻ Cao cấp trong trình chỉnh phòng, dùng cho mọi phòng bạn làm."
+        }
+      ],
+      "soon": "Sắp có thêm gói: đám cưới, sinh nhật, Tết và nhiều hơn nữa."
     }
   }
 }

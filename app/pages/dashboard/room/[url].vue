@@ -27,6 +27,9 @@
       @save="save()"
       @publish="publish"
     />
+    <!-- The room editor has its own layout: the plan and pack prompts live here too -->
+    <BillingUpgradeDialog />
+    <BillingPackDialog />
   </div>
 </template>
 

@@ -327,6 +327,12 @@
         <!-- Tray -->
         <div v-show="trayOpen" class="border-b border-default">
           <!-- Catalog items -->
+          <!-- Premium: try anything, the pack is needed to publish -->
+          <div v-if="activeCategory === 'premium'" class="flex items-center gap-2 border-b border-default bg-gradient-to-r from-amber-400/15 via-pink-500/10 to-transparent px-3 py-2">
+            <UIcon name="i-lucide-crown" class="size-4 shrink-0 text-amber-500" />
+            <p class="min-w-0 flex-1 text-xs text-muted">{{ allPremiumOwned ? t('room.packs.trayOwned') : t('room.packs.trayLocked') }}</p>
+            <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-store" :label="t('room.packs.seeMarket')" to="/marketplace" target="_blank" />
+          </div>
           <div v-if="activeCategory" class="flex gap-2 overflow-x-auto scroll-fade-x p-3 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button
               v-for="item in activeItems"
@@ -337,9 +343,12 @@
               @pointerdown="onItemPointerDown($event, item.type)"
               @click.prevent
             >
-              <div class="flex aspect-square w-full items-center justify-center">
+              <div class="relative flex aspect-square w-full items-center justify-center" :class="item.pack && 'rounded-lg bg-gradient-to-br from-rose-300/30 to-fuchsia-400/20'">
                 <img v-if="thumbnails[item.type]" :src="thumbnails[item.type]" :alt="objectName(item)" class="size-full object-contain transition group-hover:scale-105" draggable="false">
                 <USkeleton v-else class="size-3/4 rounded-lg" />
+                <span v-if="item.pack" class="absolute right-0.5 top-0.5 flex size-5 items-center justify-center rounded-full shadow" :class="packOwned(item.pack) ? 'bg-gradient-to-br from-amber-300 to-pink-400 text-white' : 'bg-black/60 text-white'">
+                  <UIcon :name="packOwned(item.pack) ? 'i-lucide-crown' : 'i-lucide-lock'" class="size-3" />
+                </span>
               </div>
               <span class="w-full truncate text-center text-[11px] font-medium text-default">{{ objectName(item) }}</span>
             </button>
@@ -666,6 +675,7 @@ function isActivePreset(style: Partial<RoomStyle>) {
 }
 
 const CATEGORY_ICONS: Record<CatalogCategory, string> = {
+  premium: 'i-lucide-crown',
   shop: 'i-lucide-shopping-bag',
   furniture: 'i-lucide-sofa',
   lighting: 'i-lucide-lamp',
@@ -685,6 +695,12 @@ const tabs = computed<{ value: Tab; label: string; icon: string }[]>(() => [
 
 const activeCategory = computed(() => (activeTab.value in CATEGORY_LABELS ? (activeTab.value as CatalogCategory) : null))
 const activeItems = computed(() => ROOM_CATALOG.filter(i => i.category === activeCategory.value))
+
+// Premium items (room packs): anyone can place them; publishing needs the pack
+const roomPacks = useRoomPacks()
+onMounted(() => roomPacks.ensure())
+const packOwned = (pack: string) => roomPacks.owns(pack)
+const allPremiumOwned = computed(() => !!roomPacks.state.value?.packs.length && roomPacks.state.value.packs.every(p => p.owned))
 
 const palette = ['#f5f5f2', '#2f2f36', '#8b5e3c', '#d9b382', '#c0605a', '#e76f51', '#e9c46a', '#4f8a4b', '#2a9d8f', '#6c8ebf', '#8338ec', '#ff4fd8']
 

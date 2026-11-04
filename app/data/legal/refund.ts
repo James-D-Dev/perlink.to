@@ -19,7 +19,7 @@ export const REFUND: LegalDocs = {
       {
         id: 'guarantee',
         title: '7-day money-back guarantee',
-        blocks: ['If a paid plan isn’t right for you, ask for a refund within 7 days of the payment (the first payment or a renewal) and we will refund it in full. Your account returns to the free plan when the refund is made.'],
+        blocks: ['If a paid plan isn’t right for you, ask for a refund within 7 days of the payment (the first payment or a renewal) and we will refund it in full. Your account returns to the free plan when the refund is made.', 'The same applies to a premium 3D item pack bought on the marketplace: within 7 days of buying it, we refund it in full and the pack is removed from your account.'],
       },
       {
         id: 'after',
@@ -70,7 +70,7 @@ export const REFUND: LegalDocs = {
       {
         id: 'guarantee',
         title: 'Cam kết hoàn tiền trong 7 ngày',
-        blocks: ['Nếu gói trả phí chưa phù hợp, hãy yêu cầu hoàn tiền trong vòng 7 ngày kể từ lúc thanh toán (lần đầu hoặc lần gia hạn), chúng tôi hoàn lại toàn bộ. Tài khoản sẽ về gói Miễn phí khi hoàn tiền xong.'],
+        blocks: ['Nếu gói trả phí chưa phù hợp, hãy yêu cầu hoàn tiền trong vòng 7 ngày kể từ lúc thanh toán (lần đầu hoặc lần gia hạn), chúng tôi hoàn lại toàn bộ. Tài khoản sẽ về gói Miễn phí khi hoàn tiền xong.', 'Gói món 3D cao cấp mua ở cửa hàng cũng vậy: trong vòng 7 ngày kể từ lúc mua, chúng tôi hoàn lại toàn bộ và gói được gỡ khỏi tài khoản.'],
       },
       {
         id: 'after',

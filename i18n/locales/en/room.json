@@ -180,7 +180,8 @@
       "wall": "Wall",
       "tech": "Tech",
       "dungeon": "Dungeon",
-      "shop": "Shop"
+      "shop": "Shop",
+      "premium": "Premium"
     },
     "styles": {
       "cozy-wood": "Cozy wood",
@@ -305,7 +306,13 @@
       "garden-rocks": "Garden rocks",
       "garden-pebble-tray": "Pebble tray",
       "product-stand": "Product stand",
-      "blog-board": "Blog board"
+      "blog-board": "Blog board",
+      "vip-rose-bouquet": "Rose bouquet",
+      "vip-heart-balloons": "Heart balloons",
+      "vip-rose-arch": "Rose arch",
+      "vip-candle-heart": "Candle heart",
+      "vip-neon-heart": "Neon heart",
+      "vip-love-bear": "Teddy bear"
     },
     "tour": {
       "back": "Back",
@@ -349,6 +356,55 @@
       "pick": "Choose a product",
       "hint": "Visitors click the stand to see the product and order right in the room.",
       "none": "This site has no products yet. Add a Products block to the page first."
+    },
+    "packs": {
+      "valentine": {
+        "name": "Valentine",
+        "tagline": "Roses, candles and hearts for the one you love."
+      },
+      "badge": "Premium",
+      "owned": "Owned",
+      "included": "Included in Max",
+      "buy": "Buy for {price}",
+      "oneTime": "One-time payment · yours forever",
+      "items": "{n} items",
+      "trayLocked": "Premium items: try them in your room, buy the pack to publish.",
+      "trayOwned": "Your premium items",
+      "seeMarket": "Marketplace",
+      "promptTitle": "Your room uses premium items",
+      "promptText": "Get the pack to publish your room with them. You pay once and keep it forever, for every room you make.",
+      "orMax": "Or get Max: every pack included",
+      "later": "Not now",
+      "checkoutFailed": "Couldn't open the checkout",
+      "bought": "{name} pack is yours",
+      "boughtText": "Its items are ready in the Premium tab of the room editor.",
+      "boughtPending": "Payment received. The pack appears in a few seconds.",
+      "signIn": "Sign in to buy"
+    },
+    "market": {
+      "metaTitle": "3D Room Marketplace: Premium Items for Your Room | Perlink",
+      "metaDescription": "Premium 3D items for your Perlink room: roses, candles, neon hearts and more. Pay once, keep forever, use in every room.",
+      "eyebrow": "Marketplace",
+      "title": "Make your room unforgettable",
+      "intro": "Premium 3D items, made for the moments that matter. Pay once, keep them forever and use them in every room you build.",
+      "maxNote": "On Max? Every pack is already yours.",
+      "openEditor": "Open the room editor",
+      "howTitle": "How it works",
+      "how": [
+        {
+          "title": "Pick a pack",
+          "text": "Every item is crafted for the 3D room and lights up at night."
+        },
+        {
+          "title": "Pay once",
+          "text": "Card, PayPal or Apple Pay through Lemon Squeezy. No subscription."
+        },
+        {
+          "title": "Decorate",
+          "text": "Find the items in the Premium tab of the room editor, in every room you make."
+        }
+      ],
+      "soon": "More packs are on the way: wedding, birthday, Tết and more."
     }
   }
 }

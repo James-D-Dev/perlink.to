@@ -1,5 +1,6 @@
 import type { H3Event } from 'h3'
 import { PAID_PLANS, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { ROOM_PACKS, type RoomPackId } from '#shared/roomPacks'
 
 // Lemon Squeezy sells the plans as subscriptions (card, PayPal, Apple Pay),
 // as Merchant of Record. Its products are named after the plans ("Starter",
@@ -38,7 +39,15 @@ export async function lemonApi<T>(event: H3Event, path: string, init: { method?:
 }
 
 type VariantKey = `${PaidPlanId}:${BillingPeriod}`
-interface Catalog { storeId: string; variants: Partial<Record<VariantKey, string>>; plans: Record<string, { plan: PaidPlanId; period: BillingPeriod }> }
+interface Catalog {
+  storeId: string
+  variants: Partial<Record<VariantKey, string>>
+  plans: Record<string, { plan: PaidPlanId; period: BillingPeriod }>
+  /** Room packs (one-time products named e.g. "Valentine Room Pack"): pack → variant */
+  packs: Partial<Record<RoomPackId, string>>
+  /** variant → pack */
+  packOfVariant: Record<string, RoomPackId>
+}
 
 // Looked up once per worker; a new deploy (or a cold start) looks again
 let catalog: { at: number; value: Catalog } | null = null
@@ -52,14 +61,28 @@ export async function lemonCatalog(event: H3Event, fresh = false): Promise<Catal
   }
   const products = await lemonApi<{ data: JsonApiItem<{ name: string; status: string }>[] }>(event, `/products?filter[store_id]=${storeId}&page[size]=100`)
   const planOfProduct = new Map<string, PaidPlanId>()
+  const packOfProduct = new Map<string, RoomPackId>()
   for (const product of products.data) {
     const name = product.attributes.name.toLowerCase()
+    // Room packs first: "Valentine Room Pack" isn't a plan
+    const pack = /\bpack\b/.test(name) ? ROOM_PACKS.find(p => name.includes(p.lemonMatch)) : undefined
+    if (pack) {
+      packOfProduct.set(product.id, pack.id)
+      continue
+    }
     const plan = PAID_PLANS.find(id => new RegExp(`\\b${id}\\b`).test(name))
     if (plan) planOfProduct.set(product.id, plan)
   }
   const variants = await lemonApi<{ data: JsonApiItem<{ product_id: number; interval: string | null; status: string }>[] }>(event, `/variants?page[size]=100`)
-  const value: Catalog = { storeId, variants: {}, plans: {} }
+  const value: Catalog = { storeId, variants: {}, plans: {}, packs: {}, packOfVariant: {} }
   for (const variant of variants.data) {
+    // A pack is one price: its published variant, else the product's only (default) one
+    const pack = packOfProduct.get(String(variant.attributes.product_id))
+    if (pack) {
+      if (variant.attributes.status === 'published' || !value.packs[pack]) value.packs[pack] = variant.id
+      value.packOfVariant[variant.id] = pack
+      continue
+    }
     const plan = planOfProduct.get(String(variant.attributes.product_id))
     const period: BillingPeriod | null = variant.attributes.interval === 'month' ? 'monthly' : variant.attributes.interval === 'year' ? 'annual' : null
     // Only variants on sale: each product also keeps a hidden "Default" variant (pending)
@@ -104,6 +127,37 @@ export async function createLemonCheckout(event: H3Event, input: { userId: strin
 }
 
 interface SubscriptionAttributes { variant_id: number; status: string; urls?: { customer_portal?: string | null } }
+
+/** A one-time checkout for a room pack, tagged with the account so the webhook can hand it over */
+export async function createLemonPackCheckout(event: H3Event, input: { userId: string; email?: string | null; name?: string | null; pack: RoomPackId; redirectUrl: string; affiliate?: string | null }) {
+  const { storeId, packs } = await lemonCatalog(event)
+  const variantId = packs[input.pack]
+  if (!variantId) return null
+  const res = await lemonApi<{ data: JsonApiItem<{ url: string }> }>(event, '/checkouts', {
+    method: 'POST',
+    body: {
+      data: {
+        type: 'checkouts',
+        attributes: {
+          checkout_data: {
+            email: input.email || undefined,
+            name: input.name || undefined,
+            custom: { user_id: input.userId, pack: input.pack, ...(input.affiliate ? { aff: input.affiliate } : {}) },
+          },
+          product_options: { redirect_url: input.redirectUrl, enabled_variants: [Number(variantId)] },
+          checkout_options: { embed: false },
+        },
+        relationships: {
+          store: { data: { type: 'stores', id: storeId } },
+          variant: { data: { type: 'variants', id: variantId } },
+        },
+      },
+    },
+  })
+  const url = new URL(res.data.attributes.url)
+  if (input.affiliate) url.searchParams.set('aff', input.affiliate)
+  return url.toString()
+}
 
 /** A subscription's customer portal link; the one webhooks send expires after a day, so ask for a fresh one */
 export async function lemonPortalUrl(event: H3Event, subscriptionId: string) {

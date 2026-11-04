@@ -1,6 +1,7 @@
 import { getDB } from '../../utils/db'
 import { lemonCatalog, verifyLemonSignature } from '../../utils/lemon'
 import { PERIOD_MONTHS, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { isRoomPackId } from '#shared/roomPacks'
 
 // Lemon Squeezy calls this for subscription events (see docs/billing.md for
 // the list to tick). Each one is signed; the account's plan follows the
@@ -23,9 +24,15 @@ interface InvoiceAttributes {
   total_usd: number
   refunded?: boolean
 }
+interface OrderAttributes {
+  /** pending | failed | paid | refunded | partial_refund */
+  status: string
+  total_usd: number
+  first_order_item?: { variant_id: number }
+}
 interface Payload {
-  meta: { event_name: string; custom_data?: { user_id?: string; plan?: string; period?: string } }
-  data: { id: string; type: string; attributes: SubscriptionAttributes & InvoiceAttributes }
+  meta: { event_name: string; custom_data?: { user_id?: string; plan?: string; period?: string; pack?: string } }
+  data: { id: string; type: string; attributes: SubscriptionAttributes & InvoiceAttributes & OrderAttributes }
 }
 
 const GRACE_DAYS = 3
@@ -85,6 +92,28 @@ export default defineEventHandler(async (event) => {
       await setPlan(owner.user_id, plan, sub.ends_at, false)
     } else if (['expired', 'unpaid', 'paused'].includes(sub.status)) {
       await setPlan(owner.user_id, plan, sub.ends_at && Date.parse(sub.ends_at) < Date.now() ? sub.ends_at : now, false)
+    }
+    return { ok: true }
+  }
+
+  // A room pack bought once (order_created / order_refunded): the account
+  // gets the pack, or loses it on a refund
+  if (payload.data.type === 'orders') {
+    const order = payload.data.attributes
+    const custom = payload.meta.custom_data
+    let pack = custom?.pack
+    if (!isRoomPackId(pack) && order.first_order_item) {
+      pack = (await lemonCatalog(event).catch(() => null))?.packOfVariant[String(order.first_order_item.variant_id)]
+    }
+    if (!isRoomPackId(pack) || !custom?.user_id) return { ok: true }
+    const ref = `lemon:order:${payload.data.id}`
+    if (name === 'order_created' && order.status === 'paid') {
+      await db.prepare(`INSERT INTO room_packs (user_id, pack_id, source, order_ref, amount_usd) VALUES (?, ?, 'lemon', ?, ?)
+        ON CONFLICT(user_id, pack_id) DO NOTHING`)
+        .bind(custom.user_id, pack, ref, (order.total_usd ?? 0) / 100)
+        .run()
+    } else if (name === 'order_refunded' || order.status === 'refunded') {
+      await db.prepare('DELETE FROM room_packs WHERE order_ref = ?').bind(ref).run()
     }
     return { ok: true }
   }

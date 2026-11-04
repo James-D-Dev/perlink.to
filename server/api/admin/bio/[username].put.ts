@@ -1,5 +1,6 @@
 import { BioRepository, DRAFT_FIELDS, editableBioPage, type BioDraft, type CreateBioPageInput } from '../../../repositories/bioRepository'
 import { requireThemeAllowed } from '../../../utils/plan'
+import { requireRoomPacksAllowed } from '../../../utils/roomPacks'
 
 export default defineEventHandler(async (event) => {
   // Check auth
@@ -50,6 +51,7 @@ export default defineEventHandler(async (event) => {
   const writesLive = bioPage.isPublished && body.draft !== true
   if (writesLive && content.themeConfig) {
     await requireThemeAllowed(event, user.id, content.themeConfig as { presetId?: string }, bioPage.themeConfig as { presetId?: string })
+    await requireRoomPacksAllowed(event, user.id, content.themeConfig as any, bioPage.themeConfig as any)
   }
 
   try {

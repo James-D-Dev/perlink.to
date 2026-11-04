@@ -90,6 +90,7 @@
 
     <slot />
     <BillingUpgradeDialog />
+    <BillingPackDialog />
     <BillingCelebration />
     <HelpCenter :launcher="false" />
   </UDashboardGroup>
@@ -144,6 +145,7 @@ const navigationLinks = computed<NavigationMenuItem[]>(() => [
   { label: t("nav.home"), icon: "i-lucide-house", to: "/dashboard", exact: true },
   // Also lit inside a site: its editor, analytics and inbox are separate pages
   { label: t("nav.sites"), icon: "i-lucide-layout-template", to: "/dashboard/site", active: route.path.startsWith("/dashboard/site") },
+  { label: t("nav.marketplace"), icon: "i-lucide-store", to: "/marketplace" },
   { label: t("nav.earn"), icon: "i-lucide-hand-coins", to: "/dashboard/earn" },
   { label: t("nav.settings"), icon: "i-lucide-settings", to: "/dashboard/settings" },
 ]);

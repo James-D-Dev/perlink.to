@@ -65,6 +65,11 @@ export function useUpgradePrompt() {
   function fromError(error: any) {
     const data = error?.data?.data ?? error?.data
     if (error?.statusCode !== 402 && error?.status !== 402) return false
+    // Premium room items: the pack prompt instead
+    if (data?.code === 'PACK_REQUIRED' && Array.isArray(data.packs)) {
+      usePackPrompt().open(data.packs)
+      return true
+    }
     if (data?.code !== 'PLAN_REQUIRED') return false
     reason.value = { feature: data.feature, plan: data.plan }
     return true
