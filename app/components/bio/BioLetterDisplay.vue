@@ -274,21 +274,31 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
 .env-flap {
   position: absolute;
   inset: 0 0 auto 0;
-  height: 58%;
-  border-radius: 20px 20px 0 0;
-  backface-visibility: visible;
-  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.12));
-  background: linear-gradient(to bottom, var(--env-dark), color-mix(in srgb, var(--env-dark) 88%, black));
-  clip-path: polygon(0 0, 100% 0, 50% 96%);
+  /* Reaches past the pocket's V so the two always overlap: no gap along the seams */
+  height: 62%;
   transform-origin: top;
   z-index: 3;
+  /* The shadow sits on this wrapper, since a clipped element can't cast one */
+  filter: drop-shadow(0 3px 4px rgb(0 0 0 / 0.14));
   /* Goes behind the letter halfway through its swing */
   transition: transform 0.65s cubic-bezier(0.55, 0, 0.3, 1), filter 0.65s ease, z-index 0s linear 0.32s;
 }
-.stage--sealed:hover .env-flap { transform: rotateX(-12deg); }
+.env-flap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(to bottom, var(--env-dark), color-mix(in srgb, var(--env-dark) 88%, black));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+/* Hover lifts the whole envelope a touch; the flap stays shut */
+.stage--sealed { transition: transform 0.3s ease; }
+@media (hover: hover) {
+  .stage--sealed:hover { transform: translateY(-3px); }
+}
 .seal {
   position: absolute;
-  top: 56%;
+  top: 59%;
   left: 50%;
   z-index: 4;
   width: 60px;
@@ -312,7 +322,7 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
 }
 .seal-icon { width: 26px; height: 26px; filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.18)); }
 .stage--sealed .seal-wax { animation: heartbeat 2.4s ease-in-out infinite; }
-.stage--sealed:hover .seal-wax { animation-duration: 1.2s; }
+@media (hover: hover) { .stage--sealed:hover .seal-wax { animation-duration: 1.2s; } }
 @keyframes heartbeat {
   0%, 40%, 100% { transform: scale(1); }
   10% { transform: scale(1.09); }
@@ -355,7 +365,7 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
 .stage:not(.stage--sealed) .label { opacity: 0; }
 /* Flap: swings up and over, behind the letter */
 .stage--flap .env-flap,
-.stage--rising .env-flap { transform: rotateX(180deg); filter: brightness(0.94) drop-shadow(0 -2px 4px rgb(0 0 0 / 0.1)); z-index: 0; }
+.stage--rising .env-flap { transform: rotateX(180deg); filter: brightness(0.94) drop-shadow(0 -2px 3px rgb(0 0 0 / 0.08)); z-index: 0; }
 /* Rising: the letter slides up out of the pocket, lifting towards the reader */
 .stage--rising .peek { transform: translateY(-42%) scale(1.03); box-shadow: 0 18px 30px -12px rgb(0 0 0 / 0.35); }
 
