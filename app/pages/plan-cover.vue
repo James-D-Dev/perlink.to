@@ -85,11 +85,11 @@ const LOOKS: Record<PaidPlanId, { name: string; tagline: string; icon: string; c
     ],
   },
   max: {
-    name: 'Max', tagline: 'Everything, plus people to help', icon: 'i-lucide-gem',
+    name: 'Max', tagline: 'For agencies and growing businesses', icon: 'i-lucide-gem',
     colors: ['#f59e0b', '#ec4899', '#7c3aed'], badge: 'bg-zinc-950 text-amber-300',
     perks: [
       { icon: 'i-lucide-headset', text: 'Priority support', tone: 'bg-pink-100 text-pink-700' },
-      { icon: 'i-lucide-wand-sparkles', text: 'We build it with you', tone: 'bg-violet-100 text-violet-700' },
+      { icon: 'i-lucide-layout-grid', text: '50 live sites', tone: 'bg-violet-100 text-violet-700' },
       { icon: 'i-lucide-store', text: 'All 3D room packs', tone: 'bg-amber-100 text-amber-700' },
     ],
   },
@@ -106,7 +106,7 @@ const prices = PLAN_PRICES_USD[id]
 const en = (key: string, params: Record<string, unknown> = {}, n?: number) => (n === undefined ? t(key, params, { locale: 'en' }) : t(key, params, { locale: 'en', plural: n }))
 const features = computed(() => {
   const list = planFeatures(id, en)
-  return id === 'max' ? [...list, 'Every 3D room pack included'] : list.slice(0, 8)
+  return list.slice(0, 8)
 })
 </script>
 

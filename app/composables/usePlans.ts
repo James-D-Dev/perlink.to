@@ -62,8 +62,9 @@ export const PLANS = {
     description: 'For agencies and growing businesses',
     features: [
       'Everything in Plus',
+      '50 live sites and 20 custom domains',
+      'Every 3D room pack included',
       'Priority online support',
-      'Setup help',
     ],
   },
 } as const

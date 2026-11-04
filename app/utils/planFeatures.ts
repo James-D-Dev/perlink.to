@@ -7,8 +7,16 @@ type Translate = (...args: any[]) => string
 export function planFeatures(plan: PlanId, t: Translate) {
   const limits = PLAN_LIMITS[plan]
   const f = (key: string, params: Record<string, unknown> = {}, n?: number) => (n === undefined ? t(`dashboard.billing.features.${key}`, params) : t(`dashboard.billing.features.${key}`, params, n))
-  // Max: what Plus has, and people to help (its larger limits aren't listed)
-  if (plan === 'max') return [f('everythingPlus'), f('support'), f('setupHelp')]
+  // Max: what Plus has, room for many sites, every 3D pack and priority support
+  if (plan === 'max') {
+    return [
+      f('everythingPlus'),
+      f('sites', { n: limits.sites }, limits.sites),
+      ...(CUSTOM_DOMAINS_LIVE ? [f('customDomains', { n: limits.domains }, limits.domains)] : []),
+      f('allPacks'),
+      f('support'),
+    ]
+  }
   const list = [
     f('sites', { n: limits.sites }, limits.sites),
     f('basics'),

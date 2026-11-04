@@ -38,8 +38,8 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50, tracking: false, protect: false, orders: false, cleanVideo: false },
   starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100, tracking: true, protect: true, orders: true, cleanVideo: true },
   plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true },
-  // Max: room for agencies and chains (not listed on the pricing page), plus
-  // priority support and setup help (planFeatures)
+  // Max: room for agencies and chains, every 3D room pack and priority
+  // support (planFeatures)
   max: { sites: 50, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true },
 }
 
