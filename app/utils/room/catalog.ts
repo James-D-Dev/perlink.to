@@ -42,6 +42,8 @@ export interface CatalogItem {
   opensBlog?: boolean
   /** Premium: comes in this pack (shared/roomPacks), bought once or with Max */
   pack?: string
+  /** Clicking it in the room plays this track (from the room music library), e.g. the grand piano */
+  music?: string
   build: (color: string) => THREE.Group
 }
 

@@ -153,6 +153,8 @@ const en = {
   switchToNight: 'Switch to night',
   switchToDay: 'Switch to day',
   viewPhoto: 'View photo',
+  playPiano: 'Play the piano',
+  stopPiano: 'Stop the piano',
   closePhoto: 'Close photo',
   formName: 'Name',
   formPhone: 'Phone',
@@ -372,6 +374,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: 'Chuyển sang đêm',
     switchToDay: 'Chuyển sang ngày',
     viewPhoto: 'Xem ảnh',
+    playPiano: 'Chơi đàn piano',
+    stopPiano: 'Dừng đàn',
     closePhoto: 'Đóng ảnh',
 
     formName: 'Họ tên',
@@ -590,6 +594,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: 'Cambiar a noche',
     switchToDay: 'Cambiar a día',
     viewPhoto: 'Ver foto',
+    playPiano: 'Tocar el piano',
+    stopPiano: 'Parar el piano',
     closePhoto: 'Cerrar foto',
 
     formName: 'Nombre',
@@ -808,6 +814,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: 'Passer en mode nuit',
     switchToDay: 'Passer en mode jour',
     viewPhoto: 'Voir la photo',
+    playPiano: 'Jouer du piano',
+    stopPiano: 'Arrêter le piano',
     closePhoto: 'Fermer la photo',
 
     formName: 'Nom',
@@ -1026,6 +1034,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: 'Zur Nacht wechseln',
     switchToDay: 'Zum Tag wechseln',
     viewPhoto: 'Foto ansehen',
+    playPiano: 'Klavier spielen',
+    stopPiano: 'Klavier stoppen',
     closePhoto: 'Foto schließen',
 
     formName: 'Name',
@@ -1244,6 +1254,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: 'Mudar para noite',
     switchToDay: 'Mudar para dia',
     viewPhoto: 'Ver foto',
+    playPiano: 'Tocar piano',
+    stopPiano: 'Parar o piano',
     closePhoto: 'Fechar foto',
 
     formName: 'Nome',
@@ -1462,6 +1474,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: 'Beralih ke malam',
     switchToDay: 'Beralih ke siang',
     viewPhoto: 'Lihat foto',
+    playPiano: 'Mainkan piano',
+    stopPiano: 'Hentikan piano',
     closePhoto: 'Tutup foto',
 
     formName: 'Nama',
@@ -1680,6 +1694,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: 'เปลี่ยนเป็นกลางคืน',
     switchToDay: 'เปลี่ยนเป็นกลางวัน',
     viewPhoto: 'ดูรูป',
+    playPiano: 'เล่นเปียโน',
+    stopPiano: 'หยุดเปียโน',
     closePhoto: 'ปิดรูป',
 
     formName: 'ชื่อ',
@@ -1898,6 +1914,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: '夜に切り替え',
     switchToDay: '昼に切り替え',
     viewPhoto: '写真を見る',
+    playPiano: 'ピアノを弾く',
+    stopPiano: 'ピアノを止める',
     closePhoto: '写真を閉じる',
 
     formName: 'お名前',
@@ -2116,6 +2134,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: '밤으로 전환',
     switchToDay: '낮으로 전환',
     viewPhoto: '사진 보기',
+    playPiano: '피아노 연주',
+    stopPiano: '피아노 멈추기',
     closePhoto: '사진 닫기',
 
     formName: '이름',
@@ -2334,6 +2354,8 @@ const messages: Record<SiteLanguage, Record<SiteMessageKey, string>> = {
     switchToNight: '切换到夜晚',
     switchToDay: '切换到白天',
     viewPhoto: '查看照片',
+    playPiano: '弹钢琴',
+    stopPiano: '停止钢琴',
     closePhoto: '关闭照片',
 
     formName: '姓名',

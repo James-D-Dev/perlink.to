@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import type { CatalogItem } from './catalog'
 import {
-  animate, balloon, box, canvasTexture, cyl, glass, glow, group, heart, heartbeat, heartGeometry, heartShape,
+  animate, balloon, box, pianoState, studioReflection, canvasTexture, cyl, glass, glow, group, heart, heartbeat, heartGeometry, heartShape,
   lathe, loop, loose, mat, mesh, metal, rod, rose, roseLeafGeometry, roses, seeded, shiny, sphere, swarm, v3,
   type RoseSpot,
 } from './modelKit'
@@ -2070,68 +2070,173 @@ const PROPOSAL = premium('proposal', [
     type: 'vip-grand-piano',
     name: 'Grand piano',
     icon: 'i-lucide-piano',
-    defaultColor: '#111114',
+    defaultColor: '#060607',
+    music: 'romantic-piano',
     build: (color) => {
-      // A grand piano, lid up, keys playing by themselves; notes float up
-      const lacquer = shiny(color, { roughness: 0.12 })
-      const gold = metal('#d9b45a', 0.25)
+      // A concert grand in mirror-black lacquer with gold trim: lid raised on
+      // its stick, gold nameboard, lyre with gold pedals, a velvet bench.
+      // Click it in the room and it plays; its keys move with the music.
+      // Its own studio reflection, so the lacquer and gold gleam on any land
+      const studio = studioReflection()
+      const lacquer = new THREE.MeshPhysicalMaterial({ color, roughness: 0.05, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.02, envMap: studio, envMapIntensity: 1.6 })
+      const gold = new THREE.MeshStandardMaterial({ color: '#e3bd5c', metalness: 1, roughness: 0.14, envMap: studio, envMapIntensity: 1.8 })
+      const ivory = new THREE.MeshPhysicalMaterial({ color: '#fbf8f1', roughness: 0.25, clearcoat: 0.6, envMap: studio, envMapIntensity: 0.6 })
+      const ebony = new THREE.MeshPhysicalMaterial({ color: '#0b0b0c', roughness: 0.15, clearcoat: 0.8, envMap: studio, envMapIntensity: 1.2 })
+      const W = 1.48 // case width
+      const KEY_Z = 0.0 // the keyboard's front edge line
+      const CASE_Y = 0.66 // underside of the case
+      const CASE_H = 0.3
+      const TOP = CASE_Y + CASE_H
+
+      // The case outline (x across, y back towards the tail), flat in xz
       const outline = new THREE.Shape()
-      outline.moveTo(-0.72, 0)
-      outline.lineTo(0.72, 0)
-      outline.lineTo(0.72, 0.5)
-      outline.bezierCurveTo(0.7, 1.0, 0.4, 1.15, 0.2, 1.35)
-      outline.bezierCurveTo(0.05, 1.55, -0.2, 1.7, -0.45, 1.65)
-      outline.bezierCurveTo(-0.65, 1.6, -0.72, 1.4, -0.72, 1.1)
-      outline.lineTo(-0.72, 0)
-      // Everything lies flat with the keyboard along z = 0 and the tail towards -z
+      outline.moveTo(-W / 2, 0)
+      outline.lineTo(W / 2, 0)
+      outline.lineTo(W / 2, 0.42)
+      outline.bezierCurveTo(W / 2 - 0.02, 0.95, 0.38, 1.1, 0.18, 1.32)
+      outline.bezierCurveTo(0.02, 1.5, -0.22, 1.72, -0.46, 1.7)
+      outline.bezierCurveTo(-0.66, 1.68, -W / 2, 1.5, -W / 2, 1.18)
+      outline.lineTo(-W / 2, 0)
       const flat = (g: THREE.BufferGeometry) => g.rotateX(-Math.PI / 2)
-      const caseGeo = flat(new THREE.ExtrudeGeometry(outline, { depth: 0.3, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01, bevelSegments: 2 }))
-      const body = mesh(caseGeo, lacquer, 0, 0.68, 0)
-      const inside = mesh(flat(new THREE.ShapeGeometry(outline)), mat('#3a2a1c', { roughness: 0.7 }), 0, 0.975, 0)
-      // Gold frame over the strings
-      const harp = mesh(flat(new THREE.ShapeGeometry(outline)), gold, 0, 0.9, 0)
-      harp.scale.set(0.9, 1, 0.9)
-      // The lid, hinged along the straight side and raised on a prop
-      const lid = mesh(flat(new THREE.ShapeGeometry(outline)), lacquer, -0.72, 0, 0)
-      const lidHinge = group(lid)
-      lidHinge.position.set(0.72, 0.99, 0)
-      lidHinge.rotation.z = -0.75
-      const prop = rod(v3(0.25, 0.99, -0.6), v3(0.28, 1.4, -0.6), 0.008, gold)
-      const parts: THREE.Object3D[] = [body, inside, harp, lidHinge, prop]
-      for (const [x, z] of [[-0.62, 0.05], [0.62, 0.05], [-0.3, -1.45]]) parts.push(cyl(0.04, 0.03, 0.68, lacquer, x!, 0, z!), cyl(0.03, 0.03, 0.02, gold, x!, 0, z!))
-      // Keyboard
-      parts.push(box(1.44, 0.06, 0.22, lacquer, 0, 0.68, 0.11))
-      parts.push(box(1.44, 0.1, 0.03, lacquer, 0, 0.74, -0.02))
-      const whiteN = 36
-      const keyW = 1.36 / whiteN
-      const pressed = (i: number, t: number) => {
-        // A little melody walking up and down the keys, with chords
-        const beat = Math.floor(t * 4)
-        const melody = 14 + Math.round(Math.sin(beat * 0.9) * 6 + Math.sin(beat * 0.37) * 4)
-        const chord = 7 + (Math.floor(beat / 4) % 3) * 2
-        return i === melody || i === chord || i === chord + 2 || i === chord + 4
+      const edge = outline.getSpacedPoints(160).map(p => v3(p.x, 0, -p.y))
+      const parts: THREE.Object3D[] = []
+
+      // Case: rim, inside, gold harp and strings
+      parts.push(mesh(flat(new THREE.ExtrudeGeometry(outline, { depth: CASE_H, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 4, curveSegments: 48 })), lacquer, 0, CASE_Y, 0))
+      parts.push(mesh(flat(new THREE.ShapeGeometry(outline, 48)), mat('#2c1d12', { roughness: 0.6 }), 0, TOP - 0.004, 0))
+      const harp = mesh(flat(new THREE.ShapeGeometry(outline, 48)), gold, 0, TOP - 0.06, 0)
+      harp.scale.set(0.92, 1, 0.92)
+      parts.push(harp)
+      const strings: THREE.Vector3[] = []
+      for (let i = 0; i < 30; i++) strings.push(v3(-0.62 + i * 0.042, TOP - 0.05, -0.15))
+      parts.push(swarm(strings.length, new THREE.CylinderGeometry(0.0015, 0.0015, 1, 4).rotateX(Math.PI / 2), metal('#d8d8dc', 0.25), (i, _t, d) => {
+        const len = 0.5 + Math.max(0, 0.95 - i * 0.03)
+        d.position.copy(strings[i]!).add(v3(0, 0, -len / 2))
+        d.scale.set(1, len, 1)
+      }))
+      // Gold bands round the top and bottom of the rim
+      for (const y of [TOP + 0.004, CASE_Y + 0.01]) parts.push(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(edge.map(p => p.clone().setY(y))), 240, 0.006, 6), gold))
+
+      // Lid: raised on its stick from the long straight side, gold edge
+      const lidGroup = group()
+      const lidGeo = flat(new THREE.ExtrudeGeometry(outline, { depth: 0.018, bevelEnabled: true, bevelThickness: 0.004, bevelSize: 0.004, bevelSegments: 2, curveSegments: 48 }))
+      lidGeo.translate(-W / 2, 0, 0)
+      lidGroup.add(mesh(lidGeo, lacquer))
+      lidGroup.add(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(edge.map(p => p.clone().setX(p.x - W / 2).setY(0.02))), 240, 0.005, 6), gold))
+      lidGroup.position.set(W / 2, TOP + 0.012, 0)
+      // Negative lifts the curved side up off the hinge
+      lidGroup.rotation.z = -0.62
+      parts.push(lidGroup)
+      // The front flap stays folded flat over the strings
+      parts.push(box(W - 0.02, 0.016, 0.26, lacquer, 0, TOP, -0.13))
+      parts.push(rod(v3(-0.42, TOP, -0.95), v3(-0.33, TOP + 0.68, -1.02), 0.009, ebony))
+
+      // Keyboard: key bed, cheeks, nameboard with gold lettering, fallboard
+      parts.push(box(W, 0.09, 0.3, lacquer, 0, CASE_Y + 0.02, KEY_Z + 0.15 - 0.3 + 0.3))
+      for (const side of [-1, 1]) {
+        const cheek = mesh(new THREE.BoxGeometry(0.06, 0.16, 0.32), lacquer, side * (W / 2 - 0.03), CASE_Y + 0.11, KEY_Z + 0.15)
+        parts.push(cheek)
+        parts.push(box(0.064, 0.006, 0.32, gold, side * (W / 2 - 0.03), CASE_Y + 0.19, KEY_Z + 0.15))
       }
-      parts.push(swarm(whiteN, new THREE.BoxGeometry(keyW * 0.92, 0.02, 0.15), mat('#fbfaf6', { roughness: 0.35 }), (i, t, d) => {
-        d.position.set(-0.68 + (i + 0.5) * keyW, 0.73 - (pressed(i, t) ? 0.007 : 0), 0.13)
-        d.rotation.x = pressed(i, t) ? 0.05 : 0
-      }))
+      const name = textTexture(512, 64, (ctx) => {
+        ctx.fillStyle = '#060607'
+        ctx.fillRect(0, 0, 512, 64)
+        ctx.fillStyle = '#e8c56a'
+        ctx.textAlign = 'center'
+        ctx.font = '600 34px "Times New Roman", Georgia, serif'
+        ctx.fillText('P E R L I N K', 256, 44)
+      })
+      const fall = group(
+        box(W - 0.14, 0.12, 0.02, lacquer),
+        mesh(new THREE.PlaneGeometry(0.5, 0.0625), new THREE.MeshStandardMaterial({ map: name, color: name ? '#ffffff' : '#060607', roughness: 0.25, metalness: 0.3 }), 0, 0.06, 0.0105),
+        box(W - 0.14, 0.004, 0.022, gold, 0, 0.12),
+      )
+      fall.position.set(0, CASE_Y + 0.12, KEY_Z - 0.02)
+      fall.rotation.x = -0.12
+      parts.push(fall)
+      // Music desk
+      const desk = box(0.62, 0.24, 0.012, lacquer, 0, TOP + 0.01, -0.12)
+      desk.rotation.x = -0.25
+      parts.push(desk, box(0.62, 0.01, 0.04, gold, 0, TOP + 0.01, -0.1))
+
+      // Keys: 52 white, 36 black. Pressed keys go down and come back up
+      // smoothly with the music: a left hand breaking chords, a right hand melody
+      const WHITE = 52
+      const keyW = (W - 0.14) / WHITE
+      const x0 = -(W - 0.14) / 2
+      const BEAT = 0.34
+      const CHORDS = [[5, 7, 9], [3, 5, 7], [0, 2, 4], [4, 6, 8]] // Am F C G, as white-key steps from C
+      const MELODY = [4, 4, 5, 4, 2, 0, 1, 2, 5, 4, 2, 4, 6, 5, 4, 2]
+      const notesAt = (step: number) => {
+        const chord = CHORDS[Math.floor(step / 8) % CHORDS.length]!
+        // The keyboard starts on A, so C3 is white key 16 and C5 is 30
+        const left = 16 + chord[step % 3]! + (step % 6 >= 3 ? 7 : 0)
+        const out = [left]
+        if (step % 2 === 0) out.push(30 + MELODY[(step / 2) % MELODY.length]! + (Math.floor(step / 32) % 2) * 7)
+        return out
+      }
+      const depthOf = (key: number, t: number) => {
+        if (!pianoState.playing) return 0
+        const step = Math.floor(t / BEAT)
+        let depth = 0
+        for (let back = 0; back < 3; back++) {
+          const s = step - back
+          if (s < 0 || !notesAt(s).includes(key)) continue
+          const age = t - s * BEAT
+          // Down in 50 ms, held, then up over 200 ms
+          const d = age < 0.05 ? age / 0.05 : age < BEAT * 0.8 ? 1 : Math.max(0, 1 - (age - BEAT * 0.8) / 0.2)
+          depth = Math.max(depth, d)
+        }
+        return depth
+      }
+      const keys = swarm(WHITE, new THREE.BoxGeometry(keyW * 0.94, 0.022, 0.15), ivory, (i, t, d) => {
+        const k = depthOf(i, t)
+        d.position.set(x0 + (i + 0.5) * keyW, CASE_Y + 0.11 - k * 0.008, KEY_Z + 0.21)
+        d.rotation.x = k * 0.06
+      })
+      keys.castShadow = false
+      parts.push(keys)
       const blacks: number[] = []
-      for (let i = 0; i < whiteN - 1; i++) if (![2, 6].includes(i % 7)) blacks.push(i)
-      parts.push(swarm(blacks.length, new THREE.BoxGeometry(keyW * 0.55, 0.025, 0.09), mat('#111111', { roughness: 0.3 }), (i, t, d) => {
-        const k = blacks[i]!
-        const down = Math.floor(t * 4 + k) % 9 === 0
-        d.position.set(-0.68 + (k + 1) * keyW, 0.745 - (down ? 0.006 : 0), 0.1)
-      }))
-      // Music stand and bench
-      parts.push(box(0.5, 0.2, 0.01, lacquer, 0, 0.99, 0.02))
-      parts.push(box(0.7, 0.06, 0.35, mat('#1b1b1d', { roughness: 0.6 }), 0, 0.45, 0.62), box(0.66, 0.02, 0.31, mat('#3a1f1f', { roughness: 0.9 }), 0, 0.51, 0.62))
-      for (const [x, z] of [[-0.3, 0.5], [0.3, 0.5], [-0.3, 0.74], [0.3, 0.74]]) parts.push(cyl(0.02, 0.02, 0.45, lacquer, x!, 0, z!))
-      // Notes floating up from the strings
-      const noteGeo = new THREE.SphereGeometry(0.018, 10, 8)
-      noteGeo.scale(1.2, 0.85, 0.6)
-      parts.push(loose(swarm(7, noteGeo, glow('#ffe7a8', 1.4, 2), (i, t, d) => {
-        const p = loop(t, 4, i * 0.57)
-        d.position.set(-0.3 + Math.sin(i * 2.1) * 0.4 + Math.sin(t * 1.5 + i) * 0.06, 1.15 + p * 0.9, -0.6 + Math.cos(i * 1.3) * 0.3)
+      for (let i = 0; i < WHITE - 1; i++) if (![2, 6].includes((i + 5) % 7)) blacks.push(i)
+      const blackKeys = swarm(blacks.length, new THREE.BoxGeometry(keyW * 0.56, 0.024, 0.095), ebony, (i, _t, d) => {
+        d.position.set(x0 + (blacks[i]! + 1) * keyW, CASE_Y + 0.13, KEY_Z + 0.175)
+      })
+      blackKeys.castShadow = false
+      parts.push(blackKeys)
+      // Key slip in front, with a gold line
+      parts.push(box(W - 0.12, 0.05, 0.014, lacquer, 0, CASE_Y + 0.07, KEY_Z + 0.29), box(W - 0.12, 0.004, 0.016, gold, 0, CASE_Y + 0.118, KEY_Z + 0.29))
+
+      // Legs with gold caster cups, and the pedal lyre
+      for (const [x, z] of [[-W / 2 + 0.1, 0.05], [W / 2 - 0.1, 0.05], [-0.3, -1.5]] as const) {
+        parts.push(lathe([[0, 0], [0.055, 0], [0.06, 0.04], [0.05, 0.06], [0.045, 0.5], [0.06, 0.6], [0.065, CASE_Y], [0, CASE_Y]], lacquer, 0, 24).translateX(x).translateZ(z))
+        parts.push(cyl(0.065, 0.07, 0.035, gold, x, 0, z, 20))
+      }
+      const lyre = group(
+        rod(v3(-0.07, 0.1, 0), v3(-0.05, CASE_Y, 0), 0.016, lacquer),
+        rod(v3(0.07, 0.1, 0), v3(0.05, CASE_Y, 0), 0.016, lacquer),
+        box(0.22, 0.05, 0.08, lacquer, 0, 0.06, 0),
+      )
+      for (let i = -1; i <= 1; i++) lyre.add(box(0.03, 0.012, 0.09, gold, i * 0.055, 0.07, 0.07))
+      lyre.position.set(0, 0, -0.3)
+      parts.push(lyre)
+
+      // A velvet-topped bench
+      const bench = group(
+        box(0.82, 0.07, 0.36, lacquer, 0, 0.42),
+        box(0.78, 0.06, 0.32, mat('#5b0f1f', { roughness: 0.95 }), 0, 0.49),
+        box(0.84, 0.006, 0.38, gold, 0, 0.42),
+      )
+      for (const [x, z] of [[-0.36, -0.14], [0.36, -0.14], [-0.36, 0.14], [0.36, 0.14]] as const) bench.add(lathe([[0, 0], [0.025, 0], [0.03, 0.05], [0.02, 0.38], [0.03, 0.42], [0, 0.42]], lacquer, 0, 16).translateX(x).translateZ(z))
+      bench.position.set(0, 0, KEY_Z + 0.75)
+      parts.push(bench)
+
+      // Golden notes floating up while it plays
+      const noteGeo = new THREE.SphereGeometry(0.02, 10, 8)
+      noteGeo.scale(1.25, 0.85, 0.6)
+      parts.push(loose(swarm(9, noteGeo, glow('#ffe7a8', 1.6, 2), (i, t, d) => {
+        if (!pianoState.playing) return false
+        const p = loop(t, 4, i * 0.45)
+        d.position.set(-0.4 + Math.sin(i * 2.1) * 0.45 + Math.sin(t * 1.5 + i) * 0.07, TOP + 0.25 + p * 1.0, -0.7 + Math.cos(i * 1.3) * 0.35)
         d.rotation.z = -0.4
         d.scale.setScalar(Math.sin(p * Math.PI))
       })))

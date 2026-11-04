@@ -2,7 +2,7 @@
   <!-- A real 3D room set with a pack's items, moving: what you get, live -->
   <div class="relative h-full w-full overflow-hidden bg-[#0e0c14]">
     <ClientOnly>
-      <RoomCanvas :room="room" :force-mode="mode" />
+      <RoomCanvas :room="room" :force-mode="mode" @activate="onActivate" />
     </ClientOnly>
     <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-4">
       <p class="pointer-events-auto rounded-full bg-black/45 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import type { RoomPack, RoomPackId } from '#shared/roomPacks'
 import { createDefaultRoom, type LandId, type RoomConfig, type RoomObject } from '~/types/room'
+import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 
 const props = defineProps<{ pack: RoomPack }>()
 const { t } = useI18n()
@@ -99,6 +100,14 @@ const LAYOUTS: Record<RoomPackId, { spots: Spot[]; land: LandId; mode: 'day' | '
 }
 
 const layout = computed(() => LAYOUTS[props.pack.id])
+
+// Clicking the piano plays it, here too
+const piano = useRoomPiano()
+function onActivate(id: string) {
+  const type = room.value.objects.find(o => o.id === id)?.type
+  const music = type ? CATALOG_BY_TYPE[type]?.music : undefined
+  if (music) piano.toggle(music)
+}
 const mode = ref<'day' | 'night'>(layout.value.mode)
 
 const room = computed<RoomConfig>(() => {

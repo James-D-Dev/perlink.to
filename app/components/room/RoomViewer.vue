@@ -463,8 +463,20 @@ function onHover(id: string | null, x: number, y: number) {
   if (product) hovered.value = { label: product.price ? `${product.name} · ${formatVnd(product.price)}` : product.name, x, y }
   else if (obj?.image) hovered.value = { label: t('viewPhoto'), x, y }
   else if (obj && CATALOG_BY_TYPE[obj.type]?.opensBlog) hovered.value = { label: t('blog'), x, y }
+  else if (obj && CATALOG_BY_TYPE[obj.type]?.music) hovered.value = { label: piano.playing.value ? t('stopPiano') : t('playPiano'), x, y }
   else hovered.value = obj?.link?.url ? { label: obj.link.label || hostOf(obj.link.url), x, y, external: true } : null
 }
+
+// A grand piano plays a love song when clicked; the room's music pauses meanwhile
+const piano = useRoomPiano({
+  pauseOther: () => {
+    if (!musicOn.value) return false
+    audio?.pause()
+    musicOn.value = false
+    return true
+  },
+  resumeOther: () => toggleMusic(),
+})
 
 // Picture frames with a photo open it in a popup; other linked objects open their link
 const photo = ref<RoomObject | null>(null)
@@ -479,6 +491,13 @@ function onActivate(id: string) {
   }
   if (obj?.image) {
     photo.value = obj
+    hovered.value = null
+    return
+  }
+  // A piano plays its music (and stops on a second click)
+  const music = obj ? CATALOG_BY_TYPE[obj.type]?.music : undefined
+  if (music) {
+    piano.toggle(music)
     hovered.value = null
     return
   }

@@ -7,6 +7,12 @@ import * as THREE from 'three'
 
 export type Tick = (time: number, lamps: number) => void
 
+/**
+ * Whether a piano in the room is playing (the visitor clicked it): its keys
+ * move with the music, and rest when it's quiet
+ */
+export const pianoState = { playing: false }
+
 export function mat(color: string, opts: Partial<THREE.MeshStandardMaterialParameters> = {}) {
   return new THREE.MeshStandardMaterial({ color, roughness: 0.75, metalness: 0.05, ...opts })
 }
@@ -332,4 +338,43 @@ export function roseLeafGeometry(length: number) {
   }
   g.computeVertexNormals()
   return g
+}
+
+/**
+ * A photo-studio reflection (dark room, soft white light strips) for glossy
+ * finishes, so lacquer and gold catch highlights on any land. Null where
+ * there's no canvas (server).
+ */
+export function studioReflection() {
+  if (typeof document === 'undefined') return null
+  const texture = canvasTexture(1024, 512, (ctx) => {
+    const g = ctx.createLinearGradient(0, 0, 0, 512)
+    // A bright room above and around, darker floor: lacquer mirrors it
+    g.addColorStop(0, '#c9ccd3')
+    g.addColorStop(0.42, '#7d808a')
+    g.addColorStop(0.6, '#3b3c42')
+    g.addColorStop(1, '#141416')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, 1024, 512)
+    // Softboxes: long bright strips with soft edges
+    const strip = (x: number, y: number, w: number, h: number, a: number) => {
+      const s = ctx.createLinearGradient(x, 0, x + w, 0)
+      s.addColorStop(0, 'rgba(255,255,255,0)')
+      s.addColorStop(0.5, `rgba(255,255,255,${a})`)
+      s.addColorStop(1, 'rgba(255,255,255,0)')
+      ctx.fillStyle = s
+      ctx.fillRect(x, y, w, h)
+    }
+    strip(120, 40, 160, 300, 1)
+    strip(470, 20, 110, 340, 1)
+    strip(760, 60, 200, 260, 0.95)
+    // A warm glow low down, like lamps in the room
+    const warm = ctx.createRadialGradient(300, 420, 0, 300, 420, 260)
+    warm.addColorStop(0, 'rgba(255,200,140,0.35)')
+    warm.addColorStop(1, 'rgba(255,200,140,0)')
+    ctx.fillStyle = warm
+    ctx.fillRect(0, 0, 1024, 512)
+  })
+  texture.mapping = THREE.EquirectangularReflectionMapping
+  return texture
 }
