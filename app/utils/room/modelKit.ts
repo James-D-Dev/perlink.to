@@ -235,3 +235,101 @@ export function canvasTexture(width: number, height: number, draw: (ctx: CanvasR
   texture.anisotropy = 4
   return texture
 }
+
+// ---------- Detailed roses ----------
+
+/** One rose petal: a rounded, cupped blade whose tip curls back (base at the origin, pointing up +y, cupped towards +z) */
+function petalGeometry() {
+  const g = new THREE.PlaneGeometry(1, 1.1, 6, 8)
+  const pos = g.attributes.position!
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i)
+    const y = pos.getY(i)
+    const v = (y + 0.55) / 1.1 // 0 at the base, 1 at the tip
+    // Narrow at the base, round at the top
+    const w = Math.sin(Math.min(1, v * 1.15) * Math.PI * 0.62 + 0.25) * (v > 0.85 ? 1 - (v - 0.85) * 1.2 : 1)
+    const nx = x * w
+    // Cupped across, curling outward at the tip
+    const z = -1.1 * nx * nx + 0.35 * Math.max(0, v - 0.6) ** 2 * 3
+    pos.setXYZ(i, nx, v * 1.1, -z)
+  }
+  g.computeVertexNormals()
+  return g
+}
+
+export interface RoseSpot {
+  /** Centre of the bloom */
+  p: THREE.Vector3
+  /** Which way the bloom faces */
+  n: THREE.Vector3
+  /** Bloom radius in metres (about 0.04 for a garden rose) */
+  size: number
+  color: string
+  /** 0 = tight bud .. 1 = fully open */
+  open?: number
+  spin?: number
+}
+
+const PETALS_PER_ROSE = 14
+const UP = new THREE.Vector3(0, 1, 0)
+
+/**
+ * Many detailed roses drawn in one go: each bloom is 14 cupped petals in a
+ * spiral, tight in the middle and opening outward, with a shaded heart.
+ */
+export function roses(spots: RoseSpot[]) {
+  const count = spots.length * PETALS_PER_ROSE
+  const petalMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.55, side: THREE.DoubleSide })
+  const petals = new THREE.InstancedMesh(petalGeometry(), petalMat, count)
+  petals.castShadow = true
+  petals.receiveShadow = true
+  const m = new THREE.Matrix4()
+  const q = new THREE.Quaternion()
+  const local = new THREE.Quaternion()
+  const euler = new THREE.Euler()
+  const pos = new THREE.Vector3()
+  const scale = new THREE.Vector3()
+  const color = new THREE.Color()
+  const dark = new THREE.Color()
+  spots.forEach((s, j) => {
+    q.setFromUnitVectors(UP, s.n.clone().normalize())
+    const open = s.open ?? 0.85
+    const spin = s.spin ?? j * 2.39
+    const base = new THREE.Color(s.color)
+    for (let k = 0; k < PETALS_PER_ROSE; k++) {
+      // Golden-angle spiral; inner petals small and upright, outer ones big and splayed
+      const t = k / (PETALS_PER_ROSE - 1)
+      const angle = spin + k * 2.39996
+      const tilt = 0.12 + t * t * (0.5 + open * 1.0)
+      const size = s.size * (0.45 + t * 0.75)
+      const radius = s.size * t * 0.32
+      euler.set(tilt, angle, 0, 'YXZ')
+      local.setFromEuler(euler)
+      pos.set(Math.sin(angle) * radius, -s.size * 0.35 * t, Math.cos(angle) * radius).applyQuaternion(q).add(s.p)
+      scale.set(size * (0.8 + t * 0.4), size, size)
+      m.compose(pos, q.clone().multiply(local), scale)
+      petals.setMatrixAt(j * PETALS_PER_ROSE + k, m)
+      // Inner petals deeper in colour, outer ones lighter
+      dark.copy(base).offsetHSL(0, 0.02, -0.12 * (1 - t))
+      color.copy(dark).lerp(base.clone().offsetHSL(0, -0.05, 0.05), t * 0.6)
+      petals.setColorAt(j * PETALS_PER_ROSE + k, color)
+    }
+  })
+  petals.instanceMatrix.needsUpdate = true
+  if (petals.instanceColor) petals.instanceColor.needsUpdate = true
+  return petals
+}
+
+/** Rose leaves: pointed, with a fold down the middle (base at the origin, pointing +y) */
+export function roseLeafGeometry(length: number) {
+  const g = new THREE.PlaneGeometry(0.55, 1, 4, 6)
+  const pos = g.attributes.position!
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i)
+    const y = pos.getY(i) + 0.5
+    const w = Math.sin(y * Math.PI) ** 0.8 * (1 - y * 0.35)
+    pos.setXYZ(i, x * w * length, y * length, Math.abs(x * w) * length * 0.25 - y * y * length * 0.12)
+  }
+  g.computeVertexNormals()
+  return g
+}

@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import type { CatalogItem } from './catalog'
 import {
   animate, balloon, box, canvasTexture, cyl, glass, glow, group, heart, heartbeat, heartGeometry, heartShape,
-  lathe, loop, loose, mat, mesh, metal, rod, rose, seeded, shiny, sphere, swarm, v3,
+  lathe, loop, loose, mat, mesh, metal, rod, rose, roseLeafGeometry, roses, seeded, shiny, sphere, swarm, v3,
+  type RoseSpot,
 } from './modelKit'
 
 // Premium room items, sold in packs (shared/roomPacks.ts). Each one is drawn
@@ -40,10 +41,12 @@ const VALENTINE = premium('valentine', [
       // The blooms sway together on their stems
       const top = group()
       const blooms: [number, number, number][] = [[0, 0.62, 0], [0.11, 0.57, 0.05], [-0.1, 0.58, 0.06], [0.06, 0.55, -0.1], [-0.07, 0.54, -0.09], [0.15, 0.5, -0.03], [-0.15, 0.5, 0.0]]
+      const bloomSpots: RoseSpot[] = []
       blooms.forEach(([x, y, z], i) => {
-        top.add(rod(v3(x * 0.3, 0.25, z * 0.3), v3(x, y, z), 0.007, mat(STEM)))
-        top.add(rose(i % 3 === 2 ? PINK : color, 0.055, x, y, z))
+        top.add(rod(v3(x * 0.3, 0.25, z * 0.3), v3(x, y - 0.02, z), 0.007, mat(STEM)))
+        bloomSpots.push({ p: v3(x, y, z), n: v3(x * 2.5, 1, z * 2.5).normalize(), size: 0.055, color: i % 3 === 2 ? PINK : color, open: 0.75 })
       })
+      top.add(roses(bloomSpots))
       for (let i = 0; i < 6; i++) {
         const a = (i / 6) * Math.PI * 2
         const leaf = mesh(new THREE.SphereGeometry(0.05, 8, 6), mat(STEM, { roughness: 0.8 }), Math.cos(a) * 0.14, 0.45, Math.sin(a) * 0.14)
@@ -106,38 +109,108 @@ const VALENTINE = premium('valentine', [
     type: 'vip-rose-arch',
     name: 'Rose arch',
     icon: 'i-lucide-rainbow',
-    defaultColor: '#f2f0ea',
+    defaultColor: '#f4efe6',
     attractsButterflies: true,
     build: (color) => {
-      const frame = mat(color, { roughness: 0.4, metalness: 0.3 })
-      const parts: THREE.Object3D[] = [
-        cyl(0.03, 0.03, 1.5, frame, -0.9, 0, 0),
-        cyl(0.03, 0.03, 1.5, frame, 0.9, 0, 0),
-        box(0.22, 0.05, 0.22, frame, -0.9, 0, 0),
-        box(0.22, 0.05, 0.22, frame, 0.9, 0, 0),
-        mesh(new THREE.TorusGeometry(0.9, 0.03, 8, 48, Math.PI), frame, 0, 1.5, 0),
-      ]
-      const climb = (x: number, y: number, i: number) => {
-        parts.push(mesh(new THREE.IcosahedronGeometry(0.07, 0), mat(i % 2 ? STEM : '#4f9447', { roughness: 0.9, flatShading: true }), x + (i % 2 ? 0.05 : -0.05), y - 0.04, i % 3 ? 0.04 : -0.04))
-        if (i % 2 === 0) parts.push(rose(i % 4 === 0 ? '#e0234e' : PINK, 0.06, x, y, 0.03))
+      // A wrought garden arch (two lattice sides, a double hoop on top)
+      // smothered in climbing roses, buds and leaves, petals drifting down
+      const iron = mat(color, { roughness: 0.35, metalness: 0.45 })
+      const W = 0.85
+      const H = 1.45
+      const D = 0.16
+      const R = W
+      const parts: THREE.Object3D[] = []
+      for (const z of [-D, D]) {
+        for (const x of [-W, W]) {
+          parts.push(cyl(0.018, 0.018, H, iron, x, 0, z, 10))
+          parts.push(sphere(0.03, iron, x, 0.02, z, 12))
+        }
+        parts.push(mesh(new THREE.TorusGeometry(R, 0.016, 8, 64, Math.PI), iron, 0, H, z))
+        parts.push(mesh(new THREE.TorusGeometry(R - 0.12, 0.01, 8, 64, Math.PI), iron, 0, H, z))
+        // Scrolls between the two hoops
+        for (let i = 1; i < 12; i++) {
+          const a = (i / 12) * Math.PI
+          parts.push(rod(v3(Math.cos(a) * (R - 0.12), H + Math.sin(a) * (R - 0.12), z), v3(Math.cos(a) * R, H + Math.sin(a) * R, z), 0.006, iron))
+        }
       }
-      for (let i = 0; i < 14; i++) {
-        climb(-0.9, 0.25 + i * 0.09, i)
-        climb(0.9, 0.25 + i * 0.09, i + 1)
+      // Rungs across the depth, and a diamond lattice on each side
+      for (let i = 0; i <= 10; i++) {
+        const a = (i / 10) * Math.PI
+        parts.push(rod(v3(Math.cos(a) * R, H + Math.sin(a) * R, -D), v3(Math.cos(a) * R, H + Math.sin(a) * R, D), 0.008, iron))
       }
-      for (let i = 0; i <= 18; i++) {
-        const a = (i / 18) * Math.PI
-        climb(Math.cos(a) * 0.9, 1.5 + Math.sin(a) * 0.9, i)
+      for (const x of [-W, W]) {
+        for (let k = 0; k < 6; k++) {
+          const y0 = 0.1 + k * 0.22
+          parts.push(rod(v3(x, y0, -D), v3(x, y0 + 0.22, D), 0.006, iron), rod(v3(x, y0, D), v3(x, y0 + 0.22, -D), 0.006, iron))
+        }
       }
-      // Little glowing hearts float up through the arch
-      const hg = heartGeometry()
-      hg.scale(0.09, 0.09, 0.09)
-      parts.push(swarm(9, hg, glow('#ff7aa8', 0.6, 1.6), (i, t, d) => {
-        const p = loop(t, 5, i * 0.55)
-        d.position.set(Math.sin(i * 7.3) * 0.55 + Math.sin(t * 1.3 + i) * 0.05, 0.25 + p * 2, Math.cos(i * 3.1) * 0.15)
-        d.rotation.y = Math.sin(t + i) * 0.6
-        d.scale.setScalar(Math.sin(p * Math.PI) * (0.7 + (i % 3) * 0.2))
+
+      // Where the roses grow: thick over the top, climbing the sides
+      const rand = seeded(71)
+      const reds = ['#c8102e', '#d81b3c', '#b0102a', '#e0234e']
+      const pinks = ['#f48fb1', '#f8bbd0', '#ffd1dc']
+      const bloomSpots: RoseSpot[] = []
+      const leafSpots: { p: THREE.Vector3; n: THREE.Vector3; spin: number; size: number }[] = []
+      const budSpots: THREE.Vector3[] = []
+      const along = (u: number) => {
+        // 0..1 up the left side, over the top, down the right side
+        const sideLen = H
+        const arcLen = Math.PI * R
+        const total = sideLen * 2 + arcLen
+        const d = u * total
+        if (d < sideLen) return { p: v3(-W, d, 0), out: v3(-1, 0, 0) }
+        if (d < sideLen + arcLen) {
+          const a = Math.PI - ((d - sideLen) / arcLen) * Math.PI
+          return { p: v3(Math.cos(a) * R, H + Math.sin(a) * R, 0), out: v3(Math.cos(a), Math.sin(a), 0) }
+        }
+        return { p: v3(W, H - (d - sideLen - arcLen), 0), out: v3(1, 0, 0) }
+      }
+      for (let i = 0; i < 150; i++) {
+        let u = rand()
+        // More roses up top than near the ground
+        const { p, out } = along(u)
+        if (p.y < 0.35 && rand() < 0.7) { u = 0.3 + rand() * 0.4; Object.assign(p, along(u).p) }
+        const facing = v3(out.x * 0.6 + (rand() - 0.5) * 0.6, out.y * 0.6 + (rand() - 0.3) * 0.5, (rand() < 0.5 ? -1 : 1) * (0.6 + rand() * 0.6)).normalize()
+        const spot = p.clone().addScaledVector(facing, 0.04 + rand() * 0.03)
+        spot.z += (rand() - 0.5) * D * 1.6
+        const pink = rand() < 0.28
+        bloomSpots.push({ p: spot, n: facing, size: 0.04 + rand() * 0.022, color: pink ? pinks[Math.floor(rand() * pinks.length)]! : reds[Math.floor(rand() * reds.length)]!, open: 0.55 + rand() * 0.45 })
+        for (let l = 0; l < 3; l++) leafSpots.push({ p: spot.clone().add(v3((rand() - 0.5) * 0.1, (rand() - 0.5) * 0.1, (rand() - 0.5) * 0.08)), n: v3(rand() - 0.5, rand() - 0.3, rand() - 0.5).normalize(), spin: rand() * 6.28, size: 0.05 + rand() * 0.03 })
+        if (rand() < 0.35) budSpots.push(spot.clone().add(v3((rand() - 0.5) * 0.08, 0.05, (rand() - 0.5) * 0.06)))
+      }
+      // A few blooms hanging down from the top on short trailing stems
+      for (let i = 0; i < 9; i++) {
+        const a = 0.25 + (i / 8) * (Math.PI - 0.5)
+        const top = v3(Math.cos(a) * R, H + Math.sin(a) * R, (rand() - 0.5) * D * 1.4)
+        const drop = 0.12 + rand() * 0.16
+        const end = top.clone().add(v3(0, -drop, 0))
+        parts.push(rod(top, end, 0.004, mat(STEM)))
+        bloomSpots.push({ p: end, n: v3((rand() - 0.5) * 0.4, -0.6, rand() < 0.5 ? -0.7 : 0.7).normalize(), size: 0.035 + rand() * 0.015, color: reds[i % reds.length]!, open: 0.7 })
+      }
+      parts.push(roses(bloomSpots))
+      const leafGeo = roseLeafGeometry(1)
+      const leafMat = mat('#2f6b2f', { roughness: 0.55, side: THREE.DoubleSide })
+      parts.push(swarm(leafSpots.length, leafGeo, leafMat, (i, _t, d) => {
+        const l = leafSpots[i]!
+        d.position.copy(l.p)
+        d.quaternion.setFromUnitVectors(v3(0, 1, 0), l.n)
+        d.rotateY(l.spin)
+        d.scale.setScalar(l.size)
+      }, ['#2f6b2f', '#3d7f35', '#285a28', '#4a8c3a']))
+      // Buds: a closed bloom in green sepals
+      parts.push(swarm(budSpots.length, new THREE.SphereGeometry(0.014, 10, 8), mat('#b0102a', { roughness: 0.5 }), (i, _t, d) => {
+        d.position.copy(budSpots[i]!)
+        d.scale.set(0.85, 1.35, 0.85)
       }))
+      // Petals drifting down through the arch
+      const petalGeo = new THREE.SphereGeometry(0.018, 8, 6)
+      petalGeo.scale(1, 0.15, 0.75)
+      parts.push(loose(swarm(14, petalGeo, mat('#ffffff', { roughness: 0.6, side: THREE.DoubleSide }), (i, t, d) => {
+        const p = loop(t, 7, i * 0.5)
+        d.position.set(Math.sin(i * 7.7) * 0.6 + Math.sin(t * 1.1 + i) * 0.08, (H + R * 0.8) * (1 - p), Math.cos(i * 3.3) * 0.25 + Math.cos(t * 0.9 + i) * 0.05)
+        d.rotation.set(t * 2 + i, t * 1.3 + i, t)
+        return p < 0.98
+      }, ['#c8102e', '#e0234e', '#f48fb1'])))
       return group(...parts)
     },
   },
@@ -918,27 +991,107 @@ const TET = premium('tet', [
     icon: 'i-lucide-apple',
     defaultColor: '#b71c1c',
     build: (color) => {
-      const lacquer = shiny(color, { roughness: 0.25 })
-      const goldMat = metal(GOLD, 0.3)
+      // Mâm ngũ quả, southern style: "cầu vừa đủ xài" — custard apples
+      // (mãng cầu), a coconut (dừa), papayas (đu đủ), mangoes (xoài) and figs
+      // (sung), stacked on a footed lacquer tray over green leaves
+      const lacquer = shiny(color, { roughness: 0.22 })
+      const goldMat = metal(GOLD, 0.25)
       const parts: THREE.Object3D[] = [
-        // A lacquered tray on a stand
-        lathe([[0, 0], [0.12, 0], [0.08, 0.06], [0.07, 0.1], [0.24, 0.13], [0.26, 0.16], [0.25, 0.16], [0.0, 0.14]], lacquer),
-        mesh(new THREE.TorusGeometry(0.255, 0.01, 8, 48), goldMat, 0, 0.16, 0),
+        lathe([[0, 0], [0.13, 0], [0.13, 0.015], [0.07, 0.04], [0.055, 0.1], [0.08, 0.13], [0.3, 0.15], [0.32, 0.18], [0.3, 0.18], [0, 0.16]], lacquer),
       ]
-      ;(parts[1] as THREE.Mesh).rotation.x = Math.PI / 2
-      // Pomelo in the middle, oranges, a hand of bananas, grapes and chillies
-      parts.push(sphere(0.11, mat('#c5d84a', { roughness: 0.7 }), 0, 0.27, 0, 24))
-      ;[[0.15, 0.06], [-0.12, 0.13], [0.03, -0.17], [-0.15, -0.07]].forEach(([x, z]) => parts.push(sphere(0.055, mat('#ff8f00', { roughness: 0.6 }), x!, 0.2, z!, 16)))
-      for (let i = 0; i < 5; i++) {
-        const curve = new THREE.QuadraticBezierCurve3(v3(-0.18, 0.18, 0.12 + i * 0.012), v3(-0.02, 0.35 - i * 0.012, 0.18), v3(0.14, 0.22, 0.16 + i * 0.012))
-        parts.push(mesh(new THREE.TubeGeometry(curve, 12, 0.02, 8), mat('#f2c94c', { roughness: 0.6 })))
+      for (const [y, r] of [[0.18, 0.31], [0.012, 0.13], [0.12, 0.075]] as const) {
+        const band = mesh(new THREE.TorusGeometry(r, 0.008, 8, 48), goldMat, 0, y, 0)
+        band.rotation.x = Math.PI / 2
+        parts.push(band)
       }
-      const rand = seeded(9)
-      for (let i = 0; i < 18; i++) parts.push(sphere(0.018, shiny('#5e2a84', { roughness: 0.3 }), 0.12 + (rand() - 0.5) * 0.09, 0.2 + rand() * 0.07, -0.1 + (rand() - 0.5) * 0.09, 10))
+      const top = 0.17
+      // Leaves fanned out under the fruit, tips over the rim
+      const leafGeo = new THREE.SphereGeometry(0.1, 12, 6)
+      leafGeo.scale(0.38, 0.05, 1)
+      for (let i = 0; i < 10; i++) {
+        const a = (i / 10) * Math.PI * 2
+        const leaf = mesh(leafGeo, mat(i % 2 ? '#2e7d32' : '#388e3c', { roughness: 0.6 }), Math.cos(a) * 0.24, top + 0.01, Math.sin(a) * 0.24)
+        leaf.rotation.set(0.25, -a + Math.PI / 2, 0)
+        leaf.rotation.order = 'YXZ'
+        leaf.rotation.y = -a + Math.PI / 2
+        parts.push(leaf)
+      }
+      /** Colour along an axis, from one end to the other (papaya, mango) */
+      const tinted = (geo: THREE.BufferGeometry, axis: 'x' | 'y', stops: string[]) => {
+        geo.computeBoundingBox()
+        const bb = geo.boundingBox!
+        const pos = geo.attributes.position!
+        const cols = stops.map(c => new THREE.Color(c))
+        const out = new Float32Array(pos.count * 3)
+        const c = new THREE.Color()
+        for (let i = 0; i < pos.count; i++) {
+          const v = axis === 'x' ? pos.getX(i) : pos.getY(i)
+          const lo = axis === 'x' ? bb.min.x : bb.min.y
+          const hi = axis === 'x' ? bb.max.x : bb.max.y
+          const f = THREE.MathUtils.clamp((v - lo) / (hi - lo), 0, 1) * (cols.length - 1)
+          const k = Math.min(Math.floor(f), cols.length - 2)
+          c.copy(cols[k]!).lerp(cols[k + 1]!, f - k)
+          out.set([c.r, c.g, c.b], i * 3)
+        }
+        geo.setAttribute('color', new THREE.BufferAttribute(out, 3))
+        return geo
+      }
+      const fruitMat = (rough = 0.45) => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: rough })
+
+      // Mangoes round the bottom ring
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2 + 0.3
+        const geo = tinted(new THREE.SphereGeometry(0.055, 20, 14), 'x', ['#8bc34a', '#ffd54f', '#ffb300'])
+        geo.scale(1.45, 0.85, 0.95)
+        const mango = mesh(geo, fruitMat(0.35), Math.cos(a) * 0.19, top + 0.05, Math.sin(a) * 0.19)
+        mango.rotation.y = -a + Math.PI / 2
+        mango.rotation.z = 0.15
+        parts.push(mango)
+      }
+      // Papayas lying between them
+      for (let i = 0; i < 2; i++) {
+        const a = i * Math.PI + 1.0
+        const geo = tinted(new THREE.LatheGeometry([[0, 0], [0.04, 0.02], [0.06, 0.08], [0.065, 0.13], [0.05, 0.18], [0.025, 0.21], [0, 0.215]].map(([r, h]) => new THREE.Vector2(r!, h!)), 20), 'y', ['#ff9800', '#ffb74d', '#9ccc65', '#558b2f'])
+        const papaya = mesh(geo, fruitMat(0.4), Math.cos(a) * 0.12, top + 0.11, Math.sin(a) * 0.12)
+        papaya.rotation.set(0, -a, Math.PI / 2 - 0.35)
+        parts.push(papaya)
+      }
+      // Custard apples in the middle layer: knobbly green segments
       for (let i = 0; i < 3; i++) {
-        const chili = mesh(new THREE.ConeGeometry(0.012, 0.09, 8), shiny('#e53935'), -0.04 + i * 0.03, 0.39, 0.02)
-        chili.rotation.z = 1.2 + i * 0.3
-        parts.push(chili)
+        const a = (i / 3) * Math.PI * 2
+        const geo = new THREE.IcosahedronGeometry(0.06, 2)
+        const pos = geo.attributes.position!
+        for (let k = 0; k < pos.count; k++) {
+          const v = v3(pos.getX(k), pos.getY(k), pos.getZ(k))
+          const bump = 1 + 0.07 * Math.sin(v.x * 140) * Math.sin(v.y * 140) * Math.sin(v.z * 140)
+          // A little heart-shaped: narrower at the bottom
+          v.multiplyScalar(bump * (1 - Math.max(0, -v.y) * 1.5))
+          pos.setXYZ(k, v.x, v.y, v.z)
+        }
+        geo.computeVertexNormals()
+        parts.push(mesh(geo, mat('#a5c26b', { roughness: 0.8, flatShading: true }), Math.cos(a) * 0.08, top + 0.15, Math.sin(a) * 0.08))
+        parts.push(cyl(0.005, 0.005, 0.02, mat('#5d4037'), Math.cos(a) * 0.08, top + 0.2, Math.sin(a) * 0.08, 5))
+      }
+      // A green coconut on top, with a red ribbon
+      const coconutGeo = tinted(new THREE.SphereGeometry(0.095, 28, 20), 'y', ['#33691e', '#689f38', '#9ccc65'])
+      coconutGeo.scale(1, 1.12, 1)
+      const coconut = mesh(coconutGeo, fruitMat(0.5), 0, top + 0.29, 0)
+      parts.push(coconut)
+      parts.push(cyl(0.025, 0.035, 0.02, mat('#827717', { roughness: 0.8 }), 0, top + 0.39, 0, 10))
+      const ribbon = mesh(new THREE.TorusGeometry(0.098, 0.008, 8, 40), shiny('#e53935'), 0, top + 0.27, 0)
+      ribbon.rotation.x = Math.PI / 2
+      parts.push(ribbon)
+      const bowL = mesh(new THREE.TorusGeometry(0.025, 0.007, 8, 18), shiny('#e53935'), -0.02, top + 0.27, 0.1)
+      const bowR = mesh(new THREE.TorusGeometry(0.025, 0.007, 8, 18), shiny('#e53935'), 0.02, top + 0.27, 0.1)
+      bowL.rotation.z = 0.7
+      bowR.rotation.z = -0.7
+      parts.push(bowL, bowR)
+      // Figs tucked into the gaps
+      const rand = seeded(17)
+      for (let i = 0; i < 14; i++) {
+        const a = rand() * Math.PI * 2
+        const r = 0.1 + rand() * 0.17
+        parts.push(sphere(0.02, mat('#9ccc65', { roughness: 0.55 }), Math.cos(a) * r, top + 0.09 + rand() * 0.08, Math.sin(a) * r, 10))
       }
       return group(...parts)
     },

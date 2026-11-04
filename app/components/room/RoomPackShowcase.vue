@@ -77,7 +77,7 @@ const LAYOUTS: Record<RoomPackId, { spots: Spot[]; land: LandId; mode: 'day' | '
     spots: [
       ['vip-red-lanterns', 0, 2.25, BACK], ['vip-firecrackers', -1.6, 2.2, BACK], ['vip-firecrackers', 1.6, 2.2, BACK],
       ['vip-peach-blossom', -1.6, 0, -1.6], ['vip-apricot-blossom', 1.6, 0, -1.6], ['vip-kumquat-tree', 0, 0, -1.8],
-      [TABLE, 0, 0, 0.1], ['vip-five-fruit-tray', 0, TOP, 0.1],
+      [TABLE, 0, 0, 0.1], ['vip-five-fruit-tray', 0, TOP, 0.1, 0, 1.4],
     ],
   },
 }

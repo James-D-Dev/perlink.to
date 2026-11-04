@@ -20,7 +20,7 @@ export interface RoomPack {
 export const ROOM_PACKS: RoomPack[] = [
   {
     id: 'valentine',
-    priceUsd: 4,
+    priceUsd: 5,
     items: ['vip-rose-bouquet', 'vip-heart-balloons', 'vip-rose-arch', 'vip-candle-heart', 'vip-neon-heart', 'vip-love-bear'],
     colors: ['#fb7185', '#ec4899', '#c026d3'],
     lemonMatch: 'valentine',
