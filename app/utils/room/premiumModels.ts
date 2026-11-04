@@ -2231,22 +2231,24 @@ const PROPOSAL = premium('proposal', [
       parts.push(bench)
 
       // ---------- The pianist ----------
-      // A stylised man in a black suit on the bench, back to the room,
-      // hands finding the keys that are playing (two-bone arms solved each
-      // frame), head nodding with the music
-      const suit = new THREE.MeshPhysicalMaterial({ color: '#141418', roughness: 0.55, sheen: 0.6, sheenColor: new THREE.Color('#4a4a55') })
-      const shirt = mat('#f6f4ef', { roughness: 0.6 })
-      const skin = mat('#e2b48f', { roughness: 0.7 })
-      const hair = mat('#1d1611', { roughness: 0.8 })
-      const shoe = shiny('#0b0b0c', { roughness: 0.25 })
+      // A concert pianist in a tailcoat on the bench, back to the room:
+      // tailored jacket with padded shoulders and tails over the bench, white
+      // collar and cuffs, slicked hair. His hands go to the keys being played
+      // (two-bone arms solved each frame), fingers curling as they press;
+      // his head nods with the music
+      const suit = new THREE.MeshPhysicalMaterial({ color: '#111116', roughness: 0.5, sheen: 0.8, sheenRoughness: 0.4, sheenColor: new THREE.Color('#5a5a6a') })
+      const satin = new THREE.MeshPhysicalMaterial({ color: '#0a0a0d', roughness: 0.25, clearcoat: 0.6 })
+      const shirt = mat('#f7f5f0', { roughness: 0.55 })
+      const skin = new THREE.MeshPhysicalMaterial({ color: '#e3b994', roughness: 0.6, sheen: 0.3, sheenColor: new THREE.Color('#ffd9c2') })
+      const hair = new THREE.MeshPhysicalMaterial({ color: '#1a130e', roughness: 0.45, clearcoat: 0.3 })
+      const shoe = new THREE.MeshPhysicalMaterial({ color: '#08080a', roughness: 0.2, clearcoat: 1 })
       const SEAT = 0.52
       const BENCH_Z = KEY_Z + 0.75
-      const unitRod = (r1: number, r2: number, m: THREE.Material) => mesh(new THREE.CylinderGeometry(r2, r1, 1, 12).translate(0, 0.5, 0), m)
-      const unitLimb = (r: number, m: THREE.Material) => {
-        const limb = group(unitRod(r, r * 0.9, m))
-        limb.add(sphere(r, m, 0, 0, 0, 12))
-        return limb
-      }
+      /** A unit-length tapered limb along +y, rounded at the start */
+      const unitLimb = (r1: number, r2: number, m: THREE.Material) => group(
+        mesh(new THREE.CylinderGeometry(r2, r1, 1, 16).translate(0, 0.5, 0), m),
+        sphere(r1, m, 0, 0, 0, 14),
+      )
       /** Stretch a unit limb from a to b */
       const place = (limb: THREE.Object3D, a: THREE.Vector3, b: THREE.Vector3) => {
         limb.position.copy(a)
@@ -2254,49 +2256,114 @@ const PROPOSAL = premium('proposal', [
         limb.scale.set(1, a.distanceTo(b), 1)
       }
       const pianist = group()
-      // Legs: thighs forward under the keyboard, shins down, shoes
+
+      // Legs: trousers with a crease, polished oxfords
       for (const side of [-1, 1]) {
-        const hip = v3(side * 0.09, SEAT + 0.06, BENCH_Z - 0.02)
-        const knee = v3(side * 0.12, SEAT + 0.05, BENCH_Z - 0.4)
-        const ankle = v3(side * 0.13, 0.07, BENCH_Z - 0.36)
-        const thigh = unitLimb(0.065, suit)
+        const hip = v3(side * 0.095, SEAT + 0.07, BENCH_Z - 0.02)
+        const knee = v3(side * 0.12, SEAT + 0.06, BENCH_Z - 0.42)
+        const ankle = v3(side * 0.125, 0.09, BENCH_Z - 0.37)
+        const thigh = unitLimb(0.072, 0.058, suit)
         place(thigh, hip, knee)
-        const shin = unitLimb(0.05, suit)
+        const shin = unitLimb(0.052, 0.043, suit)
         place(shin, knee, ankle)
-        pianist.add(thigh, shin, sphere(0.06, suit, knee.x, knee.y, knee.z, 12))
-        pianist.add(box(0.09, 0.06, 0.24, shoe, ankle.x, 0, ankle.z - 0.06))
+        pianist.add(thigh, shin, sphere(0.058, suit, knee.x, knee.y, knee.z, 14))
+        // Front crease
+        const crease = rod(knee.clone().add(v3(0, 0, -0.05)), ankle.clone().add(v3(0, 0.02, -0.043)), 0.0025, satin)
+        pianist.add(crease)
+        const shoeGroup = group(
+          mesh(new THREE.CapsuleGeometry(0.042, 0.16, 6, 14).rotateX(Math.PI / 2), shoe, 0, 0.042, -0.06),
+          box(0.07, 0.03, 0.06, shoe, 0, 0, 0.03),
+        )
+        ;(shoeGroup.children[0] as THREE.Mesh).scale.set(1.05, 0.62, 1)
+        shoeGroup.position.set(ankle.x, 0, ankle.z)
+        pianist.add(shoeGroup)
       }
-      // Hips and torso, leaning a little towards the keys
-      pianist.add(box(0.3, 0.12, 0.24, suit, 0, SEAT, BENCH_Z))
-      const torso = mesh(new THREE.CapsuleGeometry(0.13, 0.26, 6, 16), suit, 0, SEAT + 0.3, BENCH_Z + 0.01)
-      torso.scale.set(1.3, 1, 0.85)
-      torso.rotation.x = 0.12
-      pianist.add(torso)
-      // Collar, neck and head
-      pianist.add(mesh(new THREE.TorusGeometry(0.052, 0.018, 8, 20).rotateX(Math.PI / 2), shirt, 0, SEAT + 0.53, BENCH_Z - 0.02))
-      pianist.add(cyl(0.045, 0.05, 0.08, skin, 0, SEAT + 0.52, BENCH_Z - 0.02, 12))
-      const head = group(
-        sphere(0.1, skin, 0, 0.1, 0, 20),
-        // Short hair over the back and top
-        mesh(new THREE.SphereGeometry(0.106, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.62), hair, 0, 0.11, 0.005),
-        sphere(0.022, skin, -0.1, 0.09, 0, 8),
-        sphere(0.022, skin, 0.1, 0.09, 0, 8),
-      )
-      ;(head.children[1] as THREE.Mesh).rotation.x = 0.35
-      head.position.set(0, SEAT + 0.58, BENCH_Z - 0.03)
+
+      // Seat and tailored jacket body: broad padded shoulders, narrow waist
+      pianist.add(mesh(new THREE.CapsuleGeometry(0.11, 0.1, 6, 16).rotateZ(Math.PI / 2), suit, 0, SEAT + 0.055, BENCH_Z + 0.01))
+      const body = group()
+      const jacket = lathe([[0, 0], [0.135, 0], [0.15, 0.05], [0.138, 0.13], [0.15, 0.22], [0.185, 0.31], [0.2, 0.355], [0.17, 0.4], [0.1, 0.43], [0.05, 0.44], [0, 0.44]], suit, 0, 32)
+      jacket.scale.set(1.12, 1, 0.74)
+      body.add(jacket)
+      // Back seam and padded shoulder caps
+      body.add(box(0.004, 0.36, 0.004, satin, 0, 0.04, 0.112))
+      for (const side of [-1, 1]) {
+        const cap = sphere(0.058, suit, side * 0.18, 0.375, 0, 16)
+        cap.scale.set(1.1, 0.62, 0.95)
+        body.add(cap)
+      }
+      // Tails, falling over the back of the bench
+      for (const side of [-1, 1]) {
+        const tail = mesh(new THREE.BoxGeometry(0.11, 0.34, 0.012).translate(0, -0.17, 0), suit, side * 0.062, 0.04, 0.1)
+        tail.rotation.set(0.42, 0, side * -0.05)
+        body.add(tail)
+      }
+      // White collar standing up behind the neck
+      body.add(mesh(new THREE.CylinderGeometry(0.052, 0.058, 0.05, 20, 1, true), shirt, 0, 0.455, 0.0))
+      body.position.set(0, SEAT + 0.06, BENCH_Z + 0.01)
+      body.rotation.x = -0.1
+      pianist.add(body)
+      const neck = cyl(0.042, 0.047, 0.09, skin, 0, SEAT + 0.5, BENCH_Z - 0.03, 14)
+      pianist.add(neck)
+
+      // Head: a natural oval, ears, nose, slicked-back hair with a nape
+      const head = group()
+      const skull = sphere(0.095, skin, 0, 0.1, 0, 28)
+      skull.scale.set(0.92, 1.1, 1)
+      head.add(skull)
+      const jaw = sphere(0.07, skin, 0, 0.04, -0.022, 20)
+      jaw.scale.set(0.95, 0.8, 0.95)
+      head.add(jaw)
+      head.add(mesh(new THREE.ConeGeometry(0.014, 0.034, 10).rotateX(-Math.PI / 2), skin, 0, 0.085, -0.1))
+      for (const side of [-1, 1]) {
+        const ear = sphere(0.022, skin, side * 0.087, 0.095, 0.008, 10)
+        ear.scale.set(0.45, 1, 0.75)
+        head.add(ear)
+      }
+      // Hair hugging the top and back of the head, open only at the face
+      // (the -z side), so no edge sticks up from any angle
+      const FACE = 1.0
+      const hairCap = mesh(new THREE.SphereGeometry(0.1, 32, 20, Math.PI * 1.5 + FACE, Math.PI * 2 - FACE * 2, 0, Math.PI * 0.72), hair, 0, 0.112, 0.006)
+      hairCap.scale.set(0.96, 1.1, 1.04)
+      ;(hairCap.material as THREE.Material).side = THREE.DoubleSide
+      head.add(hairCap)
+      // The hairline over the forehead
+      const fringe = mesh(new THREE.SphereGeometry(0.1, 24, 10, 0, Math.PI * 2, 0, Math.PI * 0.22), hair, 0, 0.115, 0.004)
+      fringe.scale.set(0.96, 1.1, 1.04)
+      head.add(fringe)
+      // Fuller at the back, tapering to the nape
+      const nape = sphere(0.085, hair, 0, 0.085, 0.03, 20)
+      nape.scale.set(0.95, 0.85, 0.75)
+      head.add(nape)
+      head.position.set(0, SEAT + 0.55, BENCH_Z - 0.04)
       pianist.add(head)
+
       // Arms: shoulders fixed, elbows and hands solved every frame
       const UPPER = 0.29
-      const FORE = 0.28
+      const FORE = 0.27
+      const fingerGeo = new THREE.CapsuleGeometry(0.0085, 0.035, 4, 8).translate(0, -0.026, 0)
       const arms = [-1, 1].map((side) => {
-        const upper = unitLimb(0.045, suit)
-        const fore = unitLimb(0.038, suit)
-        const cuff = cyl(0.036, 0.036, 0.025, shirt, 0, 0, 0, 12)
-        const hand = group(box(0.075, 0.028, 0.09, skin, 0, -0.014, -0.03), box(0.02, 0.022, 0.04, skin, side * -0.04, -0.012, -0.01))
+        const upper = unitLimb(0.04, 0.035, suit)
+        const fore = unitLimb(0.034, 0.028, suit)
+        const cuff = cyl(0.03, 0.03, 0.028, shirt, 0, 0, 0, 14)
+        // Hand: palm, four curved fingers and a thumb, pointing at the keys
+        const hand = group()
+        const palm = mesh(new THREE.CapsuleGeometry(0.032, 0.03, 4, 12).rotateX(Math.PI / 2), skin, 0, -0.008, -0.025)
+        palm.scale.set(1.15, 0.45, 1)
+        hand.add(palm)
+        const fingers: THREE.Mesh[] = []
+        for (let f = 0; f < 4; f++) {
+          const finger = mesh(fingerGeo, skin, (f - 1.5) * 0.019, -0.01, -0.055)
+          finger.rotation.x = 1.2
+          fingers.push(finger)
+          hand.add(finger)
+        }
+        const thumb = mesh(fingerGeo, skin, side * -0.04, -0.012, -0.03)
+        thumb.rotation.set(1.0, 0, side * 0.6)
+        hand.add(thumb)
         pianist.add(upper, fore, cuff, hand)
-        return { side, upper, fore, cuff, hand, shoulder: v3(side * 0.19, SEAT + 0.45, BENCH_Z - 0.01), x: side * 0.2 }
+        return { side, upper, fore, cuff, hand, fingers, shoulder: v3(side * 0.2, SEAT + 0.43, BENCH_Z - 0.02), x: side * 0.2 }
       })
-      pianist.add(...arms.map(a => sphere(0.055, suit, a.shoulder.x, a.shoulder.y, a.shoulder.z, 12)))
       const keyX = (i: number) => x0 + (i + 0.5) * keyW
       const KEY_TOP = CASE_Y + 0.122
       const solve = (arm: (typeof arms)[number], target: THREE.Vector3) => {
@@ -2304,8 +2371,8 @@ const PROPOSAL = premium('proposal', [
         const toT = target.clone().sub(S)
         const d = Math.min(toT.length(), UPPER + FORE - 0.002)
         const u = toT.normalize()
-        // Elbows out to the side and down
-        const pole = v3(arm.side * 1, -0.6, 0.3)
+        // Elbows out to the side and a little down, like a pianist's
+        const pole = v3(arm.side * 1, -0.5, 0.35)
         const w = pole.sub(u.clone().multiplyScalar(pole.dot(u))).normalize()
         const along = (UPPER * UPPER - FORE * FORE + d * d) / (2 * d)
         const up = Math.sqrt(Math.max(0, UPPER * UPPER - along * along))
@@ -2313,28 +2380,33 @@ const PROPOSAL = premium('proposal', [
         const wrist = S.clone().addScaledVector(u, d)
         place(arm.upper, S, elbow)
         place(arm.fore, elbow, wrist)
-        arm.cuff.position.copy(elbow.clone().lerp(wrist, 0.92))
+        arm.cuff.position.copy(elbow.clone().lerp(wrist, 0.93))
         arm.cuff.quaternion.copy(arm.fore.quaternion)
         arm.hand.position.copy(wrist)
-        arm.hand.rotation.set(0, Math.atan2(wrist.x - elbow.x, -(wrist.z - elbow.z)) * -0.6, 0)
+        // Hands level over the keys, turned along the forearm
+        arm.hand.rotation.set(0, Math.atan2(-(wrist.x - elbow.x), -(wrist.z - elbow.z)) * 0.7, 0)
       }
       parts.push(animate(pianist, (t) => {
         const playing = pianoState.playing
         const step = Math.floor(t / BEAT)
         const notes = playing ? notesAt(step) : []
         const melody = playing ? notesAt(step - (step % 2))[1] : undefined
-        // Left hand on the chord, right hand on the melody; at rest they wait on middle C
-        const leftKey = notes[0] ?? 21
-        const rightKey = melody ?? 30
-        const targets = [keyX(leftKey), keyX(rightKey)]
+        // Left hand on the chord, right hand on the melody; at rest they wait round middle C
+        const keysNow = [notes[0] ?? 21, melody ?? 30]
         arms.forEach((arm, i) => {
-          arm.x += (targets[i]! - arm.x) * (playing ? 0.35 : 0.08)
-          const press = playing ? depthOf(i === 0 ? leftKey : rightKey, t) : 0
-          solve(arm, v3(arm.x, KEY_TOP + 0.035 - press * 0.02, KEY_Z + 0.24))
+          arm.x += (keyX(keysNow[i]!) - arm.x) * (playing ? 0.35 : 0.08)
+          const press = playing ? depthOf(keysNow[i]!, t) : 0
+          solve(arm, v3(arm.x, KEY_TOP + 0.045 - press * 0.012, KEY_Z + 0.26))
+          // The pressing finger curls down; the others lift a touch in turn
+          arm.fingers.forEach((finger, f) => {
+            const lead = playing ? (step + f + i) % 4 === 0 : false
+            finger.rotation.x = 1.2 + (lead ? press * 0.45 : playing ? Math.sin(t * 6 + f + i) * 0.08 : 0)
+          })
         })
-        head.rotation.x = playing ? 0.12 + Math.sin(t * Math.PI / BEAT / 2) * 0.05 : 0.05
+        head.rotation.x = playing ? 0.14 + Math.sin(t * Math.PI / BEAT / 2) * 0.05 : 0.06
         head.rotation.z = playing ? Math.sin(t * 0.7) * 0.06 : 0
-        torso.rotation.z = playing ? Math.sin(t * 0.7) * 0.02 : 0
+        body.rotation.z = playing ? Math.sin(t * 0.7) * 0.025 : 0
+        neck.rotation.z = body.rotation.z
       }))
 
       // Golden notes floating up while it plays
