@@ -39,6 +39,22 @@ const BACK = -2.5
 
 // Where each pack's items stand in a 5 x 5 m room (back wall at z = -2.5)
 const LAYOUTS: Record<RoomPackId, { spots: Spot[]; land: LandId; mode: 'day' | 'night'; wall: string; floor: string }> = {
+  proposal: {
+    land: 'sakura', mode: 'night', wall: '#2b1a24', floor: '#5a3a32',
+    spots: [
+      ['vip-marry-me', 0, 0, -2.25], ['vip-rose-heart', 0, 0, -1.2], ['vip-petal-aisle', 0, 0, 1.0],
+      ['vip-grand-piano', -1.45, 0, -0.6, 35, 0.95], ['vip-fireworks', 1.9, 0, -1.9],
+      [TABLE, 1.4, 0, -0.2], ['vip-ring-box', 1.4, TOP, -0.2, 0, 1.6],
+    ],
+  },
+  showroom: {
+    land: 'city', mode: 'night', wall: '#f4f2ee', floor: '#d8d2c8',
+    spots: [
+      ['vip-neon-open', -1.2, 1.9, BACK], ['vip-ad-screen', 1.1, 1.65, BACK], ['vip-sale-banner', 1.1, 2.72, BACK],
+      ['vip-glass-cabinet', -1.9, 0, -2.2], ['vip-glass-cabinet', -0.9, 0, -2.2],
+      ['vip-display-podium', 0, 0, -0.6], ['vip-checkout-counter', 1.4, 0, 0.6, -90],
+    ],
+  },
   valentine: {
     land: 'sakura', mode: 'night', wall: '#fbe4ea', floor: '#c99a7a',
     spots: [

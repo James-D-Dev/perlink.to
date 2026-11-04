@@ -8,10 +8,11 @@
       "price": 5,
       "currency": "USD",
       "pricing": "Single payment",
-      "action": "update price to $5 (already exists at $4)",
+      "action": "done (Test mode)",
       "description": "Six animated 3D items for your Perlink room: a rose arch, rose bouquet, heart balloons, candle heart, beating neon heart and a teddy bear.",
       "taxCategory": "Software as a Service (SaaS)",
-      "status": "Published"
+      "status": "Published",
+      "image": "docs/lemon-covers/valentine.png"
     },
     {
       "pack": "wedding",
@@ -19,10 +20,11 @@
       "price": 6,
       "currency": "USD",
       "pricing": "Single payment",
-      "action": "create",
+      "action": "done (Test mode)",
       "description": "Six animated 3D items for your Perlink room: a wedding arch with veils, turning cake, pouring champagne tower, LOVE lights, lanterns and sparklers.",
       "taxCategory": "Software as a Service (SaaS)",
-      "status": "Published"
+      "status": "Published",
+      "image": "docs/lemon-covers/wedding.png"
     },
     {
       "pack": "birthday",
@@ -30,10 +32,11 @@
       "price": 5,
       "currency": "USD",
       "pricing": "Single payment",
-      "action": "create",
+      "action": "done (Test mode)",
       "description": "Six animated 3D items for your Perlink room: a birthday cake with candles, balloons, a popping gift tower, disco ball, confetti popper and bunting.",
       "taxCategory": "Software as a Service (SaaS)",
-      "status": "Published"
+      "status": "Published",
+      "image": "docs/lemon-covers/birthday.png"
     },
     {
       "pack": "galaxy",
@@ -41,10 +44,11 @@
       "price": 7,
       "currency": "USD",
       "pricing": "Single payment",
-      "action": "create",
+      "action": "done (Test mode)",
       "description": "Six animated 3D items for your Perlink room: a floating planet with moons, jellyfish lamp, star projector, moon lamp, snow globe and nebula painting.",
       "taxCategory": "Software as a Service (SaaS)",
-      "status": "Published"
+      "status": "Published",
+      "image": "docs/lemon-covers/galaxy.png"
     },
     {
       "pack": "tet",
@@ -52,10 +56,35 @@
       "price": 5,
       "currency": "USD",
       "pricing": "Single payment",
-      "action": "create",
+      "action": "done (Test mode)",
       "description": "Six animated 3D items for your Perlink room: peach and apricot blossom trees with wish cards, a kumquat tree, red lanterns, firecrackers and fruit tray.",
       "taxCategory": "Software as a Service (SaaS)",
-      "status": "Published"
+      "status": "Published",
+      "image": "docs/lemon-covers/tet.png"
+    },
+    {
+      "pack": "proposal",
+      "name": "Proposal Room Pack",
+      "price": 15,
+      "currency": "USD",
+      "pricing": "Single payment",
+      "action": "create",
+      "description": "Six animated 3D items for your Perlink room: an opening ring box, MARRY ME lights, a 99-rose heart, petal aisle, self-playing piano and fireworks.",
+      "taxCategory": "Software as a Service (SaaS)",
+      "status": "Published",
+      "image": "docs/lemon-covers/proposal.png"
+    },
+    {
+      "pack": "showroom",
+      "name": "Showroom Room Pack",
+      "price": 19,
+      "currency": "USD",
+      "pricing": "Single payment",
+      "action": "create",
+      "description": "Six animated 3D items to turn your Perlink room into a shop: a turning product podium, glass cabinet, OPEN neon, promo screen, till and sale banner.",
+      "taxCategory": "Software as a Service (SaaS)",
+      "status": "Published",
+      "image": "docs/lemon-covers/showroom.png"
     }
   ]
 }

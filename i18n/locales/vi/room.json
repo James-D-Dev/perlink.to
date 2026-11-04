@@ -336,7 +336,19 @@
       "vip-kumquat-tree": "Cây quất",
       "vip-red-lanterns": "Đèn lồng đỏ",
       "vip-firecrackers": "Dây pháo",
-      "vip-five-fruit-tray": "Mâm ngũ quả"
+      "vip-five-fruit-tray": "Mâm ngũ quả",
+      "vip-ring-box": "Hộp nhẫn",
+      "vip-marry-me": "Chữ MARRY ME",
+      "vip-rose-heart": "Trái tim 99 hồng",
+      "vip-petal-aisle": "Lối đi cánh hồng",
+      "vip-grand-piano": "Đàn piano",
+      "vip-fireworks": "Màn pháo hoa",
+      "vip-display-podium": "Bục trưng bày",
+      "vip-glass-cabinet": "Tủ kính",
+      "vip-neon-open": "Biển neon OPEN",
+      "vip-ad-screen": "Màn hình quảng cáo",
+      "vip-checkout-counter": "Quầy thu ngân",
+      "vip-sale-banner": "Băng rôn SALE"
     },
     "tour": {
       "back": "Quay lại",
@@ -420,7 +432,15 @@
         "name": "Tết",
         "tagline": "Hoa đào, hoa mai, đèn lồng đỏ và lì xì cho năm mới."
       },
-      "animated": "Có chuyển động"
+      "animated": "Có chuyển động",
+      "proposal": {
+        "name": "Cầu hôn",
+        "tagline": "Hộp nhẫn tự mở, 99 bông hồng, đàn piano tự chơi và pháo hoa cho lời cầu hôn."
+      },
+      "showroom": {
+        "name": "Showroom",
+        "tagline": "Biến căn phòng thành cửa hàng: bục xoay trưng sản phẩm, neon, màn hình quảng cáo và quầy thu ngân."
+      }
     },
     "market": {
       "metaTitle": "Cửa hàng phòng 3D: Món đồ cao cấp cho phòng của bạn | Perlink",

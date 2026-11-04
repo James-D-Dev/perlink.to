@@ -12,7 +12,7 @@
           <p class="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-[17px] font-semibold ring-1 ring-white/30 backdrop-blur">
             <UIcon name="i-lucide-crown" class="size-5" />Premium room pack
           </p>
-          <h1 class="mt-7 text-[76px] font-extrabold leading-[0.95] tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.25)]">{{ name }}</h1>
+          <h1 class="mt-7 font-extrabold leading-[0.95] tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.25)]" :class="name.length > 7 ? 'text-[62px]' : 'text-[76px]'">{{ name }}</h1>
           <p class="mt-5 text-[26px] font-medium text-white/90">6 animated 3D items</p>
           <ul class="mt-6 space-y-1.5 text-[19px] text-white/85">
             <li v-for="type in pack.items" :key="type" class="flex items-center gap-2">

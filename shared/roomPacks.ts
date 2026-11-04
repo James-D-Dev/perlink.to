@@ -3,7 +3,7 @@
 // code like the rest of the catalog (app/utils/room/premiumModels.ts); the
 // server only needs to know which item types belong to which pack.
 
-export type RoomPackId = 'valentine' | 'birthday' | 'tet' | 'wedding' | 'galaxy'
+export type RoomPackId = 'valentine' | 'birthday' | 'tet' | 'wedding' | 'galaxy' | 'proposal' | 'showroom'
 
 export interface RoomPack {
   id: RoomPackId
@@ -18,6 +18,20 @@ export interface RoomPack {
 }
 
 export const ROOM_PACKS: RoomPack[] = [
+  {
+    id: 'proposal',
+    priceUsd: 15,
+    items: ['vip-ring-box', 'vip-marry-me', 'vip-rose-heart', 'vip-petal-aisle', 'vip-grand-piano', 'vip-fireworks'],
+    colors: ['#7f1d1d', '#be123c', '#f59e0b'],
+    lemonMatch: 'proposal',
+  },
+  {
+    id: 'showroom',
+    priceUsd: 19,
+    items: ['vip-display-podium', 'vip-glass-cabinet', 'vip-neon-open', 'vip-ad-screen', 'vip-checkout-counter', 'vip-sale-banner'],
+    colors: ['#0f172a', '#334155', '#e11d48'],
+    lemonMatch: 'showroom',
+  },
   {
     id: 'valentine',
     priceUsd: 5,

@@ -1815,4 +1815,758 @@ const GALAXY = premium('galaxy', [
   },
 ])
 
-export const PREMIUM_ITEMS: CatalogItem[] = [...VALENTINE, ...BIRTHDAY, ...TET, ...WEDDING, ...GALAXY]
+
+// ======================================================================
+// Shared: letters drawn as strokes (marquees, neon)
+// ======================================================================
+
+/** Strokes of capital letters on a 0..1 box (x1, y1, x2, y2) */
+const STROKES: Record<string, [number, number, number, number][]> = {
+  A: [[0.05, 0, 0.5, 1], [0.5, 1, 0.95, 0], [0.25, 0.42, 0.75, 0.42]],
+  E: [[0.15, 1, 0.15, 0], [0.15, 1, 0.85, 1], [0.15, 0.5, 0.7, 0.5], [0.15, 0, 0.85, 0]],
+  M: [[0.08, 0, 0.08, 1], [0.08, 1, 0.5, 0.45], [0.5, 0.45, 0.92, 1], [0.92, 1, 0.92, 0]],
+  N: [[0.12, 0, 0.12, 1], [0.12, 1, 0.88, 0], [0.88, 0, 0.88, 1]],
+  O: [[0.15, 0.15, 0.15, 0.85], [0.15, 0.85, 0.5, 1], [0.5, 1, 0.85, 0.85], [0.85, 0.85, 0.85, 0.15], [0.85, 0.15, 0.5, 0], [0.5, 0, 0.15, 0.15]],
+  P: [[0.15, 0, 0.15, 1], [0.15, 1, 0.75, 1], [0.75, 1, 0.88, 0.86], [0.88, 0.86, 0.88, 0.64], [0.88, 0.64, 0.75, 0.5], [0.75, 0.5, 0.15, 0.5]],
+  R: [[0.15, 0, 0.15, 1], [0.15, 1, 0.72, 1], [0.72, 1, 0.86, 0.86], [0.86, 0.86, 0.86, 0.66], [0.86, 0.66, 0.72, 0.52], [0.72, 0.52, 0.15, 0.52], [0.45, 0.52, 0.88, 0]],
+  Y: [[0.08, 1, 0.5, 0.5], [0.92, 1, 0.5, 0.5], [0.5, 0.5, 0.5, 0]],
+}
+
+/** Each letter's strokes as segments in metres, a line of text centred on x = 0 with its baseline at y */
+function textStrokes(text: string, height: number, width: number, gap: number, y = 0) {
+  const letters = text.split('')
+  const total = letters.length * width + (letters.length - 1) * gap
+  const out: { a: THREE.Vector3; b: THREE.Vector3; letter: number }[] = []
+  letters.forEach((ch, i) => {
+    const ox = -total / 2 + i * (width + gap)
+    for (const [x1, y1, x2, y2] of STROKES[ch] ?? []) out.push({ a: v3(ox + x1 * width, y + y1 * height, 0), b: v3(ox + x2 * width, y + y2 * height, 0), letter: i })
+  })
+  return out
+}
+
+/** Marquee letters: cream faces with gold sides and a chase of bulbs */
+function marqueeLetters(lines: { text: string; y: number }[], height: number, width: number, faceColor: string, bulbColor: string) {
+  const face = glow(faceColor, 0.12, 0.5)
+  face.roughness = 0.5
+  const side = metal('#c9a14a', 0.35)
+  const parts: THREE.Object3D[] = []
+  const bulbs: THREE.Vector3[] = []
+  for (const line of lines) {
+    for (const { a, b } of textStrokes(line.text, height, width, width * 0.16, line.y)) {
+      const len = a.distanceTo(b)
+      const stroke = mesh(new THREE.BoxGeometry(len + 0.07, 0.07, 0.08), face)
+      stroke.position.copy(a).add(b).multiplyScalar(0.5)
+      stroke.rotation.z = Math.atan2(b.y - a.y, b.x - a.x)
+      stroke.add(mesh(new THREE.BoxGeometry(len + 0.075, 0.075, 0.06), side, 0, 0, -0.012))
+      parts.push(stroke)
+      const n = Math.max(2, Math.round(len / 0.075))
+      for (let k = 0; k <= n; k++) bulbs.push(a.clone().lerp(b, k / n).setZ(0.045))
+    }
+  }
+  parts.push(swarm(bulbs.length, new THREE.SphereGeometry(0.02, 10, 8), glow(bulbColor, 1.3, 2.4), (i, t, d) => {
+    d.position.copy(bulbs[i]!)
+    d.scale.setScalar(0.65 + 0.45 * (Math.sin(t * 5 - i * 0.6) > 0.3 ? 1 : 0.35))
+  }))
+  return group(...parts)
+}
+
+/** A text texture for screens and signs (null where there's no canvas, e.g. on the server) */
+function textTexture(width: number, height: number, draw: (ctx: CanvasRenderingContext2D) => void) {
+  return typeof document === 'undefined' ? null : canvasTexture(width, height, draw)
+}
+
+// ======================================================================
+// Proposal
+// ======================================================================
+
+const PROPOSAL = premium('proposal', [
+  {
+    type: 'vip-ring-box',
+    name: 'Ring box',
+    icon: 'i-lucide-gem',
+    defaultColor: '#9b1030',
+    build: (color) => {
+      // A velvet ring box on a little pedestal under a glass dome: the lid
+      // opens, the diamond ring turns and sparkles
+      const velvet = mat(color, { roughness: 0.95 })
+      const satin = mat('#fbf3ea', { roughness: 0.45 })
+      const gold = metal('#e7c26a', 0.18)
+      const parts: THREE.Object3D[] = [
+        cyl(0.13, 0.15, 0.04, mat('#f4efe8', { roughness: 0.3, metalness: 0.2 })),
+        mesh(new THREE.TorusGeometry(0.14, 0.006, 8, 40).rotateX(Math.PI / 2), gold, 0, 0.04, 0),
+      ]
+      const boxBody = group(
+        box(0.12, 0.05, 0.12, velvet),
+        box(0.106, 0.004, 0.106, satin, 0, 0.048),
+        // The cushion slot
+        mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.08, 16).rotateZ(Math.PI / 2), satin, 0, 0.056, 0.012),
+      )
+      boxBody.position.y = 0.04
+      parts.push(boxBody)
+      // Lid, hinged at the back
+      const lid = group(box(0.12, 0.04, 0.12, velvet, 0, 0, 0.06), box(0.106, 0.004, 0.106, satin, 0, 0.002, 0.06))
+      lid.children.forEach(c => c.position.z = 0.06)
+      const hinge = group(lid)
+      hinge.position.set(0, 0.09, -0.06)
+      // The ring, standing in the slot
+      const ring = group(mesh(new THREE.TorusGeometry(0.022, 0.0035, 12, 40), gold))
+      const stone = group(
+        mesh(new THREE.ConeGeometry(0.011, 0.012, 8).rotateX(Math.PI), new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0, metalness: 0, transmission: 0.2, clearcoat: 1, iridescence: 1, iridescenceIOR: 1.6, emissive: '#dff6ff', emissiveIntensity: 0.25 }), 0, -0.006, 0),
+        mesh(new THREE.CylinderGeometry(0.007, 0.011, 0.005, 8), new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0, clearcoat: 1, iridescence: 1, emissive: '#dff6ff', emissiveIntensity: 0.3 }), 0, 0.0025, 0),
+      )
+      stone.position.y = 0.027
+      ring.add(stone)
+      ring.position.set(0, 0.125, 0.012)
+      const sparkles = loose(swarm(10, new THREE.OctahedronGeometry(0.004, 0), glow('#ffffff', 2.5, 2), (i, t, d) => {
+        const a = i * 0.63 + t * 0.8
+        d.position.set(Math.cos(a) * 0.035, 0.155 + Math.sin(t * 2 + i) * 0.01, 0.012 + Math.sin(a) * 0.035)
+        d.scale.setScalar(Math.max(0, Math.sin(t * 4 + i * 1.7)))
+      }))
+      parts.push(hinge, ring, sparkles)
+      // A glass dome over it all
+      const dome = sphere(0.135, glass('#f5fbff', 0.18), 0, 0.04, 0, 32)
+      dome.scale.y = 1.3
+      ;(dome.geometry as THREE.SphereGeometry).dispose()
+      dome.geometry = new THREE.SphereGeometry(0.135, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+      dome.castShadow = false
+      parts.push(dome)
+      return group(...parts, animate(group(), (t) => {
+        // Open for a while, close, open again
+        // Starts open (so it's open in pictures), closes for a moment now and then
+        const p = loop(t, 9, 1.5)
+        const open = p < 0.08 ? p / 0.08 : p < 0.82 ? 1 : p < 0.9 ? 1 - (p - 0.82) / 0.08 : 0
+        const ease = open * open * (3 - 2 * open)
+        hinge.rotation.x = -ease * 1.75
+        ring.visible = ease > 0.3
+        ring.rotation.y = t * 0.8
+        ring.position.y = 0.11 + ease * 0.015
+      }))
+    },
+  },
+  {
+    type: 'vip-marry-me',
+    name: 'MARRY ME lights',
+    icon: 'i-lucide-type',
+    defaultColor: '#f4f1ea',
+    light: { color: '#ffd89b', intensity: 2.8, distance: 4.5, offset: [0, 0.6, 0.3] },
+    build: color => marqueeLetters([{ text: 'MARRY', y: 0.62 }, { text: 'ME', y: 0.02 }], 0.5, 0.34, color, '#ffe6a8'),
+  },
+  {
+    type: 'vip-petal-aisle',
+    name: 'Rose petal aisle',
+    icon: 'i-lucide-route',
+    defaultColor: '#fbf7f2',
+    light: { color: '#ffb35c', intensity: 2.2, distance: 3.5, offset: [0, 0.3, 0], flicker: true },
+    build: (color) => {
+      // A runner strewn with petals, lanterns with candles along both sides
+      const L = 2.6
+      const W = 0.7
+      const parts: THREE.Object3D[] = [box(W, 0.008, L, mat(color, { roughness: 1 }), 0, 0, 0)]
+      const rand = seeded(91)
+      const petals = Array.from({ length: 160 }, () => [rand(), rand(), rand(), rand()])
+      const petalGeo = new THREE.SphereGeometry(0.02, 8, 6)
+      petalGeo.scale(1, 0.15, 0.75)
+      // Thicker towards the edges, a heart of petals at the far end
+      parts.push(swarm(160, petalGeo, mat('#ffffff', { roughness: 0.7 }), (i, _t, d) => {
+        const [x, z, s, h] = petals[i]!
+        if (i < 40) {
+          const p = heartShape().getPointAt(i / 40)
+          d.position.set(p.x * 0.55, 0.01, -L / 2 + 0.35 - p.y * 0.55)
+        } else {
+          const edge = x < 0.5 ? -1 : 1
+          const off = Math.pow(Math.abs(x - 0.5) * 2, 0.6)
+          d.position.set(edge * off * W * 0.5, 0.01 + h * 0.004, (z - 0.5) * L)
+        }
+        d.rotation.y = s * 6.28
+      }, ['#c8102e', '#e0234e', '#b0102a', '#f48fb1']))
+      // Lanterns along both sides
+      const frame = metal('#2b2725', 0.4)
+      const flameMat = glow('#ffb347', 1.3, 2)
+      const flames: THREE.Mesh[] = []
+      for (let k = 0; k < 5; k++) {
+        for (const side of [-1, 1]) {
+          const x = side * (W / 2 + 0.12)
+          const z = -L / 2 + 0.3 + k * ((L - 0.6) / 4)
+          parts.push(box(0.12, 0.015, 0.12, frame, x, 0, z))
+          parts.push(box(0.1, 0.18, 0.1, glass('#fff6e5', 0.25), x, 0.015, z))
+          parts.push(box(0.13, 0.015, 0.13, frame, x, 0.195, z))
+          parts.push(mesh(new THREE.ConeGeometry(0.09, 0.06, 4).rotateY(Math.PI / 4), frame, x, 0.24, z))
+          parts.push(cyl(0.022, 0.022, 0.06, mat('#fff3e0', { roughness: 0.6 }), x, 0.015, z, 12))
+          const f = mesh(new THREE.SphereGeometry(0.01, 8, 6), flameMat, x, 0.09, z)
+          f.castShadow = false
+          flames.push(f)
+          parts.push(f)
+        }
+      }
+      parts.push(animate(group(), (t) => {
+        flames.forEach((f, i) => f.scale.set(1, 1.8 * (1 + 0.22 * Math.sin(t * 12 + i * 2.1) + 0.12 * Math.sin(t * 25 + i)), 1))
+      }))
+      // A few petals drifting down onto it
+      parts.push(loose(swarm(10, petalGeo, mat('#e0234e', { roughness: 0.7, side: THREE.DoubleSide }), (i, t, d) => {
+        const p = loop(t, 6, i * 0.6)
+        d.position.set(Math.sin(i * 4.1) * 0.3 + Math.sin(t + i) * 0.08, 1.6 * (1 - p), (i / 10 - 0.5) * L)
+        d.rotation.set(t * 2 + i, t, t * 1.3)
+        return p < 0.98
+      })))
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-rose-heart',
+    name: '99 rose heart',
+    icon: 'i-lucide-heart',
+    defaultColor: '#c8102e',
+    build: (color) => {
+      // 99 roses packed into a heart on the floor, ringed with fairy lights
+      const shape = heartShape()
+      const pts = shape.getPoints(64)
+      const inside = (x: number, y: number) => {
+        let c = false
+        for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+          const a = pts[i]!
+          const b = pts[j]!
+          if ((a.y > y) !== (b.y > y) && x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x) c = !c
+        }
+        return c
+      }
+      const scale = 1.25
+      const cells: THREE.Vector2[] = []
+      for (let gy = -0.4; gy <= 0.42; gy += 0.056) {
+        for (let gx = -0.5; gx <= 0.5; gx += 0.056) {
+          const x = gx + ((Math.round((gy + 0.4) / 0.056) % 2) ? 0.028 : 0)
+          if (inside(x, gy)) cells.push(new THREE.Vector2(x, gy))
+        }
+      }
+      // Keep exactly 99, closest to the middle first
+      cells.sort((a, b) => a.length() - b.length())
+      const rand = seeded(99)
+      const spots: RoseSpot[] = cells.slice(0, 99).map((c, i) => ({
+        p: v3(c.x * scale, 0.07 + rand() * 0.01, -c.y * scale),
+        n: v3((rand() - 0.5) * 0.3, 1, (rand() - 0.5) * 0.3).normalize(),
+        size: 0.05 + rand() * 0.008,
+        color: i % 11 === 0 ? '#e0234e' : color,
+        open: 0.75 + rand() * 0.25,
+      }))
+      const parts: THREE.Object3D[] = [roses(spots)]
+      // Leaves peeking out at the edge
+      const edge = shape.getSpacedPoints(48)
+      parts.push(swarm(edge.length, roseLeafGeometry(1), mat('#2f6b2f', { roughness: 0.55, side: THREE.DoubleSide }), (i, _t, d) => {
+        const p = edge[i]!
+        d.position.set(p.x * scale * 1.04, 0.03, -p.y * scale * 1.04)
+        d.quaternion.setFromUnitVectors(v3(0, 1, 0), v3(p.x, 0.5, -p.y).normalize())
+        d.scale.setScalar(0.07)
+      }))
+      // Fairy lights twinkling round the outline
+      const ring = shape.getSpacedPoints(70)
+      parts.push(swarm(ring.length, new THREE.SphereGeometry(0.011, 8, 6), glow('#fff1c1', 0.8, 2.6), (i, t, d) => {
+        const p = ring[i]!
+        d.position.set(p.x * scale * 1.12, 0.012, -p.y * scale * 1.12)
+        d.scale.setScalar(0.6 + 0.6 * (0.5 + 0.5 * Math.sin(t * 2.6 + i * 1.3)))
+      }))
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-grand-piano',
+    name: 'Grand piano',
+    icon: 'i-lucide-piano',
+    defaultColor: '#111114',
+    build: (color) => {
+      // A grand piano, lid up, keys playing by themselves; notes float up
+      const lacquer = shiny(color, { roughness: 0.12 })
+      const gold = metal('#d9b45a', 0.25)
+      const outline = new THREE.Shape()
+      outline.moveTo(-0.72, 0)
+      outline.lineTo(0.72, 0)
+      outline.lineTo(0.72, 0.5)
+      outline.bezierCurveTo(0.7, 1.0, 0.4, 1.15, 0.2, 1.35)
+      outline.bezierCurveTo(0.05, 1.55, -0.2, 1.7, -0.45, 1.65)
+      outline.bezierCurveTo(-0.65, 1.6, -0.72, 1.4, -0.72, 1.1)
+      outline.lineTo(-0.72, 0)
+      // Everything lies flat with the keyboard along z = 0 and the tail towards -z
+      const flat = (g: THREE.BufferGeometry) => g.rotateX(-Math.PI / 2)
+      const caseGeo = flat(new THREE.ExtrudeGeometry(outline, { depth: 0.3, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01, bevelSegments: 2 }))
+      const body = mesh(caseGeo, lacquer, 0, 0.68, 0)
+      const inside = mesh(flat(new THREE.ShapeGeometry(outline)), mat('#3a2a1c', { roughness: 0.7 }), 0, 0.975, 0)
+      // Gold frame over the strings
+      const harp = mesh(flat(new THREE.ShapeGeometry(outline)), gold, 0, 0.9, 0)
+      harp.scale.set(0.9, 1, 0.9)
+      // The lid, hinged along the straight side and raised on a prop
+      const lid = mesh(flat(new THREE.ShapeGeometry(outline)), lacquer, -0.72, 0, 0)
+      const lidHinge = group(lid)
+      lidHinge.position.set(0.72, 0.99, 0)
+      lidHinge.rotation.z = -0.75
+      const prop = rod(v3(0.25, 0.99, -0.6), v3(0.28, 1.4, -0.6), 0.008, gold)
+      const parts: THREE.Object3D[] = [body, inside, harp, lidHinge, prop]
+      for (const [x, z] of [[-0.62, 0.05], [0.62, 0.05], [-0.3, -1.45]]) parts.push(cyl(0.04, 0.03, 0.68, lacquer, x!, 0, z!), cyl(0.03, 0.03, 0.02, gold, x!, 0, z!))
+      // Keyboard
+      parts.push(box(1.44, 0.06, 0.22, lacquer, 0, 0.68, 0.11))
+      parts.push(box(1.44, 0.1, 0.03, lacquer, 0, 0.74, -0.02))
+      const whiteN = 36
+      const keyW = 1.36 / whiteN
+      const pressed = (i: number, t: number) => {
+        // A little melody walking up and down the keys, with chords
+        const beat = Math.floor(t * 4)
+        const melody = 14 + Math.round(Math.sin(beat * 0.9) * 6 + Math.sin(beat * 0.37) * 4)
+        const chord = 7 + (Math.floor(beat / 4) % 3) * 2
+        return i === melody || i === chord || i === chord + 2 || i === chord + 4
+      }
+      parts.push(swarm(whiteN, new THREE.BoxGeometry(keyW * 0.92, 0.02, 0.15), mat('#fbfaf6', { roughness: 0.35 }), (i, t, d) => {
+        d.position.set(-0.68 + (i + 0.5) * keyW, 0.73 - (pressed(i, t) ? 0.007 : 0), 0.13)
+        d.rotation.x = pressed(i, t) ? 0.05 : 0
+      }))
+      const blacks: number[] = []
+      for (let i = 0; i < whiteN - 1; i++) if (![2, 6].includes(i % 7)) blacks.push(i)
+      parts.push(swarm(blacks.length, new THREE.BoxGeometry(keyW * 0.55, 0.025, 0.09), mat('#111111', { roughness: 0.3 }), (i, t, d) => {
+        const k = blacks[i]!
+        const down = Math.floor(t * 4 + k) % 9 === 0
+        d.position.set(-0.68 + (k + 1) * keyW, 0.745 - (down ? 0.006 : 0), 0.1)
+      }))
+      // Music stand and bench
+      parts.push(box(0.5, 0.2, 0.01, lacquer, 0, 0.99, 0.02))
+      parts.push(box(0.7, 0.06, 0.35, mat('#1b1b1d', { roughness: 0.6 }), 0, 0.45, 0.62), box(0.66, 0.02, 0.31, mat('#3a1f1f', { roughness: 0.9 }), 0, 0.51, 0.62))
+      for (const [x, z] of [[-0.3, 0.5], [0.3, 0.5], [-0.3, 0.74], [0.3, 0.74]]) parts.push(cyl(0.02, 0.02, 0.45, lacquer, x!, 0, z!))
+      // Notes floating up from the strings
+      const noteGeo = new THREE.SphereGeometry(0.018, 10, 8)
+      noteGeo.scale(1.2, 0.85, 0.6)
+      parts.push(loose(swarm(7, noteGeo, glow('#ffe7a8', 1.4, 2), (i, t, d) => {
+        const p = loop(t, 4, i * 0.57)
+        d.position.set(-0.3 + Math.sin(i * 2.1) * 0.4 + Math.sin(t * 1.5 + i) * 0.06, 1.15 + p * 0.9, -0.6 + Math.cos(i * 1.3) * 0.3)
+        d.rotation.z = -0.4
+        d.scale.setScalar(Math.sin(p * Math.PI))
+      })))
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-fireworks',
+    name: 'Fireworks show',
+    icon: 'i-lucide-sparkles',
+    defaultColor: '#7a1f2b',
+    light: { color: '#ffd27a', intensity: 3.5, distance: 12, offset: [0, 4.5, 0], flicker: true },
+    build: (color) => {
+      // A launch crate; shells climb high above the room and burst into
+      // colour, then the sparks fall and fade. Best at night
+      // A cake of firework tubes in bright wraps, a fountain of sparks
+      // fizzing from the top while the shells go up
+      const crate = group(
+        box(0.44, 0.06, 0.44, mat(color, { roughness: 0.7 })),
+        mesh(new THREE.TorusGeometry(0.3, 0.008, 6, 4).rotateX(Math.PI / 2).rotateY(Math.PI / 4), metal('#d9b45a', 0.3), 0, 0.06, 0),
+      )
+      const wraps = ['#e63946', '#ffd166', '#3a86ff', '#06d6a0', '#ff7a45', '#8338ec', '#ff4d6d', '#ffd166', '#3a86ff']
+      for (let i = 0; i < 9; i++) {
+        const x = (i % 3 - 1) * 0.13
+        const z = (Math.floor(i / 3) - 1) * 0.13
+        const h = 0.22 + ((i * 7) % 3) * 0.04
+        crate.add(cyl(0.055, 0.055, h, shiny(wraps[i]!, { roughness: 0.4 }), x, 0.06, z, 20))
+        crate.add(mesh(new THREE.TorusGeometry(0.056, 0.006, 6, 24).rotateX(Math.PI / 2), metal('#ffffff', 0.4), x, 0.06 + h * 0.7, z))
+        crate.add(cyl(0.048, 0.048, 0.006, mat('#2b2b2b'), x, 0.06 + h, z, 16))
+        // A star on each wrap
+        const star = mesh(new THREE.OctahedronGeometry(0.018, 0), metal('#fff3b0', 0.3), x, 0.06 + h * 0.45, z + 0.055)
+        star.scale.set(1, 1, 0.3)
+        crate.add(star)
+      }
+      crate.add(rod(v3(0.2, 0.08, 0.2), v3(0.28, 0.02, 0.3), 0.004, mat('#5a3a1a')))
+      const rand = seeded(47)
+      const fizz = Array.from({ length: 50 }, () => [rand(), rand(), rand()])
+      const fountain = swarm(50, new THREE.SphereGeometry(0.008, 6, 4), glow('#ffe08a', 2.2, 2), (i, t, d) => {
+        const [a, sp, ph] = fizz[i]!
+        const life = 0.9
+        const time = loop(t, life, ph * life) * life
+        const ang = a * Math.PI * 2
+        const vy = 1.3 + sp * 0.7
+        const y = 0.34 + vy * time - 2.4 * time * time
+        if (y < 0.3) return false
+        d.position.set(Math.cos(ang) * (0.06 + sp * 0.12) * time * 2, y, Math.sin(ang) * (0.06 + sp * 0.12) * time * 2)
+        d.scale.set(1, 2.5, 1)
+        d.scale.multiplyScalar(1 - time / life * 0.7)
+      }, ['#ffe08a', '#fff3b0', '#ff9f43', '#ffffff'])
+      crate.add(fountain)
+      const SHELLS = 4
+      const SPARKS = 46
+      const palettes = [['#ff4d6d', '#ffb3c1'], ['#ffd166', '#fff3b0'], ['#7ee8ff', '#c3f7ff'], ['#b388ff', '#e5d4ff'], ['#06d6a0', '#b7ffe9']]
+      const colors: string[] = []
+      for (let s = 0; s < SHELLS; s++) for (let k = 0; k < SPARKS; k++) colors.push(palettes[(s * 2 + k % 2) % palettes.length]![k % 2]!)
+      const dirs = Array.from({ length: SPARKS }, (_, k) => {
+        const y = 1 - (2 * (k + 0.5)) / SPARKS
+        const r = Math.sqrt(1 - y * y)
+        const a = k * 2.39996
+        return v3(Math.cos(a) * r, y, Math.sin(a) * r)
+      })
+      const PERIOD = 3.2
+      const sparks = loose(swarm(SHELLS * SPARKS, new THREE.SphereGeometry(0.03, 6, 4), glow('#ffffff', 3, 2), (i, t, d) => {
+        const s = Math.floor(i / SPARKS)
+        const k = i % SPARKS
+        const p = loop(t, PERIOD, s * (PERIOD / SHELLS))
+        const rise = 0.32
+        if (p < rise) return false
+        const q = (p - rise) / (1 - rise)
+        const centre = v3(Math.sin(s * 2.7) * 1.4, 4.2 + (s % 2) * 0.9, Math.cos(s * 1.9) * 1.0)
+        const spread = 1.3 * (1 - Math.exp(-q * 5))
+        d.position.copy(centre).addScaledVector(dirs[k]!, spread)
+        d.position.y -= q * q * 1.2
+        d.scale.setScalar((1 - q) * 1.2)
+      }, colors))
+      // The shells climbing, with a short trail
+      const trails = loose(swarm(SHELLS * 3, new THREE.SphereGeometry(0.025, 6, 4), glow('#fff1c1', 2.5, 2), (i, t, d) => {
+        const s = Math.floor(i / 3)
+        const k = i % 3
+        const p = loop(t, PERIOD, s * (PERIOD / SHELLS))
+        if (p >= 0.32) return false
+        const q = p / 0.32 - k * 0.05
+        if (q < 0) return false
+        const centre = v3(Math.sin(s * 2.7) * 1.4, 4.2 + (s % 2) * 0.9, Math.cos(s * 1.9) * 1.0)
+        d.position.set(0, 0.25, 0).lerp(centre, q * (2 - q))
+        d.scale.setScalar(1 - k * 0.3)
+      }))
+      return group(crate, sparks, trails)
+    },
+  },
+])
+
+// ======================================================================
+// Showroom
+// ======================================================================
+
+const SHOWROOM = premium('showroom', [
+  {
+    type: 'vip-display-podium',
+    name: 'Display podium',
+    icon: 'i-lucide-gallery-vertical-end',
+    defaultColor: '#f5f3ef',
+    light: { color: '#fff4e0', intensity: 2.6, distance: 3.5, offset: [0, 1.4, 0.3] },
+    // A card for one of the shop's products, on the acrylic stand
+    productCard: { width: 0.3, height: 0.41, center: [0, 0.83, -0.18] },
+    build: (color) => {
+      const stone = mat(color, { roughness: 0.25, metalness: 0.1 })
+      const gold = metal('#d9b45a', 0.22)
+      const parts: THREE.Object3D[] = [
+        cyl(0.42, 0.44, 0.12, stone, 0, 0, 0, 48),
+        cyl(0.32, 0.34, 0.1, stone, 0, 0.12, 0, 48),
+        mesh(new THREE.TorusGeometry(0.43, 0.008, 8, 64).rotateX(Math.PI / 2), gold, 0, 0.12, 0),
+        // LED ring that breathes
+        mesh(new THREE.TorusGeometry(0.335, 0.01, 8, 64).rotateX(Math.PI / 2), glow('#bfe3ff', 1, 1.6), 0, 0.105, 0),
+        // Acrylic stand at the back, for the product card
+        box(0.34, 0.46, 0.012, glass('#ffffff', 0.35), 0, 0.6, -0.19),
+        box(0.36, 0.03, 0.06, gold, 0, 0.58, -0.19),
+      ]
+      const card = box(0.3, 0.41, 0.004, mat('#ffffff', { roughness: 0.6 }), 0, 0.625, -0.182)
+      card.userData.placeholder = true
+      parts.push(card)
+      // A turning plate with a perfume bottle and a shopping bag on it
+      const plate = group(
+        cyl(0.24, 0.24, 0.02, mat('#ffffff', { roughness: 0.2 }), 0, 0, 0, 40),
+        lathe([[0, 0], [0.06, 0], [0.065, 0.12], [0.03, 0.14], [0.02, 0.16], [0, 0.16]], glass('#ffd9e8', 0.6), 0.02, 32),
+        cyl(0.03, 0.03, 0.05, gold, 0, 0.18),
+        box(0.16, 0.2, 0.08, mat('#e85d8a', { roughness: 0.6 }), 0.13, 0.02, 0.04),
+        mesh(new THREE.TorusGeometry(0.04, 0.005, 6, 20, Math.PI), mat('#2b2b2b'), 0.13, 0.22, 0.04),
+      )
+      ;(plate.children[1] as THREE.Mesh).position.x = -0.09
+      ;(plate.children[2] as THREE.Mesh).position.x = -0.09
+      plate.position.y = 0.22
+      parts.push(animate(plate, (t) => {
+        plate.rotation.y = t * 0.5
+      }))
+      // Overhead spotlight on an arm, with a soft cone of light
+      parts.push(cyl(0.012, 0.012, 1.25, metal('#2b2b30', 0.3), -0.38, 0.22, -0.3, 8))
+      parts.push(rod(v3(-0.38, 1.46, -0.3), v3(0, 1.46, 0), 0.01, metal('#2b2b30', 0.3)))
+      parts.push(cyl(0.05, 0.035, 0.1, metal('#2b2b30', 0.3), 0, 1.36, 0, 16))
+      const beam = mesh(new THREE.CylinderGeometry(0.04, 0.3, 1.1, 32, 1, true), new THREE.MeshBasicMaterial({ color: '#fff4dc', transparent: true, opacity: 0.08, side: THREE.DoubleSide, depthWrite: false }), 0, 0.81, 0)
+      beam.castShadow = false
+      parts.push(loose(beam))
+      return group(...parts)
+    },
+  },
+  {
+    type: 'vip-glass-cabinet',
+    name: 'Glass cabinet',
+    icon: 'i-lucide-panels-top-left',
+    defaultColor: '#1f1f24',
+    light: { color: '#eaf4ff', intensity: 1.6, distance: 3, offset: [0, 1.2, 0.3] },
+    build: (color) => {
+      // A tall display cabinet with LED-lit glass shelves full of products
+      const frame = mat(color, { roughness: 0.35, metalness: 0.4 })
+      const W = 0.9
+      const D = 0.4
+      const H = 1.9
+      const parts: THREE.Object3D[] = [
+        box(W, 0.12, D, frame),
+        box(W, 0.06, D, frame, 0, H - 0.06),
+        box(W, H, 0.02, mat('#2a2a30', { roughness: 0.4 }), 0, 0, -D / 2 + 0.01),
+      ]
+      for (const x of [-W / 2 + 0.02, W / 2 - 0.02]) parts.push(box(0.04, H, D, frame, x, 0, 0))
+      parts.push(box(W - 0.06, H - 0.18, 0.006, glass('#eef7ff', 0.18), 0, 0.12, D / 2 - 0.01))
+      const leds: THREE.MeshStandardMaterial[] = []
+      const shelfYs = [0.5, 0.92, 1.34]
+      for (const y of shelfYs) {
+        parts.push(box(W - 0.08, 0.012, D - 0.06, glass('#e8f6ff', 0.4), 0, y, 0))
+        const led = glow('#d9efff', 1.2, 1.6)
+        leds.push(led)
+        parts.push(box(W - 0.1, 0.008, 0.012, led, 0, y + 0.37, D / 2 - 0.05))
+      }
+      // Products: bags, boxes, bottles, sneakers
+      const rand = seeded(17)
+      const palette = ['#e85d8a', '#ffd166', '#06d6a0', '#3a86ff', '#ffffff', '#ff7a45', '#8338ec']
+      for (const y of [0.12, ...shelfYs]) {
+        let x = -W / 2 + 0.1
+        while (x < W / 2 - 0.12) {
+          const kind = Math.floor(rand() * 4)
+          const c = palette[Math.floor(rand() * palette.length)]!
+          if (kind === 0) {
+            parts.push(box(0.13, 0.17, 0.07, mat(c, { roughness: 0.6 }), x + 0.06, y + 0.012, 0))
+            parts.push(mesh(new THREE.TorusGeometry(0.035, 0.004, 6, 16, Math.PI), mat('#333'), x + 0.06, y + 0.18, 0))
+            x += 0.17
+          } else if (kind === 1) {
+            parts.push(box(0.12, 0.1, 0.12, mat(c, { roughness: 0.5 }), x + 0.06, y + 0.012, 0))
+            parts.push(box(0.124, 0.02, 0.124, mat('#ffffff', { roughness: 0.5 }), x + 0.06, y + 0.11, 0))
+            x += 0.16
+          } else if (kind === 2) {
+            parts.push(lathe([[0, 0], [0.035, 0], [0.04, 0.12], [0.015, 0.16], [0.012, 0.19], [0, 0.19]], glass(c, 0.75), y + 0.012, 20).translateX(x + 0.04))
+            x += 0.11
+          } else {
+            const shoe = group(box(0.17, 0.05, 0.07, mat(c, { roughness: 0.6 })), box(0.09, 0.06, 0.07, mat(c, { roughness: 0.6 }), -0.04, 0.05), box(0.172, 0.015, 0.072, mat('#ffffff'), 0, 0))
+            shoe.position.set(x + 0.09, y + 0.012, 0)
+            shoe.rotation.y = 0.3
+            parts.push(shoe)
+            x += 0.2
+          }
+        }
+      }
+      return group(...parts, animate(group(), (t) => {
+        leds.forEach((m, i) => (m.emissiveIntensity *= 0.85 + 0.15 * Math.sin(t * 1.5 + i)))
+      }))
+    },
+  },
+  {
+    type: 'vip-neon-open',
+    name: 'OPEN neon sign',
+    icon: 'i-lucide-zap',
+    defaultColor: '#ff3b6b',
+    wallMounted: true,
+    light: { color: '#ff5c8a', intensity: 1.8, distance: 3.5, offset: [0, 0, 0.35] },
+    build: (color) => {
+      const letterMat = glow(color, 1.4, 2.2)
+      const borderMat = glow('#4dd8ff', 1.2, 2)
+      const parts: THREE.Object3D[] = [
+        box(1.25, 0.5, 0.015, mat('#15151c', { transparent: true, opacity: 0.35 }), 0, -0.25, 0.01),
+      ]
+      const tube = (a: THREE.Vector3, b: THREE.Vector3, m: THREE.Material, r: number) => {
+        const t = rod(a, b, r, m, r, 8)
+        t.castShadow = false
+        return t
+      }
+      // Letters, one per group so one of them can flicker
+      const letters: THREE.Group[] = [group(), group(), group(), group()]
+      for (const { a, b, letter } of textStrokes('OPEN', 0.28, 0.2, 0.06, -0.14)) {
+        a.z = b.z = 0.05
+        letters[letter]!.add(tube(a, b, letterMat, 0.012), sphere(0.012, letterMat, a.x, a.y, a.z, 8), sphere(0.012, letterMat, b.x, b.y, b.z, 8))
+      }
+      parts.push(...letters)
+      // A rounded border
+      const r = 0.07
+      const w = 0.58
+      const h = 0.21
+      const corners: THREE.Vector3[] = []
+      for (const [cx, cy, a0] of [[w - r, h - r, 0], [-w + r, h - r, Math.PI / 2], [-w + r, -h + r, Math.PI], [w - r, -h + r, Math.PI * 1.5]] as const) {
+        for (let k = 0; k <= 6; k++) {
+          const a = a0 + (k / 6) * (Math.PI / 2)
+          corners.push(v3(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 0.04))
+        }
+      }
+      parts.push(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(corners, true), 120, 0.009, 8, true), borderMat))
+      return group(...parts, animate(group(), (t) => {
+        // Every few seconds the "P" stutters, like a real old sign
+        const p = loop(t, 5)
+        const off = p > 0.8 && p < 0.9 && Math.sin(t * 60) > 0
+        letters[1]!.visible = !off
+        letterMat.emissiveIntensity *= 0.92 + 0.08 * Math.sin(t * 9)
+      }))
+    },
+  },
+  {
+    type: 'vip-ad-screen',
+    name: 'Promo screen',
+    icon: 'i-lucide-monitor-play',
+    defaultColor: '#16161c',
+    wallMounted: true,
+    build: (color) => {
+      // A slim wall screen cycling bright promo slides
+      const slides = [
+        { bg: ['#ff3b6b', '#ff9a3c'], big: 'SALE', small: 'UP TO 50% OFF' },
+        { bg: ['#3a86ff', '#8338ec'], big: 'NEW', small: 'JUST ARRIVED' },
+        { bg: ['#06d6a0', '#118ab2'], big: 'FREE', small: 'SHIPPING TODAY' },
+      ].map(sl => textTexture(512, 288, (ctx) => {
+        const g = ctx.createLinearGradient(0, 0, 512, 288)
+        g.addColorStop(0, sl.bg[0]!)
+        g.addColorStop(1, sl.bg[1]!)
+        ctx.fillStyle = g
+        ctx.fillRect(0, 0, 512, 288)
+        ctx.fillStyle = 'rgba(255,255,255,0.12)'
+        for (let i = 0; i < 6; i++) {
+          ctx.beginPath()
+          ctx.arc(60 + i * 90, 250 - (i % 2) * 180, 40 + i * 6, 0, Math.PI * 2)
+          ctx.fill()
+        }
+        ctx.fillStyle = '#ffffff'
+        ctx.textAlign = 'center'
+        ctx.font = 'bold 130px Arial, sans-serif'
+        ctx.fillText(sl.big, 256, 165)
+        ctx.font = 'bold 30px Arial, sans-serif'
+        ctx.fillText(sl.small, 256, 225)
+      }))
+      const screenMat = new THREE.MeshStandardMaterial({ color: '#ffffff', map: slides[0], emissive: '#ffffff', emissiveMap: slides[0], emissiveIntensity: 0.8, roughness: 0.3 })
+      const W = 1.1
+      const H = W * 9 / 16
+      const screen = mesh(new THREE.PlaneGeometry(W, H), screenMat, 0, 0, 0.032)
+      screen.castShadow = false
+      return group(
+        box(W + 0.04, H + 0.04, 0.03, mat(color, { roughness: 0.3, metalness: 0.4 }), 0, -(H + 0.04) / 2, 0.015),
+        screen,
+        animate(group(), (t) => {
+          const k = Math.floor(t / 3.5) % slides.length
+          const tex = slides[k] ?? null
+          if (screenMat.map !== tex) {
+            screenMat.map = tex
+            screenMat.emissiveMap = tex
+            screenMat.needsUpdate = true
+          }
+          // A quick zoom-in as each slide starts
+          const p = loop(t, 3.5)
+          screen.scale.setScalar(p < 0.06 ? 0.96 + (p / 0.06) * 0.04 : 1)
+        }),
+      )
+    },
+  },
+  {
+    type: 'vip-checkout-counter',
+    name: 'Checkout counter',
+    icon: 'i-lucide-store',
+    defaultColor: '#f2ede6',
+    build: (color) => {
+      // A counter with a till, a card machine whose light blinks, a receipt
+      // printing and shopping bags ready to go
+      const top = mat('#2f2b28', { roughness: 0.35 })
+      const parts: THREE.Object3D[] = [
+        box(1.3, 0.9, 0.55, mat(color, { roughness: 0.6 })),
+        box(1.36, 0.04, 0.6, top, 0, 0.9),
+        box(1.3, 0.06, 0.02, glow('#ffd27a', 0.8, 1.6), 0, 0.82, 0.28),
+      ]
+      // Till screen
+      const screenMat = glow('#4fd1ff', 0.9, 1.4)
+      parts.push(cyl(0.02, 0.03, 0.12, metal('#3a3a40', 0.4), -0.3, 0.94, -0.05, 10))
+      const screen = group(box(0.32, 0.22, 0.02, top), mesh(new THREE.PlaneGeometry(0.29, 0.19), screenMat, 0, 0.11, 0.011))
+      screen.position.set(-0.3, 1.04, -0.05)
+      screen.rotation.x = -0.2
+      parts.push(screen)
+      // Card machine
+      const led = glow('#22e07a', 1.5, 1.5)
+      const terminal = group(box(0.08, 0.025, 0.13, top), box(0.06, 0.003, 0.04, glow('#9fe7ff', 0.8, 1.2), 0, 0.025, -0.03), sphere(0.006, led, 0.025, 0.03, 0.04, 8))
+      terminal.position.set(0.05, 0.94, 0.08)
+      terminal.rotation.x = -0.3
+      parts.push(terminal)
+      // Receipt printer, paper feeding out
+      parts.push(box(0.12, 0.08, 0.14, top, 0.25, 0.94, -0.05))
+      const paper = box(0.08, 0.1, 0.002, mat('#ffffff', { roughness: 0.8 }), 0.25, 1.02, 0.02)
+      parts.push(paper)
+      // Bags
+      const bag = (x: number, c: string, h: number, rot: number) => {
+        const g = group(box(0.18, h, 0.09, mat(c, { roughness: 0.6 })), mesh(new THREE.TorusGeometry(0.045, 0.005, 6, 18, Math.PI), mat('#222'), 0, h, 0))
+        g.position.set(x, 0.94, -0.1)
+        g.rotation.y = rot
+        return g
+      }
+      parts.push(bag(0.5, '#e85d8a', 0.22, -0.2), bag(0.42, '#ffd166', 0.18, 0.3))
+      // A small "Thank you" sign
+      const thanks = textTexture(256, 96, (ctx) => {
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, 256, 96)
+        ctx.fillStyle = '#2f2b28'
+        ctx.textAlign = 'center'
+        ctx.font = 'italic bold 44px Georgia, serif'
+        ctx.fillText('Thank you', 128, 62)
+      })
+      const sign = group(box(0.22, 0.09, 0.01, top), mesh(new THREE.PlaneGeometry(0.2, 0.075), new THREE.MeshStandardMaterial({ map: thanks, roughness: 0.6 }), 0, 0.045, 0.006))
+      sign.position.set(-0.55, 0.94, 0.12)
+      sign.rotation.x = -0.15
+      parts.push(sign)
+      return group(...parts, animate(group(), (t) => {
+        led.emissiveIntensity *= Math.sin(t * 6) > 0 ? 1.4 : 0.2
+        screenMat.emissiveIntensity *= 0.85 + 0.15 * Math.sin(t * 2)
+        const p = loop(t, 4)
+        paper.scale.y = 0.2 + Math.min(1, p * 2) * 0.8
+        paper.position.y = 1.02 - (1 - paper.scale.y) * 0.05
+      }))
+    },
+  },
+  {
+    type: 'vip-sale-banner',
+    name: 'Sale banner',
+    icon: 'i-lucide-badge-percent',
+    defaultColor: '#e11d48',
+    wallMounted: true,
+    build: (color) => {
+      // A big SALE banner with price tags swinging under it; every few
+      // seconds it pops a burst of confetti
+      const banner = textTexture(512, 200, (ctx) => {
+        ctx.fillStyle = color
+        ctx.fillRect(0, 0, 512, 200)
+        ctx.strokeStyle = '#ffd166'
+        ctx.lineWidth = 10
+        ctx.strokeRect(12, 12, 488, 176)
+        ctx.fillStyle = '#ffffff'
+        ctx.textAlign = 'center'
+        ctx.font = 'bold 140px Arial, sans-serif'
+        ctx.fillText('SALE', 256, 150)
+      })
+      const parts: THREE.Object3D[] = [
+        box(1.04, 0.42, 0.02, mat(color, { roughness: 0.5 }), 0, -0.21, 0.01),
+        mesh(new THREE.PlaneGeometry(1.02, 0.4), new THREE.MeshStandardMaterial({ map: banner, color: banner ? '#ffffff' : color, roughness: 0.5, emissive: '#ffffff', emissiveMap: banner, emissiveIntensity: banner ? 0.25 : 0 }), 0, 0, 0.021),
+      ]
+      const tags = ['-50%', '-30%', 'HOT', '-20%']
+      tags.forEach((label, i) => {
+        const tex = textTexture(128, 160, (ctx) => {
+          ctx.fillStyle = i % 2 ? '#ffd166' : '#ffffff'
+          ctx.beginPath()
+          ctx.moveTo(64, 0)
+          ctx.lineTo(128, 40)
+          ctx.lineTo(128, 160)
+          ctx.lineTo(0, 160)
+          ctx.lineTo(0, 40)
+          ctx.closePath()
+          ctx.fill()
+          ctx.fillStyle = '#e11d48'
+          ctx.textAlign = 'center'
+          ctx.font = 'bold 38px Arial, sans-serif'
+          ctx.fillText(label, 64, 112)
+          ctx.fillStyle = '#333'
+          ctx.beginPath()
+          ctx.arc(64, 30, 8, 0, Math.PI * 2)
+          ctx.fill()
+        })
+        const hang = group()
+        hang.position.set(-0.39 + i * 0.26, -0.21, 0.04)
+        hang.add(cyl(0.0015, 0.0015, 0.08, mat('#333'), 0, -0.08, 0, 4))
+        const tag = mesh(new THREE.PlaneGeometry(0.1, 0.125), new THREE.MeshStandardMaterial({ map: tex, color: tex ? '#ffffff' : '#ffd166', roughness: 0.6, side: THREE.DoubleSide, transparent: true, alphaTest: 0.5 }), 0, -0.14, 0)
+        hang.add(tag)
+        parts.push(animate(hang, (t) => {
+          hang.rotation.z = Math.sin(t * 1.7 + i * 1.3) * 0.16
+          hang.rotation.y = Math.sin(t * 1.1 + i) * 0.25
+        }))
+      })
+      const rand = seeded(29)
+      const bits = Array.from({ length: 40 }, () => [rand(), rand(), rand()])
+      parts.push(loose(swarm(40, new THREE.PlaneGeometry(0.025, 0.015), mat('#ffffff', { side: THREE.DoubleSide }), (i, t, d) => {
+        const [a, sp, s] = bits[i]!
+        const p = loop(t, 6)
+        if (p > 0.55) return false
+        const time = p * 6
+        const ang = a * Math.PI * 2
+        d.position.set(Math.cos(ang) * (0.3 + sp * 0.4) * Math.min(1, time * 2), 0.2 + Math.sin(ang) * 0.2 * Math.min(1, time * 2) - time * time * 0.12, 0.1 + sp * 0.2 * Math.min(1, time))
+        d.rotation.set(time * (5 + s * 5), time * 4, time * 3)
+      }, ['#ff4d6d', '#ffd166', '#3a86ff', '#06d6a0', '#ffffff'])))
+      return group(...parts)
+    },
+  },
+])
+
+export const PREMIUM_ITEMS: CatalogItem[] = [...VALENTINE, ...BIRTHDAY, ...TET, ...WEDDING, ...GALAXY, ...PROPOSAL, ...SHOWROOM]
