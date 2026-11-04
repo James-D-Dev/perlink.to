@@ -10,7 +10,7 @@ import { DEFAULT_ROOM_STYLE } from '~/types/room'
 
 const SIZE = 192
 // Bump when catalog models change so cached thumbnails are regenerated
-const CACHE_KEY = 'perlink-room-thumbs-v11'
+const CACHE_KEY = 'perlink-room-thumbs-v16'
 
 let memoryCache: Record<string, string> | null = null
 
@@ -51,7 +51,15 @@ async function renderItem(renderer: RoomRenderer, item: CatalogItem): Promise<st
   scene.add(model)
 
   // Frame the model's bounding sphere from a 3/4 view (front view for wall items)
-  const box = new THREE.Box3().setFromObject(model)
+  // Frame the model itself: parts that fly around it (particles, orbits) don't count
+  const box = new THREE.Box3()
+  model.updateWorldMatrix(true, true)
+  model.traverse((obj) => {
+    let skip = false
+    for (let o: THREE.Object3D | null = obj; o && o !== model.parent; o = o.parent) if (o.userData.ignoreBounds) skip = true
+    if (!skip && (obj as THREE.Mesh).isMesh) box.expandByObject(obj, false)
+  })
+  if (box.isEmpty()) box.setFromObject(model)
   const center = box.getCenter(new THREE.Vector3())
   const radius = box.getBoundingSphere(new THREE.Sphere()).radius || 1
   const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 100)

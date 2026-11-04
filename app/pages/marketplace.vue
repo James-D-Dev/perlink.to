@@ -25,7 +25,17 @@
     <section class="mx-auto max-w-6xl px-5 py-14 sm:px-8 md:py-20">
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <article v-for="pack in ROOM_PACKS" :key="pack.id" class="flex flex-col overflow-hidden rounded-3xl bg-paper shadow-[0_24px_60px_-30px_rgba(0,0,0,0.35)] ring-1 ring-line">
-          <RoomPackPreview :pack="pack" />
+          <button type="button" class="group relative block text-left" :aria-label="t('room.market.preview3d')" @click="showcase = pack">
+            <RoomPackPreview :pack="pack" />
+            <span class="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">
+              <UIcon name="i-lucide-activity" class="size-3.5" />{{ t('room.packs.animated') }}
+            </span>
+            <span class="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/25 group-hover:opacity-100">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink shadow-lg">
+                <UIcon name="i-lucide-box" class="size-4" />{{ t('room.market.preview3d') }}
+              </span>
+            </span>
+          </button>
           <div class="flex flex-1 flex-col p-6">
             <div class="flex items-start justify-between gap-3">
               <div>
@@ -37,6 +47,7 @@
             <ul class="mt-4 flex flex-wrap gap-1.5">
               <li v-for="type in pack.items" :key="type" class="rounded-full bg-sand px-2.5 py-1 text-xs text-ink-muted">{{ t(`room.objects.${type}`) }}</li>
             </ul>
+            <UButton class="mt-4 self-start" size="sm" color="neutral" variant="outline" icon="i-lucide-box" :label="t('room.market.preview3d')" @click="showcase = pack" />
             <div class="mt-auto pt-6">
               <template v-if="state && (state.allIncluded || ownsPack(pack.id))">
                 <p class="flex items-center justify-center gap-1.5 rounded-full bg-emerald-500/10 py-2.5 text-sm font-semibold text-emerald-700">
@@ -81,6 +92,26 @@
         </ol>
       </div>
     </section>
+
+    <!-- A live 3D room with the pack's items -->
+    <UModal v-model:open="showcaseOpen" fullscreen :ui="{ content: 'bg-black' }">
+      <template #content>
+        <div class="relative h-dvh w-full">
+          <LazyRoomPackShowcase v-if="showcase" :pack="showcase" />
+          <div class="absolute inset-x-0 bottom-0 flex flex-wrap items-center justify-center gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <UButton
+              v-if="showcase && !(state?.allIncluded || ownsPack(showcase.id))"
+              size="lg"
+              icon="i-lucide-shopping-bag"
+              :loading="buying === showcase.id"
+              :label="t('room.packs.buy', { price: formatUsd(showcase.priceUsd) })"
+              @click="buy(showcase.id, '/marketplace')"
+            />
+            <UButton size="lg" color="neutral" variant="solid" icon="i-lucide-x" :label="t('common.close')" @click="showcase = null" />
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -94,6 +125,13 @@ const { t } = useI18n()
 const route = useRoute()
 const toast = useToast()
 const { state, buying, refresh, owns: ownsPack } = useRoomPacks()
+
+// The pack shown in the live 3D preview
+const showcase = shallowRef<(typeof ROOM_PACKS)[number] | null>(null)
+const showcaseOpen = computed({
+  get: () => !!showcase.value,
+  set: (open: boolean) => { if (!open) showcase.value = null },
+})
 
 const HEARTS = [
   { c: 'right-[8%] top-[12%] size-10 rotate-12', d: '0s' },

@@ -70,6 +70,8 @@ interface ObjectEntry {
   revealedAt: number | null
   /** Still playing the pop-in animation */
   popping?: boolean
+  /** Moving parts (premium items): called every frame with the time and lamp level */
+  ticks: ((time: number, lamps: number) => void)[]
 }
 
 /** Quality steps used by the adaptive renderer, best first */
@@ -210,6 +212,8 @@ export class RoomScene {
   private statsSince = 0
   private statsCap = 60
   private activeUntil = 0
+  /** Objects with moving parts in the room (their shadows follow them) */
+  private movingObjects = 0
   private quality = 0
   private frameRatios: number[] = []
   /** Frame times at the 60 fps cap, to see whether a lowered quality can step back up */
@@ -899,7 +903,12 @@ export class RoomScene {
       }
       if (existing) this.removeEntry(data.id)
       // Rebuilt objects (e.g. a colour change) swap in quietly; new ones get the loading marker and pop-in
-      this.addEntry(data, item, signature, !existing)
+      // One broken model shouldn't take the whole room down
+      try {
+        this.addEntry(data, item, signature, !existing)
+      } catch (error) {
+        console.error(`[room] couldn't build ${data.type}:`, error)
+      }
     }
     for (const id of [...this.entries.keys()]) {
       if (!seen.has(id)) this.removeEntry(id)
@@ -917,6 +926,10 @@ export class RoomScene {
 
     const glowMaterials: THREE.MeshStandardMaterial[] = []
     const skyMaterials: THREE.MeshStandardMaterial[] = []
+    const ticks: ObjectEntry['ticks'] = []
+    model.traverse((obj) => {
+      if (typeof obj.userData.tick === 'function') ticks.push(obj.userData.tick)
+    })
     const collectMaterials = () => {
       model.traverse((obj) => {
         const material = (obj as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined
@@ -932,7 +945,7 @@ export class RoomScene {
     // Model-based items load asynchronously; pick up their glowing parts when ready
     ;(model.userData.ready as Promise<void> | undefined)?.then(collectMaterials).catch(() => {})
 
-    const entry: ObjectEntry = { data, item, root, glowMaterials, skyMaterials, signature, revealedAt: null }
+    const entry: ObjectEntry = { data, item, root, glowMaterials, skyMaterials, signature, revealedAt: null, ticks }
     this.entries.set(data.id, entry)
     this.assignLight(entry)
     this.objectsGroup.add(root)
@@ -987,9 +1000,14 @@ export class RoomScene {
   }
 
   /** Pooled lights live in the scene, so follow their lamp each frame; markers pulse while loading */
-  private updateObjectEffects(now: number) {
+  private updateObjectEffects(now: number, time: number) {
     const offset = new THREE.Vector3()
+    let moving = 0
     for (const entry of this.entries.values()) {
+      if (entry.ticks.length && entry.revealedAt !== null) {
+        for (const tick of entry.ticks) tick(time, this.lamps)
+        moving++
+      }
       if (entry.popping && entry.revealedAt !== null) {
         // Pop in: a quick overshoot from slightly smaller to full size
         const t = Math.min((now - entry.revealedAt) / 260, 1)
@@ -1011,6 +1029,7 @@ export class RoomScene {
       }
     }
     this.loadingMarkerMaterial.opacity = 0.45 + 0.25 * Math.sin(now / 160)
+    this.movingObjects = moving
   }
 
   /** Show an uploaded photo in the item's photo area, cropped to fill it */
@@ -1409,7 +1428,8 @@ export class RoomScene {
     if (this.options.capture || !this.renderer.shadowMap.enabled) return
     const sunMoved = this.shadowSun.distanceToSquared(this.sun.position) > 1e-4
     const changing = now < this.shadowsUntil || sunMoved || !!this.drag?.active || this.loadingMarkers.size > 0 || !!this.land?.movingShadows
-    const bobbing = this.guests.size > 0 && ++this.shadowFrames % 3 === 0
+    // Guests and moving items: shadows follow every third frame
+    const bobbing = (this.guests.size > 0 || this.movingObjects > 0) && ++this.shadowFrames % 3 === 0
     if (!changing && !bobbing && now - this.shadowedAt < 1000) return
     this.sun.shadow.needsUpdate = true
     this.shadowedAt = now
@@ -1508,7 +1528,7 @@ export class RoomScene {
     }
     if (this.intro) this.updateIntro(now)
     else if (!this.touring) this.controls.update()
-    this.updateObjectEffects(now)
+    this.updateObjectEffects(now, time)
     this.updateGuests(now, time)
     this.keepSkyAroundCamera()
     this.updateShadows(now)

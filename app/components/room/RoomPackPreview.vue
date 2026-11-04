@@ -1,6 +1,6 @@
 <template>
   <!-- A pack's items on its colour, as rendered 3D thumbnails -->
-  <div class="relative isolate overflow-hidden bg-gradient-to-br p-4" :class="pack.gradient">
+  <div class="relative isolate overflow-hidden p-4" :style="{ backgroundImage: `linear-gradient(135deg, ${pack.colors.join(', ')})` }">
     <div class="pointer-events-none absolute -right-10 -top-10 -z-10 size-40 rounded-full bg-white/25 blur-2xl" />
     <div class="pointer-events-none absolute -bottom-12 -left-8 -z-10 size-40 rounded-full bg-black/10 blur-2xl" />
     <div class="grid grid-cols-3 gap-2">

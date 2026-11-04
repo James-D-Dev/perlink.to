@@ -3,7 +3,7 @@
 // code like the rest of the catalog (app/utils/room/premiumModels.ts); the
 // server only needs to know which item types belong to which pack.
 
-export type RoomPackId = 'valentine'
+export type RoomPackId = 'valentine' | 'birthday' | 'tet' | 'wedding' | 'galaxy'
 
 export interface RoomPack {
   id: RoomPackId
@@ -11,8 +11,8 @@ export interface RoomPack {
   priceUsd: number
   /** Item types (catalog `type`) in the pack */
   items: string[]
-  /** Card colours on the marketplace */
-  gradient: string
+  /** Card colours on the marketplace: from, via, to */
+  colors: [string, string, string]
   /** The Lemon Squeezy product's name contains this (case-insensitive) */
   lemonMatch: string
 }
@@ -22,8 +22,36 @@ export const ROOM_PACKS: RoomPack[] = [
     id: 'valentine',
     priceUsd: 4,
     items: ['vip-rose-bouquet', 'vip-heart-balloons', 'vip-rose-arch', 'vip-candle-heart', 'vip-neon-heart', 'vip-love-bear'],
-    gradient: 'from-rose-400 via-pink-500 to-fuchsia-600',
+    colors: ['#fb7185', '#ec4899', '#c026d3'],
     lemonMatch: 'valentine',
+  },
+  {
+    id: 'wedding',
+    priceUsd: 6,
+    items: ['vip-wedding-arch', 'vip-wedding-cake', 'vip-champagne-tower', 'vip-love-marquee', 'vip-candle-lanterns', 'vip-sparkler-fountain'],
+    colors: ['#fde68a', '#fecdd3', '#d6d3d1'],
+    lemonMatch: 'wedding',
+  },
+  {
+    id: 'birthday',
+    priceUsd: 5,
+    items: ['vip-birthday-cake', 'vip-balloon-bunch', 'vip-gift-tower', 'vip-disco-ball', 'vip-confetti-popper', 'vip-birthday-bunting'],
+    colors: ['#38bdf8', '#8b5cf6', '#ec4899'],
+    lemonMatch: 'birthday',
+  },
+  {
+    id: 'galaxy',
+    priceUsd: 7,
+    items: ['vip-floating-planet', 'vip-jellyfish-lamp', 'vip-star-projector', 'vip-moon-lamp', 'vip-snow-globe', 'vip-nebula-painting'],
+    colors: ['#1e1b4b', '#6d28d9', '#c026d3'],
+    lemonMatch: 'galaxy',
+  },
+  {
+    id: 'tet',
+    priceUsd: 5,
+    items: ['vip-peach-blossom', 'vip-apricot-blossom', 'vip-kumquat-tree', 'vip-red-lanterns', 'vip-firecrackers', 'vip-five-fruit-tray'],
+    colors: ['#dc2626', '#ef4444', '#fbbf24'],
+    lemonMatch: 'tet',
   },
 ]
 

@@ -312,7 +312,31 @@
       "vip-rose-arch": "Rose arch",
       "vip-candle-heart": "Candle heart",
       "vip-neon-heart": "Neon heart",
-      "vip-love-bear": "Teddy bear"
+      "vip-love-bear": "Teddy bear",
+      "vip-wedding-arch": "Wedding arch",
+      "vip-wedding-cake": "Wedding cake",
+      "vip-champagne-tower": "Champagne tower",
+      "vip-love-marquee": "LOVE marquee",
+      "vip-candle-lanterns": "Candle lanterns",
+      "vip-sparkler-fountain": "Sparkler fountain",
+      "vip-birthday-cake": "Birthday cake",
+      "vip-balloon-bunch": "Balloon bunch",
+      "vip-gift-tower": "Gift tower",
+      "vip-disco-ball": "Disco ball",
+      "vip-confetti-popper": "Confetti popper",
+      "vip-birthday-bunting": "Party bunting",
+      "vip-floating-planet": "Floating planet",
+      "vip-jellyfish-lamp": "Jellyfish lamp",
+      "vip-star-projector": "Star projector",
+      "vip-moon-lamp": "Moon lamp",
+      "vip-snow-globe": "Snow globe",
+      "vip-nebula-painting": "Nebula painting",
+      "vip-peach-blossom": "Peach blossom",
+      "vip-apricot-blossom": "Apricot blossom",
+      "vip-kumquat-tree": "Kumquat tree",
+      "vip-red-lanterns": "Red lanterns",
+      "vip-firecrackers": "Firecrackers",
+      "vip-five-fruit-tray": "Five-fruit tray"
     },
     "tour": {
       "back": "Back",
@@ -360,7 +384,7 @@
     "packs": {
       "valentine": {
         "name": "Valentine",
-        "tagline": "Roses, candles and hearts for the one you love."
+        "tagline": "Roses, candles, a beating neon heart and balloons for the one you love."
       },
       "badge": "Premium",
       "owned": "Owned",
@@ -379,7 +403,24 @@
       "bought": "{name} pack is yours",
       "boughtText": "Its items are ready in the Premium tab of the room editor.",
       "boughtPending": "Payment received. The pack appears in a few seconds.",
-      "signIn": "Sign in to buy"
+      "signIn": "Sign in to buy",
+      "wedding": {
+        "name": "Wedding",
+        "tagline": "An arch with drifting veils, a turning cake, champagne and sparklers."
+      },
+      "birthday": {
+        "name": "Birthday",
+        "tagline": "Candles to blow out, balloons, a disco ball and confetti that flies."
+      },
+      "galaxy": {
+        "name": "Galaxy",
+        "tagline": "A floating planet, a glowing jellyfish, stars and a moon for dreamy nights."
+      },
+      "tet": {
+        "name": "Tết",
+        "tagline": "Peach and apricot blossoms, red lanterns and lucky money for the new year."
+      },
+      "animated": "Animated"
     },
     "market": {
       "metaTitle": "3D Room Marketplace: Premium Items for Your Room | Perlink",
@@ -404,7 +445,8 @@
           "text": "Find the items in the Premium tab of the room editor, in every room you make."
         }
       ],
-      "soon": "More packs are on the way: wedding, birthday, Tết and more."
+      "soon": "More packs are on the way.",
+      "preview3d": "Preview in 3D"
     }
   }
 }

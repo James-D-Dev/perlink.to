@@ -312,7 +312,31 @@
       "vip-rose-arch": "Cổng hoa hồng",
       "vip-candle-heart": "Nến trái tim",
       "vip-neon-heart": "Đèn neon trái tim",
-      "vip-love-bear": "Gấu bông"
+      "vip-love-bear": "Gấu bông",
+      "vip-wedding-arch": "Cổng cưới",
+      "vip-wedding-cake": "Bánh cưới",
+      "vip-champagne-tower": "Tháp champagne",
+      "vip-love-marquee": "Chữ LOVE đèn",
+      "vip-candle-lanterns": "Đèn lồng nến",
+      "vip-sparkler-fountain": "Pháo hoa lạnh",
+      "vip-birthday-cake": "Bánh sinh nhật",
+      "vip-balloon-bunch": "Chùm bóng bay",
+      "vip-gift-tower": "Tháp quà",
+      "vip-disco-ball": "Quả cầu disco",
+      "vip-confetti-popper": "Pháo giấy",
+      "vip-birthday-bunting": "Dây cờ tiệc",
+      "vip-floating-planet": "Hành tinh lơ lửng",
+      "vip-jellyfish-lamp": "Đèn sứa",
+      "vip-star-projector": "Đèn chiếu sao",
+      "vip-moon-lamp": "Đèn mặt trăng",
+      "vip-snow-globe": "Quả cầu tuyết",
+      "vip-nebula-painting": "Tranh tinh vân",
+      "vip-peach-blossom": "Cây hoa đào",
+      "vip-apricot-blossom": "Cây hoa mai",
+      "vip-kumquat-tree": "Cây quất",
+      "vip-red-lanterns": "Đèn lồng đỏ",
+      "vip-firecrackers": "Dây pháo",
+      "vip-five-fruit-tray": "Mâm ngũ quả"
     },
     "tour": {
       "back": "Quay lại",
@@ -360,7 +384,7 @@
     "packs": {
       "valentine": {
         "name": "Valentine",
-        "tagline": "Hoa hồng, nến và trái tim cho người bạn thương."
+        "tagline": "Hoa hồng, nến, tim neon đập nhịp và bóng bay cho người bạn thương."
       },
       "badge": "Cao cấp",
       "owned": "Đã sở hữu",
@@ -379,7 +403,24 @@
       "bought": "Gói {name} đã là của bạn",
       "boughtText": "Các món đã sẵn sàng ở thẻ Cao cấp trong trình chỉnh phòng.",
       "boughtPending": "Đã nhận thanh toán. Gói sẽ hiện sau vài giây.",
-      "signIn": "Đăng nhập để mua"
+      "signIn": "Đăng nhập để mua",
+      "wedding": {
+        "name": "Đám cưới",
+        "tagline": "Cổng cưới voan bay, bánh cưới xoay, tháp champagne và pháo hoa lạnh."
+      },
+      "birthday": {
+        "name": "Sinh nhật",
+        "tagline": "Nến lung linh, bóng bay, quả cầu disco và pháo giấy tung bay."
+      },
+      "galaxy": {
+        "name": "Dải ngân hà",
+        "tagline": "Hành tinh lơ lửng, đèn sứa phát sáng, sao và trăng cho những đêm mơ mộng."
+      },
+      "tet": {
+        "name": "Tết",
+        "tagline": "Hoa đào, hoa mai, đèn lồng đỏ và lì xì cho năm mới."
+      },
+      "animated": "Có chuyển động"
     },
     "market": {
       "metaTitle": "Cửa hàng phòng 3D: Món đồ cao cấp cho phòng của bạn | Perlink",
@@ -404,7 +445,8 @@
           "text": "Tìm các món ở thẻ Cao cấp trong trình chỉnh phòng, dùng cho mọi phòng bạn làm."
         }
       ],
-      "soon": "Sắp có thêm gói: đám cưới, sinh nhật, Tết và nhiều hơn nữa."
+      "soon": "Sắp có thêm nhiều gói mới.",
+      "preview3d": "Xem 3D"
     }
   }
 }
