@@ -16,6 +16,80 @@ const PINK = '#ff8fb1'
 const GOLD = '#d9a93f'
 const RED = '#d0142c'
 
+
+// ---------- Shared pieces for the packs ----------
+
+/** A brass pattern with star and dot holes (white = metal, black = hole), for pierced lanterns */
+function piercedPattern() {
+  if (typeof document === 'undefined') return null
+  const tex = canvasTexture(256, 128, (ctx) => {
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, 256, 128)
+    ctx.fillStyle = '#000000'
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 8; col++) {
+        const x = col * 32 + (row % 2 ? 16 : 0) + 8
+        const y = row * 32 + 16
+        // An eight-point star
+        ctx.beginPath()
+        for (let k = 0; k < 16; k++) {
+          const r = k % 2 ? 4 : 10
+          const a = (k / 16) * Math.PI * 2
+          ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r)
+        }
+        ctx.fill()
+        ctx.beginPath()
+        ctx.arc(x + 16, y, 2.5, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+  })
+  tex.wrapS = THREE.RepeatWrapping
+  return tex
+}
+
+/**
+ * A Moroccan brass lantern with a candle inside: pierced body and onion dome
+ * that let the glow out, amber glass, a finial and ring. About 0.42 tall at
+ * scale 1. Returns its flames so the item can flicker them.
+ */
+function moroccanLantern(scale = 1) {
+  const pattern = piercedPattern()
+  const brass = new THREE.MeshStandardMaterial({ color: '#c99a4a', metalness: 0.9, roughness: 0.3, side: THREE.DoubleSide, alphaMap: pattern, alphaTest: pattern ? 0.5 : 0 })
+  const solidBrass = new THREE.MeshStandardMaterial({ color: '#c99a4a', metalness: 0.9, roughness: 0.28 })
+  const amber = glow('#ffb456', 0.45, 2.2)
+  amber.transparent = true
+  amber.opacity = 0.85
+  const g = group(
+    lathe([[0, 0], [0.075, 0], [0.08, 0.012], [0.06, 0.03], [0.065, 0.04], [0, 0.04]], solidBrass, 0, 24),
+    // Inner amber glass, glowing
+    cyl(0.06, 0.06, 0.17, amber, 0, 0.04, 0, 20),
+    // Pierced body
+    mesh(new THREE.CylinderGeometry(0.068, 0.068, 0.17, 24, 1, true), brass, 0, 0.125, 0),
+    // Bands
+    mesh(new THREE.TorusGeometry(0.07, 0.006, 6, 28).rotateX(Math.PI / 2), solidBrass, 0, 0.042, 0),
+    mesh(new THREE.TorusGeometry(0.07, 0.006, 6, 28).rotateX(Math.PI / 2), solidBrass, 0, 0.21, 0),
+    // Onion dome, pierced too, with a glowing core
+    lathe([[0.072, 0.21], [0.085, 0.235], [0.075, 0.27], [0.045, 0.31], [0.015, 0.34], [0.006, 0.36]], brass, 0, 24),
+    lathe([[0.06, 0.21], [0.07, 0.235], [0.06, 0.27], [0.035, 0.3], [0, 0.32]], amber, 0, 20),
+    cyl(0.006, 0.01, 0.04, solidBrass, 0, 0.355, 0, 8),
+    sphere(0.012, solidBrass, 0, 0.4, 0, 10),
+    mesh(new THREE.TorusGeometry(0.018, 0.004, 6, 16), solidBrass, 0, 0.425, 0),
+  )
+  const flame = mesh(new THREE.SphereGeometry(0.012, 10, 8), glow('#ffcf6b', 1.5, 2), 0, 0.12, 0)
+  flame.castShadow = false
+  g.add(cyl(0.022, 0.022, 0.055, mat('#fff3e0', { roughness: 0.6 }), 0, 0.04, 0, 12), flame)
+  g.scale.setScalar(scale)
+  return { lantern: g, flame }
+}
+
+/** Flickers flames like candlelight */
+function flicker(flames: THREE.Object3D[]) {
+  return animate(group(), (t) => {
+    flames.forEach((f, i) => f.scale.set(1, 1.7 * (1 + 0.22 * Math.sin(t * 12 + i * 2.1) + 0.12 * Math.sin(t * 25 + i)), 1))
+  })
+}
+
 type Item = Omit<CatalogItem, 'category'>
 const premium = (pack: string, items: Item[]): CatalogItem[] => items.map(item => ({ ...item, category: 'premium', pack }))
 
@@ -221,29 +295,31 @@ const VALENTINE = premium('valentine', [
     defaultColor: '#fff3e0',
     light: { color: '#ffb35c', intensity: 2.6, distance: 3.5, offset: [0, 0.25, 0], flicker: true },
     build: (color) => {
+      // Candles in glass votives along the outline, each throwing a warm
+      // pool of light on the floor
       const wax = mat(color, { roughness: 0.6 })
+      const votive = glass('#fff4e2', 0.35)
+      const pool = new THREE.MeshBasicMaterial({ color: '#ffb35c', transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending })
       const parts: THREE.Object3D[] = []
-      const points = heartShape().getSpacedPoints(22)
+      const points = heartShape().getSpacedPoints(18)
       points.pop()
       const flames: THREE.Mesh[] = []
-      const flameMat = glow('#ffb347', 1.2, 2)
+      const flameMat = glow('#ffb347', 1.4, 2)
+      const poolGeo = new THREE.CircleGeometry(0.14, 24).rotateX(-Math.PI / 2)
       points.forEach((p, i) => {
-        const x = p.x * 1.4
-        const z = -p.y * 1.4
-        const h = 0.06 + (i % 3) * 0.02
-        parts.push(cyl(0.028, 0.03, h, wax, x, 0, z, 12))
-        parts.push(cyl(0.002, 0.002, 0.012, mat('#2b2b2b'), x, h, z, 4))
-        const f = mesh(new THREE.SphereGeometry(0.012, 10, 8), flameMat, x, h + 0.02, z)
+        const x = p.x * 1.45
+        const z = -p.y * 1.45
+        parts.push(cyl(0.05, 0.045, 0.1, votive, x, 0, z, 18))
+        parts.push(cyl(0.037, 0.037, 0.05 + (i % 3) * 0.012, wax, x, 0.004, z, 14))
+        const f = mesh(new THREE.SphereGeometry(0.013, 10, 8), flameMat, x, 0.08 + (i % 3) * 0.012, z)
         f.castShadow = false
         flames.push(f)
         parts.push(f)
+        const glowPool = mesh(poolGeo, pool, x, 0.003, z)
+        glowPool.castShadow = false
+        parts.push(glowPool)
       })
-      parts.push(animate(group(), (t) => {
-        flames.forEach((f, i) => {
-          const k = 1 + 0.25 * Math.sin(t * 13 + i * 1.7) + 0.15 * Math.sin(t * 23 + i * 3.1)
-          f.scale.set(1, 1.7 * k, 1)
-        })
-      }))
+      parts.push(flicker(flames))
       const petalGeo = new THREE.SphereGeometry(0.025, 8, 6)
       petalGeo.scale(1, 0.15, 0.7)
       const rand = seeded(7)
@@ -482,94 +558,149 @@ const BIRTHDAY = premium('birthday', [
   },
   {
     type: 'vip-disco-ball',
-    name: 'Disco ball',
+    name: 'Disco light show',
     icon: 'i-lucide-disc-3',
     defaultColor: '#d8dde6',
-    light: { color: '#c79bff', intensity: 2.2, distance: 4.5, offset: [0, 1.6, 0] },
+    light: { color: '#c79bff', intensity: 2.6, distance: 5, offset: [0, 1.7, 0.3] },
     build: (color) => {
-      // A floor stand holding the ball up; mirror tiles catch the room's light
-      const pole = metal('#2e2f36', 0.35)
-      const tilesGeo = new THREE.BoxGeometry(0.03, 0.03, 0.008)
+      // A chrome tripod stand with a T-bar: a turning mirror ball in the
+      // middle, two moving-head lights sweeping coloured beams, and spots of
+      // light dancing on the floor
+      const chrome = new THREE.MeshStandardMaterial({ color: '#e9ecf1', metalness: 1, roughness: 0.12, envMap: studioReflection(), envMapIntensity: 1.2 })
+      const black = mat('#1d1d22', { roughness: 0.4, metalness: 0.4 })
+      const H = 1.75
+      const parts: THREE.Object3D[] = []
+      // Tripod
+      for (let k = 0; k < 3; k++) {
+        const a = (k / 3) * Math.PI * 2
+        parts.push(rod(v3(Math.cos(a) * 0.38, 0.01, Math.sin(a) * 0.38), v3(0, 0.55, 0), 0.012, chrome))
+        parts.push(sphere(0.02, black, Math.cos(a) * 0.38, 0.01, Math.sin(a) * 0.38, 8))
+      }
+      parts.push(cyl(0.02, 0.02, H - 0.5, chrome, 0, 0.5, 0, 12), cyl(0.03, 0.03, 0.06, black, 0, 0.52, 0, 12))
+      // T-bar
+      parts.push(mesh(new THREE.CylinderGeometry(0.016, 0.016, 1.1, 10).rotateZ(Math.PI / 2), chrome, 0, H, 0))
+      // Mirror ball hanging from the middle of the bar
+      const tilesGeo = new THREE.BoxGeometry(0.026, 0.026, 0.006)
+      const spots: [number, number][] = []
       const rows = 14
-      const spots: [number, number, number][] = []
       for (let r = 1; r < rows; r++) {
         const phi = (r / rows) * Math.PI
-        const n = Math.max(6, Math.round(Math.sin(phi) * 28))
-        for (let c = 0; c < n; c++) spots.push([phi, (c / n) * Math.PI * 2, (r * 31 + c * 17) % 7])
+        const n = Math.max(6, Math.round(Math.sin(phi) * 30))
+        for (let c = 0; c < n; c++) spots.push([phi, (c / n) * Math.PI * 2])
       }
-      const ball = group(sphere(0.2, mat('#9aa0ad', { roughness: 0.5 }), 0, 0, 0, 24))
-      const mirror = new THREE.MeshStandardMaterial({ color, metalness: 0.55, roughness: 0.18, emissive: '#1d1f2a', emissiveIntensity: 0.4 })
-      const tiles = swarm(spots.length, tilesGeo, mirror, (i, _t, d) => {
+      const ball = group(sphere(0.17, mat('#9aa0ad', { roughness: 0.5 }), 0, 0, 0, 24))
+      const mirror = new THREE.MeshStandardMaterial({ color, metalness: 0.95, roughness: 0.08, envMap: studioReflection(), envMapIntensity: 1.6 })
+      ball.add(swarm(spots.length, tilesGeo, mirror, (i, _t, d) => {
         const [phi, theta] = spots[i]!
-        d.position.setFromSphericalCoords(0.205, phi, theta)
+        d.position.setFromSphericalCoords(0.175, phi, theta)
         d.lookAt(0, 0, 0)
-      })
-      ball.add(tiles)
-      // A few tiles flash in colour as it turns
-      const flashMat = glow('#ffffff', 0.4, 2.2)
-      const flash = swarm(18, tilesGeo, flashMat, (i, t, d) => {
+      }))
+      ball.add(swarm(24, tilesGeo, glow('#ffffff', 0.6, 2.2), (i, t, d) => {
         const [phi, theta] = spots[(i * 37) % spots.length]!
-        d.position.setFromSphericalCoords(0.207, phi, theta)
+        d.position.setFromSphericalCoords(0.177, phi, theta)
         d.lookAt(0, 0, 0)
-        d.scale.setScalar(0.5 + 0.5 * Math.max(0, Math.sin(t * 3 + i * 1.9)))
-      }, PARTY)
-      ball.add(flash)
-      ball.position.y = 1.6
-      return group(
-        cyl(0.16, 0.18, 0.03, pole),
-        cyl(0.012, 0.012, 1.38, pole, 0, 0.03),
-        cyl(0.03, 0.012, 0.03, pole, 0, 1.38),
-        animate(ball, (t) => {
-          ball.rotation.y = t * 0.6
-        }),
-      )
+        d.scale.setScalar(0.4 + 0.6 * Math.max(0, Math.sin(t * 3 + i * 1.9)))
+      }, PARTY))
+      ball.position.y = H - 0.26
+      parts.push(cyl(0.003, 0.003, 0.09, chrome, 0, H - 0.09, 0, 4))
+      parts.push(animate(ball, (t) => {
+        ball.rotation.y = t * 0.6
+      }))
+      // Moving heads at both ends, each with a beam that sweeps and changes colour
+      const beamColors = ['#ff4d6d', '#3a86ff', '#06d6a0', '#ffd166', '#8338ec']
+      for (const side of [-1, 1]) {
+        const yoke = group(
+          mesh(new THREE.TorusGeometry(0.06, 0.008, 6, 16, Math.PI).rotateZ(Math.PI), black, 0, 0, 0),
+        )
+        const head = group(cyl(0.05, 0.06, 0.12, black, 0, -0.06, 0, 16))
+        const lensMat = glow('#ffffff', 1.5, 1.5)
+        head.add(cyl(0.045, 0.045, 0.006, lensMat, 0, -0.064, 0, 16))
+        const beamMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide })
+        const beam = mesh(new THREE.CylinderGeometry(0.04, 0.35, 1.6, 24, 1, true).translate(0, -0.86, 0), beamMat)
+        beam.castShadow = false
+        head.add(loose(beam))
+        yoke.add(head)
+        yoke.position.set(side * 0.5, H - 0.02, 0)
+        parts.push(animate(yoke, (t) => {
+          yoke.rotation.y = Math.sin(t * 0.7 + side) * 0.9
+          head.rotation.x = 0.5 + Math.sin(t * 1.1 + side * 2) * 0.35
+          head.rotation.z = side * (0.25 + Math.sin(t * 0.8) * 0.2)
+          const c = beamColors[(Math.floor(t / 2) + (side > 0 ? 2 : 0)) % beamColors.length]!
+          beamMat.color.set(c)
+          lensMat.color.set(c)
+          lensMat.emissive.set(c)
+        }))
+      }
+      // Coloured light spots dancing on the floor
+      parts.push(loose(swarm(14, new THREE.CircleGeometry(0.05, 16).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending }), (i, t, d) => {
+        const a = i * 0.45 + t * 0.6
+        const r = 0.5 + (i % 4) * 0.25
+        d.position.set(Math.cos(a) * r, 0.006, Math.sin(a) * r)
+        d.scale.setScalar(0.7 + 0.5 * Math.sin(t * 2 + i))
+      }, PARTY)))
+      return group(...parts)
     },
   },
   {
     type: 'vip-confetti-popper',
-    name: 'Confetti popper',
+    name: 'Confetti cannons',
     icon: 'i-lucide-party-popper',
     defaultColor: '#8338ec',
     build: (color) => {
-      // A party popper that bursts every few seconds; confetti flutters down
-      const popper = group(
-        mesh(new THREE.ConeGeometry(0.09, 0.3, 24, 1, true), shiny(color, { side: THREE.DoubleSide }), 0, 0.15, 0),
-      )
-      const cone = popper.children[0] as THREE.Mesh
-      cone.rotation.x = Math.PI
-      // Stripes
-      for (let i = 0; i < 3; i++) popper.add(mesh(new THREE.TorusGeometry(0.03 + i * 0.022, 0.006, 6, 24), mat('#ffd166'), 0, 0.06 + i * 0.07, 0))
-      popper.children.slice(1).forEach(c => (c.rotation.x = Math.PI / 2))
-      popper.rotation.z = -0.35
-      popper.position.set(-0.1, 0.02, 0)
+      // Two party cannons on a wrapped gift box, curly streamers spilling
+      // out and swaying; every few seconds they fire a burst of confetti
+      const ribbon = shiny('#ffd166', { roughness: 0.25 })
+      const parts: THREE.Object3D[] = [
+        box(0.36, 0.2, 0.28, mat('#ff4d6d', { roughness: 0.45 })),
+        box(0.364, 0.204, 0.04, ribbon),
+        box(0.04, 0.204, 0.284, ribbon),
+      ]
+      const cannons: THREE.Group[] = []
+      for (const [x, tilt, c] of [[-0.08, -0.3, color], [0.09, 0.32, '#06d6a0']] as const) {
+        const cannon = group(
+          mesh(new THREE.ConeGeometry(0.075, 0.34, 28, 1, true).rotateX(Math.PI).translate(0, 0.17, 0), shiny(c, { side: THREE.DoubleSide })),
+        )
+        for (let i = 0; i < 3; i++) cannon.add(mesh(new THREE.TorusGeometry(0.03 + i * 0.019, 0.005, 6, 24).rotateX(Math.PI / 2), ribbon, 0, 0.06 + i * 0.09, 0))
+        cannon.add(mesh(new THREE.TorusGeometry(0.074, 0.006, 6, 24).rotateX(Math.PI / 2), ribbon, 0, 0.34, 0))
+        // Curly streamers hanging out of the mouth
+        for (let k = 0; k < 4; k++) {
+          const pts = Array.from({ length: 18 }, (_, i) => v3(Math.cos(i * 0.9 + k) * 0.02, 0.34 - i * 0.022, Math.sin(i * 0.9 + k) * 0.02 + 0.06 + k * 0.01))
+          const streamer = mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, 0.004, 4), mat(PARTY[(k + (x > 0 ? 2 : 0)) % PARTY.length]!, { roughness: 0.5 }))
+          streamer.castShadow = false
+          cannon.add(animate(streamer, (t) => {
+            streamer.rotation.x = Math.sin(t * 1.5 + k) * 0.12
+          }))
+        }
+        cannon.position.set(x, 0.2, 0)
+        cannon.rotation.z = tilt
+        cannons.push(cannon)
+        parts.push(cannon)
+      }
+      parts.push(animate(group(), (t) => {
+        const p = loop(t, 5)
+        const kick = p < 0.06 ? Math.sin((p / 0.06) * Math.PI) : 0
+        cannons.forEach(c => c.scale.set(1 + kick * 0.08, 1 - kick * 0.12, 1 + kick * 0.08))
+      }))
       const rand = seeded(23)
-      const bits = Array.from({ length: 60 }, () => [rand(), rand(), rand(), rand()])
-      const confettiGeo = new THREE.PlaneGeometry(0.03, 0.018)
-      const confetti = loose(swarm(60, confettiGeo, mat('#ffffff', { side: THREE.DoubleSide, roughness: 0.6 }), (i, t, d) => {
+      const bits = Array.from({ length: 80 }, () => [rand(), rand(), rand(), rand()])
+      parts.push(loose(swarm(80, new THREE.PlaneGeometry(0.03, 0.018), mat('#ffffff', { side: THREE.DoubleSide, roughness: 0.6 }), (i, t, d) => {
         const [a, sp, s, delay] = bits[i]!
-        const p = loop(t, 5) - delay * 0.08
+        const p = loop(t, 5) - delay * 0.06
         if (p <= 0) return false
         const time = p * 5
-        // Out of the popper, up and away, then fluttering down to the floor
+        const side = i % 2 ? 1 : -1
         const ang = a * Math.PI * 2
         const speed = 1.1 + sp * 1.1
-        const vx = Math.cos(ang) * 0.35 + 0.25
-        const vz = Math.sin(ang) * 0.35
         const drag = 1 - Math.exp(-time * 2.2)
-        const x = -0.05 + (vx * drag) / 2.2 * speed + Math.sin(time * 6 + i) * 0.03 * time
-        const z = (vz * drag) / 2.2 * speed + Math.cos(time * 5 + i) * 0.03 * time
-        const y = Math.max(0.005, 0.32 + (speed * drag) / 2.2 * 1.4 - time * 0.42)
+        const x = side * 0.12 + (side * 0.35 + Math.cos(ang) * 0.3) * drag / 2.2 * speed + Math.sin(time * 6 + i) * 0.03 * time
+        const z = Math.sin(ang) * 0.35 * drag / 2.2 * speed + Math.cos(time * 5 + i) * 0.03 * time
+        const y = Math.max(0.005, 0.55 + (speed * drag) / 2.2 * 1.4 - time * 0.42)
         d.position.set(x, y, z)
         if (y > 0.006) d.rotation.set(time * (6 + s * 6), time * (4 + s * 5), time * 3)
         else d.rotation.set(-Math.PI / 2, 0, s * 6)
         return p < 0.96
-      }, PARTY))
-      return group(animate(popper, (t) => {
-        const p = loop(t, 5)
-        // A little kick when it pops
-        const kick = p < 0.06 ? Math.sin((p / 0.06) * Math.PI) : 0
-        popper.scale.set(1 + kick * 0.08, 1 - kick * 0.12, 1 + kick * 0.08)
-      }), confetti)
+      }, PARTY)))
+      return group(...parts)
     },
   },
   {
@@ -1455,48 +1586,38 @@ const WEDDING = premium('wedding', [
     type: 'vip-candle-lanterns',
     name: 'Candle lanterns',
     icon: 'i-lucide-lamp-desk',
-    defaultColor: '#2f2b28',
-    light: { color: '#ffb35c', intensity: 2.2, distance: 3.5, offset: [0, 0.35, 0], flicker: true },
-    build: (color) => {
-      const frame = metal(color, 0.45)
-      const panes = glass('#fff6e5', 0.25)
-      const flameMat = glow('#ffb347', 1.3, 2)
-      const flames: THREE.Mesh[] = []
-      const lantern = (x: number, z: number, s: number) => {
-        const g = group(
-          box(0.2, 0.02, 0.2, frame),
-          box(0.17, 0.3, 0.17, panes, 0, 0.02),
-          box(0.22, 0.03, 0.22, frame, 0, 0.32),
-          mesh(new THREE.ConeGeometry(0.15, 0.1, 4), frame, 0, 0.4, 0),
-          mesh(new THREE.TorusGeometry(0.035, 0.006, 6, 18), frame, 0, 0.48, 0),
-          cyl(0.035, 0.035, 0.1, mat('#fff3e0', { roughness: 0.6 }), 0, 0.02),
-        )
-        ;(g.children[3] as THREE.Mesh).rotation.y = Math.PI / 4
-        for (const [cx, cz] of [[-0.09, -0.09], [0.09, -0.09], [-0.09, 0.09], [0.09, 0.09]]) g.add(box(0.012, 0.3, 0.012, frame, cx!, 0.02, cz!))
-        const f = mesh(new THREE.SphereGeometry(0.014, 10, 8), flameMat, 0, 0.14, 0)
+    defaultColor: '#c99a4a',
+    light: { color: '#ffb35c', intensity: 2.6, distance: 3.8, offset: [0, 0.35, 0], flicker: true },
+    build: () => {
+      // Three Moroccan brass lanterns of different heights, pillar candles
+      // and scattered petals: a warm glowing corner
+      const a = moroccanLantern(1.5)
+      const b = moroccanLantern(1.1)
+      const c = moroccanLantern(0.8)
+      a.lantern.position.set(-0.12, 0, -0.05)
+      b.lantern.position.set(0.17, 0, 0.06)
+      c.lantern.position.set(0.02, 0, 0.2)
+      const flames = [a.flame, b.flame, c.flame]
+      const wax = mat('#fbf1e1', { roughness: 0.6 })
+      const parts: THREE.Object3D[] = [a.lantern, b.lantern, c.lantern]
+      for (const [x, z, h] of [[0.28, -0.08, 0.14], [0.33, 0.1, 0.09], [-0.28, 0.14, 0.11]] as const) {
+        parts.push(cyl(0.035, 0.035, h, wax, x, 0, z, 16))
+        const f = mesh(new THREE.SphereGeometry(0.011, 8, 6), glow('#ffcf6b', 1.5, 2), x, h + 0.014, z)
         f.castShadow = false
         flames.push(f)
-        g.add(f)
-        g.position.set(x, 0, z)
-        g.scale.setScalar(s)
-        return g
+        parts.push(f)
       }
       const petals = new THREE.SphereGeometry(0.02, 8, 6)
       petals.scale(1, 0.15, 0.7)
       const rand = seeded(31)
-      const scatter = Array.from({ length: 14 }, () => [rand(), rand()])
-      return group(
-        lantern(-0.14, 0, 1.2),
-        lantern(0.16, 0.08, 0.85),
-        animate(group(), (t) => {
-          flames.forEach((f, i) => f.scale.set(1, 1.7 * (1 + 0.22 * Math.sin(t * 12 + i * 2.2) + 0.12 * Math.sin(t * 25 + i)), 1))
-        }),
-        swarm(14, petals, mat('#f4f1ea', { roughness: 0.7 }), (i, _t, d) => {
-          const [a, r] = scatter[i]!
-          d.position.set(Math.cos(a * 6.28) * (0.2 + r * 0.15), 0.004, Math.sin(a * 6.28) * (0.12 + r * 0.12) + 0.05)
-          d.rotation.y = a * 9
-        }),
-      )
+      const scatter = Array.from({ length: 22 }, () => [rand(), rand()])
+      parts.push(swarm(22, petals, mat('#ffffff', { roughness: 0.7 }), (i, _t, d) => {
+        const [ang, r] = scatter[i]!
+        d.position.set(Math.cos(ang * 6.28) * (0.22 + r * 0.2), 0.004, Math.sin(ang * 6.28) * (0.16 + r * 0.16) + 0.05)
+        d.rotation.y = ang * 9
+      }, ['#f8f1ea', '#f4b6c6', '#ffffff']))
+      parts.push(flicker(flames))
+      return group(...parts)
     },
   },
   {
@@ -1691,32 +1812,59 @@ const GALAXY = premium('galaxy', [
     name: 'Star projector',
     icon: 'i-lucide-stars',
     defaultColor: '#3b2f7a',
-    light: { color: '#8fb3ff', intensity: 1.8, distance: 4, offset: [0, 0.3, 0] },
+    light: { color: '#8fb3ff', intensity: 2, distance: 4, offset: [0, 0.3, 0] },
     build: (color) => {
-      const shell = mat(color, { roughness: 0.35, metalness: 0.3 })
-      const dome = group(mesh(new THREE.SphereGeometry(0.13, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), shell))
-      // Star-shaped holes glowing through the dome
-      const rand = seeded(29)
-      const holes = Array.from({ length: 40 }, () => [Math.acos(1 - rand() * 0.95), rand() * Math.PI * 2])
-      dome.add(swarm(40, new THREE.OctahedronGeometry(0.008, 0), glow('#cfe1ff', 1, 2.4), (i, _t, d) => {
-        const [phi, theta] = holes[i]!
-        d.position.setFromSphericalCoords(0.131, phi, theta)
-      }))
-      dome.position.y = 0.06
-      // Stars hover in a slowly turning cloud around it
+      // A glowing nebula dome on a gold-rimmed base, light rings orbiting it
+      // and a slowly turning cloud of stars
+      const nebula = textTexture(512, 256, (ctx) => {
+        ctx.fillStyle = '#0b0820'
+        ctx.fillRect(0, 0, 512, 256)
+        const rand = seeded(73)
+        ctx.globalCompositeOperation = 'lighter'
+        const blob = (x: number, y: number, r: number, c: string) => {
+          const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+          g.addColorStop(0, c)
+          g.addColorStop(1, 'rgba(0,0,0,0)')
+          ctx.fillStyle = g
+          ctx.fillRect(0, 0, 512, 256)
+        }
+        for (let i = 0; i < 14; i++) blob(rand() * 512, rand() * 256, 50 + rand() * 90, ['rgba(130,80,255,0.5)', 'rgba(255,80,190,0.4)', 'rgba(80,200,255,0.45)'][i % 3]!)
+        for (let i = 0; i < 300; i++) {
+          ctx.fillStyle = `rgba(255,255,255,${0.4 + rand() * 0.6})`
+          ctx.fillRect(rand() * 512, rand() * 256, rand() < 0.9 ? 1.5 : 3, rand() < 0.9 ? 1.5 : 3)
+        }
+      })
+      const domeMat = new THREE.MeshStandardMaterial({ color: nebula ? '#ffffff' : color, map: nebula, emissive: '#ffffff', emissiveMap: nebula, emissiveIntensity: 0.6, roughness: 0.3 })
+      domeMat.userData.glow = true
+      domeMat.userData.baseGlow = 0.6
+      domeMat.userData.nightGlow = 1.2
+      const dome = group(mesh(new THREE.SphereGeometry(0.15, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2), domeMat))
+      dome.position.y = 0.07
+      const gold = metal('#e1b95a', 0.2)
+      const rings = group(
+        mesh(new THREE.TorusGeometry(0.22, 0.004, 6, 64), glow('#bcd4ff', 1.2, 2)),
+        mesh(new THREE.TorusGeometry(0.26, 0.003, 6, 64), glow('#ffb3e6', 1.2, 2)),
+      )
+      ;(rings.children[0] as THREE.Mesh).rotation.x = Math.PI / 2 + 0.4
+      ;(rings.children[1] as THREE.Mesh).rotation.x = Math.PI / 2 - 0.5
+      rings.position.y = 0.14
       const cloudRand = seeded(37)
-      const stars = Array.from({ length: 60 }, () => [cloudRand(), cloudRand(), cloudRand(), cloudRand()])
-      const cloud = loose(swarm(60, new THREE.OctahedronGeometry(0.01, 0), glow('#e3ecff', 1.2, 2.4), (i, t, d) => {
+      const stars = Array.from({ length: 70 }, () => [cloudRand(), cloudRand(), cloudRand(), cloudRand()])
+      const cloud = loose(swarm(70, new THREE.OctahedronGeometry(0.01, 0), glow('#e3ecff', 1.2, 2.4), (i, t, d) => {
         const [a, r, h, tw] = stars[i]!
         const ang = a * Math.PI * 2 + t * 0.12
-        d.position.set(Math.cos(ang) * (0.3 + r * 0.5), 0.25 + h * 0.9, Math.sin(ang) * (0.3 + r * 0.5))
+        d.position.set(Math.cos(ang) * (0.35 + r * 0.6), 0.3 + h * 1.0, Math.sin(ang) * (0.35 + r * 0.6))
         d.rotation.set(t, t * 1.3, 0)
         d.scale.setScalar(0.4 + 0.8 * (0.5 + 0.5 * Math.sin(t * 2 + tw * 20)))
       }))
       return group(
-        cyl(0.14, 0.15, 0.06, mat('#1d1a33', { roughness: 0.4, metalness: 0.4 })),
+        lathe([[0, 0], [0.17, 0], [0.18, 0.02], [0.16, 0.06], [0.155, 0.07], [0, 0.07]], mat('#14122a', { roughness: 0.35, metalness: 0.5 })),
+        mesh(new THREE.TorusGeometry(0.157, 0.008, 8, 48).rotateX(Math.PI / 2), gold, 0, 0.07, 0),
         animate(dome, (t) => {
-          dome.rotation.y = t * 0.25
+          dome.rotation.y = t * 0.2
+        }),
+        animate(rings, (t) => {
+          rings.rotation.y = t * 0.5
         }),
         cloud,
       )
@@ -1727,32 +1875,57 @@ const GALAXY = premium('galaxy', [
     name: 'Moon lamp',
     icon: 'i-lucide-moon',
     defaultColor: '#fff1cf',
-    light: { color: '#ffe2a8', intensity: 2.6, distance: 4.5, offset: [0, 1.2, 0.2] },
+    light: { color: '#ffe2a8', intensity: 2.8, distance: 4.5, offset: [0, 1.2, 0.2] },
     build: (color) => {
-      const moonMat = glow(color, 0.12, 1.4)
-      moonMat.roughness = 0.95
-      const moon = group(mesh(new THREE.SphereGeometry(0.22, 40, 28), moonMat))
-      // Craters
-      const rand = seeded(43)
-      for (let i = 0; i < 16; i++) {
-        const phi = Math.acos(2 * rand() - 1)
-        const theta = rand() * Math.PI * 2
-        const crater = mesh(new THREE.SphereGeometry(0.02 + rand() * 0.035, 12, 8), glow(new THREE.Color(color).offsetHSL(0.02, -0.25, -0.3).getStyle(), 0.05, 0.9))
-        crater.position.setFromSphericalCoords(0.205, phi, theta)
-        crater.scale.set(1, 1, 0.3)
-        crater.lookAt(0, 0, 0)
-        moon.add(crater)
-      }
+      // A moon with real-looking maria and craters, glowing warm with a soft
+      // halo, hanging from an arched gold stand
+      const surface = textTexture(512, 256, (ctx) => {
+        ctx.fillStyle = color
+        ctx.fillRect(0, 0, 512, 256)
+        const rand = seeded(43)
+        // Darker seas
+        for (let i = 0; i < 9; i++) {
+          const x = rand() * 512
+          const y = 60 + rand() * 140
+          const g = ctx.createRadialGradient(x, y, 0, x, y, 40 + rand() * 60)
+          g.addColorStop(0, 'rgba(150,135,110,0.55)')
+          g.addColorStop(1, 'rgba(150,135,110,0)')
+          ctx.fillStyle = g
+          ctx.fillRect(0, 0, 512, 256)
+        }
+        // Craters: a shadowed rim and a bright lip
+        for (let i = 0; i < 120; i++) {
+          const x = rand() * 512
+          const y = rand() * 256
+          const r = 2 + Math.pow(rand(), 3) * 18
+          ctx.fillStyle = 'rgba(120,105,85,0.35)'
+          ctx.beginPath()
+          ctx.arc(x, y, r, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.strokeStyle = 'rgba(255,250,235,0.5)'
+          ctx.lineWidth = Math.max(1, r * 0.2)
+          ctx.beginPath()
+          ctx.arc(x - r * 0.15, y - r * 0.15, r, Math.PI * 0.9, Math.PI * 1.7)
+          ctx.stroke()
+        }
+      })
+      const moonMat = new THREE.MeshStandardMaterial({ color: surface ? '#ffffff' : color, map: surface, emissive: '#ffe6b0', emissiveMap: surface, emissiveIntensity: 0.25, roughness: 0.95 })
+      moonMat.userData.glow = true
+      moonMat.userData.baseGlow = 0.25
+      moonMat.userData.nightGlow = 0.9
+      const moon = group(mesh(new THREE.SphereGeometry(0.22, 48, 32), moonMat))
+      const halo = mesh(new THREE.SphereGeometry(0.3, 32, 20), new THREE.MeshBasicMaterial({ color: '#ffd98a', transparent: true, opacity: 0.12, side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending }))
+      halo.castShadow = false
+      moon.add(halo)
       moon.position.set(0, 1.2, 0.18)
-      // An arched stand it hangs from
-      const stand = metal('#2b2b30', 0.3)
+      const gold = metal('#d9b45a', 0.25)
       const arc = new THREE.CatmullRomCurve3([v3(0, 0.04, -0.15), v3(0, 0.9, -0.2), v3(0, 1.55, -0.05), v3(0, 1.62, 0.18)])
       return group(
-        cyl(0.17, 0.19, 0.04, stand, 0, 0, -0.15),
-        mesh(new THREE.TubeGeometry(arc, 40, 0.012, 8), stand),
+        lathe([[0, 0], [0.18, 0], [0.19, 0.02], [0.15, 0.045], [0, 0.045]], gold, 0, 32).translateZ(-0.15),
+        mesh(new THREE.TubeGeometry(arc, 48, 0.012, 10), gold),
         cyl(0.002, 0.002, 0.2, mat('#cccccc'), 0, 1.42, 0.18, 4),
         animate(moon, (t) => {
-          moon.rotation.y = t * 0.15
+          moon.children[0]!.rotation.y = t * 0.12
           moon.position.y = 1.2 + Math.sin(t * 0.7) * 0.01
         }),
       )
@@ -1979,28 +2152,17 @@ const PROPOSAL = premium('proposal', [
         }
         d.rotation.y = s * 6.28
       }, ['#c8102e', '#e0234e', '#b0102a', '#f48fb1']))
-      // Lanterns along both sides
-      const frame = metal('#2b2725', 0.4)
-      const flameMat = glow('#ffb347', 1.3, 2)
+      // Moroccan lanterns along both sides
       const flames: THREE.Mesh[] = []
       for (let k = 0; k < 5; k++) {
         for (const side of [-1, 1]) {
-          const x = side * (W / 2 + 0.12)
-          const z = -L / 2 + 0.3 + k * ((L - 0.6) / 4)
-          parts.push(box(0.12, 0.015, 0.12, frame, x, 0, z))
-          parts.push(box(0.1, 0.18, 0.1, glass('#fff6e5', 0.25), x, 0.015, z))
-          parts.push(box(0.13, 0.015, 0.13, frame, x, 0.195, z))
-          parts.push(mesh(new THREE.ConeGeometry(0.09, 0.06, 4).rotateY(Math.PI / 4), frame, x, 0.24, z))
-          parts.push(cyl(0.022, 0.022, 0.06, mat('#fff3e0', { roughness: 0.6 }), x, 0.015, z, 12))
-          const f = mesh(new THREE.SphereGeometry(0.01, 8, 6), flameMat, x, 0.09, z)
-          f.castShadow = false
-          flames.push(f)
-          parts.push(f)
+          const { lantern, flame } = moroccanLantern(0.85)
+          lantern.position.set(side * (W / 2 + 0.12), 0, -L / 2 + 0.3 + k * ((L - 0.6) / 4))
+          flames.push(flame)
+          parts.push(lantern)
         }
       }
-      parts.push(animate(group(), (t) => {
-        flames.forEach((f, i) => f.scale.set(1, 1.8 * (1 + 0.22 * Math.sin(t * 12 + i * 2.1) + 0.12 * Math.sin(t * 25 + i)), 1))
-      }))
+      parts.push(flicker(flames))
       // A few petals drifting down onto it
       parts.push(loose(swarm(10, petalGeo, mat('#e0234e', { roughness: 0.7, side: THREE.DoubleSide }), (i, t, d) => {
         const p = loop(t, 6, i * 0.6)
