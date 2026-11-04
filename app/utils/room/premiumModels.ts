@@ -1156,52 +1156,141 @@ const WEDDING = premium('wedding', [
     type: 'vip-champagne-tower',
     name: 'Champagne tower',
     icon: 'i-lucide-wine',
-    defaultColor: '#f6d77a',
+    defaultColor: '#f3d27a',
     build: (color) => {
-      const glassMat = glass('#f4fbff', 0.45)
-      const wine = new THREE.MeshPhysicalMaterial({ color, roughness: 0.1, clearcoat: 1, emissive: color, emissiveIntensity: 0.15 })
+      // A classic coupe tower (4 x 4, 3 x 3, 2 x 2, 1) on a silver tray. A
+      // bottle pours into the top glass; champagne spills over the rims and
+      // runs down, glass to glass, to the bottom row
+      const RIM = 0.056 // coupe rim radius
+      const GLASS_H = 0.115 // foot to rim
+      const STEP = GLASS_H - 0.006 // an upper glass's foot sits in the gap between four rims
+      const BASE_Y = 0.035
       const parts: THREE.Object3D[] = [
-        cyl(0.36, 0.36, 0.03, metal('#cfd3da', 0.15)),
-        mesh(new THREE.TorusGeometry(0.36, 0.012, 8, 48), metal(GOLD, 0.2), 0, 0.03, 0),
+        // Brushed silver tray (not a mirror, so it doesn't turn sky-blue)
+        cyl(0.36, 0.38, 0.025, mat('#e4e6ea', { metalness: 0.45, roughness: 0.32 })),
+        mesh(new THREE.TorusGeometry(0.37, 0.01, 8, 64), metal(GOLD, 0.25), 0, 0.028, 0),
       ]
       ;(parts[1] as THREE.Mesh).rotation.x = Math.PI / 2
-      // Coupe glasses in a pyramid: 3x3, 2x2, 1
-      const coupe = (x: number, y: number, z: number) => group(
-        cyl(0.006, 0.02, 0.06, glassMat, 0, 0, 0, 10),
-        lathe([[0.006, 0.06], [0.05, 0.075], [0.06, 0.09], [0.058, 0.09]], glassMat, 0, 24),
-        cyl(0.052, 0.035, 0.018, wine, 0, 0.07, 0, 20),
-      ).translateX(x).translateY(y).translateZ(z)
-      const levels: [number, number][] = [[3, 0.03], [2, 0.12], [1, 0.21]]
-      const glasses: THREE.Vector3[] = []
-      for (const [n, y] of levels) {
+
+      // Every glass: where its foot stands
+      const glasses: { p: THREE.Vector3; level: number }[] = []
+      for (let level = 0; level < 4; level++) {
+        const n = 4 - level
         for (let i = 0; i < n; i++) {
           for (let j = 0; j < n; j++) {
-            const x = (i - (n - 1) / 2) * 0.12
-            const z = (j - (n - 1) / 2) * 0.12
-            parts.push(coupe(x, y, z))
-            glasses.push(v3(x, y + 0.085, z))
+            glasses.push({ p: v3((i - (n - 1) / 2) * RIM * 2, BASE_Y + level * STEP, (j - (n - 1) / 2) * RIM * 2), level })
           }
         }
       }
+      const at = (geo: THREE.BufferGeometry, material: THREE.Material, dy = 0) => {
+        const g = swarm(glasses.length, geo, material, (i, _t, d) => {
+          d.position.copy(glasses[i]!.p)
+          d.position.y += dy
+        })
+        g.castShadow = false
+        return g
+      }
+      const crystal = glass('#f7fbff', 0.38)
+      const lip = new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.02, clearcoat: 1, transparent: true, opacity: 0.75 })
+      const wine = new THREE.MeshPhysicalMaterial({ color, roughness: 0.08, clearcoat: 1, transparent: true, opacity: 0.88, emissive: color, emissiveIntensity: 0.18 })
+      const surface = new THREE.MeshStandardMaterial({ color: '#fff3c4', roughness: 0.05, metalness: 0.2, transparent: true, opacity: 0.9, emissive: '#ffe08a', emissiveIntensity: 0.25 })
+      // Foot, stem with a knop, shallow bowl, bright rim
+      parts.push(at(new THREE.CylinderGeometry(0.03, 0.034, 0.004, 24), crystal, 0.002))
+      parts.push(at(new THREE.CylinderGeometry(0.0035, 0.005, 0.06, 10), crystal, 0.034))
+      parts.push(at(new THREE.SphereGeometry(0.008, 12, 8), crystal, 0.045))
+      const bowl = new THREE.LatheGeometry([[0.004, 0], [0.025, 0.006], [0.045, 0.02], [0.054, 0.042], [RIM, 0.05], [RIM - 0.002, 0.05], [0.051, 0.04], [0.042, 0.02], [0.022, 0.008], [0.003, 0.005]].map(([r, h]) => new THREE.Vector2(r!, h!)), 32)
+      parts.push(at(bowl, crystal, 0.065))
+      parts.push(at(new THREE.TorusGeometry(RIM - 0.001, 0.0018, 6, 40).rotateX(Math.PI / 2), lip, 0.065 + 0.05))
+      // Champagne filling each bowl to the brim, with its surface
+      const fill = new THREE.LatheGeometry([[0, 0.006], [0.021, 0.009], [0.04, 0.021], [0.05, 0.04], [0.053, 0.047], [0, 0.047]].map(([r, h]) => new THREE.Vector2(r!, h!)), 28)
+      parts.push(at(fill, wine, 0.065))
+      parts.push(at(new THREE.CircleGeometry(0.053, 28).rotateX(-Math.PI / 2), surface, 0.065 + 0.0475))
+
       // Bubbles rising in every glass
-      parts.push(swarm(glasses.length * 4, new THREE.SphereGeometry(0.004, 6, 4), glow('#fffbe6', 0.8, 1), (i, t, d) => {
-        const g = glasses[i % glasses.length]!
+      parts.push(swarm(glasses.length * 3, new THREE.SphereGeometry(0.0028, 6, 4), glow('#fffbe6', 0.9, 1), (i, t, d) => {
+        const g = glasses[i % glasses.length]!.p
         const k = Math.floor(i / glasses.length)
-        const p = loop(t, 1.6, k * 0.4 + (i % 5) * 0.13)
-        d.position.set(g.x + Math.sin(i * 3.3) * 0.02, g.y - 0.012 + p * 0.016, g.z + Math.cos(i * 2.1) * 0.02)
-        d.scale.setScalar(Math.sin(p * Math.PI))
+        const p = loop(t, 1.4, k * 0.47 + (i % 7) * 0.11)
+        const a = i * 2.3
+        d.position.set(g.x + Math.cos(a) * 0.02, g.y + 0.075 + p * 0.035, g.z + Math.sin(a) * 0.02)
+        d.scale.setScalar(Math.sin(p * Math.PI) * 1.2)
       }))
-      // A bottle on top, gently pouring
-      const bottle = group(
-        lathe([[0, 0], [0.035, 0], [0.037, 0.14], [0.015, 0.2], [0.013, 0.25], [0, 0.25]], shiny('#1f4d2b', { roughness: 0.15 })),
-        cyl(0.038, 0.038, 0.06, mat('#f3e7c9', { roughness: 0.6 }), 0, 0.05),
-        cyl(0.015, 0.015, 0.05, metal(GOLD, 0.25), 0, 0.21),
+
+      // Overflow: from the four corners of each upper glass's rim, a thin
+      // stream and drops run down into the glass below
+      const spills: { from: THREE.Vector3; to: THREE.Vector3 }[] = []
+      for (const g of glasses) {
+        if (g.level === 0) continue
+        const rimY = g.p.y + 0.065 + 0.05
+        for (const [dx, dz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]] as const) {
+          const from = v3(g.p.x + dx * RIM * 0.72, rimY, g.p.z + dz * RIM * 0.72)
+          const to = v3(g.p.x + dx * RIM, rimY - STEP + 0.005, g.p.z + dz * RIM)
+          spills.push({ from, to })
+        }
+      }
+      const streamMat = new THREE.MeshPhysicalMaterial({ color, roughness: 0.05, clearcoat: 1, transparent: true, opacity: 0.55, emissive: color, emissiveIntensity: 0.3, depthWrite: false })
+      const streams = swarm(spills.length, new THREE.CylinderGeometry(0.0022, 0.0028, 1, 6), streamMat, (i, t, d) => {
+        const { from, to } = spills[i]!
+        d.position.copy(from).lerp(to, 0.5)
+        d.position.x += (to.x - from.x) * 0.15
+        d.position.z += (to.z - from.z) * 0.15
+        d.quaternion.setFromUnitVectors(v3(0, 1, 0), from.clone().sub(to).normalize())
+        const wobble = 0.8 + 0.35 * Math.sin(t * 14 + i * 1.7)
+        d.scale.set(wobble, from.distanceTo(to), wobble)
+      })
+      parts.push(streams)
+      parts.push(swarm(spills.length * 3, new THREE.SphereGeometry(0.004, 6, 4), streamMat, (i, t, d) => {
+        const { from, to } = spills[i % spills.length]!
+        const p = loop(t, 0.6, Math.floor(i / spills.length) * 0.2 + (i % 5) * 0.07)
+        // Out over the rim, then falling (eased) to the glass below
+        d.position.copy(from).lerp(to, p * p)
+        d.position.x += (to.x - from.x) * Math.sin(p * Math.PI) * 0.2
+        d.position.z += (to.z - from.z) * Math.sin(p * Math.PI) * 0.2
+        d.scale.set(1, 1.6, 1)
+      }))
+
+      // The bottle, held above the top glass and tilted to pour
+      const topRim = BASE_Y + 3 * STEP + 0.065 + 0.05
+      const bottleGlass = shiny('#16391f', { roughness: 0.12 })
+      const foil = metal('#e2b84f', 0.3)
+      const L = 0.3
+      // Built neck-down from the tip (origin) back to the base (-y)
+      const body = group(
+        lathe([[0.0, 0], [0.012, 0], [0.0135, -0.008], [0.013, -0.05], [0.02, -0.09], [0.036, -0.13], [0.04, -0.16], [0.04, -L + 0.01], [0.034, -L], [0, -L + 0.02]], bottleGlass, 0, 28),
+        lathe([[0.0, -0.002], [0.0145, -0.002], [0.0145, -0.07], [0.021, -0.095], [0, -0.095]], foil, 0, 24),
+        lathe([[0.0, -0.17], [0.0405, -0.17], [0.0405, -0.235], [0, -0.235]], mat('#f5ead2', { roughness: 0.55 }), 0, 28),
+        lathe([[0.0, -0.172], [0.041, -0.172], [0.041, -0.18], [0, -0.18]], foil, 0, 28),
       )
-      bottle.position.set(0, 0.32, 0)
-      bottle.rotation.z = 2.1
-      const stream = cyl(0.004, 0.004, 0.08, wine, 0, 0.26, 0, 6)
-      parts.push(bottle, animate(stream, (t) => {
-        stream.scale.x = stream.scale.z = 0.8 + 0.3 * Math.sin(t * 9)
+      const bottle = group(body)
+      const tip = v3(0.012, topRim + 0.085, 0)
+      bottle.position.copy(tip)
+      // Base up and to the side: the neck points down into the glass
+      const toBase = v3(Math.cos(0.62), Math.sin(0.62), 0.12).normalize()
+      body.quaternion.setFromUnitVectors(v3(0, -1, 0), toBase)
+      parts.push(animate(bottle, (t) => {
+        // A gentle pour: tips in a little more, then back
+        bottle.rotation.z = Math.sin(t * 0.9) * 0.05
+      }))
+      // The pour: a stream from the tip into the top glass, drops along it
+      const pourTop = tip.clone().add(v3(0, -0.004, 0))
+      const pourBottom = v3(0.004, topRim - 0.002, 0)
+      const pour = mesh(new THREE.CylinderGeometry(0.003, 0.0045, pourTop.distanceTo(pourBottom), 8), streamMat)
+      pour.position.copy(pourTop).lerp(pourBottom, 0.5)
+      pour.castShadow = false
+      parts.push(animate(pour, (t) => {
+        const w = 0.85 + 0.3 * Math.sin(t * 16)
+        pour.scale.set(w, 1, w)
+      }))
+      parts.push(swarm(6, new THREE.SphereGeometry(0.005, 6, 4), streamMat, (i, t, d) => {
+        const p = loop(t, 0.45, i / 6)
+        d.position.copy(pourTop).lerp(pourBottom, p * p)
+        d.scale.set(1, 1.8, 1)
+      }))
+      // Splash ring where it lands
+      const splash = mesh(new THREE.TorusGeometry(0.012, 0.0018, 6, 24).rotateX(Math.PI / 2), streamMat, pourBottom.x, topRim - 0.001, 0)
+      splash.castShadow = false
+      parts.push(animate(splash, (t) => {
+        splash.scale.setScalar(0.6 + loop(t, 0.5) * 1.6)
       }))
       return group(...parts)
     },

@@ -53,7 +53,7 @@ const LAYOUTS: Record<RoomPackId, { spots: Spot[]; land: LandId; mode: 'day' | '
       ['vip-wedding-arch', 0, 0, -2.0], ['vip-sparkler-fountain', -0.55, 0, -1.4], ['vip-sparkler-fountain', 0.55, 0, -1.4],
       ['vip-love-marquee', -1.2, 0, 0.5, 25, 0.7], ['vip-candle-lanterns', -1.75, 0, -1.7],
       [TABLE, 1.45, 0, -1.45], ['vip-wedding-cake', 1.45, TOP, -1.45],
-      [TABLE, 1.3, 0, 0.6], ['vip-champagne-tower', 1.3, TOP, 0.6],
+      [TABLE, 1.3, 0, 0.6], ['vip-champagne-tower', 1.3, TOP, 0.6, 0, 1.3],
     ],
   },
   birthday: {
