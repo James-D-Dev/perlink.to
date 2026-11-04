@@ -1331,16 +1331,76 @@ const WEDDING = premium('wedding', [
           geo.computeVertexNormals()
         }))
       }
-      // Flowers in the top corners
-      const corner = (x: number) => {
-        for (let i = 0; i < 9; i++) {
-          const a = i * 2.4
-          parts.push(rose(i % 3 === 0 ? '#f7c6d4' : '#ffffff', 0.05, x + Math.cos(a) * 0.12, 2.1 + Math.sin(a) * 0.08, 0.06 + (i % 2) * 0.04))
+      // Bridal florals: a lush cluster of detailed roses on the top left
+      // that spills along the beam and down the post, a smaller one on the
+      // right, with rose leaves, eucalyptus sprigs and baby's breath
+      const rand = seeded(83)
+      // Ivory and champagne rather than pure white, so they stand out on a pale wall
+      const whites = ['#fff6ea', '#fbead6', '#f6e1cf', '#fffaf3']
+      const blush = ['#f4b6c6', '#ec9fb3', '#f8cdd8', '#e48aa2']
+      const bloomSpots: RoseSpot[] = []
+      const leafSpots: { p: THREE.Vector3; n: THREE.Vector3; spin: number; size: number }[] = []
+      const sprigSpots: { p: THREE.Vector3; n: THREE.Vector3; spin: number }[] = []
+      const breath: THREE.Vector3[] = []
+      const budSpots: THREE.Vector3[] = []
+      /** Flowers in an oval round (cx, cy), thick in the middle and thinning out */
+      const cluster = (cx: number, cy: number, rx: number, ry: number, count: number) => {
+        for (let i = 0; i < count; i++) {
+          const a = rand() * Math.PI * 2
+          const r = Math.sqrt(rand())
+          const x = cx + Math.cos(a) * rx * r
+          const y = cy + Math.sin(a) * ry * r
+          const front = rand() < 0.78
+          const z = front ? 0.05 + (1 - r) * 0.07 + rand() * 0.03 : -0.05 - rand() * 0.05
+          const n = v3(Math.cos(a) * r * 0.7, Math.sin(a) * r * 0.6 + 0.15, front ? 1 : -1).normalize()
+          const big = 1 - r * 0.45
+          bloomSpots.push({ p: v3(x, y, z), n, size: (0.045 + rand() * 0.028) * big, color: rand() < 0.5 ? blush[Math.floor(rand() * blush.length)]! : whites[Math.floor(rand() * whites.length)]!, open: 0.6 + rand() * 0.4 })
+          for (let l = 0; l < 2; l++) leafSpots.push({ p: v3(x + (rand() - 0.5) * 0.1, y + (rand() - 0.5) * 0.08, z - 0.02), n: v3(rand() - 0.5, rand() - 0.2, (front ? 1 : -1) * rand()).normalize(), spin: rand() * 6.28, size: 0.055 + rand() * 0.03 })
+          if (rand() < 0.5) sprigSpots.push({ p: v3(x + (rand() - 0.5) * 0.14, y + (rand() - 0.5) * 0.1, z - 0.03), n: v3(Math.cos(a), Math.sin(a), 0.3).normalize(), spin: rand() * 6.28 })
+          for (let k = 0; k < 3; k++) breath.push(v3(x + (rand() - 0.5) * 0.12, y + (rand() - 0.5) * 0.1, z + 0.02 + rand() * 0.03))
+          if (rand() < 0.25) budSpots.push(v3(x + (rand() - 0.5) * 0.1, y + rand() * 0.06, z + 0.01))
         }
-        for (let i = 0; i < 7; i++) parts.push(mesh(new THREE.IcosahedronGeometry(0.06, 0), mat('#7fa36b', { roughness: 0.9, flatShading: true }), x + Math.cos(i * 1.7) * 0.2, 2.06 + Math.sin(i * 2.3) * 0.12, 0.02))
       }
-      corner(-0.75)
-      corner(0.75)
+      // Left: the main cluster at the corner, a trail along the beam and down the post
+      cluster(-0.78, 2.1, 0.26, 0.17, 30)
+      cluster(-0.42, 2.13, 0.2, 0.09, 12)
+      cluster(-0.85, 1.82, 0.1, 0.2, 11)
+      cluster(-0.85, 1.55, 0.07, 0.14, 5)
+      // Right: smaller, balancing it
+      cluster(0.8, 2.1, 0.18, 0.13, 16)
+      cluster(0.55, 2.13, 0.12, 0.07, 6)
+      cluster(0.85, 1.9, 0.07, 0.12, 5)
+      parts.push(roses(bloomSpots))
+      parts.push(swarm(leafSpots.length, roseLeafGeometry(1), mat('#4f7a45', { roughness: 0.55, side: THREE.DoubleSide }), (i, _t, d) => {
+        const l = leafSpots[i]!
+        d.position.copy(l.p)
+        d.quaternion.setFromUnitVectors(v3(0, 1, 0), l.n)
+        d.rotateY(l.spin)
+        d.scale.setScalar(l.size)
+      }, ['#4f7a45', '#5d8a50', '#3f6b3a']))
+      // Eucalyptus: round silver-green leaves along a sprig
+      const sprigLeaves: { p: THREE.Vector3; q: THREE.Quaternion; s: number }[] = []
+      for (const sp of sprigSpots) {
+        for (let k = 0; k < 5; k++) {
+          const p = sp.p.clone().addScaledVector(sp.n, k * 0.025)
+          p.y += (k % 2 ? 1 : -1) * 0.012
+          const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2 + (rand() - 0.5) * 0.6, sp.spin + k, 0))
+          sprigLeaves.push({ p, q, s: 1 - k * 0.12 })
+        }
+      }
+      parts.push(swarm(sprigLeaves.length, new THREE.CircleGeometry(0.014, 10), mat('#9db8a4', { roughness: 0.7, side: THREE.DoubleSide }), (i, _t, d) => {
+        const l = sprigLeaves[i]!
+        d.position.copy(l.p)
+        d.quaternion.copy(l.q)
+        d.scale.setScalar(l.s)
+      }))
+      parts.push(swarm(breath.length, new THREE.SphereGeometry(0.005, 6, 4), mat('#ffffff', { roughness: 0.6 }), (i, _t, d) => {
+        d.position.copy(breath[i]!)
+      }))
+      parts.push(swarm(budSpots.length, new THREE.SphereGeometry(0.012, 10, 8), mat('#f6dfe3', { roughness: 0.5 }), (i, _t, d) => {
+        d.position.copy(budSpots[i]!)
+        d.scale.set(0.85, 1.35, 0.85)
+      }))
       // Fairy lights twinkling across the top
       const bulbs: THREE.Vector3[] = []
       for (let i = 0; i < 26; i++) {

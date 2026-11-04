@@ -10,7 +10,7 @@ import { DEFAULT_ROOM_STYLE } from '~/types/room'
 
 const SIZE = 192
 // Bump when catalog models change so cached thumbnails are regenerated
-const CACHE_KEY = 'perlink-room-thumbs-v20'
+const CACHE_KEY = 'perlink-room-thumbs-v22'
 
 let memoryCache: Record<string, string> | null = null
 
