@@ -70,6 +70,22 @@
                 <UIcon name="i-lucide-crown" class="mt-0.5 size-3.5 shrink-0 text-amber-400" />
                 <span>{{ t('room.tour.watermark') }} <NuxtLink to="/dashboard/upgrade" class="font-medium text-white underline">{{ t('room.tour.removeWatermark') }}</NuxtLink></span>
               </p>
+              <p v-if="withMusic && track?.contentId" class="flex items-start gap-2 text-xs text-amber-300">
+                <UIcon name="i-lucide-triangle-alert" class="mt-0.5 size-3.5 shrink-0" />
+                <span>{{ t('room.tour.musicClaim') }}</span>
+              </p>
+              <!-- The link in the video must open this room: offer to put it live -->
+              <div v-if="liveIssue" class="rounded-2xl bg-amber-400/15 p-3 ring-1 ring-amber-300/30">
+                <p class="flex items-start gap-2 text-sm text-amber-100">
+                  <UIcon name="i-lucide-eye-off" class="mt-0.5 size-4 shrink-0 text-amber-300" />
+                  <span>{{ t(`room.tour.notLive.${liveIssue}`) }}</span>
+                </p>
+                <UButton v-if="goLive" class="mt-2.5" size="sm" color="warning" icon="i-lucide-globe" :loading="goingLive" :label="t('room.tour.goLive')" @click="putLive" />
+              </div>
+              <p v-else-if="wentLive" class="flex items-start gap-2 text-sm text-emerald-300">
+                <UIcon name="i-lucide-circle-check" class="mt-0.5 size-4 shrink-0" />
+                <span>{{ t('room.tour.wentLive') }}</span>
+              </p>
               <p v-if="!supported" class="text-sm text-red-400">{{ t('room.tour.unsupported') }}</p>
               <div class="mt-2 flex gap-2">
                 <UButton size="xl" color="neutral" variant="soft" icon="i-lucide-arrow-left" :label="t('room.tour.back')" @click="close" />
@@ -85,6 +101,12 @@
                  with it), download -->
             <template v-else>
               <p class="text-sm text-white/70">{{ t('room.tour.readyText') }}</p>
+              <!-- TikTok drops text sent with a shared video: the caption is copied for pasting -->
+              <div class="rounded-2xl bg-white/10 p-3 ring-1 ring-white/10">
+                <p class="text-xs text-white/50">{{ t('room.tour.captionHint') }}</p>
+                <p class="mt-1 whitespace-pre-line break-words text-sm text-white/90">{{ postText }}</p>
+                <UButton class="mt-2" size="sm" color="neutral" variant="soft" :icon="copied ? 'i-lucide-check' : 'i-lucide-copy'" :label="copied ? t('room.tour.captionCopied') : t('room.tour.copyCaption')" @click="copyCaption" />
+              </div>
               <div class="flex gap-2">
                 <UButton size="xl" color="neutral" variant="soft" icon="i-lucide-arrow-left" :label="t('room.tour.back')" @click="reset" />
                 <UButton v-if="canShare" size="xl" icon="i-lucide-share" class="flex-1 justify-center" :label="t('room.tour.share')" @click="share" />
@@ -124,6 +146,12 @@ const props = defineProps<{
   siteName: string
   /** A picture of the editor's current view in a light (the preview) */
   still: (light: DaylightState) => Promise<Blob | null>
+  /** The site's address as visitors type it: its own domain, or perlink.to/username */
+  link?: string
+  /** Why the link wouldn't show this room yet (null: it would) */
+  liveIssue?: 'unpublished' | 'hidden' | 'draft' | null
+  /** Saves, switches the room on for visitors and publishes; false if it failed */
+  goLive?: () => Promise<boolean>
 }>()
 /** Open: the editor pauses and hides behind the studio; closing goes back */
 const open = defineModel<boolean>('open', { default: false })
@@ -156,6 +184,9 @@ const styleItems = computed(() => TOUR_STYLES.map(style => ({
   onUpdateChecked: () => (tourStyle.value = style),
 })))
 const withMusic = ref(true)
+const goingLive = ref(false)
+const wentLive = ref(false)
+const copied = ref(false)
 // setup: choosing options; recording: dialog hidden, recording; done: the video
 const phase = ref<'setup' | 'recording' | 'done'>('setup')
 const preparing = ref(false)
@@ -171,7 +202,7 @@ const track = computed(() => (props.room.music?.trackId ? MUSIC_BY_ID[props.room
 // Free plans carry a small Perlink mark
 // Paid plans record without the "Made with Perlink" watermark
 const watermark = computed(() => !PLAN_LIMITS[billing.value?.plan ?? 'free'].cleanVideo)
-const link = computed(() => `perlink.to/${props.username}`)
+const link = computed(() => props.link || `perlink.to/${props.username}`)
 const postText = computed(() => t('room.tour.postText', { link: link.value }))
 
 const DURATIONS = [8, 12, 15]
@@ -197,6 +228,9 @@ let stillImage: HTMLImageElement | null = null
 watch(open, (isOpen) => {
   if (isOpen) {
     caption.value ||= props.siteName
+    // A track registered with Content ID gets videos muted or claimed: off by default
+    withMusic.value = !track.value?.contentId
+    wentLive.value = false
     ensureBilling()
     loadStill()
   } else {
@@ -272,11 +306,14 @@ watch(timeOfDay, applyTime)
 /** Name, link, watermark and the closing card */
 function drawTitles(ctx: CanvasRenderingContext2D, p: number) {
   // Top shade so the text reads on any sky
-  const shade = ctx.createLinearGradient(0, 0, 0, 520)
-  shade.addColorStop(0, 'rgba(0,0,0,0.45)')
+  // (TikTok, Reels and Shorts cover the top ~280 px with their tabs and
+  // icons, the right edge with buttons and the bottom with the caption, so
+  // everything sits below that, centred)
+  const shade = ctx.createLinearGradient(0, 0, 0, 760)
+  shade.addColorStop(0, 'rgba(0,0,0,0.5)')
   shade.addColorStop(1, 'rgba(0,0,0,0)')
   ctx.fillStyle = shade
-  ctx.fillRect(0, 0, WIDTH, 520)
+  ctx.fillRect(0, 0, WIDTH, 760)
 
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -284,16 +321,11 @@ function drawTitles(ctx: CanvasRenderingContext2D, p: number) {
   ctx.shadowColor = 'rgba(0,0,0,0.35)'
   ctx.shadowBlur = 24
   ctx.font = '700 76px Inter, system-ui, sans-serif'
-  ctx.fillText(fit(ctx, caption.value || props.siteName, WIDTH - 140), WIDTH / 2, 230)
+  ctx.fillText(fit(ctx, caption.value || props.siteName, WIDTH - 260), WIDTH / 2, 380)
   ctx.shadowBlur = 0
-  pill(ctx, link.value, WIDTH / 2, 330, 40)
+  pill(ctx, link.value, WIDTH / 2, 480, 40)
 
-  if (watermark.value) {
-    ctx.font = '600 30px Inter, system-ui, sans-serif'
-    ctx.textAlign = 'right'
-    ctx.fillStyle = 'rgba(255,255,255,0.85)'
-    ctx.fillText(t('room.tour.madeWith'), WIDTH - 48, 84)
-  }
+  if (watermark.value) madeWith(ctx, 572, 1)
 
   // Closing card over the last second and a half
   const end = duration.value ? Math.max(0, Math.min(1, (p * duration.value - (duration.value - 1.5)) / 0.6)) : 0
@@ -306,8 +338,21 @@ function drawTitles(ctx: CanvasRenderingContext2D, p: number) {
     ctx.font = '600 58px Inter, system-ui, sans-serif'
     ctx.fillText(t('room.tour.visit'), WIDTH / 2, HEIGHT / 2 - 70)
     pill(ctx, link.value, WIDTH / 2, HEIGHT / 2 + 40, 52)
+    if (watermark.value) madeWith(ctx, HEIGHT / 2 + 160, end)
     ctx.globalAlpha = 1
   }
+}
+
+/** "Made with Perlink", small and centred */
+function madeWith(ctx: CanvasRenderingContext2D, y: number, alpha: number) {
+  ctx.globalAlpha = alpha
+  ctx.font = '600 32px Inter, system-ui, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillStyle = 'rgba(255,255,255,0.9)'
+  ctx.shadowColor = 'rgba(0,0,0,0.45)'
+  ctx.shadowBlur = 12
+  ctx.fillText(t('room.tour.madeWith'), WIDTH / 2, y)
+  ctx.shadowBlur = 0
 }
 
 function fit(ctx: CanvasRenderingContext2D, text: string, max: number) {
@@ -690,7 +735,28 @@ function download() {
   a.click()
 }
 
+async function copyCaption() {
+  try {
+    await navigator.clipboard.writeText(postText.value)
+    copied.value = true
+    setTimeout(() => (copied.value = false), 4000)
+  } catch {}
+}
+
+async function putLive() {
+  if (!props.goLive) return
+  goingLive.value = true
+  try {
+    wentLive.value = await props.goLive()
+  } finally {
+    goingLive.value = false
+  }
+}
+
 async function share() {
+  // Copied first (not awaited, so the share sheet still opens from the tap):
+  // TikTok and Reels drop the text that comes with a shared video
+  copyCaption()
   try {
     await navigator.share({ files: [videoFile()], text: postText.value })
   } catch {
@@ -703,6 +769,7 @@ function reset() {
   if (videoUrl.value) URL.revokeObjectURL(videoUrl.value)
   videoUrl.value = ''
   videoBlob.value = null
+  copied.value = false
   progress.value = 0
   phase.value = 'setup'
   nextTick(drawPreview)

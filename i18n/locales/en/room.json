@@ -380,7 +380,18 @@
         "dive": "Fly in",
         "crane": "Pull out",
         "ground": "Low angle"
-      }
+      },
+      "notLive": {
+        "unpublished": "Your site isn’t published yet. People who tap the link in your video will find nothing.",
+        "hidden": "Your 3D room isn’t switched on for visitors. People who open the link won’t see it.",
+        "draft": "Your room has unpublished changes. People who open the link will see the old version."
+      },
+      "goLive": "Put the room live",
+      "wentLive": "Your room is live. Viewers will see exactly this.",
+      "copyCaption": "Copy caption",
+      "captionCopied": "Caption copied: paste it into your TikTok post",
+      "captionHint": "Post caption (with your room’s link):",
+      "musicClaim": "This track is registered with Content ID: the video may be muted or claimed on YouTube and TikTok. Pick another track."
     },
     "guestbook": {
       "label": "Guestbook",

@@ -607,7 +607,7 @@
     >
       {{ t('room.hint.firstRun') }}
     </p>
-    <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" :still="videoStill" />
+    <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" :still="videoStill" :link="videoLink" :live-issue="liveIssue" :go-live="goLive" />
   </div>
 </template>
 
@@ -639,6 +639,10 @@ const props = defineProps<{
   /** Open the room video dialog as soon as the editor is up */
   autoRecord?: boolean
   shopAccent?: string
+  /** For the room video: the site's address, and whether that link shows this room yet */
+  videoLink?: string
+  liveIssue?: 'unpublished' | 'hidden' | 'draft' | null
+  goLive?: () => Promise<boolean>
 }>()
 
 const productOptions = computed(() => (props.products ?? []).map(p => ({ value: p.id, label: p.name })))

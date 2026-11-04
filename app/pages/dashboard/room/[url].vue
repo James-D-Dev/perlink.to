@@ -23,6 +23,9 @@
       :products="products"
       :auto-record="autoRecord"
       :shop-accent="bioPage.themeConfig.colors?.primary"
+      :video-link="videoLink"
+      :live-issue="liveIssue"
+      :go-live="goLive"
       @back="goBack"
       @save="save()"
       @publish="publish"
@@ -58,7 +61,8 @@ useHead({ title: () => t('room.page.title', { name: username.value }) })
 const loading = ref(true)
 const saving = ref(false)
 const publishing = ref(false)
-const bioPage = ref<{ username: string; title?: string | null; themeConfig: Partial<ThemeConfig>; blocks?: BioBlock[] } | null>(null)
+type EditedSite = { username: string; title?: string | null; themeConfig: Partial<ThemeConfig>; blocks?: BioBlock[]; isPublished?: boolean; hasDraft?: boolean }
+const bioPage = ref<EditedSite | null>(null)
 // Products the room's product stands can show
 const products = computed(() => pageProducts(bioPage.value?.blocks).map(p => p.product))
 const room = ref<RoomConfig>(createDefaultRoom())
@@ -68,10 +72,11 @@ const dirty = computed(() => JSON.stringify(room.value) !== savedSnapshot.value)
 
 async function load() {
   try {
-    const response = await $fetch<{ success: boolean; bioPage: { username: string; title?: string | null; themeConfig: Partial<ThemeConfig>; blocks?: BioBlock[] } }>(
+    const response = await $fetch<{ success: boolean; bioPage: EditedSite }>(
       `/api/admin/bio/${username.value}`,
     )
     bioPage.value = response.bioPage
+    loadDomain()
     room.value = normalizeRoom(response.bioPage.themeConfig?.room)
     savedSnapshot.value = JSON.stringify(room.value)
   } catch (error) {
@@ -91,7 +96,7 @@ async function save(options: { silent?: boolean } = {}): Promise<boolean> {
     const themeConfig = { ...bioPage.value.themeConfig, room: room.value }
     // Saved as a draft on live sites; Publish makes it visible
     const response = await $fetch<{ bioPage?: { hasDraft?: boolean } }>(`/api/admin/bio/${username.value}`, { method: 'PUT' as const, body: { themeConfig, draft: true } })
-    bioPage.value = { ...bioPage.value, themeConfig }
+    bioPage.value = { ...bioPage.value, themeConfig, hasDraft: !!response?.bioPage?.hasDraft }
     savedSnapshot.value = JSON.stringify(room.value)
     if (!options.silent) toast.add({ title: response?.bioPage?.hasDraft ? t('room.toast.savedDraft') : t('room.toast.saved'), color: 'success' })
     saveRoomPicture()
@@ -115,24 +120,56 @@ async function saveRoomPicture() {
   }
 }
 
-async function publish() {
+async function publish(): Promise<boolean> {
   publishing.value = true
   try {
     // Publishing saves first; only the publish result gets a toast
-    if (!(await save({ silent: true }))) return
+    if (!(await save({ silent: true }))) return false
     await $fetch(`/api/admin/bio/${username.value}/publish`, { method: 'POST' as const })
+    if (bioPage.value) bioPage.value = { ...bioPage.value, isPublished: true, hasDraft: false }
     toast.add({
       title: t('room.toast.published'),
       description: t('room.toast.publishedText', { name: username.value }),
       color: 'success',
       actions: [{ label: t('room.toast.view'), onClick: () => { window.open(`/${username.value}`, '_blank') } }],
     })
+    return true
   } catch (error: any) {
-    if (useUpgradePrompt().fromError(error)) return
+    if (useUpgradePrompt().fromError(error)) return false
     toast.add({ title: t('room.toast.publishFailed'), description: error?.data?.statusMessage, color: 'error' })
+    return false
   } finally {
     publishing.value = false
   }
+}
+
+// ---------- Room video: its link must open this very room ----------
+
+/** The site's own domain once it's active, else its perlink.to address */
+const customDomain = ref<string | null>(null)
+async function loadDomain() {
+  try {
+    const res = await $fetch<{ domain: { hostname: string; status: string } | null }>(`/api/admin/bio/${username.value}/domain`)
+    customDomain.value = res.domain?.status === 'active' ? res.domain.hostname : null
+  } catch {}
+}
+const videoLink = computed(() => customDomain.value ?? `perlink.to/${username.value}`)
+
+/** Visitors see the room when the page opens in 3D or shows the room button */
+const roomShown = (theme?: Partial<ThemeConfig>) => theme?.pageMode === '3d' || !!theme?.roomButton
+/** Why the link wouldn't show the room in the video yet */
+const liveIssue = computed<'unpublished' | 'hidden' | 'draft' | null>(() => {
+  const site = bioPage.value
+  if (!site) return null
+  if (site.isPublished === false) return 'unpublished'
+  if (!roomShown(site.themeConfig)) return 'hidden'
+  return site.hasDraft || dirty.value ? 'draft' : null
+})
+/** Switches the room on for visitors (a button on the page) if it's off, and publishes */
+async function goLive() {
+  if (!bioPage.value) return false
+  if (!roomShown(bioPage.value.themeConfig)) bioPage.value = { ...bioPage.value, themeConfig: { ...bioPage.value.themeConfig, roomButton: true } }
+  return publish()
 }
 
 const confirm = useConfirm()

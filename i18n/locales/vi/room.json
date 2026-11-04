@@ -380,7 +380,18 @@
         "dive": "Bay vào",
         "crane": "Từ trong ra",
         "ground": "Góc thấp"
-      }
+      },
+      "notLive": {
+        "unpublished": "Trang của bạn chưa được đăng. Người xem video bấm vào link sẽ không thấy gì.",
+        "hidden": "Phòng 3D chưa bật cho khách. Người xem video vào link sẽ không thấy phòng.",
+        "draft": "Phòng có thay đổi chưa đăng. Người xem video vào link sẽ thấy bản cũ."
+      },
+      "goLive": "Đăng phòng lên trang",
+      "wentLive": "Phòng đã lên trang. Người xem video sẽ thấy đúng như vậy.",
+      "copyCaption": "Copy mô tả",
+      "captionCopied": "Đã copy mô tả, dán vào bài đăng TikTok nhé",
+      "captionHint": "Mô tả bài đăng (có link phòng):",
+      "musicClaim": "Bài nhạc này đã đăng ký bản quyền Content ID: video có thể bị tắt tiếng hoặc bị báo bản quyền trên YouTube, TikTok. Nên chọn bài khác."
     },
     "guestbook": {
       "label": "Sổ lưu bút",
