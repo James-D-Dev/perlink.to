@@ -1,8 +1,10 @@
 <template>
-  <!-- A letter on ruled paper. Sealed, it waits in an envelope with a wax
-       seal in the page's accent. A tap cracks the seal, the flap swings
-       open, the letter slides out and unfolds, and its lines appear one by
-       one, as if being read. The page music starts with that same tap -->
+  <!-- A letter on ruled paper. Sealed, it waits in an envelope closed with
+       a heart-shaped wax seal in the page's accent. A tap makes the heart
+       beat and lift off in a little burst of hearts, the flap swings open,
+       the letter slides out and opens up, and its lines appear one by one,
+       as if being read, while a few hearts float up. The page music starts
+       with that same tap -->
   <section ref="root" class="letter relative" :class="[`letter--${paper}`, { 'letter--opening': phase !== 'sealed' }]">
     <!-- The letter itself -->
     <article v-if="!sealed || phase === 'open'" class="paper relative px-6 pb-7 pt-8 sm:px-8" :class="{ 'paper--reveal': revealing }">
@@ -29,6 +31,13 @@
       </button>
     </article>
 
+    <!-- A few hearts drifting up as the letter opens -->
+    <span v-if="floating" class="float-layer" aria-hidden="true">
+      <svg v-for="h in FLOAT" :key="h.x" class="float-heart" viewBox="0 0 24 24" :style="{ left: `${h.x}%`, width: `${h.size}px`, animationDelay: `${h.delay}ms`, color: accent, '--drift': `${h.drift}px` }">
+        <path :d="HEART" fill="currentColor" />
+      </svg>
+    </span>
+
     <!-- The envelope -->
     <Transition name="envelope-out">
       <button
@@ -48,10 +57,16 @@
         </span>
         <span class="env-front" aria-hidden="true" />
         <span class="env-flap" aria-hidden="true" />
-        <!-- Wax seal, in two halves that break apart -->
+        <!-- Wax seal: a heart that beats, then lifts off in a burst of small hearts -->
         <span class="seal" aria-hidden="true">
-          <span class="seal-half seal-half--left" :style="sealStyle"><UIcon name="i-lucide-heart" class="seal-icon" /></span>
-          <span class="seal-half seal-half--right" :style="sealStyle"><UIcon name="i-lucide-heart" class="seal-icon" /></span>
+          <span class="seal-wax" :style="sealStyle">
+            <svg viewBox="0 0 24 24" class="seal-icon"><path :d="HEART" fill="currentColor" /></svg>
+          </span>
+          <span class="burst">
+            <svg v-for="(b, i) in BURST" :key="i" class="burst-heart" viewBox="0 0 24 24" :style="{ '--x': `${b.x}px`, '--y': `${b.y}px`, '--r': `${b.r}deg`, width: `${b.size}px`, color: accent }">
+              <path :d="HEART" fill="currentColor" />
+            </svg>
+          </span>
         </span>
         <span class="label">
           <span v-if="envelopeText" class="block truncate px-6 text-xl leading-tight sm:text-2xl" :style="scriptStyle">{{ envelopeText }}</span>
@@ -99,10 +114,23 @@ const sealStyle = computed<CSSProperties>(() => ({
   color: String(props.accentStyle?.color || '#ffffff'),
 }))
 
+const HEART = 'M12 21s-7.5-4.6-10-9.2C.3 8.6 2.1 4.5 6 4.5c2.3 0 3.7 1.3 6 3.6 2.3-2.3 3.7-3.6 6-3.6 3.9 0 5.7 4.1 4 7.3C19.5 16.4 12 21 12 21z'
+// Small hearts flying out of the seal, and drifting up over the open letter
+const BURST = [
+  { x: -46, y: -38, r: -24, size: 12 }, { x: 44, y: -42, r: 20, size: 14 }, { x: -58, y: 6, r: -12, size: 10 },
+  { x: 60, y: 2, r: 16, size: 11 }, { x: -26, y: -64, r: -8, size: 9 }, { x: 24, y: -66, r: 10, size: 10 },
+  { x: -36, y: 40, r: -30, size: 8 }, { x: 38, y: 36, r: 26, size: 9 },
+]
+const FLOAT = [
+  { x: 8, size: 14, delay: 0, drift: 18 }, { x: 22, size: 10, delay: 500, drift: -12 }, { x: 40, size: 16, delay: 250, drift: 10 },
+  { x: 58, size: 11, delay: 800, drift: -16 }, { x: 74, size: 15, delay: 350, drift: 14 }, { x: 90, size: 10, delay: 650, drift: -10 },
+]
+
 // ---------- Opening ----------
-// sealed → cracking (seal breaks) → flap (swings open) → rising (letter
-// slides out) → open (envelope drops away, lines appear)
-type Phase = 'sealed' | 'cracking' | 'flap' | 'rising' | 'open'
+// sealed → popping (the heart beats and lifts off) → flap (swings open) →
+// rising (letter slides out) → open (envelope drops away, lines appear)
+type Phase = 'sealed' | 'popping' | 'flap' | 'rising' | 'open'
+const floating = ref(false)
 const phase = ref<Phase>('sealed')
 // Lines fade in one after another once the letter is out
 const revealing = ref(false)
@@ -119,18 +147,21 @@ function openLetter() {
     phase.value = 'open'
     return
   }
-  phase.value = 'cracking'
-  later(380, () => (phase.value = 'flap'))
-  later(1000, () => (phase.value = 'rising'))
-  later(1700, () => growTo(() => {
+  phase.value = 'popping'
+  later(650, () => (phase.value = 'flap'))
+  later(1250, () => (phase.value = 'rising'))
+  later(2050, () => growTo(() => {
     revealing.value = true
+    floating.value = true
     phase.value = 'open'
   }))
+  later(6500, () => (floating.value = false))
 }
 
 function foldBack() {
   timers.forEach(clearTimeout)
   revealing.value = false
+  floating.value = false
   growTo(() => (phase.value = 'sealed'))
 }
 
@@ -225,7 +256,7 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
   border-radius: 10px;
   background: var(--paper);
   box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.3);
-  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.8s ease;
 }
 .peek-line { height: 6px; border-radius: 3px; background: currentColor; opacity: 0.13; }
 .env-front {
@@ -234,50 +265,82 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
   border-radius: 20px;
   /* The pocket: side and bottom flaps meeting below the middle */
   background:
-    linear-gradient(to top right, transparent 49.6%, rgb(0 0 0 / 0.05) 50%, transparent 50.4%) left bottom / 50% 100% no-repeat,
-    linear-gradient(to top left, transparent 49.6%, rgb(0 0 0 / 0.05) 50%, transparent 50.4%) right bottom / 50% 100% no-repeat,
-    var(--env);
+    linear-gradient(to top right, transparent 49.6%, rgb(0 0 0 / 0.06) 50%, transparent 50.6%) left bottom / 50% 60% no-repeat,
+    linear-gradient(to top left, transparent 49.6%, rgb(0 0 0 / 0.06) 50%, transparent 50.6%) right bottom / 50% 60% no-repeat,
+    linear-gradient(to bottom, color-mix(in srgb, var(--env) 92%, white), var(--env));
   z-index: 2;
-  clip-path: polygon(0 30%, 50% 64%, 100% 30%, 100% 100%, 0 100%);
+  clip-path: polygon(0 0, 50% 56%, 100% 0, 100% 100%, 0 100%);
 }
 .env-flap {
   position: absolute;
   inset: 0 0 auto 0;
-  height: 52%;
+  height: 58%;
   border-radius: 20px 20px 0 0;
+  backface-visibility: visible;
+  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.12));
   background: linear-gradient(to bottom, var(--env-dark), color-mix(in srgb, var(--env-dark) 88%, black));
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 96%);
   transform-origin: top;
   z-index: 3;
   /* Goes behind the letter halfway through its swing */
-  transition: transform 0.6s cubic-bezier(0.55, 0, 0.3, 1), filter 0.6s ease, z-index 0s linear 0.3s;
+  transition: transform 0.65s cubic-bezier(0.55, 0, 0.3, 1), filter 0.65s ease, z-index 0s linear 0.32s;
 }
 .stage--sealed:hover .env-flap { transform: rotateX(-12deg); }
 .seal {
   position: absolute;
-  top: 52%;
+  top: 56%;
   left: 50%;
   z-index: 4;
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   transform: translate(-50%, -50%);
-  transition: transform 0.3s ease;
 }
-.stage--sealed:hover .seal { transform: translate(-50%, -50%) scale(1.06) rotate(-6deg); }
-.seal-half {
+.seal-wax {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 9999px;
-  box-shadow: inset 0 -3px 6px rgb(0 0 0 / 0.2), inset 0 2px 4px rgb(255 255 255 / 0.25), 0 6px 14px -4px rgb(0 0 0 / 0.4);
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.6, 1), opacity 0.45s ease;
+  /* A wax blob: slightly uneven edge, glossy top, soft shadow */
+  border-radius: 48% 52% 50% 50% / 52% 48% 52% 48%;
+  box-shadow:
+    inset 0 -4px 7px rgb(0 0 0 / 0.22),
+    inset 0 3px 5px rgb(255 255 255 / 0.3),
+    0 0 0 3px color-mix(in srgb, currentColor 0%, rgb(0 0 0 / 0.06)),
+    0 8px 16px -6px rgb(0 0 0 / 0.45);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-/* A jagged crack down the middle */
-.seal-half--left { clip-path: polygon(0 0, 52% 0, 46% 22%, 55% 40%, 45% 60%, 54% 78%, 48% 100%, 0 100%); }
-.seal-half--right { clip-path: polygon(52% 0, 100% 0, 100% 100%, 48% 100%, 54% 78%, 45% 60%, 55% 40%, 46% 22%); }
-.seal-icon { width: 24px; height: 24px; }
+.seal-icon { width: 26px; height: 26px; filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.18)); }
+.stage--sealed .seal-wax { animation: heartbeat 2.4s ease-in-out infinite; }
+.stage--sealed:hover .seal-wax { animation-duration: 1.2s; }
+@keyframes heartbeat {
+  0%, 40%, 100% { transform: scale(1); }
+  10% { transform: scale(1.09); }
+  20% { transform: scale(0.98); }
+  30% { transform: scale(1.06); }
+}
+/* Popping: one strong beat, then the seal lifts off and fades */
+.stage:not(.stage--sealed) .seal-wax { animation: seal-off 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes seal-off {
+  0% { transform: scale(1); opacity: 1; }
+  35% { transform: scale(1.22); opacity: 1; }
+  100% { transform: translateY(-34px) scale(0.6) rotate(-10deg); opacity: 0; }
+}
+.burst { position: absolute; inset: 0; pointer-events: none; }
+.burst-heart {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.2);
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.15));
+}
+.stage:not(.stage--sealed) .burst-heart { animation: burst 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.18s forwards; }
+@keyframes burst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1) rotate(var(--r)); }
+}
 .label {
   position: absolute;
   inset: auto 0 7% 0;
@@ -288,15 +351,13 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
   transition: opacity 0.3s ease;
 }
 
-/* Cracking: the halves fall apart */
-.stage:not(.stage--sealed) .seal-half--left { transform: translate(-14px, 26px) rotate(-28deg); opacity: 0; }
-.stage:not(.stage--sealed) .seal-half--right { transform: translate(14px, 30px) rotate(24deg); opacity: 0; }
+/* Once tapped: the label fades */
 .stage:not(.stage--sealed) .label { opacity: 0; }
 /* Flap: swings up and over, behind the letter */
 .stage--flap .env-flap,
-.stage--rising .env-flap { transform: rotateX(180deg); filter: brightness(0.92); z-index: 0; }
-/* Rising: the letter slides up out of the pocket */
-.stage--rising .peek { transform: translateY(-46%); }
+.stage--rising .env-flap { transform: rotateX(180deg); filter: brightness(0.94) drop-shadow(0 -2px 4px rgb(0 0 0 / 0.1)); z-index: 0; }
+/* Rising: the letter slides up out of the pocket, lifting towards the reader */
+.stage--rising .peek { transform: translateY(-42%) scale(1.03); box-shadow: 0 18px 30px -12px rgb(0 0 0 / 0.35); }
 
 /* Leaving: the envelope drops away below the unfolding letter */
 .envelope-out-leave-active {
@@ -304,7 +365,7 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
   inset: auto 0 0 0;
   transition: transform 0.7s cubic-bezier(0.55, 0, 0.3, 1), opacity 0.55s ease;
 }
-.envelope-out-leave-to { transform: translateY(40%) scale(0.92); opacity: 0; }
+.envelope-out-leave-to { transform: translateY(30%) scale(0.94); opacity: 0; }
 .envelope-out-enter-active { transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
 .envelope-out-enter-from { opacity: 0; transform: translateY(12px) scale(0.98); }
 
@@ -321,8 +382,25 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
 }
 .letter--opening .paper { animation: unfold 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: top center; }
 @keyframes unfold {
-  from { opacity: 0; transform: perspective(900px) rotateX(-14deg) translateY(-18px) scale(0.94); }
-  to { opacity: 1; transform: none; }
+  0% { opacity: 0.6; transform: perspective(1000px) rotateX(-24deg) translateY(-10px) scale(0.9); }
+  60% { opacity: 1; transform: perspective(1000px) rotateX(3deg) scale(1.01); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* Hearts drifting up over the opened letter */
+.float-layer { position: absolute; inset: 0; z-index: 5; overflow: visible; pointer-events: none; }
+.float-heart {
+  position: absolute;
+  bottom: 12%;
+  opacity: 0;
+  animation: float-up 3.6s ease-out forwards;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
+}
+@keyframes float-up {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  15% { opacity: 0.85; }
+  50% { transform: translate(var(--drift), -140px) scale(1) rotate(8deg); }
+  100% { opacity: 0; transform: translate(calc(var(--drift) * -0.5), -300px) scale(0.9) rotate(-6deg); }
 }
 .paper--reveal .line,
 .paper--reveal .fold { animation: line-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -343,7 +421,8 @@ const delay = (n: number): CSSProperties => ({ animationDelay: `${150 + n * 230}
 .paper--reveal .flourish path { animation: draw 1s ease both; animation-delay: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
-  .env-flap, .seal, .seal-half, .peek, .label { transition: none; }
+  .env-flap, .seal, .seal-wax, .peek, .label { transition: none; animation: none !important; }
+  .float-layer, .burst { display: none; }
   .letter--opening .paper, .paper--reveal .line, .paper--reveal .fold, .paper--reveal .flourish path { animation: none; }
   .envelope-out-leave-active, .envelope-out-enter-active { transition: none; }
 }
