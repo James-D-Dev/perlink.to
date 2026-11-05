@@ -43,7 +43,9 @@ export default defineEventHandler(async (event) => {
     try {
       const result = await loadSites(open)
       sites = (result.results ?? []).filter(site => siteIndexable({ username: site.username, title: site.title, bio: site.bio, blockCount: site.block_count }))
-      posts = (await loadPosts(open.replace('access_hash', 'b.access_hash'))).results ?? []
+      // Blog posts only of sites that are indexed themselves
+      const indexed = new Set(sites.map(site => site.username))
+      posts = ((await loadPosts(open.replace('access_hash', 'b.access_hash'))).results ?? []).filter(post => indexed.has(post.username))
       break
     } catch (error) {
       console.error('[sitemap] Failed to load published sites', error)
