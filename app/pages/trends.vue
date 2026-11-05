@@ -54,6 +54,7 @@ useSeoMeta({
   ogUrl: 'https://perlink.to/trends',
   ogImage: 'https://perlink.to/images/og.jpg',
   twitterCard: 'summary_large_image',
+  twitterSite: X_HANDLE,
 })
 useHead({ link: [{ rel: 'canonical', href: 'https://perlink.to/trends' }] })
 

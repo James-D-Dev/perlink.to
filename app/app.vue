@@ -36,6 +36,7 @@ useSeoMeta({
   ogImage: "https://perlink.to/images/og.jpg",
   ogSiteName: "Perlink",
   twitterCard: "summary_large_image",
+  twitterSite: X_HANDLE,
 });
 
 

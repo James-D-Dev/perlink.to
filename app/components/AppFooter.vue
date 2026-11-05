@@ -21,7 +21,12 @@
     <div class="border-t border-line">
       <div class="mx-auto flex max-w-6xl flex-col gap-2 border-x border-line px-5 py-6 text-xs text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <p>© {{ year }} Perlink. {{ copy.footer.rights }}</p>
-        <p>{{ copy.footer.contact }}: <a :href="`mailto:${SUPPORT_EMAIL}`" class="hover:text-ink">{{ SUPPORT_EMAIL }}</a></p>
+        <div class="flex items-center gap-4">
+          <p>{{ copy.footer.contact }}: <a :href="`mailto:${SUPPORT_EMAIL}`" class="hover:text-ink">{{ SUPPORT_EMAIL }}</a></p>
+          <a :href="X_URL" target="_blank" rel="me noopener" aria-label="Perlink on X" title="Perlink on X" class="inline-flex size-5 items-center justify-center transition-colors hover:text-ink">
+            <UIcon name="i-simple-icons-x" class="size-3.5" />
+          </a>
+        </div>
       </div>
     </div>
   </footer>

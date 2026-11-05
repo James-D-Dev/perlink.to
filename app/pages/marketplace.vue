@@ -149,6 +149,7 @@ useSeoMeta({
   ogUrl: `${SITE}/marketplace`,
   ogImage: `${SITE}/images/og.jpg`,
   twitterCard: 'summary_large_image',
+  twitterSite: X_HANDLE,
 })
 useHead({ link: [{ rel: 'canonical', href: `${SITE}/marketplace` }] })
 

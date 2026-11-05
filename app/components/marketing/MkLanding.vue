@@ -253,6 +253,7 @@ useSeoMeta({
   ogImageWidth: 1200,
   ogImageHeight: 630,
   twitterCard: 'summary_large_image',
+  twitterSite: X_HANDLE,
   twitterTitle: () => c.value.meta.title,
   twitterDescription: () => c.value.meta.description,
   twitterImage: `${SITE_URL}/images/og.jpg`,
@@ -274,7 +275,7 @@ useHead({
         '@context': 'https://schema.org',
         '@graph': [
           { '@type': 'WebSite', name: 'Perlink', url: pageUrl.value, inLanguage: lang.value, description: c.value.meta.description },
-          { '@type': 'Organization', name: 'Perlink', url: SITE_URL, logo: `${SITE_URL}/web-app-manifest-512x512.png` },
+          { '@type': 'Organization', name: 'Perlink', url: SITE_URL, logo: `${SITE_URL}/web-app-manifest-512x512.png`, email: SUPPORT_EMAIL, sameAs: SOCIAL_PROFILES },
           {
             '@type': 'SoftwareApplication',
             name: 'Perlink',

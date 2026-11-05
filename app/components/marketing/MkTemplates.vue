@@ -124,6 +124,7 @@ useSeoMeta({
   ogSiteName: 'Perlink',
   ogImage: `${SITE}/images/og.jpg`,
   twitterCard: 'summary_large_image',
+  twitterSite: X_HANDLE,
 })
 useHead({
   htmlAttrs: { lang: () => lang.value },

@@ -40,6 +40,7 @@ useSeoMeta({
   ogUrl: 'https://perlink.to/pricing',
   ogImage: 'https://perlink.to/images/og.jpg',
   twitterCard: 'summary_large_image',
+  twitterSite: X_HANDLE,
 })
 useHead({ link: [{ rel: 'canonical', href: 'https://perlink.to/pricing' }] })
 
