@@ -2,7 +2,7 @@
 
 > Perlink (perlink.to) is a link in bio and personal website builder. Anyone can make a mobile-first page at perlink.to/yourname from a template, with links, menus, products, photos and a blog, and show the same page as a small 3D room visitors can walk around. Free to start; English and Vietnamese.
 
-Updated: 2026-11-05
+Updated: 2026-11-06
 
 Perlink is made for creators, restaurants, cafés, hotels, small shops, portfolios and events. A page is built in a drag-and-drop editor from blocks, and every template comes with sample content, a matching theme and a matching 3D room.
 
@@ -41,6 +41,18 @@ Key facts:
 
 - [How to make a personal website](https://perlink.to/how-to-make-a-personal-website): what to put on it, how to write the about section, getting found on Google, six steps ([Vietnamese](https://perlink.to/vi/cach-tao-website-ca-nhan))
 - [How to make a link in bio page](https://perlink.to/how-to-make-a-link-in-bio): which links to include, tips, adding it to Instagram and TikTok ([Vietnamese](https://perlink.to/vi/cach-tao-link-bio))
+
+## 3D portfolio guides
+
+- [3D portfolio for designers](https://perlink.to/3d-portfolio/designer): what design hirers look for, case studies, dressing the room ([Vietnamese](https://perlink.to/vi/portfolio-3d/designer))
+- [3D portfolio for developers](https://perlink.to/3d-portfolio/developer): projects to show, GitHub on the laptop, when to build in Three.js yourself ([Vietnamese](https://perlink.to/vi/portfolio-3d/lap-trinh-vien))
+- [3D portfolio for photographers](https://perlink.to/3d-portfolio/photographer): curating, preparing files, the room as a gallery wall ([Vietnamese](https://perlink.to/vi/portfolio-3d/nhiep-anh-gia))
+- [3D portfolio for architects](https://perlink.to/3d-portfolio/architect): built photos, renders and drawings, one project per wall ([Vietnamese](https://perlink.to/vi/portfolio-3d/kien-truc-su))
+- [3D portfolio for students](https://perlink.to/3d-portfolio/student): a first portfolio with little experience ([Vietnamese](https://perlink.to/vi/portfolio-3d/sinh-vien))
+- [3D portfolio examples](https://perlink.to/3d-portfolio/examples): well-known 3D portfolios on the web and what makes them work ([Vietnamese](https://perlink.to/vi/portfolio-3d/vi-du))
+- [3D portfolio vs a regular portfolio](https://perlink.to/3d-portfolio/vs-traditional-portfolio) ([Vietnamese](https://perlink.to/vi/portfolio-3d/so-voi-portfolio-thuong))
+- [Portfolio websites with 3D effects](https://perlink.to/3d-portfolio/portfolio-website-with-3d-effects): kinds of effect, cost in load time, performance rules ([Vietnamese](https://perlink.to/vi/portfolio-3d/website-portfolio-hieu-ung-3d))
+- [Make a 3D portfolio for free](https://perlink.to/3d-portfolio/free): what is free on Perlink and the other free routes ([Vietnamese](https://perlink.to/vi/portfolio-3d/mien-phi))
 
 ## Templates
 

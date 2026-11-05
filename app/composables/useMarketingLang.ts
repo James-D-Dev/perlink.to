@@ -1,6 +1,7 @@
 import { MARKETING_COPY, type MarketingLang } from '~/data/marketingCopy'
 import { ABOUT_PAIR, GUIDE_PAIRS } from '~/data/guides'
 import { USE_CASE_PAIRS } from '~/data/useCases'
+import { PORTFOLIO_PAIRS } from '~/data/portfolio3d/paths'
 
 /**
  * Language of a marketing page, plus its copy and links that stay in the same
@@ -18,6 +19,7 @@ export const LANG_PAIRS: [string, string][] = [
   ['/', '/vi'],
   ['/templates', '/vi/templates'],
   ['/3d-portfolio', '/vi/portfolio-3d'],
+  ...PORTFOLIO_PAIRS,
   ['/affiliates', '/vi/cong-tac-vien'],
   ...USE_CASE_PAIRS,
   ...GUIDE_PAIRS,

@@ -4,6 +4,7 @@ import { getAccountPlan } from '../../utils/plan'
 import { PLAN_LIMITS, showsBranding } from '#shared/plans'
 import { cleanTracking } from '#shared/tracking'
 import { gatedBioPage, siteGate } from '../../utils/siteAccess'
+import { siteIndexable } from '../../utils/siteIndexing'
 import { isBot, parseDevice, hashIP, parseReferrer, parseUTMParams, detectSourceType } from '../../services/analytics'
 
 export default defineEventHandler(async (event) => {
@@ -42,7 +43,14 @@ export default defineEventHandler(async (event) => {
   bioPage.themeConfig = { ...bioPage.themeConfig, tracking: tracking ?? undefined }
   // Template sample photos saved as JPG (sites made before their WebP
   // versions) go out as the WebP ones, a third of the size
-  const page = JSON.parse(JSON.stringify({ ...publicBioPage(bioPage), showBranding: showsBranding(ownerPlan?.plan) })
+  // Thin or untouched-template sites ask search engines not to index them (utils/siteIndexing)
+  const indexable = siteIndexable({
+    username: bioPage.username,
+    title: bioPage.title,
+    bio: bioPage.bio,
+    blockCount: (bioPage.blocks ?? []).filter(block => !block.hidden).length,
+  })
+  const page = JSON.parse(JSON.stringify({ ...publicBioPage(bioPage), showBranding: showsBranding(ownerPlan?.plan), indexable })
     .replace(/(\/images\/templates\/photos\/[a-z0-9-]+)\.jpg/g, '$1.webp'))
 
   // For bots: track as bot view (deduplicated per bot per day), then return data

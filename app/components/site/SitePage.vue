@@ -23,7 +23,7 @@
 
       <Link v-if="!error" rel="canonical" :href="metaUrl" />
       <!-- An address nobody uses, or a private site: not for search results -->
-      <Meta v-if="error || gate?.kind === 'password'" name="robots" content="noindex" />
+      <Meta v-if="error || gate?.kind === 'password' || bioPage?.indexable === false" name="robots" content="noindex" />
       <!-- Google Search Console ownership check (paid plans) -->
       <Meta v-if="tracking?.gsc" name="google-site-verification" :content="tracking.gsc" />
       <Meta name="mobile-web-app-capable" content="yes" />
@@ -145,6 +145,8 @@ interface ApiBioPage {
   viewCount: number;
   blocks?: BioBlock[];
   showBranding?: boolean;
+  /** False for thin or untouched-template sites: noindex (server/utils/siteIndexing) */
+  indexable?: boolean;
   /** Set when the site is private right now: only name, photo and colours come with it */
   gate?: { kind: "password" } | { kind: "schedule"; opensAt: string };
 }

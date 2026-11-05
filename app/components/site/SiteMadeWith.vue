@@ -59,5 +59,8 @@ const parts = computed(() => siteT(props.lang, 'madeWith').split('Perlink'))
 const before = computed(() => parts.value[0]?.trim() ?? '')
 const after = computed(() => parts.value.slice(1).join('Perlink').trim())
 
-const href = computed(() => `https://perlink.to/?utm_source=site&utm_medium=${props.variant === 'pill' ? 'room-badge' : 'badge'}&utm_campaign=${encodeURIComponent(props.username)}`)
+// From a 3D room, to the page about 3D portfolios (in the site's language);
+// from a page, to the home page
+const target = computed(() => (props.variant === 'pill' ? (props.lang === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio') : '/'))
+const href = computed(() => `https://perlink.to${target.value}?utm_source=site&utm_medium=${props.variant === 'pill' ? 'room-badge' : 'badge'}&utm_campaign=${encodeURIComponent(props.username)}`)
 </script>

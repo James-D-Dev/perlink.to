@@ -1,15 +1,17 @@
 import { PAGE_TEMPLATES } from '../../app/data/pageTemplates'
 import { USE_CASE_PAIRS } from '../../app/data/useCases'
 import { ABOUT_PAIR, GUIDE_PAIRS } from '../../app/data/guides'
+import { PORTFOLIO_PAIRS } from '../../app/data/portfolio3d/paths'
 import { getDB } from '../utils/db'
+import { siteIndexable } from '../utils/siteIndexing'
 
 const SITE = 'https://perlink.to'
 
 /** Public marketing pages, then every published site and its blog posts */
-const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/3d-portfolio', '/vi/portfolio-3d', '/affiliates', '/vi/cong-tac-vien', '/marketplace', ...USE_CASE_PAIRS.flat(), ...GUIDE_PAIRS.flat(), ...ABOUT_PAIR, '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
+const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/3d-portfolio', '/vi/portfolio-3d', ...PORTFOLIO_PAIRS.flat(), '/affiliates', '/vi/cong-tac-vien', '/marketplace', ...USE_CASE_PAIRS.flat(), ...GUIDE_PAIRS.flat(), ...ABOUT_PAIR, '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
 
 /** Pages with an address per language, linked to each other (hreflang) */
-const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/3d-portfolio', '/vi/portfolio-3d'], ['/affiliates', '/vi/cong-tac-vien'], ...USE_CASE_PAIRS, ...GUIDE_PAIRS, ABOUT_PAIR]
+const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/3d-portfolio', '/vi/portfolio-3d'], ...PORTFOLIO_PAIRS, ['/affiliates', '/vi/cong-tac-vien'], ...USE_CASE_PAIRS, ...GUIDE_PAIRS, ABOUT_PAIR]
 function languages(path: string) {
   const pair = LANG_PAIRS.find(p => p.includes(path))
   if (!pair) return ''
@@ -25,18 +27,27 @@ const escapeXml = (value: string) => value.replace(/[<>&'"]/g, c => ({ '<': '&lt
 export default defineEventHandler(async (event) => {
   let sites: { username: string; updated_at: string | null }[] = []
   let posts: { username: string; slug: string; updated_at: string | null }[] = []
-  try {
-    const result = await getDB(event)
-      .prepare('SELECT username, updated_at FROM bio_pages WHERE is_published = 1 ORDER BY updated_at DESC LIMIT 5000')
-      .all<{ username: string; updated_at: string | null }>()
-    sites = result.results ?? []
-    const postRows = await getDB(event)
-      .prepare(`SELECT b.username, p.slug, p.updated_at FROM posts p JOIN bio_pages b ON b.id = p.bio_page_id
-        WHERE p.status = 'published' AND b.is_published = 1 ORDER BY p.published_at DESC LIMIT 5000`)
-      .all<{ username: string; slug: string; updated_at: string | null }>()
-    posts = postRows.results ?? []
-  } catch (error) {
-    console.error('[sitemap] Failed to load published sites', error)
+  // Published, open sites that pass the bar for indexing (utils/siteIndexing);
+  // password-protected ones stay out. If the password column is missing (a
+  // database without that migration), the same query without it
+  const visibleBlocks = `(SELECT COUNT(*) FROM json_each(CASE WHEN json_valid(blocks) THEN blocks ELSE '[]' END) WHERE COALESCE(json_extract(value, '$.hidden'), 0) = 0)`
+  const loadSites = (open: string) => getDB(event)
+    .prepare(`SELECT username, title, bio, updated_at, ${visibleBlocks} AS block_count
+      FROM bio_pages WHERE is_published = 1 ${open} ORDER BY updated_at DESC LIMIT 5000`)
+    .all<{ username: string; title: string | null; bio: string | null; updated_at: string | null; block_count: number }>()
+  const loadPosts = (open: string) => getDB(event)
+    .prepare(`SELECT b.username, p.slug, p.updated_at FROM posts p JOIN bio_pages b ON b.id = p.bio_page_id
+      WHERE p.status = 'published' AND b.is_published = 1 ${open} ORDER BY p.published_at DESC LIMIT 5000`)
+    .all<{ username: string; slug: string; updated_at: string | null }>()
+  for (const open of ['AND access_hash IS NULL', '']) {
+    try {
+      const result = await loadSites(open)
+      sites = (result.results ?? []).filter(site => siteIndexable({ username: site.username, title: site.title, bio: site.bio, blockCount: site.block_count }))
+      posts = (await loadPosts(open.replace('access_hash', 'b.access_hash'))).results ?? []
+      break
+    } catch (error) {
+      console.error('[sitemap] Failed to load published sites', error)
+    }
   }
   const lastmod = (value: string | null) => (value ? `<lastmod>${new Date(value).toISOString()}</lastmod>` : '')
 
