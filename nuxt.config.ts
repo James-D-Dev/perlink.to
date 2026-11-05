@@ -201,7 +201,8 @@ export default defineNuxtConfig({
     prerender: { autoSubfolderIndex: false },
     compressPublicAssets: true,
     minify: true,
-    timing: true,
+    // No Server-Timing header: it listed ~100 chunk names on every page
+    timing: false,
     cloudflare: {
       deployConfig: true,
       nodeCompat: true,

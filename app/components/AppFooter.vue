@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { ABOUT_PAIR, GUIDES } from '~/data/guides'
 import { USE_CASES } from '~/data/useCases'
 
 const year = new Date().getFullYear()
@@ -58,6 +59,8 @@ const columns = computed(() => {
         { label: f.marketplace, to: '/marketplace' },
         { label: f.faq, to: anchor('faq') },
         { label: f.affiliates, to: lang.value === 'vi' ? '/vi/cong-tac-vien' : '/affiliates' },
+        ...GUIDES.map(guide => ({ label: guide[lang.value].title, to: guide.path[lang.value] })),
+        { label: f.about, to: lang.value === 'vi' ? ABOUT_PAIR[1] : ABOUT_PAIR[0] },
       ],
     },
     {

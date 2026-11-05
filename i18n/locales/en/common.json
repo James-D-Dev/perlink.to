@@ -95,6 +95,26 @@
       {
         "q": "What happens to my page if I downgrade?",
         "a": "Your page stays online at the same address."
+      },
+      {
+        "q": "Is there a free trial of the paid plans?",
+        "a": "Yes. Every new account can try Plus free for 7 days, with no payment details. When the trial ends you go back to Free unless you choose a plan."
+      },
+      {
+        "q": "Can I get my money back?",
+        "a": "Yes. Every payment comes with a 7-day money-back guarantee: email support{'@'}perlink.to within 7 days and you get a full refund, no questions asked. The details are in our refund policy at perlink.to/refund."
+      },
+      {
+        "q": "Can I use my own domain?",
+        "a": "Yes, on Plus (up to 3 domains) or Max (up to 20). Your site keeps its perlink.to/yourname address as well, so links you've already shared keep working."
+      },
+      {
+        "q": "What does a live site mean?",
+        "a": "Plans count sites that are published. Drafts are unlimited on every plan, so you can try as many templates as you like and publish the ones you need."
+      },
+      {
+        "q": "Which plan should I choose?",
+        "a": "Free is enough for one link in bio page or personal site. Starter adds Pro themes, pixels and Search Console, password-protected pages and three live sites. Plus is for a business or creator with their own domain and up to ten sites. Max is for agencies and chains running many sites, and includes every 3D room pack."
       }
     ]
   }

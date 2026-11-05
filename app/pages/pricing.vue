@@ -42,7 +42,19 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
   twitterSite: X_HANDLE,
 })
-useHead({ link: [{ rel: 'canonical', href: 'https://perlink.to/pricing' }] })
+useHead({
+  link: [{ rel: 'canonical', href: 'https://perlink.to/pricing' }],
+  // The app with each plan's price, and the questions below
+  script: () => [{
+    type: 'application/ld+json',
+    innerHTML: jsonLd([
+      perlinkOrganization(),
+      perlinkApp(description.value),
+      breadcrumbs([{ name: 'Perlink', url: PERLINK_URL }, { name: title.value, url: `${PERLINK_URL}/pricing` }]),
+      { '@type': 'WebPage', '@id': `${PERLINK_URL}/pricing`, url: `${PERLINK_URL}/pricing`, name: title.value, description: description.value, about: { '@id': PERLINK_APP_ID }, isPartOf: { '@id': PERLINK_WEBSITE_ID } },
+    ]),
+  }],
+})
 
 // Questions and answers in the visitor's language
 const faq = computed(() =>

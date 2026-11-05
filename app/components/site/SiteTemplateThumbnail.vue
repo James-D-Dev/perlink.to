@@ -47,7 +47,12 @@ const props = withDefaults(defineProps<{
 
 
 const box = ref<HTMLElement | null>(null)
-const shown = ref(!props.lazy)
+// Marketing samples (sample) are drawn in the browser only: rendered on the
+// server, their made-up menus, prices and headings made up most of the words
+// and headings search engines read on our own pages. Their wrappers hydrate
+// on visible, so each one is built only as it nears the screen.
+const shown = ref(!props.lazy && !props.sample)
+if (props.sample && !props.lazy) onMounted(() => { shown.value = true })
 if (props.lazy) {
   useIntersectionObserver(box, ([entry], observer) => {
     if (!entry?.isIntersecting) return

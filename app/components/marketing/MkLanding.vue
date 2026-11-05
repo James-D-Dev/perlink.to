@@ -67,6 +67,7 @@
                 :alt="c.hero.worldAlt(world.title)"
                 class="absolute inset-0 size-full object-cover"
                 :loading="i === 0 ? 'eager' : 'lazy'"
+                :fetchpriority="i === 0 ? 'high' : 'low'"
               >
             </TransitionGroup>
             <div class="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-gradient-to-t from-black/55 to-transparent p-5 text-white sm:flex-row sm:items-end sm:justify-between md:p-7">
@@ -271,22 +272,11 @@ useHead({
   script: () => [
     {
       type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@graph': [
-          { '@type': 'WebSite', name: 'Perlink', url: pageUrl.value, inLanguage: lang.value, description: c.value.meta.description },
-          { '@type': 'Organization', name: 'Perlink', url: SITE_URL, logo: `${SITE_URL}/web-app-manifest-512x512.png`, email: SUPPORT_EMAIL, sameAs: SOCIAL_PROFILES },
-          {
-            '@type': 'SoftwareApplication',
-            name: 'Perlink',
-            url: SITE_URL,
-            applicationCategory: 'WebApplication',
-            operatingSystem: 'Any',
-            description: c.value.meta.description,
-            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-          },
-        ],
-      }),
+      innerHTML: jsonLd([
+        perlinkWebsite(),
+        perlinkOrganization(c.value.meta.description),
+        perlinkApp(c.value.meta.description),
+      ]),
     },
   ],
 })

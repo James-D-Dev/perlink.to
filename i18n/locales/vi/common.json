@@ -95,6 +95,26 @@
       {
         "q": "Hạ gói thì trang của tôi có sao không?",
         "a": "Trang vẫn hoạt động ở đúng địa chỉ cũ."
+      },
+      {
+        "q": "Các gói trả phí có dùng thử miễn phí không?",
+        "a": "Có. Mỗi tài khoản mới được dùng thử gói Plus miễn phí 7 ngày, không cần thông tin thanh toán. Hết thời gian dùng thử, tài khoản trở về gói Miễn phí nếu bạn không chọn gói."
+      },
+      {
+        "q": "Tôi có được hoàn tiền không?",
+        "a": "Có. Mọi khoản thanh toán đều được hoàn tiền trong 7 ngày: gửi email tới support{'@'}perlink.to trong vòng 7 ngày là được hoàn toàn bộ, không cần lý do. Chi tiết ở chính sách hoàn tiền tại perlink.to/refund."
+      },
+      {
+        "q": "Có dùng tên miền riêng được không?",
+        "a": "Được, với gói Plus (tối đa 3 tên miền) hoặc Max (tối đa 20). Trang của bạn vẫn giữ địa chỉ perlink.to/tên-bạn, nên các link đã chia sẻ vẫn hoạt động."
+      },
+      {
+        "q": "\"Trang đang hoạt động\" nghĩa là gì?",
+        "a": "Các gói chỉ tính những trang đã xuất bản. Bản nháp không giới hạn ở mọi gói, nên bạn có thể thử bao nhiêu mẫu tuỳ thích và chỉ xuất bản trang cần dùng."
+      },
+      {
+        "q": "Nên chọn gói nào?",
+        "a": "Gói Miễn phí đủ cho một trang link bio hoặc trang cá nhân. Starter có thêm theme Pro, pixel và Search Console, trang có mật khẩu và ba trang hoạt động. Plus dành cho cửa hàng hoặc creator dùng tên miền riêng, tối đa mười trang. Max dành cho agency và chuỗi cửa hàng chạy nhiều trang, kèm mọi gói phòng 3D."
       }
     ]
   }
