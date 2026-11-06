@@ -239,6 +239,17 @@ function onViewerMounted() {
   setTimeout(() => (roomLoading.value = false), loaderWaitMs());
 }
 
+// Opened as the 2D page: once the browser is idle, fetch the 3D viewer's
+// code (three.js and the room), so tapping "3D room" doesn't wait for the
+// download on top of building the room
+onMounted(() => {
+  if (!room.value || !show2d.value) return;
+  const prefetch = () => import("~/components/room/RoomViewer.vue").catch(() => {});
+  const idle = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
+  if (idle) idle(prefetch, { timeout: 4000 });
+  else setTimeout(prefetch, 2500);
+});
+
 // Bio page view tracking is now handled server-side in /api/bio/[username].get.ts
 
 // The owner's pixels and Google Analytics (paid plans). The server only sends
