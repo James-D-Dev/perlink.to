@@ -114,7 +114,7 @@
         <h2 class="mk-display text-3xl sm:text-4xl">{{ text.ctaTitle }}</h2>
         <p class="mt-4 text-base leading-relaxed text-ink-muted md:text-lg">{{ text.ctaText }}</p>
         <div class="mt-8">
-          <MarketingMkClaimForm />
+          <MarketingMkClaimForm :topic="['designer', 'developer', 'photographer', 'architect', 'student'].includes(topic.id) ? topic.id : 'portfolio'" />
         </div>
       </div>
       <p class="mt-14 text-sm font-medium text-ink">{{ more.related }}</p>

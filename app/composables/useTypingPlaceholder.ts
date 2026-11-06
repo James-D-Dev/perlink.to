@@ -7,14 +7,75 @@ const EXAMPLES: Record<string, string[]> = {
   vi: ['ten-cua-ban', 'minh-anh', 'quan-ca-phe', 'tiem-banh-nho', 'studio-mai', 'ha-nails'],
 }
 
+/** Addresses that fit the page's topic (a wedding page suggests a couple's names) */
+const TOPIC_EXAMPLES: Record<string, Record<'en' | 'vi', string[]>> = {
+  wedding: {
+    en: ['linh-and-nam', 'anna-and-james', 'our-wedding', 'mia-loves-tom', 'the-nguyens-2026'],
+    vi: ['linh-va-nam', 'minh-anh-va-huy', 'dam-cuoi-tu-ha', 'ngoc-loves-quan', 'thiep-cuoi-lan-tuan'],
+  },
+  birthday: {
+    en: ['happy-birthday-mai', 'anna-turns-30', 'birthday-lily', 'for-mom-60'],
+    vi: ['chuc-mung-sinh-nhat-mai', 'sinh-nhat-be-na', 'mung-me-60-tuoi', 'happy-birthday-lan'],
+  },
+  valentine: {
+    en: ['for-lan', 'be-my-valentine', 'mia-and-tom', 'love-you-anna'],
+    vi: ['gui-em-lan', 'valentine-cua-anh', 'minh-va-ha', 'yeu-em-ngoc'],
+  },
+  'qr-menu': {
+    en: ['sunny-cafe', 'pho-corner', 'the-bakehouse', 'green-tea-bar'],
+    vi: ['quan-ca-phe', 'pho-ba-lan', 'tiem-banh-nho', 'tra-sua-may'],
+  },
+  homestay: {
+    en: ['pine-hill-homestay', 'sea-breeze-villa', 'dalat-garden-house', 'old-town-stay'],
+    vi: ['homestay-doi-thong', 'villa-bien-xanh', 'nha-vuon-da-lat', 'phong-co-hoi-an'],
+  },
+  'link-in-bio': {
+    en: ['anna-smith', 'mia-yoga', 'chef-tom', 'studio-lumi'],
+    vi: ['minh-anh', 'ha-nails', 'bep-cua-tom', 'studio-mai'],
+  },
+  personal: {
+    en: ['anna-smith', 'james-lee', 'minh-tran', 'hello-mia'],
+    vi: ['nguyen-minh-anh', 'tran-tuan', 'le-thu-ha', 'xin-chao-mai'],
+  },
+  portfolio: {
+    en: ['anna-designs', 'minh-builds', 'lumi-photo', 'studio-arch', 'mia-portfolio'],
+    vi: ['minh-design', 'tuan-dev', 'mai-photo', 'kts-hoang', 'portfolio-cua-ha'],
+  },
+  designer: {
+    en: ['anna-designs', 'studio-lumi', 'mia-ui', 'pixel-tom'],
+    vi: ['minh-design', 'ha-ui-ux', 'studio-mai', 'thiet-ke-cua-lan'],
+  },
+  developer: {
+    en: ['minh-builds', 'dev-anna', 'tom-codes', 'james-dev'],
+    vi: ['tuan-dev', 'lap-trinh-minh', 'code-cua-ha', 'dev-hoang'],
+  },
+  photographer: {
+    en: ['lumi-photo', 'anna-shoots', 'tom-in-frame', 'mia-film'],
+    vi: ['mai-photo', 'chup-anh-tuan', 'anh-cuoi-ha', 'film-cua-lan'],
+  },
+  architect: {
+    en: ['studio-arch', 'anna-architect', 'tom-spaces', 'mia-interiors'],
+    vi: ['kts-hoang', 'kien-truc-minh', 'noi-that-ha', 'studio-kts-lan'],
+  },
+  student: {
+    en: ['anna-student', 'minh-portfolio', 'tom-class-of-2027', 'mia-cv'],
+    vi: ['minh-sinh-vien', 'ha-portfolio', 'cv-cua-tuan', 'lan-k66'],
+  },
+}
+
 /**
- * A placeholder that types out example addresses, holds each a moment, then
+ * A placeholder that types out example addresses (the topic's, when it has
+ * its own), holds each a moment, then
  * deletes it and types the next. Stops while `paused` (something is typed in,
  * so the placeholder isn't showing), and stays on the first example for
  * people who prefer reduced motion.
  */
-export function useTypingPlaceholder(lang: MaybeRefOrGetter<string>, paused: MaybeRefOrGetter<boolean> = false) {
-  const examples = computed(() => EXAMPLES[toValue(lang)] ?? EXAMPLES.en!)
+export function useTypingPlaceholder(lang: MaybeRefOrGetter<string>, paused: MaybeRefOrGetter<boolean> = false, topic?: MaybeRefOrGetter<string | undefined>) {
+  const examples = computed(() => {
+    const language = toValue(lang) === 'vi' ? 'vi' : 'en'
+    const forTopic = TOPIC_EXAMPLES[toValue(topic) ?? '']
+    return forTopic?.[language] ?? EXAMPLES[language]!
+  })
   // The first example in full until the page is live (also what the server renders)
   const text = ref(examples.value[0]!)
   let index = 0

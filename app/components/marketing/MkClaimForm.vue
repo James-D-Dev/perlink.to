@@ -26,13 +26,17 @@
 <script setup lang="ts">
 // "perlink.to/yourname" claim box. Signed-in users go straight to setup;
 // others sign in first and continue there.
-withDefaults(defineProps<{ dark?: boolean }>(), { dark: false })
+const props = withDefaults(defineProps<{
+  dark?: boolean
+  /** The page's topic, for example addresses that fit it (useTypingPlaceholder) */
+  topic?: string
+}>(), { dark: false, topic: undefined })
 
 const { loggedIn } = useUserSession()
 const { copy, lang } = useMarketingLang()
 const name = ref('')
 // Types out example names, brands and shops while the box is empty
-const placeholder = useTypingPlaceholder(lang, () => !!name.value)
+const placeholder = useTypingPlaceholder(lang, () => !!name.value, () => props.topic)
 const error = ref('')
 
 function claim() {

@@ -7,7 +7,7 @@
           <h1 class="mk-display text-[40px] sm:text-6xl">{{ text.title }}</h1>
           <p class="mt-5 text-lg leading-relaxed text-ink-muted">{{ text.intro }}</p>
           <div class="mt-8">
-            <MarketingMkClaimForm />
+            <MarketingMkClaimForm topic="portfolio" />
           </div>
           <p class="mt-4 text-sm text-ink-muted">
             {{ text.note }} · <a href="#live-room" class="underline decoration-line underline-offset-4 hover:text-ink">{{ text.tryLink }}</a>
@@ -246,7 +246,7 @@
         <h2 class="mk-display text-3xl sm:text-4xl">{{ text.ctaTitle }}</h2>
         <p class="mt-4 text-base leading-relaxed text-ink-muted md:text-lg">{{ text.ctaText }}</p>
         <div class="mt-8">
-          <MarketingMkClaimForm />
+          <MarketingMkClaimForm topic="portfolio" />
         </div>
       </div>
     </MarketingMkSection>

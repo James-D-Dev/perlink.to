@@ -62,7 +62,7 @@
         <h2 class="mk-display text-3xl sm:text-4xl">{{ text.ctaTitle }}</h2>
         <p class="mt-4 text-base leading-relaxed text-ink-muted md:text-lg">{{ text.ctaText }}</p>
         <div class="mt-8">
-          <MarketingMkClaimForm />
+          <MarketingMkClaimForm :topic="id === 'personal-website' ? 'personal' : id" />
         </div>
       </div>
       <ul class="mt-12 flex flex-wrap gap-2">

@@ -7,7 +7,7 @@
           <h1 class="mk-display text-[40px] sm:text-6xl">{{ text.title }}</h1>
           <p class="mt-5 text-lg leading-relaxed text-ink-muted">{{ text.intro }}</p>
           <div class="mt-8">
-            <MarketingMkClaimForm />
+            <MarketingMkClaimForm :topic="id" />
           </div>
           <p class="mt-4 text-sm text-ink-muted">{{ text.note }}</p>
         </div>
