@@ -85,6 +85,19 @@
       "taxCategory": "Software as a Service (SaaS)",
       "status": "Published",
       "image": "docs/lemon-covers/showroom.png"
+    },
+    {
+      "product": "wedding-pass",
+      "name": "Wedding Pass",
+      "price": 8,
+      "currency": "USD",
+      "pricing": "Single payment",
+      "action": "done (Test mode)",
+      "description": "Everything for your wedding invitation site, paid once: a year of Perlink Starter and the Wedding 3D room pack to keep. Nothing renews.",
+      "taxCategory": "Software as a Service (SaaS)",
+      "status": "Published",
+      "image": "docs/lemon-covers/wedding-pass.png",
+      "note": "The name must contain 'Wedding Pass' (server/utils/lemon.ts). Price matches WEDDING_PASS.priceUsd in shared/plans.ts."
     }
   ]
 }
