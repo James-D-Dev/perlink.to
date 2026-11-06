@@ -2,7 +2,8 @@ import { rememberReferral } from '../../utils/affiliate'
 import { getDB } from '../../utils/db'
 import { getAccountPlan } from '../../utils/plan'
 import { paymentMethods } from '../../utils/billing'
-import { PLAN_LIMITS } from '#shared/plans'
+import { PLAN_LIMITS, PLAN_ORDER, WEDDING_PASS } from '#shared/plans'
+import { paymentProducts, weddingPassByCard } from '../../utils/weddingPass'
 
 // The signed-in user's plan, what it allows, and their recent payments.
 // A 'pending' payment is only an opened checkout (e.g. a look at the crypto
@@ -15,7 +16,7 @@ export default defineEventHandler(async (event) => {
   // A new account remembers the affiliate link it came through
   await rememberReferral(event, user.id)
   const methods = await paymentMethods(event)
-  const [sites, payments, celebrate, subscription] = await Promise.all([
+  const [sites, payments, celebrate, subscription, passByCard] = await Promise.all([
     db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN is_published = 1 THEN 1 ELSE 0 END) AS live FROM bio_pages WHERE user_id = ?').bind(user.id).first<{ n: number; live: number | null }>(),
     db.prepare(`SELECT id, plan, period, amount, amount_usd, method, code, status, created_at, paid_at FROM payments WHERE user_id = ? AND status != 'pending' ORDER BY created_at DESC LIMIT 10`)
       .bind(user.id)
@@ -30,7 +31,9 @@ export default defineEventHandler(async (event) => {
       .bind(user.id)
       .first<{ plan: string; period: string; status: string; renews_at: string | null; ends_at: string | null; portal_url: string | null }>()
       .catch(() => null),
+    weddingPassByCard(event),
   ])
+  const products = await paymentProducts(event, (payments.results ?? []).map(p => p.id))
   return {
     plan: account.plan,
     expiresAt: account.plan === 'free' ? null : account.expiresAt,
@@ -46,13 +49,19 @@ export default defineEventHandler(async (event) => {
     liveSites: sites?.live ?? 0,
     canTrial: !account.trialUsed && account.plan === 'free',
     checkoutEnabled: Object.values(methods).some(Boolean),
+    // The Wedding pass, paid once: how it can be paid, and whether this account would gain from it
+    weddingPass: {
+      bank: methods.bank,
+      card: passByCard,
+      included: PLAN_ORDER.indexOf(account.plan) > PLAN_ORDER.indexOf(WEDDING_PASS.plan),
+    },
     paymentMethods: methods,
     celebrate: celebrate ? { paymentId: celebrate.id, plan: celebrate.plan } : null,
     subscription: subscription && subscription.status !== 'expired'
       ? { plan: subscription.plan, period: subscription.period, status: subscription.status, renewsAt: subscription.renews_at, endsAt: subscription.ends_at, portalUrl: subscription.portal_url }
       : null,
     payments: (payments.results ?? []).map(p => ({
-      id: p.id, plan: p.plan, period: p.period, amount: p.amount, amountUsd: p.amount_usd, method: p.method, code: p.code, status: p.status, createdAt: p.created_at, paidAt: p.paid_at,
+      id: p.id, plan: p.plan, period: p.period, amount: p.amount, amountUsd: p.amount_usd, method: p.method, code: p.code, status: p.status, createdAt: p.created_at, paidAt: p.paid_at, product: products.get(p.id) ?? null,
     })),
   }
 })

@@ -24,7 +24,7 @@
               <div class="flex flex-wrap items-center gap-2">
                 <UBadge :color="STATUS_COLOR[p.status] ?? 'neutral'" variant="soft" :label="STATUS_LABEL[p.status] ?? p.status" />
                 <UBadge color="neutral" variant="subtle" :icon="METHOD_ICON[p.method] ?? 'i-lucide-landmark'" :label="METHOD_LABEL[p.method] ?? 'Bank'" />
-                <span class="font-medium">{{ p.plan.toUpperCase() }} · {{ p.period === 'annual' ? '1 year' : '1 month' }}</span>
+                <span class="font-medium">{{ p.product === 'wedding' ? '💍 Wedding pass' : `${p.plan.toUpperCase()} · ${p.period === 'annual' ? '1 year' : '1 month'}` }}</span>
                 <span class="font-semibold tabular-nums">
                   {{ p.method === 'crypto' ? `$${(p.amountUsd ?? 0).toFixed(2)} ${p.token ?? ''}` : p.method === 'lemon' ? `$${(p.amountUsd ?? 0).toFixed(2)}` : formatVnd(p.amount) }}
                 </span>
@@ -92,6 +92,7 @@ interface Payment {
   id: string
   email: string | null
   plan: string
+  product?: string | null
   period: string
   method: 'bank' | 'crypto' | 'lemon'
   amount: number

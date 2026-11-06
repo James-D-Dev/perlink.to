@@ -483,6 +483,50 @@
         "name": "Garden wedding invitation",
         "description": "Light and modern in sage green: ceremony and reception, your story, dress code, RSVP and photos."
       },
+      "wedding-song-hy": {
+        "name": "Song Hỷ wedding invitation",
+        "description": "Traditional red and gold with the double-happiness sign: both families, the lunar date, ceremony, party, RSVP and a gift QR."
+      },
+      "wedding-dragon-phoenix": {
+        "name": "Dragon & phoenix wedding invitation",
+        "description": "Formal deep red and gold, sent by both sets of parents: send-off, ceremony and party, each on its family’s tab."
+      },
+      "wedding-minimal": {
+        "name": "Minimal wedding invitation",
+        "description": "White space and black type: the date, the place, the evening’s plan and an RSVP."
+      },
+      "wedding-korean": {
+        "name": "Korean-style wedding invitation",
+        "description": "Soft beige, film photos and gentle type: your story, the day and an RSVP."
+      },
+      "wedding-vintage": {
+        "name": "Vintage wedding invitation",
+        "description": "Sepia paper and a wax-sealed letter: the invitation, the date, the venue and a reply card."
+      },
+      "wedding-ao-dai": {
+        "name": "Áo dài wedding invitation",
+        "description": "Modern Vietnamese in ivory and rose: áo dài photos, family ceremony, party, lunar date and RSVP."
+      },
+      "wedding-lotus": {
+        "name": "Lotus wedding invitation",
+        "description": "Lotus pink on leaf green: a letter, the ceremony, a lakeside party, photos, RSVP and a gift QR."
+      },
+      "wedding-beach": {
+        "name": "Beach wedding invitation",
+        "description": "A destination wedding by the sea: travel, where to stay, a sunset ceremony and an RSVP."
+      },
+      "wedding-night-gold": {
+        "name": "Black & gold evening wedding",
+        "description": "An evening reception in black and gold: programme, dress code, photos, RSVP and a gift QR."
+      },
+      "wedding-bilingual": {
+        "name": "Bilingual wedding invitation",
+        "description": "Vietnamese and English side by side: letter, tea ceremony, party, RSVP and gifts."
+      },
+      "wedding-two-families": {
+        "name": "Wedding invitation for both families",
+        "description": "One link with a tab for each family: their ceremony, party, time and address, plus shared photos, RSVP and gifts."
+      },
       "invite-kids-birthday": {
         "name": "Kid’s birthday invitation",
         "description": "A first birthday or kid’s party: countdown, the party plan, the place, RSVP and photos."
@@ -1015,6 +1059,24 @@
         "text": "Your subscription changes from {from} to {to} right away. Lemon Squeezy adjusts the price difference on your next bill.",
         "confirm": "Switch plan",
         "done": "You’re now on {plan}"
+      },
+      "weddingPass": {
+        "name": "Wedding pass",
+        "badge": "Pay once",
+        "title": "Wedding pass",
+        "text": "Everything for your wedding invitation, paid once. No subscription, nothing renews.",
+        "price": "{price} once",
+        "perks": [
+          "A year of Starter: Pro themes, a password or an opening time, room videos without the watermark",
+          "See which guests opened their invitation, and a message when they do",
+          "The Wedding 3D room pack (arch, cake, champagne tower…), yours to keep",
+          "After the year your site stays online on the free plan"
+        ],
+        "buy": "Get the Wedding pass",
+        "included": "Your plan already includes everything in the Wedding pass.",
+        "once": "once",
+        "noRenew": "One payment. Nothing renews.",
+        "history": "Wedding pass"
       }
     },
     "telegram": {
@@ -1151,6 +1213,49 @@
       "rulesLink": "Program rules",
       "forever": "For life",
       "example": "10 friends on Plus annually = {amount} a year for you"
+    },
+    "guests": {
+      "title": "Guests",
+      "nav": "Guests",
+      "intro": "Add your guests and send each one their own link: the envelope greets them by name, and you see who has opened it.",
+      "addTitle": "Add guests",
+      "addHelp": "One name per line, the way it should read on the envelope (e.g. “Uncle Minh and family”).",
+      "addPlaceholder": "Uncle Minh and family\nAnh Tuấn\nChị Lan",
+      "side": "Family",
+      "sideNone": "Both",
+      "sideGroom": "Groom’s side",
+      "sideBride": "Bride’s side",
+      "add": "Add to the list",
+      "added": "{n} guest added | {n} guests added",
+      "statGuests": "Guests",
+      "statOpened": "Opened",
+      "statNotOpened": "Not opened yet",
+      "statReplied": "Replied",
+      "emptyTitle": "No guests yet",
+      "emptyText": "Add the names above. Anyone who opens a link with their name (?to=Name) shows up here too.",
+      "copy": "Copy link",
+      "copied": "Link copied",
+      "copyAll": "Copy all links",
+      "copiedAll": "{n} links copied, one per line",
+      "search": "Search guests",
+      "filterAll": "All",
+      "filterOpened": "Opened",
+      "filterNotOpened": "Not opened",
+      "openedAt": "Opened {date}",
+      "opens": "{n} visit | {n} visits",
+      "letterOpened": "Opened the letter",
+      "notOpened": "Not opened yet",
+      "viaLink": "Came through a link",
+      "rsvpYes": "Coming",
+      "rsvpNo": "Can’t come",
+      "rsvpGuests": "{n} people",
+      "remove": "Remove",
+      "removeConfirm": "Remove {name} from the list?",
+      "lockedTitle": "See who opened their invitation",
+      "lockedText": "{opened} of {total} guests have opened it. The Wedding pass (or any paid plan) shows who, when, and sends you a message the moment a guest opens it.",
+      "lockedButton": "See the Wedding pass",
+      "telegramHint": "Get a message on Telegram when a guest opens the invitation.",
+      "failed": "Couldn’t update the guest list"
     }
   }
 }

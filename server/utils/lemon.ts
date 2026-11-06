@@ -47,6 +47,8 @@ interface Catalog {
   packs: Partial<Record<RoomPackId, string>>
   /** variant → pack */
   packOfVariant: Record<string, RoomPackId>
+  /** The Wedding pass (a one-time product named "Wedding Pass"): its variant */
+  weddingPass?: string
 }
 
 // Looked up once per worker; a new deploy (or a cold start) looks again
@@ -62,8 +64,13 @@ export async function lemonCatalog(event: H3Event, fresh = false): Promise<Catal
   const products = await lemonApi<{ data: JsonApiItem<{ name: string; status: string }>[] }>(event, `/products?filter[store_id]=${storeId}&page[size]=100`)
   const planOfProduct = new Map<string, PaidPlanId>()
   const packOfProduct = new Map<string, RoomPackId>()
+  const passProducts = new Set<string>()
   for (const product of products.data) {
     const name = product.attributes.name.toLowerCase()
+    if (/\bwedding pass\b/.test(name)) {
+      passProducts.add(product.id)
+      continue
+    }
     // Room packs first: "Valentine Room Pack" isn't a plan
     const pack = /\bpack\b/.test(name) ? ROOM_PACKS.find(p => name.includes(p.lemonMatch)) : undefined
     if (pack) {
@@ -77,6 +84,10 @@ export async function lemonCatalog(event: H3Event, fresh = false): Promise<Catal
   const value: Catalog = { storeId, variants: {}, plans: {}, packs: {}, packOfVariant: {} }
   for (const variant of variants.data) {
     // A pack is one price: its published variant, else the product's only (default) one
+    if (passProducts.has(String(variant.attributes.product_id))) {
+      if (variant.attributes.status === 'published' || !value.weddingPass) value.weddingPass = variant.id
+      continue
+    }
     const pack = packOfProduct.get(String(variant.attributes.product_id))
     if (pack) {
       if (variant.attributes.status === 'published' || !value.packs[pack]) value.packs[pack] = variant.id
@@ -128,10 +139,10 @@ export async function createLemonCheckout(event: H3Event, input: { userId: strin
 
 interface SubscriptionAttributes { variant_id: number; status: string; urls?: { customer_portal?: string | null } }
 
-/** A one-time checkout for a room pack, tagged with the account so the webhook can hand it over */
-export async function createLemonPackCheckout(event: H3Event, input: { userId: string; email?: string | null; name?: string | null; pack: RoomPackId; redirectUrl: string; affiliate?: string | null }) {
-  const { storeId, packs } = await lemonCatalog(event)
-  const variantId = packs[input.pack]
+/** A one-time checkout for a room pack (or the Wedding pass), tagged with the account so the webhook can hand it over */
+export async function createLemonPackCheckout(event: H3Event, input: { userId: string; email?: string | null; name?: string | null; pack?: RoomPackId; product?: 'wedding'; redirectUrl: string; affiliate?: string | null }) {
+  const { storeId, packs, weddingPass } = await lemonCatalog(event)
+  const variantId = input.product === 'wedding' ? weddingPass : input.pack ? packs[input.pack] : undefined
   if (!variantId) return null
   const res = await lemonApi<{ data: JsonApiItem<{ url: string }> }>(event, '/checkouts', {
     method: 'POST',
@@ -142,7 +153,7 @@ export async function createLemonPackCheckout(event: H3Event, input: { userId: s
           checkout_data: {
             email: input.email || undefined,
             name: input.name || undefined,
-            custom: { user_id: input.userId, pack: input.pack, ...(input.affiliate ? { aff: input.affiliate } : {}) },
+            custom: { user_id: input.userId, ...(input.product ? { product: input.product } : { pack: input.pack }), ...(input.affiliate ? { aff: input.affiliate } : {}) },
           },
           product_options: { redirect_url: input.redirectUrl, enabled_variants: [Number(variantId)] },
           checkout_options: { embed: false },

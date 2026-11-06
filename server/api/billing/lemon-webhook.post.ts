@@ -1,6 +1,7 @@
 import { getDB } from '../../utils/db'
 import { lemonCatalog, verifyLemonSignature } from '../../utils/lemon'
-import { PERIOD_MONTHS, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { PERIOD_MONTHS, WEDDING_PASS, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { grantWeddingPass, revokeWeddingPass, setPaymentProduct } from '../../utils/weddingPass'
 import { isRoomPackId } from '#shared/roomPacks'
 
 // Lemon Squeezy calls this for subscription events (see docs/billing.md for
@@ -31,7 +32,7 @@ interface OrderAttributes {
   first_order_item?: { variant_id: number }
 }
 interface Payload {
-  meta: { event_name: string; custom_data?: { user_id?: string; plan?: string; period?: string; pack?: string } }
+  meta: { event_name: string; custom_data?: { user_id?: string; plan?: string; period?: string; pack?: string; product?: string } }
   data: { id: string; type: string; attributes: SubscriptionAttributes & InvoiceAttributes & OrderAttributes }
 }
 
@@ -101,6 +102,29 @@ export default defineEventHandler(async (event) => {
   if (payload.data.type === 'orders') {
     const order = payload.data.attributes
     const custom = payload.meta.custom_data
+    // The Wedding pass: a year of Starter and the Wedding pack, once
+    const isPass = custom?.product === 'wedding'
+      || (!!order.first_order_item && (await lemonCatalog(event).catch(() => null))?.weddingPass === String(order.first_order_item.variant_id))
+    if (isPass) {
+      if (!custom?.user_id) return { ok: true }
+      const ref = `lemon:order:${payload.data.id}`
+      if (name === 'order_created' && order.status === 'paid') {
+        const id = crypto.randomUUID()
+        const added = await db.prepare(`INSERT OR IGNORE INTO payments (id, user_id, plan, period, amount, amount_usd, code, method, status, provider_ref, paid_at)
+          VALUES (?, ?, ?, ?, 0, ?, ?, 'lemon', 'paid', ?, datetime('now'))`)
+          .bind(id, custom.user_id, WEDDING_PASS.plan, WEDDING_PASS.period, (order.total_usd ?? 0) / 100, `LS${payload.data.id}`, ref)
+          .run()
+        // Once per order, however often the webhook comes
+        if ((added.meta as { changes?: number }).changes) {
+          await setPaymentProduct(event, id, 'wedding').catch(() => {})
+          await grantWeddingPass(event, custom.user_id, ref)
+        }
+      } else if (name === 'order_refunded' || order.status === 'refunded') {
+        await db.prepare(`UPDATE payments SET status = 'refunded' WHERE provider_ref = ?`).bind(ref).run()
+        await revokeWeddingPass(event, custom.user_id, ref)
+      }
+      return { ok: true }
+    }
     let pack = custom?.pack
     if (!isRoomPackId(pack) && order.first_order_item) {
       pack = (await lemonCatalog(event).catch(() => null))?.packOfVariant[String(order.first_order_item.variant_id)]

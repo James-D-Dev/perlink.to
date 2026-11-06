@@ -49,6 +49,9 @@
           <UTooltip :text="t('dashboard.inbox.open')">
             <UButton :to="`/dashboard/site/${existingBio.username}/inbox`" icon="i-lucide-inbox" color="neutral" variant="ghost" class="hidden sm:inline-flex" :aria-label="t('dashboard.inbox.open')" />
           </UTooltip>
+          <UTooltip :text="t('dashboard.guests.title')">
+            <UButton :to="`/dashboard/site/${existingBio.username}/guests`" icon="i-lucide-users-round" color="neutral" variant="ghost" class="hidden sm:inline-flex" :aria-label="t('dashboard.guests.title')" />
+          </UTooltip>
           <UTooltip :text="t('common.openSite')">
             <UButton :to="`/${existingBio.username}`" target="_blank" icon="i-lucide-external-link" color="neutral" variant="ghost" :aria-label="t('common.openSite')" />
           </UTooltip>
@@ -878,6 +881,7 @@ const shareMenu = computed(() => [
   [
     { label: t("common.analytics"), icon: "i-lucide-chart-column", to: `/dashboard/site/${routeUsername.value}/analytics` },
     { label: t("dashboard.inbox.open"), icon: "i-lucide-inbox", to: `/dashboard/site/${routeUsername.value}/inbox` },
+    { label: t("dashboard.guests.title"), icon: "i-lucide-users-round", to: `/dashboard/site/${routeUsername.value}/guests` },
   ],
 ]);
 

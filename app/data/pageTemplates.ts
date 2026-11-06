@@ -6,6 +6,7 @@ import { MORE_PAGE_TEMPLATES, MORE_VI, RSVP_FIELDS, reviews } from './pageTempla
 import { PERSONAL_CREATIVE_TEMPLATES } from './templatesExtra/personalCreative'
 import { PLACES_LEARNING_TEMPLATES } from './templatesExtra/placesLearning'
 import { BUSINESS_HEALTH_SHOP_TEMPLATES } from './templatesExtra/businessHealthShop'
+import { WEDDING_TEMPLATES } from './templatesExtra/weddings'
 import { COFFEE_TABLE_TOP, DESK_TOP, SAMPLE_ADDRESS, SAMPLE_PHONE, album, links, look, menu, noteCopy, photo, room, social, withIndex, withOwnCopy } from './templateKit'
 
 // Starter pages by industry. Applying a template fills the page with sample
@@ -493,6 +494,7 @@ const BASE_TEMPLATES: PageTemplate[] = [
 export const PAGE_TEMPLATES: PageTemplate[] = [
   ...BASE_TEMPLATES,
   ...MORE_PAGE_TEMPLATES,
+  ...WEDDING_TEMPLATES,
   ...PERSONAL_CREATIVE_TEMPLATES,
   ...PLACES_LEARNING_TEMPLATES,
   ...BUSINESS_HEALTH_SHOP_TEMPLATES,

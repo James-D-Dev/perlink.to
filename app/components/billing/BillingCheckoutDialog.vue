@@ -82,9 +82,9 @@
           </div>
           <p class="mt-4 text-lg font-semibold text-ink">{{ t('dashboard.billing.checkout.cardTitle') }}</p>
           <p class="mt-2 text-3xl font-semibold tabular-nums text-ink">
-            ${{ PLAN_PRICES_USD[plan][period] }}<span class="text-base font-normal text-ink-muted"> / {{ t(period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly') }}</span>
+            ${{ cardPrice }}<span class="text-base font-normal text-ink-muted"> / {{ product ? t('dashboard.billing.weddingPass.once') : t(period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly') }}</span>
           </p>
-          <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.cardRenews') }}</p>
+          <p class="mt-1 text-xs text-ink-muted">{{ product ? t('dashboard.billing.weddingPass.noRenew') : t('dashboard.billing.checkout.cardRenews') }}</p>
           <div class="mt-5 flex items-center gap-3 text-ink-muted" aria-hidden="true">
             <UIcon v-for="brand in CARD_BRANDS" :key="brand" :name="brand" class="size-6" />
           </div>
@@ -153,7 +153,7 @@
         block
         size="lg"
         icon="i-lucide-lock"
-        :loading="openingCard"
+        :loading="openingCard || openingPass"
         :label="t('dashboard.billing.checkout.cardButton')"
         @click="payByCard"
       />
@@ -183,7 +183,7 @@
 <script setup lang="ts">
 import qrcode from 'qrcode-generator'
 import { CRYPTO_NETWORK_BY_ID, CRYPTO_TOKEN_ICONS, type CryptoToken } from '#shared/crypto'
-import { PLAN_PRICES_USD, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { PLAN_PRICES_USD, WEDDING_PASS, type BillingPeriod, type PaidPlanId, type Product } from '#shared/plans'
 import { SUPPORT_EMAIL } from '~/utils/legal'
 
 // Pay for a plan by bank transfer (VietQR, VND) or in USDT / USDC to the
@@ -192,6 +192,8 @@ import { SUPPORT_EMAIL } from '~/utils/legal'
 const props = defineProps<{
   plan: PaidPlanId
   period: BillingPeriod
+  /** The Wedding pass instead of the plan: paid once, its own price */
+  product?: Product
 }>()
 const emit = defineEmits<{ paid: [] }>()
 const open = defineModel<boolean>('open', { default: false })
@@ -207,7 +209,9 @@ interface CryptoInfo { address: string; amountUsd: number; networks: { id: strin
 interface Check { verdict: 'ok' | 'short' | 'none' | 'failed' | 'pending' | 'error' }
 
 const methods = computed<Method[]>(() => {
-  const available: Partial<Record<Method, boolean>> = info.value?.paymentMethods ?? { bank: true, crypto: false }
+  const available: Partial<Record<Method, boolean>> = props.product
+    ? { bank: info.value?.weddingPass?.bank ?? true, card: !!info.value?.weddingPass?.card, crypto: false }
+    : info.value?.paymentMethods ?? { bank: true, crypto: false }
   return (['card', 'bank', 'crypto'] as Method[]).filter(m => available[m])
 })
 const method = ref<Method>('bank')
@@ -234,10 +238,12 @@ watch(networkTokens, (tokens) => {
   if (!tokens.includes(token.value)) token.value = tokens[0] ?? 'USDT'
 })
 
-const planName = computed(() => t(`dashboard.billing.plans.${props.plan}.name`))
-const title = computed(() =>
-  `${t('dashboard.billing.checkout.title', { plan: planName.value })} · ${t(props.period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly')}`,
+const planName = computed(() => (props.product ? t('dashboard.billing.weddingPass.name') : t(`dashboard.billing.plans.${props.plan}.name`)))
+const title = computed(() => props.product
+  ? t('dashboard.billing.checkout.title', { plan: planName.value })
+  : `${t('dashboard.billing.checkout.title', { plan: planName.value })} · ${t(props.period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly')}`,
 )
+const cardPrice = computed(() => (props.product ? WEDDING_PASS.priceUsd : PLAN_PRICES_USD[props.plan][props.period]))
 
 function qrSvg(text: string) {
   const qr = qrcode(0, 'M')
@@ -255,7 +261,19 @@ function copy(text: string) {
 
 // Card: off to Lemon Squeezy's checkout (useCardCheckout)
 const { opening: openingCard, payByCard: openCardCheckout } = useCardCheckout()
-const payByCard = () => openCardCheckout(props.plan, props.period)
+const openingPass = ref(false)
+async function payByCard() {
+  if (!props.product) return openCardCheckout(props.plan, props.period)
+  // The pass is one Lemon Squeezy order, not a subscription
+  openingPass.value = true
+  try {
+    const res = await $fetch<{ url: string }>('/api/billing/wedding-checkout', { method: 'POST' })
+    window.location.href = res.url
+  } catch (error: any) {
+    toast.add({ title: t('dashboard.billing.checkout.failed'), description: error?.data?.statusMessage, color: 'error' })
+    openingPass.value = false
+  }
+}
 
 async function start() {
   // Nothing to set up for card: the checkout opens from the button
@@ -271,7 +289,7 @@ async function start() {
   try {
     const res = await $fetch<{ id: string; code: string; status: string; transfer: Transfer | null; crypto: CryptoInfo | null }>('/api/billing/checkout', {
       method: 'POST',
-      body: { plan: props.plan, period: props.period, method: method.value },
+      body: props.product ? { product: props.product, method: method.value } : { plan: props.plan, period: props.period, method: method.value },
     })
     paymentId.value = res.id
     paymentCode.value = res.code

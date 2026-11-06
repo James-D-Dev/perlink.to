@@ -346,7 +346,7 @@ export const USE_CASES: UseCase[] = [
   {
     id: 'wedding',
     path: { en: '/wedding-website', vi: '/vi/thiep-cuoi-online' },
-    templates: ['wedding-invite', 'invite-wedding-red', 'invite-wedding-garden', 'love-anniversary'],
+    templates: ['wedding-song-hy', 'wedding-two-families', 'wedding-ao-dai', 'wedding-korean', 'wedding-minimal', 'wedding-invite'],
     en: {
       label: 'Wedding website',
       metaTitle: 'Free Wedding Website & Online Invitation with RSVP | Perlink',
@@ -367,7 +367,7 @@ export const USE_CASES: UseCase[] = [
         { icon: 'i-lucide-qr-code', title: 'Gift QR code', text: 'A VietQR bank-transfer code for wedding gifts from guests far away.' },
       ],
       templatesTitle: 'Wedding templates',
-      templatesText: 'An invitation, an event page, a wedding photographer page and a love room.',
+      templatesText: 'Song Hỷ red and gold, one link for both families, áo dài, Korean-style, minimal and more.',
       stepsTitle: 'Invite everyone in three steps',
       steps: [
         { title: 'Pick the wedding template', text: 'Choose an address like perlink.to/linh-and-nam.' },
@@ -403,7 +403,7 @@ export const USE_CASES: UseCase[] = [
         { icon: 'i-lucide-qr-code', title: 'Mã QR mừng cưới', text: 'Mã VietQR để khách ở xa gửi quà mừng qua chuyển khoản.' },
       ],
       templatesTitle: 'Mẫu thiệp cưới',
-      templatesText: 'Thiệp mời cưới, trang sự kiện, trang thợ chụp ảnh cưới và phòng tình yêu.',
+      templatesText: 'Song Hỷ đỏ vàng, một link cho cả nhà trai và nhà gái, áo dài, phong cách Hàn Quốc, tối giản và nhiều mẫu khác.',
       stepsTitle: 'Mời mọi người trong ba bước',
       steps: [
         { title: 'Chọn mẫu thiệp cưới', text: 'Chọn địa chỉ như perlink.to/linh-va-nam.' },

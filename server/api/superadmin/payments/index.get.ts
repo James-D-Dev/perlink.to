@@ -3,6 +3,7 @@ import { requireSuperadmin } from '../../../utils/superadmin'
 import { PAYMENT_SELECT, parseCheck, type PaymentRow } from '../../../utils/paymentReview'
 import { describeCheck } from '../../../utils/cryptoPayments'
 import { CRYPTO_NETWORK_BY_ID } from '#shared/crypto'
+import { paymentProducts } from '../../../utils/weddingPass'
 
 // Superadmin → Payments: waiting for review first, or everything
 export default defineEventHandler(async (event) => {
@@ -12,6 +13,7 @@ export default defineEventHandler(async (event) => {
   const { results } = await getDB(event)
     .prepare(`${PAYMENT_SELECT} ${where} ORDER BY COALESCE(p.submitted_at, p.created_at) DESC LIMIT 200`)
     .all<PaymentRow>()
+  const products = await paymentProducts(event, (results ?? []).map(p => p.id))
   return {
     payments: (results ?? []).map((p) => {
       const check = parseCheck(p)
@@ -20,6 +22,8 @@ export default defineEventHandler(async (event) => {
         email: p.email,
         plan: p.plan,
         period: p.period,
+        /** 'wedding': the Wedding pass */
+        product: products.get(p.id) ?? null,
         method: p.method,
         amount: p.amount,
         amountUsd: p.amount_usd,

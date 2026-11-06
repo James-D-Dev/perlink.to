@@ -314,7 +314,13 @@ export interface BaseBlock {
   name: BlockName;
   index: number;
   hidden: boolean;
+  /** A wedding page for two families: shown only on that side's tab
+   * (Groom's side / Bride's side, or ?side=groom|bride in the link).
+   * No side: shown on both */
+  side?: BlockSide;
 }
+
+export type BlockSide = 'groom' | 'bride';
 
 export interface LinksBlock extends BaseBlock {
   name: 'links';

@@ -65,6 +65,17 @@
           <UButton :disabled="!guestName.trim()" icon="i-lucide-copy" :label="t('blocks.letter.copyLink')" color="neutral" variant="outline" @click="copyGuestLink" />
         </div>
         <p v-if="data.personal !== false && guestName.trim()" class="break-all text-xs text-muted">{{ guestLink }}</p>
+        <!-- The whole list: a link each, and who has opened theirs -->
+        <UButton
+          v-if="data.personal !== false && route.params.url"
+          :to="`/dashboard/site/${String(route.params.url)}/guests`"
+          size="sm"
+          color="neutral"
+          variant="soft"
+          icon="i-lucide-users-round"
+          trailing-icon="i-lucide-arrow-right"
+          :label="t('blocks.letter.guestList')"
+        />
       </div>
     </div>
   </div>

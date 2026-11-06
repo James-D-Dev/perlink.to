@@ -63,6 +63,9 @@
       </div>
     </MarketingMkSection>
 
+    <!-- The wedding page's guides (a separate chunk, only there) -->
+    <LazyMarketingMkWeddingGuides v-if="id === 'wedding'" />
+
     <!-- Questions -->
     <MarketingMkSection :title="more.faqTitle">
       <div class="divide-y divide-line border-y border-line">

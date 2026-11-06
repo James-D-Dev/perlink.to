@@ -12,7 +12,13 @@
         "up": "Move up",
         "down": "Move down",
         "duplicate": "Duplicate",
-        "addBelow": "Add block below"
+        "addBelow": "Add block below",
+        "side": "Shown to",
+        "sideBoth": "Both families",
+        "sideGroom": "Groom's side only",
+        "sideBride": "Bride's side only",
+        "sideBadgeGroom": "Groom",
+        "sideBadgeBride": "Bride"
       }
     },
     "header": {
@@ -487,7 +493,8 @@
       "linkCopied": "Link copied",
       "cover": "On the envelope",
       "coverHelp": "Leave empty to show “For …”.",
-      "coverPlaceholder": "Open when you miss me"
+      "coverPlaceholder": "Open when you miss me",
+      "guestList": "Guest list: a link each, see who opened"
     },
     "event": {
       "title": "Event details",

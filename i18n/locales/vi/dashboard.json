@@ -483,6 +483,50 @@
         "name": "Thiệp cưới sân vườn",
         "description": "Nhẹ nhàng, hiện đại, tông xanh lá: lễ cưới, tiệc tối, câu chuyện, trang phục, xác nhận tham dự."
       },
+      "wedding-song-hy": {
+        "name": "Thiệp cưới Song Hỷ",
+        "description": "Đỏ và vàng truyền thống với chữ Hỷ: thông tin hai gia đình, ngày âm lịch, lễ thành hôn, tiệc cưới, xác nhận tham dự và QR mừng cưới."
+      },
+      "wedding-dragon-phoenix": {
+        "name": "Thiệp cưới Long Phụng",
+        "description": "Trang trọng, đỏ đậm và vàng, lời “Trân trọng kính mời” từ hai bên cha mẹ: lễ vu quy, lễ thành hôn và tiệc cưới, mỗi bên một thẻ."
+      },
+      "wedding-minimal": {
+        "name": "Thiệp cưới tối giản",
+        "description": "Nền trắng, chữ đen, không gì thừa: ngày, địa điểm, lịch trình buổi tối và xác nhận tham dự."
+      },
+      "wedding-korean": {
+        "name": "Thiệp cưới phong cách Hàn Quốc",
+        "description": "Tông be nhẹ nhàng, ảnh film và chữ mềm mại như thiệp studio Seoul: chuyện tình, ngày cưới và xác nhận tham dự."
+      },
+      "wedding-vintage": {
+        "name": "Thiệp cưới vintage",
+        "description": "Giấy ngả màu sepia và lá thư niêm phong sáp kiểu xưa: lời mời, ngày cưới, địa điểm và phiếu hồi âm."
+      },
+      "wedding-ao-dai": {
+        "name": "Thiệp cưới áo dài",
+        "description": "Việt Nam hiện đại, tông ngà và đỏ hồng: ảnh áo dài, lễ rước dâu, lễ gia tiên, tiệc cưới, ngày âm lịch và xác nhận tham dự."
+      },
+      "wedding-lotus": {
+        "name": "Thiệp cưới hoa sen",
+        "description": "Hồng sen trên nền xanh lá, thanh nhã: lá thư, lễ tân hôn, tiệc cưới bên hồ sen, ảnh cưới, xác nhận và QR mừng cưới."
+      },
+      "wedding-beach": {
+        "name": "Thiệp cưới biển",
+        "description": "Đám cưới ở biển đảo: cách di chuyển, chỗ ở, lễ cưới lúc hoàng hôn, tiệc chào mừng và xác nhận tham dự."
+      },
+      "wedding-night-gold": {
+        "name": "Thiệp cưới đen vàng tiệc tối",
+        "description": "Tiệc cưới buổi tối sang trọng tông đen và vàng: chương trình, dress code, ảnh, xác nhận và QR mừng cưới."
+      },
+      "wedding-bilingual": {
+        "name": "Thiệp cưới song ngữ Việt–Anh",
+        "description": "Tiếng Việt và tiếng Anh song song, cho gia đình và bạn bè hai nơi: lá thư, lễ gia tiên, tiệc cưới, xác nhận và quà mừng."
+      },
+      "wedding-two-families": {
+        "name": "Thiệp cưới nhà trai – nhà gái",
+        "description": "Một link, hai thẻ Nhà trai và Nhà gái: giờ, địa điểm lễ và tiệc của từng bên, cùng album ảnh, xác nhận tham dự và QR mừng cưới."
+      },
       "invite-kids-birthday": {
         "name": "Thiệp sinh nhật bé",
         "description": "Thôi nôi hay sinh nhật bé: đếm ngược, chương trình, địa điểm, xác nhận tham dự và ảnh."
@@ -1015,6 +1059,24 @@
         "text": "Gói của bạn đổi từ {from} sang {to} ngay bây giờ. Lemon Squeezy tính phần chênh lệch vào hoá đơn kỳ sau.",
         "confirm": "Đổi gói",
         "done": "Bạn đã chuyển sang gói {plan}"
+      },
+      "weddingPass": {
+        "name": "Gói Đám cưới",
+        "badge": "Trả một lần",
+        "title": "Gói Đám cưới",
+        "text": "Đủ mọi thứ cho thiệp cưới online, trả một lần. Không gia hạn, không trừ tiền hằng tháng.",
+        "price": "{price} một lần",
+        "perks": [
+          "1 năm gói Starter: giao diện Pro, đặt mật khẩu hoặc giờ mở thiệp, video phòng 3D không logo",
+          "Biết khách nào đã mở thiệp, và nhận tin báo ngay khi họ mở",
+          "Bộ phòng Cưới 3D (cổng hoa, bánh cưới, tháp champagne…), dùng mãi mãi",
+          "Hết 1 năm, trang vẫn online ở gói miễn phí"
+        ],
+        "buy": "Mua Gói Đám cưới",
+        "included": "Gói hiện tại của bạn đã có đủ mọi thứ trong Gói Đám cưới.",
+        "once": "một lần",
+        "noRenew": "Trả một lần, không tự gia hạn.",
+        "history": "Gói Đám cưới"
       }
     },
     "telegram": {
@@ -1151,6 +1213,49 @@
       "rulesLink": "Quy định chương trình",
       "forever": "Trọn đời",
       "example": "10 người dùng Plus theo năm = {amount} mỗi năm cho bạn"
+    },
+    "guests": {
+      "title": "Khách mời",
+      "nav": "Khách mời",
+      "intro": "Thêm khách mời và gửi mỗi người một link riêng: phong bì ghi đúng tên họ, và bạn biết ai đã mở thiệp.",
+      "addTitle": "Thêm khách mời",
+      "addHelp": "Mỗi dòng một tên, đúng như muốn ghi trên phong bì (vd. “Cô chú Minh và gia đình”).",
+      "addPlaceholder": "Cô chú Minh và gia đình\nAnh Tuấn\nChị Lan",
+      "side": "Bên",
+      "sideNone": "Cả hai",
+      "sideGroom": "Nhà trai",
+      "sideBride": "Nhà gái",
+      "add": "Thêm vào danh sách",
+      "added": "Đã thêm {n} khách | Đã thêm {n} khách",
+      "statGuests": "Khách mời",
+      "statOpened": "Đã mở",
+      "statNotOpened": "Chưa mở",
+      "statReplied": "Đã xác nhận",
+      "emptyTitle": "Chưa có khách mời",
+      "emptyText": "Thêm tên ở trên. Ai mở link có tên của họ (?to=Tên) cũng sẽ hiện ở đây.",
+      "copy": "Sao chép link",
+      "copied": "Đã sao chép link",
+      "copyAll": "Sao chép tất cả link",
+      "copiedAll": "Đã sao chép {n} link, mỗi dòng một link",
+      "search": "Tìm khách",
+      "filterAll": "Tất cả",
+      "filterOpened": "Đã mở",
+      "filterNotOpened": "Chưa mở",
+      "openedAt": "Mở lúc {date}",
+      "opens": "{n} lần xem | {n} lần xem",
+      "letterOpened": "Đã mở thư mời",
+      "notOpened": "Chưa mở thiệp",
+      "viaLink": "Mở từ link",
+      "rsvpYes": "Sẽ đến",
+      "rsvpNo": "Không đến được",
+      "rsvpGuests": "{n} người",
+      "remove": "Xoá",
+      "removeConfirm": "Xoá {name} khỏi danh sách?",
+      "lockedTitle": "Xem ai đã mở thiệp",
+      "lockedText": "{opened}/{total} khách đã mở thiệp. Gói Đám cưới (hoặc gói trả phí bất kỳ) cho bạn biết là ai, mở lúc nào, và báo ngay khi có khách mở.",
+      "lockedButton": "Xem Gói Đám cưới",
+      "telegramHint": "Nhận tin Telegram khi khách mở thiệp.",
+      "failed": "Không cập nhật được danh sách khách"
     }
   }
 }

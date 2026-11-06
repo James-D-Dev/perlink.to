@@ -1,5 +1,5 @@
 import type { ComputedRef, InjectionKey } from 'vue'
-import type { BioBlock } from '~/types/bio'
+import type { BioBlock, BlockSide } from '~/types/bio'
 
 /** What a block's header can do to the block, provided by BioBlockItem */
 export interface BlockItemActions {
@@ -11,6 +11,8 @@ export interface BlockItemActions {
   duplicate: () => void
   remove: () => void
   toggleHidden: () => void
+  /** Which family's tab it shows on, on a two-family wedding page (none: both) */
+  setSide: (side: BlockSide | undefined) => void
   addBelow: () => void
 }
 

@@ -143,6 +143,8 @@ const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.
 
 function openLetter() {
   if (phase.value !== 'sealed') return
+  // The page counts it for the guest named in the link
+  if (guest.value) window.dispatchEvent(new CustomEvent('perlink:letter-open'))
   if (reducedMotion()) {
     phase.value = 'open'
     return

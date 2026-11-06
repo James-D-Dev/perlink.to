@@ -55,6 +55,9 @@
           </div>
         </div>
 
+        <!-- Paid once, for a wedding site -->
+        <BillingWeddingPass class="mb-8" :auto-open="route.query.pass === 'wedding'" />
+
         <MarketingMkPricing :highlight="highlight" />
 
         <!-- Payments -->
@@ -64,7 +67,8 @@
             <div v-for="p in info.payments" :key="p.id" class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
               <div class="min-w-0">
                 <p class="font-medium text-ink">
-                  {{ t(`dashboard.billing.plans.${p.plan}.name`) }} · {{ t(p.period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly') }}
+                  <template v-if="p.product === 'wedding'">{{ t('dashboard.billing.weddingPass.history') }}</template>
+                  <template v-else>{{ t(`dashboard.billing.plans.${p.plan}.name`) }} · {{ t(p.period === 'annual' ? 'dashboard.billing.checkout.periodAnnual' : 'dashboard.billing.checkout.periodMonthly') }}</template>
                 </p>
                 <p class="text-xs text-ink-muted">{{ formatDate(p.paidAt || p.createdAt) }} · <span class="font-mono">{{ p.code }}</span></p>
               </div>

@@ -2,6 +2,7 @@ import type { BioBlock } from '~/types/bio'
 import type { PageTemplateContent } from './pageTemplates'
 import { MORE_VI } from './pageTemplatesMore'
 import { PERSONAL_CREATIVE_VI } from './templatesExtra/personalCreative'
+import { WEDDINGS_VI } from './templatesExtra/weddings'
 import { PLACES_LEARNING_VI } from './templatesExtra/placesLearning'
 import { BUSINESS_HEALTH_SHOP_VI } from './templatesExtra/businessHealthShop'
 
@@ -142,7 +143,7 @@ const VND_PRICES: Record<string, string> = { '250': '2,500,000', '600': '6,000,0
 function translate<T>(value: T, own: Record<string, string> = {}): T {
   if (typeof value === 'string') {
     // The template's own wording first, then the shared tables
-    return (own[value] ?? VI[value] ?? MORE_VI[value] ?? PERSONAL_CREATIVE_VI[value] ?? PLACES_LEARNING_VI[value] ?? BUSINESS_HEALTH_SHOP_VI[value] ?? value) as T
+    return (own[value] ?? VI[value] ?? MORE_VI[value] ?? PERSONAL_CREATIVE_VI[value] ?? PLACES_LEARNING_VI[value] ?? BUSINESS_HEALTH_SHOP_VI[value] ?? WEDDINGS_VI[value] ?? value) as T
   }
   if (Array.isArray(value)) return value.map(item => translate(item, own)) as T
   if (value && typeof value === 'object') {

@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BioBlock } from '~/types/bio'
+import type { BioBlock, BlockSide } from '~/types/bio'
 import { BLOCK_ITEM_KEY, type BlockItemActions } from '~/utils/blockItem'
 
 // Wraps one block editor and hands its header the actions that need to know
@@ -34,6 +34,7 @@ const emit = defineEmits<{
   duplicate: []
   remove: []
   toggleHidden: []
+  setSide: [side: BlockSide | undefined]
   addBelow: []
 }>()
 
@@ -48,6 +49,7 @@ const actions: BlockItemActions = {
   duplicate: () => emit('duplicate'),
   remove: () => emit('remove'),
   toggleHidden: () => emit('toggleHidden'),
+  setSide: side => emit('setSide', side),
   addBelow: () => emit('addBelow'),
 }
 

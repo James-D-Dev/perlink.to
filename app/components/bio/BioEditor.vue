@@ -47,6 +47,7 @@
             @duplicate="duplicateBlock(block.id)"
             @remove="onRemoveBlock(block.id)"
             @toggle-hidden="toggleHidden(block.id)"
+            @set-side="(side?: BlockSide) => setSide(block.id, side)"
             @add-below="openBlockModal(block.id)"
           >
             <BioBlockSocial
@@ -249,6 +250,7 @@ import type {
   SocialLink,
   ImageAlbumLayout,
   BioBlock,
+  BlockSide,
   VietQRInfo,
 } from "~/types/bio";
 
@@ -373,6 +375,15 @@ function duplicateBlock(blockId: string) {
   localBlocks.value.splice(index + 1, 0, copy);
   emitBlockUpdate();
   emit("focusBlock", copy.id!);
+}
+
+// On a wedding page for two families: the block shows on one side's tab only
+function setSide(blockId: string, side?: BlockSide) {
+  const index = localBlocks.value.findIndex((b) => b.id === blockId);
+  if (index === -1) return;
+  const { side: _old, ...rest } = localBlocks.value[index]!;
+  localBlocks.value[index] = (side ? { ...rest, side } : rest) as BioBlock;
+  emitBlockUpdate();
 }
 
 function toggleHidden(blockId: string) {

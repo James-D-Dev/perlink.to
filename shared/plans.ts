@@ -32,15 +32,17 @@ export interface PlanLimits {
   orders: boolean
   /** Room videos without the Perlink watermark */
   cleanVideo: boolean
+  /** Which guests opened their invitation link, and a message when they do */
+  guestTracking: boolean
 }
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
-  free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50, tracking: false, protect: false, orders: false, cleanVideo: false },
-  starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100, tracking: true, protect: true, orders: true, cleanVideo: true },
-  plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true },
+  free: { sites: 1, customDomain: false, domains: 0, proThemes: false, removeBranding: false, analyticsDays: 30, posts: 50, tracking: false, protect: false, orders: false, cleanVideo: false, guestTracking: false },
+  starter: { sites: 3, customDomain: false, domains: 0, proThemes: true, removeBranding: false, analyticsDays: 90, posts: 100, tracking: true, protect: true, orders: true, cleanVideo: true, guestTracking: true },
+  plus: { sites: 10, customDomain: true, domains: 3, proThemes: true, removeBranding: true, analyticsDays: 365, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true, guestTracking: true },
   // Max: room for agencies and chains, every 3D room pack and priority
   // support (planFeatures)
-  max: { sites: 50, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true },
+  max: { sites: 50, customDomain: true, domains: 20, proThemes: true, removeBranding: true, analyticsDays: 1095, posts: Infinity, tracking: true, protect: true, orders: true, cleanVideo: true, guestTracking: true },
 }
 
 /**
@@ -81,6 +83,23 @@ export const PLAN_PRICES_USD: Record<PaidPlanId, Record<BillingPeriod, number>> 
 /** Whole dollars as "$6", anything else with cents */
 export const formatUsd = (amount: number) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: Number.isInteger(amount) ? 0 : 2, maximumFractionDigits: 2 })}`
 
+/**
+ * The Wedding pass: one payment, no subscription. A year of Starter (Pro
+ * themes, a password or opening time, clean room videos, which guests opened
+ * the invitation) and the Wedding room pack to keep. Couples need a site for
+ * a few months, not a monthly plan; wedding invitation sites in Vietnam sell
+ * for 119k-400k once (2026).
+ */
+export const WEDDING_PASS = {
+  plan: 'starter' as PaidPlanId,
+  period: 'annual' as BillingPeriod,
+  months: 12,
+  price: 199_000,
+  priceUsd: 8,
+  pack: 'wedding' as const,
+}
+export type Product = 'wedding'
+
 export const PERIOD_MONTHS: Record<BillingPeriod, number> = { monthly: 1, annual: 12 }
 
 /** New accounts can try this plan once, for free */
@@ -95,7 +114,7 @@ export const PRO_THEME_IDS = new Set([
   'latte', 'sunset-mesh', 'meadow', 'cotton-candy', 'cyber', 'lixi', 'party',
 ])
 
-export type PlanFeature = 'sites' | 'customDomain' | 'proThemes' | 'removeBranding' | 'tracking' | 'protect' | 'orders' | 'cleanVideo'
+export type PlanFeature = 'sites' | 'customDomain' | 'proThemes' | 'removeBranding' | 'tracking' | 'protect' | 'orders' | 'cleanVideo' | 'guestTracking'
 
 export function isPlanId(value: unknown): value is PlanId {
   return typeof value === 'string' && (PLAN_ORDER as string[]).includes(value)

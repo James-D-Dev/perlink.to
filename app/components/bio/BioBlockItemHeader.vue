@@ -47,6 +47,11 @@
       {{ t('blocks.editor.hiddenBadge') }}
     </span>
 
+    <!-- Shown on one family's tab only (two-family wedding pages) -->
+    <span v-if="side" class="shrink-0 rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
+      {{ side === 'groom' ? t('blocks.editor.menu.sideBadgeGroom') : t('blocks.editor.menu.sideBadgeBride') }}
+    </span>
+
     <!-- Badge/Count (optional) -->
     <slot name="badge" />
 
@@ -111,6 +116,7 @@ const look = computed(() => (props.block ? blockLook(props.block) : null))
 const item = inject(BLOCK_ITEM_KEY, null)
 
 const isHidden = computed(() => item ? !!item.block.value.hidden : !!props.hidden)
+const side = computed(() => item?.block.value.side)
 
 function onToggleHidden() {
   if (item) item.toggleHidden()
@@ -128,6 +134,26 @@ const menuItems = computed(() => {
     [
       ...(repeatable ? [{ label: t('blocks.editor.menu.duplicate'), icon: 'i-lucide-copy', onSelect: item.duplicate }] : []),
       { label: t('blocks.editor.menu.addBelow'), icon: 'i-lucide-plus', onSelect: item.addBelow },
+    ],
+    // A wedding page for two families: this block on one side's tab only
+    [
+      {
+        label: t('blocks.editor.menu.side'),
+        icon: 'i-lucide-users-round',
+        children: ([
+          [undefined, 'sideBoth'],
+          ['groom', 'sideGroom'],
+          ['bride', 'sideBride'],
+        ] as const).map(([value, key]) => ({
+          label: t(`blocks.editor.menu.${key}`),
+          type: 'checkbox' as const,
+          checked: side.value === value,
+          onSelect: (e: Event) => {
+            e.preventDefault()
+            item.setSide(value)
+          },
+        })),
+      },
     ],
     [
       { label: t('common.delete'), icon: 'i-lucide-trash-2', color: 'error' as const, onSelect: item.remove },

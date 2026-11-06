@@ -238,6 +238,28 @@
 
       <!-- Blocks, evenly spaced -->
       <div class="flex flex-col px-4" :style="{ gap: blockGap }">
+        <!-- A wedding page for two families: one tab per side, each showing
+             its own blocks (ceremony at each home) next to the shared ones -->
+        <div
+          v-if="hasSides"
+          role="tablist"
+          class="mx-auto flex w-full max-w-xs gap-1 rounded-full p-1"
+          :style="{ backgroundColor: 'color-mix(in srgb, currentColor 8%, transparent)' }"
+        >
+          <button
+            v-for="option in SIDES"
+            :key="option"
+            type="button"
+            role="tab"
+            :aria-selected="side === option"
+            class="flex-1 rounded-full px-3 py-2 text-sm font-medium transition"
+            :class="side === option ? 'shadow-sm' : 'opacity-70 hover:opacity-100'"
+            :style="side === option ? buttonStyle : undefined"
+            @click="chooseSide(option)"
+          >
+            {{ siteT(siteLang, option === 'groom' ? 'sideGroom' : 'sideBride') }}
+          </button>
+        </div>
         <!-- display: contents, so the wrapper adds no box of its own to the gap layout -->
         <div
           v-for="block in sortedBlocks"
@@ -513,8 +535,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineAsyncComponent, ref, watch, onMounted } from "vue";
-import type { BioData, BioLink, SocialLink, ThemeConfig, BioBlock } from "~/types/bio";
+import { computed, defineAsyncComponent, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import type { BioData, BioLink, SocialLink, ThemeConfig, BioBlock, BlockSide } from "~/types/bio";
 import { SOCIAL_PROVIDERS } from "~/types/bio";
 import { useBioTheme } from "~/composables/useBioTheme";
 import { getEffectBgClass } from "~/utils/effectUtils";
@@ -809,9 +831,60 @@ function blockDomId(block: BioBlock) {
 }
 
 // Sort blocks by index for rendering
-const sortedBlocks = computed(() => {
+const visibleBlocks = computed(() => {
   return (props.bioData?.blocks || []).sort((a, b) => (a.index || 0) - (b.index || 0)).filter((item)=>!item.hidden);
 });
+
+// Two families, one link: blocks marked for the groom's or the bride's side
+// show on that side's tab. A link can open on a side (?side=groom|bride, or
+// nha-trai / nha-gai); otherwise the groom's side comes first
+const SIDES: BlockSide[] = ["groom", "bride"];
+const hasSides = computed(() => visibleBlocks.value.some((b) => b.side));
+const route = useRoute();
+function sideFromQuery(): BlockSide | null {
+  const raw = route?.query?.side;
+  const value = String((Array.isArray(raw) ? raw[0] : raw) ?? "").toLowerCase();
+  if (["groom", "trai", "nha-trai", "nhatrai"].includes(value)) return "groom";
+  if (["bride", "gai", "nha-gai", "nhagai"].includes(value)) return "bride";
+  return null;
+}
+const side = ref<BlockSide>(sideFromQuery() ?? "groom");
+function chooseSide(next: BlockSide) {
+  side.value = next;
+  // The address follows, so a copied link opens on the same side
+  if (props.mode === "preview" || typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  url.searchParams.set("side", next);
+  window.history.replaceState(window.history.state, "", url);
+}
+
+// A guest opening their own link (?to=Name) is counted on the guest list,
+// and again when they open the letter's envelope (BioLetterDisplay)
+function guestName() {
+  const raw = route?.query?.to;
+  return String((Array.isArray(raw) ? raw[0] : raw) ?? "").trim().slice(0, 60);
+}
+function reportGuestOpen(letter = false) {
+  const name = guestName();
+  if (props.mode !== "view" || !name || !props.username) return;
+  $fetch(`/api/bio/${encodeURIComponent(props.username)}/guest-open`, { method: "POST", body: { name, letter } }).catch(() => {});
+}
+const onLetterOpen = () => reportGuestOpen(true);
+onMounted(() => {
+  reportGuestOpen();
+  window.addEventListener("perlink:letter-open", onLetterOpen);
+});
+onBeforeUnmount(() => window.removeEventListener("perlink:letter-open", onLetterOpen));
+
+// Editing a block of the other side brings its tab up in the preview
+watch(() => props.activeBlockId, (id) => {
+  const block = visibleBlocks.value.find((b) => b.id === id);
+  if (block?.side) side.value = block.side;
+});
+
+const sortedBlocks = computed(() =>
+  hasSides.value ? visibleBlocks.value.filter((b) => !b.side || b.side === side.value) : visibleBlocks.value,
+);
 
 // Share page function
 async function sharePage() {

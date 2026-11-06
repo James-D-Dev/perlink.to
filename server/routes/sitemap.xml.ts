@@ -2,16 +2,17 @@ import { PAGE_TEMPLATES } from '../../app/data/pageTemplates'
 import { USE_CASE_PAIRS } from '../../app/data/useCases'
 import { ABOUT_PAIR, GUIDE_PAIRS } from '../../app/data/guides'
 import { PORTFOLIO_PAIRS } from '../../app/data/portfolio3d/paths'
+import { WEDDING_PAIRS } from '../../app/data/weddingGuides/paths'
 import { getDB } from '../utils/db'
 import { siteIndexable } from '../utils/siteIndexing'
 
 const SITE = 'https://perlink.to'
 
 /** Public marketing pages, then every published site and its blog posts */
-const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/3d-portfolio', '/vi/portfolio-3d', ...PORTFOLIO_PAIRS.flat(), '/affiliates', '/vi/cong-tac-vien', '/marketplace', ...USE_CASE_PAIRS.flat(), ...GUIDE_PAIRS.flat(), ...ABOUT_PAIR, '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
+const STATIC_PAGES = ['/', '/vi', '/templates', '/vi/templates', '/3d-portfolio', '/vi/portfolio-3d', ...PORTFOLIO_PAIRS.flat(), '/affiliates', '/vi/cong-tac-vien', '/marketplace', ...USE_CASE_PAIRS.flat(), ...WEDDING_PAIRS.flat(), ...GUIDE_PAIRS.flat(), ...ABOUT_PAIR, '/trends', '/pricing', '/terms', '/privacy', '/refund', '/cookie-notice']
 
 /** Pages with an address per language, linked to each other (hreflang) */
-const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/3d-portfolio', '/vi/portfolio-3d'], ...PORTFOLIO_PAIRS, ['/affiliates', '/vi/cong-tac-vien'], ...USE_CASE_PAIRS, ...GUIDE_PAIRS, ABOUT_PAIR]
+const LANG_PAIRS: [string, string][] = [['/', '/vi'], ['/templates', '/vi/templates'], ['/3d-portfolio', '/vi/portfolio-3d'], ...PORTFOLIO_PAIRS, ['/affiliates', '/vi/cong-tac-vien'], ...USE_CASE_PAIRS, ...WEDDING_PAIRS, ...GUIDE_PAIRS, ABOUT_PAIR]
 function languages(path: string) {
   const pair = LANG_PAIRS.find(p => p.includes(path))
   if (!pair) return ''

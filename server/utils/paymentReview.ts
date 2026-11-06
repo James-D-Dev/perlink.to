@@ -2,6 +2,7 @@ import type { H3Event } from 'h3'
 import { getDB } from './db'
 import { escapeHtml } from './email'
 import { grantPlan } from './plan'
+import { grantWeddingPass, paymentProducts } from './weddingPass'
 import { SUPERADMIN_EMAIL } from './superadmin'
 import { sendTelegram, telegramApi } from './telegram'
 import { transferNote } from './billing'
@@ -25,6 +26,8 @@ export interface PaymentRow {
   code: string
   status: string
   method: 'bank' | 'crypto' | 'lemon'
+  /** 'wedding': the Wedding pass rather than the plan alone (payment_products) */
+  product?: string | null
   network: string | null
   token: string | null
   tx_hash: string | null
@@ -39,8 +42,10 @@ export const PAYMENT_SELECT = `SELECT p.id, p.user_id, pr.email, p.plan, p.perio
   p.network, p.token, p.tx_hash, p.check_result, p.created_at, p.submitted_at, p.reviewed_at, p.paid_at
   FROM payments p LEFT JOIN profiles pr ON pr.id = p.user_id`
 
-export function loadPayment(event: H3Event, id: string) {
-  return getDB(event).prepare(`${PAYMENT_SELECT} WHERE p.id = ?`).bind(id).first<PaymentRow>()
+export async function loadPayment(event: H3Event, id: string) {
+  const payment = await getDB(event).prepare(`${PAYMENT_SELECT} WHERE p.id = ?`).bind(id).first<PaymentRow>()
+  if (payment) payment.product = (await paymentProducts(event, [id])).get(id) ?? null
+  return payment
 }
 
 export const parseCheck = (row: { check_result: string | null }) => {
@@ -65,7 +70,9 @@ export async function approvePayment(event: H3Event, id: string, providerRef?: s
     .bind(providerRef ?? (payment.tx_hash ? `tx:${payment.network}:${payment.tx_hash}` : `manual:${payment.id}`), id)
     .run()
   if (!(marked.meta as { changes?: number }).changes) return { ok: false as const, reason: 'already-paid' }
-  const expiresAt = await grantPlan(event, payment.user_id, payment.plan, { period: payment.period })
+  const expiresAt = payment.product === 'wedding'
+    ? await grantWeddingPass(event, payment.user_id, `payment:${payment.id}`)
+    : await grantPlan(event, payment.user_id, payment.plan, { period: payment.period })
   return { ok: true as const, payment, expiresAt }
 }
 
@@ -96,6 +103,7 @@ export const REVIEW_COPY = {
     period: { monthly: '1 month', annual: '1 year' } as Record<BillingPeriod, string>,
     title: '💳 <b>Payment waiting for review</b>',
     method: { bank: 'Bank transfer', crypto: 'Crypto', lemon: 'Card' },
+    weddingPass: '💍 Wedding pass (1 year of Starter + Wedding room pack)',
     account: 'Account', plan: 'Plan', amount: 'Amount', tx: 'Tx', check: 'Check', note: 'Transfer message', code: 'Code',
     bankCheck: 'open your bank app and find a transfer with this amount and message.',
     approve: '✅ Approve & upgrade', reject: '✖ Reject', reviewPage: 'Review page',
@@ -111,6 +119,7 @@ export const REVIEW_COPY = {
     period: { monthly: '1 tháng', annual: '1 năm' } as Record<BillingPeriod, string>,
     title: '💳 <b>Thanh toán chờ duyệt</b>',
     method: { bank: 'Chuyển khoản', crypto: 'Crypto', lemon: 'Thẻ' },
+    weddingPass: '💍 Gói Đám cưới (1 năm Starter + bộ phòng Cưới 3D)',
     account: 'Tài khoản', plan: 'Gói', amount: 'Số tiền', tx: 'Tx', check: 'Kiểm tra', note: 'Nội dung CK', code: 'Mã',
     bankCheck: 'mở app ngân hàng, tìm giao dịch đúng số tiền và nội dung trên.',
     approve: '✅ Duyệt & nâng cấp', reject: '✖ Từ chối', reviewPage: 'Trang duyệt',
@@ -137,7 +146,9 @@ export function paymentSummary(payment: PaymentRow, lang: AppLanguage = 'en') {
     `${c.title} · ${c.method[payment.method]}`,
     '',
     `<b>${c.account}:</b> ${escapeHtml(payment.email ?? payment.user_id)}`,
-    `<b>${c.plan}:</b> ${payment.plan.toUpperCase()} · ${c.period[payment.period]}`,
+    payment.product === 'wedding'
+      ? `<b>${c.plan}:</b> ${c.weddingPass}`
+      : `<b>${c.plan}:</b> ${payment.plan.toUpperCase()} · ${c.period[payment.period]}`,
   ]
   if (payment.method === 'crypto') {
     const network = payment.network ? CRYPTO_NETWORK_BY_ID[payment.network] : undefined

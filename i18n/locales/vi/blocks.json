@@ -12,7 +12,13 @@
         "up": "Chuyển lên",
         "down": "Chuyển xuống",
         "duplicate": "Nhân bản",
-        "addBelow": "Thêm khối bên dưới"
+        "addBelow": "Thêm khối bên dưới",
+        "side": "Hiện cho",
+        "sideBoth": "Cả hai nhà",
+        "sideGroom": "Chỉ nhà trai",
+        "sideBride": "Chỉ nhà gái",
+        "sideBadgeGroom": "Nhà trai",
+        "sideBadgeBride": "Nhà gái"
       }
     },
     "header": {
@@ -487,7 +493,8 @@
       "linkCopied": "Đã sao chép link",
       "cover": "Chữ trên phong bì",
       "coverHelp": "Để trống thì hiện “Gửi …”.",
-      "coverPlaceholder": "Mở khi em nhớ anh"
+      "coverPlaceholder": "Mở khi em nhớ anh",
+      "guestList": "Danh sách khách: link riêng, xem ai đã mở"
     },
     "event": {
       "title": "Thông tin sự kiện",
