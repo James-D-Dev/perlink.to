@@ -83,7 +83,7 @@ const TEXT = {
       {
         title: 'How Perlink pays for itself',
         paragraphs: [
-          'Perlink has a free plan with no time limit. It is paid for by people who need more: the Starter, Plus and Max plans add more live sites, Pro themes, custom domains and longer analytics, and the marketplace sells themed 3D room packs.',
+          'Perlink has a free plan with no time limit. It is paid for by people who need more: the Starter, Plus and Max plans add more live sites, Pro themes, custom domains and longer analytics, and themed 3D room packs are sold once.',
           'Every payment comes with a 7-day money-back guarantee, and your content stays yours: you can edit, unpublish or delete it at any time.',
         ],
       },

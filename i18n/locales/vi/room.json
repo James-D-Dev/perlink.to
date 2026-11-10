@@ -424,7 +424,7 @@
       "items": "{n} món",
       "trayLocked": "Món cao cấp: đặt thử vào phòng thoải mái, mua gói để xuất bản.",
       "trayOwned": "Món cao cấp của bạn",
-      "seeMarket": "Cửa hàng",
+      "seeMarket": "Gói phòng 3D",
       "promptTitle": "Phòng của bạn có món cao cấp",
       "promptText": "Mua gói để xuất bản phòng với các món này. Trả một lần, dùng mãi mãi cho mọi phòng bạn làm.",
       "orMax": "Hoặc lên gói Max: có sẵn mọi gói",
@@ -461,9 +461,9 @@
       }
     },
     "market": {
-      "metaTitle": "Cửa hàng phòng 3D: Món đồ cao cấp cho phòng của bạn | Perlink",
+      "metaTitle": "Gói phòng 3D: Món đồ cao cấp cho phòng của bạn | Perlink",
       "metaDescription": "Món đồ 3D cao cấp cho phòng Perlink: hoa hồng, nến, đèn neon trái tim và nhiều hơn nữa. Trả một lần, dùng mãi mãi, cho mọi phòng.",
-      "eyebrow": "Cửa hàng",
+      "eyebrow": "Gói phòng 3D",
       "title": "Làm căn phòng của bạn thật khó quên",
       "intro": "Những món đồ 3D cao cấp dành cho những khoảnh khắc quan trọng. Trả một lần, giữ mãi mãi và dùng trong mọi phòng bạn làm.",
       "maxNote": "Đang dùng gói Max? Bạn đã có sẵn mọi gói.",

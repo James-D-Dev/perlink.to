@@ -17,7 +17,7 @@ Key facts:
 - Languages: the editor and sites work in English and Vietnamese.
 - Plans (sites count when they are live; drafts are unlimited on every plan; a year costs ten months; 7-day money-back guarantee): Free (1 live site, 30 days of analytics). Starter, US$6 or 150,000đ a month (3 live sites, Pro themes, 90 days of analytics, pixels and Search Console, password-protected sites, order statuses). Plus, US$20 or 500,000đ a month (10 live sites, 3 custom domains, a year of analytics, unlimited blog posts). Max, US$100 or 2,500,000đ a month (50 live sites, 20 custom domains, 3 years of analytics, every 3D room pack). New accounts can try Plus free for 7 days.
 - Custom domains: connect your own domain on Plus or Max; the site keeps its perlink.to/<name> address too.
-- 3D room packs: themed sets of animated room items (Valentine, Wedding, Birthday, Galaxy, Tet, Proposal, Showroom) sold in the marketplace, US$5–19 each.
+- 3D room packs: themed sets of animated room items (Valentine, Wedding, Birthday, Galaxy, Tet, Proposal, Showroom) sold as one-time 3D room packs, US$5–19 each.
 
 ## Main pages
 
@@ -25,7 +25,7 @@ Key facts:
 - [Trang chủ (tiếng Việt)](https://perlink.to/vi): the home page in Vietnamese
 - [Templates](https://perlink.to/templates): the gallery of all templates by category ([Vietnamese](https://perlink.to/vi/templates))
 - [Pricing](https://perlink.to/pricing): plans and what each includes
-- [Marketplace](https://perlink.to/marketplace): 3D room packs
+- [3D room packs](https://perlink.to/marketplace): premium 3D items for rooms, paid once
 - [About](https://perlink.to/about): who makes Perlink and why
 - [Trends](https://perlink.to/trends): popular 3D worlds and website styles
 - [3D portfolio website](https://perlink.to/3d-portfolio): a portfolio page plus a 3D room, without code ([Vietnamese](https://perlink.to/vi/portfolio-3d))

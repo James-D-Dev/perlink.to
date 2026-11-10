@@ -424,7 +424,7 @@
       "items": "{n} items",
       "trayLocked": "Premium items: try them in your room, buy the pack to publish.",
       "trayOwned": "Your premium items",
-      "seeMarket": "Marketplace",
+      "seeMarket": "3D room packs",
       "promptTitle": "Your room uses premium items",
       "promptText": "Get the pack to publish your room with them. You pay once and keep it forever, for every room you make.",
       "orMax": "Or get Max: every pack included",
@@ -461,9 +461,9 @@
       }
     },
     "market": {
-      "metaTitle": "3D Room Marketplace: Premium Items for Your Room | Perlink",
+      "metaTitle": "3D Room Packs: Premium Items for Your Room | Perlink",
       "metaDescription": "Premium 3D items for your Perlink room: roses, candles, neon hearts and more. Pay once, keep forever, use in every room.",
-      "eyebrow": "Marketplace",
+      "eyebrow": "3D room packs",
       "title": "Make your room unforgettable",
       "intro": "Premium 3D items, made for the moments that matter. Pay once, keep them forever and use them in every room you build.",
       "maxNote": "On Max? Every pack is already yours.",
