@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3'
 import { getDB } from './db'
 import { getAccountPlan, grantPlan } from './plan'
-import { lemonCatalog, lemonEnabled } from './lemon'
+import { creemCatalog, creemEnabled } from './creem'
 import { PLAN_ORDER, WEDDING_PASS, type Product } from '#shared/plans'
 
 // The Wedding pass (shared/plans WEDDING_PASS): paid once, a year of Starter
@@ -32,10 +32,10 @@ export async function revokeWeddingPass(event: H3Event, userId: string, ref: str
     .bind(userId, WEDDING_PASS.plan).run()
 }
 
-/** Whether the pass can be bought by card right now (a "Wedding Pass" product on Lemon Squeezy) */
+/** Whether the pass can be bought by card right now (the "wedding-pass" product on Creem) */
 export async function weddingPassByCard(event: H3Event) {
-  if (!lemonEnabled(event)) return false
-  return !!(await lemonCatalog(event).catch(() => null))?.weddingPass
+  if (!creemEnabled(event)) return false
+  return !!(await creemCatalog(event).catch(() => null))?.weddingPass
 }
 
 /** Marks a payment as the Wedding pass (payment_products) */

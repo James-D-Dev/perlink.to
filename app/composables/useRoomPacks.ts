@@ -23,7 +23,7 @@ export function useRoomPacks() {
 
   const owns = (pack: string) => !!state.value?.packs.find(p => p.id === pack)?.owned
 
-  /** Opens Lemon Squeezy's checkout for a pack; comes back to `back` (this page by default) */
+  /** Opens Creem's checkout for a pack; comes back to `back` (this page by default) */
   async function buy(pack: RoomPackId, back?: string) {
     buying.value = pack
     try {

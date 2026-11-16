@@ -1,5 +1,5 @@
 <template>
-  <!-- A product picture for a plan (Lemon Squeezy product image), 1200 x 800 -->
+  <!-- A product picture for a plan (Creem product image), 1200 x 800 -->
   <div v-if="look" class="cover relative isolate overflow-hidden text-white" :style="{ backgroundImage: `linear-gradient(135deg, ${look.colors.join(', ')})` }">
     <div class="pointer-events-none absolute -right-40 -top-40 -z-10 size-[600px] rounded-full bg-white/20 blur-3xl" />
     <div class="pointer-events-none absolute -bottom-52 -left-40 -z-10 size-[560px] rounded-full bg-black/25 blur-3xl" />
@@ -102,7 +102,7 @@ const look = LOOKS[id] ?? null
 if (!look) throw createError({ statusCode: 404, statusMessage: 'Not found' })
 const prices = PLAN_PRICES_USD[id]
 
-// The pricing page's list, in English (these go on the Lemon Squeezy store)
+// The pricing page's list, in English (these go on the Creem store)
 const en = (key: string, params: Record<string, unknown> = {}, n?: number) => (n === undefined ? t(key, params, { locale: 'en' }) : t(key, params, { locale: 'en', plural: n }))
 const features = computed(() => {
   const list = planFeatures(id, en)

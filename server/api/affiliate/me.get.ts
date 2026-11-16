@@ -1,7 +1,7 @@
 import { getDB } from '../../utils/db'
 
 // The signed-in account's affiliate code and how many sign-ups it brought
-// (sales and payouts are in the Lemon Squeezy affiliate dashboard)
+// (sales and payouts are in Creem's affiliate portal)
 export default defineEventHandler(async (event) => {
   const user = event.context.user
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })

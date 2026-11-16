@@ -27,7 +27,7 @@
           </div>
         </div>
 
-        <!-- 1. Join on Lemon Squeezy -->
+        <!-- 1. Join the program (Creem) -->
         <div class="rounded-3xl bg-paper p-5 ring-1 ring-line sm:p-6">
           <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ t('dashboard.earn.step', { n: 1 }) }}</p>
           <h2 class="mt-1 font-semibold text-ink">{{ t('dashboard.earn.joinTitle') }}</h2>
@@ -64,7 +64,7 @@
             <UIcon name="i-lucide-badge-check" class="mt-0.5 size-4 shrink-0 text-emerald-600" />
             {{ t('dashboard.earn.badge') }}
           </p>
-          <UButton v-if="code" class="mt-4" to="https://app.lemonsqueezy.com/affiliate" target="_blank" color="neutral" variant="outline" icon="i-lucide-chart-line" trailing-icon="i-lucide-external-link" :label="t('dashboard.earn.dashboard')" />
+          <UButton v-if="code" class="mt-4" to="https://affiliates.creem.io" target="_blank" color="neutral" variant="outline" icon="i-lucide-chart-line" trailing-icon="i-lucide-external-link" :label="t('dashboard.earn.dashboard')" />
         </div>
 
         <p class="px-1 text-xs text-ink-faint">

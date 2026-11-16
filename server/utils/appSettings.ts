@@ -6,7 +6,7 @@ import { getDB } from './db'
 export type AppSettingKey = 'bank_payments'
 
 const DEFAULTS: Record<AppSettingKey, string> = {
-  // VietQR bank transfers for plans; off, plans sell through Lemon Squeezy
+  // VietQR bank transfers for plans; off, plans sell by card through Creem
   bank_payments: '0',
 }
 

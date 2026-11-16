@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createLemonPackCheckout, lemonEnabled } from '../../utils/lemon'
+import { createCreemCheckout, creemCatalog, creemEnabled, packKey } from '../../utils/creem'
 import { ownedPacks } from '../../utils/roomPacks'
 import { checkoutAffiliate } from '../../utils/affiliate'
 import { ROOM_PACKS, type RoomPackId } from '#shared/roomPacks'
@@ -10,12 +10,12 @@ const bodySchema = z.object({
   back: z.string().startsWith('/').max(300).optional(),
 })
 
-// Buying a room pack: a one-time Lemon Squeezy checkout. The order webhook
-// adds the pack to the account.
+// Buying a room pack: a one-time Creem checkout. The checkout webhook adds
+// the pack to the account.
 export default defineEventHandler(async (event) => {
   const user = event.context.user
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  if (!lemonEnabled(event)) throw createError({ statusCode: 503, statusMessage: 'Card payments are not available yet' })
+  if (!creemEnabled(event)) throw createError({ statusCode: 503, statusMessage: 'Card payments are not available yet' })
   const body = bodySchema.safeParse(await readBody(event))
   if (!body.success) throw createError({ statusCode: 400, statusMessage: 'Choose a pack' })
   const pack = body.data.pack as RoomPackId
@@ -27,19 +27,20 @@ export default defineEventHandler(async (event) => {
   const redirect = new URL(back, siteUrl)
   redirect.searchParams.set('bought', pack)
   try {
-    const url = await createLemonPackCheckout(event, {
+    const productId = (await creemCatalog(event)).byKey[packKey(pack)]
+    if (!productId) throw createError({ statusCode: 503, statusMessage: 'This pack is not on sale yet' })
+    const url = await createCreemCheckout(event, {
+      productId,
       userId: user.id,
       email: user.email,
-      name: user.name,
-      pack,
-      redirectUrl: redirect.toString(),
+      successUrl: redirect.toString(),
+      metadata: { user_id: user.id, pack },
       affiliate: await checkoutAffiliate(event, user.id),
     })
-    if (!url) throw createError({ statusCode: 503, statusMessage: 'This pack is not on sale yet' })
     return { url }
   } catch (error: any) {
     if (error?.statusCode) throw error
-    console.error('[lemon] pack checkout failed:', error?.message)
+    console.error('[creem] pack checkout failed:', error?.message)
     throw createError({ statusCode: 502, statusMessage: 'Could not open the checkout, please try again' })
   }
 })

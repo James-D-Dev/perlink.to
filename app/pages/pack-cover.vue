@@ -1,5 +1,5 @@
 <template>
-  <!-- A product picture for a room pack (Lemon Squeezy product image), 1200 x 800 -->
+  <!-- A product picture for a room pack (Creem product image), 1200 x 800 -->
   <div v-if="pack" class="cover relative isolate overflow-hidden text-white" :style="{ backgroundImage: `linear-gradient(135deg, ${pack.colors.join(', ')})` }">
     <div class="pointer-events-none absolute -right-40 -top-40 -z-10 size-[560px] rounded-full bg-white/25 blur-3xl" />
     <div class="pointer-events-none absolute -bottom-48 -left-32 -z-10 size-[520px] rounded-full bg-black/20 blur-3xl" />
@@ -48,7 +48,7 @@ const id = String(route.query.pack ?? '')
 const pack = isRoomPackId(id) ? ROOM_PACK_BY_ID[id] : null
 if (!pack) throw createError({ statusCode: 404, statusMessage: 'Not found' })
 
-// Always in English: these go on the Lemon Squeezy store
+// Always in English: these go on the Creem store
 const name = computed(() => (pack!.id === 'tet' ? 'Tết' : t(`room.packs.${pack!.id}.name`, {}, { locale: 'en' })))
 const itemName = (type: string) => (te(`room.objects.${type}`, 'en') ? t(`room.objects.${type}`, {}, { locale: 'en' }) : type)
 // Rendered big so the picture stays sharp

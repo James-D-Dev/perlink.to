@@ -164,7 +164,7 @@ async function buy(pack: (typeof ROOM_PACKS)[number]['id'], back: string) {
 
 onMounted(async () => {
   await refresh()
-  // Back from Lemon Squeezy: the order webhook adds the pack within seconds
+  // Back from Creem: the order webhook adds the pack within seconds
   const bought = route.query.bought
   if (!isRoomPackId(bought)) return
   const name = t(`room.packs.${bought}.name`)

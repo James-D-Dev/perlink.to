@@ -38,8 +38,8 @@
           <div class="space-y-4 text-sm">
             <div class="flex items-start justify-between gap-4">
               <div>
-                <p class="font-medium">Card / PayPal (Lemon Squeezy)</p>
-                <p class="text-muted">{{ payments?.card ? 'On: set up with NUXT_LEMON_API_KEY.' : 'Off: add NUXT_LEMON_API_KEY to turn it on.' }}</p>
+                <p class="font-medium">Card, Apple Pay, Google Pay (Creem)</p>
+                <p class="text-muted">{{ payments?.card ? 'On: set up with NUXT_CREEM_API_KEY.' : 'Off: add NUXT_CREEM_API_KEY to turn it on.' }}</p>
               </div>
               <UBadge :color="payments?.card ? 'success' : 'neutral'" variant="subtle" :label="payments?.card ? 'On' : 'Off'" />
             </div>
@@ -47,7 +47,7 @@
               <div>
                 <p class="font-medium">VietQR bank transfer (VND)</p>
                 <p class="text-muted">
-                  When off, the plan buttons go straight to Lemon Squeezy's checkout and prices show in US dollars.
+                  When off, the plan buttons go straight to Creem's checkout and prices show in US dollars.
                   <template v-if="payments && !payments.bankConfigured"><br>No bank account is set up, so it stays off even when switched on.</template>
                 </p>
               </div>
@@ -56,48 +56,41 @@
           </div>
         </UCard>
 
-        <!-- Lemon Squeezy: card / PayPal subscriptions -->
+        <!-- Creem: card subscriptions and one-time orders -->
         <UCard :ui="superadminPanelUi">
           <template #header>
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
-                <UIcon name="i-lucide-credit-card" class="size-5 text-[#7047EB]" />
-                <h2 class="font-medium">Lemon Squeezy</h2>
+                <UIcon name="i-lucide-credit-card" class="size-5 text-[#ff6b4a]" />
+                <h2 class="font-medium">Creem</h2>
+                <UBadge v-if="creem?.configured" :color="creem.testMode ? 'warning' : 'success'" variant="subtle" size="sm" :label="creem.testMode ? 'Test mode' : 'Live'" />
               </div>
-              <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-refresh-cw" :loading="lemonPending" aria-label="Check again" @click="refreshLemon()" />
+              <UButton size="xs" color="neutral" variant="ghost" icon="i-lucide-refresh-cw" :loading="creemPending" aria-label="Check again" @click="refreshCreem()" />
             </div>
           </template>
 
-          <p v-if="lemonPending && !lemon" class="text-sm text-muted">Loading…</p>
-          <p v-else-if="!lemon?.configured" class="text-sm text-muted">Not set up. Add <code>NUXT_LEMON_API_KEY</code> and <code>NUXT_LEMON_WEBHOOK_SECRET</code> (see <code>docs/billing.md</code>), then redeploy.</p>
+          <p v-if="creemPending && !creem" class="text-sm text-muted">Loading…</p>
+          <p v-else-if="!creem?.configured" class="text-sm text-muted">Not set up. Add <code>NUXT_CREEM_API_KEY</code> and <code>NUXT_CREEM_WEBHOOK_SECRET</code> (see <code>docs/billing.md</code>), then redeploy.</p>
           <div v-else class="space-y-4 text-sm">
-            <p v-if="lemon.error" class="text-error">{{ lemon.error }}</p>
-            <dl v-if="lemon.store" class="grid grid-cols-[9rem_1fr] gap-x-4 gap-y-2">
-              <dt class="text-muted">Store</dt>
-              <dd>{{ lemon.store.name }} <span class="text-muted">· #{{ lemon.store.id }} · {{ lemon.store.domain }}</span></dd>
+            <p v-if="creem.error" class="text-error">{{ creem.error }}</p>
+            <dl class="grid grid-cols-[9rem_1fr] gap-x-4 gap-y-2">
               <dt class="text-muted">Webhook secret</dt>
-              <dd>{{ lemon.hasWebhookSecret ? 'Set' : 'Missing' }}</dd>
+              <dd>{{ creem.hasWebhookSecret ? 'Set' : 'Missing' }}</dd>
+              <dt class="text-muted">Webhook URL</dt>
+              <dd class="break-all font-mono text-xs">{{ webhookUrl }}</dd>
             </dl>
 
-            <div v-if="lemon.plans">
-              <p class="mb-1.5 font-medium">Plans on sale</p>
+            <div v-if="creem.products?.length">
+              <div class="mb-1.5 flex items-center justify-between gap-2">
+                <p class="font-medium">Products</p>
+                <UButton v-if="missing" size="xs" icon="i-lucide-plus" :loading="syncing" :label="`Create ${missing} missing on Creem`" @click="syncProducts" />
+              </div>
               <ul class="space-y-1">
-                <li v-for="row in lemon.plans" :key="`${row.plan}:${row.period}`" class="flex items-center gap-2">
-                  <UIcon :name="row.variantId ? 'i-lucide-circle-check' : 'i-lucide-circle-x'" class="size-4" :class="row.variantId ? 'text-success' : 'text-error'" />
-                  <span class="capitalize">{{ row.plan }} · {{ row.period }}</span>
-                  <span class="text-muted">{{ row.variantId ? `variant #${row.variantId}` : 'no matching variant' }}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div v-if="lemon.products?.length">
-              <p class="mb-1.5 font-medium">Products in the store</p>
-              <ul class="space-y-2">
-                <li v-for="product in lemon.products" :key="product.id">
-                  <p>{{ product.name }} <span class="text-muted">· {{ product.status }}</span></p>
-                  <p v-for="v in product.variants" :key="v.id" class="pl-4 text-xs text-muted">
-                    #{{ v.id }} {{ v.name }} · ${{ v.price }} / {{ v.interval ?? 'one-time' }} · {{ v.status }}
-                  </p>
+                <li v-for="row in creem.products" :key="row.key" class="flex items-center gap-2">
+                  <UIcon :name="row.productId ? 'i-lucide-circle-check' : 'i-lucide-circle-x'" class="size-4 shrink-0" :class="row.productId ? 'text-success' : 'text-error'" />
+                  <span>{{ row.name }}</span>
+                  <span class="text-muted">· ${{ row.livePrice ?? row.price }}{{ row.recurring ? '' : ' once' }}</span>
+                  <UBadge v-if="row.livePrice !== null && row.livePrice !== row.price" color="warning" variant="subtle" size="sm" :label="`site says $${row.price}`" />
                 </li>
               </ul>
             </div>
@@ -159,13 +152,12 @@ interface TelegramStatus {
   lastError?: string | null
 }
 
-interface LemonStatus {
+interface CreemStatus {
   configured: boolean
+  testMode?: boolean
   hasWebhookSecret?: boolean
   error?: string
-  store?: { id: string; name: string; domain: string }
-  plans?: { plan: string; period: string; variantId: string | null }[]
-  products?: { id: string; name: string; status: string; variants: { id: string; name: string; price: number; interval: string | null; status: string }[] }[]
+  products?: { key: string; name: string; price: number; recurring: boolean; productId: string | null; livePrice: number | null }[]
 }
 
 const toast = useToast()
@@ -198,7 +190,22 @@ async function setBank(bank: boolean) {
   }
 }
 
-const { data: lemon, pending: lemonPending, refresh: refreshLemon } = useFetch<LemonStatus>('/api/superadmin/lemon', { server: false })
+const { data: creem, pending: creemPending, refresh: refreshCreem } = useFetch<CreemStatus>('/api/superadmin/creem', { server: false })
+const webhookUrl = computed(() => `${useRuntimeConfig().public.siteUrl}/api/billing/creem-webhook`)
+const missing = computed(() => creem.value?.products?.filter(p => !p.productId).length ?? 0)
+const syncing = ref(false)
+async function syncProducts() {
+  syncing.value = true
+  try {
+    const res = await $fetch<{ created: string[] }>('/api/superadmin/creem-sync', { method: 'POST' })
+    toast.add({ title: `Created ${res.created.length} products on Creem`, color: 'success' })
+    await refreshCreem()
+  } catch (error: any) {
+    toast.add({ title: 'Failed', description: error?.data?.statusMessage, color: 'error' })
+  } finally {
+    syncing.value = false
+  }
+}
 const { data: telegram, pending, refresh } = await useFetch<TelegramStatus>('/api/superadmin/telegram')
 
 const registering = ref(false)

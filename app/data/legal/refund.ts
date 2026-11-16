@@ -46,7 +46,7 @@ export const REFUND: LegalDocs = {
           { list: [
             'Email {email} from the address of your Perlink account, with the order number from your receipt email (or, for a bank transfer in Vietnam, the payment code starting with "PL" from **Plans → Payment history**).',
             'We reply within 2 business days.',
-            'Orders paid online are refunded through our reseller and Merchant of Record, **Lemon Squeezy**, to the original payment method; your bank may take 5–10 business days to show it. Bank transfers in Vietnam are refunded by bank transfer within 5 business days.',
+            'Orders paid online are refunded through our reseller and Merchant of Record, **Creem**, to the original payment method; your bank may take 5–10 business days to show it. Bank transfers in Vietnam are refunded by bank transfer within 5 business days.',
           ] },
         ],
       },
@@ -97,7 +97,7 @@ export const REFUND: LegalDocs = {
           { list: [
             'Gửi email tới {email} từ địa chỉ email của tài khoản Perlink, kèm mã đơn hàng trong email biên nhận (hoặc, nếu chuyển khoản tại Việt Nam, mã thanh toán bắt đầu bằng "PL" trong **Gói dịch vụ → Lịch sử thanh toán**).',
             'Chúng tôi phản hồi trong 2 ngày làm việc.',
-            'Đơn thanh toán trực tuyến được hoàn qua đại lý bán lại và đơn vị bán hàng chính thức **Lemon Squeezy**, về phương thức thanh toán ban đầu; ngân hàng có thể mất 5–10 ngày làm việc để hiển thị. Chuyển khoản tại Việt Nam được hoàn bằng chuyển khoản trong 5 ngày làm việc.',
+            'Đơn thanh toán trực tuyến được hoàn qua đại lý bán lại và đơn vị bán hàng chính thức **Creem**, về phương thức thanh toán ban đầu; ngân hàng có thể mất 5–10 ngày làm việc để hiển thị. Chuyển khoản tại Việt Nam được hoàn bằng chuyển khoản trong 5 ngày làm việc.',
           ] },
         ],
       },

@@ -26,7 +26,7 @@
                 <UBadge color="neutral" variant="subtle" :icon="METHOD_ICON[p.method] ?? 'i-lucide-landmark'" :label="METHOD_LABEL[p.method] ?? 'Bank'" />
                 <span class="font-medium">{{ p.product === 'wedding' ? '💍 Wedding pass' : `${p.plan.toUpperCase()} · ${p.period === 'annual' ? '1 year' : '1 month'}` }}</span>
                 <span class="font-semibold tabular-nums">
-                  {{ p.method === 'crypto' ? `$${(p.amountUsd ?? 0).toFixed(2)} ${p.token ?? ''}` : p.method === 'lemon' ? `$${(p.amountUsd ?? 0).toFixed(2)}` : formatVnd(p.amount) }}
+                  {{ p.method === 'crypto' ? `$${(p.amountUsd ?? 0).toFixed(2)} ${p.token ?? ''}` : (p.method === 'lemon' || p.method === 'creem') ? `$${(p.amountUsd ?? 0).toFixed(2)}` : formatVnd(p.amount) }}
                 </span>
               </div>
               <p class="text-sm">{{ p.email ?? '—' }}</p>
@@ -39,7 +39,7 @@
                 </p>
                 <p v-if="p.checkText" class="text-sm">{{ p.checkText }}</p>
               </template>
-              <p v-else-if="p.method === 'lemon'" class="text-xs text-muted">Card / PayPal via Lemon Squeezy · {{ p.code }}</p>
+              <p v-else-if="p.method === 'lemon' || p.method === 'creem'" class="text-xs text-muted">Card via {{ p.method === 'creem' ? 'Creem' : 'Lemon Squeezy' }} · {{ p.code }}</p>
               <p v-else class="text-xs text-muted">Transfer message: <span class="font-mono text-default">PERLINK {{ p.code }}</span></p>
 
               <p class="text-xs text-muted">
@@ -77,8 +77,8 @@
 import { superadminPanelUi } from '~/utils/superadmin'
 import { formatVnd } from '#shared/plans'
 
-const METHOD_LABEL: Record<string, string> = { bank: 'Bank', crypto: 'Crypto', lemon: 'Card' }
-const METHOD_ICON: Record<string, string> = { bank: 'i-lucide-landmark', crypto: 'i-lucide-bitcoin', lemon: 'i-lucide-credit-card' }
+const METHOD_LABEL: Record<string, string> = { bank: 'Bank', crypto: 'Crypto', lemon: 'Card', creem: 'Card' }
+const METHOD_ICON: Record<string, string> = { bank: 'i-lucide-landmark', crypto: 'i-lucide-bitcoin', lemon: 'i-lucide-credit-card', creem: 'i-lucide-credit-card' }
 
 // Payments people marked as done, waiting for a decision. Approving puts the
 // plan on their account (same as the Telegram button).
@@ -94,7 +94,7 @@ interface Payment {
   plan: string
   product?: string | null
   period: string
-  method: 'bank' | 'crypto' | 'lemon'
+  method: 'bank' | 'crypto' | 'lemon' | 'creem'
   amount: number
   amountUsd: number | null
   code: string

@@ -73,7 +73,7 @@
                 <p class="text-xs text-ink-muted">{{ formatDate(p.paidAt || p.createdAt) }} · <span class="font-mono">{{ p.code }}</span></p>
               </div>
               <div class="flex items-center gap-3">
-                <span class="font-medium text-ink">{{ (p.method === 'crypto' || p.method === 'lemon') && p.amountUsd ? `$${p.amountUsd}` : formatVnd(p.amount) }}</span>
+                <span class="font-medium text-ink">{{ (p.method === 'crypto' || p.method === 'lemon' || p.method === 'creem') && p.amountUsd ? `$${p.amountUsd}` : formatVnd(p.amount) }}</span>
                 <UBadge :color="STATUS_COLOR[p.status] ?? 'neutral'" variant="soft" :label="t(`dashboard.billing.paymentStatus.${p.status}`)" />
               </div>
             </div>
@@ -111,7 +111,7 @@ const subscriptionLine = computed(() => {
   return ''
 })
 
-// Back from Lemon Squeezy's checkout: the webhook turns the plan on within
+// Back from Creem's checkout: the webhook turns the plan on within
 // seconds, so look again a few times (the "you're upgraded" screen follows)
 let paidTimer: ReturnType<typeof setInterval> | null = null
 onBeforeUnmount(() => { if (paidTimer) clearInterval(paidTimer) })

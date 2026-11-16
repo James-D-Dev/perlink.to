@@ -71,14 +71,13 @@ export default defineNuxtConfig({
       // EVM wallet that receives USDT / USDC (NUXT_BILLING_CRYPTO_ADDRESS)
       cryptoAddress: "",
     },
-    // Lemon Squeezy (card / PayPal subscriptions, Merchant of Record):
-    // NUXT_LEMON_API_KEY and NUXT_LEMON_WEBHOOK_SECRET. The store and the
-    // plan variants are looked up through the API; NUXT_LEMON_STORE_ID can pin
-    // the store. Empty key = the card option is hidden.
-    lemon: {
+    // Creem (card subscriptions and one-time orders, Merchant of Record):
+    // NUXT_CREEM_API_KEY and NUXT_CREEM_WEBHOOK_SECRET. A creem_test_ key uses
+    // Creem's test mode. Products are found by their external_id (see
+    // server/utils/creem.ts). Empty key = the card option is hidden.
+    creem: {
       apiKey: "",
       webhookSecret: "",
-      storeId: "",
     },
     // Order and request alerts on Telegram (see docs/telegram-notifications.md).
     // Empty token = the "Connect Telegram" option is hidden.
@@ -90,9 +89,9 @@ export default defineNuxtConfig({
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
       oauthGoogleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID || "",
-      // Where people sign up as affiliates: the store's Lemon Squeezy
-      // affiliate page (Affiliates → Share your affiliate link in Lemon Squeezy)
-      affiliateSignupUrl: "https://store.perlink.to/affiliates",
+      // Where people sign up as affiliates: the Creem affiliate program's
+      // join link (Creem → Growth → Affiliate Hub)
+      affiliateSignupUrl: "https://affiliates.creem.io",
     },
   },
 
@@ -180,7 +179,7 @@ export default defineNuxtConfig({
               "Permissions-Policy":
                 "accelerometer=(), autoplay=(), bluetooth=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), microphone=(), payment=(), serial=(), usb=()",
               "Content-Security-Policy":
-                "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://lmsqueezy.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https:; media-src 'self' https: blob:; frame-src https://accounts.google.com/gsi/ https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://www.tiktok.com;",
+                "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https:; media-src 'self' https: blob:; frame-src https://accounts.google.com/gsi/ https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://www.tiktok.com;",
             },
           }
         : {}),

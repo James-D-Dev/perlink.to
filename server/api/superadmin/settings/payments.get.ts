@@ -1,7 +1,7 @@
 import { requireSuperadmin } from '../../../utils/superadmin'
 import { getFlag } from '../../../utils/appSettings'
 import { billingAccount } from '../../../utils/billing'
-import { lemonEnabled } from '../../../utils/lemon'
+import { creemEnabled } from '../../../utils/creem'
 
 // Payment switches for Superadmin → Settings
 export default defineEventHandler(async (event) => {
@@ -10,6 +10,6 @@ export default defineEventHandler(async (event) => {
     bank: await getFlag(event, 'bank_payments'),
     // Whether a bank account is set up at all (the switch does nothing without one)
     bankConfigured: !!billingAccount(event),
-    card: lemonEnabled(event),
+    card: creemEnabled(event),
   }
 })

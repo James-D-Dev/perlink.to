@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
 import { generateVietQR, getBankByBIN } from './vietqr'
-import { lemonEnabled } from './lemon'
+import { creemEnabled } from './creem'
 import { isEvmAddress } from '#shared/crypto'
 import { getFlag } from './appSettings'
 
@@ -56,15 +56,15 @@ export function cryptoWallet(event: H3Event) {
   return isEvmAddress(address) ? address : null
 }
 
-/** Paying in USDT / USDC is off (Lemon Squeezy doesn't accept crypto
- * businesses); the wallet secret stays so it can be turned back on */
+/** Paying in USDT / USDC is off; the wallet secret stays so it can be
+ * turned back on */
 export const CRYPTO_PAYMENTS_ON = false
 
 /** Ways to pay that are set up and switched on */
 export async function paymentMethods(event: H3Event) {
   return {
-    // Card / PayPal through Lemon Squeezy
-    card: lemonEnabled(event),
+    // Card, Apple Pay, Google Pay through Creem
+    card: creemEnabled(event),
     // VietQR transfers, switched on in Superadmin → Settings
     bank: !!billingAccount(event) && await getFlag(event, 'bank_payments'),
     crypto: CRYPTO_PAYMENTS_ON && !!cryptoWallet(event),

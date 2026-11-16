@@ -75,7 +75,7 @@
           <p class="mt-2 text-xs text-ink-muted">{{ t('dashboard.billing.checkout.scan') }}</p>
         </div>
 
-        <!-- Card / PayPal: Lemon Squeezy's hosted checkout -->
+        <!-- Card: Creem's hosted checkout -->
         <div v-else-if="method === 'card'" class="flex h-full flex-col items-center justify-center text-center">
           <div class="flex size-14 items-center justify-center rounded-2xl bg-sand text-ink">
             <UIcon name="i-lucide-shield-check" class="size-7" />
@@ -259,12 +259,12 @@ function copy(text: string) {
   toast.add({ title: t('dashboard.billing.checkout.copied'), description: text })
 }
 
-// Card: off to Lemon Squeezy's checkout (useCardCheckout)
+// Card: off to Creem's checkout (useCardCheckout)
 const { opening: openingCard, payByCard: openCardCheckout } = useCardCheckout()
 const openingPass = ref(false)
 async function payByCard() {
   if (!props.product) return openCardCheckout(props.plan, props.period)
-  // The pass is one Lemon Squeezy order, not a subscription
+  // The pass is one Creem order, not a subscription
   openingPass.value = true
   try {
     const res = await $fetch<{ url: string }>('/api/billing/wedding-checkout', { method: 'POST' })

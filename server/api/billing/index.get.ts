@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
       .bind(user.id)
       .first<{ id: string; plan: string }>()
       .catch(() => null),
-    // The latest Lemon Squeezy subscription, to manage it
+    // The latest card subscription (Creem), to manage it
     db.prepare('SELECT plan, period, status, renews_at, ends_at, portal_url FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1')
       .bind(user.id)
       .first<{ plan: string; period: string; status: string; renews_at: string | null; ends_at: string | null; portal_url: string | null }>()

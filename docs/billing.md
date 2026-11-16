@@ -84,38 +84,45 @@ Flow:
    from the chain again (every 20 s at most), and the reviewer is told once
    it shows as paid in full.
 
-## Card / PayPal: Lemon Squeezy
+## Card: Creem
 
-Lemon Squeezy sells the plans as subscriptions and is the Merchant of Record
-(tax, invoices, refunds). Code: `server/utils/lemon.ts`,
-`server/api/billing/lemon-checkout.post.ts`, `server/api/billing/lemon-webhook.post.ts`,
-table `subscriptions` (migration 0032).
+Creem (creem.io) sells online as the Merchant of Record (tax, invoices,
+refunds): the plans as subscriptions, the room packs and the Wedding pass as
+one-time orders. Cards, Apple Pay and Google Pay. Code: `server/utils/creem.ts`,
+`server/api/billing/card-checkout.post.ts`, `server/api/billing/wedding-checkout.post.ts`,
+`server/api/room-packs/checkout.post.ts`, `server/api/billing/creem-webhook.post.ts`,
+table `subscriptions` (migration 0032; Creem ids start with `sub_`).
 
-1. **Products**: one subscription product per plan, named so it contains the
-   plan's name ("Perlink Starter", "Perlink Plus"), each with a monthly and a
-   yearly variant. Prices must match the pricing page ($6 / $12 a month,
-   10× a year). Don't create Pro while it's "Coming soon". The server finds the
-   store and the variants through the API (cached 10 minutes per worker).
-2. **API key**: Settings → API → new key. Then
-   `npx wrangler pages secret put NUXT_LEMON_API_KEY --project-name perlink-app`.
-   (Optional: `NUXT_LEMON_STORE_ID` if the key sees more than one store.)
-3. **Webhook**: Settings → Webhooks → add
-   - URL: `https://perlink.to/api/billing/lemon-webhook`
-   - Signing secret: a long random string, also saved as
-     `NUXT_LEMON_WEBHOOK_SECRET`
-   - Events: `subscription_created`, `subscription_updated`,
-     `subscription_cancelled`, `subscription_resumed`, `subscription_expired`,
-     `subscription_paused`, `subscription_unpaused`,
-     `subscription_payment_success`, `subscription_payment_refunded`
-4. **Customer portal** (Settings → General → Customer portal): turn it on and
-   allow switching between the plan variants, so subscribers change plan or
-   cancel there.
-5. Redeploy. The "Card" tab appears in the checkout once the API key is set.
+Lemon Squeezy was used before; it stopped taking new stores (Nov 2026) and
+never went live. Old rows keep the method `lemon`.
 
-How the plan follows the subscription: active / on trial / past due → the
-plan runs to the next renewal plus 3 days' grace; cancelled → until its end
-date; expired, unpaid or paused → ends; a refunded charge → back to Free.
-Every successful charge is saved as a payment (method `lemon`, amount in
-`amount_usd`); only the first one shows the "you're upgraded" screen.
-Someone who already has a running subscription is sent to the customer portal
-instead of a second checkout.
+1. **API key**: Creem → Developers → API keys. A key starting with
+   `creem_test_` talks to Creem's test API; switch Test mode off in Creem for
+   the live key. Then
+   `npx wrangler pages secret put NUXT_CREEM_API_KEY --project-name perlink-app`.
+2. **Webhook**: Creem → Developers → Webhooks → add
+   `https://perlink.to/api/billing/creem-webhook` (all events), and save its
+   secret as `NUXT_CREEM_WEBHOOK_SECRET`. Test mode and live mode each have
+   their own webhook and secret.
+3. Redeploy, then **Superadmin → Settings → Creem → Create missing products**.
+   Every product carries our key in `external_id` (`plan-starter-monthly`,
+   `plan-plus-annual`, `pack-valentine`, `wedding-pass`…), which is how the
+   site finds it; names, prices and covers (`public/billing-covers/`) come
+   from `wantedProducts` in `server/utils/creem.ts`, i.e. `shared/plans.ts`
+   and `shared/roomPacks.ts`. Change a price in Creem and the settings page
+   flags the difference.
+4. **Affiliates**: Creem → Growth → Affiliate Hub: create the program
+   (commission and cookie days as in `shared/affiliate.ts`, recurring), and put
+   its join link in `affiliateSignupUrl` (nuxt.config.ts). Codes saved in
+   Dashboard → Earn, or arriving as `?aff=CODE`, go to the checkout as
+   `affiliate_code`; an unknown code is dropped rather than failing the sale.
+
+How the plan follows the subscription: active / trialing / past due → the
+plan runs to the end of the period plus 3 days' grace; scheduled to cancel →
+until the period ends; cancelled, unpaid or paused → ends; a refunded charge
+→ back to Free. Every successful charge (`subscription.paid`) is saved as a
+payment (method `creem`, amount in `amount_usd`); only the first one shows
+the "you're upgraded" screen. Someone who already has a running subscription
+gets their customer portal (same plan) or a prorated switch (other plan)
+instead of a second checkout. One-time orders arrive as `checkout.completed`
+and are taken back on `refund.created`.

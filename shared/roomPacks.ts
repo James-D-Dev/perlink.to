@@ -1,4 +1,4 @@
-// Premium 3D item packs for the room, sold once (Lemon Squeezy, one-time
+// Premium 3D item packs for the room, sold once (Creem, one-time
 // product) and kept forever. Max includes every pack. Items are drawn in
 // code like the rest of the catalog (app/utils/room/premiumModels.ts); the
 // server only needs to know which item types belong to which pack.
@@ -13,8 +13,6 @@ export interface RoomPack {
   items: string[]
   /** Card colours on the marketplace: from, via, to */
   colors: [string, string, string]
-  /** The Lemon Squeezy product's name contains this (case-insensitive) */
-  lemonMatch: string
 }
 
 export const ROOM_PACKS: RoomPack[] = [
@@ -23,49 +21,42 @@ export const ROOM_PACKS: RoomPack[] = [
     priceUsd: 15,
     items: ['vip-ring-box', 'vip-marry-me', 'vip-rose-heart', 'vip-petal-aisle', 'vip-grand-piano', 'vip-fireworks'],
     colors: ['#7f1d1d', '#be123c', '#f59e0b'],
-    lemonMatch: 'proposal',
   },
   {
     id: 'showroom',
     priceUsd: 19,
     items: ['vip-display-podium', 'vip-glass-cabinet', 'vip-neon-open', 'vip-ad-screen', 'vip-checkout-counter', 'vip-sale-banner'],
     colors: ['#0f172a', '#334155', '#e11d48'],
-    lemonMatch: 'showroom',
   },
   {
     id: 'valentine',
     priceUsd: 5,
     items: ['vip-rose-bouquet', 'vip-heart-balloons', 'vip-rose-arch', 'vip-candle-heart', 'vip-neon-heart', 'vip-love-bear'],
     colors: ['#fb7185', '#ec4899', '#c026d3'],
-    lemonMatch: 'valentine',
   },
   {
     id: 'wedding',
     priceUsd: 6,
     items: ['vip-wedding-arch', 'vip-wedding-cake', 'vip-champagne-tower', 'vip-love-marquee', 'vip-candle-lanterns', 'vip-sparkler-fountain'],
     colors: ['#b8925a', '#d79aa6', '#8c7a6e'],
-    lemonMatch: 'wedding',
   },
   {
     id: 'birthday',
     priceUsd: 5,
     items: ['vip-birthday-cake', 'vip-balloon-bunch', 'vip-gift-tower', 'vip-disco-ball', 'vip-confetti-popper', 'vip-birthday-bunting'],
     colors: ['#38bdf8', '#8b5cf6', '#ec4899'],
-    lemonMatch: 'birthday',
   },
   {
     id: 'galaxy',
     priceUsd: 7,
     items: ['vip-floating-planet', 'vip-jellyfish-lamp', 'vip-star-projector', 'vip-moon-lamp', 'vip-snow-globe', 'vip-nebula-painting'],
     colors: ['#1e1b4b', '#6d28d9', '#c026d3'],
-    lemonMatch: 'galaxy',
   },
   {
     id: 'tet',
     priceUsd: 5,
     items: ['vip-peach-blossom', 'vip-apricot-blossom', 'vip-kumquat-tree', 'vip-red-lanterns', 'vip-firecrackers', 'vip-five-fruit-tray'],
     colors: ['#dc2626', '#ef4444', '#fbbf24'],
-    lemonMatch: 'tet',
   },
 ]
 

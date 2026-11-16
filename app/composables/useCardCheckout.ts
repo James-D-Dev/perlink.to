@@ -1,7 +1,7 @@
 import type { BillingPeriod, PaidPlanId } from '#shared/plans'
 
 /**
- * Card / PayPal checkout through Lemon Squeezy: opens its checkout page, which
+ * Card checkout through Creem: opens its checkout page, which
  * brings the buyer back to the plans page. Someone already subscribed is sent
  * to their subscription page to change plan instead.
  */
@@ -16,7 +16,7 @@ export function useCardCheckout() {
   async function payByCard(plan: PaidPlanId, period: BillingPeriod, confirmed = false): Promise<void> {
     opening.value = true
     try {
-      const res = await $fetch<{ url?: string; portalUrl?: string; needsSwitch?: boolean; from?: { plan: string; period: string }; switched?: boolean }>('/api/billing/lemon-checkout', {
+      const res = await $fetch<{ url?: string; portalUrl?: string; needsSwitch?: boolean; from?: { plan: string; period: string }; switched?: boolean }>('/api/billing/card-checkout', {
         method: 'POST',
         body: { plan, period, ...(confirmed ? { switch: true } : {}) },
       })
@@ -36,7 +36,7 @@ export function useCardCheckout() {
       if (res.switched) {
         toast.add({ title: t('dashboard.billing.switch.done', { plan: t(`dashboard.billing.plans.${plan}.name`) }), color: 'success' })
         opening.value = false
-        // The plan follows Lemon Squeezy's webhook, a few seconds later
+        // The plan follows Creem's webhook, a few seconds later
         setTimeout(() => refresh(), 4000)
         return
       }

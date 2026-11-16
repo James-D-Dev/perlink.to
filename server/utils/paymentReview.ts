@@ -25,7 +25,7 @@ export interface PaymentRow {
   amount_usd: number | null
   code: string
   status: string
-  method: 'bank' | 'crypto' | 'lemon'
+  method: 'bank' | 'crypto' | 'lemon' | 'creem'
   /** 'wedding': the Wedding pass rather than the plan alone (payment_products) */
   product?: string | null
   network: string | null
@@ -102,7 +102,7 @@ export const REVIEW_COPY = {
   en: {
     period: { monthly: '1 month', annual: '1 year' } as Record<BillingPeriod, string>,
     title: '💳 <b>Payment waiting for review</b>',
-    method: { bank: 'Bank transfer', crypto: 'Crypto', lemon: 'Card' },
+    method: { bank: 'Bank transfer', crypto: 'Crypto', lemon: 'Card', creem: 'Card' },
     weddingPass: '💍 Wedding pass (1 year of Starter + Wedding room pack)',
     account: 'Account', plan: 'Plan', amount: 'Amount', tx: 'Tx', check: 'Check', note: 'Transfer message', code: 'Code',
     bankCheck: 'open your bank app and find a transfer with this amount and message.',
@@ -118,7 +118,7 @@ export const REVIEW_COPY = {
   vi: {
     period: { monthly: '1 tháng', annual: '1 năm' } as Record<BillingPeriod, string>,
     title: '💳 <b>Thanh toán chờ duyệt</b>',
-    method: { bank: 'Chuyển khoản', crypto: 'Crypto', lemon: 'Thẻ' },
+    method: { bank: 'Chuyển khoản', crypto: 'Crypto', lemon: 'Thẻ', creem: 'Thẻ' },
     weddingPass: '💍 Gói Đám cưới (1 năm Starter + bộ phòng Cưới 3D)',
     account: 'Tài khoản', plan: 'Gói', amount: 'Số tiền', tx: 'Tx', check: 'Kiểm tra', note: 'Nội dung CK', code: 'Mã',
     bankCheck: 'mở app ngân hàng, tìm giao dịch đúng số tiền và nội dung trên.',

@@ -103,8 +103,8 @@
 </template>
 
 <script setup lang="ts">
-// The affiliate program: /affiliates and /vi/cong-tac-vien. Run by Lemon
-// Squeezy; the numbers come from shared/affiliate.
+// The affiliate program: /affiliates and /vi/cong-tac-vien. Run by Creem
+// (Affiliate Hub); the numbers come from shared/affiliate.
 import { AFFILIATE_COMMISSION as PCT, AFFILIATE_COOKIE_DAYS as DAYS } from '#shared/affiliate'
 import { PLAN_PRICES_USD, formatUsd } from '#shared/plans'
 
@@ -114,10 +114,10 @@ const signupUrl = useRuntimeConfig().public.affiliateSignupUrl as string
 const TEXT = {
   en: {
     metaTitle: `Perlink Affiliate Program: Earn ${PCT}% Recurring, for Life | Perlink`,
-    metaDescription: `Earn ${PCT}% of every payment, for as long as they stay subscribed, when people you send buy a Perlink plan. Free to join, paid by Lemon Squeezy.`,
+    metaDescription: `Earn ${PCT}% of every payment, for as long as they stay subscribed, when people you send buy a Perlink plan. Free to join, paid by Creem.`,
     eyebrow: 'Affiliate program',
     title: `Share Perlink, earn ${PCT}% for life`,
-    intro: `Send people to Perlink with your link. When they buy Starter, Plus or Max within ${DAYS} days, you earn ${PCT}% of every payment they make, renewals included, for as long as they stay subscribed. Lemon Squeezy tracks every sale and pays you.`,
+    intro: `Send people to Perlink with your link. When they buy Starter, Plus or Max within ${DAYS} days, you earn ${PCT}% of every payment they make, renewals included, for as long as they stay subscribed. Creem, our payment partner, tracks every sale and pays you.`,
     join: 'Become an affiliate',
     ledgerTitle: 'Your commission, one year',
     ledgerNote: 'Example: three people you sent',
@@ -131,7 +131,7 @@ const TEXT = {
     ],
     stepsTitle: 'How it works',
     steps: [
-      { title: 'Join on Lemon Squeezy', text: 'Sign up with your email. Lemon Squeezy runs the program: it counts your sales and pays you by PayPal or bank.' },
+      { title: 'Join the program', text: 'Sign up with your email. Creem runs the program: it counts your sales and pays you by bank transfer or USDC.' },
       { title: 'Share your link', text: 'Add your code in Perlink (Dashboard → Earn) and share your links. Your own sites’ “Made with Perlink” badge carries your code too.' },
       { title: 'Get paid', text: `Every time someone you sent pays for Starter, Plus or Max, ${PCT}% is yours, every month or year they renew.` },
     ],
@@ -150,23 +150,23 @@ const TEXT = {
       'No fake reviews, coupons or promises we don’t make.',
       'No buying through your own link, and no paying people to sign up.',
       'Commission is on payments that are kept: refunds and chargebacks are taken back.',
-      'We can remove an affiliate who breaks these rules; Lemon Squeezy’s affiliate terms also apply.',
+      'We can remove an affiliate who breaks these rules; Creem’s affiliate terms also apply.',
     ],
     faqTitle: 'Questions',
     faq: [
       { q: 'Does it cost anything to join?', a: 'No. Joining is free, and you don’t need a paid Perlink plan.' },
-      { q: 'How and when am I paid?', a: 'Lemon Squeezy pays affiliates by PayPal or bank transfer once your earnings pass its payout threshold. You see every sale in your Lemon Squeezy affiliate dashboard.' },
-      { q: 'What counts as a sale?', a: `Someone who follows your link and buys Starter, Plus or Max by card or PayPal within ${DAYS} days. You earn on every payment they make after that, for as long as they stay subscribed.` },
+      { q: 'How and when am I paid?', a: 'Creem pays affiliates by bank transfer or USDC on the 1st and 15th of each month, once your earnings reach $50 and you’ve verified your identity. You see every sale in your Creem affiliate portal.' },
+      { q: 'What counts as a sale?', a: `Someone who follows your link and buys Starter, Plus or Max by card within ${DAYS} days. You earn on every payment they make after that, for as long as they stay subscribed.` },
       { q: 'Do I earn from free sign-ups?', a: 'Not directly, but we remember who brought each account: if they upgrade later, the sale is yours.' },
       { q: 'What does the badge do?', a: 'Perlink sites show a “Made with Perlink” badge. Once you add your code, the badge on your own sites sends visitors to Perlink with your code.' },
     ],
   },
   vi: {
     metaTitle: `Cộng tác viên Perlink: Nhận ${PCT}% hoa hồng trọn đời | Perlink`,
-    metaDescription: `Nhận ${PCT}% mỗi khoản thanh toán, chừng nào khách còn dùng, khi người bạn giới thiệu mua gói Perlink. Đăng ký miễn phí, Lemon Squeezy trả tiền.`,
+    metaDescription: `Nhận ${PCT}% mỗi khoản thanh toán, chừng nào khách còn dùng, khi người bạn giới thiệu mua gói Perlink. Đăng ký miễn phí, Creem trả tiền.`,
     eyebrow: 'Chương trình cộng tác viên',
     title: `Giới thiệu Perlink, nhận ${PCT}% trọn đời`,
-    intro: `Gửi mọi người tới Perlink bằng link của bạn. Khi họ mua gói Starter, Plus hoặc Max trong vòng ${DAYS} ngày, bạn nhận ${PCT}% mỗi lần họ thanh toán, kể cả các lần gia hạn, chừng nào họ còn dùng. Lemon Squeezy theo dõi từng đơn và trả tiền cho bạn.`,
+    intro: `Gửi mọi người tới Perlink bằng link của bạn. Khi họ mua gói Starter, Plus hoặc Max trong vòng ${DAYS} ngày, bạn nhận ${PCT}% mỗi lần họ thanh toán, kể cả các lần gia hạn, chừng nào họ còn dùng. Creem, đối tác thanh toán của chúng tôi, theo dõi từng đơn và trả tiền cho bạn.`,
     join: 'Đăng ký làm cộng tác viên',
     ledgerTitle: 'Hoa hồng của bạn trong một năm',
     ledgerNote: 'Ví dụ: ba người bạn giới thiệu',
@@ -180,7 +180,7 @@ const TEXT = {
     ],
     stepsTitle: 'Cách hoạt động',
     steps: [
-      { title: 'Đăng ký trên Lemon Squeezy', text: 'Đăng ký bằng email. Lemon Squeezy vận hành chương trình: đếm doanh số và trả tiền cho bạn qua PayPal hoặc ngân hàng.' },
+      { title: 'Đăng ký chương trình', text: 'Đăng ký bằng email. Creem vận hành chương trình: đếm doanh số và trả tiền cho bạn qua chuyển khoản ngân hàng hoặc USDC.' },
       { title: 'Chia sẻ link', text: 'Thêm mã vào Perlink (Dashboard → Kiếm tiền) rồi chia sẻ link. Huy hiệu “Made with Perlink” trên trang của bạn cũng mang mã của bạn.' },
       { title: 'Nhận tiền', text: `Mỗi lần người bạn giới thiệu thanh toán gói Starter, Plus hoặc Max, ${PCT}% là của bạn, mỗi tháng hoặc mỗi năm họ gia hạn.` },
     ],
@@ -199,13 +199,13 @@ const TEXT = {
       'Không đánh giá giả, mã giảm giá giả hay hứa hẹn những gì chúng tôi không cam kết.',
       'Không tự mua qua link của mình, không trả tiền để người khác đăng ký.',
       'Hoa hồng tính trên khoản thanh toán được giữ lại: đơn hoàn tiền hoặc bị chargeback sẽ bị trừ.',
-      'Chúng tôi có thể loại cộng tác viên vi phạm; điều khoản cộng tác viên của Lemon Squeezy cũng được áp dụng.',
+      'Chúng tôi có thể loại cộng tác viên vi phạm; điều khoản cộng tác viên của Creem cũng được áp dụng.',
     ],
     faqTitle: 'Câu hỏi thường gặp',
     faq: [
       { q: 'Tham gia có mất phí không?', a: 'Không. Đăng ký miễn phí và không cần dùng gói trả phí của Perlink.' },
-      { q: 'Tôi được trả tiền thế nào, khi nào?', a: 'Lemon Squeezy trả cho cộng tác viên qua PayPal hoặc chuyển khoản khi thu nhập đạt ngưỡng thanh toán của họ. Bạn xem từng đơn trong trang cộng tác viên của Lemon Squeezy.' },
-      { q: 'Thế nào được tính là một đơn?', a: `Người bấm link của bạn và mua gói Starter, Plus hoặc Max bằng thẻ hoặc PayPal trong vòng ${DAYS} ngày. Bạn nhận hoa hồng mỗi lần họ thanh toán sau đó, chừng nào họ còn dùng.` },
+      { q: 'Tôi được trả tiền thế nào, khi nào?', a: 'Creem trả cho cộng tác viên qua chuyển khoản ngân hàng hoặc USDC vào ngày 1 và 15 hằng tháng, khi thu nhập đạt 50 USD và bạn đã xác minh danh tính. Bạn xem từng đơn trong trang cộng tác viên của Creem.' },
+      { q: 'Thế nào được tính là một đơn?', a: `Người bấm link của bạn và mua gói Starter, Plus hoặc Max bằng thẻ trong vòng ${DAYS} ngày. Bạn nhận hoa hồng mỗi lần họ thanh toán sau đó, chừng nào họ còn dùng.` },
       { q: 'Người đăng ký miễn phí có được tính không?', a: 'Không trực tiếp, nhưng Perlink ghi nhớ ai mang tới mỗi tài khoản: nếu sau này họ nâng cấp, đơn đó là của bạn.' },
       { q: 'Huy hiệu dùng để làm gì?', a: 'Các trang Perlink có huy hiệu “Made with Perlink”. Khi bạn thêm mã, huy hiệu trên trang của bạn sẽ đưa khách tới Perlink kèm mã của bạn.' },
     ],

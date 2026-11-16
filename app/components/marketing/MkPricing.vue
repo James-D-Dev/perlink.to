@@ -79,7 +79,7 @@
 import { PLAN_ORDER, PLAN_PRICES, PLAN_PRICES_USD, formatUsd, formatVnd, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
 
 // Plan cards for /pricing and the dashboard upgrade page. Signed in, a paid
-// plan opens Lemon Squeezy's checkout, or a dialog to choose how to pay when
+// plan opens Creem's checkout, or a dialog to choose how to pay when
 // VietQR bank transfers are on too.
 const props = defineProps<{
   /** Plan to draw attention to, e.g. the one an upgrade prompt asked for */
@@ -116,7 +116,7 @@ const shownPlans = PLAN_ORDER
 const isPopular = (plan: PlanId) => plan === 'plus'
 const muted = (plan: PlanId) => (isPopular(plan) ? 'text-paper/60' : 'text-ink-muted')
 
-// Dollars, what Lemon Squeezy charges; VND only for Vietnamese while VietQR
+// Dollars, what Creem charges; VND only for Vietnamese while VietQR
 // bank transfers are on
 const usd = computed(() => locale.value === 'en' || methods.value?.bank === false)
 
@@ -133,8 +133,8 @@ function monthlyPrice(plan: PlanId) {
 
 const features = (plan: PlanId) => planFeatures(plan, t)
 
-// With card as the only way to pay, the button goes straight to Lemon
-// Squeezy's checkout; otherwise the dialog lets them pick
+// With card as the only way to pay, the button goes straight to Creem's
+// checkout; otherwise the dialog lets them pick
 const { opening, payByCard } = useCardCheckout()
 function buy(plan: PaidPlanId) {
   const available = info.value?.paymentMethods

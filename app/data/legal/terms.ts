@@ -87,7 +87,7 @@ export const TERMS: LegalDocs = {
         blocks: [
           { list: [
             'Perlink is software sold as a subscription. There is a free plan and paid plans (Starter, Plus and Max); prices and what each plan includes are on the [pricing page](/pricing). Prices are shown in US dollars, and in Vietnamese đồng (VND) for customers in Vietnam when bank transfer is offered.',
-            'Our order process is conducted by our online reseller **Lemon Squeezy**, which is the Merchant of Record for all our orders. Lemon Squeezy handles payment, billing, sales tax and invoices, and provides all customer service inquiries and handles returns for those orders.',
+            'Our order process is conducted by our online reseller **Creem**, which is the Merchant of Record for all our orders. Creem handles payment, billing, sales tax and invoices, and provides all customer service inquiries and handles returns for those orders.',
             'Monthly and yearly subscriptions **renew automatically** at the end of each period until you cancel. You can cancel at any time from your account or the receipt email; the plan then stays active until the end of the period you paid for and is not charged again.',
             'When it is offered at checkout, customers in Vietnam may instead pay by local bank transfer (VietQR). Those plans are paid in advance for one month or one year and do not renew on their own.',
             'Paid features are delivered digitally: they turn on in your account as soon as the payment is confirmed. Nothing is shipped.',
@@ -96,7 +96,7 @@ export const TERMS: LegalDocs = {
             'Price changes apply to future periods only, never to a period you already paid for.',
             'Premium [3D room packs](/marketplace) are a **one-time purchase**, not a subscription. A pack is added to your account as soon as the payment is confirmed and you can use its items in every room you make, for as long as you have an account. The Max plan includes every pack while it is active; rooms published with pack items keep them after the plan ends.',
             'Refunds follow our [Refund Policy](/refund).',
-            'Our affiliate program is run through Lemon Squeezy, which tracks referred sales and pays affiliates. Affiliates follow the [program rules](/affiliates#rules) and Lemon Squeezy’s affiliate terms; commission on refunded or charged-back payments is reversed.',
+            'Our affiliate program is run through Creem, which tracks referred sales and pays affiliates. Affiliates follow the [program rules](/affiliates#rules) and Creem’s affiliate terms; commission on refunded or charged-back payments is reversed.',
           ] },
         ],
       },
@@ -238,7 +238,7 @@ export const TERMS: LegalDocs = {
         blocks: [
           { list: [
             'Perlink là phần mềm bán theo hình thức thuê bao. Có gói Miễn phí và các gói trả phí (Starter, Plus và Max); giá và quyền lợi từng gói có ở [trang Bảng giá](/pricing). Giá hiển thị bằng đô la Mỹ, và bằng đồng Việt Nam (VND) cho khách tại Việt Nam khi có hình thức chuyển khoản.',
-            'Việc đặt mua được thực hiện qua đại lý bán lại trực tuyến **Lemon Squeezy**, đơn vị bán hàng chính thức (Merchant of Record) cho mọi đơn hàng của chúng tôi. Lemon Squeezy xử lý thanh toán, hoá đơn, thuế bán hàng, hỗ trợ khách hàng và hoàn trả cho các đơn đó.',
+            'Việc đặt mua được thực hiện qua đại lý bán lại trực tuyến **Creem**, đơn vị bán hàng chính thức (Merchant of Record) cho mọi đơn hàng của chúng tôi. Creem xử lý thanh toán, hoá đơn, thuế bán hàng, hỗ trợ khách hàng và hoàn trả cho các đơn đó.',
             'Thuê bao theo tháng hoặc theo năm **tự gia hạn** khi hết kỳ cho đến khi bạn huỷ. Bạn có thể huỷ bất cứ lúc nào trong tài khoản hoặc từ email biên nhận; gói vẫn dùng được đến hết kỳ đã trả và không bị trừ tiền thêm.',
             'Khi trang thanh toán có hình thức này, khách tại Việt Nam có thể thanh toán bằng chuyển khoản ngân hàng (VietQR). Các gói này trả trước theo tháng hoặc năm và không tự gia hạn.',
             'Tính năng trả phí được giao dưới dạng số: bật ngay trong tài khoản khi thanh toán được xác nhận. Không có hàng hoá vận chuyển.',
@@ -247,7 +247,7 @@ export const TERMS: LegalDocs = {
             'Thay đổi giá chỉ áp dụng cho kỳ sau, không ảnh hưởng kỳ bạn đã thanh toán.',
             'Các [gói phòng 3D](/marketplace) cao cấp được **mua một lần**, không phải thuê bao. Gói được thêm vào tài khoản ngay khi thanh toán xác nhận và bạn dùng các món trong mọi phòng bạn làm, chừng nào còn tài khoản. Gói Max có sẵn mọi gói khi còn hiệu lực; phòng đã xuất bản với món của gói vẫn giữ nguyên sau khi gói Max kết thúc.',
             'Hoàn tiền theo [Chính sách hoàn tiền](/refund).',
-            'Chương trình cộng tác viên được vận hành qua Lemon Squeezy, đơn vị theo dõi đơn hàng được giới thiệu và trả tiền cho cộng tác viên. Cộng tác viên tuân theo [quy định chương trình](/vi/cong-tac-vien#rules) và điều khoản cộng tác viên của Lemon Squeezy; hoa hồng của khoản thanh toán bị hoàn tiền hoặc chargeback sẽ bị thu hồi.',
+            'Chương trình cộng tác viên được vận hành qua Creem, đơn vị theo dõi đơn hàng được giới thiệu và trả tiền cho cộng tác viên. Cộng tác viên tuân theo [quy định chương trình](/vi/cong-tac-vien#rules) và điều khoản cộng tác viên của Creem; hoa hồng của khoản thanh toán bị hoàn tiền hoặc chargeback sẽ bị thu hồi.',
           ] },
         ],
       },

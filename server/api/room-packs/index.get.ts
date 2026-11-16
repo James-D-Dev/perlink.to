@@ -1,5 +1,5 @@
 import { ownedPacks } from '../../utils/roomPacks'
-import { lemonEnabled } from '../../utils/lemon'
+import { creemEnabled } from '../../utils/creem'
 import { ROOM_PACKS } from '#shared/roomPacks'
 
 // The marketplace: every room pack, its price, and whether the signed-in
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   return {
     signedIn: !!user,
     allIncluded: owned.all,
-    canBuy: lemonEnabled(event),
+    canBuy: creemEnabled(event),
     packs: ROOM_PACKS.map(pack => ({ id: pack.id, priceUsd: pack.priceUsd, items: pack.items, owned: owned.packs.has(pack.id) })),
   }
 })
