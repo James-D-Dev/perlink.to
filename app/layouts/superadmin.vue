@@ -97,7 +97,7 @@ const navUi = {
 };
 
 // Unread mail to support@perlink.to, on the Emails item (checked on each page change)
-const { data: mailbox, refresh: refreshUnread } = useFetch<{ unread: number }>('/api/superadmin/email/unread', { server: false });
+const { data: mailbox, refresh: refreshUnread } = useFetch<{ unread: number }>('/api/superadmin/email/unread', { key: 'mail-unread', server: false });
 watch(() => route.fullPath, () => refreshUnread());
 
 const navigationGroups = computed<{ label: string; items: NavigationMenuItem[] }[]>(() => [

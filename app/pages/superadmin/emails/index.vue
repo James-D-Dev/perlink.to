@@ -256,8 +256,13 @@ async function openEmail(id: string) {
     detail.value = await $fetch<Detail>(`/api/superadmin/email/${id}`)
     const row = data.value?.emails.find(e => e.id === id)
     if (row && row.direction === 'in' && !row.read) {
-      row.read = true
-      if (data.value) data.value.unread = Math.max(0, data.value.unread - 1)
+      // useFetch data is shallow: replace it so the list and counts update
+      data.value = {
+        ...data.value!,
+        unread: Math.max(0, data.value!.unread - 1),
+        emails: data.value!.emails.map(e => (e.id === id ? { ...e, read: true } : e)),
+      }
+      refreshNuxtData('mail-unread')
     }
   } catch (error: any) {
     toast.add({ title: 'Could not open the email', description: error?.data?.statusMessage, color: 'error' })
@@ -272,6 +277,7 @@ async function markUnread() {
   await $fetch(`/api/superadmin/email/${detail.value.email.id}`, { method: 'PATCH', body: { read: false } })
   back()
   refresh()
+  refreshNuxtData('mail-unread')
 }
 
 function back() {
@@ -281,6 +287,7 @@ function back() {
 
 function reload() {
   refresh()
+  refreshNuxtData('mail-unread')
   if (view.value === 'read' && selectedId.value) openEmail(selectedId.value)
 }
 
