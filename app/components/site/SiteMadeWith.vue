@@ -13,7 +13,7 @@
     <span class="min-w-0 flex-1">
       <span class="flex items-baseline gap-[0.3em] text-sm font-semibold" :aria-label="siteT(lang, 'madeWith')">
         <span v-if="before">{{ before }}</span>
-        <AppLogo :size="20" class="-translate-y-[1.5px]" />
+        <AppLogo :size="20" :style="onBaseline(20)" />
         <span v-if="after">{{ after }}</span>
       </span>
       <span class="mt-0.5 block text-xs leading-snug text-black/55">{{ siteT(lang, 'madeWithCta') }}</span>
@@ -30,11 +30,10 @@
     :aria-label="siteT(lang, 'madeWith')"
     class="group pointer-events-auto inline-flex h-9 items-center gap-1.5 rounded-full bg-black/35 pl-3.5 pr-3 text-xs font-medium text-white shadow-lg ring-1 ring-white/15 backdrop-blur-xl transition hover:bg-black/50"
   >
-    <!-- Words and logo share a baseline; the logo sits a hair higher so its
-         p descender doesn't make it look low -->
+    <!-- Words and logo share a baseline (see onBaseline) -->
     <span class="inline-flex items-baseline gap-1.5">
       <span v-if="before">{{ before }}</span>
-      <AppLogo :size="17" inverted class="-translate-y-px" />
+      <AppLogo :size="17" inverted :style="onBaseline(17)" />
       <span v-if="after">{{ after }}</span>
     </span>
     <UIcon name="i-lucide-arrow-up-right" class="size-3.5 text-white/60 transition group-hover:text-white" />
@@ -58,6 +57,12 @@ const props = withDefaults(defineProps<{
 const parts = computed(() => siteT(props.lang, 'madeWith').split('Perlink'))
 const before = computed(() => parts.value[0]?.trim() ?? '')
 const after = computed(() => parts.value.slice(1).join('Perlink').trim())
+
+// The wordmark is drawn 0.82 of `size` high, with its baseline 14.5% up from
+// the drawing's bottom (viewBox -855…145). In a baseline row the drawing's
+// bottom lands on the text's baseline, so it is moved down by that 14.5%
+// (measured on a live site: the two baselines then meet)
+const onBaseline = (size: number) => ({ transform: `translateY(${(size * 0.82 * 0.145).toFixed(2)}px)` })
 
 // From a 3D room, to the page about 3D portfolios (in the site's language);
 // from a page, to the home page
