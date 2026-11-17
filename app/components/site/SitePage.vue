@@ -38,6 +38,14 @@
       <Meta name="twitter:image" :content="metaImg" />
       <Meta property="profile:username" :content="bioPage?.username" />
     </Head>
+    <div
+      v-if="bioPage?.adminPreview"
+      class="pointer-events-none fixed inset-x-0 top-3 z-[100] flex justify-center px-4"
+    >
+      <span class="rounded-full bg-amber-400 px-3 py-1 text-xs font-semibold text-black shadow-lg">
+        Draft · not published · visible to superadmin only
+      </span>
+    </div>
 
     <div class="mx-auto">
       <!-- Loading -->
@@ -147,6 +155,8 @@ interface ApiBioPage {
   showBranding?: boolean;
   /** False for thin or untouched-template sites: noindex (server/utils/siteIndexing) */
   indexable?: boolean;
+  /** A draft shown to the superadmin (not published, nobody else sees it) */
+  adminPreview?: boolean;
   /** Set when the site is private right now: only name, photo and colours come with it */
   gate?: { kind: "password" } | { kind: "schedule"; opensAt: string };
 }

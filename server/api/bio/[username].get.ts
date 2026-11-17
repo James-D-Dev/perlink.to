@@ -5,6 +5,7 @@ import { PLAN_LIMITS, showsBranding } from '#shared/plans'
 import { cleanTracking } from '#shared/tracking'
 import { gatedBioPage, siteGate } from '../../utils/siteAccess'
 import { siteIndexable } from '../../utils/siteIndexing'
+import { isSuperadmin } from '../../utils/superadmin'
 import { isBot, parseDevice, hashIP, parseReferrer, parseUTMParams, detectSourceType } from '../../services/analytics'
 
 export default defineEventHandler(async (event) => {
@@ -22,11 +23,21 @@ export default defineEventHandler(async (event) => {
   const bioRepo = new BioRepository(event)
   const bioPage = await bioRepo.findByUsername(username)
 
-  if (!bioPage || !bioPage.isPublished) {
+  // A draft is visible to the superadmin only (moderation, support): the
+  // latest edits, never cached, indexed, tracked or sending the owner's pixels
+  const adminPreview = !!bioPage && !bioPage.isPublished && isSuperadmin(event)
+  if (!bioPage || (!bioPage.isPublished && !adminPreview)) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Bio page not found'
     })
+  }
+  if (adminPreview) {
+    setResponseHeader(event, 'Cache-Control', 'private, no-store')
+    const ownerPlan = await getAccountPlan(event, bioPage.userId).catch(() => null)
+    const latest = { ...bioPage, ...(bioPage.draft ?? {}) }
+    latest.themeConfig = { ...latest.themeConfig, tracking: undefined }
+    return { bioPage: { ...publicBioPage(latest), showBranding: showsBranding(ownerPlan?.plan), indexable: false, adminPreview: true } }
   }
 
   // A password or an opening time: only the name and photo until then
