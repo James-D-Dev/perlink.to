@@ -2,6 +2,7 @@ import type { H3Event } from 'h3'
 import { getQuery } from 'h3'
 import { getDB } from './db'
 import { ProfileRepository } from '../repositories/profileRepository'
+import { sendWelcomeEmail } from './welcomeEmail'
 
 export interface SocialAccount {
   provider: 'facebook' | 'tiktok'
@@ -61,6 +62,7 @@ export async function signInWithSocial(event: H3Event, account: SocialAccount) {
       avatar: account.avatar || null,
     })
     console.log(`[OAuth] ${account.provider}: new profile`, { id: profile.id })
+    sendWelcomeEmail(event, profile)
   }
   if (!linked || linked.user_id !== profile.id) {
     await db
