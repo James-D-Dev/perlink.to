@@ -20,10 +20,10 @@ export async function getAccountPlan(event: H3Event, userId: string): Promise<Ac
   let storedPlan = row?.plan || 'free'
   let expiresAt = row?.plan_expires_at ?? null
   if (row && plan === 'free') {
-    // A higher plan (e.g. paid by bank) ran out while a card subscription is
-    // still paid up: the account moves onto the subscription's plan
+    // A higher plan (e.g. paid by bank) ran out while a Creem subscription is
+    // still paid up (old Lemon rows are left out: nothing updates them now): the account moves onto the subscription's plan
     const sub = await getDB(event)
-      .prepare(`SELECT plan, renews_at, ends_at FROM subscriptions WHERE user_id = ? AND status IN ('on_trial', 'active', 'past_due', 'cancelled')
+      .prepare(`SELECT plan, renews_at, ends_at FROM subscriptions WHERE user_id = ? AND id LIKE 'sub_%' AND status IN ('on_trial', 'active', 'past_due', 'cancelled')
         AND COALESCE(renews_at, ends_at) > ? ORDER BY COALESCE(renews_at, ends_at) DESC LIMIT 1`)
       .bind(userId, new Date().toISOString())
       .first<{ plan: string; renews_at: string | null; ends_at: string | null }>()
