@@ -282,11 +282,15 @@ export function textToHtml(text: string, opts: { color?: string } = {}) {
 /** Plain-text version of the same words (bold marks removed) */
 const textOnly = (text: string) => text.replace(/\*\*(.+?)\*\*/g, '$1').trim()
 
-/** A label/value table (form details, an order) in the card */
+/** Form details or an order in the card: each label small above its value,
+ *  so it reads well at any width (no side-by-side columns to squeeze) */
 export function detailsTable(rows: [string, string][]) {
   if (!rows.length) return ''
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 24px;border-collapse:collapse;background:#f8f6f3;border-radius:14px">
-${rows.map(([label, value], i) => `<tr><td style="padding:12px 16px;${i ? 'border-top:1px solid #ece8e2;' : ''}color:#6b655e;font-size:14px;width:120px;vertical-align:top">${escapeHtml(label)}</td><td style="padding:12px 16px;${i ? 'border-top:1px solid #ece8e2;' : ''}color:#0c0b0a;font-size:14px;white-space:pre-line;word-break:break-word">${escapeHtml(value)}</td></tr>`).join('\n')}
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 24px;border-collapse:separate;background:#f8f6f3;border-radius:14px">
+${rows.map(([label, value], i) => `<tr><td style="padding:12px 16px;${i ? 'border-top:1px solid #ece8e2;' : ''}">
+<div style="font-size:12px;line-height:1.4;color:#8a837b;margin:0 0 2px">${escapeHtml(label)}</div>
+<div style="font-size:15px;line-height:1.5;color:#0c0b0a;white-space:pre-line;word-break:normal;overflow-wrap:break-word">${escapeHtml(value)}</div>
+</td></tr>`).join('\n')}
 </table>`
 }
 
@@ -312,16 +316,23 @@ export function renderLayout(opts: {
 </td></tr></table>`
     : ''
   return `<!doctype html>
-<html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>${escapeHtml(opts.title)}</title></head>
+<html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>${escapeHtml(opts.title)}</title>
+<style>
+@media only screen and (max-width:480px){
+  .pl-outer{padding:20px 10px !important}
+  .pl-card{padding:26px 20px !important;border-radius:16px !important}
+  .pl-h1{font-size:21px !important}
+}
+</style></head>
 <body style="margin:0;padding:0;background:#f3f1ee;-webkit-text-size-adjust:100%">
 ${opts.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${escapeHtml(opts.preheader)}</div>` : ''}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f1ee"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f1ee"><tr><td align="center" class="pl-outer" style="padding:32px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
 <tr><td style="padding:0 4px 20px">
 <a href="https://perlink.to" style="text-decoration:none"><img src="https://perlink.to/web-app-manifest-192x192.png" width="32" height="32" alt="" style="display:inline-block;vertical-align:middle;border:0;border-radius:8px"><span style="display:inline-block;vertical-align:middle;margin-left:10px;font-family:${FONT};font-size:21px;font-weight:700;letter-spacing:-0.03em;color:#0c0b0a"><span style="color:${accent}">per</span>link</span></a>
 </td></tr>
-<tr><td style="background:#ffffff;border:1px solid #e8e4de;border-radius:20px;padding:36px 32px;font-family:${FONT};font-size:15px;line-height:1.6;color:#3a3631">
-${opts.heading ? `<h1 style="margin:0 0 18px;font-family:${FONT};font-size:23px;line-height:1.3;font-weight:700;letter-spacing:-0.02em;color:#0c0b0a">${escapeHtml(opts.heading)}</h1>` : ''}
+<tr><td class="pl-card" style="background:#ffffff;border:1px solid #e8e4de;border-radius:20px;padding:34px 30px;font-family:${FONT};font-size:15px;line-height:1.6;color:#3a3631">
+${opts.heading ? `<h1 class="pl-h1" style="margin:0 0 18px;font-family:${FONT};font-size:23px;line-height:1.3;font-weight:700;letter-spacing:-0.02em;color:#0c0b0a">${escapeHtml(opts.heading)}</h1>` : ''}
 ${opts.bodyHtml}
 ${button}
 ${opts.note ? `<p style="margin:8px 0 0;padding-top:18px;border-top:1px solid #efebe6;font-size:13px;line-height:1.55;color:#8a837b">${escapeHtml(opts.note)}</p>` : ''}
