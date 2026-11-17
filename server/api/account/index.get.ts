@@ -1,5 +1,5 @@
 import { getDB } from '../../utils/db'
-import { effectivePlan } from '#shared/plans'
+import { getAccountPlan } from '../../utils/plan'
 import { toAppLanguage } from '#shared/language'
 
 // The signed-in user's account summary for the settings page
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
       email: profile.email,
       name: profile.name,
       avatar: profile.avatar,
-      plan: effectivePlan(profile.plan, profile.plan_expires_at),
+      plan: (await getAccountPlan(event, user.id)).plan,
       createdAt: profile.created_at,
       language: toAppLanguage(profile.language),
       sites: sites?.n ?? 0,

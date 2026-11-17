@@ -1,6 +1,6 @@
 import { getDB } from '../../utils/db'
 import { creemCatalog, idOf, verifyCreemSignature, type CreemSubscription } from '../../utils/creem'
-import { WEDDING_PASS, type BillingPeriod, type PaidPlanId } from '#shared/plans'
+import { PLAN_ORDER, WEDDING_PASS, type BillingPeriod, type PaidPlanId, type PlanId } from '#shared/plans'
 import { grantWeddingPass, revokeWeddingPass, setPaymentProduct } from '../../utils/weddingPass'
 import { isRoomPackId } from '#shared/roomPacks'
 
@@ -51,12 +51,20 @@ export default defineEventHandler(async (event) => {
   const db = getDB(event)
   const now = new Date().toISOString()
 
-  async function setPlan(userId: string, plan: PaidPlanId, expiresAt: string, extendOnly: boolean) {
+  /**
+   * fromPlan: the plan this same subscription was on before (a switch), so a
+   * downgrade through it applies; a higher plan paid some other way (e.g. by
+   * bank) is kept until it runs out instead
+   */
+  async function setPlan(userId: string, plan: PaidPlanId, expiresAt: string, extendOnly: boolean, fromPlan?: string) {
     const profile = await db.prepare('SELECT plan, plan_expires_at FROM profiles WHERE id = ?').bind(userId)
       .first<{ plan: string | null; plan_expires_at: string | null }>()
     if (!profile) return
     // Never cut short time the account has on another plan (e.g. paid by bank)
     if (!extendOnly && profile.plan !== plan) return
+    const current = (profile.plan ?? 'free') as PlanId
+    const stillOn = !profile.plan_expires_at || Date.parse(profile.plan_expires_at) > Date.now()
+    if (extendOnly && stillOn && current !== fromPlan && PLAN_ORDER.indexOf(current) > PLAN_ORDER.indexOf(plan)) return
     const until = extendOnly && profile.plan === plan ? later(profile.plan_expires_at, expiresAt) : expiresAt
     await db.prepare('UPDATE profiles SET plan = ?, plan_expires_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').bind(plan, until, userId).run()
   }
@@ -82,15 +90,15 @@ export default defineEventHandler(async (event) => {
         renews_at = excluded.renews_at, ends_at = excluded.ends_at, updated_at = datetime('now')`)
       .bind(sub.id, userId, plan, period, status, status === 'cancelled' || status === 'expired' ? null : periodEnd, endsAt)
       .run()
-    return { userId, plan, period, status, periodEnd, endsAt }
+    return { userId, plan, period, status, periodEnd, endsAt, fromPlan: known?.plan }
   }
 
   /** The account's plan, following the subscription's status */
   async function applyStatus(saved: NonNullable<Awaited<ReturnType<typeof saveSubscription>>>) {
-    const { userId, plan, status, periodEnd, endsAt } = saved
+    const { userId, plan, status, periodEnd, endsAt, fromPlan } = saved
     if (['on_trial', 'active', 'past_due'].includes(status) && periodEnd) {
       // Paid up: on until the period ends, with a few days' grace for the renewal charge
-      await setPlan(userId, plan, addDays(periodEnd, GRACE_DAYS), true)
+      await setPlan(userId, plan, addDays(periodEnd, GRACE_DAYS), true, fromPlan)
     } else if (status === 'cancelled' && endsAt) {
       // Cancelled at the end of the period: stays on until then
       await setPlan(userId, plan, endsAt, false)

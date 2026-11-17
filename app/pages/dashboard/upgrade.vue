@@ -13,8 +13,8 @@
         </div>
 
         <!-- Where the account stands -->
-        <div v-if="info" class="mb-8 grid gap-3 lg:grid-cols-2">
-          <div class="flex flex-wrap items-center gap-4 rounded-3xl bg-paper ring-1 ring-line p-5">
+        <div v-if="info" class="mb-8 grid gap-3" :class="info.canTrial ? 'lg:grid-cols-2' : ''">
+          <div class="flex flex-wrap items-center gap-4 rounded-3xl bg-paper ring-1 ring-line p-5 sm:flex-nowrap">
             <div class="flex size-11 shrink-0 items-center justify-center rounded-xl" :class="info.plan === 'free' ? 'bg-sand text-ink-muted' : 'bg-gradient-to-br from-amber-400 to-pink-500 text-white'">
               <UIcon :name="info.plan === 'free' ? 'i-lucide-user' : 'i-lucide-crown'" class="size-5" />
             </div>

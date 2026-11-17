@@ -16,12 +16,28 @@ export async function getAccountPlan(event: H3Event, userId: string): Promise<Ac
     .prepare('SELECT plan, plan_expires_at, trial_used FROM profiles WHERE id = ?')
     .bind(userId)
     .first<{ plan: string | null; plan_expires_at: string | null; trial_used: number | null }>()
-  return {
-    plan: effectivePlan(row?.plan, row?.plan_expires_at),
-    storedPlan: row?.plan || 'free',
-    expiresAt: row?.plan_expires_at ?? null,
-    trialUsed: !!row?.trial_used,
+  let plan = effectivePlan(row?.plan, row?.plan_expires_at)
+  let storedPlan = row?.plan || 'free'
+  let expiresAt = row?.plan_expires_at ?? null
+  if (row && plan === 'free') {
+    // A higher plan (e.g. paid by bank) ran out while a card subscription is
+    // still paid up: the account moves onto the subscription's plan
+    const sub = await getDB(event)
+      .prepare(`SELECT plan, renews_at, ends_at FROM subscriptions WHERE user_id = ? AND status IN ('on_trial', 'active', 'past_due', 'cancelled')
+        AND COALESCE(renews_at, ends_at) > ? ORDER BY COALESCE(renews_at, ends_at) DESC LIMIT 1`)
+      .bind(userId, new Date().toISOString())
+      .first<{ plan: string; renews_at: string | null; ends_at: string | null }>()
+      .catch(() => null)
+    if (sub) {
+      const until = sub.renews_at ? new Date(Date.parse(sub.renews_at) + 3 * 86400000).toISOString() : sub.ends_at!
+      plan = effectivePlan(sub.plan, until)
+      storedPlan = sub.plan
+      expiresAt = until
+      await getDB(event).prepare('UPDATE profiles SET plan = ?, plan_expires_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .bind(sub.plan, until, userId).run().catch(() => {})
+    }
   }
+  return { plan, storedPlan, expiresAt, trialUsed: !!row?.trial_used }
 }
 
 /**
