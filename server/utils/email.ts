@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3'
+import { getDB } from './db'
 
 // Transactional email through Cloudflare Email Sending. Pages can't have a
 // send_email binding, so emails go to the perlink-email Worker
@@ -14,6 +15,13 @@ export interface EmailMessage {
   replyTo?: string
   /** Sender, e.g. "Perlink Support <support@perlink.to>" (default NUXT_EMAIL_FROM) */
   from?: string
+  /** For Superadmin → Emails → Sent: 'admin' (written there) or 'system' (default) */
+  kind?: 'admin' | 'system'
+  /** The Sent row's id, when the caller wants to know it */
+  id?: string
+  /** Threading, when answering a received mail (its Message-ID / References) */
+  inReplyTo?: string
+  references?: string
 }
 
 interface ServiceBinding {
@@ -31,7 +39,45 @@ export function emailEnabled(event: H3Event) {
   return !!emailBinding(event) || !!useRuntimeConfig(event).cfEmailApiToken
 }
 
+/** Sends an email and keeps it in Superadmin → Emails → Sent (mail_messages) */
 export async function sendEmail(event: H3Event, message: EmailMessage): Promise<boolean> {
+  const sent: Sent = { messageId: null }
+  const ok = await deliver(event, message, sent)
+  await logSent(event, message, ok, sent.messageId).catch(error => console.error('[email] could not log', error?.message))
+  return ok
+}
+
+interface Sent { messageId: string | null }
+
+async function logSent(event: H3Event, message: EmailMessage, ok: boolean, messageId: string | null) {
+  const from = message.from || String(useRuntimeConfig(event).emailFrom)
+  const fromEmail = (from.match(/<([^>]+)>/)?.[1] ?? from).trim()
+  const fromName = from.match(/^\s*"?([^"<]+?)"?\s*</)?.[1] ?? null
+  const db = getDB(event)
+  const account = await db.prepare('SELECT id FROM profiles WHERE lower(email) = lower(?)').bind(message.to).first<{ id: string }>()
+  await db.prepare(`INSERT INTO mail_messages
+    (id, direction, kind, from_email, from_name, to_email, subject, text, html, message_id, in_reply_to, refs, user_id, status, error, read_at)
+    VALUES (?, 'out', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`)
+    .bind(
+      message.id ?? crypto.randomUUID(),
+      message.kind ?? 'system',
+      fromEmail,
+      fromName,
+      message.to,
+      message.subject.slice(0, 500),
+      message.text.slice(0, 1_000_000),
+      message.html.slice(0, 1_000_000),
+      messageId,
+      message.inReplyTo ?? null,
+      message.references ?? null,
+      account?.id ?? null,
+      ok ? 'sent' : 'failed',
+      ok ? null : lastEmailError || 'Unknown error',
+    )
+    .run()
+}
+
+async function deliver(event: H3Event, message: EmailMessage, sent: Sent): Promise<boolean> {
   const config = useRuntimeConfig(event)
   const from = message.from || String(config.emailFrom)
   const bare = from.match(/<([^>]+)>/)?.[1] ?? from
@@ -43,10 +89,13 @@ export async function sendEmail(event: H3Event, message: EmailMessage): Promise<
       const response = await worker.fetch('https://perlink-email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: message.to, from: bare, fromName, subject: message.subject, html: message.html, text: message.text, replyTo: message.replyTo }),
+        body: JSON.stringify({ to: message.to, from: bare, fromName, subject: message.subject, html: message.html, text: message.text, replyTo: message.replyTo, inReplyTo: message.inReplyTo, references: message.references }),
       })
-      const data = await response.json().catch(() => null) as { ok?: boolean; error?: string } | null
-      if (data?.ok) return true
+      const data = await response.json().catch(() => null) as { ok?: boolean; error?: string; messageId?: string | null } | null
+      if (data?.ok) {
+        sent.messageId = data.messageId ?? null
+        return true
+      }
       lastEmailError = data?.error || `Email worker HTTP ${response.status}`
       console.error('[email] worker send failed', lastEmailError)
       return false

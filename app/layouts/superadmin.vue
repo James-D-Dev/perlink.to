@@ -96,7 +96,11 @@ const navUi = {
   linkLeadingIcon: "size-5 text-ink-muted group-data-active:text-tint",
 };
 
-const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [
+// Unread mail to support@perlink.to, on the Emails item (checked on each page change)
+const { data: mailbox, refresh: refreshUnread } = useFetch<{ unread: number }>('/api/superadmin/email/unread', { server: false });
+watch(() => route.fullPath, () => refreshUnread());
+
+const navigationGroups = computed<{ label: string; items: NavigationMenuItem[] }[]>(() => [
   {
     label: "Overview",
     items: [
@@ -112,7 +116,7 @@ const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [
       { label: "QR Codes", icon: "i-lucide-qr-code", to: "/superadmin/qr-codes" },
       { label: "Reports", icon: "i-lucide-flag", to: "/superadmin/reports" },
       { label: "Payments", icon: "i-lucide-wallet", to: "/superadmin/payments" },
-      { label: "Emails", icon: "i-lucide-mail", to: "/superadmin/emails" },
+      { label: "Emails", icon: "i-lucide-mail", to: "/superadmin/emails", badge: mailbox.value?.unread ? String(mailbox.value.unread) : undefined },
     ],
   },
   {
@@ -121,7 +125,7 @@ const navigationGroups: { label: string; items: NavigationMenuItem[] }[] = [
       { label: "Settings", icon: "i-lucide-settings", to: "/superadmin/settings" },
     ],
   },
-];
+]);
 
 const supportLinks: NavigationMenuItem[] = [
   { label: "User Dashboard", icon: "i-lucide-layout-grid", to: "/dashboard" },
@@ -132,7 +136,7 @@ const groups = computed(() => [
   {
     id: "links",
     label: "Go to",
-    items: navigationGroups.flatMap(g => g.items) as any,
+    items: navigationGroups.value.flatMap(g => g.items) as any,
   },
   {
     id: "actions",

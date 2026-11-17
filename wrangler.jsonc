@@ -30,6 +30,11 @@
 		{
 			"bucket_name": "perlink-avatars",
 			"binding": "AVATARS_BUCKET"
+		},
+		{
+			// Attachments of mail received at support@perlink.to (private)
+			"bucket_name": "perlink-mail",
+			"binding": "MAIL_BUCKET"
 		}
 	],
 	/**
