@@ -27,9 +27,9 @@ export default defineEventHandler(async (event) => {
       .first<{ id: string; plan: string }>()
       .catch(() => null),
     // The latest card subscription (Creem), to manage it
-    db.prepare('SELECT plan, period, status, renews_at, ends_at, portal_url FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1')
+    db.prepare('SELECT id, plan, period, status, renews_at, ends_at, portal_url FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1')
       .bind(user.id)
-      .first<{ plan: string; period: string; status: string; renews_at: string | null; ends_at: string | null; portal_url: string | null }>()
+      .first<{ id: string; plan: string; period: string; status: string; renews_at: string | null; ends_at: string | null; portal_url: string | null }>()
       .catch(() => null),
     weddingPassByCard(event),
   ])
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     paymentMethods: methods,
     celebrate: celebrate ? { paymentId: celebrate.id, plan: celebrate.plan } : null,
     subscription: subscription && subscription.status !== 'expired'
-      ? { plan: subscription.plan, period: subscription.period, status: subscription.status, renewsAt: subscription.renews_at, endsAt: subscription.ends_at, portalUrl: subscription.portal_url }
+      ? { plan: subscription.plan, period: subscription.period, status: subscription.status, renewsAt: subscription.renews_at, endsAt: subscription.ends_at, portalUrl: subscription.id.startsWith('sub_') ? '/api/billing/portal' : subscription.portal_url }
       : null,
     payments: (payments.results ?? []).map(p => ({
       id: p.id, plan: p.plan, period: p.period, amount: p.amount, amountUsd: p.amount_usd, method: p.method, code: p.code, status: p.status, createdAt: p.created_at, paidAt: p.paid_at, product: products.get(p.id) ?? null,

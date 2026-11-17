@@ -39,6 +39,7 @@
               variant="outline"
               icon="i-lucide-settings-2"
               :to="info.subscription.portalUrl"
+              external
               target="_blank"
               :label="t('dashboard.billing.subscription.manage')"
             />
