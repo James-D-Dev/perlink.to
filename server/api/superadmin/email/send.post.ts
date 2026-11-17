@@ -1,7 +1,8 @@
 import { z } from 'zod'
 import { getDB } from '../../../utils/db'
 import { requireSuperadmin } from '../../../utils/superadmin'
-import { escapeHtml, lastEmailError, sendEmail } from '../../../utils/email'
+import { lastEmailError, sendEmail } from '../../../utils/email'
+import { getLayout, renderLayout, textToHtml } from '../../../utils/emailTemplates'
 
 const SUPPORT_FROM = 'Perlink Support <support@perlink.to>'
 
@@ -35,11 +36,8 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Plain text as written; the HTML version keeps paragraphs and line breaks
-  const html = body
-    .split(/\n{2,}/)
-    .map(paragraph => `<p style="margin:0 0 14px;line-height:1.6">${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`)
-    .join('')
+  // Plain text as written; the HTML version is the branded layout around it
+  const html = renderLayout({ layout: await getLayout(event), lang: 'en', title: subject, preheader: body.split('\n').find(Boolean)?.slice(0, 140), bodyHtml: textToHtml(body) })
   const id = crypto.randomUUID()
   const ok = await sendEmail(event, {
     id,
@@ -48,7 +46,7 @@ export default defineEventHandler(async (event) => {
     to,
     subject,
     text: body,
-    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;color:#1c1a17">${html}</div>`,
+    html,
     replyTo: 'support@perlink.to',
     inReplyTo,
     references,

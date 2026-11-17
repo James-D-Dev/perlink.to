@@ -122,6 +122,7 @@ const navigationGroups = computed<{ label: string; items: NavigationMenuItem[] }
   {
     label: "System",
     items: [
+      { label: "Email templates", icon: "i-lucide-mail-plus", to: "/superadmin/email-templates" },
       { label: "Settings", icon: "i-lucide-settings", to: "/superadmin/settings" },
     ],
   },

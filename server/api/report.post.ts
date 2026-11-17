@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { getDB } from '../utils/db'
-import { escapeHtml, runInBackground, sendEmail } from '../utils/email'
+import { runInBackground, sendEmail } from '../utils/email'
+import { renderTemplate } from '../utils/emailTemplates'
 import { hashIP } from '../services/analytics'
 import { SUPERADMIN_EMAIL } from '../utils/superadmin'
 import { REPORT_REASONS } from '#shared/reports'
@@ -41,13 +42,14 @@ export default defineEventHandler(async (event) => {
 
   // Let the admin know (skipped while email isn't set up)
   const siteUrl = `https://perlink.to/${site.username}`
-  runInBackground(event, sendEmail(event, {
-    to: SUPERADMIN_EMAIL,
-    subject: `Report: perlink.to/${site.username} (${reason})`,
-    text: `${siteUrl}\nReason: ${reason}\n${details ?? ''}\nReview: https://perlink.to/superadmin/reports`,
-    html: `<p><a href="${siteUrl}">${siteUrl}</a></p><p>Reason: <b>${reason}</b></p><p>${escapeHtml(details ?? '')}</p><p><a href="https://perlink.to/superadmin/reports">Review reports</a></p>`,
-    replyTo: email || undefined,
-  }))
+  runInBackground(event, (async () => {
+    const { subject, html, text } = await renderTemplate(event, 'report', 'en', {
+      vars: { site: site.username, reason },
+      buttonUrl: 'https://perlink.to/superadmin/reports',
+      rows: [['Site', siteUrl], ['Reason', reason], ...(details ? [['Details', details] as [string, string]] : []), ...(email ? [['From', email] as [string, string]] : [])],
+    })
+    await sendEmail(event, { to: SUPERADMIN_EMAIL, subject, html, text, replyTo: email || undefined })
+  })().catch(error => console.error('[report] email not sent', error)))
 
   return { success: true }
 })
