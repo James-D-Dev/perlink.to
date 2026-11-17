@@ -91,7 +91,7 @@ export default defineNuxtConfig({
       oauthGoogleClientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID || "",
       // Where people sign up as affiliates: the Creem affiliate program's
       // join link (Creem → Growth → Affiliate Hub)
-      affiliateSignupUrl: "https://affiliates.creem.io",
+      affiliateSignupUrl: "https://affiliates.creem.io/join/perlink",
     },
   },
 
