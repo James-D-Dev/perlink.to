@@ -112,7 +112,7 @@
                   {{ `\{\{${key}\}\}` }}
                 </button>
               </div>
-              <p class="text-muted">Blank line = new paragraph · lines starting <code>- </code> or <code>1. </code> = a list · <code>**bold**</code></p>
+              <p class="text-muted">Blank line = new paragraph · lines starting <code>- </code> or <code>1. </code> = a list · <code>**bold**</code> · <code v-pre>{{button}}</code> on its own line = where the button goes</p>
             </div>
 
             <div class="flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4">

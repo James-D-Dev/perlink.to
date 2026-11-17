@@ -53,14 +53,14 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
       en: {
         subject: 'Welcome to Perlink 👋',
         heading: 'Welcome to Perlink, {{name}} 👋',
-        body: 'Your own site, or a whole 3D world, is a few minutes away. Here’s how to get your first one live:\n\n1. **Create a site.** Add your links, photos and contact buttons, or start from a ready-made theme.\n2. **Make it yours.** Pick colours, step into a 3D room, add a password or an opening time.\n3. **Share it.** Put your link in your bio, print it on a QR code or send it in a message.\n\nHappy building,\n**The Perlink team**',
+        body: 'Your own site, or a whole 3D world, is a few minutes away. Here’s how to get your first one live:\n\n1. **Create a site.** Add your links, photos and contact buttons, or start from a ready-made theme.\n2. **Make it yours.** Pick colours, step into a 3D room, add a password or an opening time.\n3. **Share it.** Put your link in your bio, print it on a QR code or send it in a message.\n\n{{button}}\n\nHappy building,\n**The Perlink team**',
         button: 'Open your dashboard',
         note: 'Questions or ideas? Just reply to this email. It comes straight to us.',
       },
       vi: {
         subject: 'Chào mừng bạn đến với Perlink 👋',
         heading: 'Chào mừng {{name}} đến với Perlink 👋',
-        body: 'Trang web của riêng bạn, hay cả một thế giới 3D, chỉ cách bạn vài phút. Ba bước để trang đầu tiên lên sóng:\n\n1. **Tạo trang.** Thêm liên kết, hình ảnh, nút liên hệ, hoặc bắt đầu từ một theme có sẵn.\n2. **Tuỳ chỉnh theo ý bạn.** Chọn màu sắc, bước vào phòng 3D, đặt mật khẩu hoặc giờ mở trang.\n3. **Chia sẻ.** Gắn link vào bio, in thành mã QR hoặc gửi qua tin nhắn.\n\nChúc bạn sáng tạo vui,\n**Đội ngũ Perlink**',
+        body: 'Trang web của riêng bạn, hay cả một thế giới 3D, chỉ cách bạn vài phút. Ba bước để trang đầu tiên lên sóng:\n\n1. **Tạo trang.** Thêm liên kết, hình ảnh, nút liên hệ, hoặc bắt đầu từ một theme có sẵn.\n2. **Tuỳ chỉnh theo ý bạn.** Chọn màu sắc, bước vào phòng 3D, đặt mật khẩu hoặc giờ mở trang.\n3. **Chia sẻ.** Gắn link vào bio, in thành mã QR hoặc gửi qua tin nhắn.\n\n{{button}}\n\nChúc bạn sáng tạo vui,\n**Đội ngũ Perlink**',
         button: 'Mở trang quản lý',
         note: 'Có câu hỏi hay góp ý? Bạn chỉ cần trả lời email này, thư sẽ đến thẳng đội ngũ Perlink.',
       },
@@ -262,7 +262,10 @@ export const isColour = (value: unknown): value is string => typeof value === 's
 
 /** {{variable}} → its value (the raw text; escaping happens when rendering) */
 export const fill = (text: string, vars: Record<string, string>) =>
-  text.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, key: string) => vars[key] ?? '')
+  text.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key: string) => (key === 'button' ? match : vars[key] ?? ''))
+
+/** Where {{button}} sits on a line of its own, the button goes; otherwise after the message */
+const BUTTON_SLOT = '<!--perlink-button-->'
 
 /** Plain text with paragraphs, lists and **bold** → email HTML */
 export function textToHtml(text: string, opts: { color?: string; accent?: string } = {}) {
@@ -272,6 +275,7 @@ export function textToHtml(text: string, opts: { color?: string; accent?: string
     .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#0c0b0a;font-weight:600">$1</strong>')
     .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#0066d6">$1</a>')
   return text.trim().split(/\n{2,}/).map((block) => {
+    if (/^\s*\{\{\s*button\s*\}\}\s*$/.test(block)) return BUTTON_SLOT
     const lines = block.split('\n')
     if (lines.every(line => /^\s*\d+[.)]\s+/.test(line))) {
       // Steps: a number in an accent circle beside each line
@@ -288,7 +292,7 @@ export function textToHtml(text: string, opts: { color?: string; accent?: string
 }
 
 /** Plain-text version of the same words (bold marks removed) */
-const textOnly = (text: string) => text.replace(/\*\*(.+?)\*\*/g, '$1').trim()
+const textOnly = (text: string) => text.replace(/\*\*(.+?)\*\*/g, '$1').replace(/^\s*\{\{\s*button\s*\}\}\s*$/gm, '').replace(/\n{3,}/g, '\n\n').trim()
 
 /** Form details or an order in the card: each label small above its value,
  *  so it reads well at any width (no side-by-side columns to squeeze) */
@@ -344,8 +348,7 @@ ${opts.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacit
 ${opts.hero ? `<img src="${escapeHtml(opts.hero.src)}" width="558" alt="${escapeHtml(opts.hero.alt)}" style="display:block;width:100%;max-width:558px;height:auto;border:0;border-radius:19px 19px 0 0">` : ''}
 <div class="pl-card" style="padding:${opts.hero ? '30px' : '34px'} 30px 34px">
 ${opts.heading ? `<h1 class="pl-h1" style="margin:0 0 18px;font-family:${FONT};font-size:23px;line-height:1.3;font-weight:700;letter-spacing:-0.02em;color:#0c0b0a">${escapeHtml(opts.heading)}</h1>` : ''}
-${opts.bodyHtml}
-${button}
+${opts.bodyHtml.includes(BUTTON_SLOT) ? opts.bodyHtml.replace(BUTTON_SLOT, button) : `${opts.bodyHtml}\n${button}`}
 ${opts.note ? `<p style="margin:8px 0 0;padding-top:18px;border-top:1px solid #efebe6;font-size:13px;line-height:1.55;color:#8a837b">${escapeHtml(opts.note)}</p>` : ''}
 </div>
 </td></tr>
