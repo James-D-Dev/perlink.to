@@ -56,7 +56,7 @@ const columns = computed(() => {
       links: [
         { label: f.start, to: '/login' },
         { label: f.portfolio3d, to: lang.value === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio' },
-        { label: f.marketplace, to: '/marketplace' },
+        { label: f.roomPacks, to: '/3d-room-packs' },
         { label: f.faq, to: anchor('faq') },
         { label: f.affiliates, to: lang.value === 'vi' ? '/vi/cong-tac-vien' : '/affiliates' },
         ...GUIDES.map(guide => ({ label: guide[lang.value].title, to: guide.path[lang.value] })),

@@ -11,7 +11,7 @@ export interface RoomPack {
   priceUsd: number
   /** Item types (catalog `type`) in the pack */
   items: string[]
-  /** Card colours on the marketplace: from, via, to */
+  /** Card colours on the 3D room packs page: from, via, to */
   colors: [string, string, string]
 }
 

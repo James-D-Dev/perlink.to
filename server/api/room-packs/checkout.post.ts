@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   if ((await ownedPacks(event, user.id)).packs.has(pack)) return { owned: true }
 
   const siteUrl = useRuntimeConfig(event).public.siteUrl
-  const back = body.data.back && !body.data.back.startsWith('//') ? body.data.back : '/marketplace'
+  const back = body.data.back && !body.data.back.startsWith('//') ? body.data.back : '/3d-room-packs'
   const redirect = new URL(back, siteUrl)
   redirect.searchParams.set('bought', pack)
   try {

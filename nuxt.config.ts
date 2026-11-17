@@ -141,6 +141,8 @@ export default defineNuxtConfig({
     // The Linktree comparison page was taken down
     "/linktree-alternative": { redirect: { to: "/", statusCode: 301 } },
     "/vi/thay-the-linktree": { redirect: { to: "/vi", statusCode: 301 } },
+    // The room pack shop was called the marketplace
+    "/marketplace": { redirect: { to: "/3d-room-packs", statusCode: 301 } },
     // "/" is rendered per request: on a site's own domain it shows that site
     "/vi": { prerender: true },
     // The dashboard is drawn in the browser only (a page's `ssr: false` in

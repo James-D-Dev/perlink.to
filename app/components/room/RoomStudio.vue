@@ -368,7 +368,7 @@
           <div v-if="activeCategory === 'premium'" class="flex items-center gap-2 border-b border-default bg-gradient-to-r from-amber-400/15 via-pink-500/10 to-transparent px-3 py-2">
             <UIcon name="i-lucide-crown" class="size-4 shrink-0 text-amber-500" />
             <p class="min-w-0 flex-1 text-xs text-muted">{{ allPremiumOwned ? t('room.packs.trayOwned') : t('room.packs.trayLocked') }}</p>
-            <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-store" :label="t('room.packs.seeMarket')" to="/marketplace" target="_blank" />
+            <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-store" :label="t('room.packs.seeMarket')" to="/3d-room-packs" target="_blank" />
           </div>
           <div v-if="activeCategory" class="flex gap-2 overflow-x-auto scroll-fade-x p-3 max-sm:[scrollbar-width:none] max-sm:[&::-webkit-scrollbar]:hidden">
             <button

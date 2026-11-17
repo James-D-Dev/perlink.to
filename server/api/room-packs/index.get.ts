@@ -2,7 +2,7 @@ import { ownedPacks } from '../../utils/roomPacks'
 import { creemEnabled } from '../../utils/creem'
 import { ROOM_PACKS } from '#shared/roomPacks'
 
-// The marketplace: every room pack, its price, and whether the signed-in
+// The 3D room packs page: every room pack, its price, and whether the signed-in
 // account already has it (bought, or on Max)
 export default defineEventHandler(async (event) => {
   const user = event.context.user

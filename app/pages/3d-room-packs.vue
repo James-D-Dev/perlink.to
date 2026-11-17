@@ -63,7 +63,7 @@
                   icon="i-lucide-shopping-bag"
                   :loading="buying === pack.id"
                   :label="state && !state.signedIn ? t('room.packs.signIn') : t('room.packs.buy', { price: formatUsd(pack.priceUsd) })"
-                  @click="buy(pack.id, '/marketplace')"
+                  @click="buy(pack.id, '/3d-room-packs')"
                 />
                 <p class="mt-2 text-center text-xs text-ink-faint">{{ t('room.packs.oneTime') }}</p>
               </template>
@@ -105,7 +105,7 @@
               icon="i-lucide-shopping-bag"
               :loading="buying === showcase.id"
               :label="t('room.packs.buy', { price: formatUsd(showcase.priceUsd) })"
-              @click="buy(showcase.id, '/marketplace')"
+              @click="buy(showcase.id, '/3d-room-packs')"
             />
             <UButton size="lg" color="neutral" variant="solid" icon="i-lucide-x" :label="t('common.close')" @click="showcase = null" />
           </div>
@@ -146,16 +146,16 @@ useSeoMeta({
   description: () => t('room.market.metaDescription'),
   ogTitle: () => t('room.market.metaTitle'),
   ogDescription: () => t('room.market.metaDescription'),
-  ogUrl: `${SITE}/marketplace`,
+  ogUrl: `${SITE}/3d-room-packs`,
   ogImage: `${SITE}/images/og.jpg`,
   twitterCard: 'summary_large_image',
   twitterSite: X_HANDLE,
 })
-useHead({ link: [{ rel: 'canonical', href: `${SITE}/marketplace` }] })
+useHead({ link: [{ rel: 'canonical', href: `${SITE}/3d-room-packs` }] })
 
 async function buy(pack: (typeof ROOM_PACKS)[number]['id'], back: string) {
   if (state.value && !state.value.signedIn) {
-    rememberPostLoginRedirect('/marketplace')
+    rememberPostLoginRedirect('/3d-room-packs')
     await navigateTo('/login')
     return
   }

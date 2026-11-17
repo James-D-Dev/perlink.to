@@ -35,7 +35,7 @@ export function useRoomPacks() {
       else if (res.owned) await refresh()
     } catch (error: any) {
       if (error?.statusCode === 401 || error?.status === 401) {
-        rememberPostLoginRedirect('/marketplace')
+        rememberPostLoginRedirect('/3d-room-packs')
         await navigateTo('/login')
         return
       }
