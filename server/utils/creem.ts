@@ -88,11 +88,15 @@ export async function listCreemProducts(event: H3Event) {
   return all
 }
 
-// Looked up once per worker for a few minutes; a deploy or cold start looks again
-let catalog: { at: number; value: Catalog } | null = null
+// Looked up once per worker for a few minutes, per API key (a test → live
+// switch looks again). A catalog missing some of Perlink's products (right
+// after a switch, before "Create missing products") is kept only briefly.
+let catalog: { at: number; key: string; complete: boolean; value: Catalog } | null = null
 
 export async function creemCatalog(event: H3Event, fresh = false): Promise<Catalog> {
-  if (!fresh && catalog && Date.now() - catalog.at < 10 * 60 * 1000) return catalog.value
+  const key = creemConfig(event).apiKey
+  const ttl = catalog?.complete ? 10 * 60 * 1000 : 30 * 1000
+  if (!fresh && catalog && catalog.key === key && Date.now() - catalog.at < ttl) return catalog.value
   const products = await listCreemProducts(event)
   const value: Catalog = { byKey: {}, plans: {}, packs: {}, products }
   for (const product of products) {
@@ -108,7 +112,8 @@ export async function creemCatalog(event: H3Event, fresh = false): Promise<Catal
     if (pack) value.packs[product.id] = pack.id
     if (key === WEDDING_PASS_KEY) value.weddingPass = product.id
   }
-  catalog = { at: Date.now(), value }
+  const complete = wantedProducts(useRuntimeConfig(event).public.siteUrl).every(p => value.byKey[p.external_id])
+  catalog = { at: Date.now(), key, complete, value }
   return value
 }
 
