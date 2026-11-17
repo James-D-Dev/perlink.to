@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3'
+import { isSuperadmin } from './superadmin'
 import { PAID_PLANS, PLAN_PRICES_USD, WEDDING_PASS, type BillingPeriod, type PaidPlanId } from '#shared/plans'
 import { ROOM_PACKS, type RoomPackId } from '#shared/roomPacks'
 
@@ -18,7 +19,14 @@ export function creemConfig(event: H3Event) {
   }
 }
 
-export const creemEnabled = (event: H3Event) => !!creemConfig(event).apiKey
+/**
+ * Card payments are on. With a test key only the superadmin sees them:
+ * anyone else could pay with a test card and get a plan for free.
+ */
+export function creemEnabled(event: H3Event) {
+  const { apiKey, testMode } = creemConfig(event)
+  return !!apiKey && (!testMode || isSuperadmin(event))
+}
 
 export class CreemError extends Error {
   constructor(message: string, public status: number) {
