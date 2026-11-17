@@ -35,6 +35,8 @@ export interface TemplateDef {
   sampleUrl?: string
   /** Sample details table, for previews of emails that have one */
   sampleRows?: [string, string][]
+  /** A picture across the top of the card */
+  hero?: { src: string; alt: string; width: number; height: number }
   defaults: Record<AppLanguage, TemplateWords>
 }
 
@@ -46,18 +48,19 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
     audience: 'user',
     variables: { name: 'Linh' },
     sampleUrl: 'https://perlink.to/dashboard',
+    hero: { src: 'https://perlink.to/images/email/welcome-hero.jpg', alt: 'A Perlink 3D room under a cherry tree', width: 1120, height: 588 },
     defaults: {
       en: {
         subject: 'Welcome to Perlink 👋',
-        heading: 'Welcome to Perlink',
-        body: 'Hi {{name}},\n\nThanks for joining Perlink. Here’s how to get your first site live:\n\n1. Create a site and add your links, photos and contact buttons, or start from a theme.\n2. Make it yours: colours, a 3D room, a password or an opening time.\n3. Publish and share your link in your bio, on a QR code or in messages.',
+        heading: 'Welcome to Perlink, {{name}} 👋',
+        body: 'Your own site, or a whole 3D world, is a few minutes away. Here’s how to get your first one live:\n\n1. **Create a site.** Add your links, photos and contact buttons, or start from a ready-made theme.\n2. **Make it yours.** Pick colours, step into a 3D room, add a password or an opening time.\n3. **Share it.** Put your link in your bio, print it on a QR code or send it in a message.\n\nHappy building,\n**The Perlink team**',
         button: 'Open your dashboard',
         note: 'Questions or ideas? Just reply to this email. It comes straight to us.',
       },
       vi: {
         subject: 'Chào mừng bạn đến với Perlink 👋',
-        heading: 'Chào mừng bạn đến với Perlink',
-        body: 'Chào {{name}},\n\nCảm ơn bạn đã tham gia Perlink. Ba bước để trang đầu tiên của bạn lên sóng:\n\n1. Tạo trang và thêm liên kết, hình ảnh, nút liên hệ, hoặc bắt đầu từ một theme có sẵn.\n2. Tuỳ chỉnh theo phong cách của bạn: màu sắc, phòng 3D, mật khẩu hoặc giờ mở trang.\n3. Xuất bản và chia sẻ link ở bio, qua mã QR hoặc tin nhắn.',
+        heading: 'Chào mừng {{name}} đến với Perlink 👋',
+        body: 'Trang web của riêng bạn, hay cả một thế giới 3D, chỉ cách bạn vài phút. Ba bước để trang đầu tiên lên sóng:\n\n1. **Tạo trang.** Thêm liên kết, hình ảnh, nút liên hệ, hoặc bắt đầu từ một theme có sẵn.\n2. **Tuỳ chỉnh theo ý bạn.** Chọn màu sắc, bước vào phòng 3D, đặt mật khẩu hoặc giờ mở trang.\n3. **Chia sẻ.** Gắn link vào bio, in thành mã QR hoặc gửi qua tin nhắn.\n\nChúc bạn sáng tạo vui,\n**Đội ngũ Perlink**',
         button: 'Mở trang quản lý',
         note: 'Có câu hỏi hay góp ý? Bạn chỉ cần trả lời email này, thư sẽ đến thẳng đội ngũ Perlink.',
       },
@@ -262,15 +265,20 @@ export const fill = (text: string, vars: Record<string, string>) =>
   text.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, key: string) => vars[key] ?? '')
 
 /** Plain text with paragraphs, lists and **bold** → email HTML */
-export function textToHtml(text: string, opts: { color?: string } = {}) {
+export function textToHtml(text: string, opts: { color?: string; accent?: string } = {}) {
   const color = opts.color ?? '#3a3631'
+  const accent = opts.accent ?? DEFAULT_LAYOUT.accent
   const inline = (line: string) => escapeHtml(line)
     .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#0c0b0a;font-weight:600">$1</strong>')
     .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#0066d6">$1</a>')
   return text.trim().split(/\n{2,}/).map((block) => {
     const lines = block.split('\n')
     if (lines.every(line => /^\s*\d+[.)]\s+/.test(line))) {
-      return `<ol style="margin:0 0 16px;padding-left:22px;color:${color}">${lines.map(line => `<li style="margin:0 0 8px;padding-left:4px">${inline(line.replace(/^\s*\d+[.)]\s+/, ''))}</li>`).join('')}</ol>`
+      // Steps: a number in an accent circle beside each line
+      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 20px">${lines.map((line, i) => `<tr>
+<td width="44" valign="top" style="padding:0 0 14px;width:44px"><div style="width:30px;height:30px;line-height:30px;border-radius:15px;background:${accent};color:#ffffff;font-size:14px;font-weight:700;text-align:center">${i + 1}</div></td>
+<td valign="top" style="padding:4px 0 14px;color:${color};font-size:15px;line-height:1.55">${inline(line.replace(/^\s*\d+[.)]\s+/, ''))}</td>
+</tr>`).join('')}</table>`
     }
     if (lines.every(line => /^\s*[-•]\s+/.test(line))) {
       return `<ul style="margin:0 0 16px;padding-left:22px;color:${color}">${lines.map(line => `<li style="margin:0 0 8px;padding-left:4px">${inline(line.replace(/^\s*[-•]\s+/, ''))}</li>`).join('')}</ul>`
@@ -304,6 +312,7 @@ export function renderLayout(opts: {
   /** Inbox preview line */
   preheader?: string
   heading?: string
+  hero?: { src: string; alt: string; width: number; height: number }
   bodyHtml: string
   button?: { label: string; url: string }
   note?: string
@@ -331,11 +340,14 @@ ${opts.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacit
 <tr><td style="padding:0 4px 20px">
 <a href="https://perlink.to" style="text-decoration:none"><img src="https://perlink.to/web-app-manifest-192x192.png" width="32" height="32" alt="" style="display:inline-block;vertical-align:middle;border:0;border-radius:8px"><span style="display:inline-block;vertical-align:middle;margin-left:10px;font-family:${FONT};font-size:21px;font-weight:700;letter-spacing:-0.03em;color:#0c0b0a"><span style="color:${accent}">per</span>link</span></a>
 </td></tr>
-<tr><td class="pl-card" style="background:#ffffff;border:1px solid #e8e4de;border-radius:20px;padding:34px 30px;font-family:${FONT};font-size:15px;line-height:1.6;color:#3a3631">
+<tr><td style="background:#ffffff;border:1px solid #e8e4de;border-radius:20px;font-family:${FONT};font-size:15px;line-height:1.6;color:#3a3631">
+${opts.hero ? `<img src="${escapeHtml(opts.hero.src)}" width="558" alt="${escapeHtml(opts.hero.alt)}" style="display:block;width:100%;max-width:558px;height:auto;border:0;border-radius:19px 19px 0 0">` : ''}
+<div class="pl-card" style="padding:${opts.hero ? '30px' : '34px'} 30px 34px">
 ${opts.heading ? `<h1 class="pl-h1" style="margin:0 0 18px;font-family:${FONT};font-size:23px;line-height:1.3;font-weight:700;letter-spacing:-0.02em;color:#0c0b0a">${escapeHtml(opts.heading)}</h1>` : ''}
 ${opts.bodyHtml}
 ${button}
 ${opts.note ? `<p style="margin:8px 0 0;padding-top:18px;border-top:1px solid #efebe6;font-size:13px;line-height:1.55;color:#8a837b">${escapeHtml(opts.note)}</p>` : ''}
+</div>
 </td></tr>
 <tr><td style="padding:22px 8px 0;text-align:center;font-family:${FONT};font-size:12px;line-height:1.6;color:#9b948c">
 ${escapeHtml(layout.footer[lang])}<br>
@@ -370,7 +382,8 @@ export async function renderTemplate(event: H3Event, id: string, lang: AppLangua
     title: subject,
     preheader: textOnly(body).split('\n').find(Boolean)?.slice(0, 140),
     heading: heading || undefined,
-    bodyHtml: textToHtml(body) + detailsTable(rows),
+    hero: templateDef(id)?.hero,
+    bodyHtml: textToHtml(body, { accent: layout.accent }) + detailsTable(rows),
     button: opts.buttonUrl && buttonLabel ? { label: buttonLabel, url: opts.buttonUrl } : undefined,
     note: note || undefined,
   })

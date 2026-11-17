@@ -23,7 +23,7 @@ export function sendWelcomeEmail(event: H3Event, profile: { email?: string | nul
   const lang = language ?? signupLanguage(event)
   // Vietnamese names put the given name last ("Hoàng Kim Đức" → Đức)
   const parts = (profile.name || '').trim().split(/\s+/).filter(Boolean)
-  const firstName = (lang === 'vi' ? parts.at(-1) : parts[0]) || (lang === 'vi' ? 'bạn' : 'there')
+  const firstName = (lang === 'vi' ? parts.at(-1) : parts[0]) || (lang === 'vi' ? 'bạn' : 'friend')
 
   runInBackground(event, (async () => {
     const { subject, html, text } = await renderTemplate(event, 'welcome', lang, {
