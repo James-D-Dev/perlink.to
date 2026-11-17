@@ -117,7 +117,10 @@ export default defineEventHandler(async (event) => {
       if (saved) await applyStatus(saved)
       return { ok: true }
     }
-    if (!order || order.status !== 'paid' || !meta?.user_id) return { ok: true }
+    if (!order || order.status !== 'paid' || !meta?.user_id) {
+      console.warn('[creem] checkout.completed skipped', JSON.stringify({ order: order ? { id: order.id, status: order.status, type: order.type } : null, meta, keys: Object.keys(payload.object ?? {}) }))
+      return { ok: true }
+    }
     const productId = idOf(order.product) || idOf(checkout.product)
     const catalog = await creemCatalog(event).catch(() => null)
     const ref = `creem:order:${order.id}`
