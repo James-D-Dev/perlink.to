@@ -24,3 +24,19 @@ REST API when `NUXT_CF_EMAIL_API_TOKEN` is set and the binding isn't there.
 
 The sender is `NUXT_EMAIL_FROM` (default `Perlink <notifications@perlink.to>`;
 the Worker sends from the address part). It must be on the onboarded domain.
+
+## Receiving: support@perlink.to (Superadmin → Emails)
+
+Email Routing sends mail for `support@perlink.to` to the **perlink-email**
+Worker (rule action "worker", not "forward"). The Worker forwards each mail to
+`FORWARD_TO` (Gmail, a verified destination) first, then keeps a copy in D1
+`mail_messages` (direction `in`) with attachments in the private R2 bucket
+`perlink-mail`. If keeping the copy fails, the mail still reaches Gmail.
+
+Everything the app sends through `sendEmail()` is kept in the same table
+(direction `out`, kind `admin` or `system`). Superadmin → Emails shows Inbox
+and Sent, and answers from support@ with In-Reply-To/References so the reply
+stays in the sender's thread.
+
+To go back to plain forwarding: Cloudflare → Email Routing → the support@
+rule → action "Send to an email" → Gmail.
