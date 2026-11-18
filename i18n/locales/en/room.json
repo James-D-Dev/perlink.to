@@ -80,6 +80,22 @@
       "hideDetails": "Hide details",
       "editObject": "Edit {name}"
     },
+    "coach": {
+      "label": "Room editor tour",
+      "replay": "How it works",
+      "step": "Step {n} of {total}",
+      "skip": "Skip",
+      "back": "Back",
+      "next": "Next",
+      "done": "Start building",
+      "steps": {
+        "welcome": { "title": "Welcome to your 3D room 👋", "text": "A quick look at the editor, in under 30 seconds." },
+        "add": { "title": "Add things to your room", "text": "Tap an item to place it, or pull it up and drop it where you want. The tabs also change the room style, the land outside, music, and day and night." },
+        "move": { "title": "Look around", "text": "Drag to turn the room, scroll or pinch to zoom, and use these buttons to zoom or reset the view. Tap an object to select it, then drag it to move it." },
+        "objects": { "title": "Make objects clickable", "text": "Open the object list to edit each one: colours, words, and a link. When visitors click that object, the link opens: your Instagram, shop or anything else." },
+        "publish": { "title": "Save and publish", "text": "Save keeps your draft. Publish puts the room live at perlink.to/{name} for everyone to visit." }
+      }
+    },
     "hint": {
       "navigation": "Click an object to select it, then drag to move · Drag to rotate · Scroll to zoom",
       "firstRun": "Drag furniture from the bar below into your room"

@@ -80,6 +80,22 @@
       "hideDetails": "Ẩn chi tiết",
       "editObject": "Sửa {name}"
     },
+    "coach": {
+      "label": "Hướng dẫn trình chỉnh phòng",
+      "replay": "Hướng dẫn",
+      "step": "Bước {n}/{total}",
+      "skip": "Bỏ qua",
+      "back": "Quay lại",
+      "next": "Tiếp",
+      "done": "Bắt đầu",
+      "steps": {
+        "welcome": { "title": "Chào mừng đến phòng 3D của bạn 👋", "text": "Xem nhanh trình chỉnh phòng, chưa tới 30 giây." },
+        "add": { "title": "Thêm đồ vào phòng", "text": "Chạm vào một món để đặt vào phòng, hoặc kéo lên và thả vào đúng chỗ bạn muốn. Các tab còn có kiểu phòng, cảnh bên ngoài, nhạc và ngày/đêm." },
+        "move": { "title": "Nhìn quanh phòng", "text": "Kéo để xoay phòng, cuộn chuột hoặc chụm hai ngón để phóng to, hoặc dùng các nút này để phóng to và đặt lại góc nhìn. Chạm vào một món để chọn, rồi kéo để dời chỗ." },
+        "objects": { "title": "Gắn link vào đồ vật", "text": "Mở danh sách đồ vật để chỉnh từng món: màu, chữ và link. Khách bấm vào món đó là mở link: Instagram, cửa hàng hay bất cứ trang nào." },
+        "publish": { "title": "Lưu và xuất bản", "text": "Lưu giữ bản nháp. Xuất bản để phòng hiện ở perlink.to/{name} cho mọi người ghé thăm." }
+      }
+    },
     "hint": {
       "navigation": "Bấm đồ vật để chọn, rồi kéo để di chuyển · Kéo để xoay · Cuộn để thu phóng",
       "firstRun": "Kéo nội thất từ thanh bên dưới vào phòng của bạn"

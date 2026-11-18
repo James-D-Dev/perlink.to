@@ -19,9 +19,12 @@
 
     <!-- Top bar -->
     <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2 sm:p-3">
-      <div class="pointer-events-auto rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
+      <div class="pointer-events-auto flex gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
         <UTooltip :text="t('room.toolbar.back')" :content="{ side: 'right' }">
           <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" :aria-label="t('room.toolbar.back')" @click="emit('back')" />
+        </UTooltip>
+        <UTooltip :text="t('room.coach.replay')" :content="{ side: 'right' }">
+          <UButton icon="i-lucide-circle-help" color="neutral" variant="ghost" :aria-label="t('room.coach.replay')" @click="coachOpen = true" />
         </UTooltip>
       </div>
 
@@ -52,14 +55,14 @@
             <span v-if="dirty" class="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-amber-500 ring-2 ring-default" />
           </UButton>
         </UTooltip>
-        <UButton icon="i-lucide-globe" :loading="publishing" @click="emit('publish')">
+        <UButton data-tour="publish" icon="i-lucide-globe" :loading="publishing" @click="emit('publish')">
           <span class="hidden sm:inline">{{ t('common.publish') }}</span>
         </UButton>
       </div>
     </div>
 
     <!-- Objects panel: a button that unfolds into the object list; picking an object shows its details -->
-    <div class="absolute left-2 top-16 z-10 sm:left-3">
+    <div data-tour="objects" class="absolute left-2 top-16 z-10 sm:left-3">
       <Transition
         mode="out-in"
         enter-active-class="transition duration-200 ease-out"
@@ -308,7 +311,7 @@
 
     <!-- Camera controls -->
     <div class="absolute right-2 top-16 flex flex-col items-center gap-2 sm:right-3">
-      <div class="flex flex-col items-center gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
+      <div data-tour="camera" class="flex flex-col items-center gap-1 rounded-2xl bg-default/70 p-1 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
         <UTooltip :text="t('room.camera.zoomIn')" :content="{ side: 'left' }">
           <UButton icon="i-lucide-plus" color="neutral" variant="ghost" :aria-label="t('room.camera.zoomIn')" @click="canvasRef?.zoomBy(0.8)" />
         </UTooltip>
@@ -360,7 +363,7 @@
       </div>
 
       <!-- Inventory bar -->
-      <div class="pointer-events-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-default/75 ring-1 ring-white/10 shadow-xl backdrop-blur-xl">
+      <div data-tour="tray" class="pointer-events-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-default/75 ring-1 ring-white/10 shadow-xl backdrop-blur-xl">
         <!-- Tray -->
         <div v-show="trayOpen" class="border-b border-default">
           <!-- Catalog items -->
@@ -607,6 +610,7 @@
     >
       {{ t('room.hint.firstRun') }}
     </p>
+    <ClientOnly><RoomCoachMarks v-model:open="coachOpen" :paused="tourOpen" :username="username" /></ClientOnly>
     <RoomTourRecorder v-if="username" v-model:open="tourOpen" :room="room" :username="username" :site-name="siteName || username" :still="videoStill" :link="videoLink" :live-issue="liveIssue" :go-live="goLive" />
   </div>
 </template>
@@ -652,6 +656,8 @@ const productOptions = computed(() => (props.products ?? []).map(p => ({ value: 
 // recording gets the whole GPU, and the controls hide. Closing it goes back
 // to where it was opened from.
 const tourOpen = ref(false)
+// First-visit walkthrough (RoomCoachMarks); the "?" button replays it
+const coachOpen = ref(false)
 onMounted(() => {
   if (props.autoRecord && props.username) tourOpen.value = true
 })
