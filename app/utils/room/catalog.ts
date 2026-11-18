@@ -3,6 +3,8 @@ import { attachDungeonModel, loadDungeonModel } from './dungeonModels'
 import { attachNaturePieces, greenLeaves, type NaturePiece } from './natureModels'
 import { PREMIUM_ITEMS } from './premiumModels'
 import { attachFurnitureModel } from './furnitureModels'
+import type { FlowerName, FurnitureModelName } from './modelManifest'
+import { attachFlowers, type FlowerStem } from './flowerModels'
 
 // Procedural model catalog for the 3D mini room.
 // Every model is assembled from primitives at runtime, so a room is fully
@@ -110,7 +112,7 @@ function sphere(r: number, material: THREE.Material, x = 0, y = 0, z = 0) {
 }
 
 /** Furniture drawn from a model file (./furnitureModels), painted `color` where it can be */
-function furnitureModel(name: string, color: string) {
+function furnitureModel(name: FurnitureModelName, color: string) {
   const g = new THREE.Group()
   // Renderers wait on this before reading the model (thumbnails, glow materials)
   g.userData.ready = attachFurnitureModel(g, name, color)
@@ -587,7 +589,39 @@ function soil(radius: number, y: number) {
   return cyl(radius, radius, 0.012, mat(SOIL, { roughness: 1 }), 0, y - 0.012)
 }
 
-const glaze = (color: string) => mat(color, { roughness: 0.32 })
+/** Glazed ceramic: glossy, with a clear coat that catches the light */
+const glaze = (color: string) => new THREE.MeshPhysicalMaterial({ color, roughness: 0.28, clearcoat: 0.8, clearcoatRoughness: 0.12 })
+
+/**
+ * A natural-looking bouquet: stems spread by the golden angle within
+ * `radius`, the outer ones leaning out more, each head turned its own way
+ */
+function bouquet(stems: [FlowerName, string, number][], radius: number, lean = [0.08, 0.32] as [number, number]): FlowerStem[] {
+  const n = stems.length
+  return stems.map(([flower, color, height], i) => {
+    const r = radius * Math.sqrt((i + 0.5) / n)
+    const angle = i * 2.39996
+    return {
+      flower,
+      color,
+      height,
+      x: Math.cos(angle) * r,
+      z: Math.sin(angle) * r,
+      lean: lean[0] + (lean[1] - lean[0]) * (r / Math.max(radius, 0.001)),
+      turn: i * 1.31,
+    }
+  })
+}
+
+// Petal colours
+const PINK = '#f28aa6'
+const ROSE_RED = '#c8243b'
+const CORAL = '#f47a5b'
+const BLUSH = '#f9c6cf'
+const BUTTER = '#f6d55c'
+const WHITE_PETAL = '#fbf7ef'
+const LILAC = '#9a7bd1'
+const PEACH = '#f6b48f'
 
 /** Container builders: parts plus the height plants stand on */
 type Container = (color: string) => [THREE.Object3D[], number]
@@ -657,6 +691,8 @@ function natureItem(
   icon: string,
   pieces: NaturePiece[],
   container?: { defaultColor: string; build: Container },
+  /** Cut flowers (./flowerModels), standing on the container's soil */
+  flowers: FlowerStem[] = [],
 ): CatalogItem {
   return {
     type,
@@ -666,7 +702,7 @@ function natureItem(
     defaultColor: container?.defaultColor ?? '#ffffff',
     // Without a container there's nothing to recolour
     fromModel: !container,
-    attractsButterflies: pieces.some(p => p.model.includes('Flower')),
+    attractsButterflies: flowers.length > 0 || pieces.some(p => p.model.includes('Flower')),
     build: (color) => {
       const g = new THREE.Group()
       let base = 0
@@ -675,7 +711,10 @@ function natureItem(
         g.add(...parts)
         base = top
       }
-      g.userData.ready = attachNaturePieces(g, pieces.map(p => ({ ...p, y: (p.y ?? 0) + base })))
+      g.userData.ready = Promise.all([
+        attachNaturePieces(g, pieces.map(p => ({ ...p, y: (p.y ?? 0) + base }))),
+        flowers.length ? attachFlowers(g, flowers.map(f => ({ ...f, y: (f.y ?? 0) + base }))) : null,
+      ])
       return g
     },
   }
@@ -684,35 +723,42 @@ function natureItem(
 const GARDEN_ITEMS: CatalogItem[] = [
   // Flowers, always in a container
   natureItem('garden-flower-pot', 'Flower pot', 'i-lucide-flower', [
-    { model: 'Flower_3_Group', height: 0.3 },
-    { model: 'Grass_Common_Short', height: 0.12, x: 0.07, z: 0.05, rotation: 1.5 },
-  ], { defaultColor: '#c8734f', build: terracottaPot() }),
+    { model: 'Grass_Common_Short', height: 0.12, x: 0.09, z: 0.06, rotation: 1.5 },
+    { model: 'Grass_Common_Short', height: 0.1, x: -0.1, z: -0.04, rotation: 3.1 },
+  ], { defaultColor: '#c8734f', build: terracottaPot() }, bouquet([
+    ['tulip', PINK, 0.36], ['tulip', CORAL, 0.33], ['tulip', WHITE_PETAL, 0.31], ['daisy', WHITE_PETAL, 0.25],
+    ['tulip', BUTTER, 0.3], ['daisy', WHITE_PETAL, 0.23], ['tulip', PINK, 0.28],
+  ], 0.1)),
   natureItem('garden-ceramic-flowers', 'Ceramic planter', 'i-lucide-flower-2', [
-    { model: 'Flower_4_Group', height: 0.32 },
-    { model: 'Flower_3_Single', height: 0.26, x: -0.07, z: 0.05, rotation: 2 },
-    { model: 'Grass_Common_Short', height: 0.12, x: 0.08, z: -0.05 },
-  ], { defaultColor: '#2f5d62', build: ceramicPlanter() }),
-  natureItem('garden-flower-vase', 'Flower vase', 'i-lucide-flower', [
-    { model: 'Flower_4_Single', height: 0.32 },
-    { model: 'Flower_3_Single', height: 0.28, x: 0.02, z: 0.015, rotation: 2.1 },
-    { model: 'Flower_4_Single', height: 0.26, x: -0.02, z: -0.01, rotation: 4.2 },
-  ], { defaultColor: '#f2efe9', build: tallVase }),
-  natureItem('garden-bud-vase', 'Bud vase', 'i-lucide-flower-2', [
-    { model: 'Flower_3_Single', height: 0.22 },
-  ], { defaultColor: '#e9a6b3', build: budVase }),
+    { model: 'Fern_1', height: 0.2, x: -0.08, z: 0.06, rotation: 2 },
+  ], { defaultColor: '#2f5d62', build: ceramicPlanter() }, bouquet([
+    ['daisy', WHITE_PETAL, 0.3], ['lavender', LILAC, 0.36], ['daisy', BUTTER, 0.27], ['lavender', LILAC, 0.33],
+    ['daisy', WHITE_PETAL, 0.26], ['lavender', LILAC, 0.3], ['daisy', WHITE_PETAL, 0.24], ['daisy', BUTTER, 0.22],
+  ], 0.11)),
+  natureItem('garden-flower-vase', 'Flower vase', 'i-lucide-flower', [], { defaultColor: '#f2efe9', build: tallVase }, bouquet([
+    ['rose', BLUSH, 0.42], ['tulip', PINK, 0.4], ['rose', PEACH, 0.38], ['lavender', LILAC, 0.44],
+    ['tulip', WHITE_PETAL, 0.37], ['rose', BLUSH, 0.35], ['lavender', LILAC, 0.4], ['tulip', CORAL, 0.34],
+  ], 0.025, [0.12, 0.42])),
+  natureItem('garden-bud-vase', 'Bud vase', 'i-lucide-flower-2', [], { defaultColor: '#e9a6b3', build: budVase }, [
+    { flower: 'rose', color: ROSE_RED, height: 0.27, x: 0.004, lean: 0.08, turn: 0.4 },
+    { flower: 'lavender', color: LILAC, height: 0.24, x: -0.006, z: 0.004, lean: 0.22, turn: 2 },
+  ]),
   natureItem('garden-flower-bowl', 'Flower bowl', 'i-lucide-flower', [
-    { model: 'Flower_3_Group', height: 0.28, x: -0.1 },
-    { model: 'Flower_4_Group', height: 0.26, x: 0.1, z: 0.04, rotation: 1.4 },
-    { model: 'Grass_Common_Short', height: 0.12, x: 0.02, z: -0.12 },
-    { model: 'Clover_1', height: 0.05, x: 0.15, z: -0.1 },
-  ], { defaultColor: '#efe6d6', build: flowerBowl }),
+    { model: 'Clover_1', height: 0.05, x: 0.2, z: -0.12 },
+    { model: 'Clover_2', height: 0.05, x: -0.2, z: 0.1, rotation: 1.2 },
+  ], { defaultColor: '#efe6d6', build: flowerBowl }, bouquet([
+    ['rose', BLUSH, 0.26], ['rose', PEACH, 0.25], ['rose', ROSE_RED, 0.24], ['rose', BLUSH, 0.25], ['daisy', WHITE_PETAL, 0.22],
+    ['rose', PEACH, 0.24], ['rose', BLUSH, 0.23], ['daisy', WHITE_PETAL, 0.22], ['rose', ROSE_RED, 0.23], ['rose', BLUSH, 0.22],
+    ['rose', PEACH, 0.22], ['daisy', WHITE_PETAL, 0.21],
+  ], 0.19, [0.2, 0.75])),
   natureItem('garden-flower-bed', 'Flower bed', 'i-lucide-flower', [
-    { model: 'Flower_4_Group', height: 0.32, x: -0.3, z: 0 },
-    { model: 'Flower_3_Group', height: 0.3, x: 0.02, z: 0.02, rotation: 1.2 },
-    { model: 'Flower_4_Group', height: 0.28, x: 0.32, z: -0.02, rotation: 2.4 },
-    { model: 'Grass_Common_Short', height: 0.15, x: -0.14, z: 0.08 },
-    { model: 'Grass_Common_Short', height: 0.14, x: 0.18, z: 0.07, rotation: 2 },
-  ], { defaultColor: '#9a6a46', build: planterBox }),
+    { model: 'Grass_Common_Short', height: 0.14, x: -0.38, z: 0.1 },
+    { model: 'Grass_Common_Short', height: 0.13, x: 0.38, z: 0.1, rotation: 2 },
+  ], { defaultColor: '#9a6a46', build: planterBox }, [
+    // Lavender along the back, tulips in front
+    ...[-0.36, -0.22, -0.08, 0.06, 0.2, 0.34].map((x, i) => ({ flower: 'lavender' as const, color: LILAC, height: 0.36 + (i % 2) * 0.04, x, z: -0.08, lean: 0.1, turn: i * 1.7 })),
+    ...[-0.38, -0.25, -0.12, 0.01, 0.14, 0.27, 0.4].map((x, i) => ({ flower: 'tulip' as const, color: [PINK, CORAL, BUTTER, WHITE_PETAL][i % 4]!, height: 0.28 + (i % 3) * 0.03, x, z: 0.07, lean: 0.12, turn: i * 2.3 })),
+  ]),
   natureItem('garden-bush-flowers', 'Flowering shrub', 'i-lucide-flower-2', [
     { model: 'Bush_Common_Flowers', height: 0.6 },
   ], { defaultColor: '#c8734f', build: terracottaPot(1.5) }),

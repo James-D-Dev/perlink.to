@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { furnitureModelUrl, type FurnitureModelName } from './modelManifest'
 
 // Furniture from Quaternius' low-poly packs (CC0, via poly.pizza), prepared in
 // Blender: one mesh per item, metres, origin at the centre of its base, facing
@@ -14,8 +15,6 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // outside: blue by day, dark at night (RoomScene keeps it in step).
 // Wall-mounted models are centred vertically with their back on z = 0.
 
-const BASE = '/models/furniture/'
-
 let loader: GLTFLoader | null = null
 function gltfLoader() {
   if (!loader) {
@@ -28,10 +27,10 @@ function gltfLoader() {
 const cache = new Map<string, Promise<THREE.Object3D>>()
 
 /** Load a model once; its untinted materials are shared by every copy */
-function loadFurniture(name: string): Promise<THREE.Object3D> {
+function loadFurniture(name: FurnitureModelName): Promise<THREE.Object3D> {
   let promise = cache.get(name)
   if (!promise) {
-    promise = gltfLoader().loadAsync(`${BASE}${name}.glb`).then((gltf) => {
+    promise = gltfLoader().loadAsync(furnitureModelUrl(name)).then((gltf) => {
       gltf.scene.traverse((child) => {
         const mesh = child as THREE.Mesh
         if (!mesh.isMesh) return
@@ -62,7 +61,7 @@ const isSky = (material: THREE.Material) => /^sky/i.test(material.name)
  * `color`. Each copy gets its own tint materials (the room disposes them with
  * the object); everything else stays shared.
  */
-export async function attachFurnitureModel(group: THREE.Group, name: string, color: string) {
+export async function attachFurnitureModel(group: THREE.Group, name: FurnitureModelName, color: string) {
   const template = await loadFurniture(name)
   const model = template.clone(true)
   const tint = new THREE.Color(color)
@@ -106,6 +105,6 @@ export async function attachFurnitureModel(group: THREE.Group, name: string, col
 }
 
 /** Start downloading the furniture models early (the editor's tray, a room with furniture) */
-export function preloadFurniture(names: string[]) {
+export function preloadFurniture(names: FurnitureModelName[]) {
   for (const name of names) loadFurniture(name).catch(() => {})
 }

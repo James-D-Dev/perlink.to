@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { MODELS_REVISION } from './modelManifest'
 import { createRoomRenderer, loadGpuKit, type RoomRenderer } from './gpu'
 import { ROOM_CATALOG, type CatalogItem } from './catalog'
 import { buildRoomShell } from './shell'
@@ -9,8 +10,8 @@ import { DEFAULT_ROOM_STYLE } from '~/types/room'
 // real previews. Results are cached in memory and in localStorage.
 
 const SIZE = 192
-// Bump when catalog models change so cached thumbnails are regenerated
-const CACHE_KEY = 'perlink-room-thumbs-v36'
+// Follows the model versions (./modelManifest), so changed models get fresh thumbnails
+const CACHE_KEY = `perlink-room-thumbs-${MODELS_REVISION}`
 
 let memoryCache: Record<string, string> | null = null
 
