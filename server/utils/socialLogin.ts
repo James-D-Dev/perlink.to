@@ -1,3 +1,4 @@
+import { FIRST_SITE_PATH } from '#shared/analytics'
 import type { H3Event } from 'h3'
 import { getQuery } from 'h3'
 import { getDB } from './db'
@@ -53,6 +54,7 @@ export async function signInWithSocial(event: H3Event, account: SocialAccount) {
   }
 
   if (!profile && email) profile = await repo.findByEmail(email)
+  const isNew = !profile
   if (!profile) {
     profile = await repo.upsert({
       id: crypto.randomUUID(),
@@ -81,7 +83,7 @@ export async function signInWithSocial(event: H3Event, account: SocialAccount) {
   })
 
   const redirect = getQuery(event).redirect
-  const path = typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
+  const path = typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : isNew ? FIRST_SITE_PATH : '/dashboard'
   return sendRedirect(event, path, 302)
 }
 

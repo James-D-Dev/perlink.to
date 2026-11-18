@@ -1,3 +1,4 @@
+import { FIRST_SITE_PATH } from '#shared/analytics'
 import { getQuery } from 'h3'
 
 // Note: nuxt-auth-utils automatically loads NUXT_OAUTH_GOOGLE_CLIENT_ID/SECRET from env
@@ -39,6 +40,7 @@ export default defineOAuthGoogleEventHandler({
       
       // Find or create user profile
       let profile = await profileRepo.findByEmail(user.email)
+      const isNew = !profile
       
       if (!profile) {
         // Create new profile for first-time user
@@ -95,7 +97,8 @@ export default defineOAuthGoogleEventHandler({
       })
 
       // Get redirect path from query or default to dashboard
-      const redirectPath = getQuery(event).redirect || '/dashboard'
+      // A new account goes straight to making its first site
+      const redirectPath = getQuery(event).redirect || (isNew ? FIRST_SITE_PATH : '/dashboard')
       
       console.log('[OAuth] Redirecting to:', redirectPath)
       

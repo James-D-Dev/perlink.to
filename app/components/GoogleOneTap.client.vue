@@ -105,11 +105,13 @@ function showFallbackButton() {
 
 async function handleCredentialResponse(response: any) {
   try {
-    await $fetch('/api/auth/google-one-tap', {
+    const res = await $fetch<{ redirect?: string | null }>('/api/auth/google-one-tap', {
       method: 'POST',
       body: { credential: response.credential }
     })
-    window.location.reload()
+    // A new account goes to making its first site; others stay where they are
+    if (res?.redirect) window.location.href = res.redirect
+    else window.location.reload()
   } catch (error) {
     console.error('[One Tap] Auth failed:', error)
   }

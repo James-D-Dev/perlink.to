@@ -22,6 +22,14 @@
     <main class="flex-1 px-4 pb-32 pt-8 sm:px-6 sm:pt-12">
       <!-- 1. What it's for -->
       <section v-if="step === 'goal'" class="mx-auto w-full max-w-3xl">
+        <!-- Just signed up (FIRST_SITE_PATH): a hello before the first question -->
+        <div v-if="welcome" class="mb-6 flex items-center gap-3 rounded-2xl bg-sand p-4 ring-1 ring-line">
+          <span class="text-2xl" aria-hidden="true">👋</span>
+          <div class="min-w-0">
+            <p class="font-medium text-ink">{{ text.welcome.title(firstName) }}</p>
+            <p class="text-sm text-ink-muted">{{ text.welcome.text }}</p>
+          </div>
+        </div>
         <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">{{ text.goal.title }}</h1>
         <p class="mt-2 text-ink-muted">{{ text.goal.lead }}</p>
 
@@ -258,6 +266,10 @@ const TEXT = {
     seePlans: 'See plans',
     limit: (n: number) => `Your plan has ${n} live ${n === 1 ? 'site' : 'sites'} and they're all in use. You can still make and edit this site; it stays a draft until you upgrade or take another site offline.`,
     limitShort: (n: number) => `Your ${n} live ${n === 1 ? 'site is' : 'sites are'} in use: this one will be saved as a draft.`,
+    welcome: {
+      title: (name: string) => (name ? `Welcome to Perlink, ${name}!` : 'Welcome to Perlink!'),
+      text: 'Let’s make your first site. It takes about 2 minutes, and you can change everything later.',
+    },
     goal: { title: 'What is your site for?', lead: 'We’ll suggest the templates and blocks that fit. You can change everything later.' },
     basics: {
       title: 'Tell visitors who you are',
@@ -292,6 +304,10 @@ const TEXT = {
     seePlans: 'Xem các gói',
     limit: (n: number) => `Gói của bạn cho ${n} trang đang hiển thị và đã dùng hết. Bạn vẫn tạo và chỉnh sửa trang này bình thường; trang sẽ ở dạng nháp cho tới khi bạn nâng cấp hoặc ẩn bớt một trang khác.`,
     limitShort: (n: number) => `Đã dùng hết ${n} trang hiển thị: trang này sẽ lưu nháp.`,
+    welcome: {
+      title: (name: string) => (name ? `Chào mừng ${name} đến với Perlink!` : 'Chào mừng bạn đến với Perlink!'),
+      text: 'Cùng tạo trang đầu tiên nhé. Chỉ mất khoảng 2 phút, và mọi thứ đều sửa lại được sau.',
+    },
     goal: { title: 'Trang của bạn dùng để làm gì?', lead: 'Perlink sẽ gợi ý mẫu và khối nội dung phù hợp. Mọi thứ đều sửa lại được sau.' },
     basics: {
       title: 'Giới thiệu đôi chút về bạn',
@@ -319,6 +335,16 @@ const TEXT = {
   },
 }
 const text = computed(() => TEXT[lang.value])
+
+// Arrived right after signing up (see FIRST_SITE_PATH)
+// (read once: the flow then moves to /dashboard/new/goal without the query)
+const arrivedFromSignup = route.query.welcome === '1'
+const welcome = computed(() => arrivedFromSignup && step.value === 'goal')
+const { user: sessionUser } = useUserSession()
+const firstName = computed(() => {
+  const parts = String(sessionUser.value?.name || '').trim().split(/\s+/).filter(Boolean)
+  return (lang.value === 'vi' ? parts.at(-1) : parts[0]) || ''
+})
 
 // ---------- State, kept for the tab so a reload doesn't lose it ----------
 interface Draft { goal: SiteGoalId | null; title: string; bio: string; templateId: string | null; address: string }

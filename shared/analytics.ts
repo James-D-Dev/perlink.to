@@ -13,3 +13,6 @@ export const CONSENT_KEY = 'pl_analytics_consent'
 
 /** Set by the server when an account is created, read once by the browser for the sign_up event */
 export const SIGNUP_COOKIE = 'pl_signup'
+
+/** Where a brand-new account lands: the create flow, with a hello (the dashboard would be empty) */
+export const FIRST_SITE_PATH = '/dashboard/new?welcome=1'

@@ -1,3 +1,4 @@
+import { FIRST_SITE_PATH } from '#shared/analytics'
 // Google One Tap Sign-in - Verify ID Token
 // https://developers.google.com/identity/gsi/web/reference/js-reference
 
@@ -64,6 +65,7 @@ export default defineEventHandler(async (event) => {
     const profileRepo = new ProfileRepository(event)
     
     let profile = await profileRepo.findByEmail(googlePayload.email)
+    const isNew = !profile
     
     if (!profile) {
       // Create new profile
@@ -110,7 +112,8 @@ export default defineEventHandler(async (event) => {
       avatar: profile.avatar || googlePayload.picture || null,
     })
 
-    return { success: true, redirect: '/dashboard' }
+    // A new account goes straight to making its first site; others stay on the page
+    return { success: true, redirect: isNew ? FIRST_SITE_PATH : null }
     
   } catch (error: any) {
     console.error('[One Tap] Error:', error.message)
