@@ -59,6 +59,7 @@
                 <div class="mt-0.5 flex items-center gap-2">
                   <p class="min-w-0 flex-1 truncate text-xs text-muted">{{ email.snippet }}</p>
                   <UBadge v-if="email.direction === 'out' && email.kind === 'system'" color="neutral" variant="soft" size="sm" label="auto" />
+                  <UBadge v-if="email.kind === 'dmarc'" color="neutral" variant="soft" size="sm" label="DMARC" />
                   <UBadge v-if="email.status === 'failed'" color="error" variant="soft" size="sm" label="failed" />
                 </div>
               </button>

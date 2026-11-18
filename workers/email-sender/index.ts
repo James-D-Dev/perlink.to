@@ -95,16 +95,30 @@ async function send(request: Request, env: Env) {
   }
 }
 
+/**
+ * DMARC aggregate reports (Google, Microsoft, Yahoo… about mail sent as
+ * perlink.to): kept, but filed as read so they don't count as unread mail
+ */
+function isDmarcReport(fromEmail: string, subject: string) {
+  return /^(noreply-dmarc-support@google\.com|dmarcreport@microsoft\.com|dmarc_?support@.*|.*dmarc.*@.*)$/i.test(fromEmail)
+    || /^report domain:/i.test(subject.trim())
+}
+
 async function receive(message: ForwardableEmail, env: Env) {
   const raw = await new Response(message.raw).arrayBuffer()
 
+  // DMARC reports stay in Superadmin only (filed as read), they'd just clutter Gmail
+  const dmarc = isDmarcReport(message.from.toLowerCase(), message.headers.get('subject') || '')
+
   // Gmail first: if keeping a copy fails, the mail still arrives as before
-  let forwarded = true
-  try {
-    await message.forward(env.FORWARD_TO)
-  } catch (error) {
-    forwarded = false
-    console.error('[mail] forward failed', error)
+  let forwarded = !dmarc
+  if (!dmarc) {
+    try {
+      await message.forward(env.FORWARD_TO)
+    } catch (error) {
+      forwarded = false
+      console.error('[mail] forward failed', error)
+    }
   }
 
   try {
@@ -123,10 +137,11 @@ async function receive(message: ForwardableEmail, env: Env) {
 
     const account = await env.DB.prepare('SELECT id FROM profiles WHERE lower(email) = ?').bind(fromEmail).first<{ id: string }>()
     await env.DB.prepare(`INSERT INTO mail_messages
-      (id, direction, kind, from_email, from_name, to_email, subject, text, html, message_id, in_reply_to, refs, user_id, status, error, attachments)
-      VALUES (?, 'in', 'inbound', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'received', ?, ?)`)
+      (id, direction, kind, from_email, from_name, to_email, subject, text, html, message_id, in_reply_to, refs, user_id, status, error, attachments, read_at)
+      VALUES (?, 'in', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'received', ?, ?, ?)`)
       .bind(
         id,
+        dmarc ? 'dmarc' : 'inbound',
         fromEmail,
         mail.from?.name || null,
         message.to.toLowerCase(),
@@ -137,14 +152,15 @@ async function receive(message: ForwardableEmail, env: Env) {
         mail.inReplyTo || null,
         mail.references || null,
         account?.id ?? null,
-        forwarded ? null : 'Not forwarded to Gmail',
+        forwarded || dmarc ? null : 'Not forwarded to Gmail',
         attachments.length ? JSON.stringify(attachments) : null,
+        dmarc ? new Date().toISOString().replace('T', ' ').slice(0, 19) : null,
       )
       .run()
   } catch (error) {
     console.error('[mail] could not keep a copy', error)
     // Neither forwarded nor kept: fail, so the sender gets a bounce rather than silence
-    if (!forwarded) throw error
+    if (!forwarded && !dmarc) throw error
   }
 }
 
