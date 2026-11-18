@@ -108,7 +108,7 @@ const MAX_POINT_LIGHTS = 8
 /** Guestbook gifts are drawn a bit larger than life so they read from the default view */
 const GIFT_SCALE = 1.3
 
-const SUN_COLOR = new THREE.Color('#ffeccb')
+const SUN_COLOR = new THREE.Color('#ffe6bf')
 const MOON_COLOR = new THREE.Color('#9fb4ff')
 
 export class RoomScene {
@@ -1720,9 +1720,10 @@ export class RoomScene {
       // Night floors (moonlit, not black) easing to the day's level
       this.scene.environmentIntensity = THREE.MathUtils.lerp(0.18, 0.4 * (light?.sky ?? 1), d)
       // Image-based light does the fill; keep flat ambient low so colours stay rich
-      this.hemi.intensity = THREE.MathUtils.lerp(0.24, 0.38 * (light?.sky ?? 1), d)
+      this.hemi.intensity = THREE.MathUtils.lerp(0.24, 0.42 * (light?.sky ?? 1), d)
       this.ambient.intensity = 0.07 + 0.01 * d
-      this.sun.intensity = isDay ? (0.6 + 3.2 * d) * (light?.sun ?? 1) : 0.55 * (1 - d) + 0.1
+      // Midday sun a little softer than physical: white walls kept their detail
+      this.sun.intensity = isDay ? (0.6 + 2.7 * d) * (light?.sun ?? 1) : 0.55 * (1 - d) + 0.1
       this.sunDisc.visible = false
     } else {
       if (this.scene.environment) {

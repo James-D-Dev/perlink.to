@@ -8,7 +8,9 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 //
 // The parts the room's colour picker paints have materials named "Tint" (the
 // colour itself) and "TintDark" (a shade darker, for trims and folds), so a
-// room saved with the old box-built furniture keeps its colours.
+// room saved with the old box-built furniture keeps its colours. Parts named
+// with "Glow" (a lamp's shade or bulb, a screen) light up as night falls;
+// "TintGlow" is both.
 
 const BASE = '/models/furniture/'
 
@@ -50,6 +52,7 @@ function loadFurniture(name: string): Promise<THREE.Object3D> {
 
 const isTint = (material: THREE.Material) => /^tint/i.test(material.name)
 const isDark = (material: THREE.Material) => /dark/i.test(material.name)
+const isGlow = (material: THREE.Material) => /glow/i.test(material.name)
 
 /**
  * Put a copy of the furniture model in `group`, its tint parts painted
@@ -65,12 +68,23 @@ export async function attachFurnitureModel(group: THREE.Group, name: string, col
     const mesh = child as THREE.Mesh
     if (!mesh.isMesh) return
     const swap = (material: THREE.Material) => {
-      if (!isTint(material)) return material
+      if (!isTint(material) && !isGlow(material)) return material
       let own = tints.get(material)
       if (!own) {
-        own = material.clone()
-        own.userData = { tint: true }
-        ;(own as THREE.MeshStandardMaterial).color.copy(tint).multiplyScalar(isDark(material) ? 0.78 : 1)
+        const copy = material.clone() as THREE.MeshStandardMaterial
+        copy.userData = {}
+        if (isTint(material)) copy.color.copy(tint).multiplyScalar(isDark(material) ? 0.78 : 1)
+        if (isGlow(material)) {
+          // Screens glow a soft blue all day; lamp shades are faint by day and
+          // bright at night, like the box-built lamps were (RoomScene)
+          const screen = /screen/i.test(material.name)
+          copy.emissive.set(screen ? '#3a7bd5' : copy.color)
+          copy.emissiveIntensity = screen ? 0.35 : 0.15
+          copy.userData.glow = true
+          copy.userData.baseGlow = screen ? 0.35 : 0.15
+          copy.userData.nightGlow = screen ? 0.5 : 2.2
+        }
+        own = copy
         tints.set(material, own)
       }
       return own

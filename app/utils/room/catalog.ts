@@ -287,11 +287,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'lighting',
     defaultColor: '#efe3c8',
     light: { color: WARM_LIGHT, intensity: 6, distance: 6, offset: [0, 1.45, 0] },
-    build: (color) => group(
-      cyl(0.18, 0.2, 0.04, mat(DARK)),
-      cyl(0.015, 0.015, 1.45, mat(DARK, { metalness: 0.6 })),
-      cyl(0.16, 0.24, 0.32, glow(color), 0, 1.35),
-    ),
+    build: color => furnitureModel('floor-lamp', color),
   },
   {
     type: 'desk-lamp',
@@ -299,14 +295,8 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-lamp-desk',
     category: 'lighting',
     defaultColor: '#f4d35e',
-    light: { color: WARM_LIGHT, intensity: 2.5, distance: 3, offset: [0, 0.32, 0.08] },
-    build: (color) => {
-      const arm = cyl(0.012, 0.012, 0.36, mat(DARK))
-      arm.rotation.x = -0.35
-      arm.position.set(0, 0.17, 0.03)
-      const shade = cyl(0.05, 0.1, 0.12, glow(color), 0, 0.3, 0.1)
-      return group(cyl(0.08, 0.09, 0.025, mat(DARK)), arm, shade)
-    },
+    light: { color: WARM_LIGHT, intensity: 2.5, distance: 3, offset: [0, 0.31, 0] },
+    build: color => furnitureModel('desk-lamp', color),
   },
   {
     type: 'candle',
@@ -381,10 +371,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-square',
     category: 'decor',
     defaultColor: '#d9b382',
-    build: (color) => group(
-      box(2.2, 0.015, 1.5, mat(color, { roughness: 1 })),
-      box(1.9, 0.017, 1.2, mat(new THREE.Color(color).offsetHSL(0, 0, -0.12).getStyle(), { roughness: 1 })),
-    ),
+    build: color => furnitureModel('rug', color),
   },
   {
     type: 'mug',
@@ -535,15 +522,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-tv',
     category: 'tech',
     defaultColor: '#3b3b44',
-    build: (color) => {
-      const screen = new THREE.MeshStandardMaterial({ color: '#1e3a5f', emissive: '#3a7bd5', emissiveIntensity: 0.35, roughness: 0.2 })
-      return group(
-        box(1.6, 0.45, 0.42, mat(color)),
-        box(0.3, 0.06, 0.2, mat(DARK), 0, 0.45),
-        box(1.3, 0.76, 0.05, mat('#111114'), 0, 0.51),
-        mesh(new THREE.PlaneGeometry(1.24, 0.7), screen, 0, 0.89, 0.026),
-      )
-    },
+    build: color => furnitureModel('tv', color),
   },
   {
     type: 'laptop',
@@ -551,15 +530,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-laptop',
     category: 'tech',
     defaultColor: '#b8bcc4',
-    build: (color) => {
-      const screenGroup = new THREE.Group()
-      screenGroup.add(box(0.34, 0.23, 0.012, mat(color, { metalness: 0.7, roughness: 0.35 })))
-      const display = new THREE.MeshStandardMaterial({ color: '#203a5c', emissive: '#6fa8ff', emissiveIntensity: 0.4 })
-      screenGroup.add(mesh(new THREE.PlaneGeometry(0.31, 0.19), display, 0, 0.115, 0.0065))
-      screenGroup.position.set(0, 0.015, -0.11)
-      screenGroup.rotation.x = -0.25
-      return group(box(0.34, 0.015, 0.24, mat(color, { metalness: 0.7, roughness: 0.35 })), screenGroup)
-    },
+    build: color => furnitureModel('laptop', color),
   },
 ]
 
