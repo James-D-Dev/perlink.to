@@ -183,10 +183,16 @@ function loadModel(name: string): Promise<LoadedModel> {
 }
 
 /** A texture from the nature pack (cached; glTF orientation, not flipped) */
+/** Resolves once a swapped-in texture (natureTexture) has loaded */
+const textureLoads = new Map<string, Promise<void>>()
+
 export function natureTexture(file: string) {
   let texture = textureCache.get(file)
   if (!texture) {
-    texture = new THREE.TextureLoader().load(`${BASE}${file}`)
+    let done = () => {}
+    textureLoads.set(file, new Promise<void>((resolve) => { done = resolve }))
+    texture = new THREE.TextureLoader().load(`${BASE}${file}`, () => done(), undefined, () => done())
+    texture.name = file
     texture.colorSpace = THREE.SRGBColorSpace
     // glTF textures are not flipped
     texture.flipY = false
@@ -311,6 +317,7 @@ export interface NaturePiece {
  */
 export async function attachNaturePieces(group: THREE.Group, pieces: NaturePiece[]) {
   const models = await Promise.all(pieces.map(p => loadModel(p.model)))
+  const waits: Promise<void>[] = []
   const place = new THREE.Matrix4()
   const quat = new THREE.Quaternion()
   const yAxis = new THREE.Vector3(0, 1, 0)
@@ -341,6 +348,11 @@ export async function attachNaturePieces(group: THREE.Group, pieces: NaturePiece
       }
       mesh.userData.shared = true
       group.add(mesh)
+      // A swapped-in leaf texture loads on its own: wait for it, or the tray
+      // thumbnail draws the leaves before they have any (an empty picture)
+      const swapped = std.map && textureLoads.get(std.map.name)
+      if (swapped) waits.push(swapped)
     }
   })
+  await Promise.all(waits)
 }

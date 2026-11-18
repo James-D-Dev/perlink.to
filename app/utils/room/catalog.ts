@@ -90,6 +90,43 @@ function glow(color: string, base = 0) {
   return m
 }
 
+/** A small painted landscape (sky, sun, layered hills) in shades of `color`, for empty picture frames */
+const landscapes = new Map<string, THREE.Texture>()
+function landscapeTexture(color: string) {
+  let texture = landscapes.get(color)
+  if (texture) return texture
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 358
+  const g = canvas.getContext('2d')!
+  const base = new THREE.Color(color)
+  const shade = (k: number, toward = '#ffffff') => base.clone().lerp(new THREE.Color(toward), k).getStyle()
+  const sky = g.createLinearGradient(0, 0, 0, 230)
+  sky.addColorStop(0, shade(0.55))
+  sky.addColorStop(1, shade(0.75, '#ffe2bf'))
+  g.fillStyle = sky
+  g.fillRect(0, 0, 256, 358)
+  g.fillStyle = '#fff3d6'
+  g.beginPath()
+  g.arc(170, 120, 34, 0, Math.PI * 2)
+  g.fill()
+  const hills: [number, number, string][] = [[200, 0.35, shade(0.35)], [240, 0.15, shade(0.1)], [285, 0, shade(0.25, '#000000')]]
+  hills.forEach(([y, , fill], i) => {
+    g.fillStyle = fill
+    g.beginPath()
+    g.moveTo(0, 358)
+    g.lineTo(0, y)
+    for (let x = 0; x <= 256; x += 16) g.lineTo(x, y - Math.sin(x / (40 + i * 18) + i * 1.7) * (18 + i * 6))
+    g.lineTo(256, 358)
+    g.fill()
+  })
+  texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.userData = { shared: true }
+  landscapes.set(color, texture)
+  return texture
+}
+
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, x = 0, y = 0, z = 0) {
   const m = new THREE.Mesh(geometry, material)
   m.position.set(x, y, z)
@@ -306,11 +343,19 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-flame',
     category: 'lighting',
     defaultColor: '#fbf3e4',
-    light: { color: '#ffb35c', intensity: 1.2, distance: 2.2, offset: [0, 0.22, 0] },
-    build: (color) => group(
-      cyl(0.04, 0.04, 0.16, mat(color)),
-      sphere(0.018, glow('#ffb347', 0.6), 0, 0.19, 0),
-    ),
+    light: { color: '#ffb35c', intensity: 1.2, distance: 2.2, offset: [0, 0.2, 0] },
+    build: (color) => {
+      // Pillar candle with a melted dip and a drip, on a brass dish; a teardrop flame
+      const brass = mat(GOLD, { metalness: 0.75, roughness: 0.3 })
+      const wax = mat(color, { roughness: 0.55 })
+      const dish = lathe([[0, 0], [0.058, 0], [0.066, 0.012], [0.062, 0.015], [0.054, 0.007], [0, 0.007]], brass)
+      const pillar = lathe([[0, 0.007], [0.036, 0.007], [0.036, 0.148], [0.033, 0.156], [0.02, 0.15], [0.006, 0.146], [0, 0.147]], wax)
+      const drip = mesh(new THREE.CapsuleGeometry(0.005, 0.03, 4, 8), wax, 0.0355, 0.13, 0.01)
+      const wick = cyl(0.0018, 0.0018, 0.016, mat('#2a2018'), 0, 0.146)
+      const flame = sphere(0.011, glow('#ffb347', 0.9), 0, 0.176, 0)
+      flame.scale.set(1, 2.1, 1)
+      return group(dish, pillar, drip, wick, flame)
+    },
   },
   {
     type: 'wall-lamp',
@@ -321,11 +366,22 @@ export const ROOM_CATALOG: CatalogItem[] = [
     wallMounted: true,
     // Light well off the wall: closer, it burns a hot round spot onto the wall
     light: { color: WARM_LIGHT, intensity: 2, distance: 4.5, offset: [0, -0.05, 0.55] },
-    build: (color) => group(
-      box(0.1, 0.18, 0.03, mat(DARK), 0, -0.09, 0.015),
-      cyl(0.008, 0.008, 0.16, mat(DARK), 0, -0.02, 0.1),
-      cyl(0.08, 0.12, 0.16, glow(color), 0, -0.02, 0.2),
-    ),
+    build: (color) => {
+      // Brass sconce: round wall plate, a curved arm, a fabric shade open at both ends
+      const brass = mat(GOLD, { metalness: 0.75, roughness: 0.32 })
+      const plate = mesh(new THREE.CylinderGeometry(0.055, 0.06, 0.018, 32), brass, 0, -0.06, 0.009)
+      plate.rotation.x = Math.PI / 2
+      const arm = mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(
+        new THREE.Vector3(0, -0.06, 0.015), new THREE.Vector3(0, -0.07, 0.16), new THREE.Vector3(0, 0.0, 0.19),
+      ), 16, 0.007, 8), brass)
+      const socket = cyl(0.014, 0.016, 0.03, brass, 0, -0.005, 0.19)
+      const bulb = sphere(0.026, glow('#fff1d6', 0.3), 0, 0.05, 0.19)
+      const fabric = glow(color)
+      fabric.side = THREE.DoubleSide
+      const shade = lathe([[0.115, 0], [0.112, 0.006], [0.082, 0.15], [0.078, 0.156]], fabric, -0.03)
+      shade.position.z = 0.19
+      return group(plate, arm, socket, bulb, shade)
+    },
   },
   {
     type: 'string-lights',
@@ -372,8 +428,13 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'decor',
     defaultColor: '#e76f51',
     build: (color) => {
-      const handle = mesh(new THREE.TorusGeometry(0.03, 0.008, 8, 16), mat(color), 0.05, 0.05, 0)
-      return group(cyl(0.04, 0.035, 0.1, mat(color)), handle)
+      // Glazed body turned with a foot and a rolled lip, coffee inside, a D-shaped handle
+      const body = lathe([[0, 0.004], [0.033, 0], [0.037, 0.006], [0.04, 0.03], [0.041, 0.098], [0.039, 0.102], [0.036, 0.098], [0.035, 0.014], [0, 0.014]], glaze(color))
+      const coffee = cyl(0.0355, 0.0355, 0.004, mat('#3b2417', { roughness: 0.15 }), 0, 0.078)
+      const handle = mesh(new THREE.TorusGeometry(0.026, 0.0075, 10, 24, Math.PI), glaze(color), 0.039, 0.054, 0)
+      handle.rotation.z = -Math.PI / 2
+      handle.scale.set(1, 1.15, 1)
+      return group(body, coffee, handle)
     },
   },
 
@@ -397,14 +458,23 @@ export const ROOM_CATALOG: CatalogItem[] = [
     photo: { width: 0.5, height: 0.7, center: [0, 0, 0.031] },
     build: (color) => {
       const art = new THREE.Group()
-      art.add(box(0.7, 0.9, 0.04, mat('#3a2a1e'), 0, -0.45))
-      art.add(box(0.58, 0.78, 0.01, mat(WHITE), 0, -0.39, 0.025))
-      // Abstract artwork, replaced by the photo once one is uploaded
-      const painting = box(0.44, 0.3, 0.01, mat(color), 0, -0.25, 0.032)
-      const sun = sphere(0.07, mat('#e9c46a'), 0.12, 0.18, 0.035)
+      // Moulded wooden frame: four bevelled rails, a gold inner lip, a white mount
+      const wood = mat('#4a3324', { roughness: 0.55 })
+      const rails: [number, number, number, number][] = [[0, 0.415, 0.68, 0.07], [0, -0.415, 0.68, 0.07], [-0.305, 0, 0.07, 0.9], [0.305, 0, 0.07, 0.9]]
+      for (const [x, y, w, h] of rails) art.add(box(w, h, 0.03, wood, x, y - h / 2, 0.015))
+      // Raised bead along the inner edge
+      const bead: [number, number, number, number][] = [[0, 0.3925, 0.565, 0.025], [0, -0.3925, 0.565, 0.025], [-0.2825, 0, 0.025, 0.81], [0.2825, 0, 0.025, 0.81]]
+      for (const [x, y, w, h] of bead) art.add(box(w, h, 0.042, wood, x, y - h / 2, 0.021))
+      art.add(box(0.56, 0.78, 0.012, mat(WHITE, { roughness: 0.9 }), 0, -0.39, 0.012))
+      const lip = mat(GOLD, { metalness: 0.7, roughness: 0.35 })
+      for (const [x, y, w, h] of [[0, 0.355, 0.52, 0.008], [0, -0.355, 0.52, 0.008], [-0.255, 0, 0.008, 0.72], [0.255, 0, 0.008, 0.72]] as const) {
+        art.add(box(w, h, 0.006, lip, x, y - h / 2, 0.024))
+      }
+      // Painted landscape in the picture's colour, replaced by the photo once one is uploaded
+      const painting = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.7), new THREE.MeshStandardMaterial({ map: landscapeTexture(color), roughness: 0.85 }))
+      painting.position.set(0, 0, 0.026)
       painting.userData.placeholder = true
-      sun.userData.placeholder = true
-      art.add(painting, sun)
+      art.add(painting)
       return art
     },
   },
@@ -659,10 +729,29 @@ const budVase: Container = (color) => {
   return [[lathe(body, glaze(color))], 0.16]
 }
 
-/** Wide, low glazed bowl */
+/** Footed compote bowl, filled with moss */
 const flowerBowl: Container = (color) => {
-  const body: Profile = [[0, 0], [0.12, 0], [0.13, 0.02], [0.24, 0.07], [0.29, 0.13], [0.3, 0.145], [0.285, 0.148], [0.27, 0.125], [0, 0.125]]
-  return [[lathe(body, glaze(color)), soil(0.27, 0.127)], 0.125]
+  const body: Profile = [[0, 0], [0.085, 0], [0.09, 0.012], [0.04, 0.03], [0.034, 0.075], [0.06, 0.1], [0.15, 0.14], [0.2, 0.19], [0.208, 0.2], [0.196, 0.203], [0.186, 0.185], [0, 0.185]]
+  const moss = cyl(0.188, 0.188, 0.014, mat('#56703a', { roughness: 1 }), 0, 0.18)
+  return [[lathe(body, glaze(color)), moss], 0.19]
+}
+
+/** A domed posy: tall in the middle, heads tipping out over the rim at the edge */
+function domedPosy(colors: [FlowerName, string][], count: number, radius: number, top: number, edge: number): FlowerStem[] {
+  return Array.from({ length: count }, (_, i) => {
+    const t = Math.sqrt((i + 0.5) / count)
+    const angle = i * 2.39996
+    const [flower, color] = colors[i % colors.length]!
+    return {
+      flower,
+      color,
+      height: top + (edge - top) * t * t,
+      x: Math.cos(angle) * radius * t,
+      z: Math.sin(angle) * radius * t,
+      lean: 0.05 + 0.95 * t * t,
+      turn: i * 1.31,
+    }
+  })
 }
 
 /** Wooden planter box with a top trim and little feet */
@@ -745,13 +834,11 @@ const GARDEN_ITEMS: CatalogItem[] = [
     { flower: 'lavender', color: LILAC, height: 0.24, x: -0.006, z: 0.004, lean: 0.22, turn: 2 },
   ]),
   natureItem('garden-flower-bowl', 'Flower bowl', 'i-lucide-flower', [
-    { model: 'Clover_1', height: 0.05, x: 0.2, z: -0.12 },
-    { model: 'Clover_2', height: 0.05, x: -0.2, z: 0.1, rotation: 1.2 },
-  ], { defaultColor: '#efe6d6', build: flowerBowl }, bouquet([
-    ['rose', BLUSH, 0.26], ['rose', PEACH, 0.25], ['rose', ROSE_RED, 0.24], ['rose', BLUSH, 0.25], ['daisy', WHITE_PETAL, 0.22],
-    ['rose', PEACH, 0.24], ['rose', BLUSH, 0.23], ['daisy', WHITE_PETAL, 0.22], ['rose', ROSE_RED, 0.23], ['rose', BLUSH, 0.22],
-    ['rose', PEACH, 0.22], ['daisy', WHITE_PETAL, 0.21],
-  ], 0.19, [0.2, 0.75])),
+    { model: 'Fern_1', height: 0.12, x: 0.15, z: 0.06, rotation: 0.6 },
+    { model: 'Fern_1', height: 0.11, x: -0.14, z: -0.08, rotation: 2.8 },
+  ], { defaultColor: '#efe6d6', build: flowerBowl }, domedPosy([
+    ['rose', BLUSH], ['rose', PEACH], ['daisy', WHITE_PETAL], ['rose', ROSE_RED], ['rose', BLUSH], ['rose', PEACH], ['lavender', LILAC],
+  ], 28, 0.17, 0.3, 0.2)),
   natureItem('garden-flower-bed', 'Flower bed', 'i-lucide-flower', [
     { model: 'Grass_Common_Short', height: 0.14, x: -0.38, z: 0.1 },
     { model: 'Grass_Common_Short', height: 0.13, x: 0.38, z: 0.1, rotation: 2 },
