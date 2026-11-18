@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { attachDungeonModel, loadDungeonModel } from './dungeonModels'
 import { attachNaturePieces, greenLeaves, type NaturePiece } from './natureModels'
 import { PREMIUM_ITEMS } from './premiumModels'
+import { attachFurnitureModel } from './furnitureModels'
 
 // Procedural model catalog for the 3D mini room.
 // Every model is assembled from primitives at runtime, so a room is fully
@@ -108,21 +109,18 @@ function sphere(r: number, material: THREE.Material, x = 0, y = 0, z = 0) {
   return mesh(new THREE.SphereGeometry(r, 20, 14), material, x, y, z)
 }
 
+/** Furniture drawn from a model file (./furnitureModels), painted `color` where it can be */
+function furnitureModel(name: string, color: string) {
+  const g = new THREE.Group()
+  // Renderers wait on this before reading the model (thumbnails, glow materials)
+  g.userData.ready = attachFurnitureModel(g, name, color)
+  return g
+}
+
 function group(...children: THREE.Object3D[]) {
   const g = new THREE.Group()
   g.add(...children)
   return g
-}
-
-function legs(w: number, d: number, h: number, r: number, material: THREE.Material, inset = 0.05) {
-  const x = w / 2 - inset
-  const z = d / 2 - inset
-  return [
-    cyl(r, r, h, material, -x, 0, -z, 8),
-    cyl(r, r, h, material, x, 0, -z, 8),
-    cyl(r, r, h, material, -x, 0, z, 8),
-    cyl(r, r, h, material, x, 0, z, 8),
-  ]
 }
 
 const WOOD = '#8b5e3c'
@@ -230,17 +228,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-bed-double',
     category: 'furniture',
     defaultColor: '#6c8ebf',
-    build: (color) => {
-      const frame = mat(WOOD)
-      return group(
-        box(1.6, 0.3, 2.1, frame),
-        box(1.6, 0.9, 0.08, frame, 0, 0, -1.03),
-        box(1.5, 0.2, 2.0, mat(WHITE), 0, 0.3, 0.02),
-        box(1.52, 0.06, 1.3, mat(color), 0, 0.5, 0.38),
-        box(0.6, 0.12, 0.35, mat(WHITE, { roughness: 0.9 }), -0.38, 0.5, -0.75),
-        box(0.6, 0.12, 0.35, mat(WHITE, { roughness: 0.9 }), 0.38, 0.5, -0.75),
-      )
-    },
+    build: color => furnitureModel('bed', color),
   },
   {
     type: 'sofa',
@@ -248,17 +236,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-sofa',
     category: 'furniture',
     defaultColor: '#c0605a',
-    build: (color) => {
-      const fabric = mat(color, { roughness: 0.95 })
-      return group(
-        box(2.0, 0.42, 0.85, fabric),
-        box(2.0, 0.5, 0.2, fabric, 0, 0.42, -0.33),
-        box(0.18, 0.28, 0.85, fabric, -0.91, 0.42, 0),
-        box(0.18, 0.28, 0.85, fabric, 0.91, 0.42, 0),
-        box(0.8, 0.1, 0.6, mat(color, { roughness: 1 }), -0.41, 0.42, 0.08),
-        box(0.8, 0.1, 0.6, mat(color, { roughness: 1 }), 0.41, 0.42, 0.08),
-      )
-    },
+    build: color => furnitureModel('sofa', color),
   },
   {
     type: 'desk',
@@ -266,14 +244,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-rectangle-horizontal',
     category: 'furniture',
     defaultColor: WOOD,
-    build: (color) => {
-      const wood = mat(color)
-      return group(
-        box(1.3, 0.05, 0.65, wood, 0, 0.71),
-        ...legs(1.3, 0.65, 0.71, 0.025, mat(DARK, { metalness: 0.6, roughness: 0.4 })),
-        box(0.4, 0.45, 0.6, wood, 0.42, 0.22),
-      )
-    },
+    build: color => furnitureModel('desk', color),
   },
   {
     type: 'chair',
@@ -281,14 +252,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-armchair',
     category: 'furniture',
     defaultColor: '#3d3d46',
-    build: (color) => {
-      const m = mat(color)
-      return group(
-        box(0.46, 0.06, 0.46, m, 0, 0.44),
-        box(0.46, 0.5, 0.05, m, 0, 0.5, -0.2),
-        ...legs(0.46, 0.46, 0.44, 0.018, mat(DARK, { metalness: 0.6, roughness: 0.4 }), 0.04),
-      )
-    },
+    build: color => furnitureModel('chair', color),
   },
   {
     type: 'coffee-table',
@@ -296,11 +260,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-circle',
     category: 'furniture',
     defaultColor: '#a47148',
-    build: (color) => group(
-      cyl(0.5, 0.5, 0.05, mat(color), 0, 0.38, 0, 32),
-      cyl(0.05, 0.08, 0.38, mat(DARK)),
-      cyl(0.25, 0.25, 0.03, mat(DARK)),
-    ),
+    build: color => furnitureModel('coffee-table', color),
   },
   {
     type: 'bookshelf',
@@ -308,30 +268,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-library',
     category: 'furniture',
     defaultColor: '#f0e6d8',
-    build: (color) => {
-      const m = mat(color)
-      const parts: THREE.Object3D[] = [
-        box(0.9, 1.9, 0.04, m, 0, 0, -0.15),
-        box(0.04, 1.9, 0.32, m, -0.43),
-        box(0.04, 1.9, 0.32, m, 0.43),
-      ]
-      const bookColors = ['#c0392b', '#2980b9', '#27ae60', '#f39c12', '#8e44ad', '#16a085', '#d35400']
-      for (let shelf = 0; shelf < 5; shelf++) {
-        const y = shelf * 0.46
-        parts.push(box(0.86, 0.03, 0.3, m, 0, y))
-        if (shelf === 4) break
-        let x = -0.38
-        let i = shelf * 2
-        while (x < 0.32) {
-          const w = 0.05 + ((i * 7) % 4) * 0.012
-          const h = 0.26 + ((i * 5) % 5) * 0.03
-          parts.push(box(w, h, 0.22, mat(bookColors[i % bookColors.length]!), x + w / 2, y + 0.03, 0))
-          x += w + 0.008
-          i++
-        }
-      }
-      return group(...parts)
-    },
+    build: color => furnitureModel('bookshelf', color),
   },
   {
     type: 'cabinet',
@@ -339,16 +276,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-archive',
     category: 'furniture',
     defaultColor: '#e8dccb',
-    build: (color) => {
-      const m = mat(color)
-      const handle = mat('#b08d57', { metalness: 0.8, roughness: 0.3 })
-      const parts: THREE.Object3D[] = [box(1.0, 0.8, 0.45, m)]
-      for (let i = 0; i < 3; i++) {
-        parts.push(box(0.92, 0.22, 0.02, mat(color, { roughness: 0.6 }), 0, 0.06 + i * 0.25, 0.225))
-        parts.push(box(0.18, 0.025, 0.03, handle, 0, 0.16 + i * 0.25, 0.24))
-      }
-      return group(...parts)
-    },
+    build: color => furnitureModel('cabinet', color),
   },
 
   // Lighting
