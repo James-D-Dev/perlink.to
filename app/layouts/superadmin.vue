@@ -45,14 +45,22 @@
           />
         </div>
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="[themeLink, ...supportLinks]"
-          orientation="vertical"
-          tooltip
-          class="mt-auto"
-          :ui="navUi"
-        />
+        <!-- Theme, the user dashboard and the site: one row of icons, so they
+             always fit under the menu -->
+        <div class="mt-auto flex gap-1 pt-4" :class="collapsed ? 'flex-col items-center' : 'items-center'">
+          <UTooltip v-for="item in [themeLink, ...supportLinks]" :key="item.label" :text="item.label">
+            <UButton
+              :to="item.to"
+              :icon="item.icon"
+              :aria-label="item.label"
+              color="neutral"
+              variant="ghost"
+              size="lg"
+              class="text-ink-muted hover:text-ink"
+              @click="item.onSelect?.($event)"
+            />
+          </UTooltip>
+        </div>
       </template>
 
       <template #footer="{ collapsed }">
@@ -92,7 +100,7 @@ const themeLink = computed<NavigationMenuItem>(() => ({
 
 // Same rows as the dashboard menu
 const navUi = {
-  link: "min-h-11 gap-3 rounded-xl px-3 py-2.5 text-[15px] text-ink-soft before:rounded-xl hover:text-ink hover:before:bg-sand/60 data-active:font-medium data-active:text-ink data-active:before:bg-sand",
+  link: "min-h-10 gap-3 rounded-xl px-3 py-2 text-sm text-ink-soft before:rounded-xl hover:text-ink hover:before:bg-sand/60 data-active:font-medium data-active:text-ink data-active:before:bg-sand",
   linkLeadingIcon: "size-5 text-ink-muted group-data-active:text-tint",
 };
 

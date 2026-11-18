@@ -6,7 +6,7 @@
       <div class="absolute inset-x-0 top-0 border-t border-dashed border-line" />
       <div class="absolute inset-x-0 top-1/2 border-t border-dashed border-line/60" />
       <span class="absolute -top-2.5 right-0 bg-paper pl-1 text-[10px] tabular-nums text-dimmed">
-        {{ niceMax.toLocaleString() }}
+        {{ fmt(niceMax) }}
       </span>
 
       <div class="absolute inset-0 flex items-end gap-0.5">
@@ -35,7 +35,7 @@
       >
         <p class="text-white/60">{{ formatDay(data[hovered]!.date, true) }}</p>
         <p class="font-semibold tabular-nums text-white">
-          {{ data[hovered]!.value.toLocaleString() }} {{ unit }}
+          {{ fmt(data[hovered]!.value) }} {{ unit }}
         </p>
       </div>
     </div>
@@ -55,12 +55,15 @@ const props = withDefaults(defineProps<{
   data: { date: string; value: number }[]
   unit?: string
   height?: number
+  /** How a value reads (axis and tooltip), e.g. as dollars */
+  format?: (value: number) => string
 }>(), {
   unit: '',
   height: 160,
 })
 
 const hovered = ref<number | null>(null)
+const fmt = (value: number) => props.format ? props.format(value) : value.toLocaleString()
 
 // Round the axis max up to a readable number
 const niceMax = computed(() => {

@@ -226,7 +226,7 @@ const tabs = [
   { value: 'in' as const, label: 'Inbox', icon: 'i-lucide-inbox' },
   { value: 'out' as const, label: 'Sent', icon: 'i-lucide-send' },
 ]
-const box = ref<'in' | 'out'>('in')
+const box = ref<'in' | 'out'>(useRoute().query.box === 'out' ? 'out' : 'in')
 const search = ref('')
 const debouncedSearch = refDebounced(search, 300)
 const page = ref(1)

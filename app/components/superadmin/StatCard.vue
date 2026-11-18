@@ -29,7 +29,9 @@ const props = defineProps<{
   hint?: string
   to?: string
   loading?: boolean
+  /** Shown instead of the number, e.g. "$1,234" */
+  display?: string
 }>()
 
-const formatted = computed(() => props.value.toLocaleString())
+const formatted = computed(() => props.display ?? props.value.toLocaleString())
 </script>

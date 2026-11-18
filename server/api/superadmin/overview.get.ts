@@ -34,6 +34,10 @@ export default defineEventHandler(async (event) => {
       recentUsers,
       topLinks,
       topBios,
+      revenue,
+      revenueDays,
+      attention,
+      recentPayments,
     ] = await db.batch([
       db.prepare(`
         SELECT
@@ -79,7 +83,7 @@ export default defineEventHandler(async (event) => {
         SELECT id, email, name, username, avatar, plan, status, created_at as createdAt
         FROM profiles
         ORDER BY created_at DESC
-        LIMIT 6
+        LIMIT 7
       `),
       db.prepare(`
         SELECT l.id, l.short_code as shortCode, l.title, l.click_count as clickCount, p.email as ownerEmail
@@ -93,6 +97,59 @@ export default defineEventHandler(async (event) => {
         FROM bio_pages b
         LEFT JOIN profiles p ON p.id = b.user_id
         ORDER BY b.view_count DESC
+        LIMIT 5
+      `),
+      // Money in: paid plans and passes (card, crypto, bank) and room packs.
+      // Card and crypto are in USD; a bank transfer only has its VND price.
+      db.prepare(`
+        WITH sales AS (
+          SELECT paid_at AS at, amount_usd AS usd, CASE WHEN amount_usd IS NULL THEN amount ELSE 0 END AS vnd
+          FROM payments WHERE status = 'paid' AND paid_at IS NOT NULL
+          UNION ALL
+          SELECT created_at, amount_usd, 0 FROM room_packs WHERE amount_usd > 0
+        )
+        SELECT
+          COALESCE(SUM(usd), 0) AS usdAll,
+          COALESCE(SUM(vnd), 0) AS vndAll,
+          COALESCE(SUM(CASE WHEN date(at) >= date('now', ?) THEN usd END), 0) AS usd30,
+          COALESCE(SUM(CASE WHEN date(at) >= date('now', ?) THEN vnd END), 0) AS vnd30,
+          SUM(CASE WHEN date(at) >= date('now', ?) THEN 1 ELSE 0 END) AS orders30,
+          (SELECT COUNT(*) FROM subscriptions WHERE status IN ('active', 'on_trial', 'trialing')) AS activeSubs
+        FROM sales
+      `).bind(since, since, since),
+      db.prepare(`
+        SELECT date(at) AS day, ROUND(SUM(usd), 2) AS count FROM (
+          SELECT paid_at AS at, amount_usd AS usd FROM payments WHERE status = 'paid' AND amount_usd > 0
+          UNION ALL
+          SELECT created_at, amount_usd FROM room_packs WHERE amount_usd > 0
+        )
+        WHERE date(at) >= date('now', ?)
+        GROUP BY day
+      `).bind(since),
+      // Waiting on the admin
+      db.prepare(`
+        SELECT
+          (SELECT COUNT(*) FROM payments WHERE status = 'submitted') AS payments,
+          (SELECT COUNT(*) FROM reports WHERE status = 'open') AS reports,
+          (SELECT COUNT(*) FROM mail_messages WHERE direction = 'in' AND read_at IS NULL) AS mail,
+          (SELECT COUNT(*) FROM mail_messages WHERE direction = 'out' AND status = 'failed' AND created_at >= datetime('now', '-7 days')) AS mailFailed
+      `),
+      db.prepare(`
+        SELECT * FROM (
+          SELECT p.id, p.plan, p.period, p.method, p.amount, p.amount_usd AS amountUsd, p.paid_at AS paidAt,
+            pr.email, pr.name, pp.product
+          FROM payments p
+          LEFT JOIN profiles pr ON pr.id = p.user_id
+          LEFT JOIN payment_products pp ON pp.payment_id = p.id
+          WHERE p.status = 'paid' AND p.paid_at IS NOT NULL
+          UNION ALL
+          SELECT 'pack:' || r.user_id || ':' || r.pack_id, NULL, NULL, r.source, 0, r.amount_usd, r.created_at,
+            pr.email, pr.name, 'pack:' || r.pack_id
+          FROM room_packs r
+          LEFT JOIN profiles pr ON pr.id = r.user_id
+          WHERE r.amount_usd > 0
+        )
+        ORDER BY paidAt DESC
         LIMIT 5
       `),
     ])
@@ -133,6 +190,23 @@ export default defineEventHandler(async (event) => {
       })),
       topLinks: (topLinks?.results || []) as any[],
       topBios: (topBios?.results || []) as any[],
+      revenue: (() => {
+        const r = first(revenue)
+        return {
+          usdAll: r.usdAll || 0,
+          vndAll: r.vndAll || 0,
+          usd30: r.usd30 || 0,
+          vnd30: r.vnd30 || 0,
+          orders30: r.orders30 || 0,
+          activeSubs: r.activeSubs || 0,
+        }
+      })(),
+      revenueSeries: fillSeries((revenueDays?.results || []) as any, DAYS),
+      attention: (() => {
+        const a = first(attention)
+        return { payments: a.payments || 0, reports: a.reports || 0, mail: a.mail || 0, mailFailed: a.mailFailed || 0 }
+      })(),
+      recentPayments: (recentPayments?.results || []) as any[],
     }
   } catch (error: any) {
     console.error('Failed to fetch overview:', error)
