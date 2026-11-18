@@ -6,6 +6,9 @@ export type PageMode = '2d' | '3d';
 
 export type FloorMaterial = 'wood' | 'tile' | 'carpet' | 'concrete';
 
+/** Wall finish, tinted by wallColor ('paint' when unset) */
+export type WallMaterial = 'paint' | 'plaster' | 'brick' | 'panel' | 'stripes';
+
 export type DayNightMode =
   | 'auto' // follows the viewer's local clock
   | 'cycle' // custom loop, e.g. 1 minute day / 1 minute night
@@ -25,6 +28,7 @@ export interface RoomStyle {
   theme?: RoomTheme;
   floorColor: string;
   floorMaterial: FloorMaterial;
+  wallMaterial?: WallMaterial;
   wallColor: string;
   trimColor: string;
   /** Room footprint in meters (x = width, z = depth) and wall height */

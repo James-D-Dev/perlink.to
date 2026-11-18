@@ -15,7 +15,7 @@ import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
 import { drawProductCard, drawProductSlide, productSignature, type ShopProduct } from './productCard'
 import type { GuestGiftType } from '#shared/guestbook'
 
-export { createFloorTexture } from './shell'
+export { createFloorTexture, createWallTexture } from './shell'
 
 export type ObjectPatch = Pick<RoomObject, 'position' | 'rotation'> & { wall?: WallSide }
 

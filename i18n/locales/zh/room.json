@@ -129,6 +129,14 @@
         "carpet": "地毯",
         "concrete": "水泥"
       },
+      "wall": "墙面",
+      "walls": {
+        "paint": "乳胶漆",
+        "plaster": "灰泥",
+        "brick": "砖墙",
+        "panel": "护墙板",
+        "stripes": "条纹墙纸"
+      },
       "colorFields": {
         "wallColor": "墙面",
         "floorColor": "地板",

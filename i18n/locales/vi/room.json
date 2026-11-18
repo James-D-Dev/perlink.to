@@ -129,6 +129,14 @@
         "carpet": "Thảm",
         "concrete": "Bê tông"
       },
+      "wall": "Tường",
+      "walls": {
+        "paint": "Sơn",
+        "plaster": "Vữa",
+        "brick": "Gạch",
+        "panel": "Ốp gỗ",
+        "stripes": "Giấy sọc"
+      },
       "colorFields": {
         "wallColor": "Tường",
         "floorColor": "Sàn",

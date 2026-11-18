@@ -433,6 +433,23 @@
               </div>
             </div>
 
+            <div v-if="(room.style.theme ?? 'classic') === 'classic'" class="shrink-0">
+              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{{ t('room.roomStyle.wall') }}</p>
+              <div class="flex gap-2">
+                <button
+                  v-for="wall in wallFinishOptions"
+                  :key="wall.value"
+                  type="button"
+                  class="w-16 overflow-hidden rounded-xl border-2 text-left transition"
+                  :class="(room.style.wallMaterial ?? 'paint') === wall.value ? 'border-perlink-blue' : 'border-default hover:border-accented'"
+                  @click="updateStyle({ wallMaterial: wall.value })"
+                >
+                  <div class="h-12" :style="{ backgroundColor: room.style.wallColor, backgroundImage: wallPreviews[wall.value] ? `url(${wallPreviews[wall.value]})` : undefined, backgroundSize: 'cover', backgroundBlendMode: 'multiply' }" />
+                  <p class="truncate px-1.5 py-1 text-[11px] text-default">{{ wall.label }}</p>
+                </button>
+              </div>
+            </div>
+
             <div class="shrink-0">
               <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{{ t('room.roomStyle.colors') }}</p>
               <div class="flex gap-3">
@@ -617,11 +634,11 @@
 
 <script setup lang="ts">
 import { nanoid } from 'nanoid'
-import type { DayNightMode, FloorMaterial, RoomConfig, RoomObject, RoomObjectLink, RoomStyle, WallSide } from '~/types/room'
+import type { DayNightMode, FloorMaterial, RoomConfig, RoomObject, RoomObjectLink, RoomStyle, WallMaterial, WallSide } from '~/types/room'
 import { ROOM_CATALOG, CATALOG_BY_TYPE, CATEGORY_LABELS, preloadDungeonModels, type CatalogCategory } from '~/utils/room/catalog'
 import type { ShopProduct } from '~/utils/room/productCard'
 import type { ObjectPatch } from '~/utils/room/RoomScene'
-import { createFloorTexture } from '~/utils/room/RoomScene'
+import { createFloorTexture, createWallTexture } from '~/utils/room/RoomScene'
 import type { DaylightState } from '~/utils/room/daylight'
 import { ROOM_STYLE_PRESETS } from '~/data/roomPresets'
 import { ROOM_MUSIC, MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
@@ -758,6 +775,8 @@ const wallOptions = computed(() => [
 
 const FLOOR_MATERIALS: FloorMaterial[] = ['wood', 'tile', 'carpet', 'concrete']
 const floorOptions = computed(() => FLOOR_MATERIALS.map(value => ({ value, label: t(`room.roomStyle.floors.${value}`) })))
+const WALL_MATERIALS: WallMaterial[] = ['paint', 'plaster', 'brick', 'panel', 'stripes']
+const wallFinishOptions = computed(() => WALL_MATERIALS.map(value => ({ value, label: t(`room.roomStyle.walls.${value}`) })))
 
 const colorFields = computed(() => (['wallColor', 'floorColor', 'trimColor'] as const).map(key => ({ key, label: t(`room.roomStyle.colorFields.${key}`) })))
 
@@ -787,10 +806,17 @@ const cycleFields = computed<{ key: 'dayMinutes' | 'nightMinutes'; label: string
 
 // Floor texture swatches, tinted with the floor color via CSS multiply
 const floorPreviews = reactive<Partial<Record<FloorMaterial, string>>>({})
+const wallPreviews = reactive<Partial<Record<WallMaterial, string>>>({})
 onMounted(() => {
   for (const floor of FLOOR_MATERIALS) {
     const texture = createFloorTexture(floor, 3, 3)
     floorPreviews[floor] = (texture.image as HTMLCanvasElement).toDataURL('image/png')
+    texture.dispose()
+  }
+  for (const wall of WALL_MATERIALS) {
+    if (wall === 'paint') continue
+    const texture = createWallTexture(wall, 1, 1)
+    wallPreviews[wall] = (texture.image as HTMLCanvasElement).toDataURL('image/png')
     texture.dispose()
   }
 })

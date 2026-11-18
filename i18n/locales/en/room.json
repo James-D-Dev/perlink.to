@@ -129,6 +129,14 @@
         "carpet": "Carpet",
         "concrete": "Concrete"
       },
+      "wall": "Walls",
+      "walls": {
+        "paint": "Paint",
+        "plaster": "Plaster",
+        "brick": "Brick",
+        "panel": "Panelling",
+        "stripes": "Stripes"
+      },
       "colorFields": {
         "wallColor": "Walls",
         "floorColor": "Floor",

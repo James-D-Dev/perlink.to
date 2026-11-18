@@ -129,6 +129,14 @@
         "carpet": "カーペット",
         "concrete": "コンクリート"
       },
+      "wall": "壁",
+      "walls": {
+        "paint": "塗装",
+        "plaster": "漆喰",
+        "brick": "レンガ",
+        "panel": "板張り",
+        "stripes": "ストライプ"
+      },
       "colorFields": {
         "wallColor": "壁",
         "floorColor": "床",

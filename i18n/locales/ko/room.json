@@ -129,6 +129,14 @@
         "carpet": "카펫",
         "concrete": "콘크리트"
       },
+      "wall": "벽",
+      "walls": {
+        "paint": "페인트",
+        "plaster": "회벽",
+        "brick": "벽돌",
+        "panel": "목재 패널",
+        "stripes": "줄무늬 벽지"
+      },
       "colorFields": {
         "wallColor": "벽",
         "floorColor": "바닥",
