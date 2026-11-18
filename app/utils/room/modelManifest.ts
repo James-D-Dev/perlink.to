@@ -53,7 +53,7 @@ export const furnitureModelUrl = (name: FurnitureModelName) => `/models/furnitur
  * Bump when a box-built catalog item changes the way it looks (the wall
  * clock, a container…); model files bump their own `v` above
  */
-const CATALOG_REVISION = 38
+const CATALOG_REVISION = 39
 
 /** Changes whenever any model or the catalog's look changes (tray thumbnail cache key) */
 export const MODELS_REVISION = `${CATALOG_REVISION}.${[...Object.values(FURNITURE_MODELS), ...Object.values(FLOWER_MODELS)].reduce((sum, m) => sum + m.v, 0)}`

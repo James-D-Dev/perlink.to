@@ -1009,7 +1009,7 @@ export class RoomScene {
     const used = new Set([...this.entries.values()].map(e => e.light))
     const light = this.lightPool.find(l => !used.has(l))
     if (!light) return
-    light.color.set(entry.item.light.color)
+    light.color.set(entry.item.light.tinted ? (entry.data.color || entry.item.defaultColor) : entry.item.light.color)
     light.distance = entry.item.light.distance
     light.intensity = 0
     entry.light = light

@@ -22,6 +22,8 @@ export interface CatalogLight {
   offset: [number, number, number]
   /** Flickers like a flame (candles, torches) */
   flicker?: boolean
+  /** Shines in the colour picked for the object (a neon sign) instead of `color` */
+  tinted?: boolean
 }
 
 export interface CatalogItem {
@@ -88,6 +90,83 @@ function glow(color: string, base = 0) {
   m.userData.glow = true
   m.userData.baseGlow = base
   return m
+}
+
+/** A pleated linen curtain hanging from (x, top), gathered more at the top than the hem */
+let curtainGeometry: THREE.BufferGeometry | null = null
+const linen = new THREE.MeshStandardMaterial({ color: '#ece3d3', roughness: 0.95, side: THREE.DoubleSide })
+linen.userData.shared = true
+function curtainPanel(x: number, top: number, z: number) {
+  if (!curtainGeometry) {
+    const width = 0.36
+    const height = 1.6
+    curtainGeometry = new THREE.PlaneGeometry(width, height, 36, 8)
+    const pos = curtainGeometry.attributes.position!
+    for (let i = 0; i < pos.count; i++) {
+      const px = pos.getX(i)
+      const py = pos.getY(i)
+      const down = 0.5 - py / height // 0 at the top, 1 at the hem
+      pos.setZ(i, Math.sin((px / width) * Math.PI * 9) * (0.022 + 0.012 * down))
+      pos.setX(i, px * (0.85 + 0.15 * down))
+    }
+    curtainGeometry.translate(0, -height / 2, 0)
+    curtainGeometry.computeVertexNormals()
+    curtainGeometry.userData.shared = true
+  }
+  const panel = new THREE.Mesh(curtainGeometry, linen)
+  panel.position.set(x, top, z)
+  panel.castShadow = true
+  panel.receiveShadow = true
+  panel.userData.shared = true
+  return panel
+}
+
+/** Cork: warm tan with darker and lighter speckles */
+let cork: THREE.Texture | null = null
+function corkTexture() {
+  if (cork) return cork
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 256
+  const g = canvas.getContext('2d')!
+  g.fillStyle = '#c69c6d'
+  g.fillRect(0, 0, 256, 256)
+  for (let i = 0; i < 2600; i++) {
+    const shade = Math.random()
+    g.fillStyle = shade < 0.5 ? `rgba(120, 78, 40, ${0.25 + shade * 0.5})` : `rgba(235, 205, 160, ${(shade - 0.5) * 0.7})`
+    g.fillRect(Math.random() * 256, Math.random() * 256, 1 + Math.random() * 2.5, 1 + Math.random() * 2.5)
+  }
+  cork = new THREE.CanvasTexture(canvas)
+  cork.colorSpace = THREE.SRGBColorSpace
+  cork.userData = { shared: true }
+  return cork
+}
+
+/** A note card with a few pencilled lines */
+const noteTextures = new Map<string, THREE.Texture>()
+function noteTexture(paper: string) {
+  let texture = noteTextures.get(paper)
+  if (texture) return texture
+  const canvas = document.createElement('canvas')
+  canvas.width = 128
+  canvas.height = 108
+  const g = canvas.getContext('2d')!
+  g.fillStyle = paper
+  g.fillRect(0, 0, 128, 108)
+  g.strokeStyle = 'rgba(60, 60, 80, 0.45)'
+  g.lineWidth = 3
+  g.lineCap = 'round'
+  for (let i = 0; i < 4; i++) {
+    const y = 34 + i * 17
+    g.beginPath()
+    g.moveTo(16, y)
+    g.lineTo(16 + (i === 3 ? 50 : 80 + (i % 2) * 14), y)
+    g.stroke()
+  }
+  texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.userData = { shared: true }
+  noteTextures.set(paper, texture)
+  return texture
 }
 
 /** A small painted landscape (sky, sun, layered hills) in shades of `color`, for empty picture frames */
@@ -446,7 +525,16 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'wall',
     defaultColor: WHITE,
     wallMounted: true,
-    build: color => furnitureModel('window', color),
+    build: (color) => {
+      const g = furnitureModel('window', color)
+      // Brass rod above the frame, two pleated linen curtains drawn to the sides
+      const brass = mat(GOLD, { metalness: 0.75, roughness: 0.3 })
+      const rod = mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.96, 12), brass, 0, 0.72, 0.13)
+      rod.rotation.z = Math.PI / 2
+      g.add(rod, sphere(0.024, brass, -0.99, 0.72, 0.13), sphere(0.024, brass, 0.99, 0.72, 0.13))
+      for (const side of [-1, 1]) g.add(curtainPanel(side * 0.8, 0.7, 0.13))
+      return g
+    },
   },
   {
     type: 'picture-frame',
@@ -489,8 +577,12 @@ export const ROOM_CATALOG: CatalogItem[] = [
     opensBlog: true,
     build: (color) => {
       const board = new THREE.Group()
-      board.add(box(1.0, 0.76, 0.04, mat('#6b4a32'), 0, -0.38))
-      board.add(box(0.9, 0.66, 0.02, mat('#c9a47c', { roughness: 0.95 }), 0, -0.33, 0.025))
+      // Oak frame round a speckled cork panel
+      const oak = mat('#7a5537', { roughness: 0.6 })
+      for (const [x, y, w, h] of [[0, 0.345, 1.0, 0.07], [0, -0.345, 1.0, 0.07], [-0.465, 0, 0.07, 0.76], [0.465, 0, 0.07, 0.76]] as const) {
+        board.add(box(w, h, 0.045, oak, x, y - h / 2, 0.0225))
+      }
+      board.add(box(0.9, 0.66, 0.03, new THREE.MeshStandardMaterial({ map: corkTexture(), roughness: 1 }), 0, -0.33, 0.015))
       // "BLOG" on a coloured header
       const header = box(0.46, 0.13, 0.012, mat(color), 0, 0.12, 0.04)
       board.add(header)
@@ -518,11 +610,18 @@ export const ROOM_CATALOG: CatalogItem[] = [
         [-0.12, -0.02, -0.06, '#ffe1e7'],
         [0.2, 0.0, 0.04, '#fff7cc'],
       ]
+      const pinMetal = mat('#c9ccd1', { metalness: 0.8, roughness: 0.3 })
       for (const [x, y, tilt, paper] of notes) {
-        const note = box(0.2, 0.17, 0.004, mat(paper), x, y - 0.085, 0.037)
+        const note = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.17), new THREE.MeshStandardMaterial({ map: noteTexture(paper), roughness: 0.9 }))
+        note.position.set(x, y, 0.033)
         note.rotation.z = tilt
+        note.receiveShadow = true
         board.add(note)
-        board.add(sphere(0.013, mat(color), x, y + 0.06, 0.043))
+        // Push pin: a coloured head on a short steel shaft
+        board.add(cyl(0.002, 0.002, 0.012, pinMetal, x, y + 0.06, 0.036))
+        const head = sphere(0.012, mat(color, { roughness: 0.35 }), x, y + 0.06, 0.046)
+        head.scale.set(1, 1, 0.8)
+        board.add(head)
       }
       return board
     },
@@ -611,12 +710,38 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'wall',
     defaultColor: '#ff4fd8',
     wallMounted: true,
-    light: { color: '#ff7be5', intensity: 1.5, distance: 3, offset: [0, 0, 0.5] },
+    light: { color: '#ff7be5', tinted: true, intensity: 1.5, distance: 3, offset: [0, 0, 0.5] },
     build: (color) => {
-      const ring = mesh(new THREE.TorusGeometry(0.3, 0.025, 10, 40), glow(color, 0.8), 0, 0, 0.05)
-      const bolt = box(0.05, 0.36, 0.03, glow(color, 0.8), 0, -0.18, 0.05)
-      bolt.rotation.z = 0.4
-      return group(box(0.8, 0.8, 0.02, mat('#1b1b24', { transparent: true, opacity: 0.35 }), 0, -0.4), ring, bolt)
+      // Thin glass tubes (a ring and a lightning bolt) on a clear acrylic plate held off the wall by four standoffs
+      const tube = glow(color, 0.9)
+      const ring = mesh(new THREE.TorusGeometry(0.28, 0.012, 10, 72), tube, 0, 0, 0.05)
+      const zig = [[0.07, 0.19], [-0.06, 0.01], [0.04, 0.01], [-0.07, -0.19]].map(([x, y]) => new THREE.Vector3(x, y, 0.05))
+      const path = new THREE.CurvePath<THREE.Vector3>()
+      for (let i = 1; i < zig.length; i++) path.add(new THREE.LineCurve3(zig[i - 1]!, zig[i]!))
+      const bolt = mesh(new THREE.TubeGeometry(path, 48, 0.012, 8), tube)
+      const caps = zig.filter((_, i) => i === 0 || i === zig.length - 1).map(p => sphere(0.012, tube, p.x, p.y, p.z))
+      const shape = new THREE.Shape()
+      const w = 0.39
+      const r = 0.05
+      shape.moveTo(-w + r, -w)
+      shape.lineTo(w - r, -w)
+      shape.quadraticCurveTo(w, -w, w, -w + r)
+      shape.lineTo(w, w - r)
+      shape.quadraticCurveTo(w, w, w - r, w)
+      shape.lineTo(-w + r, w)
+      shape.quadraticCurveTo(-w, w, -w, w - r)
+      shape.lineTo(-w, -w + r)
+      shape.quadraticCurveTo(-w, -w, -w + r, -w)
+      const acrylic = new THREE.MeshPhysicalMaterial({ color: '#ffffff', transparent: true, opacity: 0.18, roughness: 0.05, clearcoat: 1, depthWrite: false })
+      const plate = mesh(new THREE.ExtrudeGeometry(shape, { depth: 0.01, bevelEnabled: false }), acrylic, 0, 0, 0.025)
+      plate.castShadow = false
+      const steel = mat('#c9ccd1', { metalness: 0.8, roughness: 0.25 })
+      const standoffs = [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sy]) => {
+        const post = mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.04, 16), steel, sx! * 0.34, sy! * 0.34, 0.02)
+        post.rotation.x = Math.PI / 2
+        return post
+      })
+      return group(plate, ring, bolt, ...caps, ...standoffs)
     },
   },
 
