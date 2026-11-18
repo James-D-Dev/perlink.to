@@ -40,8 +40,26 @@ async function endSession(event: H3Event) {
   }
 }
 
+/**
+ * Note where the account is used from (Cloudflare's country of the visitor),
+ * on sign-in and on the daily renewal, so Superadmin → Users shows it. Kept
+ * once known; never holds up the request.
+ */
+function rememberCountry(event: H3Event, userId: string) {
+  const country = getHeader(event, 'cf-ipcountry')
+  if (!country || !/^[A-Z]{2}$/.test(country) || country === 'XX' || country === 'T1') return
+  const write = getDB(event)
+    .prepare(`UPDATE profiles SET country = ? WHERE id = ? AND (country IS NULL OR country = '')`)
+    .bind(country, userId)
+    .run()
+    .catch(error => console.error('[auth] country not saved', error))
+  const ctx = event.context.cloudflare?.context
+  if (ctx?.waitUntil) ctx.waitUntil(write)
+}
+
 /** Start a login session for a user (replaces any previous session cookie) */
 export async function startUserSession(event: H3Event, user: SessionUser) {
+  rememberCountry(event, user.id)
   const state = await accountState(event, user.id)
   // Signing in on a device brings the account's language with it
   if (state?.language) setCookie(event, LANGUAGE_COOKIE, toAppLanguage(state.language), { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax', path: '/' })
@@ -77,6 +95,7 @@ export async function validateUserSession(event: H3Event) {
     return null
   }
   await replaceUserSession(event, { user: user as any, sessionVersion: version, renewedAt: Date.now() })
+  rememberCountry(event, user.id)
   return user
 }
 

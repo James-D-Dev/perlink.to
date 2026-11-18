@@ -58,8 +58,8 @@ export class ProfileRepository {
         email = excluded.email,
         username = excluded.username,
         name = excluded.name,
-        ip = excluded.ip,
-        country = excluded.country,
+        ip = COALESCE(excluded.ip, profiles.ip),
+        country = COALESCE(excluded.country, profiles.country),
         avatar = excluded.avatar,
         updated_at = excluded.updated_at
     `).bind(
