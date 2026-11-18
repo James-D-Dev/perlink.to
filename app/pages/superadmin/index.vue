@@ -120,6 +120,8 @@
           </UCard>
         </div>
 
+        <SuperadminFunnel />
+
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
           <!-- Recent users -->
           <UCard :ui="listCardUi" class="lg:col-span-3">
