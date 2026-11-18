@@ -1,0 +1,599 @@
+{
+  "theme": {
+    "panelTitle": "テンプレートとテーマ",
+    "tabs": {
+      "presets": "テーマプリセット",
+      "custom": "カスタマイズ"
+    },
+    "options": {
+      "none": "なし",
+      "xs": "XS",
+      "small": "小",
+      "medium": "中",
+      "large": "大",
+      "xl": "XL"
+    },
+    "fields": {
+      "fontFamily": "フォント",
+      "fontSize": "フォントサイズ",
+      "textColor": "文字色",
+      "weight": "太さ",
+      "letterSpacing": "文字間隔"
+    },
+    "headerLayout": {
+      "label": "ヘッダーのレイアウト",
+      "tabs": {
+        "noBanner": "バナーなし",
+        "banner": "バナー"
+      },
+      "options": {
+        "centered": "中央揃え",
+        "left": "左揃え",
+        "cover": "カバー",
+        "imageOverlay": "画像オーバーレイ",
+        "bannerCircle": "バナー ○",
+        "bannerSquare": "バナー □"
+      },
+      "addBanner": "バナー画像を追加",
+      "upload": "画像をアップロード"
+    },
+    "colors": {
+      "title": "カラー",
+      "primary": "メイン",
+      "secondary": "サブ",
+      "third": "サード",
+      "categories": {
+        "neutral": "ニュートラル",
+        "bold": "ビビッド",
+        "playful": "ポップ",
+        "dark": "ダーク",
+        "gradient": "グラデーション"
+      },
+      "accent": "アクセントカラー",
+      "accentHelp": "カード、ボタン、アイコンに使われます。"
+    },
+    "background": {
+      "title": "背景",
+      "tabs": {
+        "solid": "単色",
+        "gradient": "グラデーション",
+        "image": "画像",
+        "video": "動画",
+        "effect": "エフェクト",
+        "pattern": "パターン"
+      },
+      "custom": "カスタム",
+      "customGradient": "カスタムグラデーション",
+      "from": "開始",
+      "via": "中間",
+      "to": "終了",
+      "customImageUrl": "カスタム画像のURL",
+      "videoUrl": "動画のURL（mp4、webm）"
+    },
+    "header": {
+      "title": "ヘッダーのタイトル",
+      "blockTitleFont": "ブロックタイトルのフォント"
+    },
+    "bio": {
+      "title": "自己紹介テキスト"
+    },
+    "card": {
+      "title": "カードのスタイル",
+      "style": "スタイル",
+      "color": "カードの色",
+      "colorHelp": "空欄の場合はメインカラーが使われます。",
+      "colorAria": "カードの色",
+      "borderColor": "枠線の色",
+      "borderColorAria": "カードの枠線の色",
+      "cornerRadius": "角の丸み",
+      "shadow": "影",
+      "backdropBlur": "背景ぼかし",
+      "appearAnimation": "表示アニメーション",
+      "hoverAnimation": "ホバーアニメーション",
+      "styles": {
+        "filled": "塗りつぶし",
+        "outline": "アウトライン",
+        "ghost": "ゴースト",
+        "soft": "ソフト"
+      },
+      "pill": "ピル型",
+      "shadowHard": "くっきり",
+      "shadowGlow": "グロー",
+      "borderWidth": "枠線の太さ",
+      "borderAuto": "スタイルに合わせる"
+    },
+    "fontWeights": {
+      "light": "細字",
+      "regular": "標準",
+      "medium": "中字",
+      "semibold": "やや太字",
+      "bold": "太字"
+    },
+    "letterSpacings": {
+      "tight": "狭い",
+      "snug": "やや狭い",
+      "normal": "標準",
+      "wide": "広い",
+      "extraWide": "とても広い"
+    },
+    "page": {
+      "title": "ページ",
+      "textColorAria": "ページの文字色",
+      "blockSpacing": "ブロックの間隔",
+      "blockTitles": "ブロックのタイトル",
+      "titleAlign": {
+        "center": "中央揃え",
+        "left": "左揃え"
+      },
+      "socialIcons": "SNSアイコン"
+    },
+    "blockGaps": {
+      "compact": "狭め",
+      "normal": "標準",
+      "relaxed": "広め"
+    },
+    "socialStyles": {
+      "soft": "ソフト",
+      "filled": "塗りつぶし",
+      "outline": "アウトライン",
+      "plain": "アイコンのみ"
+    },
+    "font": {
+      "title": "フォント",
+      "selectPlaceholder": "フォントを選択..."
+    },
+    "avatar": {
+      "title": "アバターの形",
+      "shapes": {
+        "circle": "円形",
+        "rounded": "角丸",
+        "square": "四角"
+      }
+    },
+    "linkLayout": {
+      "title": "リンクカードのレイアウト",
+      "vertical": "縦型（画像が上）",
+      "horizontalLeft": "横型（画像が左）",
+      "horizontalRight": "横型（画像が右）",
+      "centered": "中央揃え（テキストのみ）"
+    },
+    "animations": {
+      "appear": {
+        "fadeIn": "フェードイン",
+        "fadeInDown": "フェードイン（上から）",
+        "fadeInUp": "フェードイン（下から）",
+        "fadeInLeft": "フェードイン（左から）",
+        "fadeInRight": "フェードイン（右から）",
+        "zoomIn": "ズームイン",
+        "zoomInDown": "ズームイン（上から）",
+        "zoomInUp": "ズームイン（下から）",
+        "bounceIn": "バウンドイン",
+        "bounceInDown": "バウンドイン（上から）",
+        "bounceInUp": "バウンドイン（下から）",
+        "slideInDown": "スライドイン（上から）",
+        "slideInUp": "スライドイン（下から）",
+        "slideInLeft": "スライドイン（左から）",
+        "slideInRight": "スライドイン（右から）",
+        "backInDown": "バックイン（上から）",
+        "backInUp": "バックイン（下から）",
+        "flipInX": "フリップイン X",
+        "flipInY": "フリップイン Y",
+        "lightSpeedInRight": "ライトスピードイン（右から）",
+        "rotateIn": "回転イン"
+      },
+      "hover": {
+        "pulse": "パルス",
+        "bounce": "バウンド",
+        "rubberBand": "ゴムバンド",
+        "shakeX": "横揺れ",
+        "shakeY": "縦揺れ",
+        "headShake": "首振り",
+        "swing": "スイング",
+        "tada": "ジャーン",
+        "wobble": "ぐらぐら",
+        "jello": "ぷるぷる",
+        "heartBeat": "鼓動",
+        "flash": "点滅",
+        "flip": "フリップ"
+      },
+      "durations": {
+        "faster": "とても速い（0.5秒）",
+        "fast": "速い（0.8秒）",
+        "normal": "標準（1秒）",
+        "slow": "遅い（2秒）",
+        "slower": "とても遅い（3秒）"
+      }
+    },
+    "presetCategories": {
+      "minimal": "ミニマル",
+      "warm": "ウォーム",
+      "elegant": "エレガント",
+      "playful": "ポップ",
+      "nature": "ナチュラル",
+      "pastel": "パステル",
+      "dark": "ダーク",
+      "festive": "イベント",
+      "glass": "ガラス",
+      "luxe": "ラグジュアリー",
+      "bold": "ビビッド"
+    },
+    "presets": {
+      "paper": {
+        "name": "ペーパー",
+        "description": "白いページに黒い文字、余計なものなし"
+      },
+      "stone": {
+        "name": "ストーン",
+        "description": "温かみのあるグレーとやわらかなカード"
+      },
+      "mono": {
+        "name": "モノ",
+        "description": "黒いボタンと四角い角"
+      },
+      "swiss": {
+        "name": "スイス",
+        "description": "左揃えに赤のアクセント"
+      },
+      "cloud": {
+        "name": "クラウド",
+        "description": "軽やかなブルーグレー、角丸"
+      },
+      "coffee": {
+        "name": "コーヒーハウス",
+        "description": "クリームとエスプレッソ、カフェ向け"
+      },
+      "terracotta": {
+        "name": "テラコッタ",
+        "description": "砂色に映える土のオレンジ"
+      },
+      "bakery": {
+        "name": "ベーカリー",
+        "description": "バターイエローとブラウン"
+      },
+      "honey": {
+        "name": "ハニー",
+        "description": "黄金色のグラデーションに濃い文字"
+      },
+      "cinnamon": {
+        "name": "シナモン",
+        "description": "深いブラウンにクリーム色のカード"
+      },
+      "ivory": {
+        "name": "アイボリー",
+        "description": "アイボリーに明朝体、細い線"
+      },
+      "spa": {
+        "name": "スパ",
+        "description": "セージとリネン、落ち着いた清潔感"
+      },
+      "champagne": {
+        "name": "シャンパン",
+        "description": "淡いピンクにやわらかなゴールド"
+      },
+      "noir": {
+        "name": "ノワール",
+        "description": "黒とゴールド、夜のお店に"
+      },
+      "atelier": {
+        "name": "アトリエ",
+        "description": "ネイビーとクリーム、上品な仕立て"
+      },
+      "bubblegum": {
+        "name": "バブルガム",
+        "description": "ピンクで丸く弾む"
+      },
+      "lemonade": {
+        "name": "レモネード",
+        "description": "レモンイエローに青いボタン"
+      },
+      "sticker": {
+        "name": "ステッカー",
+        "description": "太い枠線の白いカード"
+      },
+      "candy": {
+        "name": "キャンディ",
+        "description": "甘いグラデーションに白いカード"
+      },
+      "retro": {
+        "name": "レトロ",
+        "description": "70年代風のオレンジとティール"
+      },
+      "forest": {
+        "name": "フォレスト",
+        "description": "深い緑にクリーム色の文字"
+      },
+      "matcha": {
+        "name": "抹茶",
+        "description": "やさしい緑茶の色合い"
+      },
+      "ocean": {
+        "name": "オーシャン",
+        "description": "海の青のグラデーションに白いカード"
+      },
+      "sand": {
+        "name": "ビーチ",
+        "description": "砂浜とターコイズ、民泊向け"
+      },
+      "lotus": {
+        "name": "ロータス",
+        "description": "蓮のピンクと葉の緑"
+      },
+      "lavender": {
+        "name": "ラベンダー",
+        "description": "ライラックのページに紫のボタン"
+      },
+      "peach": {
+        "name": "ピーチ",
+        "description": "桃色のグラデーションにコーラルのアクセント"
+      },
+      "mint": {
+        "name": "ミント",
+        "description": "爽やかなミントとティール"
+      },
+      "sky": {
+        "name": "ベビーブルー",
+        "description": "淡い青、やさしく親しみやすい"
+      },
+      "sorbet": {
+        "name": "ソルベ",
+        "description": "虹色のパステルグラデーション"
+      },
+      "midnight": {
+        "name": "ミッドナイト",
+        "description": "黒に近い背景に白いカード"
+      },
+      "graphite": {
+        "name": "グラファイト",
+        "description": "チャコールのカード、控えめな枠線"
+      },
+      "neon": {
+        "name": "ネオンナイト",
+        "description": "深い紫に光るピンク"
+      },
+      "aurora": {
+        "name": "オーロラ",
+        "description": "オーロラのグラデーションにガラスのカード"
+      },
+      "starry": {
+        "name": "星空",
+        "description": "流れ星の舞うネイビーの夜空"
+      },
+      "tet": {
+        "name": "旧正月",
+        "description": "テトを祝う赤とゴールド"
+      },
+      "wedding": {
+        "name": "ウェディング",
+        "description": "筆記体の名前、淡いピンクと白"
+      },
+      "birthday": {
+        "name": "誕生日",
+        "description": "紙吹雪カラーと丸いカード"
+      },
+      "christmas": {
+        "name": "クリスマス",
+        "description": "松の緑、赤と雪"
+      },
+      "midautumn": {
+        "name": "中秋節",
+        "description": "夜の青に灯ろうのオレンジ"
+      },
+      "aurora-glass": {
+        "name": "オーロラガラス",
+        "description": "すりガラスのカード越しに揺れるオーロラ"
+      },
+      "frost": {
+        "name": "フロスト",
+        "description": "氷のようなブルー、透明なガラス、シャープな文字"
+      },
+      "midnight-glass": {
+        "name": "ミッドナイトガラス",
+        "description": "深い紫の夜に光るガラス"
+      },
+      "sakura-glass": {
+        "name": "桜ガラス",
+        "description": "やわらかなガラスに桜色"
+      },
+      "lagoon-glass": {
+        "name": "ラグーン",
+        "description": "透明なカードの下を漂うターコイズの光"
+      },
+      "gold-noir": {
+        "name": "ゴールドノワール",
+        "description": "黒いシルクにゴールドの線と名前"
+      },
+      "marble": {
+        "name": "マーブル",
+        "description": "やわらかな石の色、細い枠線、明朝体"
+      },
+      "emerald": {
+        "name": "エメラルドベルベット",
+        "description": "深緑のベルベットにゴールドの縁取り"
+      },
+      "royal": {
+        "name": "ロイヤルネイビー",
+        "description": "ネイビーとゴールド、静かな気品"
+      },
+      "rose-gold": {
+        "name": "ローズゴールド",
+        "description": "淡いピンクのメッシュにローズゴールドのアクセント"
+      },
+      "pearl": {
+        "name": "パール",
+        "description": "真珠のような光沢に白いカード"
+      },
+      "brutal": {
+        "name": "ブルータル",
+        "description": "太い枠線とくっきりした影、大胆で明快"
+      },
+      "brutal-pink": {
+        "name": "ホットピンク",
+        "description": "バブルガムピンクに黒い枠線"
+      },
+      "y2k": {
+        "name": "Y2K",
+        "description": "クロームパステル、ピル型の枠線、2000年代の勢い"
+      },
+      "vaporwave": {
+        "name": "ヴェイパーウェイヴ",
+        "description": "紫の夕暮れにネオンピンクとシアン"
+      },
+      "comic": {
+        "name": "コミック",
+        "description": "網点の黄色、黒インク、赤のアクセント"
+      },
+      "terminal": {
+        "name": "ターミナル",
+        "description": "黒いグリッドに緑の蛍光文字"
+      },
+      "poster": {
+        "name": "ポスター",
+        "description": "大きな文字、赤いブロック、クリーム色の紙"
+      },
+      "notebook": {
+        "name": "ノート",
+        "description": "方眼紙とインクブルーのメモ"
+      },
+      "ruled": {
+        "name": "罫線ノート",
+        "description": "やさしい罫線紙と落ち着いた明朝体"
+      },
+      "latte": {
+        "name": "ラテアート",
+        "description": "クリーミーなコーヒーのメッシュ、キャラメルのアクセント"
+      },
+      "sunset-mesh": {
+        "name": "ゴールデンアワー",
+        "description": "ピーチ、コーラル、ハニーが溶け合う"
+      },
+      "botanical": {
+        "name": "ボタニカル",
+        "description": "リネンに葉の緑のドット"
+      },
+      "meadow": {
+        "name": "草原",
+        "description": "若草と空のやわらかなメッシュ"
+      },
+      "cotton-candy": {
+        "name": "わたあめ",
+        "description": "動き続けるパステルのオーロラ"
+      },
+      "dreamy": {
+        "name": "ドリーミー",
+        "description": "ライラックと空色のメッシュ、丸くやわらか"
+      },
+      "cyber": {
+        "name": "サイバーグロー",
+        "description": "漆黒にシアンのネオンの縁"
+      },
+      "obsidian": {
+        "name": "オブシディアン",
+        "description": "紫に光る磨かれた黒"
+      },
+      "lixi": {
+        "name": "お年玉袋",
+        "description": "お年玉袋の赤にゴールドの波"
+      },
+      "party": {
+        "name": "パーティー",
+        "description": "紙吹雪のドットとネオンの枠線"
+      }
+    },
+    "sections": {
+      "colors": "カラーと背景",
+      "text": "テキスト",
+      "cards": "カードとボタン",
+      "layout": "レイアウト",
+      "effects": "エフェクト",
+      "music": "BGM"
+    },
+    "text": {
+      "general": "メインフォント",
+      "generalHelp": "ブロック内のテキストに使われます。",
+      "align": "配置",
+      "pageColor": "本文の文字色",
+      "pageColorHelp": "ブロック内のテキストの色です。",
+      "pairs": "フォントの組み合わせ",
+      "nameGradient": "グラデーションの名前",
+      "nameGradientHelp": "サイト名をアクセントカラーで彩ります。"
+    },
+    "presetActions": {
+      "random": "おまかせ",
+      "count": "{n} 個のテーマ",
+      "pro": "Pro",
+      "proNote": "Proテーマは無料で試せます。公開はStarterプランからです。",
+      "seePlans": "プランを見る"
+    },
+    "rows": {
+      "theme": "テーマ",
+      "themeHint": "{n} 種類のデザイン",
+      "customize": "カスタマイズ",
+      "custom": "カスタム"
+    },
+    "music": {
+      "hint": "訪問者が最初にタップした時点からページで再生されます（それ以前はブラウザが音声の再生を許可しません）。3Dルームには独自の音楽が設定されます。",
+      "none": "音楽なし",
+      "preview": "{title} を試聴"
+    }
+  },
+  "analytics": {
+    "unpublished": "サイトを公開すると、アクセス解析が表示されます。",
+    "tabs": {
+      "overview": "概要",
+      "links": "アクションとリンク"
+    },
+    "links": {
+      "empty": "このサイトにはまだリンクやSNSアイコンがありません。",
+      "linksTitle": "リンク",
+      "socialTitle": "SNSアイコン",
+      "clicks": "クリック | クリック",
+      "noLink": "リンク未設定"
+    },
+    "overview": {
+      "periodAria": "期間",
+      "periods": {
+        "h24": "24時間",
+        "d7": "7日",
+        "d30": "30日",
+        "d90": "90日"
+      },
+      "cards": {
+        "views": "閲覧数",
+        "unique": "ユニーク訪問者",
+        "today": "今日",
+        "bots": "除外したボット"
+      },
+      "viewsOverTime": "閲覧数の推移",
+      "peak": "ピーク {value}",
+      "botsNote": "ボットによる {n} 件の訪問を除外しました | ボットによる {n} 件の訪問を除外しました",
+      "noViews": "この期間の閲覧はまだありません",
+      "viewsCount": "{n} 回閲覧 | {n} 回閲覧",
+      "topReferrers": "主な参照元",
+      "devices": "デバイス",
+      "browsers": "ブラウザ",
+      "noData": "まだデータがありません"
+    },
+    "countryMap": {
+      "title": "国",
+      "map": "地図",
+      "list": "リスト",
+      "noData": "まだデータがありません",
+      "viewsCount": "{n} 回閲覧 | {n} 回閲覧"
+    },
+    "actions": {
+      "title": "連絡アクション",
+      "text": "訪問者が電話、経路検索、メッセージ、予約をした回数です（全期間）。",
+      "call": "電話",
+      "map": "経路検索",
+      "book": "予約クリック",
+      "form": "フォーム送信",
+      "zalo": "Zaloチャット",
+      "whatsapp": "WhatsAppチャット",
+      "telegram": "Telegramチャット",
+      "email": "メール",
+      "order": "注文",
+      "store": "ストアクリック",
+      "guestbook": "ゲストブックのメッセージ"
+    }
+  }
+}

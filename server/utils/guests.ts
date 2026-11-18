@@ -4,7 +4,7 @@ import { escapeHtml } from './email'
 import { sendTelegram } from './telegram'
 import { getAccountPlan } from './plan'
 import { PLAN_LIMITS } from '#shared/plans'
-import { toAppLanguage } from '#shared/language'
+import { toAppLanguage, type AppLanguage } from '#shared/language'
 
 // Guests of an invitation (site_guests): the owner's list, each with a link
 // of their own (?to=Name), and when each one opened it.
@@ -34,7 +34,25 @@ const COPY = {
     on: (site: string) => `trên perlink.to/${site}`,
     open: 'Xem danh sách khách',
   },
-}
+  zh: {
+    opened: (name: string) => `💌 <b>${name}</b> 刚刚打开了你的邀请函`,
+    letter: (name: string) => `💌 <b>${name}</b> 打开了信件`,
+    on: (site: string) => `（perlink.to/${site}）`,
+    open: '查看来宾名单',
+  },
+  ja: {
+    opened: (name: string) => `💌 <b>${name}</b>さんが招待状を開きました`,
+    letter: (name: string) => `💌 <b>${name}</b>さんが手紙を開きました`,
+    on: (site: string) => `（perlink.to/${site}）`,
+    open: 'ゲスト一覧を見る',
+  },
+  ko: {
+    opened: (name: string) => `💌 <b>${name}</b>님이 방금 초대장을 열었어요`,
+    letter: (name: string) => `💌 <b>${name}</b>님이 편지를 열었어요`,
+    on: (site: string) => `(perlink.to/${site})`,
+    open: '하객 명단 보기',
+  },
+} satisfies Record<AppLanguage, unknown>
 
 /** Tells the owner on Telegram that a guest opened the invitation the first time (plans with guest tracking) */
 export async function notifyGuestOpened(event: H3Event, site: { userId: string; username: string }, name: string) {

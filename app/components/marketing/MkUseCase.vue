@@ -59,7 +59,7 @@
       </ol>
       <div class="mt-10 flex flex-wrap gap-3">
         <MarketingMkButton to="/login" trailing-icon="i-lucide-arrow-right">{{ text.cta }}</MarketingMkButton>
-        <MarketingMkButton :to="lang === 'vi' ? '/vi/templates' : '/templates'" variant="outline">{{ more.templates }}</MarketingMkButton>
+        <MarketingMkButton :to="local('/templates')" variant="outline">{{ more.templates }}</MarketingMkButton>
       </div>
     </MarketingMkSection>
 
@@ -83,10 +83,10 @@
     <MarketingMkSection :title="more.othersTitle">
       <ul class="flex flex-wrap gap-2">
         <li v-for="other in others" :key="other.id">
-          <NuxtLink :to="other.path[lang]" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ other[lang].label }}</NuxtLink>
+          <NuxtLink :to="local(other.path.en)" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ other[lang].label }}</NuxtLink>
         </li>
         <li>
-          <NuxtLink :to="lang === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio'" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ copy.footer.portfolio3d }}</NuxtLink>
+          <NuxtLink :to="local('/3d-portfolio')" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ copy.footer.portfolio3d }}</NuxtLink>
         </li>
       </ul>
     </MarketingMkSection>
@@ -94,6 +94,8 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO } from '#shared/language'
+import { alternateLinks } from '~/data/langPaths'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
 import { USE_CASES } from '~/data/useCases'
 
@@ -101,7 +103,7 @@ import { USE_CASES } from '~/data/useCases'
 // at an address per language; the words are in data/useCases
 const props = defineProps<{ id: string }>()
 
-const { lang, copy } = useMarketingLang()
+const { lang, copy, local } = useMarketingLang()
 const useCase = USE_CASES.find(item => item.id === props.id)!
 const others = USE_CASES.filter(item => item.id !== props.id)
 const text = computed(() => useCase[lang.value])
@@ -112,12 +114,15 @@ const heroTemplate = templates[0]!
 const MORE = {
   en: { templates: 'Browse all templates', faqTitle: 'Questions', othersTitle: 'More you can make with Perlink' },
   vi: { templates: 'Xem tất cả mẫu', faqTitle: 'Câu hỏi', othersTitle: 'Làm gì khác với Perlink' },
+  zh: { templates: '浏览全部模板', faqTitle: '常见问题', othersTitle: '用 Perlink 还能做什么' },
+  ja: { templates: 'すべてのテンプレートを見る', faqTitle: 'よくある質問', othersTitle: 'Perlinkで作れるほかのページ' },
+  ko: { templates: '모든 템플릿 보기', faqTitle: '자주 묻는 질문', othersTitle: 'Perlink로 만들 수 있는 다른 페이지' },
 }
 const more = computed(() => MORE[lang.value])
 
 // ---------- SEO ----------
 const SITE = 'https://perlink.to'
-const pageUrl = computed(() => `${SITE}${useCase.path[lang.value]}`)
+const pageUrl = computed(() => `${SITE}${local(useCase.path.en)}`)
 useSeoMeta({
   title: () => text.value.metaTitle,
   description: () => text.value.metaDescription,
@@ -131,12 +136,10 @@ useSeoMeta({
   twitterSite: X_HANDLE,
 })
 useHead({
-  htmlAttrs: { lang: () => lang.value },
+  htmlAttrs: { lang: () => LANGUAGE_INFO[lang.value].html },
   link: () => [
     { rel: 'canonical', href: pageUrl.value },
-    { rel: 'alternate', hreflang: 'en', href: `${SITE}${useCase.path.en}` },
-    { rel: 'alternate', hreflang: 'vi', href: `${SITE}${useCase.path.vi}` },
-    { rel: 'alternate', hreflang: 'x-default', href: `${SITE}${useCase.path.en}` },
+    ...alternateLinks(useCase.path.en),
   ],
   // The product and the questions, for search results
   script: () => [{
@@ -155,7 +158,7 @@ useHead({
       {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
-        inLanguage: lang.value,
+        inLanguage: LANGUAGE_INFO[lang.value].html,
         mainEntity: text.value.faq.map(item => ({
           '@type': 'Question',
           name: item.q,
@@ -166,8 +169,8 @@ useHead({
   }],
 })
 
-const { setLocale } = useI18n()
+const { locale, setLocale } = useI18n()
 onMounted(() => {
-  if (lang.value === 'vi') setLocale('vi')
+  if (lang.value !== 'en' && locale.value !== lang.value) setLocale(lang.value)
 })
 </script>

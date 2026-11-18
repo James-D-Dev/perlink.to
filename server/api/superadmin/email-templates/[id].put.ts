@@ -1,3 +1,4 @@
+import { APP_LANGUAGES } from '#shared/language'
 import { requireSuperadmin } from '../../../utils/superadmin'
 import { saveTemplateOverrides, templateDef } from '../../../utils/emailTemplates'
 import { wordsByLanguage } from '../../../utils/emailTemplateSchema'
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const parsed = wordsByLanguage.safeParse(body)
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: 'Check the fields' })
   const saved: Partial<Record<AppLanguage, Record<string, string>>> = {}
-  for (const lang of ['en', 'vi'] as const) {
+  for (const lang of APP_LANGUAGES) {
     const words = parsed.data[lang]
     if (!words) continue
     const changed = Object.fromEntries(Object.entries(words).filter(([key, value]) => value !== undefined && value !== def.defaults[lang][key as keyof typeof def.defaults.en]))

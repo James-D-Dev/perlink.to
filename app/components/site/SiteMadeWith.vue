@@ -41,6 +41,7 @@
 </template>
 
 <script setup lang="ts">
+import { PREFIXED_LANGUAGES } from '#shared/language'
 import { siteT, type SiteLanguage } from '~/utils/siteI18n'
 
 const props = withDefaults(defineProps<{
@@ -66,6 +67,11 @@ const onBaseline = (size: number) => ({ transform: `translateY(${(size * 0.82 * 
 
 // From a 3D room, to the page about 3D portfolios (in the site's language);
 // from a page, to the home page
-const target = computed(() => (props.variant === 'pill' ? (props.lang === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio') : '/'))
+const portfolioPage = (lang: SiteLanguage) => {
+  if (lang === 'vi') return '/vi/portfolio-3d'
+  if ((PREFIXED_LANGUAGES as readonly string[]).includes(lang)) return `/${lang}/3d-portfolio`
+  return '/3d-portfolio'
+}
+const target = computed(() => (props.variant === 'pill' ? portfolioPage(props.lang) : '/'))
 const href = computed(() => `https://perlink.to${target.value}?utm_source=site&utm_medium=${props.variant === 'pill' ? 'room-badge' : 'badge'}&utm_campaign=${encodeURIComponent(props.username)}`)
 </script>

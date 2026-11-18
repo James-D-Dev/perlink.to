@@ -144,6 +144,7 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 import type { PlanId } from '#shared/plans'
 
 definePageMeta({
@@ -296,5 +297,5 @@ function menuFor(guest: Guest) {
 }
 
 const formatDate = (iso: string) => new Date(iso.includes('T') ? iso : `${iso.replace(' ', 'T')}Z`)
-  .toLocaleString(locale.value === 'vi' ? 'vi-VN' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  .toLocaleString(toAppLanguage(locale.value) === 'en' ? 'en-GB' : LANGUAGE_INFO[toAppLanguage(locale.value)].intl, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 </script>

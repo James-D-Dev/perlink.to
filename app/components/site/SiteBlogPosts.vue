@@ -47,6 +47,7 @@
 
 <script setup lang="ts">
 import { PLAN_LIMITS } from '#shared/plans'
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 
 const props = defineProps<{
   username: string
@@ -55,6 +56,8 @@ const props = defineProps<{
 }>()
 
 const { t, locale } = useI18n()
+// Dates in the dashboard language (English as day-month, like the rest of the app)
+const intlLocale = computed(() => { const lang = toAppLanguage(locale.value); return lang === 'en' ? 'en-GB' : LANGUAGE_INFO[lang].intl })
 const toast = useToast()
 const confirm = useConfirm()
 const { info, ensure } = useBilling()
@@ -72,7 +75,7 @@ const limit = computed(() => {
 })
 
 const editLink = (id: string) => `/dashboard/site/${props.username}/blog/${id}`
-const formatDate = (iso: string) => new Date(iso.includes('T') ? iso : `${iso.replace(' ', 'T')}Z`).toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB')
+const formatDate = (iso: string) => new Date(iso.includes('T') ? iso : `${iso.replace(' ', 'T')}Z`).toLocaleDateString(intlLocale.value)
 
 const creating = ref(false)
 async function create() {

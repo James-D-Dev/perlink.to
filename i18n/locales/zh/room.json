@@ -1,0 +1,506 @@
+{
+  "room": {
+    "page": {
+      "title": "3D 房间 · {name} {'|'} Perlink",
+      "notFoundTitle": "页面不存在",
+      "notFoundText": "此页面不存在，或你没有访问权限。",
+      "backToPages": "返回我的页面",
+      "leaveTitle": "不保存就离开？",
+      "leaveText": "你对房间的更改尚未保存。",
+      "leave": "离开"
+    },
+    "toast": {
+      "saved": "房间已保存",
+      "savedDraft": "房间已保存为草稿。发布后访客才能看到。",
+      "saveFailed": "保存失败",
+      "published": "已发布",
+      "publishedText": "你的房间已上线：perlink.to/{name}",
+      "view": "查看",
+      "publishFailed": "发布失败",
+      "photoUploadFailed": "照片上传失败",
+      "imageProcessFailed": "无法处理图片",
+      "imageReadFailed": "无法读取图片"
+    },
+    "toolbar": {
+      "back": "返回页面编辑器",
+      "undo": "撤销（Ctrl+Z）",
+      "redo": "重做（Ctrl+Shift+Z）",
+      "unsaved": "有未保存的更改（Ctrl+S）",
+      "allSaved": "所有更改已保存"
+    },
+    "preview": {
+      "day": "预览：白天（点击切换到夜晚）",
+      "night": "预览：夜晚（点击切换到白天）"
+    },
+    "panel": {
+      "showObjects": "显示物品（{n}）",
+      "objects": "物品",
+      "backToObjects": "返回物品列表",
+      "closeObjects": "关闭物品列表",
+      "search": "搜索物品",
+      "noMatch": "没有符合搜索的物品。",
+      "empty": "还没有物品。从下方栏中添加吧。",
+      "deleteObject": "删除 {name}"
+    },
+    "places": {
+      "backWall": "后墙",
+      "leftWall": "左墙",
+      "onFurniture": "家具上",
+      "floor": "地面"
+    },
+    "detail": {
+      "dragWall": "沿墙拖动以移动",
+      "dragFloor": "拖动以移动 · 放到家具上可叠放",
+      "rotate": "旋转",
+      "rotateLeft": "向左旋转",
+      "rotateRight": "向右旋转",
+      "wall": "墙面",
+      "size": "大小",
+      "smaller": "缩小",
+      "bigger": "放大",
+      "photo": "照片",
+      "replacePhoto": "更换照片",
+      "uploadPhoto": "上传照片",
+      "remove": "移除",
+      "photoHint": "访客点击相框即可查看原尺寸照片。",
+      "color": "颜色",
+      "resetColor": "恢复默认颜色",
+      "resetColorAria": "重置颜色",
+      "colorSwatch": "颜色 {color}",
+      "customColor": "自定义颜色",
+      "link": "链接",
+      "linkHint": "访客点击此物品即可打开链接。",
+      "linkLabel": "标签，例如：我的 Instagram",
+      "duplicate": "复制"
+    },
+    "camera": {
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "resetView": "重置视角",
+      "hideDetails": "隐藏详情",
+      "editObject": "编辑 {name}"
+    },
+    "coach": {
+      "label": "房间编辑器导览",
+      "replay": "使用说明",
+      "step": "第 {n} 步，共 {total} 步",
+      "skip": "跳过",
+      "back": "上一步",
+      "next": "下一步",
+      "done": "开始搭建",
+      "steps": {
+        "welcome": { "title": "欢迎来到你的 3D 房间 👋", "text": "30 秒快速了解编辑器。" },
+        "add": { "title": "为房间添加物品", "text": "点击物品即可放置，或把它拖到你想要的位置。标签页还可以更换房间风格、外部场景、音乐以及白天和夜晚。" },
+        "move": { "title": "四处看看", "text": "拖动可旋转房间，滚动或双指缩放，也可以用这些按钮缩放或重置视角。点击物品选中它，然后拖动来移动。" },
+        "objects": { "title": "让物品可以点击", "text": "打开物品列表逐个编辑：颜色、文字和链接。访客点击该物品时会打开链接：你的 Instagram、店铺或其他任何内容。" },
+        "publish": { "title": "保存并发布", "text": "保存会保留草稿。发布后房间将在 perlink.to/{name} 上线，所有人都能访问。" }
+      }
+    },
+    "hint": {
+      "navigation": "点击物品选中，然后拖动移动 · 拖动旋转 · 滚动缩放",
+      "firstRun": "从下方栏把家具拖进你的房间"
+    },
+    "stats": {
+      "title": "{drawCalls} 次绘制调用 · {triangles} 个三角形 · 上限 {cap} fps",
+      "idleParen": "（空闲）",
+      "fps": "{fps} FPS",
+      "idle": "· 空闲"
+    },
+    "tray": {
+      "addItem": "拖进房间或点击添加",
+      "hide": "隐藏物品栏",
+      "show": "显示物品栏"
+    },
+    "tabs": {
+      "room": "房间",
+      "land": "场景",
+      "time": "白天与夜晚",
+      "music": "音乐"
+    },
+    "roomStyle": {
+      "style": "风格",
+      "floor": "地板",
+      "colors": "颜色",
+      "size": "尺寸",
+      "meters": "{n} 米",
+      "floors": {
+        "wood": "木地板",
+        "tile": "瓷砖",
+        "carpet": "地毯",
+        "concrete": "水泥"
+      },
+      "colorFields": {
+        "wallColor": "墙面",
+        "floorColor": "地板",
+        "trimColor": "装饰线"
+      },
+      "sizeFields": {
+        "width": "宽度",
+        "depth": "深度",
+        "height": "高度"
+      }
+    },
+    "time": {
+      "modes": {
+        "auto": {
+          "label": "实时",
+          "description": "跟随每位访客的本地时间"
+        },
+        "cycle": {
+          "label": "自定义循环",
+          "description": "白天与夜晚循环，例如各 1 分钟"
+        },
+        "day": {
+          "label": "始终白天",
+          "description": "一直阳光明媚"
+        },
+        "night": {
+          "label": "始终夜晚",
+          "description": "灯光始终开启"
+        }
+      },
+      "day": "白天",
+      "night": "夜晚",
+      "minutes": "{n} 分钟"
+    },
+    "music": {
+      "none": "无音乐",
+      "previewTrack": "试听 {title}",
+      "fileMissing": "文件缺失",
+      "autoplay": "自动播放",
+      "autoplayOn": "访客打开房间时开始播放；如浏览器阻止声音，则在首次点击时播放。",
+      "autoplayOff": "访客进入时为静音，可自行开启音乐。",
+      "creditPrefix": "音乐来自",
+      "moods": {
+        "fun-game": "欢快",
+        "happy-runner": "活力",
+        "puzzle-casual": "轻松",
+        "pixel-plains": "芯片音乐",
+        "happy-8bit": "8-bit",
+        "marimba-travel": "热带",
+        "fairytale-quest": "梦幻",
+        "playful-kids": "俏皮",
+        "game-background": "放松",
+        "romantic-piano": "浪漫",
+        "romantic-date": "温柔",
+        "love-acoustic": "原声",
+        "cozy-love-lofi": "Lo-fi",
+        "happy-birthday": "生日",
+        "party-celebration": "派对"
+      }
+    },
+    "categories": {
+      "furniture": "家具",
+      "lighting": "灯具",
+      "decor": "装饰",
+      "wall": "墙饰",
+      "tech": "数码",
+      "dungeon": "地牢",
+      "shop": "商店",
+      "premium": "高级"
+    },
+    "styles": {
+      "cozy-wood": "温馨原木",
+      "minimal-white": "极简白",
+      "pastel": "粉彩",
+      "sage": "鼠尾草绿",
+      "night-studio": "夜间工作室",
+      "industrial": "工业风",
+      "dungeon": "地牢"
+    },
+    "lands": {
+      "island": {
+        "name": "天空岛",
+        "description": "漂浮的岛屿，一棵巨树和倾泻入云海的瀑布"
+      },
+      "mars": {
+        "name": "火星",
+        "description": "漂浮在太空中的红色星球表面，周围环绕着行星"
+      },
+      "sakura": {
+        "name": "樱花",
+        "description": "盛开的巨大樱花树、飘落的花瓣、蝴蝶和池塘"
+      },
+      "crimson": {
+        "name": "绯红樱花",
+        "description": "巨大的绯红樱花树，蓝天下红草与花瓣飘舞"
+      },
+      "city": {
+        "name": "城市",
+        "description": "市中心街区：街道、车流、路灯和夜晚亮起的窗户"
+      },
+      "winter": {
+        "name": "冬日",
+        "description": "霜白巨树、结冰的池塘、飞雪和夜晚的灯笼"
+      },
+      "autumn": {
+        "name": "秋天",
+        "description": "红金色的巨大枫树、随风飘落的树叶和南瓜"
+      },
+      "tropical": {
+        "name": "热带海滩",
+        "description": "白沙上的棕榈树、碧蓝海水与浪花，夜晚点起提基火把"
+      },
+      "fairy": {
+        "name": "精灵森林",
+        "description": "深苔中发光的巨型蘑菇、飘浮的孢子和萤火虫"
+      },
+      "volcano": {
+        "name": "火山",
+        "description": "冒烟的火山、从边缘倾泻的熔岩河和升腾的火星"
+      },
+      "zen": {
+        "name": "禅意庭院",
+        "description": "竹林、耙纹砾石、锦鲤池和石灯笼"
+      }
+    },
+    "objects": {
+      "bed": "床",
+      "sofa": "沙发",
+      "desk": "书桌",
+      "chair": "椅子",
+      "coffee-table": "茶几",
+      "bookshelf": "书架",
+      "cabinet": "斗柜",
+      "floor-lamp": "落地灯",
+      "desk-lamp": "台灯",
+      "candle": "蜡烛",
+      "wall-lamp": "壁灯",
+      "string-lights": "串灯",
+      "plant": "绿植",
+      "rug": "地毯",
+      "mug": "马克杯",
+      "window": "窗户",
+      "picture-frame": "画框",
+      "wall-clock": "挂钟",
+      "neon-sign": "霓虹灯牌",
+      "tv": "电视柜",
+      "laptop": "笔记本电脑",
+      "dungeon-chest": "箱子",
+      "dungeon-chest-gold": "宝箱",
+      "dungeon-barrel": "木桶",
+      "dungeon-candelabrum": "烛台",
+      "dungeon-candelabrum-tall": "高烛台",
+      "dungeon-candle": "蜡烛台",
+      "dungeon-torch": "立式火把",
+      "dungeon-wall-torch": "壁挂火把",
+      "dungeon-book-open": "打开的书",
+      "dungeon-book": "书",
+      "dungeon-books": "魔法书",
+      "dungeon-potion-blue": "蓝色药水",
+      "dungeon-potion-green": "绿色药水",
+      "dungeon-potion-ice": "冰霜药水",
+      "dungeon-potion-vial": "药瓶",
+      "dungeon-potion-dark": "暗黑药水",
+      "dungeon-potion-gold": "金色药水",
+      "dungeon-bones": "骷髅",
+      "dungeon-bones-pile": "骨堆",
+      "dungeon-rock": "岩石",
+      "dungeon-rock-flat": "扁平岩石",
+      "dungeon-carpet": "皇家地毯",
+      "dungeon-column": "石柱",
+      "dungeon-column-broken": "断柱",
+      "dungeon-column-ruin": "倒塌的石柱",
+      "dungeon-stairs": "楼梯",
+      "dungeon-window": "铁栅窗",
+      "dungeon-bars": "铁栏杆",
+      "dungeon-arch": "石拱门",
+      "garden-flower-pot": "花盆",
+      "garden-ceramic-flowers": "陶瓷花盆",
+      "garden-flower-vase": "花瓶",
+      "garden-bud-vase": "小花瓶",
+      "garden-flower-bowl": "花钵",
+      "garden-flower-bed": "花坛",
+      "garden-bush-flowers": "开花灌木",
+      "garden-fern-pot": "盆栽蕨类",
+      "garden-indoor-tree": "室内树",
+      "garden-pine-pot": "盆栽松树",
+      "garden-bush": "灌木",
+      "garden-autumn-bush": "秋色灌木",
+      "garden-tall-grass": "高草",
+      "garden-mushrooms": "蘑菇",
+      "garden-rocks": "庭院石",
+      "garden-pebble-tray": "鹅卵石托盘",
+      "product-stand": "商品展台",
+      "blog-board": "博客展板",
+      "vip-rose-bouquet": "玫瑰花束",
+      "vip-heart-balloons": "爱心气球",
+      "vip-rose-arch": "玫瑰拱门",
+      "vip-candle-heart": "爱心蜡烛",
+      "vip-neon-heart": "霓虹爱心",
+      "vip-love-bear": "泰迪熊",
+      "vip-wedding-arch": "婚礼拱门",
+      "vip-wedding-cake": "婚礼蛋糕",
+      "vip-champagne-tower": "香槟塔",
+      "vip-love-marquee": "LOVE 灯牌",
+      "vip-candle-lanterns": "蜡烛灯笼",
+      "vip-sparkler-fountain": "冷焰火喷泉",
+      "vip-birthday-cake": "生日蛋糕",
+      "vip-balloon-bunch": "气球束",
+      "vip-gift-tower": "礼物塔",
+      "vip-disco-ball": "迪斯科灯光秀",
+      "vip-confetti-popper": "彩纸礼炮",
+      "vip-birthday-bunting": "派对彩旗",
+      "vip-floating-planet": "漂浮星球",
+      "vip-jellyfish-lamp": "水母灯",
+      "vip-star-projector": "星空投影仪",
+      "vip-moon-lamp": "月球灯",
+      "vip-snow-globe": "雪花水晶球",
+      "vip-nebula-painting": "星云画",
+      "vip-peach-blossom": "桃花",
+      "vip-apricot-blossom": "黄梅花",
+      "vip-kumquat-tree": "金桔树",
+      "vip-red-lanterns": "红灯笼",
+      "vip-firecrackers": "鞭炮",
+      "vip-five-fruit-tray": "五果盘",
+      "vip-ring-box": "戒指盒",
+      "vip-marry-me": "MARRY ME 灯牌",
+      "vip-rose-heart": "99 朵玫瑰爱心",
+      "vip-petal-aisle": "玫瑰花瓣走道",
+      "vip-grand-piano": "三角钢琴",
+      "vip-fireworks": "烟花秀",
+      "vip-display-podium": "展示台",
+      "vip-glass-cabinet": "玻璃展柜",
+      "vip-neon-open": "霓虹灯牌",
+      "vip-ad-screen": "宣传屏",
+      "vip-checkout-counter": "收银台",
+      "vip-sale-banner": "促销横幅"
+    },
+    "tour": {
+      "back": "返回",
+      "title": "3D 房间视频",
+      "caption": "视频标题",
+      "day": "白天",
+      "night": "夜晚",
+      "length": "视频时长",
+      "music": "房间音乐",
+      "watermark": "免费套餐的视频带有小小的“Made with Perlink”标记。",
+      "removeWatermark": "去除标记",
+      "unsupported": "此浏览器暂不支持录制视频。请使用新版 Chrome、Edge 或 Safari。",
+      "record": "录制视频",
+      "preparing": "准备中…",
+      "drawing": "正在绘制画面…",
+      "ready": "视频已就绪！",
+      "readyText": "发布到 TikTok、Reels 或 Shorts，并附上你的房间链接。",
+      "share": "分享",
+      "download": "下载视频",
+      "postText": "来逛逛我的 3D 房间 ✨ {link}\n#perlink #3droom #roomtour #aesthetic",
+      "madeWith": "Made with Perlink",
+      "visit": "来看看我的 3D 房间 👇",
+      "recordingNow": "录制中",
+      "cancel": "取消",
+      "style": "镜头风格",
+      "styles": {
+        "sweep": "横扫",
+        "orbit": "环绕",
+        "dive": "飞入",
+        "crane": "拉远",
+        "ground": "低角度"
+      },
+      "notLive": {
+        "unpublished": "你的网站尚未发布。点击视频中链接的人将什么也看不到。",
+        "hidden": "你的 3D 房间尚未对访客开启。打开链接的人将看不到它。",
+        "draft": "你的房间有未发布的更改。打开链接的人将看到旧版本。"
+      },
+      "goLive": "让房间上线",
+      "wentLive": "你的房间已上线。观众将看到与此完全相同的内容。",
+      "copyCaption": "复制文案",
+      "captionCopied": "文案已复制：粘贴到你的 TikTok 帖子中",
+      "captionHint": "帖子文案（附房间链接）：",
+      "musicClaim": "此曲目已登记 Content ID：视频在 YouTube 和 TikTok 上可能被静音或被认领。请换一首曲目。"
+    },
+    "guestbook": {
+      "label": "留言簿",
+      "on": "留言簿已开启：访客可在房间前留言和送礼物。点击关闭。",
+      "off": "留言簿已关闭。点击开启。"
+    },
+    "shop": {
+      "product": "展台上的商品",
+      "pick": "选择商品",
+      "hint": "访客点击展台即可查看商品并直接在房间内下单。",
+      "none": "此网站还没有商品。请先在页面中添加商品区块。",
+      "products": "展示的商品",
+      "productsAuto": "你的前几件商品",
+      "productsHint": "留空则展示店铺的前几件商品。访客点击商品即可直接在房间内下单。",
+      "text": "文字",
+      "textHint": "最多 {max} 个字符，任何语言均可。",
+      "soldOut": "已售罄",
+      "buy": "立即购买"
+    },
+    "packs": {
+      "valentine": {
+        "name": "情人节",
+        "tagline": "玫瑰、蜡烛、跳动的霓虹爱心和气球，献给你爱的人。"
+      },
+      "badge": "高级",
+      "owned": "已拥有",
+      "included": "Max 套餐已包含",
+      "buy": "{price} 购买",
+      "oneTime": "一次性付款 · 永久拥有",
+      "items": "{n} 件物品",
+      "trayLocked": "高级物品：可在房间中试用，购买物品包后即可发布。",
+      "trayOwned": "你的高级物品",
+      "seeMarket": "3D 房间包",
+      "promptTitle": "你的房间使用了高级物品",
+      "promptText": "购买物品包即可发布带有这些物品的房间。一次付款，永久拥有，适用于你创建的每个房间。",
+      "orMax": "或升级到 Max：包含全部物品包",
+      "later": "暂不",
+      "checkoutFailed": "无法打开结账页面",
+      "bought": "{name} 物品包已归你所有",
+      "boughtText": "其中的物品已在房间编辑器的“高级”标签页中准备就绪。",
+      "boughtPending": "已收到付款。物品包将在几秒钟后出现。",
+      "signIn": "登录后购买",
+      "wedding": {
+        "name": "婚礼",
+        "tagline": "飘逸纱幔的拱门、旋转的蛋糕、香槟和冷焰火。"
+      },
+      "birthday": {
+        "name": "生日",
+        "tagline": "可以吹灭的蜡烛、气球、迪斯科球和飞舞的彩纸。"
+      },
+      "galaxy": {
+        "name": "银河",
+        "tagline": "漂浮的星球、发光的水母、星星和月亮，营造梦幻夜晚。"
+      },
+      "tet": {
+        "name": "春节",
+        "tagline": "桃花、黄梅花、红灯笼和压岁钱，迎接新年。"
+      },
+      "animated": "动画",
+      "proposal": {
+        "name": "求婚",
+        "tagline": "会打开的戒指盒、99 朵玫瑰、自动弹奏的钢琴和烟花，为那个重要的问题。"
+      },
+      "showroom": {
+        "name": "展厅",
+        "tagline": "把房间变成你的店铺：玻璃展柜和宣传屏展示你的真实商品（点击即可下单），霓虹灯牌和横幅显示你自己的文字，还有旋转展示台和收银台。"
+      }
+    },
+    "market": {
+      "metaTitle": "3D 房间包：为你的房间添加高级物品 | Perlink",
+      "metaDescription": "为你的 Perlink 房间打造的高级 3D 物品：玫瑰、蜡烛、霓虹爱心等。一次付款，永久拥有，每个房间都能用。",
+      "eyebrow": "3D 房间包",
+      "title": "让你的房间令人难忘",
+      "intro": "为重要时刻打造的高级 3D 物品。一次付款，永久拥有，可用于你搭建的每个房间。",
+      "maxNote": "已是 Max 用户？所有物品包都已归你所有。",
+      "openEditor": "打开房间编辑器",
+      "howTitle": "使用方式",
+      "how": [
+        {
+          "title": "选择物品包",
+          "text": "每件物品都为 3D 房间精心打造，夜晚还会发光。"
+        },
+        {
+          "title": "一次付款",
+          "text": "通过 Creem 使用银行卡、Apple Pay 或 Google Pay 付款。无需订阅。"
+        },
+        {
+          "title": "开始装饰",
+          "text": "在房间编辑器的“高级”标签页中找到这些物品，每个房间都能使用。"
+        }
+      ],
+      "soon": "更多物品包即将推出。",
+      "preview3d": "3D 预览"
+    }
+  }
+}

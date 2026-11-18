@@ -140,7 +140,9 @@ import { PORTFOLIO_BASE, PORTFOLIO_EXAMPLES, PORTFOLIO_TOPICS, topicPath, type P
 // start from and links back to the pillar page and the other topics
 const props = defineProps<{ topic: PortfolioTopic }>()
 
-const { lang, home, copy } = useMarketingLang()
+// Topic pages exist in English and Vietnamese only
+const { lang: pageLang, home, copy } = useMarketingLang()
+const lang = computed<'en' | 'vi'>(() => (pageLang.value === 'vi' ? 'vi' : 'en'))
 const topic = computed(() => props.topic)
 const text = computed(() => topic.value[lang.value])
 const pillar = computed(() => PORTFOLIO_BASE[lang.value])

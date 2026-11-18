@@ -236,6 +236,7 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
+import { toAppLanguage, type AppLanguage } from '#shared/language'
 import { SITE_GOALS, addressFromName, goalForCategory, type SiteGoalId } from '~/data/siteGoals'
 
 definePageMeta({
@@ -253,48 +254,51 @@ type Step = typeof STEPS[number] | 'done'
 const route = useRoute()
 const router = useRouter()
 const { t, locale } = useI18n()
-const lang = computed<'en' | 'vi'>(() => (locale.value === 'vi' ? 'vi' : 'en'))
+// A country suffix for address suggestions ("linh-vn"), by language
+const COUNTRY_SUFFIX: Partial<Record<AppLanguage, string>> = { vi: 'vn', zh: 'cn', ja: 'jp', ko: 'kr' }
+const lang = computed<AppLanguage>(() => toAppLanguage(locale.value))
 useHead({ htmlAttrs: { class: 'admin-theme' } })
 
-const TEXT = {
-  en: {
-    close: 'Back to the dashboard',
-    stepOf: (n: number, total: number) => `Step ${n} of ${total}`,
-    back: 'Back',
-    next: 'Continue',
-    create: 'Create my site',
-    seePlans: 'See plans',
-    limit: (n: number) => `Your plan has ${n} live ${n === 1 ? 'site' : 'sites'} and they're all in use. You can still make and edit this site; it stays a draft until you upgrade or take another site offline.`,
-    limitShort: (n: number) => `Your ${n} live ${n === 1 ? 'site is' : 'sites are'} in use: this one will be saved as a draft.`,
-    welcome: {
-      title: (name: string) => (name ? `Welcome to Perlink, ${name}!` : 'Welcome to Perlink!'),
-      text: 'Let’s make your first site. It takes about 2 minutes, and you can change everything later.',
-    },
-    goal: { title: 'What is your site for?', lead: 'We’ll suggest the templates and blocks that fit. You can change everything later.' },
-    basics: {
-      title: 'Tell visitors who you are',
-      lead: 'Your page uses these right away, instead of sample text.',
-      photo: 'Photo or logo',
-      photoHint: 'Optional. A square picture works best.',
-      removePhoto: 'Remove',
-      name: 'Name of your page',
-      about: 'One line about it',
-    },
-    look: { title: 'Pick a look', lead: 'Every template is shown with your name. Colors, fonts and blocks can all be changed in the editor.', more: (n: number) => `See ${n} more templates` },
-    address: {
-      title: 'Choose your address',
-      lead: 'This is the link you’ll share. Letters, numbers, hyphens and underscores.',
-      suggestions: 'Free addresses for you',
-      later: 'You can change the address later in the site’s settings.',
-      checking: 'Checking…',
-      available: (a: string) => `perlink.to/${a} is free`,
-      taken: 'That address is taken. Try another, or pick a suggestion.',
-      short: 'At least 3 characters.',
-      failed: 'Couldn’t check the address. Try again.',
-    },
-    done: { title: 'Your site is ready', lead: (a: string) => `perlink.to/${a} is saved as a draft. Add your links and photos in the editor, then publish when you’re happy.`, edit: 'Open the editor', sites: 'My sites' },
-    failed: 'Couldn’t create the site',
+const TEXT_EN = {
+  close: 'Back to the dashboard',
+  stepOf: (n: number, total: number) => `Step ${n} of ${total}`,
+  back: 'Back',
+  next: 'Continue',
+  create: 'Create my site',
+  seePlans: 'See plans',
+  limit: (n: number) => `Your plan has ${n} live ${n === 1 ? 'site' : 'sites'} and they're all in use. You can still make and edit this site; it stays a draft until you upgrade or take another site offline.`,
+  limitShort: (n: number) => `Your ${n} live ${n === 1 ? 'site is' : 'sites are'} in use: this one will be saved as a draft.`,
+  welcome: {
+    title: (name: string) => (name ? `Welcome to Perlink, ${name}!` : 'Welcome to Perlink!'),
+    text: 'Let’s make your first site. It takes about 2 minutes, and you can change everything later.',
   },
+  goal: { title: 'What is your site for?', lead: 'We’ll suggest the templates and blocks that fit. You can change everything later.' },
+  basics: {
+    title: 'Tell visitors who you are',
+    lead: 'Your page uses these right away, instead of sample text.',
+    photo: 'Photo or logo',
+    photoHint: 'Optional. A square picture works best.',
+    removePhoto: 'Remove',
+    name: 'Name of your page',
+    about: 'One line about it',
+  },
+  look: { title: 'Pick a look', lead: 'Every template is shown with your name. Colors, fonts and blocks can all be changed in the editor.', more: (n: number) => `See ${n} more templates` },
+  address: {
+    title: 'Choose your address',
+    lead: 'This is the link you’ll share. Letters, numbers, hyphens and underscores.',
+    suggestions: 'Free addresses for you',
+    later: 'You can change the address later in the site’s settings.',
+    checking: 'Checking…',
+    available: (a: string) => `perlink.to/${a} is free`,
+    taken: 'That address is taken. Try another, or pick a suggestion.',
+    short: 'At least 3 characters.',
+    failed: 'Couldn’t check the address. Try again.',
+  },
+  done: { title: 'Your site is ready', lead: (a: string) => `perlink.to/${a} is saved as a draft. Add your links and photos in the editor, then publish when you’re happy.`, edit: 'Open the editor', sites: 'My sites' },
+  failed: 'Couldn’t create the site',
+}
+const TEXT: Record<AppLanguage, typeof TEXT_EN> = {
+  en: TEXT_EN,
   vi: {
     close: 'Về bảng điều khiển',
     stepOf: (n: number, total: number) => `Bước ${n}/${total}`,
@@ -333,6 +337,120 @@ const TEXT = {
     done: { title: 'Trang của bạn đã sẵn sàng', lead: (a: string) => `perlink.to/${a} đang được lưu ở dạng nháp. Thêm liên kết và hình ảnh trong trình chỉnh sửa, rồi đăng khi bạn ưng ý.`, edit: 'Mở trình chỉnh sửa', sites: 'Trang của tôi' },
     failed: 'Không tạo được trang',
   },
+  zh: {
+    close: '返回控制台',
+    stepOf: (n: number, total: number) => `第 ${n} 步，共 ${total} 步`,
+    back: '返回',
+    next: '继续',
+    create: '创建我的网站',
+    seePlans: '查看套餐',
+    limit: (n: number) => `你的套餐可发布 ${n} 个网站，目前已全部用完。你仍然可以创建和编辑这个网站；在你升级或下线另一个网站之前，它会保持为草稿。`,
+    limitShort: (n: number) => `${n} 个可发布网站已用完：这个网站将保存为草稿。`,
+    welcome: {
+      title: (name: string) => (name ? `欢迎来到 Perlink，${name}！` : '欢迎来到 Perlink！'),
+      text: '一起来创建你的第一个网站吧。只需大约 2 分钟，之后所有内容都可以修改。',
+    },
+    goal: { title: '你的网站是做什么用的？', lead: '我们会推荐合适的模板和内容块。之后所有内容都可以修改。' },
+    basics: {
+      title: '向访客介绍一下你自己',
+      lead: '你的页面会直接使用这些信息，而不是示例文字。',
+      photo: '照片或标志',
+      photoHint: '选填。方形图片效果最好。',
+      removePhoto: '移除',
+      name: '页面名称',
+      about: '一句话介绍',
+    },
+    look: { title: '选择外观', lead: '每个模板都会显示你的名字。颜色、字体和内容块都可以在编辑器中修改。', more: (n: number) => `查看另外 ${n} 个模板` },
+    address: {
+      title: '选择你的网址',
+      lead: '这是你要分享的链接。可使用字母、数字、连字符和下划线。',
+      suggestions: '为你推荐的可用网址',
+      later: '之后可以在网站设置中修改网址。',
+      checking: '正在检查…',
+      available: (a: string) => `perlink.to/${a} 可以使用`,
+      taken: '这个网址已被占用。换一个试试，或选择一个推荐网址。',
+      short: '至少 3 个字符。',
+      failed: '无法检查网址，请重试。',
+    },
+    done: { title: '你的网站已准备就绪', lead: (a: string) => `perlink.to/${a} 已保存为草稿。在编辑器中添加链接和照片，满意后再发布。`, edit: '打开编辑器', sites: '我的网站' },
+    failed: '无法创建网站',
+  },
+  ja: {
+    close: 'ダッシュボードに戻る',
+    stepOf: (n: number, total: number) => `ステップ ${n}/${total}`,
+    back: '戻る',
+    next: '次へ',
+    create: 'サイトを作成',
+    seePlans: 'プランを見る',
+    limit: (n: number) => `ご利用中のプランで公開できるサイトは ${n} 件で、すべて使用中です。このサイトの作成や編集はそのままできます。アップグレードするか、別のサイトを非公開にするまでは下書きのままになります。`,
+    limitShort: (n: number) => `公開できるサイト ${n} 件はすべて使用中です。このサイトは下書きとして保存されます。`,
+    welcome: {
+      title: (name: string) => (name ? `${name}さん、Perlink へようこそ！` : 'Perlink へようこそ！'),
+      text: '最初のサイトを作りましょう。2 分ほどで完成し、あとからすべて変更できます。',
+    },
+    goal: { title: 'サイトの目的は何ですか？', lead: 'ぴったりのテンプレートとブロックをおすすめします。あとからすべて変更できます。' },
+    basics: {
+      title: 'あなたのことを教えてください',
+      lead: 'サンプルの文章の代わりに、この内容がすぐにページに使われます。',
+      photo: '写真またはロゴ',
+      photoHint: '任意です。正方形の画像がおすすめです。',
+      removePhoto: '削除',
+      name: 'ページの名前',
+      about: 'ひとこと紹介',
+    },
+    look: { title: 'デザインを選ぶ', lead: 'どのテンプレートもあなたの名前で表示されます。色、フォント、ブロックはエディターでいつでも変更できます。', more: (n: number) => `ほかのテンプレートを見る（${n} 件）` },
+    address: {
+      title: 'アドレスを選ぶ',
+      lead: 'これが共有するリンクになります。英字、数字、ハイフン、アンダースコアが使えます。',
+      suggestions: '使えるアドレスの候補',
+      later: 'アドレスはあとからサイトの設定で変更できます。',
+      checking: '確認しています…',
+      available: (a: string) => `perlink.to/${a} は使用できます`,
+      taken: 'このアドレスはすでに使われています。別のアドレスを試すか、候補から選んでください。',
+      short: '3 文字以上で入力してください。',
+      failed: 'アドレスを確認できませんでした。もう一度お試しください。',
+    },
+    done: { title: 'サイトの準備ができました', lead: (a: string) => `perlink.to/${a} は下書きとして保存されています。エディターでリンクや写真を追加して、納得できたら公開しましょう。`, edit: 'エディターを開く', sites: 'マイサイト' },
+    failed: 'サイトを作成できませんでした',
+  },
+  ko: {
+    close: '대시보드로 돌아가기',
+    stepOf: (n: number, total: number) => `${total}단계 중 ${n}단계`,
+    back: '이전',
+    next: '계속',
+    create: '내 사이트 만들기',
+    seePlans: '요금제 보기',
+    limit: (n: number) => `현재 요금제로 게시할 수 있는 사이트 ${n}개를 모두 사용 중이에요. 이 사이트는 그대로 만들고 편집할 수 있지만, 업그레이드하거나 다른 사이트의 게시를 중단하기 전까지는 초안으로 남아요.`,
+    limitShort: (n: number) => `게시 가능한 사이트 ${n}개를 모두 사용 중이에요. 이 사이트는 초안으로 저장돼요.`,
+    welcome: {
+      title: (name: string) => (name ? `${name}님, Perlink에 오신 걸 환영해요!` : 'Perlink에 오신 걸 환영해요!'),
+      text: '첫 사이트를 만들어 볼까요? 2분 정도면 충분하고, 나중에 모두 바꿀 수 있어요.',
+    },
+    goal: { title: '어떤 사이트를 만드시나요?', lead: '어울리는 템플릿과 블록을 추천해 드릴게요. 나중에 모두 바꿀 수 있어요.' },
+    basics: {
+      title: '방문자에게 나를 소개해 주세요',
+      lead: '샘플 문구 대신 이 내용이 바로 페이지에 들어가요.',
+      photo: '사진 또는 로고',
+      photoHint: '선택 사항이에요. 정사각형 이미지가 가장 잘 어울려요.',
+      removePhoto: '삭제',
+      name: '페이지 이름',
+      about: '한 줄 소개',
+    },
+    look: { title: '디자인 고르기', lead: '모든 템플릿이 내 이름으로 보여요. 색상, 글꼴, 블록은 편집기에서 모두 바꿀 수 있어요.', more: (n: number) => `템플릿 ${n}개 더 보기` },
+    address: {
+      title: '주소 정하기',
+      lead: '공유할 링크예요. 영문, 숫자, 하이픈, 밑줄을 쓸 수 있어요.',
+      suggestions: '사용 가능한 추천 주소',
+      later: '주소는 나중에 사이트 설정에서 바꿀 수 있어요.',
+      checking: '확인하는 중…',
+      available: (a: string) => `perlink.to/${a} 사용 가능해요`,
+      taken: '이미 사용 중인 주소예요. 다른 주소를 입력하거나 추천 주소를 골라 주세요.',
+      short: '3자 이상 입력해 주세요.',
+      failed: '주소를 확인하지 못했어요. 다시 시도해 주세요.',
+    },
+    done: { title: '사이트가 준비됐어요', lead: (a: string) => `perlink.to/${a} 사이트가 초안으로 저장됐어요. 편집기에서 링크와 사진을 추가하고, 마음에 들면 게시하세요.`, edit: '편집기 열기', sites: '내 사이트' },
+    failed: '사이트를 만들지 못했어요',
+  },
 }
 const text = computed(() => TEXT[lang.value])
 
@@ -343,7 +461,10 @@ const welcome = computed(() => arrivedFromSignup && step.value === 'goal')
 const { user: sessionUser } = useUserSession()
 const firstName = computed(() => {
   const parts = String(sessionUser.value?.name || '').trim().split(/\s+/).filter(Boolean)
-  return (lang.value === 'vi' ? parts.at(-1) : parts[0]) || ''
+  // Vietnamese names end with the given name; English starts with it; Chinese, Japanese and Korean use the full name
+  if (lang.value === 'vi') return parts.at(-1) || ''
+  if (lang.value === 'en') return parts[0] || ''
+  return parts.join(' ')
 })
 
 // ---------- State, kept for the tab so a reload doesn't lose it ----------
@@ -506,7 +627,7 @@ watch([step, () => state.title], async ([current]) => {
   if (current !== 'address') return
   const base = addressFromName(state.title)
   if (!base) return
-  const candidates = [...new Set([base, base.replace(/-/g, ''), `${base}-vn`, `${base}-${new Date().getFullYear() % 100}`]
+  const candidates = [...new Set([base, base.replace(/-/g, ''), ...(COUNTRY_SUFFIX[lang.value] ? [`${base}-${COUNTRY_SUFFIX[lang.value]}`] : []), `${base}-${new Date().getFullYear() % 100}`]
     .filter(item => item.length >= 3 && item.length <= 30))]
   const free: string[] = []
   for (const candidate of candidates) {
@@ -562,5 +683,6 @@ watch(step, (current) => {
   if (current === 'done' && !doneSite.value) router.replace('/dashboard/site')
 }, { immediate: true })
 
-useSeoMeta({ title: () => `${lang.value === 'vi' ? 'Tạo trang mới' : 'New site'} — Perlink`, robots: 'noindex, nofollow' })
+const PAGE_TITLE: Record<AppLanguage, string> = { en: 'New site', vi: 'Tạo trang mới', zh: '新建网站', ja: '新しいサイト', ko: '새 사이트' }
+useSeoMeta({ title: () => `${PAGE_TITLE[lang.value]} — Perlink`, robots: 'noindex, nofollow' })
 </script>

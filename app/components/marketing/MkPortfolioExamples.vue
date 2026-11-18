@@ -65,7 +65,9 @@ import { PORTFOLIO_EXAMPLES, type DemoRoom } from '~/data/portfolio3d'
 
 // The examples page's roundup: 3D portfolios around the web, then the ones
 // you can make on Perlink, with one live room that switches between them
-const { lang } = useMarketingLang()
+// Only on the topic pages, which are English or Vietnamese
+const { lang: pageLang } = useMarketingLang()
+const lang = computed(() => (pageLang.value === 'vi' ? 'vi' : 'en'))
 const web = PORTFOLIO_EXAMPLES.filter(item => item.kind === 'web' && item.url)
 const perlink = PORTFOLIO_EXAMPLES.filter(item => item.kind === 'perlink')
 

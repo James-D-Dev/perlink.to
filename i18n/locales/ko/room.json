@@ -1,0 +1,506 @@
+{
+  "room": {
+    "page": {
+      "title": "3D 룸 · {name} {'|'} Perlink",
+      "notFoundTitle": "페이지를 찾을 수 없어요",
+      "notFoundText": "이 페이지가 없거나 접근 권한이 없어요.",
+      "backToPages": "내 페이지로 돌아가기",
+      "leaveTitle": "저장하지 않고 나갈까요?",
+      "leaveText": "룸 변경 사항이 저장되지 않았어요.",
+      "leave": "나가기"
+    },
+    "toast": {
+      "saved": "룸을 저장했어요",
+      "savedDraft": "룸을 초안으로 저장했어요. 방문자에게 보여주려면 게시하세요.",
+      "saveFailed": "저장하지 못했어요",
+      "published": "게시했어요",
+      "publishedText": "룸이 perlink.to/{name}에 게시되었어요",
+      "view": "보기",
+      "publishFailed": "게시하지 못했어요",
+      "photoUploadFailed": "사진을 업로드하지 못했어요",
+      "imageProcessFailed": "이미지를 처리하지 못했어요",
+      "imageReadFailed": "이미지를 읽지 못했어요"
+    },
+    "toolbar": {
+      "back": "페이지 편집기로 돌아가기",
+      "undo": "실행 취소 (Ctrl+Z)",
+      "redo": "다시 실행 (Ctrl+Shift+Z)",
+      "unsaved": "저장되지 않은 변경 사항 (Ctrl+S)",
+      "allSaved": "모든 변경 사항이 저장됨"
+    },
+    "preview": {
+      "day": "미리보기: 낮 (클릭하면 밤)",
+      "night": "미리보기: 밤 (클릭하면 낮)"
+    },
+    "panel": {
+      "showObjects": "오브젝트 보기 ({n})",
+      "objects": "오브젝트",
+      "backToObjects": "오브젝트로 돌아가기",
+      "closeObjects": "오브젝트 닫기",
+      "search": "오브젝트 검색",
+      "noMatch": "검색과 일치하는 오브젝트가 없어요.",
+      "empty": "아직 오브젝트가 없어요. 아래 바에서 추가해 보세요.",
+      "deleteObject": "{name} 삭제"
+    },
+    "places": {
+      "backWall": "뒷벽",
+      "leftWall": "왼쪽 벽",
+      "onFurniture": "가구 위",
+      "floor": "바닥"
+    },
+    "detail": {
+      "dragWall": "벽을 따라 끌어서 이동",
+      "dragFloor": "끌어서 이동 · 가구 위에 놓으면 쌓기",
+      "rotate": "회전",
+      "rotateLeft": "왼쪽으로 회전",
+      "rotateRight": "오른쪽으로 회전",
+      "wall": "벽",
+      "size": "크기",
+      "smaller": "작게",
+      "bigger": "크게",
+      "photo": "사진",
+      "replacePhoto": "사진 바꾸기",
+      "uploadPhoto": "사진 업로드",
+      "remove": "삭제",
+      "photoHint": "방문자가 액자를 클릭하면 사진을 원본 크기로 볼 수 있어요.",
+      "color": "색상",
+      "resetColor": "기본 색상으로 되돌리기",
+      "resetColorAria": "색상 초기화",
+      "colorSwatch": "색상 {color}",
+      "customColor": "사용자 지정 색상",
+      "link": "링크",
+      "linkHint": "방문자가 이 오브젝트를 클릭하면 링크가 열려요.",
+      "linkLabel": "라벨, 예: 내 Instagram",
+      "duplicate": "복제"
+    },
+    "camera": {
+      "zoomIn": "확대",
+      "zoomOut": "축소",
+      "resetView": "시점 초기화",
+      "hideDetails": "세부 정보 숨기기",
+      "editObject": "{name} 편집"
+    },
+    "coach": {
+      "label": "룸 편집기 둘러보기",
+      "replay": "사용 방법",
+      "step": "{total}단계 중 {n}단계",
+      "skip": "건너뛰기",
+      "back": "뒤로",
+      "next": "다음",
+      "done": "만들기 시작",
+      "steps": {
+        "welcome": { "title": "3D 룸에 오신 걸 환영해요 👋", "text": "30초 안에 편집기를 빠르게 둘러봐요." },
+        "add": { "title": "룸에 물건 추가하기", "text": "아이템을 눌러 배치하거나, 위로 끌어 올려 원하는 곳에 놓으세요. 탭에서 룸 스타일, 바깥 풍경, 음악, 낮과 밤도 바꿀 수 있어요." },
+        "move": { "title": "둘러보기", "text": "끌어서 룸을 돌리고, 스크롤하거나 두 손가락으로 확대/축소하세요. 이 버튼으로 확대하거나 시점을 초기화할 수 있어요. 오브젝트를 눌러 선택한 뒤 끌어서 옮기세요." },
+        "objects": { "title": "클릭 가능한 오브젝트 만들기", "text": "오브젝트 목록을 열어 각각의 색상, 문구, 링크를 편집하세요. 방문자가 그 오브젝트를 클릭하면 Instagram, 쇼핑몰 등 링크가 열려요." },
+        "publish": { "title": "저장하고 게시하기", "text": "저장은 초안을 보관해요. 게시하면 누구나 방문할 수 있도록 perlink.to/{name}에 룸이 공개돼요." }
+      }
+    },
+    "hint": {
+      "navigation": "오브젝트를 클릭해 선택한 뒤 끌어서 이동 · 끌어서 회전 · 스크롤로 확대/축소",
+      "firstRun": "아래 바에서 가구를 끌어 룸에 놓아 보세요"
+    },
+    "stats": {
+      "title": "드로우 콜 {drawCalls} · 삼각형 {triangles} · 최대 {cap} fps",
+      "idleParen": "(대기)",
+      "fps": "{fps} FPS",
+      "idle": "· 대기"
+    },
+    "tray": {
+      "addItem": "룸으로 끌어 오거나 눌러서 추가",
+      "hide": "트레이 숨기기",
+      "show": "트레이 보기"
+    },
+    "tabs": {
+      "room": "룸",
+      "land": "풍경",
+      "time": "낮 & 밤",
+      "music": "음악"
+    },
+    "roomStyle": {
+      "style": "스타일",
+      "floor": "바닥",
+      "colors": "색상",
+      "size": "크기",
+      "meters": "{n} m",
+      "floors": {
+        "wood": "나무",
+        "tile": "타일",
+        "carpet": "카펫",
+        "concrete": "콘크리트"
+      },
+      "colorFields": {
+        "wallColor": "벽",
+        "floorColor": "바닥",
+        "trimColor": "몰딩"
+      },
+      "sizeFields": {
+        "width": "너비",
+        "depth": "깊이",
+        "height": "높이"
+      }
+    },
+    "time": {
+      "modes": {
+        "auto": {
+          "label": "실제 시간",
+          "description": "각 방문자의 현지 시간을 따라요"
+        },
+        "cycle": {
+          "label": "사용자 지정 주기",
+          "description": "낮과 밤을 반복해요 (예: 각 1분)"
+        },
+        "day": {
+          "label": "항상 낮",
+          "description": "언제나 화창하게"
+        },
+        "night": {
+          "label": "항상 밤",
+          "description": "조명이 항상 켜져 있어요"
+        }
+      },
+      "day": "낮",
+      "night": "밤",
+      "minutes": "{n}분"
+    },
+    "music": {
+      "none": "음악 없음",
+      "previewTrack": "{title} 미리 듣기",
+      "fileMissing": "파일 없음",
+      "autoplay": "자동 재생",
+      "autoplayOn": "방문자가 룸을 열면 재생돼요. 브라우저가 소리를 막으면 처음 화면을 누를 때 재생돼요.",
+      "autoplayOff": "방문자는 음소거 상태로 시작하고 직접 음악을 켤 수 있어요.",
+      "creditPrefix": "음악 출처:",
+      "moods": {
+        "fun-game": "신나는",
+        "happy-runner": "활기찬",
+        "puzzle-casual": "가벼운",
+        "pixel-plains": "칩튠",
+        "happy-8bit": "8비트",
+        "marimba-travel": "트로피컬",
+        "fairytale-quest": "몽환적인",
+        "playful-kids": "장난스러운",
+        "game-background": "잔잔한",
+        "romantic-piano": "로맨틱",
+        "romantic-date": "다정한",
+        "love-acoustic": "어쿠스틱",
+        "cozy-love-lofi": "로파이",
+        "happy-birthday": "생일",
+        "party-celebration": "파티"
+      }
+    },
+    "categories": {
+      "furniture": "가구",
+      "lighting": "조명",
+      "decor": "장식",
+      "wall": "벽",
+      "tech": "전자기기",
+      "dungeon": "던전",
+      "shop": "상점",
+      "premium": "프리미엄"
+    },
+    "styles": {
+      "cozy-wood": "아늑한 원목",
+      "minimal-white": "미니멀 화이트",
+      "pastel": "파스텔",
+      "sage": "세이지",
+      "night-studio": "나이트 스튜디오",
+      "industrial": "인더스트리얼",
+      "dungeon": "던전"
+    },
+    "lands": {
+      "island": {
+        "name": "하늘 섬",
+        "description": "거대한 나무와 구름 속으로 쏟아지는 폭포가 있는 떠 있는 섬"
+      },
+      "mars": {
+        "name": "화성",
+        "description": "우주에 떠 있는 붉은 행성 표면, 주변을 둘러싼 행성들"
+      },
+      "sakura": {
+        "name": "벚꽃",
+        "description": "만개한 거대한 벚나무, 흩날리는 꽃잎, 나비와 연못"
+      },
+      "crimson": {
+        "name": "진홍 벚꽃",
+        "description": "파란 하늘 아래 거대한 진홍빛 벚나무, 붉은 풀과 흩날리는 꽃잎"
+      },
+      "city": {
+        "name": "도시",
+        "description": "도심 블록: 거리, 차량, 가로등, 밤에 불 켜진 창문"
+      },
+      "winter": {
+        "name": "겨울",
+        "description": "서리로 하얗게 덮인 거대한 나무, 얼어붙은 연못, 날리는 눈, 밤의 등불"
+      },
+      "autumn": {
+        "name": "가을",
+        "description": "붉고 노랗게 물든 거대한 단풍나무, 바람에 날리는 낙엽, 호박"
+      },
+      "tropical": {
+        "name": "열대 해변",
+        "description": "하얀 모래 위 야자수, 청록빛 바다와 파도, 밤의 티키 횃불"
+      },
+      "fairy": {
+        "name": "요정의 숲",
+        "description": "빛나는 거대한 버섯, 떠다니는 포자, 깊은 이끼 속 반딧불이"
+      },
+      "volcano": {
+        "name": "화산",
+        "description": "연기를 뿜는 화산, 가장자리로 쏟아지는 용암 강, 솟아오르는 불씨"
+      },
+      "zen": {
+        "name": "선 정원",
+        "description": "대나무 숲, 갈퀴로 정돈한 자갈, 잉어 연못, 석등"
+      }
+    },
+    "objects": {
+      "bed": "침대",
+      "sofa": "소파",
+      "desk": "책상",
+      "chair": "의자",
+      "coffee-table": "커피 테이블",
+      "bookshelf": "책장",
+      "cabinet": "서랍장",
+      "floor-lamp": "플로어 램프",
+      "desk-lamp": "책상 램프",
+      "candle": "양초",
+      "wall-lamp": "벽 조명",
+      "string-lights": "줄 조명",
+      "plant": "화분",
+      "rug": "러그",
+      "mug": "머그잔",
+      "window": "창문",
+      "picture-frame": "액자",
+      "wall-clock": "시계",
+      "neon-sign": "네온사인",
+      "tv": "TV 거치대",
+      "laptop": "노트북",
+      "dungeon-chest": "상자",
+      "dungeon-chest-gold": "보물 상자",
+      "dungeon-barrel": "통",
+      "dungeon-candelabrum": "촛대",
+      "dungeon-candelabrum-tall": "긴 촛대",
+      "dungeon-candle": "캔들 스틱",
+      "dungeon-torch": "스탠드 횃불",
+      "dungeon-wall-torch": "벽 횃불",
+      "dungeon-book-open": "펼친 책",
+      "dungeon-book": "책",
+      "dungeon-books": "마법서",
+      "dungeon-potion-blue": "파란 물약",
+      "dungeon-potion-green": "초록 물약",
+      "dungeon-potion-ice": "얼음 물약",
+      "dungeon-potion-vial": "약병",
+      "dungeon-potion-dark": "어둠의 물약",
+      "dungeon-potion-gold": "황금 물약",
+      "dungeon-bones": "해골",
+      "dungeon-bones-pile": "뼈 더미",
+      "dungeon-rock": "바위",
+      "dungeon-rock-flat": "납작한 바위",
+      "dungeon-carpet": "왕실 카펫",
+      "dungeon-column": "기둥",
+      "dungeon-column-broken": "부서진 기둥",
+      "dungeon-column-ruin": "쓰러진 기둥",
+      "dungeon-stairs": "계단",
+      "dungeon-window": "창살 창문",
+      "dungeon-bars": "쇠창살",
+      "dungeon-arch": "돌 아치",
+      "garden-flower-pot": "꽃 화분",
+      "garden-ceramic-flowers": "도자기 화분",
+      "garden-flower-vase": "꽃병",
+      "garden-bud-vase": "작은 꽃병",
+      "garden-flower-bowl": "꽃 그릇",
+      "garden-flower-bed": "화단",
+      "garden-bush-flowers": "꽃 덤불",
+      "garden-fern-pot": "고사리 화분",
+      "garden-indoor-tree": "실내 나무",
+      "garden-pine-pot": "소나무 화분",
+      "garden-bush": "덤불",
+      "garden-autumn-bush": "가을 덤불",
+      "garden-tall-grass": "키 큰 풀",
+      "garden-mushrooms": "버섯",
+      "garden-rocks": "정원석",
+      "garden-pebble-tray": "자갈 쟁반",
+      "product-stand": "상품 진열대",
+      "blog-board": "블로그 보드",
+      "vip-rose-bouquet": "장미 꽃다발",
+      "vip-heart-balloons": "하트 풍선",
+      "vip-rose-arch": "장미 아치",
+      "vip-candle-heart": "하트 촛불",
+      "vip-neon-heart": "네온 하트",
+      "vip-love-bear": "곰 인형",
+      "vip-wedding-arch": "웨딩 아치",
+      "vip-wedding-cake": "웨딩 케이크",
+      "vip-champagne-tower": "샴페인 타워",
+      "vip-love-marquee": "LOVE 마키 조명",
+      "vip-candle-lanterns": "캔들 랜턴",
+      "vip-sparkler-fountain": "불꽃 분수",
+      "vip-birthday-cake": "생일 케이크",
+      "vip-balloon-bunch": "풍선 다발",
+      "vip-gift-tower": "선물 탑",
+      "vip-disco-ball": "디스코 조명 쇼",
+      "vip-confetti-popper": "컨페티 대포",
+      "vip-birthday-bunting": "파티 가랜드",
+      "vip-floating-planet": "떠 있는 행성",
+      "vip-jellyfish-lamp": "해파리 램프",
+      "vip-star-projector": "별 프로젝터",
+      "vip-moon-lamp": "달 램프",
+      "vip-snow-globe": "스노우볼",
+      "vip-nebula-painting": "성운 그림",
+      "vip-peach-blossom": "복숭아꽃",
+      "vip-apricot-blossom": "살구꽃",
+      "vip-kumquat-tree": "금귤 나무",
+      "vip-red-lanterns": "빨간 등불",
+      "vip-firecrackers": "폭죽",
+      "vip-five-fruit-tray": "오과 쟁반",
+      "vip-ring-box": "반지 상자",
+      "vip-marry-me": "MARRY ME 조명",
+      "vip-rose-heart": "장미 99송이 하트",
+      "vip-petal-aisle": "장미 꽃잎 버진로드",
+      "vip-grand-piano": "그랜드 피아노",
+      "vip-fireworks": "불꽃놀이 쇼",
+      "vip-display-podium": "전시 단상",
+      "vip-glass-cabinet": "유리 진열장",
+      "vip-neon-open": "네온사인",
+      "vip-ad-screen": "홍보 스크린",
+      "vip-checkout-counter": "계산대",
+      "vip-sale-banner": "세일 배너"
+    },
+    "tour": {
+      "back": "뒤로",
+      "title": "3D 룸 영상",
+      "caption": "영상 제목",
+      "day": "낮",
+      "night": "밤",
+      "length": "영상 길이",
+      "music": "룸 음악",
+      "watermark": "Free 요금제의 영상에는 작은 “Made with Perlink”가 표시돼요.",
+      "removeWatermark": "제거하기",
+      "unsupported": "이 브라우저는 아직 영상을 녹화할 수 없어요. 최신 Chrome, Edge 또는 Safari를 사용하세요.",
+      "record": "영상 녹화",
+      "preparing": "준비 중…",
+      "drawing": "프레임을 그리는 중…",
+      "ready": "영상이 준비되었어요!",
+      "readyText": "TikTok, Reels 또는 Shorts에 올리고 룸 링크를 추가하세요.",
+      "share": "공유",
+      "download": "영상 다운로드",
+      "postText": "제 3D 룸에 놀러 오세요 ✨ {link}\n#perlink #3droom #roomtour #aesthetic",
+      "madeWith": "Made with Perlink",
+      "visit": "제 3D 룸에 놀러 오세요 👇",
+      "recordingNow": "녹화 중",
+      "cancel": "취소",
+      "style": "카메라 스타일",
+      "styles": {
+        "sweep": "스윕",
+        "orbit": "궤도",
+        "dive": "날아 들어가기",
+        "crane": "멀어지기",
+        "ground": "로우 앵글"
+      },
+      "notLive": {
+        "unpublished": "사이트가 아직 게시되지 않았어요. 영상 속 링크를 누른 사람은 아무것도 볼 수 없어요.",
+        "hidden": "방문자에게 3D 룸이 켜져 있지 않아요. 링크를 연 사람은 룸을 볼 수 없어요.",
+        "draft": "룸에 게시하지 않은 변경 사항이 있어요. 링크를 연 사람은 이전 버전을 보게 돼요."
+      },
+      "goLive": "룸 게시하기",
+      "wentLive": "룸이 게시되었어요. 시청자는 지금 이 모습 그대로 보게 돼요.",
+      "copyCaption": "캡션 복사",
+      "captionCopied": "캡션을 복사했어요. TikTok 게시물에 붙여 넣으세요",
+      "captionHint": "게시물 캡션 (룸 링크 포함):",
+      "musicClaim": "이 곡은 Content ID에 등록되어 있어 YouTube와 TikTok에서 영상이 음소거되거나 저작권 주장을 받을 수 있어요. 다른 곡을 고르세요."
+    },
+    "guestbook": {
+      "label": "방명록",
+      "on": "방명록 켜짐: 방문자가 룸 앞에 메시지와 선물을 남겨요. 클릭하면 꺼져요.",
+      "off": "방명록 꺼짐. 클릭하면 켜져요."
+    },
+    "shop": {
+      "product": "진열대의 상품",
+      "pick": "상품 선택",
+      "hint": "방문자가 진열대를 클릭하면 상품을 보고 룸 안에서 바로 주문할 수 있어요.",
+      "none": "이 사이트에는 아직 상품이 없어요. 먼저 페이지에 상품 블록을 추가하세요.",
+      "products": "표시할 상품",
+      "productsAuto": "첫 번째 상품들",
+      "productsHint": "비워 두면 쇼핑몰의 첫 상품들이 표시돼요. 방문자가 상품을 클릭하면 룸 안에서 바로 주문할 수 있어요.",
+      "text": "문구",
+      "textHint": "최대 {max}자, 어떤 언어든 가능해요.",
+      "soldOut": "품절",
+      "buy": "지금 구매"
+    },
+    "packs": {
+      "valentine": {
+        "name": "발렌타인",
+        "tagline": "사랑하는 사람을 위한 장미, 촛불, 두근거리는 네온 하트와 풍선."
+      },
+      "badge": "프리미엄",
+      "owned": "보유 중",
+      "included": "Max에 포함",
+      "buy": "{price}에 구매",
+      "oneTime": "1회 결제 · 영구 소장",
+      "items": "아이템 {n}개",
+      "trayLocked": "프리미엄 아이템: 룸에서 써 보고, 게시하려면 팩을 구매하세요.",
+      "trayOwned": "내 프리미엄 아이템",
+      "seeMarket": "3D 룸 팩",
+      "promptTitle": "룸에 프리미엄 아이템이 사용됐어요",
+      "promptText": "이 아이템으로 룸을 게시하려면 팩을 구매하세요. 한 번 결제하면 앞으로 만드는 모든 룸에서 영구히 사용할 수 있어요.",
+      "orMax": "또는 Max 이용: 모든 팩 포함",
+      "later": "나중에",
+      "checkoutFailed": "결제 페이지를 열지 못했어요",
+      "bought": "{name} 팩을 구매했어요",
+      "boughtText": "룸 편집기의 프리미엄 탭에서 아이템을 바로 쓸 수 있어요.",
+      "boughtPending": "결제가 확인되었어요. 몇 초 후 팩이 표시돼요.",
+      "signIn": "로그인하고 구매하기",
+      "wedding": {
+        "name": "웨딩",
+        "tagline": "베일이 날리는 아치, 회전하는 케이크, 샴페인과 불꽃."
+      },
+      "birthday": {
+        "name": "생일",
+        "tagline": "불어서 끄는 촛불, 풍선, 디스코 볼, 날아다니는 컨페티."
+      },
+      "galaxy": {
+        "name": "갤럭시",
+        "tagline": "꿈같은 밤을 위한 떠 있는 행성, 빛나는 해파리, 별과 달."
+      },
+      "tet": {
+        "name": "뗏(Tết)",
+        "tagline": "새해를 위한 복숭아꽃과 살구꽃, 빨간 등불, 세뱃돈."
+      },
+      "animated": "애니메이션",
+      "proposal": {
+        "name": "프러포즈",
+        "tagline": "열리는 반지 상자, 장미 99송이, 연주하는 피아노, 그리고 중요한 질문을 위한 불꽃놀이."
+      },
+      "showroom": {
+        "name": "쇼룸",
+        "tagline": "룸을 내 상점으로 바꾸세요: 실제 상품을 보여주는 유리 진열장과 홍보 스크린(클릭하면 주문), 내 문구가 담긴 네온사인과 배너, 회전하는 단상과 계산대."
+      }
+    },
+    "market": {
+      "metaTitle": "3D 룸 팩: 내 룸을 위한 프리미엄 아이템 | Perlink",
+      "metaDescription": "Perlink 룸을 위한 프리미엄 3D 아이템: 장미, 촛불, 네온 하트 등. 한 번 결제로 영구 소장하고 모든 룸에서 사용하세요.",
+      "eyebrow": "3D 룸 팩",
+      "title": "잊지 못할 룸을 만들어 보세요",
+      "intro": "소중한 순간을 위해 만든 프리미엄 3D 아이템. 한 번 결제하면 영구히 소장하고, 만드는 모든 룸에서 사용할 수 있어요.",
+      "maxNote": "Max 요금제를 이용 중이신가요? 모든 팩이 이미 내 것이에요.",
+      "openEditor": "룸 편집기 열기",
+      "howTitle": "이용 방법",
+      "how": [
+        {
+          "title": "팩 고르기",
+          "text": "모든 아이템은 3D 룸을 위해 제작되었고 밤에는 빛을 내요."
+        },
+        {
+          "title": "한 번 결제",
+          "text": "Creem을 통해 카드, Apple Pay 또는 Google Pay로 결제해요. 구독이 아니에요."
+        },
+        {
+          "title": "꾸미기",
+          "text": "만드는 모든 룸의 룸 편집기 프리미엄 탭에서 아이템을 찾을 수 있어요."
+        }
+      ],
+      "soon": "더 많은 팩이 곧 나올 예정이에요.",
+      "preview3d": "3D로 미리보기"
+    }
+  }
+}

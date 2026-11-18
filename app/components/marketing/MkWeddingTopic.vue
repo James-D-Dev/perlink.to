@@ -149,7 +149,9 @@ import { WEDDING_BASE, WEDDING_TOPICS, weddingTopicPath, type WeddingTopic } fro
 // copy, templates to start from and links back to the pillar and the others
 const props = defineProps<{ topic: WeddingTopic }>()
 
-const { lang, home, copy } = useMarketingLang()
+// Topic pages exist in English and Vietnamese only
+const { lang: pageLang, home, copy } = useMarketingLang()
+const lang = computed<'en' | 'vi'>(() => (pageLang.value === 'vi' ? 'vi' : 'en'))
 const topic = computed(() => props.topic)
 const text = computed(() => topic.value[lang.value])
 const pillar = computed(() => WEDDING_BASE[lang.value])

@@ -10,7 +10,7 @@ export const RESERVED_NAMES = new Set([
   'blog', 'docs', 'help', 'support', 'settings', 'templates', 'features', 'explore', 'signup', 'register',
   'account', 'billing', 'status', 'perlink', 'www', 'app',
   // Marketing pages
-  'vi', 'marketplace', '3d-room-packs', 'pack-cover', 'plan-cover', 'linktree-alternative', '3d-portfolio', 'portfolio-3d', 'vs', 'compare', 'alternatives',
+  'vi', 'zh', 'ja', 'ko', 'marketplace', '3d-room-packs', 'pack-cover', 'plan-cover', 'linktree-alternative', '3d-portfolio', 'portfolio-3d', 'vs', 'compare', 'alternatives',
   'birthday-website', 'valentine-website', 'qr-menu', 'free-link-in-bio', 'wedding-website', 'personal-website', 'homestay-website',
 ])
 

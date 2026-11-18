@@ -20,6 +20,9 @@ export default defineNuxtConfig({
     locales: [
       { code: "en", language: "en-US", name: "English", files: ["en/common.json", "en/dashboard.json", "en/blocks.json", "en/theme.json", "en/room.json"] },
       { code: "vi", language: "vi-VN", name: "Tiếng Việt", files: ["vi/common.json", "vi/dashboard.json", "vi/blocks.json", "vi/theme.json", "vi/room.json"] },
+      { code: "zh", language: "zh-CN", name: "简体中文", files: ["zh/common.json", "zh/dashboard.json", "zh/blocks.json", "zh/theme.json", "zh/room.json"] },
+      { code: "ja", language: "ja-JP", name: "日本語", files: ["ja/common.json", "ja/dashboard.json", "ja/blocks.json", "ja/theme.json", "ja/room.json"] },
+      { code: "ko", language: "ko-KR", name: "한국어", files: ["ko/common.json", "ko/dashboard.json", "ko/blocks.json", "ko/theme.json", "ko/room.json"] },
     ],
     // English unless the visitor picked another language (Settings, the
     // header switch); the browser's language isn't used. The choice is kept

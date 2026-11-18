@@ -103,6 +103,7 @@
 
 <script setup lang="ts">
 import { REPORT_REASONS, type ReportReason } from '#shared/reports'
+import type { LegalLang } from '~/data/legal/types'
 
 // Anyone can report a site; it lands in Superadmin → Reports
 definePageMeta({ layout: 'default', colorMode: 'light' })
@@ -121,19 +122,34 @@ const email = ref('')
 const sending = ref(false)
 const sent = ref(false)
 
-const steps = computed(() =>
-  lang.value === 'vi'
-    ? [
-        { icon: 'i-lucide-eye', title: 'Chúng tôi xem xét', text: 'Mỗi báo cáo đều được người thật kiểm tra, thường trong 1–2 ngày.' },
-        { icon: 'i-lucide-ban', title: 'Gỡ nếu vi phạm', text: 'Trang vi phạm bị gỡ và chủ trang không thể tự đăng lại.' },
-        { icon: 'i-lucide-lock', title: 'Bạn được ẩn danh', text: 'Chủ trang không biết ai đã báo cáo.' },
-      ]
-    : [
-        { icon: 'i-lucide-eye', title: 'We review it', text: 'A person checks every report, usually within 1–2 days.' },
-        { icon: 'i-lucide-ban', title: 'Taken down if it breaks the rules', text: 'The site is removed and its owner can’t publish it again.' },
-        { icon: 'i-lucide-lock', title: 'You stay anonymous', text: 'The site owner never learns who reported it.' },
-      ],
-)
+const STEPS: Record<LegalLang, { icon: string; title: string; text: string }[]> = {
+  en: [
+    { icon: 'i-lucide-eye', title: 'We review it', text: 'A person checks every report, usually within 1–2 days.' },
+    { icon: 'i-lucide-ban', title: 'Taken down if it breaks the rules', text: 'The site is removed and its owner can’t publish it again.' },
+    { icon: 'i-lucide-lock', title: 'You stay anonymous', text: 'The site owner never learns who reported it.' },
+  ],
+  vi: [
+    { icon: 'i-lucide-eye', title: 'Chúng tôi xem xét', text: 'Mỗi báo cáo đều được người thật kiểm tra, thường trong 1–2 ngày.' },
+    { icon: 'i-lucide-ban', title: 'Gỡ nếu vi phạm', text: 'Trang vi phạm bị gỡ và chủ trang không thể tự đăng lại.' },
+    { icon: 'i-lucide-lock', title: 'Bạn được ẩn danh', text: 'Chủ trang không biết ai đã báo cáo.' },
+  ],
+  zh: [
+    { icon: 'i-lucide-eye', title: '我们会进行审核', text: '每一份举报都由专人核查，通常在 1–2 天内完成。' },
+    { icon: 'i-lucide-ban', title: '违规即下架', text: '违规网站将被移除，网站所有者无法再次发布。' },
+    { icon: 'i-lucide-lock', title: '您的身份保密', text: '网站所有者不会知道是谁举报的。' },
+  ],
+  ja: [
+    { icon: 'i-lucide-eye', title: '担当者が確認します', text: 'すべての報告をスタッフが確認します。通常 1～2 日以内に対応します。' },
+    { icon: 'i-lucide-ban', title: '違反があれば削除します', text: '違反したサイトは削除され、所有者が再び公開することはできません。' },
+    { icon: 'i-lucide-lock', title: '匿名で報告できます', text: '誰が報告したかがサイトの所有者に知られることはありません。' },
+  ],
+  ko: [
+    { icon: 'i-lucide-eye', title: '직접 검토합니다', text: '모든 신고는 담당자가 직접 확인하며, 보통 1~2일 이내에 처리됩니다.' },
+    { icon: 'i-lucide-ban', title: '위반 시 삭제합니다', text: '위반한 사이트는 삭제되며, 소유자는 다시 게시할 수 없습니다.' },
+    { icon: 'i-lucide-lock', title: '익명이 보장됩니다', text: '사이트 소유자는 누가 신고했는지 알 수 없습니다.' },
+  ],
+}
+const steps = computed(() => STEPS[lang.value])
 
 async function submit() {
   if (!site.value.trim() || !reason.value || sending.value) return

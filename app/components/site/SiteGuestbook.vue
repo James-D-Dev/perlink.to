@@ -47,6 +47,7 @@
 
 <script setup lang="ts">
 import { GUEST_GIFT_EMOJI, type GuestGiftType } from '#shared/guestbook'
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 
 // Owner's list of guestbook messages left in the site's 3D room
 const props = defineProps<{ username: string }>()
@@ -54,6 +55,8 @@ const props = defineProps<{ username: string }>()
 interface Entry { id: string; name: string; message: string; gift: string; hidden: boolean; createdAt: string }
 
 const { t, locale } = useI18n()
+// Dates in the dashboard language (English as day-month, like the rest of the app)
+const intlLocale = computed(() => { const lang = toAppLanguage(locale.value); return lang === 'en' ? 'en-GB' : LANGUAGE_INFO[lang].intl })
 const toast = useToast()
 const confirm = useConfirm()
 
@@ -90,6 +93,6 @@ async function remove(entry: Entry) {
 
 function formatWhen(value: string) {
   const date = new Date(`${value.replace(' ', 'T')}Z`)
-  return date.toLocaleString(locale.value === 'vi' ? 'vi-VN' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleString(intlLocale.value, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 </script>

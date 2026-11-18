@@ -2,7 +2,7 @@
   <section>
     <div class="mx-auto max-w-6xl border-x border-line px-5 py-10 sm:px-8 md:py-16">
       <!-- In short -->
-      <p class="mk-eyebrow mb-4">{{ lang === 'vi' ? 'Tóm tắt nhanh' : 'In short' }}</p>
+      <p class="mk-eyebrow mb-4">{{ ui.short }}</p>
       <div class="grid gap-3 sm:grid-cols-3">
         <div v-for="item in doc.summary" :key="item.title" class="rounded-2xl bg-sand p-5">
           <div class="flex size-9 items-center justify-center rounded-xl bg-paper text-ink ring-1 ring-line">
@@ -18,7 +18,7 @@
         <aside class="mb-10 lg:mb-0">
           <details class="group rounded-2xl bg-sand lg:hidden">
             <summary class="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-ink [&::-webkit-details-marker]:hidden">
-              {{ lang === 'vi' ? 'Nội dung trang' : 'On this page' }}
+              {{ ui.onPage }}
               <UIcon name="i-lucide-chevron-down" class="size-4 text-ink-muted transition-transform group-open:rotate-180" />
             </summary>
             <ol class="space-y-0.5 px-2 pb-3">
@@ -30,8 +30,8 @@
             </ol>
           </details>
 
-          <nav class="sticky top-24 hidden lg:block" :aria-label="lang === 'vi' ? 'Nội dung trang' : 'On this page'">
-            <p class="mb-3 text-xs font-medium uppercase tracking-[0.08em] text-ink-faint">{{ lang === 'vi' ? 'Nội dung' : 'Contents' }}</p>
+          <nav class="sticky top-24 hidden lg:block" :aria-label="ui.onPage">
+            <p class="mb-3 text-xs font-medium uppercase tracking-[0.08em] text-ink-faint">{{ ui.contents }}</p>
             <ol class="space-y-0.5 border-l border-line">
               <li v-for="(section, i) in doc.sections" :key="section.id">
                 <a
@@ -97,11 +97,20 @@
 </template>
 
 <script setup lang="ts">
-import type { LegalDoc } from '~/data/legal/types'
+import type { LegalDoc, LegalLang } from '~/data/legal/types'
 
 // Body of a legal page: summary cards, contents and numbered sections
 defineProps<{ doc: LegalDoc }>()
 const lang = useLegalLang()
+
+const UI: Record<LegalLang, { short: string; onPage: string; contents: string }> = {
+  en: { short: 'In short', onPage: 'On this page', contents: 'Contents' },
+  vi: { short: 'Tóm tắt nhanh', onPage: 'Nội dung trang', contents: 'Nội dung' },
+  zh: { short: '要点速览', onPage: '本页内容', contents: '目录' },
+  ja: { short: '概要', onPage: 'このページの内容', contents: '目次' },
+  ko: { short: '요약', onPage: '이 페이지의 내용', contents: '목차' },
+}
+const ui = computed(() => UI[lang.value])
 
 // The section being read, highlighted in the contents
 const sectionEls = ref<HTMLElement[]>([])

@@ -37,6 +37,7 @@ import type { BlogBlock } from '~/types/bio'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
 import { localizeTemplateContent } from '~/data/templateCopyVi'
 import { renderPostHtml, type PostNode } from '#shared/postContent'
+import { toAppLanguage, type AppLanguage } from '#shared/language'
 
 // One of a template's example posts, opened from its preview page, so people
 // can see how a post reads on that site before choosing it. The words are
@@ -68,7 +69,7 @@ const site: BlogSite = {
 
 const text = (value: string): PostNode => ({ type: 'text', text: value })
 const p = (value: string): PostNode => ({ type: 'paragraph', content: [text(value)] })
-const COPY = {
+const COPY: Record<AppLanguage, { intro: string; heading: string; body: string; list: string[]; quote: string; end: string }> = {
   en: {
     intro: `This is an example post that comes with the ${t(`dashboard.templates.${template.id}.name`)} template. When you write in Perlink's blog editor, your own posts show here, in your site's colours and fonts.`,
     heading: 'What a post can hold',
@@ -85,8 +86,32 @@ const COPY = {
     quote: 'Một câu đáng nhớ sẽ nổi bật như thế này.',
     end: 'Người đọc có thể chia sẻ từng bài, và công cụ tìm kiếm có thể tìm thấy bài viết.',
   },
+  zh: {
+    intro: `这是 ${t(`dashboard.templates.${template.id}.name`)} 模板自带的示例文章。你在 Perlink 博客编辑器里写的文章会显示在这里，并沿用你网站的配色和字体。`,
+    heading: '一篇文章可以包含什么',
+    body: '标题、列表、引用、链接和图片，排版清晰，在手机上也方便阅读。',
+    list: ['按自己的节奏写，草稿会自动保存', '添加封面图，也可以在正文中插入图片', '准备好了就发布：文章会出现在你的页面和博客里'],
+    quote: '值得记住的一句话会像这样突出显示。',
+    end: '读者可以分享每一篇文章，搜索引擎也能找到它们。',
+  },
+  ja: {
+    intro: `これは「${t(`dashboard.templates.${template.id}.name`)}」テンプレートに付いているサンプル記事です。Perlinkのブログエディターで書いた記事は、サイトの色とフォントでここに表示されます。`,
+    heading: '記事に入れられるもの',
+    body: '見出し、リスト、引用、リンク、写真。スマートフォンでも読みやすくレイアウトされます。',
+    list: ['自分のペースで書けます。下書きは自動で保存されます', 'カバー写真や本文中の画像を追加できます', '準備ができたら公開。あなたのページとブログに表示されます'],
+    quote: '心に残る一文は、このように目立たせることができます。',
+    end: '読者は記事ごとにシェアでき、検索エンジンにも見つけてもらえます。',
+  },
+  ko: {
+    intro: `${t(`dashboard.templates.${template.id}.name`)} 템플릿에 들어 있는 예시 글이에요. Perlink 블로그 편집기에서 글을 쓰면 사이트의 색상과 글꼴 그대로 여기에 표시돼요.`,
+    heading: '글에 담을 수 있는 것',
+    body: '제목, 목록, 인용, 링크, 사진을 휴대폰에서도 읽기 편하게 배치해요.',
+    list: ['내 속도에 맞춰 쓰세요. 임시 저장은 자동으로 돼요', '커버 사진과 본문 속 사진을 넣을 수 있어요', '준비되면 게시하세요. 내 페이지와 블로그에 바로 표시돼요'],
+    quote: '기억할 만한 문장은 이렇게 돋보이게 할 수 있어요.',
+    end: '독자는 글마다 공유할 수 있고, 검색 엔진도 글을 찾을 수 있어요.',
+  },
 }
-const c = COPY[locale.value === 'vi' ? 'vi' : 'en']
+const c = COPY[toAppLanguage(locale.value)]
 const html = renderPostHtml({
   type: 'doc',
   content: [

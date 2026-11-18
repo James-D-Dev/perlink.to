@@ -1,0 +1,121 @@
+{
+  "common": {
+    "save": "保存",
+    "saveDraft": "保存草稿",
+    "publish": "发布",
+    "unpublish": "取消发布",
+    "cancel": "取消",
+    "close": "关闭",
+    "delete": "删除",
+    "edit": "编辑",
+    "preview": "预览",
+    "copied": "已复制",
+    "copyLink": "复制链接",
+    "openSite": "打开网站",
+    "analytics": "数据分析",
+    "settings": "设置",
+    "loading": "加载中…",
+    "error": "出了点问题",
+    "reset": "重置",
+    "auto": "自动",
+    "optional": "可选",
+    "confirm": "确认",
+    "back": "返回",
+    "copy": "复制"
+  },
+  "menu": {
+    "account": "我的账户",
+    "plans": "套餐",
+    "settings": "设置",
+    "language": "语言",
+    "signOut": "退出登录"
+  },
+  "nav": {
+    "createSite": "创建网站",
+    "home": "控制台",
+    "sites": "我的网站",
+    "settings": "设置",
+    "help": "帮助",
+    "feedback": "反馈",
+    "proTitle": "Perlink Pro",
+    "proText": "更多网站、更多 3D 世界和高级功能。",
+    "seePlans": "查看套餐",
+    "darkMode": "深色模式",
+    "lightMode": "浅色模式",
+    "earn": "赚取收益",
+    "roomPacks": "3D 房间包"
+  },
+  "report": {
+    "title": "举报网站",
+    "intro": "发现诈骗、虚假或违反我们规则的 Perlink 网站？告诉我们，我们会进行审核，如属实将予以下架。",
+    "site": "网站地址",
+    "sitePlaceholder": "site-name",
+    "reason": "原因",
+    "reasons": {
+      "scam": "诈骗或欺诈",
+      "phishing": "钓鱼：仿冒银行/品牌页面，索要密码或验证码",
+      "adult": "成人内容",
+      "violence": "暴力、仇恨或骚扰",
+      "illegal": "非法商品或服务（赌博、毒品等）",
+      "copyright": "侵犯版权",
+      "impersonation": "冒充他人",
+      "spam": "垃圾信息或误导性链接",
+      "other": "其他"
+    },
+    "details": "更多详情（可选）",
+    "detailsPlaceholder": "这个网站有什么问题？",
+    "email": "你的邮箱（可选）",
+    "emailHelp": "仅在需要跟进时使用。",
+    "submit": "提交举报",
+    "sent": "已收到举报",
+    "sentText": "谢谢。我们会尽快审核该网站。",
+    "failed": "举报提交失败",
+    "terms": "阅读服务条款"
+  },
+  "pricingPage": {
+    "eyebrow": "价格",
+    "title": "免费开始，按需升级。",
+    "intro": "每个套餐都包含模板、拖放编辑器，以及为你的页面打造的 3D 世界。",
+    "faqTitle": "套餐常见问题",
+    "seoTitle": "价格：免费 Link in Bio 与个人网站套餐 — Perlink",
+    "seoDescription": "免费创建 Link in Bio 页面或个人网站。升级可获得更多网站、Pro 主题和更长的数据分析周期。7 天无理由退款保证。",
+    "faq": [
+      {
+        "q": "真的可以免费使用 Perlink 吗？",
+        "a": "可以。免费套餐支持创建并发布一个页面，并附带专属 3D 世界。"
+      },
+      {
+        "q": "如何升级？",
+        "a": "在控制台选择套餐并在线付款，付款由我们的经销商 Creem 处理。付款成功后套餐立即生效，你可以随时取消。"
+      },
+      {
+        "q": "以后可以更换套餐吗？",
+        "a": "可以，你可以随时升级或降级。"
+      },
+      {
+        "q": "降级后我的页面会怎样？",
+        "a": "你的页面会继续在原地址保持在线。"
+      },
+      {
+        "q": "付费套餐有免费试用吗？",
+        "a": "有。每个新账户都可以免费试用 Plus 7 天，无需填写付款信息。试用结束后，如未选择套餐，将自动回到免费版。"
+      },
+      {
+        "q": "可以退款吗？",
+        "a": "可以。每笔付款都享有 7 天无理由退款保证：在 7 天内发送邮件至 support{'@'}perlink.to，即可获得全额退款，无需说明理由。详情请见我们的退款政策 perlink.to/refund。"
+      },
+      {
+        "q": "可以使用自己的域名吗？",
+        "a": "可以，Plus 套餐最多支持 3 个域名，Max 套餐最多 20 个。你的网站仍保留 perlink.to/yourname 地址，已分享的链接依然有效。"
+      },
+      {
+        "q": "“在线网站”是什么意思？",
+        "a": "套餐只计算已发布的网站。所有套餐的草稿数量都不限，你可以随意尝试各种模板，只发布需要的那些。"
+      },
+      {
+        "q": "我该选择哪个套餐？",
+        "a": "免费版足以满足一个 Link in Bio 页面或个人网站。Starter 增加了 Pro 主题、像素代码和 Search Console、密码保护页面，以及三个在线网站。Plus 适合拥有自有域名、最多十个网站的企业或创作者。Max 适合运营大量网站的代理机构和连锁品牌，并包含全部 3D 房间包。"
+      }
+    ]
+  }
+}

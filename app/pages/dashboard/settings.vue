@@ -41,7 +41,7 @@
               <p class="mt-1 text-xs text-ink-muted">{{ t('dashboard.account.languageText') }}</p>
               <USelect
                 :model-value="locale"
-                :items="locales.map((l) => ({ label: l.name, value: l.code }))"
+                :items="APP_LANGUAGES.map((code) => ({ label: LANGUAGE_INFO[code].label, value: code }))"
                 class="mt-3 w-full"
                 @update:model-value="changeLanguage($event as string)"
               />
@@ -116,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+import { APP_LANGUAGES, LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 import { PLAN_LIMITS, isPlanId, type PlanId } from '#shared/plans'
 
 definePageMeta({
@@ -136,7 +137,7 @@ interface Account {
   liveSites?: number
 }
 
-const { t, locale, locales, setLocale } = useI18n()
+const { t, locale, setLocale } = useI18n()
 
 // The language follows the account: the dashboard, Telegram and emails use it
 async function changeLanguage(language: string) {
@@ -179,7 +180,7 @@ onMounted(async () => {
 
 function formatDate(value: string) {
   const date = new Date(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`)
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString(toAppLanguage(locale.value) === 'en' ? 'en-GB' : LANGUAGE_INFO[toAppLanguage(locale.value)].intl, { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 const savingName = ref(false)

@@ -42,9 +42,12 @@
 
 <script setup lang="ts">
 import { PLAN_LIMITS, PLAN_ORDER, TRIAL_PLAN } from '#shared/plans'
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 
 // Shown when something needs a higher plan (see useUpgradePrompt)
 const { t, locale } = useI18n()
+// Dates in the dashboard language (English as day-month, like the rest of the app)
+const intlLocale = computed(() => { const lang = toAppLanguage(locale.value); return lang === 'en' ? 'en-GB' : LANGUAGE_INFO[lang].intl })
 const toast = useToast()
 const { reason, close } = useUpgradePrompt()
 const { info, ensure, refresh } = useBilling()
@@ -66,7 +69,7 @@ async function startTrial() {
     await refresh()
     close()
     toast.add({
-      title: t('dashboard.billing.trial.started', { date: new Date(res.expiresAt).toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB') }),
+      title: t('dashboard.billing.trial.started', { date: new Date(res.expiresAt).toLocaleDateString(intlLocale.value) }),
       color: 'success',
     })
   } catch (error: any) {

@@ -1,0 +1,536 @@
+{
+  "blocks": {
+    "editor": {
+      "addBlock": "ブロックを追加",
+      "unsavedChanges": "未保存の変更があります",
+      "allSaved": "すべての変更を保存しました",
+      "hiddenBadge": "非表示",
+      "menu": {
+        "more": "その他の操作",
+        "show": "ブロックを表示",
+        "hide": "ブロックを非表示",
+        "up": "上へ移動",
+        "down": "下へ移動",
+        "duplicate": "複製",
+        "addBelow": "下にブロックを追加",
+        "side": "表示対象",
+        "sideBoth": "両家",
+        "sideGroom": "新郎側のみ",
+        "sideBride": "新婦側のみ",
+        "sideBadgeGroom": "新郎",
+        "sideBadgeBride": "新婦"
+      }
+    },
+    "header": {
+      "changePhoto": "写真を変更",
+      "addPhoto": "写真を追加",
+      "titlePlaceholder": "名前またはタイトル",
+      "bioPlaceholder": "自己紹介を書いてください",
+      "nameLabel": "表示名",
+      "bioLabel": "自己紹介",
+      "removePhoto": "削除"
+    },
+    "links": {
+      "title": "リンク",
+      "titleLabel": "タイトル",
+      "titleHelp": "リンクの上に表示する見出し（任意）です。",
+      "titlePlaceholder": "例：おすすめ",
+      "linkTitlePlaceholder": "タイトル（必須）",
+      "linkSubtitlePlaceholder": "サブタイトル（任意）",
+      "linkUrlPlaceholder": "URLまたはメールアドレス（必須）",
+      "add": "追加",
+      "visible": "表示中",
+      "hidden": "非表示",
+      "addLabel": "リンクをすばやく追加",
+      "addHelp": "アドレスを貼り付けると、タイトルが自動で入力されます。"
+    },
+    "social": {
+      "title": "SNSリンク",
+      "empty": "SNSリンクはまだありません",
+      "addSocial": "SNSを追加",
+      "modalTitle": "SNSリンクを追加",
+      "searchPlaceholder": "SNSを検索...",
+      "usernamePlaceholder": "ユーザー名",
+      "urlPlaceholder": "URLを入力",
+      "groups": {
+        "social": "SNS",
+        "stores": "ストア・フードデリバリー・地図（ボタンとして表示）"
+      }
+    },
+    "album": {
+      "title": "画像アルバム",
+      "imageCount": "{n}枚の画像 | {n}枚の画像",
+      "titleLabel": "タイトル",
+      "titleHelp": "画像の上に表示する見出し（任意）です。",
+      "titlePlaceholder": "例：ギャラリー",
+      "layout": "レイアウト",
+      "layouts": {
+        "grid": "グリッド",
+        "masonry": "メイソンリー",
+        "vertical": "縦並び",
+        "carousel": "カルーセル"
+      },
+      "dropHint": "クリックまたは画像をここにドラッグ",
+      "limits": "最大6枚、1枚あたり5MBまで",
+      "maxReached": "上限の6枚に達しました",
+      "uploading": "アップロード中...",
+      "images": "画像",
+      "deleteTitle": "画像を削除",
+      "deleteConfirm": "この画像を削除してもよろしいですか？この操作は元に戻せません。",
+      "toast": {
+        "limitTitle": "上限に達しました",
+        "limitDescription": "画像は最大{max}枚までです",
+        "successTitle": "完了",
+        "uploaded": "{n}枚の画像をアップロードしました | {n}枚の画像をアップロードしました",
+        "uploadFailedTitle": "アップロードに失敗しました",
+        "uploadFailedDescription": "画像をアップロードできませんでした",
+        "deletedTitle": "削除しました",
+        "deletedDescription": "アルバムから画像を削除しました"
+      }
+    },
+    "text": {
+      "title": "テキスト",
+      "titleLabel": "タイトル",
+      "titleHelp": "テキストの上に表示する見出し（任意）です。",
+      "titlePlaceholder": "私たちについて",
+      "textLabel": "テキスト",
+      "textPlaceholder": "あなたが誰なのか、何をしているのか、お店の魅力などを訪問者に伝えましょう。",
+      "alignment": "配置",
+      "alignLeft": "左揃え",
+      "alignCenter": "中央揃え",
+      "alignRight": "右揃え",
+      "style": "スタイル",
+      "styles": {
+        "plain": "シンプル",
+        "card": "カード"
+      }
+    },
+    "menu": {
+      "title": "メニュー",
+      "itemCount": "{n}件 | {n}件",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "メニュー、客室、サービス...",
+      "currency": "通貨",
+      "priceSuffix": "価格の後に付ける文字",
+      "priceSuffixPlaceholder": "例：/泊",
+      "sectionSuffix": "このセクションの価格の後に付ける文字",
+      "sectionSuffixPlaceholder": "接尾辞",
+      "layout": "レイアウト",
+      "layouts": {
+        "list": "リスト",
+        "cards": "カード"
+      },
+      "sectionPlaceholder": "セクション名（例：前菜）",
+      "itemNamePlaceholder": "名前",
+      "itemPricePlaceholder": "価格",
+      "itemDescriptionPlaceholder": "短い説明（任意）",
+      "itemTagPlaceholder": "タグ（例：人気No.1）",
+      "itemImagePlaceholder": "画像URL（任意）",
+      "addItem": "項目を追加",
+      "addSection": "セクションを追加",
+      "itemPhoto": "写真",
+      "removePhoto": "写真を削除",
+      "soldOut": "売り切れ",
+      "photoFailed": "写真をアップロードできませんでした"
+    },
+    "hours": {
+      "title": "営業時間",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "営業時間",
+      "closed": "定休日",
+      "copyMonday": "月曜日の設定を全曜日にコピー",
+      "note": "備考",
+      "notePlaceholder": "例：ラストオーダーは閉店30分前",
+      "pause": "臨時休業",
+      "pauseHelp": "休暇や改装のときに使います。選んだ日まで休業中であることが訪問者に表示されます。",
+      "pauseUntil": "再開日",
+      "pauseMessage": "メッセージ",
+      "pauseMessagePlaceholder": "例：年末年始はお休みします。またのご来店をお待ちしています！"
+    },
+    "contact": {
+      "title": "連絡先",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "お問い合わせ・ご予約",
+      "address": "住所",
+      "addressPlaceholder": "東京都渋谷区神南1-2-3",
+      "mapLink": "地図のリンク",
+      "mapLinkHelp": "空欄の場合は、住所をGoogleマップで開きます。",
+      "phone": "電話番号",
+      "email": "メールアドレス",
+      "bookingButton": "予約ボタン",
+      "bookingButtonPlaceholder": "席を予約する",
+      "bookingLink": "予約リンク",
+      "quickBar": "クイック連絡ボタン",
+      "quickBarHelp": "ページ下部に電話・経路・チャットのボタンを固定表示します。チャットにはSNSアイコンブロックのZalo、WhatsApp、Telegramを使います。"
+    },
+    "birthday": {
+      "title": "カウントダウン",
+      "birthDate": "生年月日",
+      "birthDatePlaceholder": "生年月日を選択",
+      "label": "ラベル",
+      "labelPlaceholder": "例：リリーの誕生日まで、付き合って、結婚式まで",
+      "theme": "テーマ",
+      "themes": {
+        "classic": "クラシック",
+        "modern": "モダン",
+        "minimal": "ミニマル",
+        "party": "パーティー",
+        "elegant": "エレガント",
+        "card": "ページのカード",
+        "rose": "ローズ",
+        "night": "ナイト"
+      },
+      "showAge": "年齢を表示（例：「25歳になります」）",
+      "sinceDate": "開始日",
+      "mode": "カウント方法",
+      "modes": {
+        "until": "カウントダウン",
+        "since": "カウントアップ"
+      },
+      "repeat": "毎年",
+      "repeatHint": "誕生日や記念日向けです。オフにすると、結婚式のようにこの1日だけに向けてカウントします。"
+    },
+    "vietqr": {
+      "title": "VietQR決済",
+      "emptyHint": "銀行情報を入力して「生成」を押してください",
+      "selectBank": "銀行を選択",
+      "accountNumber": "口座番号",
+      "accountName": "口座名義",
+      "amount": "金額（VND）",
+      "note": "振込メモ（任意）",
+      "theme": "テーマ：{name}",
+      "themes": {
+        "doreamon": "ドラえもん",
+        "hello-kitty": "Hello Kitty",
+        "merry-christmas": "メリークリスマス",
+        "newyear-2026": "新年2026",
+        "vietnam": "ベトナム",
+        "rose": "ローズ"
+      },
+      "generate": "QRコードを生成",
+      "errorTitle": "エラー",
+      "generateFailed": "QRコードを生成できませんでした",
+      "copiedDescription": "QRコードのテキストをクリップボードにコピーしました"
+    },
+    "picker": {
+      "title": "ブロックを追加",
+      "description": "ブロックはページを構成するセクションです。あとから並べ替えられます。",
+      "added": "追加済み",
+      "groups": {
+        "content": "コンテンツ",
+        "business": "ビジネス",
+        "extras": "その他"
+      },
+      "items": {
+        "links": {
+          "label": "リンク",
+          "description": "ウェブサイト、ショップ、動画などへのボタンです。"
+        },
+        "social": {
+          "label": "SNSアイコン",
+          "description": "Instagram、TikTok、Zaloなどのアイコンを1列に並べます。"
+        },
+        "text": {
+          "label": "テキスト",
+          "description": "自己紹介や、タイトル付きの文章です。"
+        },
+        "imageAlbum": {
+          "label": "ギャラリー",
+          "description": "最大6枚の写真をグリッド、メイソンリー、縦並び、カルーセルで表示します。"
+        },
+        "menu": {
+          "label": "メニュー・料金表",
+          "description": "料理、客室、サービスを価格付きで掲載します。"
+        },
+        "hours": {
+          "label": "営業時間",
+          "description": "1週間の営業時間と、リアルタイムの「営業中」バッジです。"
+        },
+        "contact": {
+          "label": "連絡先・予約",
+          "description": "住所、電話番号、メールアドレスと予約ボタンです。"
+        },
+        "vietqr": {
+          "label": "VietQR",
+          "description": "支払いやチップを受け取れる銀行QRコードです。"
+        },
+        "birthdayCountdown": {
+          "label": "カウントダウン",
+          "description": "誕生日や結婚式までの日数、またはある日から一緒に過ごした日数です。"
+        },
+        "form": {
+          "label": "予約・お問い合わせフォーム",
+          "description": "訪問者からの予約や質問が受信箱に届きます。"
+        },
+        "video": {
+          "label": "動画",
+          "description": "YouTube、Vimeo、TikTokの動画をページ上で再生します。"
+        },
+        "testimonials": {
+          "label": "お客様の声",
+          "description": "お客様からのレビューや感想を星付きで掲載します。"
+        },
+        "products": {
+          "label": "商品",
+          "description": "販売：ページで注文を受けるか、Shopee、TikTok Shopなどにリンクします。"
+        },
+        "blog": {
+          "label": "最新の投稿",
+          "description": "ブログの最新記事を表示し、ブログへリンクします。"
+        },
+        "timeline": {
+          "label": "タイムライン",
+          "description": "出会い、結婚式当日の流れ、節目など、日付付きのステップでストーリーを伝えます。"
+        },
+        "letter": {
+          "label": "手紙",
+          "description": "訪問者がタップして開ける封筒入りのラブレターや招待状です。"
+        },
+        "event": {
+          "label": "イベント詳細",
+          "description": "日時と場所に、「カレンダーに追加」と「経路」ボタンが付きます。"
+        },
+        "question": {
+          "label": "質問",
+          "description": "「バレンタインになってくれる？」「いいえ」ボタンは逃げていき、「はい」でハートが舞います。"
+        }
+      },
+      "searchPlaceholder": "リンクを貼り付けるか、ブロックを検索…",
+      "suggested": "おすすめ",
+      "more": "ページに追加できるもの",
+      "results": "検索結果",
+      "noResults": "「{query}」に一致するブロックはありません。",
+      "pasteAdd": "追加",
+      "paste": {
+        "video": "この動画を追加",
+        "map": "このGoogleマップの場所を追加",
+        "social": "{name}をSNSアイコンに追加",
+        "link": "リンクボタンとして追加",
+        "product": "{store}から商品を追加"
+      }
+    },
+    "iconPicker": {
+      "title": "アイコンを選択",
+      "website": "ウェブサイト",
+      "link": "リンク"
+    },
+    "deleteLink": {
+      "title": "リンクを削除",
+      "description": "このリンクを削除してもよろしいですか？この操作は元に戻せません。",
+      "errorTitle": "エラー",
+      "deletedTitle": "リンクを削除しました",
+      "deletedDescription": "リンクを削除しました",
+      "failed": "リンクを削除できませんでした。もう一度お試しください。"
+    },
+    "form": {
+      "title": "フォーム",
+      "defaultTitle": "予約フォーム",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "席を予約する",
+      "descriptionLabel": "説明",
+      "descriptionPlaceholder": "1時間以内にお電話で確認いたします。",
+      "kind": "種類",
+      "kinds": {
+        "booking": "予約",
+        "contact": "お問い合わせ",
+        "rsvp": "招待状の返信（RSVP）",
+        "stay": "宿泊予約",
+        "subscribe": "購読（ニュースレター）"
+      },
+      "subscribeHint": "訪問者はメールアドレスだけを残します。購読者は受信箱の専用タブに表示され、すべてのアドレスをコピーしたり、メール配信ツール用にCSVをダウンロードしたりできます。",
+      "serviceLabel": "選択欄のタイトル",
+      "serviceLabelHelp": "空欄の場合は「サービス」になります。",
+      "serviceLabelPlaceholder": "例：プランを選択",
+      "serviceLabelStay": "例：ご希望の客室は？",
+      "fieldsLabel": "項目",
+      "fieldsHelp": "名前は常に入力してもらいます。",
+      "fields": {
+        "phone": "電話番号",
+        "email": "メールアドレス",
+        "date": "日付",
+        "time": "時間",
+        "guests": "人数",
+        "message": "メッセージ",
+        "service": "サービス",
+        "checkout": "チェックアウト日"
+      },
+      "serviceHint": "サービス：訪問者はページの料金表や商品から価格付きで選べます。料金表や商品がない場合は、希望を自由に入力できます。",
+      "checkoutHint": "チェックアウト：宿泊の場合、訪問者はチェックイン日とチェックアウト日を選び、泊数を確認できます。",
+      "hoursHint": "営業時間を設定すると、時間が予約枠になり、定休日には予約できなくなります。",
+      "submitLabel": "ボタンのテキスト",
+      "submitPlaceholder": "予約をリクエスト",
+      "successLabel": "送信後のお礼メッセージ",
+      "successPlaceholder": "ありがとうございます！折り返しご連絡いたします。",
+      "inboxNote": "リクエストは受信箱に届きます。サイト一覧またはエディターの上部バーから開けます。",
+      "openInbox": "受信箱を開く"
+    },
+    "video": {
+      "title": "動画",
+      "urlLabel": "動画のリンク",
+      "urlHelp": "YouTube（ショートを含む）、Vimeo、TikTokに対応しています。",
+      "unsupported": "YouTube、Vimeo、TikTokの動画リンクを貼り付けてください。",
+      "providers": {
+        "youtube": "YouTube動画",
+        "vimeo": "Vimeo動画",
+        "tiktok": "TikTok動画"
+      },
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "例：店内のご紹介",
+      "captionLabel": "キャプション"
+    },
+    "testimonials": {
+      "title": "お客様の声",
+      "count": "{n}件のレビュー | {n}件のレビュー",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "お客様の声",
+      "quotePlaceholder": "どんな感想でしたか？",
+      "authorPlaceholder": "名前",
+      "detailPlaceholder": "例：Googleのレビュー",
+      "add": "レビューを追加",
+      "stars": "星{n}つ | 星{n}つ"
+    },
+    "preview": {
+      "empty": "{name} — まだ表示する内容がありません"
+    },
+    "products": {
+      "title": "商品",
+      "itemCount": "{n}件の商品 | {n}件の商品",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "商品、ショップ、コレクション...",
+      "layout": "レイアウト",
+      "layouts": {
+        "grid": "グリッド",
+        "list": "リスト"
+      },
+      "ordering": "ページで注文を受け付ける",
+      "orderingHelp": "ストアのリンクがない商品には注文ボタンが付きます。注文は受信箱に届きます。",
+      "askAddress": "配送先住所を入力してもらう",
+      "payment": "支払い方法",
+      "payments": {
+        "both": "代金引換と銀行振込",
+        "cod": "代金引換のみ",
+        "transfer": "銀行振込のみ"
+      },
+      "needBank": "お客様が振込で支払えるよう、銀行口座を設定したVietQRブロックを追加してください（QRに金額と注文番号が自動で入ります）。",
+      "photo": "商品写真",
+      "photoFailed": "写真をアップロードできませんでした",
+      "namePlaceholder": "商品名",
+      "price": "価格",
+      "comparePrice": "通常価格（セール中の場合）",
+      "descriptionPlaceholder": "短い説明（任意）",
+      "urlPlaceholder": "Shopee、TikTok Shop、Lazadaなどのリンク（任意）",
+      "urlHelp": "ストアのリンクを貼り付けると、お客様はそこで購入します。",
+      "urlHelpOrder": "空欄にするとページで注文を受け付けます。ストアのリンクを貼り付けると、お客様はそこで購入します。",
+      "urlHelpStore": "お客様が「購入」をタップすると{store}へ移動します。",
+      "website": "あなたのウェブサイト",
+      "tagPlaceholder": "ラベル（例：人気No.1）",
+      "soldOut": "売り切れ",
+      "moveUp": "上へ移動",
+      "moveDown": "下へ移動",
+      "add": "商品を追加",
+      "choices": "選択肢と在庫",
+      "stock": "在庫",
+      "stockPlaceholder": "管理しない",
+      "stockHelp": "空欄にすると在庫を管理しません。5以下で「残り3点」のように表示され、0で売り切れになります。",
+      "stockCount": "在庫{n}点",
+      "optionName": "サイズ",
+      "optionValues": "S, M, L（カンマ区切り）",
+      "addSize": "サイズ",
+      "addColour": "カラー",
+      "addOption": "その他の選択肢",
+      "choicePrice": "選択肢ごとの価格",
+      "choicePriceAdd": "選択肢ごとに価格を変える",
+      "choicePricePlaceholder": "商品と同じ",
+      "choicePriceHint": "空欄にすると商品の価格のままです。カードには「…から」と表示され、選択後に正確な価格が表示されます。",
+      "sizeName": "サイズ",
+      "colourName": "カラー",
+      "colourValues": "ブラック, ホワイト, ベージュ"
+    },
+    "blog": {
+      "title": "最新の投稿",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "例：ブログより",
+      "countLabel": "表示する投稿数",
+      "hint": "投稿はブログタブで書けます。",
+      "empty": "公開済みの投稿はまだありません。ブログタブで書いてみましょう。"
+    },
+    "timeline": {
+      "title": "タイムライン",
+      "count": "{n}ステップ | {n}ステップ",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "私たちのストーリー",
+      "datePlaceholder": "2023年2月",
+      "itemTitlePlaceholder": "出来事",
+      "textPlaceholder": "ひとこと（任意）",
+      "photo": "写真",
+      "photoHint": "写真を追加（任意）",
+      "removePhoto": "写真を削除",
+      "photoFailed": "写真をアップロードできませんでした",
+      "add": "ステップを追加",
+      "moveUp": "上へ移動",
+      "moveDown": "下へ移動"
+    },
+    "letter": {
+      "title": "手紙",
+      "to": "宛先",
+      "toPlaceholder": "ゆうとへ",
+      "body": "本文",
+      "bodyPlaceholder": "伝えたいことを書きましょう…",
+      "from": "署名",
+      "fromPlaceholder": "愛をこめて、みお",
+      "paper": "便箋",
+      "papers": {
+        "cream": "クリーム",
+        "blush": "ピンク",
+        "night": "ナイト"
+      },
+      "sealed": "封筒に入れる",
+      "sealedHint": "訪問者が封筒をタップすると手紙が開きます。",
+      "personal": "リンクからゲスト名を表示",
+      "personalHint": "ゲストごとに専用リンクを送ると、封筒に名前が表示されます。",
+      "guestPlaceholder": "ゲストの名前",
+      "copyLink": "リンクをコピー",
+      "linkCopied": "リンクをコピーしました",
+      "cover": "封筒の表書き",
+      "coverHelp": "空欄の場合は「…へ」と表示されます。",
+      "coverPlaceholder": "会いたくなったら開けてね",
+      "guestList": "ゲストリスト：一人ずつ専用リンク、開封した人がわかります"
+    },
+    "event": {
+      "title": "イベント詳細",
+      "name": "イベント名",
+      "namePlaceholder": "結婚披露宴",
+      "date": "日付",
+      "startTime": "開始",
+      "endTime": "終了",
+      "venue": "会場",
+      "venuePlaceholder": "ローズガーデンホテル",
+      "address": "住所",
+      "addressHelp": "地図のリンクがない場合、経路案内に使われます。",
+      "addressPlaceholder": "東京都港区湖畔通り8",
+      "mapUrl": "地図のリンク（任意）",
+      "dressCode": "ドレスコード",
+      "dressCodePlaceholder": "パステルカラー",
+      "note": "備考",
+      "notePlaceholder": "地下に駐車場があります",
+      "calendarNote": "ゲストはGoogleカレンダー、Appleカレンダー、Outlookに保存でき、ワンタップで経路を開けます。"
+    },
+    "question": {
+      "title": "質問",
+      "question": "質問",
+      "questionPlaceholder": "私のバレンタインになってくれる？",
+      "yesLabel": "「はい」ボタン",
+      "yesPlaceholder": "はい",
+      "noLabel": "「いいえ」ボタン",
+      "noPlaceholder": "いいえ",
+      "answer": "「はい」の後",
+      "answerPlaceholder": "やっぱりね！7時に会おう ❤️",
+      "playful": "「いいえ」ボタンが逃げる",
+      "playfulHint": "指から逃げていき、そのたびに「はい」が大きくなります。",
+      "idea1": "私のバレンタインになってくれる？",
+      "idea2": "結婚してくれますか？",
+      "idea3": "許してくれる？",
+      "idea4": "今週の土曜日、一緒にディナーはどう？"
+    }
+  }
+}

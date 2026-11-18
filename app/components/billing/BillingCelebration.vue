@@ -46,8 +46,11 @@
 
 <script setup lang="ts">
 import type { PlanId } from '#shared/plans'
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 
 const { t, locale } = useI18n()
+// Dates in the dashboard language (English as day-month, like the rest of the app)
+const intlLocale = computed(() => { const lang = toAppLanguage(locale.value); return lang === 'en' ? 'en-GB' : LANGUAGE_INFO[lang].intl })
 const { loggedIn } = useUserSession()
 const { info, ensure, refresh } = useBilling()
 
@@ -57,7 +60,7 @@ const shown = ref<{ paymentId: string; plan: PlanId } | null>(null)
 
 const planName = computed(() => (shown.value ? t(`dashboard.billing.plans.${shown.value.plan}.name`) : ''))
 const features = computed(() => (shown.value ? planFeatures(shown.value.plan, t) : []))
-const formatDate = (iso: string) => new Date(iso).toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB')
+const formatDate = (iso: string) => new Date(iso).toLocaleDateString(intlLocale.value)
 
 // Show it when the billing info says there's one to celebrate
 watch(() => info.value?.celebrate?.paymentId, (id) => {

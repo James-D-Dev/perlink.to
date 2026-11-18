@@ -221,6 +221,7 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 definePageMeta({
   colorMode: 'light',
   layout: 'admin',
@@ -351,7 +352,7 @@ async function setStatus(item: Submission, status: OrderStatus) {
   }
 }
 
-const dateLocale = computed(() => (locale.value === 'vi' ? 'vi-VN' : 'en-GB'))
+const dateLocale = computed(() => (toAppLanguage(locale.value) === 'en' ? 'en-GB' : LANGUAGE_INFO[toAppLanguage(locale.value)].intl))
 
 // Stored as UTC "YYYY-MM-DD HH:MM:SS"
 function formatWhen(value: string) {

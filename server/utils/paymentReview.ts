@@ -100,7 +100,10 @@ export async function isAdminChat(event: H3Event, chatId: string) {
   return (await adminChatId(event)) === chatId
 }
 
-// What the reviewer and the payer read, in their own language (English by default)
+/** The reviewer (superadmin) reads English or Vietnamese */
+export type AdminLanguage = 'en' | 'vi'
+
+// What the reviewer reads, in their language (English by default)
 export const REVIEW_COPY = {
   en: {
     period: { monthly: '1 month', annual: '1 year' } as Record<BillingPeriod, string>,
@@ -113,9 +116,6 @@ export const REVIEW_COPY = {
     approved: (plan: string, until: string) => `✅ <b>Approved</b> · ${plan} until ${until}`,
     rejected: '✖ <b>Rejected</b>',
     answers: { unknown: 'Unknown request', notAdmin: 'Only the superadmin can review', notFound: 'Payment not found', alreadyPaid: 'Already approved', failed: 'Couldn’t approve', approved: 'Upgraded ✅', rejected: 'Rejected', decided: 'This payment was already decided' },
-    payerApproved: (plan: string, until: string) => `✅ <b>Your ${plan} plan is on</b>${until ? ` until ${until}` : ''}. Thank you!`,
-    payerRejected: (code: string, plan: string) => `⚠️ <b>We couldn’t confirm payment ${code}</b> (${plan} plan). If you did pay, contact support with this code and we’ll check again.`,
-    openPerlink: 'Open Perlink', seePayment: 'See the payment',
     dateLocale: 'en-GB',
   },
   vi: {
@@ -129,21 +129,52 @@ export const REVIEW_COPY = {
     approved: (plan: string, until: string) => `✅ <b>Đã duyệt</b> · gói ${plan} tới ${until}`,
     rejected: '✖ <b>Đã từ chối</b>',
     answers: { unknown: 'Không hiểu yêu cầu', notAdmin: 'Chỉ superadmin được duyệt', notFound: 'Không tìm thấy thanh toán', alreadyPaid: 'Đã duyệt trước đó', failed: 'Không duyệt được', approved: 'Đã nâng cấp ✅', rejected: 'Đã từ chối', decided: 'Thanh toán này đã được xử lý' },
-    payerApproved: (plan: string, until: string) => `✅ <b>Gói ${plan} đã được bật</b>${until ? ` đến ${until}` : ''}. Cảm ơn bạn!`,
-    payerRejected: (code: string, plan: string) => `⚠️ <b>Chưa xác nhận được thanh toán ${code}</b> (gói ${plan}). Nếu bạn đã chuyển tiền, hãy liên hệ hỗ trợ kèm mã này để được kiểm tra lại.`,
+    dateLocale: 'vi-VN',
+  },
+} satisfies Record<AdminLanguage, unknown>
+
+// What the payer reads, in their own language (English by default)
+const PAYER_COPY = {
+  en: {
+    approved: (plan: string, until: string) => `✅ <b>Your ${plan} plan is on</b>${until ? ` until ${until}` : ''}. Thank you!`,
+    rejected: (code: string, plan: string) => `⚠️ <b>We couldn’t confirm payment ${code}</b> (${plan} plan). If you did pay, contact support with this code and we’ll check again.`,
+    openPerlink: 'Open Perlink', seePayment: 'See the payment',
+    dateLocale: 'en-GB',
+  },
+  vi: {
+    approved: (plan: string, until: string) => `✅ <b>Gói ${plan} đã được bật</b>${until ? ` đến ${until}` : ''}. Cảm ơn bạn!`,
+    rejected: (code: string, plan: string) => `⚠️ <b>Chưa xác nhận được thanh toán ${code}</b> (gói ${plan}). Nếu bạn đã chuyển tiền, hãy liên hệ hỗ trợ kèm mã này để được kiểm tra lại.`,
     openPerlink: 'Mở Perlink', seePayment: 'Xem thanh toán',
     dateLocale: 'vi-VN',
   },
+  zh: {
+    approved: (plan: string, until: string) => `✅ <b>你的 ${plan} 套餐已开通</b>${until ? `，有效期至 ${until}` : ''}。感谢你的支持！`,
+    rejected: (code: string, plan: string) => `⚠️ <b>我们暂时无法确认付款 ${code}</b>（${plan} 套餐）。如果你已付款，请带上这个编号联系客服，我们会再次核实。`,
+    openPerlink: '打开 Perlink', seePayment: '查看付款',
+    dateLocale: 'zh-CN',
+  },
+  ja: {
+    approved: (plan: string, until: string) => `✅ <b>${plan} プランが有効になりました</b>${until ? `（${until} まで）` : ''}。ありがとうございます！`,
+    rejected: (code: string, plan: string) => `⚠️ <b>お支払い ${code} を確認できませんでした</b>（${plan} プラン）。お支払い済みの場合は、このコードを添えてサポートまでご連絡ください。改めて確認いたします。`,
+    openPerlink: 'Perlink を開く', seePayment: 'お支払いを確認する',
+    dateLocale: 'ja-JP',
+  },
+  ko: {
+    approved: (plan: string, until: string) => `✅ <b>${plan} 플랜이 활성화되었어요</b>${until ? ` (${until}까지)` : ''}. 감사합니다!`,
+    rejected: (code: string, plan: string) => `⚠️ <b>결제를 확인하지 못했어요</b> (코드 ${code}, ${plan} 플랜). 결제하셨다면 이 코드와 함께 고객지원에 문의해 주세요. 다시 확인해 드릴게요.`,
+    openPerlink: 'Perlink 열기', seePayment: '결제 내역 보기',
+    dateLocale: 'ko-KR',
+  },
 } satisfies Record<AppLanguage, unknown>
 
-/** The superadmin's language (their account setting), English by default */
-export async function adminLanguage(event: H3Event): Promise<AppLanguage> {
+/** The superadmin's language (their account setting): Vietnamese if they chose it, English otherwise */
+export async function adminLanguage(event: H3Event): Promise<AdminLanguage> {
   const row = await getDB(event).prepare('SELECT language FROM profiles WHERE email = ?').bind(SUPERADMIN_EMAIL).first<{ language: string | null }>().catch(() => null)
-  return toAppLanguage(row?.language)
+  return toAppLanguage(row?.language) === 'vi' ? 'vi' : 'en'
 }
 
 /** The review message: who, which plan, how much, and how to check it */
-export function paymentSummary(payment: PaymentRow, lang: AppLanguage = 'en') {
+export function paymentSummary(payment: PaymentRow, lang: AdminLanguage = 'en') {
   const c = REVIEW_COPY[lang]
   const lines = [
     `${c.title} · ${c.method[payment.method]}`,
@@ -196,11 +227,11 @@ export async function notifyPaymentSubmitted(event: H3Event, payment: PaymentRow
 export async function notifyPayer(event: H3Event, payment: PaymentRow, approved: boolean, expiresAt?: string) {
   const row = await getDB(event).prepare('SELECT telegram_chat_id, language FROM profiles WHERE id = ?').bind(payment.user_id).first<{ telegram_chat_id: string | null; language: string | null }>()
   if (!row?.telegram_chat_id) return
-  const c = REVIEW_COPY[toAppLanguage(row.language)]
+  const c = PAYER_COPY[toAppLanguage(row.language)]
   const siteUrl = useRuntimeConfig(event).public.siteUrl
   const plan = payment.plan.toUpperCase()
   const until = expiresAt ? new Date(expiresAt).toLocaleDateString(c.dateLocale) : ''
-  const html = approved ? c.payerApproved(plan, until) : c.payerRejected(payment.code, plan)
+  const html = approved ? c.approved(plan, until) : c.rejected(payment.code, plan)
   await sendTelegram(event, row.telegram_chat_id, html, [{ text: approved ? c.openPerlink : c.seePayment, url: `${siteUrl}/dashboard/upgrade` }])
 }
 

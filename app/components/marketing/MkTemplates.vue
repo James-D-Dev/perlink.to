@@ -5,7 +5,7 @@
         <p class="mk-eyebrow mb-4">{{ text.eyebrow }}</p>
         <h1 class="mk-display text-[40px] sm:text-6xl">{{ text.title }}</h1>
         <p class="mt-5 text-lg text-ink-muted">{{ text.intro }}</p>
-        <NuxtLink :to="lang === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio'" class="mt-4 inline-block text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink">{{ text.portfolioLink }}</NuxtLink>
+        <NuxtLink :to="local('/3d-portfolio')" class="mt-4 inline-block text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink">{{ text.portfolioLink }}</NuxtLink>
       </div>
 
       <!-- Categories -->
@@ -56,27 +56,30 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, type AppLanguage } from '#shared/language'
+import { alternateLinks } from '~/data/langPaths'
 import { PAGE_TEMPLATES, TEMPLATE_CATEGORIES, type PageTemplate, type TemplateCategory } from '~/data/pageTemplates'
 
 // The template gallery, an address per language (/templates, /vi/templates)
 // so each renders the same for search engines
-const { lang, copy } = useMarketingLang()
+const { lang, copy, local } = useMarketingLang()
 
-const TEXT = {
-  en: {
-    eyebrow: 'Templates',
-    title: 'Free website & link in bio templates',
-    intro: 'Real pages with sample content, a matching theme and a matching 3D room. Pick one for your portfolio, restaurant, shop or creator page, then make it yours.',
-    metaTitle: 'Free Website & Link in Bio Templates | Perlink',
-    metaDescription: 'Browse free templates for link in bio pages and personal websites: portfolios, restaurant menus, hotels, cafés, shops and creators, each with a 3D room.',
-    filter: 'Filter templates',
-    all: 'All',
-    use: 'Use template',
-    preview: 'Preview',
-    portfolioLink: 'Making a portfolio? See 3D portfolio websites',
-    ctaTitle: 'Ready to make it yours?',
-    ctaText: 'Claim your name and start from any template.',
-  },
+const TEXT_EN = {
+  eyebrow: 'Templates',
+  title: 'Free website & link in bio templates',
+  intro: 'Real pages with sample content, a matching theme and a matching 3D room. Pick one for your portfolio, restaurant, shop or creator page, then make it yours.',
+  metaTitle: 'Free Website & Link in Bio Templates | Perlink',
+  metaDescription: 'Browse free templates for link in bio pages and personal websites: portfolios, restaurant menus, hotels, cafés, shops and creators, each with a 3D room.',
+  filter: 'Filter templates',
+  all: 'All',
+  use: 'Use template',
+  preview: 'Preview',
+  portfolioLink: 'Making a portfolio? See 3D portfolio websites',
+  ctaTitle: 'Ready to make it yours?',
+  ctaText: 'Claim your name and start from any template.',
+}
+const TEXT: Record<AppLanguage, typeof TEXT_EN> = {
+  en: TEXT_EN,
   vi: {
     eyebrow: 'Mẫu',
     title: 'Mẫu trang web & link bio miễn phí',
@@ -91,11 +94,71 @@ const TEXT = {
     ctaTitle: 'Sẵn sàng làm trang của bạn?',
     ctaText: 'Giữ tên của bạn và bắt đầu từ bất kỳ mẫu nào.',
   },
+  zh: {
+    eyebrow: '模板',
+    title: '免费个人网站与链接主页模板',
+    intro: '真实页面，自带示例内容、配套主题和配套的 3D 房间。为你的作品集、餐厅、店铺或创作者主页挑一个，再改成你的样子。',
+    metaTitle: '免费个人网站与链接主页模板 | Perlink',
+    metaDescription: '免费的链接主页和个人网站模板：作品集、餐厅菜单、酒店、咖啡馆、网店和创作者主页，每个模板都配有 3D 房间。',
+    filter: '筛选模板',
+    all: '全部',
+    use: '使用模板',
+    preview: '预览',
+    portfolioLink: '要做作品集？看看 3D 作品集网站',
+    ctaTitle: '准备好打造你的页面了吗？',
+    ctaText: '抢占你的名字，从任意模板开始。',
+  },
+  ja: {
+    eyebrow: 'テンプレート',
+    title: '無料の個人サイト・リンクまとめテンプレート',
+    intro: 'サンプル内容、合うテーマ、合う3Dルームがそろった本物のページです。ポートフォリオ、レストラン、ショップ、クリエイターのページに合うものを選んで、自分らしく仕上げましょう。',
+    metaTitle: '無料の個人サイト・リンクまとめテンプレート | Perlink',
+    metaDescription: 'プロフィールリンクや個人サイトの無料テンプレート集。ポートフォリオ、飲食店、ホテル、カフェ、ショップ、クリエイター向け。どれも3Dルーム付き。',
+    filter: 'テンプレートを絞り込む',
+    all: 'すべて',
+    use: 'テンプレートを使う',
+    preview: 'プレビュー',
+    portfolioLink: 'ポートフォリオを作るなら、3Dポートフォリオサイトへ',
+    ctaTitle: '自分らしいページをつくりませんか？',
+    ctaText: '名前を取得して、好きなテンプレートから始めましょう。',
+  },
+  ko: {
+    eyebrow: '템플릿',
+    title: '무료 홈페이지 & 링크 인 바이오 템플릿',
+    intro: '샘플 콘텐츠, 어울리는 테마, 어울리는 3D 룸이 갖춰진 실제 페이지예요. 포트폴리오, 레스토랑, 쇼핑몰, 크리에이터 페이지에 맞는 템플릿을 골라 내 것으로 만들어 보세요.',
+    metaTitle: '무료 홈페이지 · 링크 인 바이오 템플릿 | Perlink',
+    metaDescription: '프로필 링크와 개인 홈페이지 무료 템플릿: 포트폴리오, 레스토랑 메뉴, 숙소, 카페, 쇼핑몰, 크리에이터. 모두 3D 룸 포함.',
+    filter: '템플릿 필터',
+    all: '전체',
+    use: '템플릿 사용',
+    preview: '미리 보기',
+    portfolioLink: '포트폴리오를 만드나요? 3D 포트폴리오 사이트 보기',
+    ctaTitle: '이제 내 것으로 만들어 볼까요?',
+    ctaText: '이름을 선점하고 원하는 템플릿에서 시작하세요.',
+  },
 }
-const CATEGORY_VI: Record<TemplateCategory, string> = {
-  gifts: 'Quà tặng', blog: 'Blog', personal: 'Cá nhân', food: 'Ăn uống', beauty: 'Làm đẹp', health: 'Sức khoẻ',
-  shop: 'Cửa hàng', education: 'Giáo dục', hospitality: 'Khách sạn & du lịch', business: 'Doanh nghiệp',
-  creative: 'Sáng tạo', events: 'Sự kiện', community: 'Cộng đồng',
+// Category names per language (English ones come from TEMPLATE_CATEGORIES)
+const CATEGORY_LABELS: Record<Exclude<AppLanguage, 'en'>, Record<TemplateCategory, string>> = {
+  vi: {
+    gifts: 'Quà tặng', blog: 'Blog', personal: 'Cá nhân', food: 'Ăn uống', beauty: 'Làm đẹp', health: 'Sức khoẻ',
+    shop: 'Cửa hàng', education: 'Giáo dục', hospitality: 'Khách sạn & du lịch', business: 'Doanh nghiệp',
+    creative: 'Sáng tạo', events: 'Sự kiện', community: 'Cộng đồng',
+  },
+  zh: {
+    gifts: '礼物', blog: '博客', personal: '个人', food: '餐饮', beauty: '美容美发', health: '健康健身',
+    shop: '店铺', education: '教育', hospitality: '酒店与旅行', business: '商务',
+    creative: '创意', events: '活动', community: '社群公益',
+  },
+  ja: {
+    gifts: 'ギフト', blog: 'ブログ', personal: '個人', food: '飲食', beauty: '美容', health: '健康・フィットネス',
+    shop: 'ショップ', education: '教育', hospitality: 'ホテル・旅行', business: 'ビジネス',
+    creative: 'クリエイティブ', events: 'イベント', community: 'コミュニティ',
+  },
+  ko: {
+    gifts: '선물', blog: '블로그', personal: '개인', food: '음식 & 음료', beauty: '뷰티', health: '건강 & 피트니스',
+    shop: '쇼핑', education: '교육', hospitality: '숙소 & 여행', business: '비즈니스',
+    creative: '크리에이티브', events: '이벤트', community: '커뮤니티',
+  },
 }
 const text = computed(() => TEXT[lang.value])
 
@@ -106,14 +169,14 @@ const descriptionOf = (template: PageTemplate) => copy.value.templates.names[tem
 const filters = computed(() => [
   { id: 'all' as const, label: text.value.all },
   ...TEMPLATE_CATEGORIES.filter(c => PAGE_TEMPLATES.some(t => t.category === c.id))
-    .map(c => ({ id: c.id, label: lang.value === 'vi' ? CATEGORY_VI[c.id] : c.label })),
+    .map(c => ({ id: c.id, label: lang.value === 'en' ? c.label : CATEGORY_LABELS[lang.value][c.id] })),
 ])
 const filter = ref<TemplateCategory | 'all'>('all')
 const shown = computed(() => (filter.value === 'all' ? PAGE_TEMPLATES : PAGE_TEMPLATES.filter(t => t.category === filter.value)))
 
 // ---------- SEO ----------
 const SITE = 'https://perlink.to'
-const pageUrl = computed(() => `${SITE}${lang.value === 'vi' ? '/vi/templates' : '/templates'}`)
+const pageUrl = computed(() => `${SITE}${local('/templates')}`)
 useSeoMeta({
   title: () => text.value.metaTitle,
   description: () => text.value.metaDescription,
@@ -127,12 +190,10 @@ useSeoMeta({
   twitterSite: X_HANDLE,
 })
 useHead({
-  htmlAttrs: { lang: () => lang.value },
+  htmlAttrs: { lang: () => LANGUAGE_INFO[lang.value].html },
   link: () => [
     { rel: 'canonical', href: pageUrl.value },
-    { rel: 'alternate', hreflang: 'en', href: `${SITE}/templates` },
-    { rel: 'alternate', hreflang: 'vi', href: `${SITE}/vi/templates` },
-    { rel: 'alternate', hreflang: 'x-default', href: `${SITE}/templates` },
+    ...alternateLinks('/templates'),
   ],
   script: () => [{
     type: 'application/ld+json',
@@ -142,7 +203,7 @@ useHead({
       name: text.value.metaTitle,
       description: text.value.metaDescription,
       url: pageUrl.value,
-      inLanguage: lang.value,
+      inLanguage: LANGUAGE_INFO[lang.value].html,
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: PAGE_TEMPLATES.map((template, i) => ({
@@ -157,8 +218,8 @@ useHead({
 })
 
 // The rest of the page in the same language
-const { setLocale } = useI18n()
+const { locale, setLocale } = useI18n()
 onMounted(() => {
-  if (lang.value === 'vi') setLocale('vi')
+  if (lang.value !== 'en' && locale.value !== lang.value) setLocale(lang.value)
 })
 </script>

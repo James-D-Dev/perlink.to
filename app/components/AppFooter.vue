@@ -38,14 +38,14 @@ import { USE_CASES } from '~/data/useCases'
 
 const year = new Date().getFullYear()
 
-const { copy, anchor, lang } = useMarketingLang()
+const { copy, anchor, lang, local } = useMarketingLang()
 const columns = computed(() => {
   const f = copy.value.footer
   return [
     {
       title: f.product,
       links: [
-        { label: f.templates, to: lang.value === 'vi' ? '/vi/templates' : '/templates' },
+        { label: f.templates, to: local('/templates') },
         { label: f.worlds, to: anchor('3d') },
         { label: f.trends, to: '/trends' },
         { label: f.pricing, to: '/pricing' },
@@ -55,17 +55,17 @@ const columns = computed(() => {
       title: f.resources,
       links: [
         { label: f.start, to: '/login' },
-        { label: f.portfolio3d, to: lang.value === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio' },
+        { label: f.portfolio3d, to: local('/3d-portfolio') },
         { label: f.roomPacks, to: '/3d-room-packs' },
         { label: f.faq, to: anchor('faq') },
-        { label: f.affiliates, to: lang.value === 'vi' ? '/vi/cong-tac-vien' : '/affiliates' },
-        ...GUIDES.map(guide => ({ label: guide[lang.value].title, to: guide.path[lang.value] })),
-        { label: f.about, to: lang.value === 'vi' ? ABOUT_PAIR[1] : ABOUT_PAIR[0] },
+        { label: f.affiliates, to: local('/affiliates') },
+        ...GUIDES.map(guide => ({ label: guide[lang.value].title, to: local(guide.path.en) })),
+        { label: f.about, to: local(ABOUT_PAIR[0]) },
       ],
     },
     {
       title: f.make,
-      links: USE_CASES.map(item => ({ label: item[lang.value].label, to: item.path[lang.value] })),
+      links: USE_CASES.map(item => ({ label: item[lang.value].label, to: local(item.path.en) })),
     },
     {
       title: f.legal,

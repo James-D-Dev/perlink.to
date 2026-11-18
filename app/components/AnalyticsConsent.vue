@@ -39,10 +39,12 @@
 </template>
 
 <script setup lang="ts">
+import type { LegalLang } from '~/data/legal/types'
+
 const { consent, measured, setConsent } = useAnalytics()
 const lang = useLegalLang()
 
-const COPY = {
+const COPY: Record<LegalLang, { title: string; text: string; more: string; decline: string; accept: string }> = {
   en: {
     title: 'Cookies for analytics',
     text: 'With your OK, Google Analytics cookies help us see how people find and use Perlink. No ads, and people’s sites are never tracked.',
@@ -56,6 +58,27 @@ const COPY = {
     more: 'Thông báo cookie',
     decline: 'Không, cảm ơn',
     accept: 'Đồng ý',
+  },
+  zh: {
+    title: '分析类 Cookie',
+    text: '经您同意后，Google Analytics Cookie 可帮助我们了解用户如何找到并使用 Perlink。我们不投放广告，也绝不追踪用户的网站。',
+    more: 'Cookie 声明',
+    decline: '不用了，谢谢',
+    accept: '允许',
+  },
+  ja: {
+    title: 'アクセス解析用 Cookie',
+    text: 'ご同意いただける場合、Google Analytics の Cookie を使って、Perlink がどのように見つけられ、利用されているかを把握します。広告は表示せず、ユーザーのサイトを追跡することもありません。',
+    more: 'Cookieに関するお知らせ',
+    decline: '同意しない',
+    accept: '許可する',
+  },
+  ko: {
+    title: '분석 쿠키',
+    text: '동의하시면 Google Analytics 쿠키를 통해 사람들이 Perlink를 어떻게 찾고 이용하는지 파악합니다. 광고는 없으며, 사용자의 사이트는 절대 추적하지 않습니다.',
+    more: '쿠키 안내',
+    decline: '거부',
+    accept: '허용',
   },
 }
 const copy = computed(() => COPY[lang.value])

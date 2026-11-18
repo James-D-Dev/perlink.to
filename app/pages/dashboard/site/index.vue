@@ -199,6 +199,7 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from "#shared/language";
 definePageMeta({
   colorMode: 'light',
   layout: "admin",
@@ -284,7 +285,7 @@ const weekChange = computed(() =>
 const weekdayLabel = (i: number) => {
   const day = bioPages.value[0]?.visits?.days?.[i];
   if (!day) return "";
-  return new Date(`${day}T12:00:00Z`).toLocaleDateString(locale.value === "vi" ? "vi-VN" : "en-GB", { weekday: "narrow" });
+  return new Date(`${day}T12:00:00Z`).toLocaleDateString(toAppLanguage(locale.value) === "en" ? "en-GB" : LANGUAGE_INFO[toAppLanguage(locale.value)].intl, { weekday: "narrow" });
 };
 
 const unreadSite = computed(() => bioPages.value.find((b) => b.unreadRequests > 0) ?? null);

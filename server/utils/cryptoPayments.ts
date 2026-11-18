@@ -1,5 +1,4 @@
 import { CRYPTO_NETWORK_BY_ID, type CryptoToken } from '#shared/crypto'
-import type { AppLanguage } from '#shared/language'
 
 // Reads a stablecoin payment back from the chain, so the reviewer sees at a
 // glance whether it's real: the transaction succeeded, moved USDT/USDC on
@@ -92,8 +91,8 @@ const CHECK_COPY = {
   },
 }
 
-/** One line for the reviewer, in their language */
-export function describeCheck(check: CryptoCheck | null, expectedUsd: number, lang: AppLanguage = 'en') {
+/** One line for the reviewer (superadmin), in English or Vietnamese */
+export function describeCheck(check: CryptoCheck | null, expectedUsd: number, lang: 'en' | 'vi' = 'en') {
   if (!check) return '—'
   const copy = CHECK_COPY[lang]
   const amount = check.received !== undefined ? `$${check.received.toFixed(2)} ${check.token ?? ''}`.trim() : ''

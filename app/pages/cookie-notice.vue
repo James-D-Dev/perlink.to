@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { COOKIES } from '~/data/legal/cookies'
+import type { LegalLang } from '~/data/legal/types'
 
 definePageMeta({ layout: 'default', colorMode: 'light' })
 const lang = useLegalLang()
@@ -38,9 +39,12 @@ const doc = computed(() => COOKIES[lang.value])
 const { consent, setConsent } = useAnalytics()
 const allowed = computed(() => consent.value === 'granted')
 
-const COPY = {
+const COPY: Record<LegalLang, { title: string; on: string; off: string; turnOn: string; turnOff: string }> = {
   en: { title: 'Analytics cookies', on: 'On: Google Analytics may set cookies on Perlink’s pages.', off: 'Off: no analytics cookies are set.', turnOn: 'Allow', turnOff: 'Turn off' },
   vi: { title: 'Cookie thống kê', on: 'Đang bật: Google Analytics có thể đặt cookie trên trang của Perlink.', off: 'Đang tắt: không đặt cookie thống kê.', turnOn: 'Cho phép', turnOff: 'Tắt' },
+  zh: { title: '分析类 Cookie', on: '已开启：Google Analytics 可能会在 Perlink 的页面上设置 Cookie。', off: '已关闭：不会设置分析类 Cookie。', turnOn: '允许', turnOff: '关闭' },
+  ja: { title: 'アクセス解析用 Cookie', on: 'オン：Google Analytics が Perlink のページで Cookie を設定することがあります。', off: 'オフ：アクセス解析用の Cookie は設定されません。', turnOn: '許可する', turnOff: 'オフにする' },
+  ko: { title: '분석 쿠키', on: '사용 중: Google Analytics가 Perlink 페이지에 쿠키를 설정할 수 있습니다.', off: '사용 안 함: 분석 쿠키를 설정하지 않습니다.', turnOn: '허용', turnOff: '끄기' },
 }
 const copy = computed(() => COPY[lang.value])
 </script>

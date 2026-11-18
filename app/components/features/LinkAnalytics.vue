@@ -103,6 +103,8 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from "#shared/language";
+
 interface BreakdownItem {
   name: string;
   clicks: number;
@@ -128,8 +130,11 @@ const periods = computed(() => [
   { label: t("analytics.overview.periods.d90"), value: "90d" },
 ]);
 
-// Dashboard locale → Intl locale ("23 Oct" / "23 thg 10")
-const intlLocale = computed(() => (locale.value === "vi" ? "vi-VN" : "en-GB"));
+// Dashboard locale → Intl locale ("23 Oct" / "23 thg 10" / "10月23日")
+const intlLocale = computed(() => {
+  const lang = toAppLanguage(locale.value);
+  return lang === "en" ? "en-GB" : LANGUAGE_INFO[lang].intl;
+});
 
 const period = ref("7d");
 

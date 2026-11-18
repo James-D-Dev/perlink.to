@@ -146,7 +146,7 @@
       </ol>
       <div class="mt-10 flex flex-wrap gap-3">
         <MarketingMkButton to="/login" trailing-icon="i-lucide-arrow-right">{{ text.cta }}</MarketingMkButton>
-        <MarketingMkButton :to="lang === 'vi' ? '/vi/templates' : '/templates'" variant="outline">{{ text.templates }}</MarketingMkButton>
+        <MarketingMkButton :to="local('/templates')" variant="outline">{{ text.templates }}</MarketingMkButton>
       </div>
     </MarketingMkSection>
 
@@ -254,6 +254,8 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, type AppLanguage } from '#shared/language'
+import { alternateLinks } from '~/data/langPaths'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
 import { PORTFOLIO_BASE, PORTFOLIO_SLUGS, type PortfolioTopicId } from '~/data/portfolio3d/paths'
 
@@ -261,9 +263,11 @@ import { PORTFOLIO_BASE, PORTFOLIO_SLUGS, type PortfolioTopicId } from '~/data/p
 // /vi/portfolio-3d). What a 3D portfolio is, a live room to try, who it suits
 // (each with its own page under this one), templates, the full how-to and
 // questions. The pages under it go deeper on one search each.
-const { lang, copy } = useMarketingLang()
+const { lang, copy, local } = useMarketingLang()
 
-const topicLink = (id: PortfolioTopicId) => `${PORTFOLIO_BASE[lang.value]}/${PORTFOLIO_SLUGS[id][lang.value]}`
+// Topic pages exist in English and Vietnamese; other languages link to the English one
+const topicLang = computed(() => (lang.value === 'vi' ? 'vi' : 'en'))
+const topicLink = (id: PortfolioTopicId) => `${PORTFOLIO_BASE[topicLang.value]}/${PORTFOLIO_SLUGS[id][topicLang.value]}`
 
 const portfolioTemplate = PAGE_TEMPLATES.find(item => item.id === 'personal')!
 // One or two per kind of work, labelled
@@ -276,7 +280,10 @@ const TEMPLATE_PICKS: [id: string, kind: 'designer' | 'developer' | 'photographe
 const KIND_LABELS = {
   en: { designer: 'Designer', developer: 'Developer', photographer: 'Photographer', architect: 'Architect', student: 'Student', anyone: 'Anyone' },
   vi: { designer: 'Designer', developer: 'Lập trình viên', photographer: 'Nhiếp ảnh', architect: 'Kiến trúc', student: 'Sinh viên', anyone: 'Mọi người' },
-}
+  zh: { designer: '设计师', developer: '开发者', photographer: '摄影师', architect: '建筑师', student: '学生', anyone: '所有人' },
+  ja: { designer: 'デザイナー', developer: '開発者', photographer: '写真家', architect: '建築', student: '学生', anyone: 'どなたでも' },
+  ko: { designer: '디자이너', developer: '개발자', photographer: '사진작가', architect: '건축가', student: '학생', anyone: '누구나' },
+} satisfies Record<AppLanguage, Record<string, string>>
 const portfolioTemplates = computed(() => TEMPLATE_PICKS
   .map(([id, kind]) => ({ template: PAGE_TEMPLATES.find(item => item.id === id), label: KIND_LABELS[lang.value][kind] }))
   .filter((item): item is { template: NonNullable<typeof item.template>; label: string } => !!item.template))
@@ -288,7 +295,7 @@ const TEXT = {
     eyebrow: '3D portfolio website',
     title: 'A 3D portfolio website, without writing code',
     intro: 'Show your work as a clean portfolio page and as a small 3D room people can walk around, with your projects on the walls. Pick a template, add your work, publish at perlink.to/you. No Three.js, no Blender, no hosting to set up.',
-    note: 'Free to start · Works on phones · English and Vietnamese',
+    note: 'Free to start · Works on phones · In 5 languages',
     tryLink: 'Try a live room',
     heroAlt: 'A Perlink 3D room on a floating island',
     demoTitle: 'Try a 3D portfolio right here',
@@ -410,7 +417,7 @@ const TEXT = {
     eyebrow: 'Website portfolio 3D',
     title: 'Website portfolio 3D, không cần viết code',
     intro: 'Trưng bày tác phẩm trên một trang portfolio gọn gàng và trong một căn phòng 3D nhỏ để mọi người dạo quanh, với dự án của bạn treo trên tường. Chọn mẫu, thêm tác phẩm, đăng tại perlink.to/tên-bạn. Không cần Three.js, Blender hay tự thuê hosting.',
-    note: 'Miễn phí để bắt đầu · Chạy tốt trên điện thoại · Tiếng Việt và tiếng Anh',
+    note: 'Miễn phí để bắt đầu · Chạy tốt trên điện thoại · 5 ngôn ngữ',
     tryLink: 'Thử phòng 3D ngay',
     heroAlt: 'Một phòng 3D Perlink trên hòn đảo lơ lửng',
     demoTitle: 'Thử một portfolio 3D ngay tại đây',
@@ -526,11 +533,377 @@ const TEXT = {
     ctaTitle: 'Làm portfolio 3D của bạn ngay hôm nay',
     ctaText: 'Lấy địa chỉ, chọn mẫu cho ngành của bạn và đăng. Miễn phí, không cần code.',
   },
-}
+  zh: {
+    metaTitle: '3D 作品集网站：免费制作，无需代码 | Perlink',
+    metaDescription: '什么是 3D 作品集、适合谁、如何不写代码做一个。在线体验 3D 房间，选择适合你领域的模板，免费发布。',
+    eyebrow: '3D 作品集网站',
+    title: '3D 作品集网站，不用写一行代码',
+    intro: '把作品做成一个简洁的作品集页面，同时也是一个可以四处走动的小型 3D 房间，你的项目就挂在墙上。选模板、加作品，发布到 perlink.to/你的名字。不用 Three.js，不用 Blender，也不用自己搭服务器。',
+    note: '免费开始 · 手机可用 · 支持 5 种语言',
+    tryLink: '体验在线房间',
+    heroAlt: '漂浮小岛上的一个 Perlink 3D 房间',
+    demoTitle: '就在这里体验 3D 作品集',
+    demoText: '这是一个真实的 Perlink 房间，正在你的浏览器里运行。在设计师、开发者、摄影师、建筑师和学生之间切换，四处看看，点一点墙上的作品。',
+    whatTitle: '什么是 3D 作品集？',
+    what: [
+      '3D 作品集是一种作品集网站：你的作品放在一个访客可以自由走动的三维空间里，而不只是一页平铺的缩略图。它可以是一个墙上挂满项目的房间，一张放着笔记本电脑、点开就是你 GitHub 的书桌，也可以是一整个小世界。它直接在浏览器里运行，无需安装任何东西。',
+      '大多数知名的 3D 作品集都是开发者用 Three.js 和 WebGL 手工打造的，要花好几周。这正是它们出彩的原因，也是大多数人从来没做过的原因。Perlink 替你搞定 3D 部分：你只需填写一个普通的作品集页面，同样的内容就会变成一个房间，拖一拖就能布置好。',
+      '好的 3D 作品集不是取代普通页面，而是在它之上加分。一位要快速浏览二十个候选人的招聘者，仍然需要在一分钟内看到你的名字、最好的三个项目和联系方式。所以在 Perlink 上，每个作品集都兼具两者：先是一个加载飞快的页面，房间只需轻点一下（如果你愿意，也可以反过来）。',
+    ],
+    diffTitle: '3D 作品集和普通作品集有什么不同',
+    diffColumns: ['普通作品集', 'Perlink 上的 3D 作品集'] as [string, string],
+    diff: [
+      ['访客做什么', '滚动浏览一页缩略图', '先看页面，再走进房间点开你的作品'],
+      ['他们记住什么', '你最好的项目（如果它排在第一个）', '房间本身，以及做出它的你'],
+      ['在网站停留的时间', '常常不到一分钟', '更久：大家会先探索一番再离开'],
+      ['手机加载', '快', '页面一样快；房间只在打开时才加载'],
+      ['能被搜索引擎找到', '能', '能：页面是真正的 HTML，有自己的标题和描述'],
+      ['制作难度', '用建站工具花一个下午', '同样一个下午：房间由你的页面直接生成'],
+    ] as [string, string, string][],
+    diffMore: '阅读完整对比，包括什么时候普通作品集更合适（英文）',
+    twoTitle: '一个地址，两种方式看你的作品',
+    twoText: '访客先看到一个处处可用、加载飞快的作品集页面，轻点一下就能进入你的 3D 房间。',
+    pageLabel: '作品集页面',
+    pageText: '个人介绍、精选作品、链接和联系方式。加载快，任何手机上都好读。',
+    pageAlt: '用 Perlink 制作的个人作品集页面',
+    roomLabel: '3D 房间',
+    roomText: '同一个页面，变成漂浮大陆上的一个房间，白天黑夜皆可，有音乐，也有能点的东西。',
+    roomAlt: '城市夜色中的一个 Perlink 3D 房间',
+    whoTitle: '3D 作品集适合谁',
+    whoText: '适合所有“作品比言语更有说服力”的人。每类工作都有专门的指南，告诉你该展示什么、房间怎么布置。',
+    whoMore: '阅读指南（英文）',
+    who: [
+      { id: 'designer' as const, icon: 'i-lucide-pen-tool', title: '设计师', text: '平面、产品和 UX 设计师：案例研究放在页面上，最出彩的视觉挂在房间里。' },
+      { id: 'developer' as const, icon: 'i-lucide-code-xml', title: '开发者', text: '已上线的项目、你的技术栈，还有一台点开就是 GitHub 的笔记本电脑，不用在 Three.js 上耗几周。' },
+      { id: 'photographer' as const, icon: 'i-lucide-camera', title: '摄影师', text: '一面可以边走边看的作品墙，拍摄套餐和预约放在页面上。' },
+      { id: 'architect' as const, icon: 'i-lucide-ruler', title: '建筑师和室内设计师', text: '空间作品就在空间里展示：实景照片、效果图和图纸，一面墙一个项目。' },
+      { id: 'student' as const, icon: 'i-lucide-graduation-cap', title: '学生和应届毕业生', text: '课程作业和个人项目、你的简历，还有招聘会用的二维码：一份让人记住的第一份作品集。' },
+    ],
+    notFor: { title: '什么时候可能不需要', text: '如果你的工作主要是写作，或者招聘方只要 PDF，一个普通页面就够了。Perlink 可以关闭房间，只用页面。' },
+    templatesTitle: '按职业分类的作品集模板',
+    templatesText: '每个模板都附带示例作品、主题和配套的 3D 房间。挑一个最接近的，改成你的样子。',
+    stepsTitle: '如何一步步做出 3D 作品集',
+    stepsText: '从零到发布大约一小时，大部分时间花在挑选作品上。',
+    steps: [
+      { title: '挑出最好的 4 到 8 件作品', text: '少而精胜过全部堆上。选择和你下一份工作或目标客户相符的作品，并为每件写一句话说明它的用途。' },
+      { title: '占下你的地址', text: '选好 perlink.to/你的名字。用你简历和社交账号上的名字，方便别人猜到。' },
+      { title: '从你所在领域的模板开始', text: '设计师、开发者、摄影师、建筑师或学生。模板会帮你定好布局、主题和一个合适的房间。' },
+      { title: '填写页面', text: '你的名字和一句话介绍你做什么，然后是相册形式的作品、经历时间线、推荐语和联系表单。' },
+      { title: '布置房间', text: '把最好的图片放进相框，把笔记本电脑链接到 GitHub 或 Behance，选一片大陆、白天或黑夜，喜欢的话再配上音乐。' },
+      { title: '在手机上检查', text: '用手机打开页面和房间。确保不进房间也能看到你的名字、最好的项目和联系方式。' },
+      { title: '发布并分享', text: '设置搜索标题和描述，然后把链接放进社交简介、简历和邮件签名。再录一段房间短视频发到抖音、TikTok 或 Reels。' },
+    ],
+    cta: '制作你的 3D 作品集',
+    templates: '浏览全部模板',
+    checkTitle: '3D 作品集该放什么，不该放什么',
+    doTitle: '应该放',
+    do: [
+      '在页面开头写明你的名字、你做什么、你在哪里',
+      '四到八个项目，每个配一句话，说明要解决的问题和你负责的部分',
+      '每个项目最有冲击力的一张图放进房间的相框，让房间一眼就讲清你的故事',
+      '清晰的联系方式：联系表单、邮箱或预约，页面上要有，房间里也要能链过去',
+      '能证明作品的链接：GitHub、Behance、Dribbble、上线的产品、已发表的文章',
+    ],
+    dontTitle: '不该放',
+    dont: [
+      '你做过的所有项目。过时或不相关的作品会稀释最好的那几件',
+      '未压缩的超大图片。它们会拖慢页面和房间；宽 2000 px 的 JPEG 或 WebP 就足够了',
+      '不能公开的作品。发布签了保密协议的客户作品前先征得同意，或者只做文字描述不放文件',
+      '一个什么都做不了的房间。每件物品要么展示作品，要么通向某个地方',
+      '只放在房间里的联系方式。从不打开房间的访客也必须能找到它们',
+    ],
+    whyTitle: '为什么要做 3D 作品集',
+    whyText: '作品集的意义在于被记住。一个可以探索的房间，比又一排缩略图更能做到这一点。',
+    why: [
+      { icon: 'i-lucide-sparkles', title: '脱颖而出', text: '招聘者和客户每天要看几十份作品集。你的，是他们在里面走过一圈的那一份。' },
+      { icon: 'i-lucide-image', title: '作品挂上墙', text: '把照片、画作和项目截图挂在房间里，完整的作品集仍保留在页面上。' },
+      { icon: 'i-lucide-smartphone', title: '为手机而做', text: '房间会根据设备自动调整，页面秒开，所以从 Instagram 或 TikTok 点进来的链接都能顺畅打开。' },
+      { icon: 'i-lucide-clapperboard', title: '房间视频', text: '直接在编辑器里录一段竖屏房间漫游视频，发到 TikTok、Reels 和 Shorts。' },
+      { icon: 'i-lucide-search', title: '能被搜索到', text: '作品集页面是一个真正的网页，有自己的标题和描述，随时可被搜索引擎收录。' },
+      { icon: 'i-lucide-chart-column', title: '看看谁来过', text: '每个网站的访问量和点击量，还有可以印在简历或名片上的二维码。' },
+    ],
+    compareTitle: '用 Perlink，还是自己写代码',
+    codeColumn: '自己写代码',
+    rows: [
+      { label: '作品集上线所需时间', perlink: '几分钟', code: '几天到几周' },
+      { label: 'Three.js、Blender 或 WebGL 技能', perlink: '不需要', code: '需要' },
+      { label: '托管和网址', perlink: '已包含（perlink.to/你的名字）', code: '自己搭建' },
+      { label: '更新作品', perlink: '在编辑器里改，手机电脑都行', code: '改代码再部署' },
+      { label: '给慢速手机和搜索引擎看的普通页面', perlink: '内置', code: '还得自己做' },
+    ],
+    effectsMore: '想自己做 3D 特效？看看它们的原理和对加载速度的影响（英文）',
+    readTitle: '继续阅读',
+    read: [
+      { id: 'examples' as const, title: '3D 作品集案例（英文）', text: '网上知名的 3D 作品集，它们为什么出彩，以及今天就能做出来的作品集。' },
+      { id: 'compare' as const, title: '3D 作品集与普通作品集对比（英文）', text: '一份坦诚的对比，包括什么时候普通作品集才是更好的选择。' },
+      { id: 'effects' as const, title: '带 3D 特效的作品集网站（英文）', text: '倾斜卡片、滚动场景、WebGL 首屏和完整的 3D 世界：各自的代价和适用场景。' },
+      { id: 'free' as const, title: '免费制作 3D 作品集（英文）', text: 'Perlink 上到底哪些是免费的，以及其他免费方案的对比。' },
+    ],
+    faqTitle: '常见问题',
+    faq: [
+      { q: '什么是 3D 作品集？', a: '一种作品集网站，你的作品展示在一个访客可以走动的 3D 空间里，比如墙上挂着项目的房间。在 Perlink 上，同一个地址还附带一个普通的作品集页面。' },
+      { q: '需要会 Three.js 或写代码吗？', a: '不需要。Perlink 会替你搭好 3D 房间。你只需选一个模板，然后在可视化编辑器里编辑页面、布置房间。' },
+      { q: '免费吗？', a: '免费。免费套餐包含一个网站，带作品集页面、3D 房间和数据统计，不限时长。付费套餐提供更多网站、Pro 主题和更长时间的数据统计。' },
+      { q: '做一个要多久？', a: '选好模板，页面和房间就已经就绪。大多数人会花一小时左右挑选作品、为每个项目写一句介绍。' },
+      { q: '可以展示我自己的项目和照片吗？', a: '可以。在页面上添加相册、视频、链接和描述，再把图片挂到 3D 房间里。访客点一下图片就能看大图。' },
+      { q: '手机上能用吗？', a: '能。页面优先为手机设计，3D 房间会根据设备调整画质，始终保持流畅。' },
+      { q: '不想看 3D 的人还能看到我的作品吗？', a: '能。你的作品集首先是一个普通网页，3D 房间只需轻点一下。你也可以设置成先打开房间。' },
+      { q: '我的 3D 作品集能被搜索引擎搜到吗？', a: '能。页面是一个真正的网页，有你自己设置的搜索标题、描述和分享图片，已发布的网站会提交给搜索引擎。' },
+      { q: '可以用自己的域名吗？', a: '可以，需要 Plus 套餐。你的作品集同时还有一个自己选的 perlink.to/你的名字 地址，绑定域名后它依然可用。' },
+      { q: '可以把 3D 作品集写进简历吗？', a: '可以。把 perlink.to 地址写进简历和邮件签名，还能从控制台下载二维码印在简历或名片上。' },
+    ],
+    ctaTitle: '今天就做好你的 3D 作品集',
+    ctaText: '占下你的地址，选一个适合你领域的模板，然后发布。免费，无需代码。',
+  },
+  ja: {
+    metaTitle: '3Dポートフォリオサイトを無料で、コード不要 | Perlink',
+    metaDescription: '3Dポートフォリオとは何か、どんな人に向いているか、コードなしで作る方法。3Dルームを試して、職種別テンプレートで無料公開。',
+    eyebrow: '3Dポートフォリオサイト',
+    title: 'コードを書かずに、3Dポートフォリオサイトを',
+    intro: '作品を、すっきりしたポートフォリオページと、歩き回れる小さな3Dルームの両方で見せましょう。壁にはあなたのプロジェクトが飾られます。テンプレートを選んで作品を追加し、perlink.to/あなたの名前 で公開。Three.js も Blender も、サーバーの準備もいりません。',
+    note: '無料ではじめられる · スマホ対応 · 5言語対応',
+    tryLink: '3Dルームを試す',
+    heroAlt: '浮かぶ島の上にある Perlink の3Dルーム',
+    demoTitle: 'ここで3Dポートフォリオを体験',
+    demoText: 'これは本物の Perlink のルームで、あなたのブラウザで動いています。デザイナー、開発者、写真家、建築家、学生を切り替えて、見回し、壁の作品をタップしてみてください。',
+    whatTitle: '3Dポートフォリオとは？',
+    what: [
+      '3Dポートフォリオとは、サムネイルが並ぶ平面のページだけでなく、訪れた人が動き回れる立体空間の中に作品を置いたポートフォリオサイトです。壁にプロジェクトを飾った部屋だったり、GitHub が開くノートパソコンが置かれた机だったり、小さなワールドまるごとだったりします。ブラウザで動くので、何もインストールする必要はありません。',
+      '有名な3Dポートフォリオの多くは、開発者が Three.js や WebGL で何週間もかけて手作りしたものです。だからこそ目を引きますが、だからこそほとんどの人は作れません。Perlink は3Dの部分を代わりに引き受けます。普通のポートフォリオページを埋めるだけで、その内容がドラッグで配置できるルームになります。',
+      '優れた3Dポートフォリオは、普通のページを置き換えるのではなく、それに加わるものです。20人の候補者を流し見する採用担当者には、1分以内に名前、ベストな3つのプロジェクト、連絡方法が必要です。だから Perlink のポートフォリオは両方を備えています。まず軽快なページがあり、ワンタップでルームへ（お好みで逆にもできます）。',
+    ],
+    diffTitle: '3Dポートフォリオと普通のポートフォリオの違い',
+    diffColumns: ['普通のポートフォリオ', 'Perlink の3Dポートフォリオ'] as [string, string],
+    diff: [
+      ['訪問者がすること', 'サムネイルのページをスクロール', 'ページを読んでから、ルームに入って作品をタップ'],
+      ['記憶に残るもの', 'ベストな作品（先頭にあれば）', 'ルームそのものと、それを作ったあなた'],
+      ['サイトの滞在時間', '1分未満のことが多い', '長め：探索してから帰る'],
+      ['スマホでの読み込み', '速い', 'ページは同じく速く、ルームは開いたときだけ読み込み'],
+      ['Google での表示', 'される', 'される：ページは独自のタイトルと説明を持つ本物のHTML'],
+      ['作る手間', 'サイトビルダーで半日', '同じ半日：ルームはページから自動で作られる'],
+    ] as [string, string, string][],
+    diffMore: '普通のポートフォリオのほうが向いている場合も含めた、詳しい比較を読む（英語）',
+    twoTitle: 'ひとつのアドレスで、ふたつの見せ方',
+    twoText: '訪問者は、どこでも見られる軽快なポートフォリオページに着地します。ワンタップで、あなたの3Dルームへ。',
+    pageLabel: 'ポートフォリオページ',
+    pageText: '自己紹介、代表作、リンク、連絡先。すぐに読み込まれ、どのスマホでも読みやすい。',
+    pageAlt: 'Perlink で作った個人ポートフォリオページ',
+    roomLabel: '3Dルーム',
+    roomText: '同じページが、浮かぶ大地の上のルームに。昼でも夜でも、音楽とタップできるものと一緒に。',
+    roomAlt: '夜の街にある Perlink の3Dルーム',
+    whoTitle: '3Dポートフォリオが向いている人',
+    whoText: '言葉で説明するより、見せたほうが早い作品を持つすべての人に。職種ごとに、何を見せてルームをどう整えるかのガイドがあります。',
+    whoMore: 'ガイドを読む（英語）',
+    who: [
+      { id: 'designer' as const, icon: 'i-lucide-pen-tool', title: 'デザイナー', text: 'グラフィック、プロダクト、UXデザイナーに。ページにはケーススタディ、ルームにはベストなビジュアルを額装して。' },
+      { id: 'developer' as const, icon: 'i-lucide-code-xml', title: '開発者', text: 'リリースしたプロジェクト、技術スタック、GitHub が開くノートパソコン。Three.js に何週間も費やす必要はありません。' },
+      { id: 'photographer' as const, icon: 'i-lucide-camera', title: '写真家', text: '歩きながら眺めるギャラリーの壁。ページには撮影プランと予約を。' },
+      { id: 'architect' as const, icon: 'i-lucide-ruler', title: '建築家・インテリアデザイナー', text: '空間の作品を空間で見せる。竣工写真、パース、図面を、1つの壁に1プロジェクトずつ。' },
+      { id: 'student' as const, icon: 'i-lucide-graduation-cap', title: '学生・新卒', text: '授業や個人のプロジェクト、履歴書、就職イベント用のQRコード。記憶に残る最初のポートフォリオに。' },
+    ],
+    notFor: { title: '必要ないかもしれない場合', text: '仕事の大半が文章だったり、採用側がPDFしか求めなかったりするなら、普通のページで十分です。Perlink ではルームをオフにして、ページだけを使えます。' },
+    templatesTitle: '職種別のポートフォリオテンプレート',
+    templatesText: 'どれもサンプル作品、テーマ、合う3Dルーム付き。いちばん近いものを選んで、自分のものにしましょう。',
+    stepsTitle: '3Dポートフォリオの作り方（ステップごと）',
+    stepsText: 'ゼロから公開まで約1時間。そのほとんどは作品選びの時間です。',
+    steps: [
+      { title: 'ベストな作品を4〜8点選ぶ', text: 'すべてを並べるより、少数精鋭のほうが効果的です。次に狙う仕事やクライアントに合う作品を選び、それぞれ何のための作品か一行添えましょう。' },
+      { title: 'アドレスを取得する', text: 'perlink.to/あなたの名前 を選びます。履歴書やSNSと同じ名前にすると、見つけてもらいやすくなります。' },
+      { title: '職種別のテンプレートから始める', text: 'デザイナー、開発者、写真家、建築家、学生。テンプレートがレイアウト、テーマ、合うルームを用意します。' },
+      { title: 'ページを埋める', text: '名前と、何をしている人かを一文で。続いて作品のアルバム、経歴のタイムライン、推薦の声、問い合わせフォーム。' },
+      { title: 'ルームを飾る', text: 'ベストな画像をフォトフレームに入れ、ノートパソコンに GitHub や Behance をリンクし、大地、昼か夜か、好みで音楽を選びます。' },
+      { title: 'スマホで確認する', text: 'ページとルームをスマホで開きます。ルームを開かなくても、名前、ベストな作品、連絡先が見えるか確かめましょう。' },
+      { title: '公開してシェアする', text: '検索用のタイトルと説明を設定し、リンクをプロフィール、履歴書、メール署名に。TikTok や Reels 用に、ルームの短い動画を撮るのもおすすめです。' },
+    ],
+    cta: '3Dポートフォリオをつくる',
+    templates: 'すべてのテンプレートを見る',
+    checkTitle: '3Dポートフォリオに入れるもの、入れないもの',
+    doTitle: '入れるもの',
+    do: [
+      '名前、職種、拠点を、ページの最初の数行に',
+      '4〜8件のプロジェクト。それぞれ課題とあなたの役割を一文で',
+      '各プロジェクトのいちばん強い画像をルームのフレームに。ひと目でルームが物語を伝えます',
+      'わかりやすい連絡手段：問い合わせフォーム、メール、予約を、ページに置き、ルームからもリンク',
+      '作品を裏付けるリンク：GitHub、Behance、Dribbble、公開中のプロダクト、掲載記事',
+    ],
+    dontTitle: '入れないもの',
+    dont: [
+      'これまでのすべてのプロジェクト。古い作品や関係ない作品は、ベストな作品の印象を薄めます',
+      '圧縮していない巨大な画像。ページもルームも重くなります。幅2,000pxの JPEG か WebP で十分です',
+      '公開できない作品。NDAのあるクライアントワークは掲載前に確認するか、ファイルなしで説明しましょう',
+      '何もすることがないルーム。どのオブジェクトも、作品を見せるか、どこかへ案内するようにしましょう',
+      'ルームの中だけにある連絡先。ルームを開かない人にも見つけられるようにしましょう',
+    ],
+    whyTitle: 'なぜ3Dポートフォリオなのか',
+    whyText: 'ポートフォリオは覚えてもらうためのもの。探索できるルームは、サムネイルのグリッドをもうひとつ増やすより、ずっと記憶に残ります。',
+    why: [
+      { icon: 'i-lucide-sparkles', title: '目立つ', text: '採用担当者やクライアントは毎日何十ものポートフォリオを見ます。あなたのものは、歩き回ったポートフォリオとして記憶されます。' },
+      { icon: 'i-lucide-image', title: '作品を壁に', text: '写真、アートワーク、プロジェクトの画像をルームに飾り、すべてのギャラリーはページに。' },
+      { icon: 'i-lucide-smartphone', title: 'スマホ向け', text: 'ルームは端末に合わせて調整され、ページはすぐ開くので、Instagram や TikTok からのリンクもスムーズです。' },
+      { icon: 'i-lucide-clapperboard', title: 'ルームの動画', text: 'TikTok、Reels、Shorts 向けに、ルームを巡る縦型動画をエディタからそのまま録画できます。' },
+      { icon: 'i-lucide-search', title: 'Google で見つかる', text: 'ポートフォリオページは独自のタイトルと説明を持つ本物のウェブページで、検索エンジンに対応しています。' },
+      { icon: 'i-lucide-chart-column', title: '訪問者がわかる', text: 'サイトごとのアクセス数とクリック数、履歴書や名刺に使えるQRコード。' },
+    ],
+    compareTitle: 'Perlink か、自分でコードを書くか',
+    codeColumn: '自分でコードを書く',
+    rows: [
+      { label: 'ポートフォリオ公開までの時間', perlink: '数分', code: '数日〜数週間' },
+      { label: 'Three.js、Blender、WebGL のスキル', perlink: '不要', code: '必要' },
+      { label: 'ホスティングとアドレス', perlink: '込み（perlink.to/あなたの名前）', code: '自分で用意' },
+      { label: '作品の更新', perlink: 'エディタで。スマホでもパソコンでも', code: 'コードを変更してデプロイ' },
+      { label: '遅いスマホや検索エンジン向けの普通のページ', perlink: '標準搭載', code: 'それも自分で作る' },
+    ],
+    effectsMore: '3Dエフェクトを自分で作りたい？仕組みと読み込み時間への影響を読む（英語）',
+    readTitle: 'さらに読む',
+    read: [
+      { id: 'examples' as const, title: '3Dポートフォリオの事例（英語）', text: 'ウェブで話題の3Dポートフォリオと、それぞれが優れている理由、そして今日作れるもの。' },
+      { id: 'compare' as const, title: '3Dポートフォリオと普通のポートフォリオ（英語）', text: '普通のポートフォリオのほうが向いている場合も含めた、率直な比較。' },
+      { id: 'effects' as const, title: '3Dエフェクトのあるポートフォリオサイト（英語）', text: '傾くカード、スクロール演出、WebGL のヒーロー、まるごとのワールド。それぞれのコストと使いどころ。' },
+      { id: 'free' as const, title: '3Dポートフォリオを無料で作る（英語）', text: 'Perlink で無料でできることの詳細と、ほかの無料の方法との比較。' },
+    ],
+    faqTitle: 'よくある質問',
+    faq: [
+      { q: '3Dポートフォリオとは何ですか？', a: '壁にプロジェクトを飾った部屋のように、訪問者が動き回れる3D空間の中で作品を見せるポートフォリオサイトです。Perlink では、同じアドレスに普通のポートフォリオページも付いています。' },
+      { q: 'Three.js やプログラミングの知識は必要ですか？', a: 'いいえ。3Dルームは Perlink が作ります。テンプレートを選んだら、ビジュアルエディタでページを編集し、ルームを配置するだけです。' },
+      { q: '無料ですか？', a: 'はい。無料プランには、ポートフォリオページ、3Dルーム、アクセス解析付きのサイトが1つ含まれ、期間の制限はありません。有料プランでは、サイト数、Pro テーマ、より長い期間のアクセス解析が加わります。' },
+      { q: '作るのにどれくらいかかりますか？', a: 'テンプレートを選んだ時点で、ページとルームはできあがっています。多くの人は、作品を選んで各プロジェクトに一行書くのに1時間ほどかけています。' },
+      { q: '自分のプロジェクトや写真を載せられますか？', a: 'はい。ページにはフォトアルバム、動画、リンク、説明を追加でき、3Dルームには写真を飾れます。訪問者は写真をタップすると大きく表示できます。' },
+      { q: 'スマホでも動きますか？', a: 'はい。ページはスマホ優先で作られており、3Dルームは端末に合わせて画質を調整するので、なめらかに動きます。' },
+      { q: '3Dを見たくない人にも作品は見えますか？', a: 'はい。あなたのポートフォリオはまず普通のウェブページで、3Dルームはワンタップ先にあります。ルームを先に開くように設定することもできます。' },
+      { q: '3Dポートフォリオは Google に表示されますか？', a: 'はい。ページは、検索用のタイトル、説明、シェア画像を自分で設定できる本物のウェブページで、公開したサイトは検索エンジンに通知されます。' },
+      { q: '独自ドメインは使えますか？', a: 'はい、Plus プランで使えます。ポートフォリオは自分で選んだ perlink.to/あなたの名前 にもあり、独自ドメインをつないだ後も使えます。' },
+      { q: '3Dポートフォリオを履歴書に載せられますか？', a: 'はい。perlink.to のアドレスを履歴書やメール署名に入れ、ダッシュボードのQRコードを履歴書や名刺に印刷しましょう。' },
+    ],
+    ctaTitle: '今日、3Dポートフォリオをつくろう',
+    ctaText: 'アドレスを取得し、職種に合うテンプレートを選んで公開。無料で、コードも不要です。',
+  },
+  ko: {
+    metaTitle: '3D 포트폴리오 사이트, 코딩 없이 무료로 | Perlink',
+    metaDescription: '3D 포트폴리오란 무엇이고 누구에게 맞는지, 코딩 없이 만드는 법. 3D 룸을 직접 체험하고 분야별 템플릿으로 무료 공개하세요.',
+    eyebrow: '3D 포트폴리오 사이트',
+    title: '코딩 없이 만드는 3D 포트폴리오 사이트',
+    intro: '작업물을 깔끔한 포트폴리오 페이지로, 그리고 벽에 프로젝트가 걸린 작은 3D 룸으로 보여 주세요. 템플릿을 고르고 작업을 넣은 뒤 perlink.to/내이름 으로 공개하면 끝. Three.js도, Blender도, 호스팅 설정도 필요 없어요.',
+    note: '무료로 시작 · 휴대폰에서도 OK · 5개 언어 지원',
+    tryLink: '3D 룸 체험하기',
+    heroAlt: '떠 있는 섬 위의 Perlink 3D 룸',
+    demoTitle: '여기서 바로 3D 포트폴리오를 체험해 보세요',
+    demoText: '지금 브라우저에서 실행 중인 진짜 Perlink 룸이에요. 디자이너, 개발자, 사진작가, 건축가, 학생을 바꿔 가며 둘러보고 벽에 걸린 작업을 눌러 보세요.',
+    whatTitle: '3D 포트폴리오란?',
+    what: [
+      '3D 포트폴리오는 작업물이 평평한 썸네일 페이지가 아니라 방문자가 돌아다닐 수 있는 3차원 공간 안에 놓인 포트폴리오 사이트예요. 프로젝트가 액자로 걸린 방일 수도 있고, 노트북을 누르면 GitHub가 열리는 책상일 수도, 작은 세계 전체일 수도 있어요. 브라우저에서 실행되니 설치할 것도 없어요.',
+      '유명한 3D 포트폴리오는 대부분 개발자가 Three.js와 WebGL로 직접 만든 것이고, 몇 주가 걸려요. 그래서 눈에 띄고, 또 그래서 대부분은 만들 엄두를 못 내요. Perlink는 3D 부분을 대신 만들어 줘요. 평범한 포트폴리오 페이지를 채우면, 같은 내용이 드래그로 배치할 수 있는 방이 돼요.',
+      '좋은 3D 포트폴리오는 일반 페이지를 대체하지 않고 더해 줘요. 지원자 스무 명을 훑어보는 채용 담당자에게는 여전히 1분 안에 이름, 대표 프로젝트 세 개, 연락 방법이 보여야 하니까요. 그래서 Perlink의 포트폴리오는 둘 다예요. 먼저 빠른 페이지, 그리고 탭 한 번 거리의 방(원하면 순서를 바꿀 수도 있어요).',
+    ],
+    diffTitle: '3D 포트폴리오와 일반 포트폴리오의 차이',
+    diffColumns: ['일반 포트폴리오', 'Perlink 3D 포트폴리오'] as [string, string],
+    diff: [
+      ['방문자가 하는 일', '썸네일 페이지를 스크롤', '페이지를 읽고, 방에 들어가 작업을 눌러 봄'],
+      ['기억에 남는 것', '대표 프로젝트(맨 위에 있다면)', '방 그 자체, 그리고 그걸 만든 사람인 나'],
+      ['사이트 체류 시간', '대개 1분 미만', '더 길게: 떠나기 전에 둘러봄'],
+      ['휴대폰 로딩', '빠름', '페이지는 똑같이 빠르고, 방은 열 때만 로딩'],
+      ['Google 검색 노출', '됨', '됨: 페이지는 고유한 제목과 설명이 있는 실제 HTML'],
+      ['만드는 수고', '사이트 빌더로 오후 한나절', '같은 오후 한나절: 방은 페이지에서 자동으로 만들어짐'],
+    ] as [string, string, string][],
+    diffMore: '일반 포트폴리오가 더 나은 경우까지 담은 전체 비교 읽기 (영문)',
+    twoTitle: '하나의 주소, 작업을 보는 두 가지 방법',
+    twoText: '방문자는 어디서나 잘 열리는 빠른 포트폴리오 페이지에 도착해요. 탭 한 번이면 3D 룸으로 들어가요.',
+    pageLabel: '포트폴리오 페이지',
+    pageText: '소개, 대표 작업, 링크, 연락처. 빠르게 열리고 어떤 휴대폰에서도 읽기 쉬워요.',
+    pageAlt: 'Perlink로 만든 개인 포트폴리오 페이지',
+    roomLabel: '3D 룸',
+    roomText: '같은 페이지가 떠 있는 땅 위의 방으로. 낮이든 밤이든, 음악과 눌러 볼 것들과 함께.',
+    roomAlt: '밤의 도시 속 Perlink 3D 룸',
+    whoTitle: '3D 포트폴리오가 어울리는 사람',
+    whoText: '설명하기보다 보여 주는 게 쉬운 작업을 하는 모든 분. 분야별로 무엇을 보여 주고 방을 어떻게 꾸밀지 담은 가이드가 있어요.',
+    whoMore: '가이드 읽기 (영문)',
+    who: [
+      { id: 'designer' as const, icon: 'i-lucide-pen-tool', title: '디자이너', text: '그래픽, 프로덕트, UX 디자이너: 페이지에는 케이스 스터디, 방에는 대표 비주얼을 액자로.' },
+      { id: 'developer' as const, icon: 'i-lucide-code-xml', title: '개발자', text: '출시한 프로젝트, 기술 스택, 누르면 GitHub가 열리는 노트북. Three.js에 몇 주를 쓰지 않아도 돼요.' },
+      { id: 'photographer' as const, icon: 'i-lucide-camera', title: '사진작가', text: '사람들이 따라 걸으며 감상하는 갤러리 벽, 페이지에는 촬영 패키지와 예약.' },
+      { id: 'architect' as const, icon: 'i-lucide-ruler', title: '건축가와 인테리어 디자이너', text: '공간 작업을 공간 안에서: 준공 사진, 렌더링, 도면을 프로젝트마다 벽 하나씩.' },
+      { id: 'student' as const, icon: 'i-lucide-graduation-cap', title: '학생과 졸업생', text: '과제와 사이드 프로젝트, 이력서, 채용 박람회용 QR 코드. 기억에 남는 첫 포트폴리오.' },
+    ],
+    notFor: { title: '굳이 필요 없는 경우', text: '작업이 대부분 글이거나, 채용하는 곳이 PDF만 요구한다면 일반 페이지로 충분해요. Perlink에서는 방을 끄고 페이지만 쓸 수 있어요.' },
+    templatesTitle: '분야별 포트폴리오 템플릿',
+    templatesText: '샘플 작업, 테마, 어울리는 3D 룸이 모두 들어 있어요. 가장 가까운 것을 골라 내 것으로 만드세요.',
+    stepsTitle: '3D 포트폴리오 만드는 법, 단계별로',
+    stepsText: '처음부터 공개까지 약 1시간. 대부분은 작업을 고르는 데 쓰는 시간이에요.',
+    steps: [
+      { title: '대표작 4~8개 고르기', text: '모든 작업보다 적지만 강한 프로젝트가 나아요. 다음에 원하는 일이나 고객에 맞는 작업을 고르고, 각각 무엇을 위한 것이었는지 한 줄로 적어 보세요.' },
+      { title: '주소 선점하기', text: 'perlink.to/내이름 을 고르세요. 이력서와 SNS 프로필에 쓰는 이름을 쓰면 사람들이 쉽게 찾아요.' },
+      { title: '내 분야 템플릿에서 시작하기', text: '디자이너, 개발자, 사진작가, 건축가, 학생. 템플릿이 레이아웃, 테마, 어울리는 방을 정해 줘요.' },
+      { title: '페이지 채우기', text: '이름과 하는 일을 한 문장으로, 그다음 작업 앨범, 경력 타임라인, 추천사, 문의 폼.' },
+      { title: '방 꾸미기', text: '대표 이미지를 액자에 넣고, 노트북에 GitHub나 Behance를 연결하고, 땅과 낮·밤, 원하면 음악도 골라요.' },
+      { title: '휴대폰으로 확인하기', text: '휴대폰에서 페이지와 방을 열어 보세요. 방에 들어가지 않아도 이름, 대표 프로젝트, 연락처가 보이는지 확인하세요.' },
+      { title: '공개하고 공유하기', text: '검색용 제목과 설명을 정하고, 링크를 프로필, 이력서, 이메일 서명에 넣으세요. 방을 짧은 영상으로 찍어 TikTok이나 Reels에 올려 보세요.' },
+    ],
+    cta: '3D 포트폴리오 만들기',
+    templates: '템플릿 전체 보기',
+    checkTitle: '3D 포트폴리오에 넣을 것, 뺄 것',
+    doTitle: '넣을 것',
+    do: [
+      '페이지 첫 줄에 이름, 하는 일, 활동 지역',
+      '4~8개의 프로젝트, 각각 문제와 내 역할을 한 문장으로',
+      '각 프로젝트의 가장 강렬한 이미지를 방의 액자에. 방이 한눈에 이야기를 전하도록',
+      '분명한 연락 방법: 문의 폼, 이메일, 예약을 페이지에 두고 방에서도 연결',
+      '작업을 증명하는 링크: GitHub, Behance, Dribbble, 운영 중인 서비스, 게재된 글',
+    ],
+    dontTitle: '뺄 것',
+    dont: [
+      '지금까지 한 모든 프로젝트. 오래되었거나 방향이 다른 작업은 대표작을 흐려요',
+      '압축하지 않은 거대한 이미지. 페이지도 방도 느려져요. 가로 2,000px JPEG나 WebP면 충분해요',
+      '공개할 수 없는 작업. NDA가 걸린 고객 작업은 먼저 물어보거나, 파일 없이 설명만 하세요',
+      '할 게 없는 방. 모든 오브젝트는 작업을 보여 주거나 어딘가로 연결돼야 해요',
+      '방 안에만 있는 연락처. 방을 열지 않는 방문자도 찾을 수 있어야 해요',
+    ],
+    whyTitle: '왜 3D 포트폴리오인가요',
+    whyText: '포트폴리오는 기억되기 위해 있어요. 둘러볼 수 있는 방은 또 하나의 썸네일 그리드보다 훨씬 잘 기억돼요.',
+    why: [
+      { icon: 'i-lucide-sparkles', title: '돋보이기', text: '채용 담당자와 고객은 하루에 수십 개의 포트폴리오를 봐요. 그중 걸어 다녀 본 건 내 것뿐이에요.' },
+      { icon: 'i-lucide-image', title: '벽에 걸린 내 작업', text: '사진, 작품, 프로젝트 이미지를 방에 걸고, 전체 갤러리는 페이지에 두세요.' },
+      { icon: 'i-lucide-smartphone', title: '휴대폰에 최적화', text: '방은 기기에 맞춰 조절되고 페이지는 바로 열려서, Instagram이나 TikTok의 링크도 문제없어요.' },
+      { icon: 'i-lucide-clapperboard', title: '내 방 영상', text: '에디터에서 바로 방을 둘러보는 세로 영상을 녹화해 TikTok, Reels, Shorts에 올려 보세요.' },
+      { icon: 'i-lucide-search', title: 'Google 검색 노출', text: '포트폴리오 페이지는 고유한 제목과 설명이 있는 실제 웹페이지라 검색 엔진에 바로 노출될 수 있어요.' },
+      { icon: 'i-lucide-chart-column', title: '방문자 확인', text: '사이트별 방문과 클릭 수, 그리고 이력서나 명함용 QR 코드.' },
+    ],
+    compareTitle: 'Perlink vs 직접 코딩',
+    codeColumn: '직접 코딩',
+    rows: [
+      { label: '포트폴리오 공개까지 걸리는 시간', perlink: '몇 분', code: '며칠에서 몇 주' },
+      { label: 'Three.js, Blender, WebGL 스킬', perlink: '필요 없음', code: '필요함' },
+      { label: '호스팅과 웹 주소', perlink: '포함 (perlink.to/내이름)', code: '직접 설정' },
+      { label: '작업 업데이트', perlink: '휴대폰이나 컴퓨터의 에디터에서', code: '코드 수정 후 배포' },
+      { label: '느린 휴대폰과 검색 엔진용 일반 페이지', perlink: '기본 제공', code: '따로 만들어야 함' },
+    ],
+    effectsMore: '3D 효과를 직접 만들고 싶나요? 작동 원리와 로딩 속도 비용 알아보기 (영문)',
+    readTitle: '더 읽어 보기',
+    read: [
+      { id: 'examples' as const, title: '3D 포트폴리오 사례 (영문)', text: '웹에서 유명한 3D 포트폴리오들, 각각이 효과적인 이유, 그리고 오늘 바로 만들 수 있는 것들.' },
+      { id: 'compare' as const, title: '3D 포트폴리오 vs 일반 포트폴리오 (영문)', text: '일반 포트폴리오가 더 나은 경우까지 담은 솔직한 비교.' },
+      { id: 'effects' as const, title: '3D 효과가 있는 포트폴리오 사이트 (영문)', text: '틸트 카드, 스크롤 씬, WebGL 히어로, 하나의 세계까지: 각각의 비용과 쓸 때.' },
+      { id: 'free' as const, title: '3D 포트폴리오 무료로 만들기 (영문)', text: 'Perlink에서 정확히 무엇이 무료인지, 그리고 다른 무료 방법과의 비교.' },
+    ],
+    faqTitle: '자주 묻는 질문',
+    faq: [
+      { q: '3D 포트폴리오란 무엇인가요?', a: '작업물을 방문자가 돌아다닐 수 있는 3D 공간 안에 보여 주는 포트폴리오 사이트예요. 예를 들면 벽에 프로젝트가 걸린 방이죠. Perlink에서는 같은 주소에 일반 포트폴리오 페이지도 함께 있어요.' },
+      { q: 'Three.js나 코딩을 알아야 하나요?', a: '아니요. Perlink가 3D 룸을 만들어 줘요. 템플릿을 고른 뒤 비주얼 에디터에서 페이지를 편집하고 방을 배치하면 돼요.' },
+      { q: '무료인가요?', a: '네. 무료 요금제에는 포트폴리오 페이지, 3D 룸, 통계가 포함된 사이트 하나가 기간 제한 없이 들어 있어요. 유료 요금제에서는 사이트 수, Pro 테마, 통계 기간이 늘어나요.' },
+      { q: '만드는 데 얼마나 걸리나요?', a: '템플릿을 고르는 순간 페이지와 방이 준비돼요. 대부분은 작업을 고르고 프로젝트마다 한 줄씩 쓰는 데 1시간 정도 걸려요.' },
+      { q: '내 프로젝트와 사진을 보여 줄 수 있나요?', a: '네. 페이지에 사진 앨범, 영상, 링크, 설명을 넣고, 3D 룸에는 사진을 걸 수 있어요. 방문자가 사진을 누르면 크게 볼 수 있어요.' },
+      { q: '휴대폰에서도 작동하나요?', a: '네. 페이지는 모바일 우선으로 만들어졌고, 3D 룸은 기기에 맞춰 품질을 조절해서 부드럽게 움직여요.' },
+      { q: '3D를 원하지 않는 사람도 작업을 볼 수 있나요?', a: '네. 포트폴리오는 먼저 일반 웹페이지이고, 3D 룸은 탭 한 번 거리에 있어요. 방이 먼저 열리게 설정할 수도 있어요.' },
+      { q: '3D 포트폴리오가 Google에 나오나요?', a: '네. 페이지는 직접 정한 검색 제목, 설명, 공유 이미지가 있는 실제 웹페이지이고, 공개된 사이트는 검색 엔진에 등록돼요.' },
+      { q: '내 도메인을 쓸 수 있나요?', a: '네, Plus 요금제에서 가능해요. 포트폴리오는 직접 고른 perlink.to/내이름 주소에도 있고, 도메인을 연결한 뒤에도 계속 작동해요.' },
+      { q: '3D 포트폴리오를 이력서에 넣을 수 있나요?', a: '네. 이력서와 이메일 서명에 perlink.to 주소를 넣고, 대시보드에서 QR 코드를 받아 이력서나 명함에 인쇄하세요.' },
+    ],
+    ctaTitle: '오늘 바로 3D 포트폴리오를 만들어 보세요',
+    ctaText: '주소를 선점하고, 내 분야 템플릿을 골라 공개하세요. 무료, 코딩 필요 없음.',
+  },
+} satisfies Record<AppLanguage, unknown>
 const text = computed(() => TEXT[lang.value])
 
 // ---------- SEO ----------
-const pageUrl = computed(() => `${PERLINK_URL}${PORTFOLIO_BASE[lang.value]}`)
+const pageUrl = computed(() => `${PERLINK_URL}${local(PORTFOLIO_BASE.en)}`)
 useSeoMeta({
   title: () => text.value.metaTitle,
   description: () => text.value.metaDescription,
@@ -544,12 +917,10 @@ useSeoMeta({
   twitterSite: X_HANDLE,
 })
 useHead({
-  htmlAttrs: { lang: () => lang.value },
+  htmlAttrs: { lang: () => LANGUAGE_INFO[lang.value].html },
   link: () => [
     { rel: 'canonical', href: pageUrl.value },
-    { rel: 'alternate', hreflang: 'en', href: `${PERLINK_URL}${PORTFOLIO_BASE.en}` },
-    { rel: 'alternate', hreflang: 'vi', href: `${PERLINK_URL}${PORTFOLIO_BASE.vi}` },
-    { rel: 'alternate', hreflang: 'x-default', href: `${PERLINK_URL}${PORTFOLIO_BASE.en}` },
+    ...alternateLinks(PORTFOLIO_BASE.en),
   ],
   // The page, the product, the pages under it and the questions
   script: () => [{
@@ -563,19 +934,19 @@ useHead({
         url: pageUrl.value,
         name: text.value.metaTitle,
         description: text.value.metaDescription,
-        inLanguage: lang.value,
+        inLanguage: LANGUAGE_INFO[lang.value].html,
         isPartOf: { '@id': PERLINK_WEBSITE_ID },
         about: { '@id': PERLINK_APP_ID },
         hasPart: (Object.keys(PORTFOLIO_SLUGS) as PortfolioTopicId[]).map(id => ({ '@type': 'WebPage', url: `${PERLINK_URL}${topicLink(id)}` })),
       },
       breadcrumbs([
-        { name: 'Perlink', url: `${PERLINK_URL}${lang.value === 'vi' ? '/vi' : ''}` },
+        { name: 'Perlink', url: `${PERLINK_URL}${lang.value === 'en' ? '' : local('/')}` },
         { name: text.value.eyebrow, url: pageUrl.value },
       ]),
       {
         '@type': 'FAQPage',
         '@id': `${pageUrl.value}#faq`,
-        inLanguage: lang.value,
+        inLanguage: LANGUAGE_INFO[lang.value].html,
         mainEntity: text.value.faq.map(item => ({
           '@type': 'Question',
           name: item.q,
@@ -586,8 +957,8 @@ useHead({
   }],
 })
 
-const { setLocale } = useI18n()
+const { locale, setLocale } = useI18n()
 onMounted(() => {
-  if (lang.value === 'vi') setLocale('vi')
+  if (lang.value !== 'en' && locale.value !== lang.value) setLocale(lang.value)
 })
 </script>

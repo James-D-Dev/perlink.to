@@ -20,17 +20,18 @@
       </nav>
 
       <div class="ml-auto flex items-center gap-2">
-        <!-- Language: the home page exists in English (/) and Vietnamese (/vi);
-             other pages switch in place -->
-        <NuxtLink
-          :to="otherLanguage"
-          :hreflang="lang === 'vi' ? 'en' : 'vi'"
-          @click="switchInPlace"
-          class="hidden rounded-full px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-sand hover:text-ink sm:inline-flex"
-          :aria-label="copy.header.language"
-        >
-          {{ lang === 'vi' ? 'EN' : 'VI' }}
-        </NuxtLink>
+        <!-- Language: pages with an address per language go to that address;
+             the others switch language in place -->
+        <UDropdownMenu :items="languageItems" :content="{ align: 'end' }" :ui="{ content: 'min-w-40' }">
+          <button
+            type="button"
+            class="hidden items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-sand hover:text-ink sm:inline-flex"
+            :aria-label="copy.header.language"
+          >
+            <UIcon name="i-lucide-globe" class="size-3.5" />
+            {{ LANGUAGE_INFO[lang].short }}
+          </button>
+        </UDropdownMenu>
         <template v-if="loggedIn">
           <MarketingMkButton to="/dashboard" size="sm" variant="solid">{{ copy.header.dashboard }}</MarketingMkButton>
         </template>
@@ -63,36 +64,47 @@
         <UIcon name="i-lucide-arrow-up-right" class="size-4 text-ink-faint" />
       </NuxtLink>
       <MarketingMkButton v-if="!loggedIn" to="/login" variant="outline" block class="mt-5">{{ copy.header.login }}</MarketingMkButton>
-      <NuxtLink :to="otherLanguage" class="mt-4 block text-center text-sm text-ink-muted" @click="(event: MouseEvent) => { menuOpen = false; switchInPlace(event) }">
-        {{ lang === 'vi' ? 'English' : 'Tiếng Việt' }}
-      </NuxtLink>
+      <div class="mt-5 flex flex-wrap justify-center gap-1.5">
+        <button
+          v-for="code in APP_LANGUAGES"
+          :key="code"
+          type="button"
+          class="rounded-full px-3 py-1.5 text-sm transition-colors"
+          :class="code === lang ? 'bg-ink text-paper' : 'text-ink-muted hover:bg-sand'"
+          @click="menuOpen = false; switchTo(code)"
+        >
+          {{ LANGUAGE_INFO[code].label }}
+        </button>
+      </div>
     </nav>
   </header>
 </template>
 
 <script setup lang="ts">
+import { APP_LANGUAGES, LANGUAGE_INFO, type AppLanguage } from '#shared/language'
 const { loggedIn } = useUserSession()
 
-const { lang, copy, home, anchor } = useMarketingLang()
+const { lang, copy, home, anchor, local } = useMarketingLang()
 
-// The other language: the other home page, or this page in that language
+// Pages with an address per language (home, templates...) go to that
+// address; the others switch language in place. Either way the dashboard
+// follows, and a signed-in account remembers it (dashboard, email).
 const route = useRoute()
 const { setLocale } = useI18n()
-// Pages with an address per language (home, templates...) switch address;
-// the others switch language in place
-const paired = computed(() => pairedPath(route.path))
-const onHome = computed(() => !!paired.value)
-const otherLanguage = computed(() => paired.value ?? route.fullPath)
-function switchInPlace(event: MouseEvent) {
-  if (onHome.value) return
-  event.preventDefault()
-  const next = lang.value === 'vi' ? 'en' : 'vi'
-  setLocale(next)
-  // Signed in: the account remembers it too (dashboard, Telegram, email)
+async function switchTo(next: AppLanguage) {
+  if (next === lang.value) return
+  await setLocale(next)
   if (loggedIn.value) $fetch('/api/account', { method: 'PATCH', body: { language: next } }).catch(() => {})
+  const set = langSetOf(route.path)
+  if (set) await navigateTo(set[next] ?? set.en)
 }
+const languageItems = computed(() => APP_LANGUAGES.map(code => ({
+  label: LANGUAGE_INFO[code].label,
+  icon: code === lang.value ? 'i-lucide-check' : undefined,
+  onSelect: () => switchTo(code),
+})))
 const nav = computed(() => [
-  { label: copy.value.header.nav.templates, to: lang.value === 'vi' ? '/vi/templates' : '/templates' },
+  { label: copy.value.header.nav.templates, to: local('/templates') },
   { label: copy.value.header.nav.worlds, to: anchor('3d') },
   { label: copy.value.header.nav.trends, to: '/trends' },
   { label: copy.value.header.nav.pricing, to: '/pricing' },

@@ -1,0 +1,536 @@
+{
+  "blocks": {
+    "editor": {
+      "addBlock": "添加区块",
+      "unsavedChanges": "有未保存的更改",
+      "allSaved": "所有更改已保存",
+      "hiddenBadge": "已隐藏",
+      "menu": {
+        "more": "更多操作",
+        "show": "显示区块",
+        "hide": "隐藏区块",
+        "up": "上移",
+        "down": "下移",
+        "duplicate": "复制",
+        "addBelow": "在下方添加区块",
+        "side": "显示给",
+        "sideBoth": "双方家庭",
+        "sideGroom": "仅男方",
+        "sideBride": "仅女方",
+        "sideBadgeGroom": "男方",
+        "sideBadgeBride": "女方"
+      }
+    },
+    "header": {
+      "changePhoto": "更换照片",
+      "addPhoto": "添加照片",
+      "titlePlaceholder": "你的名字或标题",
+      "bioPlaceholder": "介绍一下你自己",
+      "nameLabel": "显示名称",
+      "bioLabel": "简介",
+      "removePhoto": "移除"
+    },
+    "links": {
+      "title": "链接",
+      "titleLabel": "标题",
+      "titleHelp": "链接上方的可选标题。",
+      "titlePlaceholder": "例如：精选",
+      "linkTitlePlaceholder": "标题（必填）",
+      "linkSubtitlePlaceholder": "副标题（可选）",
+      "linkUrlPlaceholder": "URL 或邮箱（必填）",
+      "add": "添加",
+      "visible": "显示",
+      "hidden": "隐藏",
+      "addLabel": "快速添加链接",
+      "addHelp": "粘贴网址，标题会自动填好。"
+    },
+    "social": {
+      "title": "社交链接",
+      "empty": "还没有添加社交链接",
+      "addSocial": "添加社交账号",
+      "modalTitle": "添加社交链接",
+      "searchPlaceholder": "搜索社交平台...",
+      "usernamePlaceholder": "用户名",
+      "urlPlaceholder": "输入 URL",
+      "groups": {
+        "social": "社交网络",
+        "stores": "商店、外卖与地图（以按钮显示）"
+      }
+    },
+    "album": {
+      "title": "图片相册",
+      "imageCount": "{n} 张图片 | {n} 张图片",
+      "titleLabel": "标题",
+      "titleHelp": "图片上方的可选标题。",
+      "titlePlaceholder": "例如：相册",
+      "layout": "布局",
+      "layouts": {
+        "grid": "网格",
+        "masonry": "瀑布流",
+        "vertical": "堆叠",
+        "carousel": "轮播"
+      },
+      "dropHint": "点击或拖动图片到这里",
+      "limits": "最多 6 张图片，每张不超过 5MB",
+      "maxReached": "已达到 6 张图片上限",
+      "uploading": "上传中...",
+      "images": "图片",
+      "deleteTitle": "删除图片",
+      "deleteConfirm": "确定要删除这张图片吗？此操作无法撤销。",
+      "toast": {
+        "limitTitle": "已达上限",
+        "limitDescription": "最多允许 {max} 张图片",
+        "successTitle": "成功",
+        "uploaded": "已上传 {n} 张图片 | 已上传 {n} 张图片",
+        "uploadFailedTitle": "上传失败",
+        "uploadFailedDescription": "图片上传失败",
+        "deletedTitle": "已删除",
+        "deletedDescription": "图片已从相册中移除"
+      }
+    },
+    "text": {
+      "title": "文字",
+      "titleLabel": "标题",
+      "titleHelp": "文字上方的可选标题。",
+      "titlePlaceholder": "关于我们",
+      "textLabel": "文字",
+      "textPlaceholder": "告诉访客你是谁、做什么，或你的店有什么特别之处。",
+      "alignment": "对齐",
+      "alignLeft": "左对齐",
+      "alignCenter": "居中对齐",
+      "alignRight": "右对齐",
+      "style": "样式",
+      "styles": {
+        "plain": "纯文字",
+        "card": "卡片"
+      }
+    },
+    "menu": {
+      "title": "菜单",
+      "itemCount": "{n} 项 | {n} 项",
+      "titleLabel": "标题",
+      "titlePlaceholder": "菜单、房型、服务...",
+      "currency": "货币",
+      "priceSuffix": "价格后缀",
+      "priceSuffixPlaceholder": "例如：/晚",
+      "sectionSuffix": "此分类的价格后缀",
+      "sectionSuffixPlaceholder": "后缀",
+      "layout": "布局",
+      "layouts": {
+        "list": "列表",
+        "cards": "卡片"
+      },
+      "sectionPlaceholder": "分类，例如：前菜",
+      "itemNamePlaceholder": "名称",
+      "itemPricePlaceholder": "价格",
+      "itemDescriptionPlaceholder": "简短描述（可选）",
+      "itemTagPlaceholder": "标签，例如：热销",
+      "itemImagePlaceholder": "图片 URL（可选）",
+      "addItem": "添加项目",
+      "addSection": "添加分类",
+      "itemPhoto": "照片",
+      "removePhoto": "移除照片",
+      "soldOut": "已售罄",
+      "photoFailed": "照片上传失败"
+    },
+    "hours": {
+      "title": "营业时间",
+      "titleLabel": "标题",
+      "titlePlaceholder": "营业时间",
+      "closed": "休息",
+      "copyMonday": "将周一复制到所有日期",
+      "note": "备注",
+      "notePlaceholder": "例如：厨房提前 30 分钟停止接单",
+      "pause": "暂停营业",
+      "pauseHelp": "用于假期或装修。访客会看到你在所选日期前暂停营业。",
+      "pauseUntil": "恢复营业日期",
+      "pauseMessage": "提示信息",
+      "pauseMessagePlaceholder": "例如：春节休息，期待再见！"
+    },
+    "contact": {
+      "title": "联系方式",
+      "titleLabel": "标题",
+      "titlePlaceholder": "联系与预订",
+      "address": "地址",
+      "addressPlaceholder": "北京市朝阳区建国路 88 号",
+      "mapLink": "地图链接",
+      "mapLinkHelp": "留空则在 Google Maps 中打开地址。",
+      "phone": "电话",
+      "email": "邮箱",
+      "bookingButton": "预订按钮",
+      "bookingButtonPlaceholder": "预订座位",
+      "bookingLink": "预订链接",
+      "quickBar": "快捷联系按钮",
+      "quickBarHelp": "固定在页面底部的电话、导航和聊天按钮。聊天会使用社交图标区块中的 Zalo、WhatsApp 或 Telegram。"
+    },
+    "birthday": {
+      "title": "倒计时",
+      "birthDate": "出生日期",
+      "birthDatePlaceholder": "选择出生日期",
+      "label": "标签",
+      "labelPlaceholder": "例如：小美的生日、我们在一起、距离婚礼还有",
+      "theme": "主题",
+      "themes": {
+        "classic": "经典",
+        "modern": "现代",
+        "minimal": "极简",
+        "party": "派对",
+        "elegant": "优雅",
+        "card": "页面卡片",
+        "rose": "玫瑰",
+        "night": "夜晚"
+      },
+      "showAge": "显示年龄（例如“即将 25 岁”）",
+      "sinceDate": "开始日期",
+      "mode": "计时方式",
+      "modes": {
+        "until": "倒计时",
+        "since": "正计时"
+      },
+      "repeat": "每年重复",
+      "repeatHint": "适用于生日和纪念日。关闭：只计到这一天，例如婚礼。"
+    },
+    "vietqr": {
+      "title": "VietQR 付款",
+      "emptyHint": "填写银行信息后点击生成",
+      "selectBank": "选择银行",
+      "accountNumber": "账号",
+      "accountName": "账户名",
+      "amount": "金额（VND）",
+      "note": "转账备注（可选）",
+      "theme": "主题：{name}",
+      "themes": {
+        "doreamon": "哆啦A梦",
+        "hello-kitty": "Hello Kitty",
+        "merry-christmas": "圣诞快乐",
+        "newyear-2026": "2026 新年",
+        "vietnam": "越南",
+        "rose": "玫瑰"
+      },
+      "generate": "生成二维码",
+      "errorTitle": "错误",
+      "generateFailed": "二维码生成失败",
+      "copiedDescription": "二维码文本已复制到剪贴板"
+    },
+    "picker": {
+      "title": "添加区块",
+      "description": "区块是页面的组成部分，之后可以调整顺序。",
+      "added": "已添加",
+      "groups": {
+        "content": "内容",
+        "business": "商家",
+        "extras": "更多"
+      },
+      "items": {
+        "links": {
+          "label": "链接",
+          "description": "指向你的网站、店铺、视频或任何内容的按钮。"
+        },
+        "social": {
+          "label": "社交图标",
+          "description": "一排 Instagram、TikTok、Zalo 等平台的图标。"
+        },
+        "text": {
+          "label": "文字",
+          "description": "关于我们，或任何带标题的段落。"
+        },
+        "imageAlbum": {
+          "label": "相册",
+          "description": "最多 6 张照片，可选网格、瀑布流、堆叠或轮播。"
+        },
+        "menu": {
+          "label": "菜单 / 价目表",
+          "description": "菜品、房型或服务及价格。"
+        },
+        "hours": {
+          "label": "营业时间",
+          "description": "一周营业时间，带实时“营业中”标记。"
+        },
+        "contact": {
+          "label": "联系与预订",
+          "description": "地址、电话、邮箱和预订按钮。"
+        },
+        "vietqr": {
+          "label": "VietQR",
+          "description": "银行二维码，方便别人付款或打赏。"
+        },
+        "birthdayCountdown": {
+          "label": "倒计时",
+          "description": "距离生日或婚礼的天数，或从某天起在一起的天数。"
+        },
+        "form": {
+          "label": "预订 / 联系表单",
+          "description": "访客提交预订或咨询，直接进入你的收件箱。"
+        },
+        "video": {
+          "label": "视频",
+          "description": "在页面上直接播放 YouTube、Vimeo 或 TikTok 视频。"
+        },
+        "testimonials": {
+          "label": "客户评价",
+          "description": "来自客户的评价和好评，附星级。"
+        },
+        "products": {
+          "label": "商品",
+          "description": "销售：在页面上接单，或链接到 Shopee、TikTok Shop 等平台。"
+        },
+        "blog": {
+          "label": "最新文章",
+          "description": "你最新的博客文章，链接到你的博客。"
+        },
+        "timeline": {
+          "label": "时间线",
+          "description": "按日期讲述你的故事：如何相识、婚礼当天安排、重要时刻。"
+        },
+        "letter": {
+          "label": "信件",
+          "description": "装在信封里的情书或邀请函，访客点击即可打开。"
+        },
+        "event": {
+          "label": "活动详情",
+          "description": "日期、时间和地点，附添加到日历和导航按钮。"
+        },
+        "question": {
+          "label": "提问",
+          "description": "“做我的情人好吗？”“不”按钮会逃跑，“好”会撒出爱心。"
+        }
+      },
+      "searchPlaceholder": "粘贴链接或搜索区块…",
+      "suggested": "推荐",
+      "more": "更多页面内容",
+      "results": "搜索结果",
+      "noResults": "没有匹配“{query}”的区块。",
+      "pasteAdd": "添加",
+      "paste": {
+        "video": "添加此视频",
+        "map": "添加此 Google Maps 地点",
+        "social": "将 {name} 添加到社交图标",
+        "link": "添加为链接按钮",
+        "product": "从 {store} 添加商品"
+      }
+    },
+    "iconPicker": {
+      "title": "选择图标",
+      "website": "网站",
+      "link": "链接"
+    },
+    "deleteLink": {
+      "title": "删除链接",
+      "description": "确定要删除此链接吗？此操作无法撤销。",
+      "errorTitle": "错误",
+      "deletedTitle": "链接已删除",
+      "deletedDescription": "链接已成功删除",
+      "failed": "删除链接失败，请重试。"
+    },
+    "form": {
+      "title": "表单",
+      "defaultTitle": "预订表单",
+      "titleLabel": "标题",
+      "titlePlaceholder": "预订座位",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "我们会在一小时内电话确认。",
+      "kind": "类型",
+      "kinds": {
+        "booking": "预订",
+        "contact": "联系",
+        "rsvp": "邀请回复（RSVP）",
+        "stay": "客房预订（住宿）",
+        "subscribe": "订阅（邮件通讯）"
+      },
+      "subscribeHint": "访客只需留下邮箱。订阅者会在收件箱中有单独的标签页，你可以复制所有地址或下载 CSV 导入邮件工具。",
+      "serviceLabel": "选择器标题",
+      "serviceLabelHelp": "留空则显示“服务”。",
+      "serviceLabelPlaceholder": "例如：选择套餐",
+      "serviceLabelStay": "例如：选择哪个房间？",
+      "fieldsLabel": "字段",
+      "fieldsHelp": "姓名始终为必填。",
+      "fields": {
+        "phone": "电话",
+        "email": "邮箱",
+        "date": "日期",
+        "time": "时间",
+        "guests": "人数",
+        "message": "留言",
+        "service": "服务",
+        "checkout": "退房日期"
+      },
+      "serviceHint": "服务：访客可从页面的价目表或商品中选择（带价格）。如果没有，可自行填写需求。",
+      "checkoutHint": "退房：用于住宿，访客选择入住和退房日期并看到入住晚数。",
+      "hoursHint": "营业时间会把时间变成可选时段，并避免在休息日被预订。",
+      "submitLabel": "按钮文字",
+      "submitPlaceholder": "提交预订",
+      "successLabel": "感谢信息",
+      "successPlaceholder": "谢谢！我们会尽快回复你。",
+      "inboxNote": "请求会进入你的收件箱。可从网站列表或编辑器顶部栏打开。",
+      "openInbox": "打开收件箱"
+    },
+    "video": {
+      "title": "视频",
+      "urlLabel": "视频链接",
+      "urlHelp": "YouTube（含 Shorts）、Vimeo 或 TikTok。",
+      "unsupported": "请粘贴 YouTube、Vimeo 或 TikTok 视频链接。",
+      "providers": {
+        "youtube": "YouTube 视频",
+        "vimeo": "Vimeo 视频",
+        "tiktok": "TikTok 视频"
+      },
+      "titleLabel": "标题",
+      "titlePlaceholder": "例如：走进店内",
+      "captionLabel": "说明文字"
+    },
+    "testimonials": {
+      "title": "客户评价",
+      "count": "{n} 条评价 | {n} 条评价",
+      "titleLabel": "标题",
+      "titlePlaceholder": "客人怎么说",
+      "quotePlaceholder": "他们说了什么？",
+      "authorPlaceholder": "姓名",
+      "detailPlaceholder": "例如：Google 评价",
+      "add": "添加评价",
+      "stars": "{n} 星 | {n} 星"
+    },
+    "preview": {
+      "empty": "{name} — 暂无内容"
+    },
+    "products": {
+      "title": "商品",
+      "itemCount": "{n} 件商品 | {n} 件商品",
+      "titleLabel": "标题",
+      "titlePlaceholder": "商品、商店、系列...",
+      "layout": "布局",
+      "layouts": {
+        "grid": "网格",
+        "list": "列表"
+      },
+      "ordering": "在页面上接单",
+      "orderingHelp": "没有商店链接的商品会显示“下单”按钮。订单会进入你的收件箱。",
+      "askAddress": "要求填写收货地址",
+      "payment": "付款方式",
+      "payments": {
+        "both": "货到付款和银行转账",
+        "cod": "仅货到付款",
+        "transfer": "仅银行转账"
+      },
+      "needBank": "添加带有你银行账户的 VietQR 区块，客户即可转账付款（二维码会自动填入金额和订单号）。",
+      "photo": "商品照片",
+      "photoFailed": "照片上传失败",
+      "namePlaceholder": "商品名称",
+      "price": "价格",
+      "comparePrice": "原价（如有折扣）",
+      "descriptionPlaceholder": "简短描述（可选）",
+      "urlPlaceholder": "Shopee、TikTok Shop、Lazada... 链接（可选）",
+      "urlHelp": "粘贴商店链接，让客户去那里购买。",
+      "urlHelpOrder": "留空则在页面上接单，或粘贴商店链接让客户去那里购买。",
+      "urlHelpStore": "客户点击“购买”后前往 {store}。",
+      "website": "你的网站",
+      "tagPlaceholder": "标签，例如：热销",
+      "soldOut": "已售罄",
+      "moveUp": "上移",
+      "moveDown": "下移",
+      "add": "添加商品",
+      "choices": "规格与库存",
+      "stock": "库存",
+      "stockPlaceholder": "不计库存",
+      "stockHelp": "留空则不计库存。5 件或以下显示“仅剩 3 件”，0 显示已售罄。",
+      "stockCount": "库存 {n} 件",
+      "optionName": "尺码",
+      "optionValues": "S, M, L（用逗号分隔）",
+      "addSize": "尺码",
+      "addColour": "颜色",
+      "addOption": "其他规格",
+      "choicePrice": "各规格价格",
+      "choicePriceAdd": "不同规格不同价格",
+      "choicePricePlaceholder": "与商品相同",
+      "choicePriceHint": "留空则沿用商品价格。买家在卡片上看到“…起”，选择规格后显示确切价格。",
+      "sizeName": "尺码",
+      "colourName": "颜色",
+      "colourValues": "黑色, 白色, 米色"
+    },
+    "blog": {
+      "title": "最新文章",
+      "titleLabel": "标题",
+      "titlePlaceholder": "例如：博客精选",
+      "countLabel": "显示文章数",
+      "hint": "在博客标签页中撰写文章。",
+      "empty": "还没有已发布的文章 — 去博客标签页写一篇吧。"
+    },
+    "timeline": {
+      "title": "时间线",
+      "count": "{n} 个节点 | {n} 个节点",
+      "titleLabel": "标题",
+      "titlePlaceholder": "我们的故事",
+      "datePlaceholder": "2023 年 2 月",
+      "itemTitlePlaceholder": "发生了什么",
+      "textPlaceholder": "简单说几句（可选）",
+      "photo": "照片",
+      "photoHint": "添加照片（可选）",
+      "removePhoto": "移除照片",
+      "photoFailed": "照片上传失败",
+      "add": "添加节点",
+      "moveUp": "上移",
+      "moveDown": "下移"
+    },
+    "letter": {
+      "title": "信件",
+      "to": "致",
+      "toPlaceholder": "小明",
+      "body": "信件内容",
+      "bodyPlaceholder": "写下你想说的话…",
+      "from": "署名",
+      "fromPlaceholder": "爱你的小美",
+      "paper": "信纸",
+      "papers": {
+        "cream": "奶油",
+        "blush": "腮红粉",
+        "night": "夜色"
+      },
+      "sealed": "装进信封",
+      "sealedHint": "访客点击信封即可打开信件。",
+      "personal": "从链接获取宾客姓名",
+      "personalHint": "给每位宾客发送专属链接，信封会以他们的名字问候。",
+      "guestPlaceholder": "宾客姓名",
+      "copyLink": "复制链接",
+      "linkCopied": "链接已复制",
+      "cover": "信封上的文字",
+      "coverHelp": "留空则显示“致 …”。",
+      "coverPlaceholder": "想我的时候再打开",
+      "guestList": "宾客名单：每人一个链接，查看谁已打开"
+    },
+    "event": {
+      "title": "活动详情",
+      "name": "活动内容",
+      "namePlaceholder": "婚宴",
+      "date": "日期",
+      "startTime": "开始",
+      "endTime": "结束",
+      "venue": "场地",
+      "venuePlaceholder": "玫瑰园酒店",
+      "address": "地址",
+      "addressHelp": "没有地图链接时用于导航。",
+      "addressPlaceholder": "湖滨路 8 号",
+      "mapUrl": "地图链接（可选）",
+      "dressCode": "着装要求",
+      "dressCodePlaceholder": "马卡龙色系",
+      "note": "备注",
+      "notePlaceholder": "地下室可停车",
+      "calendarNote": "宾客可将活动保存到 Google 日历、Apple 日历或 Outlook，并一键打开导航。"
+    },
+    "question": {
+      "title": "提问",
+      "question": "问题",
+      "questionPlaceholder": "做我的情人好吗？",
+      "yesLabel": "“是”按钮",
+      "yesPlaceholder": "好",
+      "noLabel": "“否”按钮",
+      "noPlaceholder": "不要",
+      "answer": "点“好”之后",
+      "answerPlaceholder": "我就知道！7 点见 ❤️",
+      "playful": "“不”按钮会逃跑",
+      "playfulHint": "它会从手指下溜走，而“好”按钮每次都会变大。",
+      "idea1": "做我的情人好吗？",
+      "idea2": "你愿意嫁给我吗？",
+      "idea3": "原谅我好吗？",
+      "idea4": "这周六一起吃晚饭吗？"
+    }
+  }
+}

@@ -663,6 +663,7 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from "#shared/language";
 import { nanoid } from "nanoid";
 import { useDebounceFn, useMediaQuery, useResizeObserver } from "@vueuse/core";
 import { LANDS } from "~/utils/room/lands";
@@ -1525,7 +1526,7 @@ const saveStatus = computed<{ text: string; tone: "muted" | "pending" | "error" 
     return { text: t("dashboard.editor.status.draftPending"), tone: "pending" };
   }
   if (lastSavedAt.value) {
-    const time = lastSavedAt.value.toLocaleTimeString(locale.value === "vi" ? "vi-VN" : "en-GB", { hour: "2-digit", minute: "2-digit" });
+    const time = lastSavedAt.value.toLocaleTimeString(toAppLanguage(locale.value) === "en" ? "en-GB" : LANGUAGE_INFO[toAppLanguage(locale.value)].intl, { hour: "2-digit", minute: "2-digit" });
     return { text: t("dashboard.editor.status.savedAt", { time }), tone: "muted" };
   }
   return { text: t("dashboard.editor.status.saved"), tone: "muted" };
@@ -1558,7 +1559,7 @@ function restoreLocalBackup(serverTime: string | null | undefined) {
   } catch {
     return forget();
   }
-  const time = new Date(backup.savedAt).toLocaleTimeString(locale.value === "vi" ? "vi-VN" : "en-GB", { hour: "2-digit", minute: "2-digit" });
+  const time = new Date(backup.savedAt).toLocaleTimeString(toAppLanguage(locale.value) === "en" ? "en-GB" : LANGUAGE_INFO[toAppLanguage(locale.value)].intl, { hour: "2-digit", minute: "2-digit" });
   toast.add({
     title: t("dashboard.editor.unsaved.restoredTitle"),
     description: t("dashboard.editor.unsaved.restoredText", { site: `perlink.to/${loadedUsername.value}`, time }),

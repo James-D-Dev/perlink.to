@@ -4,6 +4,7 @@ import { getQuery } from 'h3'
 import { getDB } from './db'
 import { ProfileRepository } from '../repositories/profileRepository'
 import { sendWelcomeEmail } from './welcomeEmail'
+import { markSignup } from './signupEvent'
 
 export interface SocialAccount {
   provider: 'facebook' | 'tiktok'

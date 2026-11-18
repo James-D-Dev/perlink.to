@@ -32,7 +32,7 @@ export const perlinkWebsite = () => ({
   '@id': PERLINK_WEBSITE_ID,
   name: 'Perlink',
   url: PERLINK_URL,
-  inLanguage: ['en', 'vi'],
+  inLanguage: ['en', 'vi', 'zh-Hans', 'ja', 'ko'],
   publisher: { '@id': PERLINK_ORG_ID },
 })
 

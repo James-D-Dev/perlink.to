@@ -154,7 +154,7 @@
           </p>
           <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <MarketingMkButton to="/login" trailing-icon="i-lucide-arrow-right">{{ c.worlds.cta }}</MarketingMkButton>
-            <NuxtLink :to="lang === 'vi' ? '/vi/portfolio-3d' : '/3d-portfolio'" class="text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink">{{ c.worlds.portfolioLink }}</NuxtLink>
+            <NuxtLink :to="local('/3d-portfolio')" class="text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink">{{ c.worlds.portfolioLink }}</NuxtLink>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-px border-t border-line bg-line md:border-l md:border-t-0">
@@ -224,11 +224,13 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO } from '#shared/language'
+import { alternateLinks } from '~/data/langPaths'
 import { PAGE_TEMPLATES } from '~/data/pageTemplates'
 import { TRENDS } from '~/data/trends'
 
 // The landing page, in the language of its URL ("/" English, "/vi" Vietnamese)
-const { lang, copy: c } = useMarketingLang()
+const { lang, copy: c, local } = useMarketingLang()
 
 // The hero's second line around its highlighted words ("3D world")
 const heroLine2 = computed(() => {
@@ -239,7 +241,7 @@ const heroLine2 = computed(() => {
 
 // ---------- SEO ----------
 const SITE_URL = 'https://perlink.to'
-const pageUrl = computed(() => (lang.value === 'vi' ? `${SITE_URL}/vi` : SITE_URL))
+const pageUrl = computed(() => `${SITE_URL}${lang.value === 'en' ? '' : local('/')}`)
 
 useSeoMeta({
   title: () => c.value.meta.title,
@@ -249,7 +251,7 @@ useSeoMeta({
   ogUrl: () => pageUrl.value,
   ogType: 'website',
   ogSiteName: 'Perlink',
-  ogLocale: () => (lang.value === 'vi' ? 'vi_VN' : 'en_US'),
+  ogLocale: () => LANGUAGE_INFO[lang.value].og,
   ogImage: `${SITE_URL}/images/og.jpg`,
   ogImageWidth: 1200,
   ogImageHeight: 630,
@@ -261,13 +263,11 @@ useSeoMeta({
 })
 
 useHead({
-  htmlAttrs: { lang: () => lang.value },
+  htmlAttrs: { lang: () => LANGUAGE_INFO[lang.value].html },
   link: () => [
     { rel: 'canonical', href: pageUrl.value },
     // Tell search engines both languages are the same page
-    { rel: 'alternate', hreflang: 'en', href: SITE_URL },
-    { rel: 'alternate', hreflang: 'vi', href: `${SITE_URL}/vi` },
-    { rel: 'alternate', hreflang: 'x-default', href: SITE_URL },
+    ...alternateLinks('/'),
   ],
   script: () => [
     {
@@ -282,9 +282,9 @@ useHead({
 })
 
 // Visitors who come in through /vi get the dashboard in Vietnamese too
-const { setLocale } = useI18n()
+const { locale, setLocale } = useI18n()
 onMounted(() => {
-  if (lang.value === 'vi') setLocale('vi')
+  if (lang.value !== 'en' && locale.value !== lang.value) setLocale(lang.value)
 })
 
 // ---------- Content ----------

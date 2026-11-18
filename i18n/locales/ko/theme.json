@@ -1,0 +1,599 @@
+{
+  "theme": {
+    "panelTitle": "템플릿 & 테마",
+    "tabs": {
+      "presets": "테마 프리셋",
+      "custom": "사용자 지정"
+    },
+    "options": {
+      "none": "없음",
+      "xs": "XS",
+      "small": "작게",
+      "medium": "보통",
+      "large": "크게",
+      "xl": "XL"
+    },
+    "fields": {
+      "fontFamily": "글꼴",
+      "fontSize": "글자 크기",
+      "textColor": "글자 색상",
+      "weight": "굵기",
+      "letterSpacing": "자간"
+    },
+    "headerLayout": {
+      "label": "헤더 레이아웃",
+      "tabs": {
+        "noBanner": "배너 없음",
+        "banner": "배너"
+      },
+      "options": {
+        "centered": "가운데",
+        "left": "왼쪽",
+        "cover": "커버",
+        "imageOverlay": "이미지 오버레이",
+        "bannerCircle": "배너 ○",
+        "bannerSquare": "배너 □"
+      },
+      "addBanner": "배너 이미지 추가",
+      "upload": "이미지 업로드"
+    },
+    "colors": {
+      "title": "색상",
+      "primary": "기본",
+      "secondary": "보조",
+      "third": "세 번째",
+      "categories": {
+        "neutral": "뉴트럴",
+        "bold": "강렬함",
+        "playful": "발랄함",
+        "dark": "다크",
+        "gradient": "그라데이션"
+      },
+      "accent": "강조 색상",
+      "accentHelp": "카드, 버튼, 아이콘에 사용돼요."
+    },
+    "background": {
+      "title": "배경",
+      "tabs": {
+        "solid": "단색",
+        "gradient": "그라데이션",
+        "image": "이미지",
+        "video": "영상",
+        "effect": "효과",
+        "pattern": "패턴"
+      },
+      "custom": "사용자 지정",
+      "customGradient": "사용자 지정 그라데이션",
+      "from": "시작",
+      "via": "중간",
+      "to": "끝",
+      "customImageUrl": "사용자 지정 이미지 URL",
+      "videoUrl": "영상 URL (mp4, webm)"
+    },
+    "header": {
+      "title": "헤더 제목",
+      "blockTitleFont": "블록 제목 글꼴"
+    },
+    "bio": {
+      "title": "소개 텍스트"
+    },
+    "card": {
+      "title": "카드 스타일",
+      "style": "스타일",
+      "color": "카드 색상",
+      "colorHelp": "비워 두면 기본 색상을 사용해요.",
+      "colorAria": "카드 색상",
+      "borderColor": "테두리 색상",
+      "borderColorAria": "카드 테두리 색상",
+      "cornerRadius": "모서리 둥글기",
+      "shadow": "그림자",
+      "backdropBlur": "배경 흐림",
+      "appearAnimation": "등장 애니메이션",
+      "hoverAnimation": "호버 애니메이션",
+      "styles": {
+        "filled": "채우기",
+        "outline": "외곽선",
+        "ghost": "고스트",
+        "soft": "소프트"
+      },
+      "pill": "알약형",
+      "shadowHard": "선명하게",
+      "shadowGlow": "글로우",
+      "borderWidth": "테두리 두께",
+      "borderAuto": "스타일에 따름"
+    },
+    "fontWeights": {
+      "light": "가늘게",
+      "regular": "보통",
+      "medium": "중간",
+      "semibold": "약간 굵게",
+      "bold": "굵게"
+    },
+    "letterSpacings": {
+      "tight": "좁게",
+      "snug": "약간 좁게",
+      "normal": "보통",
+      "wide": "넓게",
+      "extraWide": "아주 넓게"
+    },
+    "page": {
+      "title": "페이지",
+      "textColorAria": "페이지 글자 색상",
+      "blockSpacing": "블록 간격",
+      "blockTitles": "블록 제목",
+      "titleAlign": {
+        "center": "가운데",
+        "left": "왼쪽"
+      },
+      "socialIcons": "소셜 아이콘"
+    },
+    "blockGaps": {
+      "compact": "좁게",
+      "normal": "보통",
+      "relaxed": "넓게"
+    },
+    "socialStyles": {
+      "soft": "소프트",
+      "filled": "채우기",
+      "outline": "외곽선",
+      "plain": "아이콘만"
+    },
+    "font": {
+      "title": "글꼴",
+      "selectPlaceholder": "글꼴 선택..."
+    },
+    "avatar": {
+      "title": "프로필 사진 모양",
+      "shapes": {
+        "circle": "원형",
+        "rounded": "둥근 모서리",
+        "square": "사각형"
+      }
+    },
+    "linkLayout": {
+      "title": "링크 카드 레이아웃",
+      "vertical": "세로 (이미지 위)",
+      "horizontalLeft": "가로 (이미지 왼쪽)",
+      "horizontalRight": "가로 (이미지 오른쪽)",
+      "centered": "가운데 (텍스트만)"
+    },
+    "animations": {
+      "appear": {
+        "fadeIn": "페이드 인",
+        "fadeInDown": "위에서 페이드 인",
+        "fadeInUp": "아래에서 페이드 인",
+        "fadeInLeft": "왼쪽에서 페이드 인",
+        "fadeInRight": "오른쪽에서 페이드 인",
+        "zoomIn": "줌 인",
+        "zoomInDown": "위에서 줌 인",
+        "zoomInUp": "아래에서 줌 인",
+        "bounceIn": "바운스 인",
+        "bounceInDown": "위에서 바운스 인",
+        "bounceInUp": "아래에서 바운스 인",
+        "slideInDown": "위에서 슬라이드 인",
+        "slideInUp": "아래에서 슬라이드 인",
+        "slideInLeft": "왼쪽에서 슬라이드 인",
+        "slideInRight": "오른쪽에서 슬라이드 인",
+        "backInDown": "위에서 백 인",
+        "backInUp": "아래에서 백 인",
+        "flipInX": "X축 플립 인",
+        "flipInY": "Y축 플립 인",
+        "lightSpeedInRight": "오른쪽에서 빠르게 등장",
+        "rotateIn": "회전하며 등장"
+      },
+      "hover": {
+        "pulse": "펄스",
+        "bounce": "바운스",
+        "rubberBand": "고무줄",
+        "shakeX": "좌우 흔들기",
+        "shakeY": "상하 흔들기",
+        "headShake": "고개 젓기",
+        "swing": "스윙",
+        "tada": "짜잔",
+        "wobble": "흔들흔들",
+        "jello": "젤리",
+        "heartBeat": "심장 박동",
+        "flash": "깜빡임",
+        "flip": "뒤집기"
+      },
+      "durations": {
+        "faster": "아주 빠르게 (0.5s)",
+        "fast": "빠르게 (0.8s)",
+        "normal": "보통 (1s)",
+        "slow": "느리게 (2s)",
+        "slower": "아주 느리게 (3s)"
+      }
+    },
+    "presetCategories": {
+      "minimal": "미니멀",
+      "warm": "따뜻함",
+      "elegant": "엘레강스",
+      "playful": "발랄함",
+      "nature": "자연",
+      "pastel": "파스텔",
+      "dark": "다크",
+      "festive": "축제",
+      "glass": "글래스",
+      "luxe": "럭스",
+      "bold": "볼드"
+    },
+    "presets": {
+      "paper": {
+        "name": "페이퍼",
+        "description": "흰 페이지, 검은 글씨, 군더더기 없이"
+      },
+      "stone": {
+        "name": "스톤",
+        "description": "부드러운 카드의 따뜻한 회색"
+      },
+      "mono": {
+        "name": "모노",
+        "description": "검은 버튼, 각진 모서리"
+      },
+      "swiss": {
+        "name": "스위스",
+        "description": "왼쪽 정렬, 빨간 포인트"
+      },
+      "cloud": {
+        "name": "클라우드",
+        "description": "가벼운 청회색, 둥근 모서리"
+      },
+      "coffee": {
+        "name": "커피하우스",
+        "description": "카페를 위한 크림과 에스프레소"
+      },
+      "terracotta": {
+        "name": "테라코타",
+        "description": "모래 위 점토 주황"
+      },
+      "bakery": {
+        "name": "베이커리",
+        "description": "버터 노랑과 갈색"
+      },
+      "honey": {
+        "name": "허니",
+        "description": "황금빛 그라데이션, 어두운 글씨"
+      },
+      "cinnamon": {
+        "name": "시나몬",
+        "description": "크림 카드의 진한 갈색"
+      },
+      "ivory": {
+        "name": "아이보리",
+        "description": "아이보리 위 세리프 글씨, 가는 선"
+      },
+      "spa": {
+        "name": "스파",
+        "description": "세이지와 리넨, 차분하고 깔끔하게"
+      },
+      "champagne": {
+        "name": "샴페인",
+        "description": "블러시 위 부드러운 금색"
+      },
+      "noir": {
+        "name": "누아르",
+        "description": "저녁을 위한 검정과 금색"
+      },
+      "atelier": {
+        "name": "아틀리에",
+        "description": "네이비와 크림, 단정하게"
+      },
+      "bubblegum": {
+        "name": "버블검",
+        "description": "분홍빛, 둥글고 통통 튀는"
+      },
+      "lemonade": {
+        "name": "레모네이드",
+        "description": "레몬 노랑, 파란 버튼"
+      },
+      "sticker": {
+        "name": "스티커",
+        "description": "두꺼운 외곽선의 흰 카드"
+      },
+      "candy": {
+        "name": "캔디",
+        "description": "달콤한 그라데이션, 흰 카드"
+      },
+      "retro": {
+        "name": "레트로",
+        "description": "70년대 주황과 청록"
+      },
+      "forest": {
+        "name": "포레스트",
+        "description": "크림색 글씨의 짙은 초록"
+      },
+      "matcha": {
+        "name": "말차",
+        "description": "부드러운 녹차 톤"
+      },
+      "ocean": {
+        "name": "오션",
+        "description": "바다색 그라데이션, 흰 카드"
+      },
+      "sand": {
+        "name": "비치",
+        "description": "홈스테이를 위한 모래와 터키석"
+      },
+      "lotus": {
+        "name": "연꽃",
+        "description": "연꽃 분홍과 잎사귀 초록"
+      },
+      "lavender": {
+        "name": "라벤더",
+        "description": "라일락 페이지, 보라 버튼"
+      },
+      "peach": {
+        "name": "피치",
+        "description": "복숭아 그라데이션, 코랄 포인트"
+      },
+      "mint": {
+        "name": "민트",
+        "description": "상쾌한 민트와 청록"
+      },
+      "sky": {
+        "name": "베이비 블루",
+        "description": "연한 파랑, 부드럽고 친근하게"
+      },
+      "sorbet": {
+        "name": "소르베",
+        "description": "무지개 파스텔 그라데이션"
+      },
+      "midnight": {
+        "name": "미드나잇",
+        "description": "흰 카드의 거의 검정"
+      },
+      "graphite": {
+        "name": "그래파이트",
+        "description": "차콜 카드, 은은한 테두리"
+      },
+      "neon": {
+        "name": "네온 나이트",
+        "description": "짙은 보라 위 빛나는 분홍"
+      },
+      "aurora": {
+        "name": "오로라",
+        "description": "북극광 그라데이션, 글래스 카드"
+      },
+      "starry": {
+        "name": "별밤",
+        "description": "별똥별이 떨어지는 네이비 하늘"
+      },
+      "tet": {
+        "name": "설날",
+        "description": "뗏(Tết)을 위한 빨강과 금색"
+      },
+      "wedding": {
+        "name": "웨딩",
+        "description": "필기체 이름, 블러시와 흰색"
+      },
+      "birthday": {
+        "name": "생일",
+        "description": "컨페티 색상, 둥근 카드"
+      },
+      "christmas": {
+        "name": "크리스마스",
+        "description": "소나무 초록, 빨강, 눈"
+      },
+      "midautumn": {
+        "name": "중추절",
+        "description": "밤하늘 파랑 위 등불 주황"
+      },
+      "aurora-glass": {
+        "name": "오로라 글래스",
+        "description": "반투명 유리 카드 뒤로 움직이는 오로라"
+      },
+      "frost": {
+        "name": "프로스트",
+        "description": "얼음빛 파랑 메시, 투명한 유리, 선명한 글씨"
+      },
+      "midnight-glass": {
+        "name": "미드나잇 글래스",
+        "description": "짙은 보랏빛 밤 위의 빛나는 유리"
+      },
+      "sakura-glass": {
+        "name": "사쿠라 글래스",
+        "description": "부드러운 유리 속 벚꽃 분홍"
+      },
+      "lagoon-glass": {
+        "name": "라군",
+        "description": "투명한 카드 아래 일렁이는 청록빛"
+      },
+      "gold-noir": {
+        "name": "골드 누아르",
+        "description": "검은 실크, 금색 선, 금색 이름"
+      },
+      "marble": {
+        "name": "마블",
+        "description": "부드러운 석재 톤, 가는 테두리, 세리프 글씨"
+      },
+      "emerald": {
+        "name": "에메랄드 벨벳",
+        "description": "금색 장식의 짙은 초록 벨벳"
+      },
+      "royal": {
+        "name": "로열 네이비",
+        "description": "네이비와 금색, 은근히 웅장하게"
+      },
+      "rose-gold": {
+        "name": "로즈 골드",
+        "description": "블러시 메시와 로즈 골드 포인트"
+      },
+      "pearl": {
+        "name": "펄",
+        "description": "무지갯빛 진주 광택, 흰 카드"
+      },
+      "brutal": {
+        "name": "브루탈",
+        "description": "두꺼운 외곽선, 선명한 그림자, 크고 분명하게"
+      },
+      "brutal-pink": {
+        "name": "핫 핑크",
+        "description": "검은 외곽선의 버블검 핑크"
+      },
+      "y2k": {
+        "name": "Y2K",
+        "description": "크롬 파스텔, 알약형 외곽선, 2000년대 감성"
+      },
+      "vaporwave": {
+        "name": "베이퍼웨이브",
+        "description": "보랏빛 황혼 위 네온 핑크와 시안"
+      },
+      "comic": {
+        "name": "코믹",
+        "description": "하프톤 노랑, 검은 잉크, 빨간 포인트"
+      },
+      "terminal": {
+        "name": "터미널",
+        "description": "검은 격자 위 초록 형광"
+      },
+      "poster": {
+        "name": "포스터",
+        "description": "큰 글씨, 빨간 블록, 크림색 종이"
+      },
+      "notebook": {
+        "name": "노트",
+        "description": "모눈종이와 잉크 파랑 메모"
+      },
+      "ruled": {
+        "name": "줄 노트",
+        "description": "부드러운 줄 종이, 차분한 세리프"
+      },
+      "latte": {
+        "name": "라테 아트",
+        "description": "크리미한 커피 메시, 캐러멜 포인트"
+      },
+      "sunset-mesh": {
+        "name": "골든 아워",
+        "description": "복숭아, 코랄, 꿀빛이 녹아드는"
+      },
+      "botanical": {
+        "name": "보태니컬",
+        "description": "리넨 위 잎사귀 초록 도트"
+      },
+      "meadow": {
+        "name": "초원",
+        "description": "부드러운 메시 속 싱그러운 풀과 하늘"
+      },
+      "cotton-candy": {
+        "name": "솜사탕",
+        "description": "쉬지 않고 움직이는 파스텔 오로라"
+      },
+      "dreamy": {
+        "name": "드리미",
+        "description": "라일락과 하늘색 메시, 둥글고 부드럽게"
+      },
+      "cyber": {
+        "name": "사이버 글로우",
+        "description": "짙은 검정 위 시안 네온 테두리"
+      },
+      "obsidian": {
+        "name": "옵시디언",
+        "description": "보랏빛 광채의 매끈한 검정"
+      },
+      "lixi": {
+        "name": "리씨 (세뱃돈 봉투)",
+        "description": "금빛 물결의 세뱃돈 봉투 빨강"
+      },
+      "party": {
+        "name": "파티",
+        "description": "컨페티 도트와 네온 외곽선"
+      }
+    },
+    "sections": {
+      "colors": "색상 & 배경",
+      "text": "텍스트",
+      "cards": "카드 & 버튼",
+      "layout": "레이아웃",
+      "effects": "효과",
+      "music": "배경 음악"
+    },
+    "text": {
+      "general": "기본 글꼴",
+      "generalHelp": "블록의 텍스트에 사용돼요.",
+      "align": "정렬",
+      "pageColor": "콘텐츠 글자 색상",
+      "pageColorHelp": "블록 안 텍스트의 색상이에요.",
+      "pairs": "글꼴 조합",
+      "nameGradient": "그라데이션 이름",
+      "nameGradientHelp": "사이트 이름을 강조 색상으로 칠해요."
+    },
+    "presetActions": {
+      "random": "랜덤 추천",
+      "count": "테마 {n}개",
+      "pro": "Pro",
+      "proNote": "Pro 테마: 무료로 써 보고, Starter 요금제부터 게시할 수 있어요.",
+      "seePlans": "요금제 보기"
+    },
+    "rows": {
+      "theme": "테마",
+      "themeHint": "준비된 디자인 {n}개",
+      "customize": "사용자 지정",
+      "custom": "사용자 지정"
+    },
+    "music": {
+      "hint": "방문자가 처음 화면을 누르면 페이지에서 재생돼요 (브라우저는 그 전에 소리를 허용하지 않아요). 3D 룸은 자체 음악을 그대로 사용해요.",
+      "none": "음악 없음",
+      "preview": "{title} 듣기"
+    }
+  },
+  "analytics": {
+    "unpublished": "분석을 보려면 사이트를 게시하세요.",
+    "tabs": {
+      "overview": "개요",
+      "links": "행동 & 링크"
+    },
+    "links": {
+      "empty": "이 사이트에는 아직 링크나 소셜 아이콘이 없어요.",
+      "linksTitle": "링크",
+      "socialTitle": "소셜 아이콘",
+      "clicks": "클릭 | 클릭",
+      "noLink": "아직 링크 없음"
+    },
+    "overview": {
+      "periodAria": "기간",
+      "periods": {
+        "h24": "24시간",
+        "d7": "7일",
+        "d30": "30일",
+        "d90": "90일"
+      },
+      "cards": {
+        "views": "조회수",
+        "unique": "순 방문자",
+        "today": "오늘",
+        "bots": "걸러낸 봇"
+      },
+      "viewsOverTime": "기간별 조회수",
+      "peak": "최고 {value}",
+      "botsNote": "봇 방문 {n}회 제외 | 봇 방문 {n}회 제외",
+      "noViews": "이 기간에는 아직 조회가 없어요",
+      "viewsCount": "조회 {n}회 | 조회 {n}회",
+      "topReferrers": "주요 유입 경로",
+      "devices": "기기",
+      "browsers": "브라우저",
+      "noData": "아직 데이터가 없어요"
+    },
+    "countryMap": {
+      "title": "국가",
+      "map": "지도",
+      "list": "목록",
+      "noData": "아직 데이터가 없어요",
+      "viewsCount": "조회 {n}회 | 조회 {n}회"
+    },
+    "actions": {
+      "title": "연락 행동",
+      "text": "방문자가 전화, 길찾기, 메시지, 예약을 한 횟수예요. 전체 기간 기준.",
+      "call": "전화",
+      "map": "길찾기",
+      "book": "예약 클릭",
+      "form": "양식 요청",
+      "zalo": "Zalo 채팅",
+      "whatsapp": "WhatsApp 채팅",
+      "telegram": "Telegram 채팅",
+      "email": "이메일",
+      "order": "주문",
+      "store": "스토어 클릭",
+      "guestbook": "방명록 메시지"
+    }
+  }
+}

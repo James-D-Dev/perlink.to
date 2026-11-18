@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { en as uiEn, vi as uiVi } from "@nuxt/ui/locale";
+import { en as uiEn, vi as uiVi, zh_cn as uiZh, ja as uiJa, ko as uiKo } from "@nuxt/ui/locale";
+import { LANGUAGE_INFO, toAppLanguage } from "#shared/language";
 
 // Built-in Nuxt UI texts (empty states, close buttons...) follow the dashboard language
 const { locale: i18nLocale } = useI18n();
-const uiLocale = computed(() => (i18nLocale.value === "vi" ? uiVi : uiEn));
+const UI_LOCALES = { en: uiEn, vi: uiVi, zh: uiZh, ja: uiJa, ko: uiKo };
+const uiLocale = computed(() => UI_LOCALES[toAppLanguage(i18nLocale.value)]);
 
 const colorMode = useColorMode();
 
@@ -18,8 +20,9 @@ useHead({
     { key: "theme-color", name: "theme-color", content: color },
   ],
   link: [{ rel: "icon", href: "/favicon.ico" }],
+  // Marketing pages set their own (from the URL)
   htmlAttrs: {
-    lang: "en",
+    lang: () => LANGUAGE_INFO[toAppLanguage(i18nLocale.value)].html,
   },
 });
 

@@ -53,8 +53,8 @@ const { info } = useBilling()
 const checkoutOpen = ref(false)
 
 const perks = computed(() => (tm('dashboard.billing.weddingPass.perks') as unknown[]).map(p => rt(p as never)))
-// Vietnamese pays in VND by bank transfer; card buyers see dollars
-const usd = computed(() => locale.value === 'en' || (info.value?.weddingPass && !info.value.weddingPass.bank))
+// Vietnamese pays in VND by bank transfer; every other language and card buyers see dollars
+const usd = computed(() => locale.value !== 'vi' || (info.value?.weddingPass && !info.value.weddingPass.bank))
 const price = computed(() => (usd.value ? formatUsd(WEDDING_PASS.priceUsd) : formatVnd(WEDDING_PASS.price)))
 const canBuy = computed(() => !!(info.value?.weddingPass?.bank || info.value?.weddingPass?.card))
 

@@ -3,7 +3,7 @@
 //
 // Inline text supports [label](/path), **bold** and {email}.
 
-export type LegalLang = 'en' | 'vi'
+export type LegalLang = import('#shared/language').AppLanguage
 
 export type LegalBlock =
   | string

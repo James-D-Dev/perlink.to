@@ -253,6 +253,7 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 import type { TabsItem } from '@nuxt/ui'
 import { PLAN_OPTIONS } from '~/composables/usePlans'
 
@@ -381,7 +382,7 @@ const details = computed(() => {
     { label: 'Email', icon: 'i-lucide-at-sign', value: u.email || '-', copy: u.email || undefined },
     { label: 'Username', icon: 'i-lucide-user', value: u.username || '-' },
     { label: 'Country', icon: 'i-lucide-map-pin', value: u.country ? `${flag(u.country)} ${countryName(u.country)}` : 'Saved on their next visit' },
-    { label: 'Language', icon: 'i-lucide-languages', value: u.language === 'vi' ? 'Tiếng Việt' : u.language === 'en' ? 'English' : '-' },
+    { label: 'Language', icon: 'i-lucide-languages', value: u.language ? LANGUAGE_INFO[toAppLanguage(u.language)].label : '-' },
     { label: 'Joined', icon: 'i-lucide-calendar-plus', value: formatAdminDate(u.createdAt) },
     { label: 'Last updated', icon: 'i-lucide-history', value: formatAdminDate(u.updatedAt) },
   ];

@@ -86,6 +86,7 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 import { formatVnd, isPlanId } from '#shared/plans'
 
 const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = { paid: 'success', submitted: 'warning', rejected: 'error' }
@@ -131,7 +132,7 @@ onMounted(() => {
 // The plan an upgrade prompt pointed to
 const highlight = computed(() => (isPlanId(route.query.plan) ? route.query.plan : undefined))
 
-const formatDate = (iso: string) => new Date(iso.includes('T') ? iso : `${iso.replace(' ', 'T')}Z`).toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB')
+const formatDate = (iso: string) => new Date(iso.includes('T') ? iso : `${iso.replace(' ', 'T')}Z`).toLocaleDateString(toAppLanguage(locale.value) === 'en' ? 'en-GB' : LANGUAGE_INFO[toAppLanguage(locale.value)].intl)
 
 const startingTrial = ref(false)
 async function startTrial() {

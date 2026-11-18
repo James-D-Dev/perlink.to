@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import type { AppLanguage } from '#shared/language'
 import type { DemoRoom } from '~/data/portfolio3d/types'
 
 const props = withDefaults(defineProps<{
@@ -110,7 +111,40 @@ const TEXT = {
     photo: 'Tác phẩm mẫu',
     close: 'Đóng',
   },
-}
+  zh: {
+    choose: '选择一个作品集',
+    kinds: { designer: '设计师', developer: '程序员', photographer: '摄影师', architect: '建筑师', student: '学生' },
+    live: '实时 3D 房间',
+    loading: '正在打开房间…',
+    hint: '拖动环顾四周 · 滚动或双指缩放 · 点击图片',
+    day: '白天',
+    night: '夜晚',
+    photo: '示例作品',
+    close: '关闭',
+  },
+  ja: {
+    choose: 'ポートフォリオを選ぶ',
+    kinds: { designer: 'デザイナー', developer: 'エンジニア', photographer: 'フォトグラファー', architect: '建築家', student: '学生' },
+    live: 'ライブ3Dルーム',
+    loading: 'ルームを開いています…',
+    hint: 'ドラッグで見回す · スクロールやピンチでズーム · 写真をタップ',
+    day: '昼',
+    night: '夜',
+    photo: '作品サンプル',
+    close: '閉じる',
+  },
+  ko: {
+    choose: '포트폴리오 선택',
+    kinds: { designer: '디자이너', developer: '개발자', photographer: '사진작가', architect: '건축가', student: '학생' },
+    live: '실시간 3D 룸',
+    loading: '룸을 여는 중…',
+    hint: '드래그해서 둘러보기 · 스크롤하거나 핀치해서 확대 · 사진을 탭하세요',
+    day: '낮',
+    night: '밤',
+    photo: '샘플 작품',
+    close: '닫기',
+  },
+} satisfies Record<AppLanguage, unknown>
 const t = computed(() => TEXT[lang.value])
 
 const kind = ref<DemoRoom>(props.initial)

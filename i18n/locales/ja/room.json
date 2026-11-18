@@ -1,0 +1,506 @@
+{
+  "room": {
+    "page": {
+      "title": "3Dルーム · {name} {'|'} Perlink",
+      "notFoundTitle": "ページが見つかりません",
+      "notFoundText": "このページは存在しないか、アクセス権がありません。",
+      "backToPages": "マイページに戻る",
+      "leaveTitle": "保存せずに移動しますか？",
+      "leaveText": "ルームの変更は保存されていません。",
+      "leave": "移動する"
+    },
+    "toast": {
+      "saved": "ルームを保存しました",
+      "savedDraft": "ルームを下書きとして保存しました。訪問者に見せるには公開してください。",
+      "saveFailed": "保存できませんでした",
+      "published": "公開しました",
+      "publishedText": "ルームは perlink.to/{name} で公開中です",
+      "view": "表示",
+      "publishFailed": "公開できませんでした",
+      "photoUploadFailed": "写真をアップロードできませんでした",
+      "imageProcessFailed": "画像を処理できませんでした",
+      "imageReadFailed": "画像を読み込めませんでした"
+    },
+    "toolbar": {
+      "back": "ページエディターに戻る",
+      "undo": "元に戻す (Ctrl+Z)",
+      "redo": "やり直す (Ctrl+Shift+Z)",
+      "unsaved": "未保存の変更 (Ctrl+S)",
+      "allSaved": "すべての変更を保存済み"
+    },
+    "preview": {
+      "day": "プレビュー：昼（クリックで夜）",
+      "night": "プレビュー：夜（クリックで昼）"
+    },
+    "panel": {
+      "showObjects": "オブジェクトを表示（{n}）",
+      "objects": "オブジェクト",
+      "backToObjects": "オブジェクト一覧に戻る",
+      "closeObjects": "オブジェクトを閉じる",
+      "search": "オブジェクトを検索",
+      "noMatch": "検索に一致するオブジェクトはありません。",
+      "empty": "オブジェクトはまだありません。下のバーから追加してください。",
+      "deleteObject": "{name}を削除"
+    },
+    "places": {
+      "backWall": "奥の壁",
+      "leftWall": "左の壁",
+      "onFurniture": "家具の上",
+      "floor": "床"
+    },
+    "detail": {
+      "dragWall": "壁に沿ってドラッグして移動",
+      "dragFloor": "ドラッグして移動 · 家具の上にドロップすると重ねられます",
+      "rotate": "回転",
+      "rotateLeft": "左に回転",
+      "rotateRight": "右に回転",
+      "wall": "壁",
+      "size": "サイズ",
+      "smaller": "小さく",
+      "bigger": "大きく",
+      "photo": "写真",
+      "replacePhoto": "写真を差し替え",
+      "uploadPhoto": "写真をアップロード",
+      "remove": "削除",
+      "photoHint": "訪問者がフレームをクリックすると、写真を原寸で表示できます。",
+      "color": "色",
+      "resetColor": "デフォルトの色に戻す",
+      "resetColorAria": "色をリセット",
+      "colorSwatch": "色 {color}",
+      "customColor": "カスタムカラー",
+      "link": "リンク",
+      "linkHint": "訪問者がこのオブジェクトをクリックするとリンクが開きます。",
+      "linkLabel": "ラベル（例：私のInstagram）",
+      "duplicate": "複製"
+    },
+    "camera": {
+      "zoomIn": "ズームイン",
+      "zoomOut": "ズームアウト",
+      "resetView": "視点をリセット",
+      "hideDetails": "詳細を隠す",
+      "editObject": "{name}を編集"
+    },
+    "coach": {
+      "label": "ルームエディターのツアー",
+      "replay": "使い方",
+      "step": "ステップ {n}/{total}",
+      "skip": "スキップ",
+      "back": "戻る",
+      "next": "次へ",
+      "done": "作り始める",
+      "steps": {
+        "welcome": { "title": "3Dルームへようこそ 👋", "text": "30秒以内でエディターをざっと紹介します。" },
+        "add": { "title": "ルームにアイテムを追加", "text": "アイテムをタップして配置するか、引き上げて好きな場所にドロップします。タブからルームのスタイル、外の景色、音楽、昼と夜も変更できます。" },
+        "move": { "title": "見回す", "text": "ドラッグでルームを回転、スクロールやピンチでズームし、これらのボタンでズームや視点のリセットができます。オブジェクトをタップして選択し、ドラッグで移動します。" },
+        "objects": { "title": "オブジェクトをクリック可能に", "text": "オブジェクト一覧を開いて、色、テキスト、リンクをそれぞれ編集できます。訪問者がそのオブジェクトをクリックすると、Instagramやショップなどのリンクが開きます。" },
+        "publish": { "title": "保存して公開", "text": "保存で下書きを残せます。公開すると、ルームが perlink.to/{name} で誰でも訪問できるようになります。" }
+      }
+    },
+    "hint": {
+      "navigation": "オブジェクトをクリックして選択し、ドラッグで移動 · ドラッグで回転 · スクロールでズーム",
+      "firstRun": "下のバーから家具をルームにドラッグしましょう"
+    },
+    "stats": {
+      "title": "{drawCalls} ドローコール · {triangles} トライアングル · 上限 {cap} fps",
+      "idleParen": "（アイドル）",
+      "fps": "{fps} FPS",
+      "idle": "· アイドル"
+    },
+    "tray": {
+      "addItem": "ルームにドラッグ、またはタップして追加",
+      "hide": "トレイを隠す",
+      "show": "トレイを表示"
+    },
+    "tabs": {
+      "room": "ルーム",
+      "land": "景色",
+      "time": "昼と夜",
+      "music": "音楽"
+    },
+    "roomStyle": {
+      "style": "スタイル",
+      "floor": "床",
+      "colors": "色",
+      "size": "サイズ",
+      "meters": "{n} m",
+      "floors": {
+        "wood": "木材",
+        "tile": "タイル",
+        "carpet": "カーペット",
+        "concrete": "コンクリート"
+      },
+      "colorFields": {
+        "wallColor": "壁",
+        "floorColor": "床",
+        "trimColor": "縁取り"
+      },
+      "sizeFields": {
+        "width": "幅",
+        "depth": "奥行き",
+        "height": "高さ"
+      }
+    },
+    "time": {
+      "modes": {
+        "auto": {
+          "label": "リアルタイム",
+          "description": "各訪問者の現地時刻に合わせます"
+        },
+        "cycle": {
+          "label": "カスタムサイクル",
+          "description": "昼と夜を繰り返します（例：各1分）"
+        },
+        "day": {
+          "label": "常に昼",
+          "description": "いつでも晴れ"
+        },
+        "night": {
+          "label": "常に夜",
+          "description": "ランプは常に点灯"
+        }
+      },
+      "day": "昼",
+      "night": "夜",
+      "minutes": "{n}分"
+    },
+    "music": {
+      "none": "音楽なし",
+      "previewTrack": "{title}を試聴",
+      "fileMissing": "ファイルがありません",
+      "autoplay": "自動再生",
+      "autoplayOn": "訪問者がルームを開くと再生されます。ブラウザが音声をブロックする場合は、最初のタップで再生されます。",
+      "autoplayOff": "訪問者にはミュートで表示され、音楽をオンにできます。",
+      "creditPrefix": "音楽提供：",
+      "moods": {
+        "fun-game": "アップビート",
+        "happy-runner": "エネルギッシュ",
+        "puzzle-casual": "ライト",
+        "pixel-plains": "チップチューン",
+        "happy-8bit": "8ビット",
+        "marimba-travel": "トロピカル",
+        "fairytale-quest": "ドリーミー",
+        "playful-kids": "プレイフル",
+        "game-background": "チル",
+        "romantic-piano": "ロマンチック",
+        "romantic-date": "やさしい",
+        "love-acoustic": "アコースティック",
+        "cozy-love-lofi": "Lo-fi",
+        "happy-birthday": "誕生日",
+        "party-celebration": "パーティー"
+      }
+    },
+    "categories": {
+      "furniture": "家具",
+      "lighting": "照明",
+      "decor": "インテリア",
+      "wall": "壁",
+      "tech": "テック",
+      "dungeon": "ダンジョン",
+      "shop": "ショップ",
+      "premium": "プレミアム"
+    },
+    "styles": {
+      "cozy-wood": "ウッディ",
+      "minimal-white": "ミニマルホワイト",
+      "pastel": "パステル",
+      "sage": "セージ",
+      "night-studio": "ナイトスタジオ",
+      "industrial": "インダストリアル",
+      "dungeon": "ダンジョン"
+    },
+    "lands": {
+      "island": {
+        "name": "空の島",
+        "description": "巨大な木と、雲へと流れ落ちる滝のある浮島"
+      },
+      "mars": {
+        "name": "火星",
+        "description": "宇宙に浮かぶ赤い惑星の地表、周りには惑星たち"
+      },
+      "sakura": {
+        "name": "桜",
+        "description": "満開の大きな桜、舞い散る花びら、蝶と池"
+      },
+      "crimson": {
+        "name": "紅桜",
+        "description": "真紅の大きな桜の木、赤い草、青空の下を舞う花びら"
+      },
+      "city": {
+        "name": "シティ",
+        "description": "街の一角：通り、行き交う車、街灯、夜に灯る窓"
+      },
+      "winter": {
+        "name": "冬",
+        "description": "霜で白く染まった大樹、凍った池、吹雪、夜のランタン"
+      },
+      "autumn": {
+        "name": "秋",
+        "description": "赤と金に染まった大きなカエデ、風に舞う葉、かぼちゃ"
+      },
+      "tropical": {
+        "name": "トロピカルビーチ",
+        "description": "白い砂浜のヤシ、ターコイズの海と波、夜のティキトーチ"
+      },
+      "fairy": {
+        "name": "妖精の森",
+        "description": "光る巨大キノコ、漂う胞子、深い苔の中のホタル"
+      },
+      "volcano": {
+        "name": "火山",
+        "description": "煙を上げる火山、崖から流れ落ちる溶岩の川、舞い上がる火の粉"
+      },
+      "zen": {
+        "name": "禅庭",
+        "description": "竹林、砂紋の庭、鯉の池と石灯籠"
+      }
+    },
+    "objects": {
+      "bed": "ベッド",
+      "sofa": "ソファ",
+      "desk": "デスク",
+      "chair": "椅子",
+      "coffee-table": "コーヒーテーブル",
+      "bookshelf": "本棚",
+      "cabinet": "チェスト",
+      "floor-lamp": "フロアランプ",
+      "desk-lamp": "デスクランプ",
+      "candle": "キャンドル",
+      "wall-lamp": "壁掛けランプ",
+      "string-lights": "ストリングライト",
+      "plant": "観葉植物",
+      "rug": "ラグ",
+      "mug": "マグカップ",
+      "window": "窓",
+      "picture-frame": "写真",
+      "wall-clock": "時計",
+      "neon-sign": "ネオンサイン",
+      "tv": "テレビ台",
+      "laptop": "ノートPC",
+      "dungeon-chest": "箱",
+      "dungeon-chest-gold": "宝箱",
+      "dungeon-barrel": "樽",
+      "dungeon-candelabrum": "燭台",
+      "dungeon-candelabrum-tall": "背の高い燭台",
+      "dungeon-candle": "ろうそく立て",
+      "dungeon-torch": "スタンドたいまつ",
+      "dungeon-wall-torch": "壁掛けたいまつ",
+      "dungeon-book-open": "開いた本",
+      "dungeon-book": "本",
+      "dungeon-books": "魔導書",
+      "dungeon-potion-blue": "青いポーション",
+      "dungeon-potion-green": "緑のポーション",
+      "dungeon-potion-ice": "氷のポーション",
+      "dungeon-potion-vial": "小瓶",
+      "dungeon-potion-dark": "闇のポーション",
+      "dungeon-potion-gold": "金のポーション",
+      "dungeon-bones": "骸骨",
+      "dungeon-bones-pile": "骨",
+      "dungeon-rock": "岩",
+      "dungeon-rock-flat": "平たい岩",
+      "dungeon-carpet": "王家の絨毯",
+      "dungeon-column": "柱",
+      "dungeon-column-broken": "折れた柱",
+      "dungeon-column-ruin": "倒れた柱",
+      "dungeon-stairs": "階段",
+      "dungeon-window": "格子窓",
+      "dungeon-bars": "鉄格子",
+      "dungeon-arch": "石のアーチ",
+      "garden-flower-pot": "植木鉢",
+      "garden-ceramic-flowers": "陶器のプランター",
+      "garden-flower-vase": "花瓶",
+      "garden-bud-vase": "一輪挿し",
+      "garden-flower-bowl": "フラワーボウル",
+      "garden-flower-bed": "花壇",
+      "garden-bush-flowers": "花の咲く低木",
+      "garden-fern-pot": "シダの鉢植え",
+      "garden-indoor-tree": "室内用の木",
+      "garden-pine-pot": "松の鉢植え",
+      "garden-bush": "低木",
+      "garden-autumn-bush": "秋の低木",
+      "garden-tall-grass": "背の高い草",
+      "garden-mushrooms": "キノコ",
+      "garden-rocks": "庭石",
+      "garden-pebble-tray": "小石のトレイ",
+      "product-stand": "商品スタンド",
+      "blog-board": "ブログボード",
+      "vip-rose-bouquet": "バラの花束",
+      "vip-heart-balloons": "ハートの風船",
+      "vip-rose-arch": "バラのアーチ",
+      "vip-candle-heart": "キャンドルハート",
+      "vip-neon-heart": "ネオンハート",
+      "vip-love-bear": "テディベア",
+      "vip-wedding-arch": "ウェディングアーチ",
+      "vip-wedding-cake": "ウェディングケーキ",
+      "vip-champagne-tower": "シャンパンタワー",
+      "vip-love-marquee": "LOVE マーキーライト",
+      "vip-candle-lanterns": "キャンドルランタン",
+      "vip-sparkler-fountain": "スパークラー噴水",
+      "vip-birthday-cake": "バースデーケーキ",
+      "vip-balloon-bunch": "風船の束",
+      "vip-gift-tower": "ギフトタワー",
+      "vip-disco-ball": "ディスコライトショー",
+      "vip-confetti-popper": "紙吹雪キャノン",
+      "vip-birthday-bunting": "パーティーガーランド",
+      "vip-floating-planet": "浮かぶ惑星",
+      "vip-jellyfish-lamp": "クラゲのランプ",
+      "vip-star-projector": "星空プロジェクター",
+      "vip-moon-lamp": "月のランプ",
+      "vip-snow-globe": "スノードーム",
+      "vip-nebula-painting": "星雲の絵",
+      "vip-peach-blossom": "桃の花",
+      "vip-apricot-blossom": "梅の花",
+      "vip-kumquat-tree": "金柑の木",
+      "vip-red-lanterns": "赤い提灯",
+      "vip-firecrackers": "爆竹",
+      "vip-five-fruit-tray": "五果盛り",
+      "vip-ring-box": "リングボックス",
+      "vip-marry-me": "MARRY ME ライト",
+      "vip-rose-heart": "99本のバラのハート",
+      "vip-petal-aisle": "バラの花びらのバージンロード",
+      "vip-grand-piano": "グランドピアノ",
+      "vip-fireworks": "花火ショー",
+      "vip-display-podium": "展示台",
+      "vip-glass-cabinet": "ガラスケース",
+      "vip-neon-open": "ネオンサイン",
+      "vip-ad-screen": "プロモーション画面",
+      "vip-checkout-counter": "レジカウンター",
+      "vip-sale-banner": "セールバナー"
+    },
+    "tour": {
+      "back": "戻る",
+      "title": "3Dルーム動画",
+      "caption": "動画のタイトル",
+      "day": "昼",
+      "night": "夜",
+      "length": "動画の長さ",
+      "music": "ルームの音楽",
+      "watermark": "Freeプランの動画には小さく「Made with Perlink」が入ります。",
+      "removeWatermark": "削除する",
+      "unsupported": "このブラウザはまだ動画を録画できません。最新の Chrome、Edge、Safari をご利用ください。",
+      "record": "動画を録画",
+      "preparing": "準備中…",
+      "drawing": "フレームを描画中…",
+      "ready": "動画の準備ができました！",
+      "readyText": "TikTok、Reels、Shorts に投稿して、ルームのリンクを添えましょう。",
+      "share": "共有",
+      "download": "動画をダウンロード",
+      "postText": "私の3Dルームに遊びに来てね ✨ {link}\n#perlink #3droom #roomtour #aesthetic",
+      "madeWith": "Made with Perlink",
+      "visit": "私の3Dルームを見に来てね 👇",
+      "recordingNow": "録画中",
+      "cancel": "キャンセル",
+      "style": "カメラの動き",
+      "styles": {
+        "sweep": "スイープ",
+        "orbit": "周回",
+        "dive": "フライイン",
+        "crane": "引きの視点",
+        "ground": "ローアングル"
+      },
+      "notLive": {
+        "unpublished": "サイトはまだ公開されていません。動画のリンクをタップした人には何も表示されません。",
+        "hidden": "3Dルームが訪問者向けにオンになっていません。リンクを開いた人には表示されません。",
+        "draft": "ルームに未公開の変更があります。リンクを開いた人には古いバージョンが表示されます。"
+      },
+      "goLive": "ルームを公開する",
+      "wentLive": "ルームは公開中です。視聴者にはこのとおりに表示されます。",
+      "copyCaption": "キャプションをコピー",
+      "captionCopied": "キャプションをコピーしました。TikTokの投稿に貼り付けてください",
+      "captionHint": "投稿のキャプション（ルームのリンク付き）：",
+      "musicClaim": "この曲は Content ID に登録されています。YouTube や TikTok で動画がミュートされたり、申し立てを受けたりする可能性があります。別の曲を選んでください。"
+    },
+    "guestbook": {
+      "label": "ゲストブック",
+      "on": "ゲストブック：オン。訪問者がルームの前にメッセージやギフトを残せます。クリックでオフにします。",
+      "off": "ゲストブック：オフ。クリックでオンにします。"
+    },
+    "shop": {
+      "product": "スタンドの商品",
+      "pick": "商品を選択",
+      "hint": "訪問者がスタンドをクリックすると、ルームの中で商品を見て注文できます。",
+      "none": "このサイトにはまだ商品がありません。先にページに商品ブロックを追加してください。",
+      "products": "表示する商品",
+      "productsAuto": "最初の商品",
+      "productsHint": "空欄にするとショップの最初の商品が表示されます。訪問者は商品をクリックしてルームの中で注文できます。",
+      "text": "テキスト",
+      "textHint": "最大 {max} 文字、どの言語でも可。",
+      "soldOut": "売り切れ",
+      "buy": "今すぐ購入"
+    },
+    "packs": {
+      "valentine": {
+        "name": "バレンタイン",
+        "tagline": "大切な人のために、バラ、キャンドル、鼓動するネオンハートと風船を。"
+      },
+      "badge": "プレミアム",
+      "owned": "購入済み",
+      "included": "Maxに含まれます",
+      "buy": "{price}で購入",
+      "oneTime": "一回払い · ずっと使えます",
+      "items": "{n}アイテム",
+      "trayLocked": "プレミアムアイテム：ルームで試せます。公開するにはパックを購入してください。",
+      "trayOwned": "あなたのプレミアムアイテム",
+      "seeMarket": "3Dルームパック",
+      "promptTitle": "ルームにプレミアムアイテムが使われています",
+      "promptText": "このまま公開するにはパックを入手してください。一度の支払いでずっと使え、作るすべてのルームで利用できます。",
+      "orMax": "またはMaxにすると、すべてのパックが含まれます",
+      "later": "今はしない",
+      "checkoutFailed": "購入画面を開けませんでした",
+      "bought": "{name}パックを入手しました",
+      "boughtText": "アイテムはルームエディターのプレミアムタブで使えます。",
+      "boughtPending": "支払いを受け付けました。パックは数秒で表示されます。",
+      "signIn": "ログインして購入",
+      "wedding": {
+        "name": "ウェディング",
+        "tagline": "ベールがなびくアーチ、回るケーキ、シャンパンとスパークラー。"
+      },
+      "birthday": {
+        "name": "誕生日",
+        "tagline": "吹き消せるキャンドル、風船、ミラーボール、舞い散る紙吹雪。"
+      },
+      "galaxy": {
+        "name": "ギャラクシー",
+        "tagline": "浮かぶ惑星、光るクラゲ、星と月で夢のような夜を。"
+      },
+      "tet": {
+        "name": "テト（旧正月）",
+        "tagline": "桃と梅の花、赤い提灯、お年玉で新年を祝いましょう。"
+      },
+      "animated": "アニメーション",
+      "proposal": {
+        "name": "プロポーズ",
+        "tagline": "開くリングボックス、99本のバラ、演奏するピアノ、そして大切なひと言のための花火。"
+      },
+      "showroom": {
+        "name": "ショールーム",
+        "tagline": "ルームをショップに：実際の商品を並べるガラスケースとプロモーション画面（クリックで注文）、自分の言葉を入れたネオンサインとバナー、回転する展示台とレジ。"
+      }
+    },
+    "market": {
+      "metaTitle": "3Dルームパック：ルーム用プレミアムアイテム | Perlink",
+      "metaDescription": "Perlinkのルーム用プレミアム3Dアイテム：バラ、キャンドル、ネオンハートなど。一度の支払いでずっと使え、すべてのルームで利用できます。",
+      "eyebrow": "3Dルームパック",
+      "title": "忘れられないルームに",
+      "intro": "大切な瞬間のために作られたプレミアム3Dアイテム。一度の支払いでずっと使え、作るすべてのルームで利用できます。",
+      "maxNote": "Maxプランなら、すべてのパックがすでに使えます。",
+      "openEditor": "ルームエディターを開く",
+      "howTitle": "使い方",
+      "how": [
+        {
+          "title": "パックを選ぶ",
+          "text": "どのアイテムも3Dルーム用に作られ、夜には光ります。"
+        },
+        {
+          "title": "一度だけ支払う",
+          "text": "Creem経由でカード、Apple Pay、Google Pay で支払えます。サブスクリプションではありません。"
+        },
+        {
+          "title": "飾り付ける",
+          "text": "アイテムはルームエディターのプレミアムタブにあり、作るすべてのルームで使えます。"
+        }
+      ],
+      "soon": "新しいパックも準備中です。",
+      "preview3d": "3Dでプレビュー"
+    }
+  }
+}

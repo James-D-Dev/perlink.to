@@ -67,10 +67,10 @@
       </div>
       <ul class="mt-12 flex flex-wrap gap-2">
         <li v-for="other in others" :key="other.id">
-          <NuxtLink :to="other.path[lang]" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ other[lang].title }}</NuxtLink>
+          <NuxtLink :to="local(other.path.en)" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ other[lang].title }}</NuxtLink>
         </li>
         <li v-for="useCase in useCases" :key="useCase.id">
-          <NuxtLink :to="useCase.path[lang]" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ useCase[lang].label }}</NuxtLink>
+          <NuxtLink :to="local(useCase.path.en)" class="inline-flex rounded-full bg-sand px-4 py-2 text-sm text-ink transition-colors hover:bg-line">{{ useCase[lang].label }}</NuxtLink>
         </li>
       </ul>
     </MarketingMkSection>
@@ -78,30 +78,37 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO } from '#shared/language'
+import { alternateLinks } from '~/data/langPaths'
 import { ABOUT_PAIR, GUIDES } from '~/data/guides'
 import { USE_CASES } from '~/data/useCases'
+import type { MarketingLang } from '~/data/marketingCopy'
 
 // A how-to guide at an address per language; the words are in data/guides
 const props = defineProps<{ id: string }>()
 
-const { lang, home } = useMarketingLang()
+const { lang, home, local } = useMarketingLang()
 const guide = GUIDES.find(item => item.id === props.id)!
 const others = GUIDES.filter(item => item.id !== props.id)
 const useCases = USE_CASES.filter(item => ['personal', 'link-in-bio'].includes(item.id))
 const text = computed(() => guide[lang.value])
-const aboutPath = computed(() => (lang.value === 'vi' ? ABOUT_PAIR[1] : ABOUT_PAIR[0]))
+const aboutPath = computed(() => local(ABOUT_PAIR[0]))
 
-const MORE = {
-  en: { breadcrumb: 'Breadcrumb', read: (n: number) => `${n} min read`, by: 'By', updated: 'Updated', start: 'Start free', template: 'See the template', faqTitle: 'Questions' },
-  vi: { breadcrumb: 'Đường dẫn', read: (n: number) => `${n} phút đọc`, by: 'Bởi', updated: 'Cập nhật', start: 'Bắt đầu miễn phí', template: 'Xem mẫu', faqTitle: 'Câu hỏi' },
+interface MoreText { breadcrumb: string; read: (n: number) => string; by: string; updated: string; start: string; template: string; faqTitle: string }
+const MORE: Record<MarketingLang, MoreText> = {
+  en: { breadcrumb: 'Breadcrumb', read: n => `${n} min read`, by: 'By', updated: 'Updated', start: 'Start free', template: 'See the template', faqTitle: 'Questions' },
+  vi: { breadcrumb: 'Đường dẫn', read: n => `${n} phút đọc`, by: 'Bởi', updated: 'Cập nhật', start: 'Bắt đầu miễn phí', template: 'Xem mẫu', faqTitle: 'Câu hỏi' },
+  zh: { breadcrumb: '面包屑导航', read: n => `阅读约 ${n} 分钟`, by: '作者', updated: '更新于', start: '免费开始', template: '查看模板', faqTitle: '常见问题' },
+  ja: { breadcrumb: 'パンくずリスト', read: n => `${n}分で読めます`, by: '執筆', updated: '更新日', start: '無料ではじめる', template: 'テンプレートを見る', faqTitle: 'よくある質問' },
+  ko: { breadcrumb: '탐색 경로', read: n => `${n}분 분량`, by: '작성', updated: '업데이트', start: '무료로 시작하기', template: '템플릿 보기', faqTitle: '자주 묻는 질문' },
 }
 const more = computed(() => MORE[lang.value])
 const updatedLabel = computed(() =>
-  new Date(`${guide.updated}T00:00:00Z`).toLocaleDateString(lang.value === 'vi' ? 'vi-VN' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }),
+  new Date(`${guide.updated}T00:00:00Z`).toLocaleDateString(LANGUAGE_INFO[lang.value].intl, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }),
 )
 
 // ---------- SEO ----------
-const pageUrl = computed(() => `${PERLINK_URL}${guide.path[lang.value]}`)
+const pageUrl = computed(() => `${PERLINK_URL}${local(guide.path.en)}`)
 useSeoMeta({
   title: () => text.value.seoTitle,
   description: () => text.value.description,
@@ -116,12 +123,10 @@ useSeoMeta({
   articleModifiedTime: guide.updated,
 })
 useHead({
-  htmlAttrs: { lang: () => lang.value },
+  htmlAttrs: { lang: () => LANGUAGE_INFO[lang.value].html },
   link: () => [
     { rel: 'canonical', href: pageUrl.value },
-    { rel: 'alternate', hreflang: 'en', href: `${PERLINK_URL}${guide.path.en}` },
-    { rel: 'alternate', hreflang: 'vi', href: `${PERLINK_URL}${guide.path.vi}` },
-    { rel: 'alternate', hreflang: 'x-default', href: `${PERLINK_URL}${guide.path.en}` },
+    ...alternateLinks(guide.path.en),
   ],
   script: () => [{
     type: 'application/ld+json',
@@ -132,7 +137,7 @@ useHead({
         '@id': `${pageUrl.value}#article`,
         headline: text.value.title,
         description: text.value.description,
-        inLanguage: lang.value,
+        inLanguage: LANGUAGE_INFO[lang.value].html,
         url: pageUrl.value,
         mainEntityOfPage: pageUrl.value,
         image: `${PERLINK_URL}/images/og.jpg`,
@@ -150,8 +155,8 @@ useHead({
   }],
 })
 
-const { setLocale } = useI18n()
+const { locale, setLocale } = useI18n()
 onMounted(() => {
-  if (lang.value === 'vi') setLocale('vi')
+  if (lang.value !== 'en' && locale.value !== lang.value) setLocale(lang.value)
 })
 </script>

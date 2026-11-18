@@ -1,0 +1,599 @@
+{
+  "theme": {
+    "panelTitle": "模板与主题",
+    "tabs": {
+      "presets": "预设主题",
+      "custom": "自定义"
+    },
+    "options": {
+      "none": "无",
+      "xs": "XS",
+      "small": "小",
+      "medium": "中",
+      "large": "大",
+      "xl": "XL"
+    },
+    "fields": {
+      "fontFamily": "字体",
+      "fontSize": "字号",
+      "textColor": "文字颜色",
+      "weight": "字重",
+      "letterSpacing": "字间距"
+    },
+    "headerLayout": {
+      "label": "页眉布局",
+      "tabs": {
+        "noBanner": "无横幅",
+        "banner": "横幅"
+      },
+      "options": {
+        "centered": "居中",
+        "left": "左对齐",
+        "cover": "封面",
+        "imageOverlay": "图片叠加",
+        "bannerCircle": "横幅 ○",
+        "bannerSquare": "横幅 □"
+      },
+      "addBanner": "添加横幅图片",
+      "upload": "上传你的图片"
+    },
+    "colors": {
+      "title": "颜色",
+      "primary": "主色",
+      "secondary": "辅色",
+      "third": "第三色",
+      "categories": {
+        "neutral": "中性",
+        "bold": "醒目",
+        "playful": "活泼",
+        "dark": "深色",
+        "gradient": "渐变"
+      },
+      "accent": "强调色",
+      "accentHelp": "用于卡片、按钮和图标。"
+    },
+    "background": {
+      "title": "背景",
+      "tabs": {
+        "solid": "纯色",
+        "gradient": "渐变",
+        "image": "图片",
+        "video": "视频",
+        "effect": "特效",
+        "pattern": "图案"
+      },
+      "custom": "自定义",
+      "customGradient": "自定义渐变",
+      "from": "起始",
+      "via": "经过",
+      "to": "结束",
+      "customImageUrl": "自定义图片 URL",
+      "videoUrl": "视频 URL（mp4、webm）"
+    },
+    "header": {
+      "title": "页眉标题",
+      "blockTitleFont": "区块标题字体"
+    },
+    "bio": {
+      "title": "简介文字"
+    },
+    "card": {
+      "title": "卡片样式",
+      "style": "样式",
+      "color": "卡片颜色",
+      "colorHelp": "留空则使用主色。",
+      "colorAria": "卡片颜色",
+      "borderColor": "边框颜色",
+      "borderColorAria": "卡片边框颜色",
+      "cornerRadius": "圆角",
+      "shadow": "阴影",
+      "backdropBlur": "背景模糊",
+      "appearAnimation": "出现动画",
+      "hoverAnimation": "悬停动画",
+      "styles": {
+        "filled": "填充",
+        "outline": "描边",
+        "ghost": "透明",
+        "soft": "柔和"
+      },
+      "pill": "胶囊",
+      "shadowHard": "硬阴影",
+      "shadowGlow": "发光",
+      "borderWidth": "边框宽度",
+      "borderAuto": "跟随样式"
+    },
+    "fontWeights": {
+      "light": "细体",
+      "regular": "常规",
+      "medium": "中等",
+      "semibold": "半粗",
+      "bold": "粗体"
+    },
+    "letterSpacings": {
+      "tight": "紧密",
+      "snug": "较紧",
+      "normal": "正常",
+      "wide": "宽松",
+      "extraWide": "特宽"
+    },
+    "page": {
+      "title": "页面",
+      "textColorAria": "页面文字颜色",
+      "blockSpacing": "区块间距",
+      "blockTitles": "区块标题",
+      "titleAlign": {
+        "center": "居中",
+        "left": "左对齐"
+      },
+      "socialIcons": "社交图标"
+    },
+    "blockGaps": {
+      "compact": "紧凑",
+      "normal": "正常",
+      "relaxed": "宽松"
+    },
+    "socialStyles": {
+      "soft": "柔和",
+      "filled": "填充",
+      "outline": "描边",
+      "plain": "仅图标"
+    },
+    "font": {
+      "title": "字体",
+      "selectPlaceholder": "选择字体..."
+    },
+    "avatar": {
+      "title": "头像形状",
+      "shapes": {
+        "circle": "圆形",
+        "rounded": "圆角",
+        "square": "方形"
+      }
+    },
+    "linkLayout": {
+      "title": "链接卡片布局",
+      "vertical": "纵向（图片在上）",
+      "horizontalLeft": "横向（图片在左）",
+      "horizontalRight": "横向（图片在右）",
+      "centered": "居中（仅文字）"
+    },
+    "animations": {
+      "appear": {
+        "fadeIn": "淡入",
+        "fadeInDown": "向下淡入",
+        "fadeInUp": "向上淡入",
+        "fadeInLeft": "从左淡入",
+        "fadeInRight": "从右淡入",
+        "zoomIn": "放大进入",
+        "zoomInDown": "向下放大进入",
+        "zoomInUp": "向上放大进入",
+        "bounceIn": "弹入",
+        "bounceInDown": "向下弹入",
+        "bounceInUp": "向上弹入",
+        "slideInDown": "向下滑入",
+        "slideInUp": "向上滑入",
+        "slideInLeft": "从左滑入",
+        "slideInRight": "从右滑入",
+        "backInDown": "向下回弹进入",
+        "backInUp": "向上回弹进入",
+        "flipInX": "X 轴翻入",
+        "flipInY": "Y 轴翻入",
+        "lightSpeedInRight": "从右光速进入",
+        "rotateIn": "旋转进入"
+      },
+      "hover": {
+        "pulse": "脉冲",
+        "bounce": "弹跳",
+        "rubberBand": "橡皮筋",
+        "shakeX": "水平抖动",
+        "shakeY": "垂直抖动",
+        "headShake": "摇头",
+        "swing": "摇摆",
+        "tada": "惊喜",
+        "wobble": "晃动",
+        "jello": "果冻",
+        "heartBeat": "心跳",
+        "flash": "闪烁",
+        "flip": "翻转"
+      },
+      "durations": {
+        "faster": "更快（0.5 秒）",
+        "fast": "快（0.8 秒）",
+        "normal": "正常（1 秒）",
+        "slow": "慢（2 秒）",
+        "slower": "更慢（3 秒）"
+      }
+    },
+    "presetCategories": {
+      "minimal": "极简",
+      "warm": "温暖",
+      "elegant": "优雅",
+      "playful": "活泼",
+      "nature": "自然",
+      "pastel": "粉彩",
+      "dark": "深色",
+      "festive": "节日",
+      "glass": "玻璃",
+      "luxe": "奢华",
+      "bold": "醒目"
+    },
+    "presets": {
+      "paper": {
+        "name": "纸张",
+        "description": "白色页面，黑色文字，简洁无多余"
+      },
+      "stone": {
+        "name": "石灰",
+        "description": "暖灰色调，柔和卡片"
+      },
+      "mono": {
+        "name": "黑白",
+        "description": "黑色按钮，直角边"
+      },
+      "swiss": {
+        "name": "瑞士风",
+        "description": "左对齐，红色点缀"
+      },
+      "cloud": {
+        "name": "云朵",
+        "description": "轻盈蓝灰，圆润造型"
+      },
+      "coffee": {
+        "name": "咖啡馆",
+        "description": "奶油色与浓缩咖啡色，适合咖啡店"
+      },
+      "terracotta": {
+        "name": "陶土",
+        "description": "沙色上的陶土橙"
+      },
+      "bakery": {
+        "name": "烘焙坊",
+        "description": "黄油黄与棕色"
+      },
+      "honey": {
+        "name": "蜂蜜",
+        "description": "金色渐变，深色文字"
+      },
+      "cinnamon": {
+        "name": "肉桂",
+        "description": "深棕色配奶油色卡片"
+      },
+      "ivory": {
+        "name": "象牙白",
+        "description": "象牙底色上的衬线字体，细线条"
+      },
+      "spa": {
+        "name": "水疗",
+        "description": "鼠尾草绿与亚麻色，平静清爽"
+      },
+      "champagne": {
+        "name": "香槟",
+        "description": "腮红粉上的柔金色"
+      },
+      "noir": {
+        "name": "暗夜",
+        "description": "黑与金，适合夜晚"
+      },
+      "atelier": {
+        "name": "工作室",
+        "description": "藏青与奶油色，精致考究"
+      },
+      "bubblegum": {
+        "name": "泡泡糖",
+        "description": "粉色、圆润、充满弹性"
+      },
+      "lemonade": {
+        "name": "柠檬水",
+        "description": "柠檬黄，蓝色按钮"
+      },
+      "sticker": {
+        "name": "贴纸",
+        "description": "白色卡片配粗描边"
+      },
+      "candy": {
+        "name": "糖果",
+        "description": "甜美渐变，白色卡片"
+      },
+      "retro": {
+        "name": "复古",
+        "description": "七十年代的橙色与青绿"
+      },
+      "forest": {
+        "name": "森林",
+        "description": "深绿配奶油色文字"
+      },
+      "matcha": {
+        "name": "抹茶",
+        "description": "柔和的绿茶色调"
+      },
+      "ocean": {
+        "name": "海洋",
+        "description": "海蓝渐变，白色卡片"
+      },
+      "sand": {
+        "name": "海滩",
+        "description": "沙色与松石绿，适合民宿"
+      },
+      "lotus": {
+        "name": "莲花",
+        "description": "莲花粉与叶绿"
+      },
+      "lavender": {
+        "name": "薰衣草",
+        "description": "丁香紫页面，紫色按钮"
+      },
+      "peach": {
+        "name": "蜜桃",
+        "description": "蜜桃渐变，珊瑚色点缀"
+      },
+      "mint": {
+        "name": "薄荷",
+        "description": "清新薄荷与青绿"
+      },
+      "sky": {
+        "name": "宝宝蓝",
+        "description": "浅蓝色，温柔友好"
+      },
+      "sorbet": {
+        "name": "雪葩",
+        "description": "彩虹粉彩渐变"
+      },
+      "midnight": {
+        "name": "午夜",
+        "description": "近黑底色配白色卡片"
+      },
+      "graphite": {
+        "name": "石墨",
+        "description": "炭灰卡片，低调边框"
+      },
+      "neon": {
+        "name": "霓虹之夜",
+        "description": "深紫底上发光的粉色"
+      },
+      "aurora": {
+        "name": "极光",
+        "description": "北极光渐变，玻璃卡片"
+      },
+      "starry": {
+        "name": "星空",
+        "description": "藏青夜空与流星"
+      },
+      "tet": {
+        "name": "农历新年",
+        "description": "红金配色，迎接新春"
+      },
+      "wedding": {
+        "name": "婚礼",
+        "description": "手写体姓名，腮红粉与白色"
+      },
+      "birthday": {
+        "name": "生日",
+        "description": "彩纸配色，圆角卡片"
+      },
+      "christmas": {
+        "name": "圣诞",
+        "description": "松绿、红色与白雪"
+      },
+      "midautumn": {
+        "name": "中秋",
+        "description": "夜蓝底上的灯笼橙"
+      },
+      "aurora-glass": {
+        "name": "极光玻璃",
+        "description": "磨砂玻璃卡片后流动的极光"
+      },
+      "frost": {
+        "name": "冰霜",
+        "description": "冰蓝网格，透明玻璃，清晰字体"
+      },
+      "midnight-glass": {
+        "name": "午夜玻璃",
+        "description": "深紫夜色中的发光玻璃"
+      },
+      "sakura-glass": {
+        "name": "樱花玻璃",
+        "description": "柔和玻璃中的樱花粉"
+      },
+      "lagoon-glass": {
+        "name": "泻湖",
+        "description": "透明卡片下流动的松石绿光"
+      },
+      "gold-noir": {
+        "name": "黑金",
+        "description": "黑色丝绸、金色线条与金色名字"
+      },
+      "marble": {
+        "name": "大理石",
+        "description": "柔和石色，细边框，衬线字体"
+      },
+      "emerald": {
+        "name": "翡翠丝绒",
+        "description": "深绿丝绒配金色镶边"
+      },
+      "royal": {
+        "name": "皇家藏青",
+        "description": "藏青与金色，低调大气"
+      },
+      "rose-gold": {
+        "name": "玫瑰金",
+        "description": "腮红粉网格与玫瑰金点缀"
+      },
+      "pearl": {
+        "name": "珍珠",
+        "description": "珍珠般的虹彩光泽，白色卡片"
+      },
+      "brutal": {
+        "name": "粗野主义",
+        "description": "粗描边、硬阴影，大胆鲜明"
+      },
+      "brutal-pink": {
+        "name": "热粉",
+        "description": "泡泡糖粉配黑色描边"
+      },
+      "y2k": {
+        "name": "Y2K",
+        "description": "金属粉彩、胶囊描边，千禧年风格"
+      },
+      "vaporwave": {
+        "name": "蒸汽波",
+        "description": "紫色黄昏中的霓虹粉与青色"
+      },
+      "comic": {
+        "name": "漫画",
+        "description": "网点黄、黑色墨线、红色亮点"
+      },
+      "terminal": {
+        "name": "终端",
+        "description": "黑色网格上的绿色荧光"
+      },
+      "poster": {
+        "name": "海报",
+        "description": "大字体、红色色块、纸张米色"
+      },
+      "notebook": {
+        "name": "笔记本",
+        "description": "方格纸与墨蓝笔记"
+      },
+      "ruled": {
+        "name": "横线纸",
+        "description": "柔和横线纸，沉静衬线体"
+      },
+      "latte": {
+        "name": "拿铁拉花",
+        "description": "奶咖色网格，焦糖色点缀"
+      },
+      "sunset-mesh": {
+        "name": "黄金时刻",
+        "description": "蜜桃、珊瑚与蜂蜜色交融"
+      },
+      "botanical": {
+        "name": "植物",
+        "description": "亚麻底上的叶绿圆点"
+      },
+      "meadow": {
+        "name": "草地",
+        "description": "柔和网格中的青草与蓝天"
+      },
+      "cotton-candy": {
+        "name": "棉花糖",
+        "description": "不停流动的粉彩极光"
+      },
+      "dreamy": {
+        "name": "梦幻",
+        "description": "丁香紫与天蓝网格，圆润柔和"
+      },
+      "cyber": {
+        "name": "赛博光",
+        "description": "深黑底上的青色霓虹边"
+      },
+      "obsidian": {
+        "name": "黑曜石",
+        "description": "抛光黑色，紫色光晕"
+      },
+      "lixi": {
+        "name": "红包",
+        "description": "红包红配金色波纹"
+      },
+      "party": {
+        "name": "派对",
+        "description": "彩纸圆点与霓虹描边"
+      }
+    },
+    "sections": {
+      "colors": "颜色与背景",
+      "text": "文字",
+      "cards": "卡片与按钮",
+      "layout": "布局",
+      "effects": "特效",
+      "music": "背景音乐"
+    },
+    "text": {
+      "general": "主字体",
+      "generalHelp": "用于区块中的文字。",
+      "align": "对齐",
+      "pageColor": "内容文字颜色",
+      "pageColorHelp": "区块内文字的颜色。",
+      "pairs": "字体搭配",
+      "nameGradient": "渐变名称",
+      "nameGradientHelp": "用强调色为网站名称上色。"
+    },
+    "presetActions": {
+      "random": "随机一个",
+      "count": "{n} 个主题",
+      "pro": "Pro",
+      "proNote": "Pro 主题：可免费试用，Starter 套餐起可发布。",
+      "seePlans": "查看套餐"
+    },
+    "rows": {
+      "theme": "主题",
+      "themeHint": "{n} 种现成风格",
+      "customize": "自定义",
+      "custom": "自定义"
+    },
+    "music": {
+      "hint": "访客首次点击后在页面上播放（浏览器不允许在此之前播放声音）。你的 3D 房间保留自己的音乐。",
+      "none": "无音乐",
+      "preview": "试听 {title}"
+    }
+  },
+  "analytics": {
+    "unpublished": "发布网站后即可查看数据分析。",
+    "tabs": {
+      "overview": "概览",
+      "links": "操作与链接"
+    },
+    "links": {
+      "empty": "此网站还没有链接或社交图标。",
+      "linksTitle": "链接",
+      "socialTitle": "社交图标",
+      "clicks": "次点击 | 次点击",
+      "noLink": "暂无链接"
+    },
+    "overview": {
+      "periodAria": "时间段",
+      "periods": {
+        "h24": "24 小时",
+        "d7": "7 天",
+        "d30": "30 天",
+        "d90": "90 天"
+      },
+      "cards": {
+        "views": "浏览量",
+        "unique": "独立访客",
+        "today": "今天",
+        "bots": "已过滤机器人"
+      },
+      "viewsOverTime": "浏览量趋势",
+      "peak": "峰值 {value}",
+      "botsNote": "已排除 {n} 次机器人访问 | 已排除 {n} 次机器人访问",
+      "noViews": "此时间段内暂无浏览",
+      "viewsCount": "{n} 次浏览 | {n} 次浏览",
+      "topReferrers": "主要来源",
+      "devices": "设备",
+      "browsers": "浏览器",
+      "noData": "暂无数据"
+    },
+    "countryMap": {
+      "title": "国家/地区",
+      "map": "地图",
+      "list": "列表",
+      "noData": "暂无数据",
+      "viewsCount": "{n} 次浏览 | {n} 次浏览"
+    },
+    "actions": {
+      "title": "联系操作",
+      "text": "访客拨打电话、查询路线、发送消息或预订的次数。全部时间。",
+      "call": "电话",
+      "map": "路线",
+      "book": "预订点击",
+      "form": "表单请求",
+      "zalo": "Zalo 聊天",
+      "whatsapp": "WhatsApp 聊天",
+      "telegram": "Telegram 聊天",
+      "email": "邮件",
+      "order": "订单",
+      "store": "商店点击",
+      "guestbook": "留言簿消息"
+    }
+  }
+}

@@ -181,6 +181,7 @@
 </template>
 
 <script setup lang="ts">
+import { LANGUAGE_INFO, toAppLanguage } from "#shared/language";
 definePageMeta({
   colorMode: 'light',
   layout: "admin",
@@ -292,7 +293,7 @@ function getStatusColor(
 }
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString(locale.value === "vi" ? "vi-VN" : "en-US", {
+  return new Date(date).toLocaleDateString(LANGUAGE_INFO[toAppLanguage(locale.value)].intl, {
     year: "numeric",
     month: "short",
     day: "numeric",

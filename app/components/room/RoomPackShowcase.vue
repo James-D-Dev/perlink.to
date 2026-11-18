@@ -38,6 +38,7 @@ import type { RoomPack, RoomPackId } from '#shared/roomPacks'
 import { createDefaultRoom, type LandId, type RoomConfig, type RoomObject } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import type { ShopProduct } from '~/utils/room/productCard'
+import { toAppLanguage, type AppLanguage } from '#shared/language'
 
 const props = defineProps<{ pack: RoomPack }>()
 const { t } = useI18n()
@@ -112,23 +113,29 @@ const layout = computed(() => LAYOUTS[props.pack.id])
 
 // Showroom: a sample shop, so the cabinet, screen and podium show real-looking products
 const { locale } = useI18n()
-const DEMO: [en: string, vi: string, price: number, photo: string, comparePrice?: number, tag?: [string, string]][] = [
-  ['Linen wrap dress', 'Đầm lanh quấn', 590000, 'boutique-2', undefined, ['New', 'Mới']],
-  ['Calm serum', 'Serum dịu da', 390000, 'skin-cover', undefined, ['Best seller', 'Bán chạy']],
-  ['Plaid mini skirt', 'Chân váy kẻ caro', 390000, 'boutique-3', 490000],
-  ['Glow routine set', 'Bộ chu trình Glow', 890000, 'skin-3', 970000],
-  ['Everyday shirt', 'Sơ mi hằng ngày', 450000, 'boutique-1'],
-  ['Daily sunscreen SPF 50', 'Kem chống nắng SPF 50', 320000, 'skin-2'],
-  ['Speckled mug', 'Cốc men lấm tấm', 220000, 'craft-avatar'],
+type Words = Record<AppLanguage, string>
+const NEW: Words = { en: 'New', vi: 'Mới', zh: '新品', ja: '新作', ko: '신상' }
+const BEST: Words = { en: 'Best seller', vi: 'Bán chạy', zh: '热卖', ja: '人気', ko: '베스트' }
+const DEMO: { name: Words; price: number; photo: string; comparePrice?: number; tag?: Words }[] = [
+  { name: { en: 'Linen wrap dress', vi: 'Đầm lanh quấn', zh: '亚麻裹身连衣裙', ja: 'リネンのラップワンピース', ko: '린넨 랩 원피스' }, price: 590000, photo: 'boutique-2', tag: NEW },
+  { name: { en: 'Calm serum', vi: 'Serum dịu da', zh: '舒缓精华', ja: 'カームセラム', ko: '진정 세럼' }, price: 390000, photo: 'skin-cover', tag: BEST },
+  { name: { en: 'Plaid mini skirt', vi: 'Chân váy kẻ caro', zh: '格纹短裙', ja: 'チェックのミニスカート', ko: '체크 미니스커트' }, price: 390000, photo: 'boutique-3', comparePrice: 490000 },
+  { name: { en: 'Glow routine set', vi: 'Bộ chu trình Glow', zh: '焕亮护肤套装', ja: 'グロウケアセット', ko: '글로우 루틴 세트' }, price: 890000, photo: 'skin-3', comparePrice: 970000 },
+  { name: { en: 'Everyday shirt', vi: 'Sơ mi hằng ngày', zh: '日常衬衫', ja: 'デイリーシャツ', ko: '데일리 셔츠' }, price: 450000, photo: 'boutique-1' },
+  { name: { en: 'Daily sunscreen SPF 50', vi: 'Kem chống nắng SPF 50', zh: '日常防晒霜 SPF 50', ja: 'デイリー日焼け止め SPF 50', ko: '데일리 선크림 SPF 50' }, price: 320000, photo: 'skin-2' },
+  { name: { en: 'Speckled mug', vi: 'Cốc men lấm tấm', zh: '斑点釉马克杯', ja: 'スペックルマグ', ko: '스페클 머그컵' }, price: 220000, photo: 'craft-avatar' },
 ]
-const demoProducts = computed<ShopProduct[]>(() => DEMO.map(([en, vi, price, photo, comparePrice, tag], i) => ({
-  id: `demo-${i}`,
-  name: locale.value === 'vi' ? vi : en,
-  price,
-  comparePrice,
-  imageUrl: `/images/templates/photos/${photo}-md.webp`,
-  tag: tag ? (locale.value === 'vi' ? tag[1] : tag[0]) : undefined,
-})))
+const demoProducts = computed<ShopProduct[]>(() => {
+  const lang = toAppLanguage(locale.value)
+  return DEMO.map(({ name, price, photo, comparePrice, tag }, i) => ({
+    id: `demo-${i}`,
+    name: name[lang],
+    price,
+    comparePrice,
+    imageUrl: `/images/templates/photos/${photo}-md.webp`,
+    tag: tag?.[lang],
+  }))
+})
 
 // Clicking the piano plays it, here too
 const piano = useRoomPiano()

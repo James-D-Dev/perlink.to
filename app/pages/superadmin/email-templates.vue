@@ -165,6 +165,7 @@
 </template>
 
 <script setup lang="ts">
+import { APP_LANGUAGES, type AppLanguage } from '#shared/language'
 import { superadminCardUi, superadminPanelUi } from '~/utils/superadmin'
 
 // Superadmin → Email templates: the words of each email Perlink sends (in
@@ -174,7 +175,7 @@ definePageMeta({
   middleware: 'superadmin',
 })
 
-type Lang = 'en' | 'vi'
+type Lang = AppLanguage
 interface Words { subject: string; heading: string; body: string; button: string; note: string }
 interface Template {
   id: string; name: string; description: string; audience: 'user' | 'site owner' | 'admin'
@@ -183,7 +184,7 @@ interface Template {
 interface Layout { accent: string; footer: Record<Lang, string> }
 
 const toast = useToast()
-const langs: Lang[] = ['en', 'vi']
+const langs: Lang[] = [...APP_LANGUAGES]
 const audienceIcon = { 'user': 'i-lucide-user-round', 'site owner': 'i-lucide-store', 'admin': 'i-lucide-shield' } as const
 const swatches = ['#0066d6', '#0c0b0a', '#7c3aed', '#db2777', '#059669', '#ea580c']
 const devices = [
@@ -204,15 +205,15 @@ const merged = (t: Template, l: Lang): Words => ({ ...t.defaults[l], ...(t.saved
 const isCustomised = (t: Template) => Object.values(t.saved ?? {}).some(words => words && Object.keys(words).length)
 
 // The words being edited, both languages
-const draft = ref<Record<Lang, Words>>({ en: emptyWords(), vi: emptyWords() })
+const draft = ref<Record<Lang, Words>>(Object.fromEntries(APP_LANGUAGES.map(l => [l, emptyWords()])) as Record<Lang, Words>)
 function emptyWords(): Words { return { subject: '', heading: '', body: '', button: '', note: '' } }
-const layoutDraft = ref<Layout>({ accent: '#0066d6', footer: { en: '', vi: '' } })
+const layoutDraft = ref<Layout>({ accent: '#0066d6', footer: Object.fromEntries(APP_LANGUAGES.map(l => [l, ''])) as Record<Lang, string> })
 
 function loadDraft() {
   if (!data.value) return
   layoutDraft.value = structuredClone(toRaw(data.value.layout))
   const t = current.value
-  if (t) draft.value = { en: merged(t, 'en'), vi: merged(t, 'vi') }
+  if (t) draft.value = Object.fromEntries(APP_LANGUAGES.map(l => [l, merged(t, l)])) as Record<Lang, Words>
 }
 watch(data, loadDraft, { immediate: true })
 

@@ -60,6 +60,9 @@
 </template>
 
 <script setup lang="ts">
+import { toAppLanguage, type AppLanguage } from '#shared/language'
+import { localPath } from '~/data/langPaths'
+
 const props = defineProps<{
   /** The site address that was asked for; none for any other missing page */
   name?: string
@@ -67,8 +70,8 @@ const props = defineProps<{
 
 const { locale } = useI18n()
 const { loggedIn } = useUserSession()
-const vi = computed(() => locale.value === 'vi')
-const home = computed(() => (vi.value ? '/vi' : '/'))
+const lang = computed(() => toAppLanguage(locale.value))
+const home = computed(() => localPath('/', lang.value))
 
 // Free to claim, taken (by a site not published yet), or not a site address at all
 const slug = (props.name ?? '').toLowerCase()
@@ -85,7 +88,8 @@ const state = computed<'free' | 'taken' | 'none'>(() => {
   return /taken/i.test(availability.value.message ?? '') ? 'taken' : 'none'
 })
 
-const TEXT = {
+type NotFoundText = { free: { title: string; body: string }; taken: { title: string; body: string }; none: { title: string; body: string }; claim: string; create: string; explore: string; note: string }
+const TEXT: Record<AppLanguage, NotFoundText> = {
   en: {
     free: { title: 'This address is still free', body: `Make perlink.to/${slug} yours: a link in bio, a website or a 3D room, ready in a minute.` },
     taken: { title: 'This page isn’t live yet', body: 'Its owner hasn’t published it. Want a page of your own? Pick your address and start free.' },
@@ -104,9 +108,36 @@ const TEXT = {
     explore: 'Khám phá Perlink',
     note: 'Miễn phí để bắt đầu · Không cần thẻ',
   },
+  zh: {
+    free: { title: '这个地址还没人用', body: `把 perlink.to/${slug} 变成你的：个人链接页、网站或 3D 房间，一分钟就能做好。` },
+    taken: { title: '这个页面还没上线', body: '页面主人还没有发布。想要一个属于自己的页面？选好地址，免费开始。' },
+    none: { title: '这个页面不存在', body: '链接可能有误，或者页面已经搬走了。一分钟免费做一个你自己的页面吧。' },
+    claim: '立即领取',
+    create: '创建你的页面',
+    explore: '了解 Perlink',
+    note: '免费开始 · 无需信用卡',
+  },
+  ja: {
+    free: { title: 'このアドレスはまだ空いています', body: `perlink.to/${slug} をあなたのものに。リンクまとめ、Webサイト、3Dルームが1分で完成します。` },
+    taken: { title: 'このページはまだ公開されていません', body: 'オーナーがまだ公開していません。自分のページを作りませんか？アドレスを選んで無料で始められます。' },
+    none: { title: 'このページは存在しません', body: 'リンクが間違っているか、ページが移動した可能性があります。自分のページを1分で無料で作れます。' },
+    claim: '今すぐ取得',
+    create: 'ページを作成',
+    explore: 'Perlinkを見る',
+    note: '無料で始められます · クレジットカード不要',
+  },
+  ko: {
+    free: { title: '이 주소는 아직 비어 있어요', body: `perlink.to/${slug} 주소를 내 것으로 만들어 보세요. 링크 인 바이오, 웹사이트, 3D 룸을 1분 만에 완성할 수 있어요.` },
+    taken: { title: '이 페이지는 아직 공개되지 않았어요', body: '주인이 아직 게시하지 않았어요. 나만의 페이지를 원하세요? 주소를 고르고 무료로 시작해 보세요.' },
+    none: { title: '이 페이지는 존재하지 않아요', body: '링크가 잘못되었거나 페이지가 이동했을 수 있어요. 1분 만에 무료로 나만의 페이지를 만들어 보세요.' },
+    claim: '지금 바로 등록하기',
+    create: '내 페이지 만들기',
+    explore: 'Perlink 둘러보기',
+    note: '무료로 시작 · 카드 등록 불필요',
+  },
 }
 const text = computed(() => {
-  const copy = TEXT[vi.value ? 'vi' : 'en']
+  const copy = TEXT[lang.value]
   return { ...copy, ...copy[state.value] }
 })
 

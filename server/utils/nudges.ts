@@ -3,7 +3,8 @@ import { getDB } from './db'
 import { sendEmail } from './email'
 import { renderTemplate } from './emailTemplates'
 import { SUPERADMIN_EMAIL } from './superadmin'
-import type { AppLanguage } from '#shared/language'
+import { countryLanguage, greetingName } from './userLanguage'
+import { APP_LANGUAGES, type AppLanguage } from '#shared/language'
 
 // One-time reminder emails, run by middleware/jobs about once an hour.
 //
@@ -16,12 +17,9 @@ const BATCH = 20
 
 interface Person { id: string; email: string; name: string | null; language: string | null; country: string | null }
 
-const languageOf = (p: Person): AppLanguage => (p.language === 'vi' || (!p.language && p.country === 'VN') ? 'vi' : 'en')
-
-function firstName(name: string | null, lang: AppLanguage) {
-  const parts = (name || '').trim().split(/\s+/).filter(Boolean)
-  return (lang === 'vi' ? parts.at(-1) : parts[0]) || (lang === 'vi' ? 'bạn' : 'there')
-}
+/** The language they chose, else their country's, else English */
+const languageOf = (p: Person): AppLanguage =>
+  (APP_LANGUAGES as readonly string[]).includes(p.language ?? '') ? p.language as AppLanguage : countryLanguage(p.country) ?? 'en'
 
 export async function runNudges(event: H3Event) {
   const db = getDB(event)
@@ -41,7 +39,7 @@ export async function runNudges(event: H3Event) {
   for (const person of results ?? []) {
     const lang = languageOf(person)
     const { subject, html, text } = await renderTemplate(event, 'nudge_no_site', lang, {
-      vars: { name: firstName(person.name, lang) },
+      vars: { name: greetingName(person.name, lang) },
       buttonUrl: 'https://perlink.to/dashboard/new?utm_source=email&utm_medium=nudge&utm_campaign=no_site',
     })
     const ok = await sendEmail(event, {

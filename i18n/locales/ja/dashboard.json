@@ -1,0 +1,1261 @@
+{
+  "dashboard": {
+    "toast": {
+      "error": "エラー",
+      "copied": "コピーしました！",
+      "copyFailed": "コピーできませんでした",
+      "published": "公開しました！",
+      "unpublished": "非公開にしました",
+      "saved": "保存しました！",
+      "urlCopied": "URL をクリップボードにコピーしました"
+    },
+    "home": {
+      "title": "作成",
+      "mySites": "マイサイト",
+      "heading": "サイトを作成",
+      "intro": "アドレスを取得するか、下のテンプレートをタップしてすぐに始めましょう。アドレスは後から決めることもでき、内容はいつでも変更できます。",
+      "newSiteLine": "新しいサイトのアドレスを選ぶか、下のテンプレートから始めましょう。",
+      "templatesHeading": "テンプレートから始める",
+      "templatesIntro": "{n} 種類のテンプレート。それぞれにサンプルコンテンツ、テーマ、マッチする3Dルームが付いています。",
+      "all": "すべて",
+      "useTemplate": "テンプレートを使う",
+      "previewTemplate": "プレビュー",
+      "previewTitle": "テンプレートのプレビュー",
+      "previewUse": "このテンプレートを使う",
+      "claimHeading": "サイトのアドレスを取得",
+      "features": {
+        "sampleContent": "編集できるサンプルコンテンツ",
+        "theme": "統一感のあるテーマとフォント",
+        "room": "装飾済みの3Dルーム付き",
+        "changeAnytime": "テンプレートはいつでも変更可能"
+      },
+      "creating": "サイトを作成しています…",
+      "yourSites": "あなたのサイト",
+      "seeAllSites": "すべて表示（{n}）"
+    },
+    "sites": {
+      "title": "マイサイト",
+      "createSite": "サイトを作成",
+      "heading": "あなたのサイト",
+      "count": "{n} サイト | {n} サイト",
+      "liveCount": "公開中 {n}",
+      "search": "サイトを検索",
+      "live": "公開中",
+      "draft": "下書き",
+      "views": "{n} 回表示",
+      "updated": "{date} に更新",
+      "noMatch": "「{query}」に一致するサイトはありません。",
+      "all": "すべて",
+      "noneLive": "公開中のサイトはまだありません。",
+      "noneDraft": "下書きはありません。",
+      "emptyTitle": "まだサイトがありません",
+      "emptyText": "perlink.to のアドレスを取得して、テンプレートから始めましょう。1分ほどで完了します。",
+      "loadFailed": "サイトを読み込めませんでした",
+      "publishedText": "サイトが公開されました",
+      "publishFailed": "サイトを公開できませんでした",
+      "unpublishedText": "サイトを非公開にしました",
+      "unpublishFailed": "サイトを非公開にできませんでした",
+      "edit": "編集",
+      "newSite": "新しいサイト",
+      "newSiteHint": "ウェブサイト、メニュー、ショップ、3Dルーム",
+      "greeting": {
+        "morning": "おはようございます、{name} さん",
+        "afternoon": "こんにちは、{name} さん",
+        "evening": "こんばんは、{name} さん",
+        "morningPlain": "おはようございます",
+        "afternoonPlain": "こんにちは",
+        "eveningPlain": "こんばんは",
+        "line": {
+          "morning": "新しい一日の始まり。今日は何を作りますか？☕",
+          "afternoon": "この調子で。あなたのサイトはワンタップで開けます。",
+          "evening": "夕食前にちょっと更新してひと息つきましょう。",
+          "night": "夜更かし中ですか？あなたのサイトはここにあります。🌙"
+        }
+      },
+      "week": {
+        "heading": "過去7日間",
+        "visits": "訪問数",
+        "change": "前週比 {n}%",
+        "details": "アナリティクスを見る",
+        "requestsTitle": "新しいリクエストが {n} 件あります | 新しいリクエストが {n} 件あります",
+        "requestsText": "訪問者があなたのサイトから予約や問い合わせのリクエストを送信しました。",
+        "nudgeTitle": "SNS のプロフィールにリンクを追加しましたか？",
+        "nudgeText": "Instagram、TikTok、Facebook のプロフィールに貼り付けるか、QR コードを印刷して見つけてもらいましょう。",
+        "goodTitle": "サイトに訪問者が来ています",
+        "goodText": "もう一度シェアして、さらに多くの人に届けましょう。"
+      },
+      "filterLabel": "表示"
+    },
+    "editor": {
+      "titleCreate": "サイトを作成",
+      "titleEdit": "サイトを編集",
+      "selectSite": "サイトを選択",
+      "copyUrl": "URL をコピー",
+      "share": "シェア",
+      "continueToEditor": "エディターへ進む",
+      "templateHeading": "テンプレートから始める",
+      "templateIntro": "出発点を選んでください。すべてのテンプレートにサンプルコンテンツ、テーマ、マッチする3Dルームが含まれています。",
+      "closePreview": "プレビューを閉じる",
+      "tabs": {
+        "site": "サイト",
+        "room": "3Dルーム",
+        "content": "コンテンツ",
+        "design": "デザイン",
+        "settings": "設定",
+        "header": "ヘッダー",
+        "blog": "ブログ"
+      },
+      "room": {
+        "heading": "あなたの3Dルーム",
+        "objects": "オブジェクト {n} 個。家具を置いて、周りの景色を選びましょう。",
+        "openEditor": "ルームを飾る",
+        "showFirst": "3Dルームを最初に表示",
+        "modeOn": "訪問者は3Dルームに到着し、ワンタップでサイトに切り替えられます。",
+        "modeOff": "訪問者には最初にページが表示されます。",
+        "shareVideo": "ルームをシェア",
+        "fab": "3Dルーム",
+        "button": "ページ上の「3Dルーム」ボタン",
+        "buttonText": "訪問者を3Dルームに案内する、画面の隅のボタンです。"
+      },
+      "settings": {
+        "addressHeading": "サイトのアドレス",
+        "addressText": "公開サイトのアドレス",
+        "languageHeading": "サイトの言語",
+        "languageText": "訪問者に表示されるボタンやラベル（営業時間や「今すぐ予約」など）の言語です。あなたが書いたテキストはそのままです。",
+        "templateHeading": "テンプレートを変更",
+        "templateText": "現在のコンテンツ、テーマ、3Dルームをすべて別のテンプレートに置き換えます。",
+        "shareHeading": "シェアボタン",
+        "shareText": "サイトにフローティングのシェアボタンを表示します",
+        "visibilityHeading": "公開設定",
+        "visibilityText": "サイトを閲覧できる人を管理します",
+        "published": "公開済み",
+        "draft": "下書き",
+        "live": "公開中",
+        "publicText": "ページは一般公開されています",
+        "privateText": "このページはあなただけが見られます",
+        "deleteHeading": "このサイトを削除",
+        "deleteText": "サイトとその中のすべてを完全に削除します。アドレスは誰でも使えるようになります。",
+        "deleteButton": "サイトを削除",
+        "deleteTitle": "このサイトを削除しますか？",
+        "deleteWarning": "この操作は元に戻せません。次のものが失われます：",
+        "deleteLossPage": "{address} のページと3Dルーム",
+        "deleteLossInbox": "受信箱：リクエスト、注文、返信、購読者",
+        "deleteLossPosts": "ブログ記事、ゲストブック、アップロードした写真",
+        "deleteLossStats": "アナリティクスと接続済みの独自ドメイン",
+        "deleteConfirmLabel": "確認のため {address} と入力してください",
+        "deleteConfirm": "完全に削除",
+        "deleted": "{address} を削除しました",
+        "deleteFailed": "サイトを削除できませんでした。もう一度お試しください。"
+      },
+      "shareFallbackTitle": "あなたの名前",
+      "usernameTooShort": "ユーザー名は3文字以上にしてください",
+      "usernameInvalid": "使用できるのは英字、数字、アンダースコア、ハイフンのみです",
+      "created": "サイトを作成しました！",
+      "createdText": "さあ、ページをカスタマイズしましょう",
+      "createFailed": "サイトを作成できませんでした",
+      "noSiteToSave": "保存するサイトがありません",
+      "savedText": "変更を保存しました",
+      "saveFailed": "保存できませんでした",
+      "noSiteToPublish": "公開するサイトがありません",
+      "publishedText": "ページが perlink.to/{username} で公開されました",
+      "publishFailed": "公開できませんでした",
+      "templateApplied": "{name} を適用しました",
+      "templateAppliedText": "サンプルコンテンツをあなた好みに編集しましょう。編集内容は自動で保存されます。",
+      "applyTitle": "「{name}」を適用しますか？",
+      "applyText": "現在のブロック、テーマ、3Dルームはすべて置き換えられます。書いたテキストは失われます。",
+      "applyConfirm": "テンプレートを適用",
+      "unsaved": {
+        "leaveTitle": "保存せずに移動しますか？",
+        "leaveText": "このサイトへの変更はまだ保存されていません。",
+        "leaveAction": "移動する",
+        "restoredTitle": "未保存の編集を復元しました",
+        "restoredText": "{time} の {site} への編集は、離れたときに保存されていませんでした。復元して、現在保存中です。",
+        "undo": "元に戻す"
+      },
+      "draft": {
+        "banner": "訪問者にまだ表示されていない保存済みの変更があります。公開すると反映されます。",
+        "savedText": "下書きとして保存しました。公開するまで、訪問者には公開中のバージョンが表示されます。",
+        "discard": "変更を破棄",
+        "discardTitle": "未公開の変更を破棄しますか？",
+        "discardText": "エディターは、現在訪問者に表示されているバージョンに戻ります。"
+      },
+      "status": {
+        "saving": "保存中…",
+        "saved": "保存済み",
+        "savedAt": "{time} に保存",
+        "unsaved": "未保存",
+        "draftPending": "下書きを保存しました",
+        "error": "保存できませんでした。再試行しています"
+      },
+      "update": "サイトを更新",
+      "upToDate": "訪問者には最新版が表示されています",
+      "previewHint": "スマホ画面の部分をタップして編集",
+      "templateReopen": "テンプレートから始める",
+      "sections": "エディターのセクション",
+      "yourSites": "あなたのサイト",
+      "notLiveYet": "未公開のため、訪問者には表示されません"
+    },
+    "username": {
+      "heading": "ユーザー名を選択",
+      "placeholder": "yourname",
+      "available": "このユーザー名は使用できます"
+    },
+    "previewPanel": {
+      "mobile": "モバイル"
+    },
+    "analyticsPage": {
+      "editSite": "サイトを編集",
+      "notFound": "サイトが見つかりません。",
+      "seoTitle": "アナリティクス · {username} — Perlink"
+    },
+    "settings": {
+      "placeholder": "設定"
+    },
+    "upgrade": {
+      "title": "プラン",
+      "heading": "プランを選択",
+      "intro": "すべてのプランにテンプレート、エディター、ページ用の3Dワールドが含まれます。",
+      "seoTitle": "プラン — Perlink"
+    },
+    "feedback": {
+      "title": "フィードバック",
+      "formHeading": "フィードバックを送信",
+      "formIntro": "Perlink の改善にご協力ください",
+      "type": "フィードバックの種類",
+      "typePlaceholder": "フィードバックの種類を選択",
+      "subject": "件名",
+      "subjectPlaceholder": "フィードバックの概要",
+      "message": "フィードバック内容",
+      "messagePlaceholder": "ご意見、不具合の報告、機能の提案などをお聞かせください...",
+      "rating": "評価（任意）",
+      "ratingValue": "5段階中 {rating}",
+      "clear": "クリア",
+      "submit": "フィードバックを送信",
+      "historyHeading": "フィードバック履歴",
+      "historyIntro": "これまでの送信内容を確認できます",
+      "submittedCount": "{n} 件送信済み",
+      "types": {
+        "general": "一般的なフィードバック",
+        "bug": "不具合の報告",
+        "feature": "機能のリクエスト",
+        "improvement": "改善の提案",
+        "other": "その他"
+      },
+      "typeBadges": {
+        "general": "一般",
+        "bug": "不具合の報告",
+        "feature": "機能のリクエスト",
+        "improvement": "改善",
+        "other": "その他"
+      },
+      "statuses": {
+        "pending": "保留中",
+        "reviewing": "確認中",
+        "resolved": "解決済み",
+        "closed": "クローズ"
+      },
+      "submitted": "フィードバックを送信しました",
+      "submittedText": "改善へのご協力ありがとうございます！",
+      "submitFailed": "送信できませんでした",
+      "tryAgain": "もう一度お試しください",
+      "submitError": "フィードバックを送信できませんでした"
+    },
+    "claim": {
+      "placeholder": "your-site",
+      "ariaLabel": "サイトのアドレス",
+      "submit": "サイトを作成",
+      "submitShort": "作成",
+      "hint": "英字、数字、ハイフン、アンダースコアが使えます。内容はいつでも変更できます。",
+      "available": "perlink.to/{slug} は使用できます",
+      "taken": "この名前は使用されています",
+      "checkFailed": "この名前を確認できませんでした。もう一度お試しください。",
+      "tooShort": "3文字以上",
+      "checking": "使用可能か確認しています...",
+      "ready": "サイトの準備ができました",
+      "createFailed": "サイトを作成できませんでした",
+      "enterAddress": "先にアドレスを選んでください",
+      "cantUse": "このアドレスは使用できません"
+    },
+    "help": {
+      "ariaLabel": "ヘルプ",
+      "heading": "どのようなご用件ですか？",
+      "intro": "よくある質問、またはお問い合わせ。",
+      "close": "ヘルプを閉じる",
+      "contact": "お問い合わせ",
+      "feedback": "フィードバック",
+      "answers": {
+        "create": {
+          "q": "サイトはどうやって作りますか？",
+          "a": "ダッシュボード → 作成 に進み、perlink.to の名前を取得してテンプレートを選びます。後からすべて変更できます。"
+        },
+        "room": {
+          "q": "3Dワールドをオンにするには？",
+          "a": "エディターでサイトを開き、「3Dルーム」をオンにします。次に「ルームを飾る」をタップして、家具を置いたり土地を選んだりしましょう。"
+        },
+        "publish": {
+          "q": "公開するには？",
+          "a": "エディターで「公開」を押します。サイトはすぐに perlink.to/yourname で公開されます。"
+        },
+        "photos": {
+          "q": "自分の写真を追加できますか？",
+          "a": "はい。サイトに画像アルバムブロックを追加するか、3Dルームに額縁を置いて写真をアップロードしてください。"
+        },
+        "phones": {
+          "q": "スマートフォンでも使えますか？",
+          "a": "はい。サイトはモバイルファーストで、3Dワールドはブラウザで動作し、端末に合わせて画質を自動調整します。"
+        },
+        "visitors": {
+          "q": "訪問者は通常のページも見られますか？",
+          "a": "いつでも見られます。訪問者はワンタップで3Dワールドから2Dページに切り替えられます。"
+        }
+      }
+    },
+    "templates": {
+      "personal": {
+        "name": "個人ポートフォリオ",
+        "description": "自己紹介、作品、連絡先をまとめて紹介。"
+      },
+      "restaurant": {
+        "name": "レストランメニュー",
+        "description": "価格付きメニュー、営業時間、席の予約。"
+      },
+      "hotel": {
+        "name": "ホテル・民宿",
+        "description": "1泊料金付きの客室、連絡先、予約。"
+      },
+      "cafe": {
+        "name": "カフェ・ショップ",
+        "description": "ドリンクや商品、営業時間、アクセス。"
+      },
+      "creator": {
+        "name": "クリエイター・アーティスト",
+        "description": "作品をギャラリーで紹介し、ショップや依頼へのリンクも。"
+      },
+      "link-in-bio": {
+        "name": "リンクインバイオ",
+        "description": "SNS と主要リンクをまとめた、すっきりしたダークなページ。"
+      },
+      "services": {
+        "name": "フリーランス・サービス",
+        "description": "価格付きのサービス、予約、営業時間。"
+      },
+      "event": {
+        "name": "結婚式・イベント",
+        "description": "特別な日のスケジュール、会場、出欠確認、フォトギャラリー。"
+      },
+      "spa": {
+        "name": "スパ・マッサージ",
+        "description": "価格付きの施術メニュー、営業時間、オンライン予約。"
+      },
+      "nail": {
+        "name": "ネイルサロン",
+        "description": "料金表、ネイルアートギャラリー、予約。"
+      },
+      "barber": {
+        "name": "ヘアサロン・理容室",
+        "description": "メニュー、スタイリストの作品、営業時間、予約。"
+      },
+      "gym": {
+        "name": "ジム・パーソナルトレーナー",
+        "description": "会員プラン、実績、無料体験の申し込み。"
+      },
+      "dental": {
+        "name": "歯科・クリニック",
+        "description": "診療内容、料金、診療時間、予約。"
+      },
+      "tutor": {
+        "name": "家庭教師・学習塾",
+        "description": "コース、料金、保護者の声、申し込み。"
+      },
+      "bakery": {
+        "name": "パン屋・ケーキ屋",
+        "description": "今日の焼き菓子を写真と価格で紹介、予約注文も。"
+      },
+      "street-food": {
+        "name": "屋台",
+        "description": "短いメニュー、夜の営業時間、銀行 QR 払い。"
+      },
+      "bar": {
+        "name": "バー・ラウンジ",
+        "description": "カクテルリスト、夜の営業時間、席の予約。"
+      },
+      "florist": {
+        "name": "花屋",
+        "description": "価格付きの花束、ギャラリー、日付指定の注文。"
+      },
+      "online-shop": {
+        "name": "オンラインショップ",
+        "description": "ストアへのリンク、人気商品、ルックブック。"
+      },
+      "real-estate": {
+        "name": "不動産エージェント",
+        "description": "おすすめ物件、写真、内見申し込みフォーム。"
+      },
+      "wedding-photo": {
+        "name": "ウェディングフォトグラファー",
+        "description": "ポートフォリオギャラリー、プラン、日程の問い合わせ。"
+      },
+      "musician": {
+        "name": "ミュージシャン・DJ",
+        "description": "最新リリース、今後のライブ、出演依頼。"
+      },
+      "birthday": {
+        "name": "誕生日パーティー",
+        "description": "カウントダウン、当日の予定、会場、出欠確認。"
+      },
+      "charity": {
+        "name": "募金・チャリティー",
+        "description": "あなたの活動、寄付用の銀行 QR、最新情報。"
+      },
+      "gift-birthday": {
+        "name": "誕生日サプライズルーム",
+        "description": "友達からのお祝いメッセージとプレゼントでいっぱいの3Dルーム。当日にリンクをシェアしましょう。"
+      },
+      "gift-love": {
+        "name": "ラブルーム",
+        "description": "パートナーにサプライズ：ラブレター、付き合った日数、2人のストーリーと写真を3Dルームで。"
+      },
+      "wedding-invite": {
+        "name": "結婚式の招待状",
+        "description": "オンライン結婚式招待状：ゲストへの手紙、カウントダウン、当日の予定、会場、出欠確認、ご祝儀用の QR。"
+      },
+      "blog": {
+        "name": "個人ブログ",
+        "description": "文章を主役に：自己紹介、最新記事、3Dルームのブログボード。"
+      },
+      "blog-travel": {
+        "name": "旅行ブログ",
+        "description": "雄大な風景、旅のフォトストリップ、最新の旅行記。"
+      },
+      "blog-food": {
+        "name": "グルメブログ",
+        "description": "レシピや食の話を、食欲をそそる写真とともに。"
+      },
+      "blog-tech": {
+        "name": "テック・プログラミングブログ",
+        "description": "ダークでテック感のあるシャープなデザイン：チュートリアル、メモ、個人プロジェクト。"
+      },
+      "blog-fashion": {
+        "name": "ファッション・ビューティーブログ",
+        "description": "エディトリアルで夢のような雰囲気：ルックブック、美容メモ、コーデ日記。"
+      },
+      "blog-wellness": {
+        "name": "ウェルネスブログ",
+        "description": "穏やかで爽やか：ヨガ、マインドフルな暮らし、健康的な習慣。"
+      },
+      "blog-family": {
+        "name": "家族・子育てブログ",
+        "description": "温かく楽しい雰囲気：家族の暮らし、成長の記録、正直な子育てのヒント。"
+      },
+      "blog-growth": {
+        "name": "お金・自己成長ブログ",
+        "description": "清潔感と信頼感：家計管理、生産性、本。"
+      },
+      "blog-diary": {
+        "name": "フォトダイアリー",
+        "description": "ムーディーで映画のような雰囲気：ストリートフォトと街の物語。"
+      },
+      "love-valentine": {
+        "name": "バレンタインになってくれる？",
+        "description": "想いを伝えよう：「いいえ」ボタンは逃げ出し、「はい」を押すとページがハートでいっぱいに。ラブレターと写真付き。"
+      },
+      "love-anniversary": {
+        "name": "結婚記念日",
+        "description": "夫や妻へ：結婚してからの年数、一緒に過ごした年月、手紙、結婚式の写真。"
+      },
+      "love-open-when": {
+        "name": "「〜のときに開けてね」レター",
+        "description": "そばにいられない瞬間のための封をした手紙：会いたくなったとき、眠れないとき、誕生日に。"
+      },
+      "love-long-distance": {
+        "name": "遠距離恋愛",
+        "description": "次に会える日までの日数、これまで会えた日々、手紙、前回の旅行の写真。"
+      },
+      "love-sorry": {
+        "name": "ケンカの後の仲直り",
+        "description": "謝罪の手紙、約束、楽しかった思い出、そして逃げる「いいえ」付きの「許してくれる？」。"
+      },
+      "invite-wedding-red": {
+        "name": "伝統的な結婚式の招待状",
+        "description": "赤と金：両家の紹介、婚約式と披露宴、出欠確認、ご祝儀用の QR。"
+      },
+      "invite-wedding-garden": {
+        "name": "ガーデンウェディングの招待状",
+        "description": "セージグリーンの軽やかでモダンなデザイン：挙式と披露宴、2人のストーリー、ドレスコード、出欠確認、写真。"
+      },
+      "wedding-song-hy": {
+        "name": "双喜の結婚式招待状",
+        "description": "双喜紋をあしらった伝統的な赤と金：両家の紹介、旧暦の日付、挙式、披露宴、出欠確認、ご祝儀用 QR。"
+      },
+      "wedding-dragon-phoenix": {
+        "name": "龍鳳の結婚式招待状",
+        "description": "両家の親から送る、深紅と金の格式あるデザイン：送り出しの儀、挙式、披露宴をそれぞれの家のタブで。"
+      },
+      "wedding-minimal": {
+        "name": "ミニマルな結婚式招待状",
+        "description": "余白と黒い文字：日付、場所、当日の予定、出欠確認。"
+      },
+      "wedding-korean": {
+        "name": "韓国風の結婚式招待状",
+        "description": "やわらかなベージュ、フィルム写真、優しい書体：2人のストーリー、当日の予定、出欠確認。"
+      },
+      "wedding-vintage": {
+        "name": "ヴィンテージ風の結婚式招待状",
+        "description": "セピア色の紙と封蝋の手紙：招待文、日付、会場、返信カード。"
+      },
+      "wedding-ao-dai": {
+        "name": "アオザイの結婚式招待状",
+        "description": "アイボリーとローズのモダンなベトナム風：アオザイ写真、家族の儀式、披露宴、旧暦の日付、出欠確認。"
+      },
+      "wedding-lotus": {
+        "name": "蓮の結婚式招待状",
+        "description": "葉の緑に蓮のピンク：手紙、挙式、湖畔のパーティー、写真、出欠確認、ご祝儀用 QR。"
+      },
+      "wedding-beach": {
+        "name": "ビーチウェディングの招待状",
+        "description": "海辺のデスティネーションウェディング：アクセス、宿泊先、夕日の挙式、出欠確認。"
+      },
+      "wedding-night-gold": {
+        "name": "黒と金のナイトウェディング",
+        "description": "黒と金の夜の披露宴：プログラム、ドレスコード、写真、出欠確認、ご祝儀用 QR。"
+      },
+      "wedding-bilingual": {
+        "name": "2か国語の結婚式招待状",
+        "description": "ベトナム語と英語を並べて：手紙、茶の儀式、披露宴、出欠確認、ご祝儀。"
+      },
+      "wedding-two-families": {
+        "name": "両家の結婚式招待状",
+        "description": "1つのリンクに家ごとのタブ：それぞれの儀式、披露宴、時間、住所に加え、共有の写真、出欠確認、ご祝儀。"
+      },
+      "invite-kids-birthday": {
+        "name": "子どもの誕生日の招待状",
+        "description": "1歳の誕生日や子ども向けパーティー：カウントダウン、パーティーの予定、場所、出欠確認、写真。"
+      },
+      "invite-grand-opening": {
+        "name": "グランドオープンの招待状",
+        "description": "オープンにお客様を招待：プログラム、オープン特典、地図、道順、出欠確認。"
+      },
+      "invite-year-end-party": {
+        "name": "忘年会の招待状",
+        "description": "会社の忘年会やガラ：カウントダウン、プログラム、ドレスコード、出欠確認、写真。"
+      },
+      "personal-neon": {
+        "name": "ネオン・デベロッパー",
+        "description": "開発者やテック系クリエイター向けの光るダークなページ：プロジェクト、タイムライン、オーロラの空。"
+      },
+      "personal-editorial": {
+        "name": "エディトリアル・ポートフォリオ",
+        "description": "モデル、スタイリスト、クリエイティブディレクター向けの雑誌風：全面のポートレート、キャンペーン、予約。"
+      },
+      "personal-resume": {
+        "name": "オンライン履歴書",
+        "description": "応募時に送れるすっきりした履歴書：経歴、スキル、推薦、履歴書のダウンロード。"
+      },
+      "personal-nomad": {
+        "name": "デジタルノマド",
+        "description": "リモートワーカーや旅人向け：旅の日数、仕事をした場所、旅のメモ、愛用品。"
+      },
+      "personal-aesthetic": {
+        "name": "パステル・エステティック",
+        "description": "Z世代クリエイター向けの、やわらかくステッカー感のあるデザイン：パステルグラデーション、ピル型リンク、販売用プリセット、lo-fi ミュージック。"
+      },
+      "photographer": {
+        "name": "フォトグラファー",
+        "description": "ダークなフレームでギャラリーを主役に：作品、価格付きの撮影プラン、予約フォーム。"
+      },
+      "tattoo-studio": {
+        "name": "タトゥースタジオ",
+        "description": "タトゥーアーティスト向けの大胆でダークなデザイン：施術直後と治癒後の作品、料金、アフターケア、カウンセリング。"
+      },
+      "hair-salon": {
+        "name": "ヘアサロン",
+        "description": "ヘアサロン向けの温かくカラフルなデザイン：価格付きメニュー、最新スタイル、口コミ、オンライン予約。"
+      },
+      "makeup-artist": {
+        "name": "メイクアップアーティスト",
+        "description": "メイクアップアーティスト向けのエレガントなデザイン：ブライダル・イベントプラン、ルックブック、口コミ、日程の確認。"
+      },
+      "homestay": {
+        "name": "松林の民宿",
+        "description": "丘の上の居心地のよい民宿：1泊料金付きの客室、宿での1日、宿泊者の口コミ、日付指定の予約。"
+      },
+      "villa-resort": {
+        "name": "高級プールヴィラ",
+        "description": "プールヴィラやリゾート向けのダークでエレガントなデザイン：価格付きのヴィラ、滞在の様子、ギャラリー、予約。"
+      },
+      "hostel": {
+        "name": "バックパッカーズホステル",
+        "description": "にぎやかでフレンドリー：価格付きのベッド、無料サービス、今週のパブクロール、旅行者の口コミ。"
+      },
+      "tour-guide": {
+        "name": "ツアー・旅行ガイド",
+        "description": "ガイドや小規模な旅行会社向け：価格付きのツアー、1日の行程、写真、口コミ、予約。"
+      },
+      "language-center": {
+        "name": "英会話スクール",
+        "description": "料金付きのコース、IELTS への道のり、受講生の成果、オープンデー、無料のレベル分けテスト。"
+      },
+      "online-course": {
+        "name": "オンライン講座",
+        "description": "講座クリエイター向けのダークでモダンなデザイン：販売中の講座、週ごとのレッスン、成果、早割のカウントダウン。"
+      },
+      "kindergarten": {
+        "name": "幼稚園",
+        "description": "やわらかく楽しい雰囲気：園での1日、月謝、保護者の声、オープンデー、見学予約。"
+      },
+      "music-school": {
+        "name": "音楽教室",
+        "description": "五線譜にアイボリーとピアノレッド：価格付きのレッスン、冬の発表会、写真、無料体験。"
+      },
+      "pet-rescue": {
+        "name": "保護動物・里親募集",
+        "description": "家族を探しているペット、譲渡の流れ、里親申し込みフォーム、QR での寄付。"
+      },
+      "running-club": {
+        "name": "ランニングクラブ",
+        "description": "黒にネオン：次回のグループラン、大会までのカウントダウン、週間スケジュール、参加申し込み。"
+      },
+      "class-reunion": {
+        "name": "同窓会",
+        "description": "ノートの紙に：招待の手紙、カウントダウン、食事会、昔と今の思い出、出欠確認、クラスの会費。"
+      },
+      "volunteer-group": {
+        "name": "ボランティア団体",
+        "description": "爽やかな海の色：数字で見る活動の成果、次の活動、参加申し込み、寄付。"
+      },
+      "creative-agency": {
+        "name": "クリエイティブエージェンシー",
+        "description": "デザイン・マーケティングスタジオ向けの大胆なポスター風ページ：サービス、事例紹介、仕事の進め方、プロジェクトの依頼。"
+      },
+      "interior-design": {
+        "name": "インテリアデザインスタジオ",
+        "description": "インテリアスタジオ向けの落ち着いた雑誌風ページ：プロジェクト、平米単位のサービス、相談予約。"
+      },
+      "consulting": {
+        "name": "コンサルティング・法律事務所",
+        "description": "コンサルタント、弁護士、会計士向けの落ち着いたネイビーとゴールドのページ：料金付きの業務分野と相談予約。"
+      },
+      "yoga-studio": {
+        "name": "ヨガスタジオ",
+        "description": "ヨガスタジオ向けのやわらかくゆったりしたページ：クラスパス、週間スケジュール、写真、無料体験クラス、穏やかな音楽。"
+      },
+      "clinic": {
+        "name": "ファミリークリニック",
+        "description": "クリニックやかかりつけ医向けの清潔で安心感のあるページ：料金付きの診療内容、診療時間、予約、ワンタップ発信。"
+      },
+      "nutritionist": {
+        "name": "栄養士・食事プラン",
+        "description": "栄養士向けの爽やかでカラフルなページ：注文できる食事プラン、利用の流れ、お客様の成果、無料通話相談。"
+      },
+      "fashion-boutique": {
+        "name": "ファッションブティック",
+        "description": "地元のアパレルブランド向けの白黒エディトリアルページ：セール価格付きの新作、ルックブック、店舗情報。"
+      },
+      "handmade-shop": {
+        "name": "ハンドメイド・陶器ショップ",
+        "description": "ハンドメイドショップ向けの素朴で温かいページ：注文できる作品、予約できる陶芸ワークショップ、工房のストーリー。"
+      },
+      "skincare-shop": {
+        "name": "スキンケアブランド",
+        "description": "スキンケアブランド向けのやわらかく輝くパステルページ：商品とセット、朝のルーティン、口コミ、無料の肌相談。"
+      }
+    },
+    "categories": {
+      "personal": "個人",
+      "food": "飲食",
+      "hospitality": "ホテル・旅行",
+      "business": "ビジネス",
+      "creative": "クリエイティブ",
+      "events": "イベント",
+      "beauty": "美容",
+      "health": "健康・フィットネス",
+      "shop": "ショップ",
+      "education": "教育",
+      "community": "コミュニティ",
+      "gifts": "ギフト",
+      "blog": "ブログ"
+    },
+    "seo": {
+      "heading": "検索とシェア",
+      "text": "Google での表示や、Zalo、Messenger、Facebook でリンクがシェアされたときのサイトの見え方です。",
+      "titleLabel": "タイトル",
+      "descriptionLabel": "説明",
+      "imageLabel": "シェア画像",
+      "imageHelp": "写真を1枚選んでください。自動の場合はバナー、次にプロフィール写真を使用します。",
+      "auto": "自動",
+      "previewLabel": "シェアされたリンクのプレビュー"
+    },
+    "inbox": {
+      "title": "受信箱",
+      "editSite": "サイトを編集",
+      "unreadCount": "未読のリクエストはありません | 未読のリクエスト {n} 件 | 未読のリクエスト {n} 件",
+      "all": "すべて",
+      "unread": "未読",
+      "emptyTitle": "まだリクエストはありません",
+      "emptyText": "サイトに予約フォームや問い合わせフォームを追加しましょう。訪問者からのリクエストがここに表示されます。",
+      "addForm": "フォームを追加",
+      "noUnread": "すべて確認済みです。",
+      "guests": "{n} 名 | {n} 名",
+      "markRead": "既読にする",
+      "markUnread": "未読にする",
+      "deleteTitle": "このリクエストを削除しますか？",
+      "deleteText": "受信箱から削除されます。",
+      "loadFailed": "受信箱を読み込めませんでした",
+      "open": "受信箱",
+      "order": "注文 {code}",
+      "payCod": "代金引換",
+      "payTransfer": "銀行振込（銀行口座をご確認ください）",
+      "requestsTab": "リクエストと注文",
+      "subscribersTab": "購読者",
+      "subscribersCount": "購読者はいません | 購読者 {n} 人 | 購読者 {n} 人",
+      "subscribersEmptyTitle": "まだ購読者はいません",
+      "subscribersEmptyText": "「購読」に設定したフォームをページに追加しましょう。メールアドレスを登録した人がここに表示されます。",
+      "copyEmails": "すべてのメールアドレスをコピー",
+      "copied": "コピーしました",
+      "exportCsv": "CSV をダウンロード",
+      "rsvpYes": "出席",
+      "rsvpNo": "欠席",
+      "rsvpComing": "件の出席の返信 | 件の出席の返信",
+      "rsvpPeople": "人（合計） | 人（合計）",
+      "rsvpNotComing": "件の欠席 | 件の欠席",
+      "answerYes": "「はい」と回答",
+      "nights": "{n} 泊 | {n} 泊",
+      "kindBooking": "予約",
+      "kindStay": "客室",
+      "kindContact": "メッセージ",
+      "openOrders": "対応待ちの注文",
+      "noOpenOrders": "対応待ちの注文はありません。お疲れさまです！",
+      "status": {
+        "new": "🆕 新規",
+        "confirmed": "✅ 確認済み",
+        "shipped": "🚚 発送済み",
+        "done": "🎉 完了",
+        "cancelled": "✖ キャンセル"
+      }
+    },
+    "qr": {
+      "open": "QR コード",
+      "title": "QR コード",
+      "ctaLabel": "カードのメッセージ",
+      "styleLabel": "カードの色",
+      "styles": {
+        "light": "ライト",
+        "dark": "ダーク",
+        "brand": "あなたの色"
+      },
+      "trackingNote": "スキャン数はアナリティクスで「QR」として別にカウントされます。",
+      "print": "印刷",
+      "downloadPng": "PNG 画像",
+      "downloadSvg": "SVG ファイル",
+      "custom": "自分で書く",
+      "customPlaceholder": "例：スキャンして席を予約",
+      "download": "ダウンロード",
+      "pngHint": "SNS の投稿やチャット用",
+      "svgHint": "印刷所や大判印刷用"
+    },
+    "account": {
+      "title": "アカウント",
+      "profile": "プロフィール",
+      "namePlaceholder": "あなたの名前",
+      "nameSaved": "名前を保存しました",
+      "memberSince": "{date} から利用中",
+      "language": "ダッシュボードの言語",
+      "languageText": "ダッシュボードと、Perlink から届くすべての通知（Telegram、メール）に使われます。サイトの言語は各サイトの設定で個別に管理されます。",
+      "plan": "プラン",
+      "sites": "{n} サイト | {n} サイト | {n} サイト",
+      "seePlans": "プランを見る",
+      "signOutAll": "すべての端末からログアウト",
+      "signOutAllText": "この端末を含む、すべてのスマートフォンとパソコンからログアウトします。",
+      "signOutAllAction": "すべての端末からログアウト",
+      "signOutAllTitle": "すべての端末からログアウトしますか？",
+      "signOutAllConfirm": "各端末で再度ログインが必要になります。",
+      "export": "データをダウンロード",
+      "exportText": "プロフィール、サイト、フォームのリクエスト、短縮リンクを JSON ファイルで取得します。",
+      "exportAction": "ダウンロード",
+      "delete": "アカウントを削除",
+      "deleteText": "アカウント、すべてのサイト、フォームのリクエスト、短縮リンク、アップロードした画像を完全に削除します。この操作は元に戻せません。",
+      "deleteAction": "アカウントを削除",
+      "deleteTitle": "アカウントを削除しますか？",
+      "deleteConfirmText": "すべてが完全に削除され、サイトのアドレスは他の人が使えるようになります。",
+      "deleteTypeEmail": "確認のため {email} と入力してください。",
+      "deleteForever": "完全に削除"
+    },
+    "onboarding": {
+      "title": "サイトの準備をしましょう",
+      "progress": "{total} 件中 {done} 件完了",
+      "expand": "ステップを表示",
+      "collapse": "ステップを隠す",
+      "dismiss": "チェックリストを隠す",
+      "steps": {
+        "photo": {
+          "title": "写真またはロゴを追加",
+          "text": "顔やロゴのあるページは信頼されやすくなります。"
+        },
+        "bio": {
+          "title": "短い自己紹介を書く",
+          "text": "あなたが誰か、何を提供しているかを1〜2行で。"
+        },
+        "contact": {
+          "title": "連絡手段を追加",
+          "text": "リンク、SNS アイコン、連絡先、予約フォームなど。"
+        },
+        "publish": {
+          "title": "サイトを公開",
+          "text": "perlink.to のアドレスで公開しましょう。"
+        },
+        "share": {
+          "title": "リンクをシェア",
+          "text": "プロフィールや Zalo に載せたり、QR コードを印刷してテーブルに置いたりしましょう。"
+        }
+      },
+      "cardTitle": "セットアップを完了",
+      "cardAction": "セットアップを続ける"
+    },
+    "domain": {
+      "heading": "独自ドメイン",
+      "text": "www.myshop.com のような独自ドメインでこのサイトを表示します。perlink.to のアドレスも引き続き使えます。",
+      "unavailable": "独自ドメインは近日対応予定です。",
+      "connect": "接続",
+      "connectFailed": "ドメインを接続できませんでした",
+      "status": {
+        "pending": "DNS 待ち",
+        "active": "有効",
+        "error": "DNS を確認してください"
+      },
+      "open": "開く",
+      "instructions": "ドメインの DNS を管理している場所に、次のレコードを追加してください：",
+      "type": "タイプ",
+      "name": "名前",
+      "value": "値",
+      "wait": "通常は数分、場合によっては最大1日かかります。その間も perlink.to のアドレスは使えます。",
+      "check": "再確認",
+      "nowActive": "ドメインが有効になりました",
+      "remove": "ドメインを削除",
+      "removeTitle": "このドメインを削除しますか？",
+      "removeText": "サイトは perlink.to のアドレスで引き続き公開されます。",
+      "detected": "ドメインの DNS は {provider} で管理されています。そこにレコードを追加してください。",
+      "pickProvider": "ドメインの DNS はどこで管理していますか？",
+      "openProvider": "{provider} を開く",
+      "otherProvider": "その他",
+      "found": "検出",
+      "check_ok": "検出済み、問題ありません",
+      "check_missing": "まだ検出されません",
+      "check_doubled": "ドメインが2回付いています",
+      "check_other": "この名前には別のレコードがあります",
+      "doubledHelp": "DNS 管理画面が自動で「.{zone}」を付けるため、レコードに2回付いてしまいました。名前を上に表示されている短い部分だけに修正してください。",
+      "otherHelp": "この名前は別のレコードで使われているか、プロキシされています。古い A/AAAA/CNAME レコードを削除し、Cloudflare ではプロキシステータスを「DNS のみ」（グレーの雲）にしてください。",
+      "tips": {
+        "cloudflare": "Cloudflare では、CNAME のプロキシステータスを「DNS のみ」（グレーの雲）にしてください。",
+        "short": "Name/Host 欄には短い名前を入力してください。ほとんどの DNS 管理画面はドメインを自動で付け加えます。"
+      }
+    },
+    "address": {
+      "title": "サイトのアドレス",
+      "text": "訪問者があなたのサイトにアクセスするためのアドレスです。",
+      "textTemp": "サイトは仮のアドレスになっています。シェアする前に覚えやすいアドレスを選びましょう。",
+      "placeholder": "your-name",
+      "save": "アドレスを保存",
+      "saveAndPublish": "保存して公開",
+      "later": "後で",
+      "change": "アドレスを変更",
+      "choose": "アドレスを選択",
+      "bannerTitle": "サイトは仮のアドレスになっています",
+      "bannerText": "公開する前に自分のアドレスを選びましょう。",
+      "liveWarning": "このサイトは公開中です。変更後は {old} が使えなくなります。",
+      "saved": "アドレスを変更しました",
+      "failed": "アドレスを変更できませんでした"
+    },
+    "billing": {
+      "plans": {
+        "free": {
+          "name": "Free",
+          "description": "まずはここから"
+        },
+        "starter": {
+          "name": "Starter",
+          "description": "個人やクリエイター向け"
+        },
+        "plus": {
+          "name": "Plus",
+          "description": "ショップや小規模ビジネス向け"
+        },
+        "max": {
+          "name": "Max",
+          "description": "代理店や成長中のビジネス向け"
+        }
+      },
+      "features": {
+        "sites": "公開サイト {n} 件、下書きは無制限 | 公開サイト {n} 件、下書きは無制限",
+        "basics": "すべてのテンプレートと50種類のテーマ",
+        "room": "ページ用の3Dワールド",
+        "proThemes": "20種類の Pro テーマ（グラス、ラグジュアリー、ボールド）",
+        "removeBranding": "「Made with Perlink」を非表示",
+        "analytics": "{n}日間のアナリティクス",
+        "analyticsYear": "1年間のアナリティクス",
+        "support": "優先オンラインサポート",
+        "customDomains": "独自ドメイン {n} 件 | 独自ドメイン {n} 件",
+        "customDomainsSoon": "独自ドメイン（近日対応）",
+        "analyticsYears": "{n}年間のアナリティクス",
+        "posts": "ブログ記事 {n} 件",
+        "postsUnlimited": "ブログ記事は無制限",
+        "tracking": "Facebook・TikTok ピクセル、Google Analytics",
+        "protect": "パスワード保護ページと予約公開ページ",
+        "orders": "注文管理（新規、確認済み、発送済み）",
+        "cleanVideo": "透かしなしの3Dルーム動画",
+        "everythingPlus": "Plus のすべての機能",
+        "allPacks": "すべての3Dルームパック付き"
+      },
+      "monthly": "月払い",
+      "annual": "年払い",
+      "annualSave": "2か月分無料",
+      "perMonth": "/月",
+      "billedYearly": "年額 {amount} で請求",
+      "recommended": "人気",
+      "current": "現在のプラン",
+      "choose": "{plan} を選ぶ",
+      "renew": "更新",
+      "startFree": "無料で始める",
+      "contact": "アップグレードのお問い合わせ",
+      "contactNote": "オンライン決済は近日対応予定です。それまではお問い合わせいただければ、アカウントをアップグレードします。",
+      "payNote": "月払いまたは年払いのサブスクリプションで、いつでも解約できます。お支払いが完了するとすぐにプランが有効になります。すべてのアカウントで Plus を1回、7日間無料でお試しいただけます（カード不要）。",
+      "status": {
+        "free": "現在 Free プランです",
+        "paid": "現在 {plan} プランです",
+        "until": "{date} まで",
+        "sites": "公開サイト {used}/{max}",
+        "overLimit": "公開中のサイトが {used} 件あり、プランに含まれるのは {max} 件です。すべて公開されたままで、下書きはいくつでも作成・編集できます。さらに公開するには、アップグレードするか、どれかを非公開にしてください。"
+      },
+      "trial": {
+        "title": "Plus を7日間無料でお試し",
+        "text": "Pro テーマ、10サイト、1年間のアナリティクス。カード不要で、終了後は Free に戻ります。",
+        "start": "無料トライアルを開始",
+        "started": "Plus は {date} まで有効です",
+        "failed": "トライアルを開始できませんでした"
+      },
+      "checkout": {
+        "title": "{plan} のお支払い",
+        "periodMonthly": "1か月",
+        "periodAnnual": "1年",
+        "scan": "銀行アプリでスキャン",
+        "manual": "または手動で振り込む",
+        "bank": "銀行",
+        "account": "口座番号",
+        "accountName": "口座名義",
+        "amount": "金額",
+        "note": "振込メモ",
+        "noteHint": "お支払いを照合できるよう、このメッセージをそのまま入力してください。",
+        "waiting": "振り込みましたか？「完了」を押してください",
+        "waitingHint": "確認後、通常は数分以内にプランを有効にします。このウィンドウを閉じても、プランは有効になります。",
+        "paidTitle": "お支払いを受け付けました",
+        "paidText": "{plan} は {date} まで有効です。ありがとうございます！",
+        "done": "完了",
+        "failed": "お支払いを開始できませんでした",
+        "copied": "コピーしました",
+        "methodBank": "銀行振込",
+        "methodCrypto": "暗号資産",
+        "submit": "完了",
+        "refresh": "更新",
+        "submittedTitle": "確認待ち",
+        "submittedText": "お知らせを受け取りました。確認でき次第プランを有効にします。このウィンドウは閉じてかまいません。",
+        "cryptoAmount": "送金額",
+        "network": "ネットワーク",
+        "token": "トークン",
+        "address": "送金先",
+        "cryptoWarning": "{network} 上の {token} のみを送金してください。別のトークンや別のネットワークで送金すると、資金を失う可能性があります。",
+        "txHash": "トランザクションハッシュ",
+        "txHashPlaceholder": "0x…",
+        "txHashHint": "送金後、ウォレットのトランザクションハッシュをここに貼り付けて「完了」を押してください。",
+        "submitFailed": "送信できませんでした",
+        "check": {
+          "ok": "チェーン上で有効なトランザクションが見つかりました",
+          "short": "送金額が不足しています",
+          "none": "トランザクションの送金先が当社のウォレットではありません",
+          "failed": "チェーン上でトランザクションが失敗しました",
+          "pending": "まだ見つかりません。承認待ちの可能性があります",
+          "error": "まだトランザクションを確認できません"
+        },
+        "copy": "コピー",
+        "rejectedTitle": "このお支払いを確認できませんでした",
+        "rejectedText": "このお支払いが見つかりませんでした。お支払い済みの場合は、下のコードを添えてサポートにお問い合わせいただくか、内容を確認して再度送信してください。",
+        "contactSupport": "サポートに問い合わせる",
+        "tryAgain": "再送信",
+        "methodCard": "カード",
+        "cardTitle": "カードで安全にお支払い",
+        "cardText": "Visa、Mastercard、Apple Pay、Google Pay に対応。販売代理店 Creem の安全な決済ページで手続きを完了し、ここに戻ります。",
+        "cardRenews": "自動更新されます。いつでも解約できます。",
+        "cardButton": "決済へ進む",
+        "cardPortal": "すでにサブスクリプションをお持ちです。サブスクリプションのページからプランを変更してください。",
+        "returned": "お支払いを受け付けました",
+        "returnedText": "数秒でプランが有効になります。"
+      },
+      "prompt": {
+        "sites": {
+          "title": "公開サイトの枠をすべて使用中です",
+          "text": "このサイトは下書きとして保存されました。{plan} なら最大 {n} サイトを同時に公開でき、Pro テーマなども使えます。または、別のサイトを非公開にしてこのサイトを公開してください。"
+        },
+        "customDomain": {
+          "title": "独自ドメインは {plan} で利用できます",
+          "text": "www.yourname.com でページを公開すれば、プロらしく覚えやすくなります。"
+        },
+        "proThemes": {
+          "title": "Pro テーマは {plan} で利用できます",
+          "text": "エディターでは自由にお試しいただけます。このテーマでページを公開するにはアップグレードしてください。"
+        },
+        "removeBranding": {
+          "title": "{plan} で Perlink のロゴを非表示に",
+          "text": "ページ下部に「Made with Perlink」が表示されなくなります。"
+        },
+        "seePlans": "プランを見る",
+        "later": "今はしない",
+        "trial": "Plus を7日間無料でお試し",
+        "posts": {
+          "title": "記事の上限に達しました",
+          "text": "{plan} プランでは、より多くの記事を公開でき、Pro テーマなども使えます。"
+        },
+        "tracking": {
+          "title": "広告ピクセルと Google Analytics は {plan} で利用できます",
+          "text": "Facebook Pixel、TikTok Pixel、Google Analytics、Search Console で広告や訪問者を計測できます。"
+        },
+        "protect": {
+          "title": "非公開ページは {plan} で利用できます",
+          "text": "パスワードでページをロックしたり、指定した時刻に自動で公開したりできます。"
+        },
+        "orders": {
+          "title": "注文管理は {plan} で利用できます",
+          "text": "各注文を確認済み、発送済み、完了、キャンセルに分類できます。キャンセルした注文は在庫に戻ります。"
+        },
+        "cleanVideo": {
+          "title": "透かしなしの動画は {plan} で利用できます",
+          "text": "ルームの動画に「Made with Perlink」が表示されなくなります。"
+        }
+      },
+      "history": "お支払い履歴",
+      "paymentStatus": {
+        "pending": "お支払い待ち",
+        "paid": "支払い済み",
+        "expired": "期限切れ",
+        "submitted": "確認待ち",
+        "rejected": "未確認",
+        "refunded": "返金済み"
+      },
+      "comingSoon": "近日公開",
+      "usdNote": "価格は米ドル表示です。決済時に税金がかかる場合があります。",
+      "celebrate": {
+        "title": "おめでとうございます！🎉",
+        "text": "{plan} プランになりました。",
+        "until": "プランは {date} まで有効です。",
+        "unlocked": "利用できるようになった機能",
+        "start": "始めましょう"
+      },
+      "subscription": {
+        "renews": "{date} に更新",
+        "ends": "解約済み · {date} に終了",
+        "pastDue": "お支払いに失敗しました · カード情報を更新してください",
+        "manage": "サブスクリプションを管理"
+      },
+      "usdNoteBank": "価格は米ドル表示です。決済時に税金がかかる場合があります。ベトナムでは銀行振込（VietQR）で VND でのお支払いも可能です。",
+      "switch": {
+        "title": "{plan} に変更しますか？",
+        "text": "サブスクリプションはすぐに {from} から {to} に変更されます。今期の残り期間の差額は今すぐ請求されます。",
+        "confirm": "プランを変更",
+        "done": "{plan} に変更しました"
+      },
+      "weddingPass": {
+        "name": "ウェディングパス",
+        "badge": "1回払い",
+        "title": "ウェディングパス",
+        "text": "結婚式の招待状に必要なすべてを1回のお支払いで。サブスクリプションではなく、自動更新もありません。",
+        "price": "{price}（1回払い）",
+        "perks": [
+          "Starter を1年間：Pro テーマ、パスワードや公開時刻の設定、透かしなしのルーム動画",
+          "どのゲストが招待状を開いたかを確認でき、開いたときに通知が届きます",
+          "ウェディング3Dルームパック（アーチ、ケーキ、シャンパンタワー…）がずっと使えます",
+          "1年経過後も、サイトは無料プランで公開されたままです"
+        ],
+        "buy": "ウェディングパスを購入",
+        "included": "現在のプランには、ウェディングパスのすべてがすでに含まれています。",
+        "once": "1回払い",
+        "noRenew": "1回のお支払いのみ。自動更新はありません。",
+        "history": "ウェディングパス"
+      }
+    },
+    "telegram": {
+      "title": "Telegram 通知",
+      "text": "すべてのサイトの新しい注文やリクエストを、受信箱へのボタン付きで Telegram に受け取れます。",
+      "connected": "接続済み",
+      "connectedText": "新しい注文やリクエストが Telegram に送信されます。",
+      "waiting": "Telegram を開き、Perlink ボットとのチャットで「開始」を押してください。",
+      "connect": "Telegram を接続",
+      "reopen": "Telegram をもう一度開く",
+      "test": "テスト送信",
+      "testSent": "テストメッセージを送信しました",
+      "disconnect": "接続を解除",
+      "done": "Telegram を接続しました",
+      "failed": "問題が発生しました",
+      "section": "通知"
+    },
+    "guestbook": {
+      "tab": "ゲストブック",
+      "intro": "訪問者が3Dルームに残したメッセージです。非表示のメッセージはルームに表示されません。",
+      "emptyTitle": "まだメッセージはありません",
+      "emptyText": "3Dルームの訪問者は「ゲストブック」を押して、ルームの前にメッセージとプレゼントを残せます。",
+      "openRoom": "3Dルームを開く",
+      "hiddenBadge": "非表示",
+      "show": "表示",
+      "hide": "非表示",
+      "deleteTitle": "このメッセージを削除しますか？",
+      "loadFailed": "ゲストブックを読み込めませんでした",
+      "saveFailed": "保存できませんでした"
+    },
+    "blog": {
+      "heading": "ブログ",
+      "intro": "サイトの記事を書きましょう。読者は次の場所で記事を見つけられます：",
+      "usage": "プランで公開できる記事 {max} 件中 {n} 件を公開済み",
+      "write": "記事を書く",
+      "emptyTitle": "まだ記事はありません",
+      "emptyText": "ニュース、ストーリー、ガイドをシェアしましょう。各記事には専用のページが作られ、Google やシェアにも対応します。",
+      "untitled": "無題",
+      "status": {
+        "draft": "下書き",
+        "published": "公開済み"
+      },
+      "minutes": "{n} 分で読めます",
+      "more": "その他",
+      "edit": "編集",
+      "view": "表示",
+      "delete": "削除",
+      "deleteTitle": "この記事を削除しますか？",
+      "deleteText": "「{title}」は完全に削除されます。",
+      "failed": "問題が発生しました",
+      "back": "サイトに戻る",
+      "saving": "保存中…",
+      "saveFailed": "保存できませんでした。再試行します",
+      "savedDraft": "下書きを保存しました",
+      "settings": "記事の設定",
+      "slug": "アドレス",
+      "excerpt": "概要",
+      "excerptHint": "一覧、Google、リンクプレビューに表示されます",
+      "unpublish": "非公開にする",
+      "publish": "公開",
+      "published": "記事を公開しました",
+      "unpublished": "記事を非公開にしました",
+      "changeCover": "変更",
+      "removeCover": "カバーを削除",
+      "addCover": "カバー画像を追加",
+      "titlePlaceholder": "記事のタイトル",
+      "bodyPlaceholder": "書き始めましょう…",
+      "linkTitle": "リンク",
+      "addLink": "リンクを追加",
+      "removeLink": "削除",
+      "addImage": "画像を追加",
+      "uploadFailed": "画像をアップロードできませんでした",
+      "notFound": "記事が見つかりません"
+    },
+    "tracking": {
+      "heading": "広告ピクセルと Google",
+      "text": "ご自身の Facebook、TikTok、Google アカウントで広告や訪問者を計測できます。",
+      "locked": "ピクセルと Google Analytics は Starter と Plus で利用できます。",
+      "upgrade": "アップグレード",
+      "invalid": "形式が正しくないようです。{example} のような形式にしてください",
+      "note": "ID またはスニペット全体を貼り付けてください。ID だけを保存します。タグはこのエディターではなく公開中のサイトで動作し、公開すると有効になります。",
+      "help": {
+        "metaPixel": "イベントマネージャ → データソース → ピクセル → 15〜16桁の ID。",
+        "tiktokPixel": "TikTok 広告マネージャー → ツール → イベント → ウェブイベント → ピクセル ID。",
+        "ga4": "Google Analytics → 管理 → データストリーム → 測定 ID（G-…）。",
+        "gsc": "Search Console → プロパティを追加（URL プレフィックス）→ HTML タグ → content=\"…\" の値。"
+      }
+    },
+    "privacy": {
+      "heading": "非公開ページ",
+      "text": "パスワードを知っている人だけが開けるようにしたり、指定した時刻に自動で公開したりできます。結婚式、サプライズ、ローンチに便利です。",
+      "locked": "パスワードと公開時刻の設定は Starter と Plus で利用できます。",
+      "passwordLabel": "パスワード",
+      "on": "オン",
+      "setPassword": "パスワードを設定（4文字以上）",
+      "newPassword": "新しいパスワード",
+      "lock": "ページをロック",
+      "change": "変更",
+      "remove": "パスワードを削除",
+      "passwordHelp": "すぐに適用されます。訪問者はブラウザごとに1回入力します。変更すると全員に再入力を求めます。",
+      "saved": "ページはパスワードで保護されています",
+      "removed": "パスワードを削除しました",
+      "opensLabel": "公開日時",
+      "clear": "クリア",
+      "opensHelp": "それまで訪問者にはカウントダウンが表示されます。公開すると有効になります。",
+      "opensSet": "{date} まで訪問者にはカウントダウンが表示されます。公開すると有効になります。"
+    },
+    "earn": {
+      "title": "Perlink で報酬を得る",
+      "eyebrow": "アフィリエイトプログラム",
+      "headline": "すべてのお支払いの {percent}% をずっと受け取れます",
+      "intro": "フォロワー、お客様、友人に Perlink をシェアしましょう。紹介した人が {days} 日以内に有料プランを購入すると、更新分も含め、その人が利用を続ける限りすべてのお支払いの一部を受け取れます。決済パートナーの Creem が売上を追跡し、報酬を支払います。",
+      "statCommission": "報酬率",
+      "statMonths": "すべての更新で",
+      "statSignups": "紹介による登録数",
+      "step": "ステップ {n}",
+      "joinTitle": "アフィリエイトプログラムに参加",
+      "joinText": "アフィリエイトプログラムは Creem が運営しています。売上の集計、報酬の表示、銀行振込または USDC での支払いを行います。メールアドレスで登録でき、無料です。",
+      "join": "アフィリエイトになる",
+      "codeTitle": "アフィリエイトコードを追加",
+      "codeText": "承認されると、Creem のアフィリエイトポータルに紹介リンク（…?code=…）が表示されます。リンクまたはコードだけをここに貼り付けてください。",
+      "codePlaceholder": "例：abc123 またはリンク全体",
+      "saved": "アフィリエイトコードを保存しました",
+      "cleared": "アフィリエイトコードを削除しました",
+      "shareTitle": "リンクをシェア",
+      "shareText": "プロフィール、投稿、動画、メールに載せましょう。どのページでも使えます。",
+      "shareLocked": "リンクを取得するには、先にコードを追加してください。",
+      "linkHome": "ホームページ",
+      "linkPricing": "料金",
+      "linkTemplates": "テンプレート",
+      "badge": "サイトの「Made with Perlink」バッジにもコードが付くようになりました。あなたのページから登録した人はすべてあなたの紹介としてカウントされます。",
+      "dashboard": "売上と支払いを確認",
+      "rules": "スパム、偽のレビュー、Perlink の名前を使った広告、自分のリンク経由での購入は禁止です。",
+      "rulesLink": "プログラム規約",
+      "forever": "ずっと",
+      "example": "友人10人が Plus を年払いで利用 = あなたに年間 {amount}"
+    },
+    "guests": {
+      "title": "ゲスト",
+      "nav": "ゲスト",
+      "intro": "ゲストを追加して、一人ひとりに専用のリンクを送りましょう。封筒に名前が表示され、誰が開いたかを確認できます。",
+      "addTitle": "ゲストを追加",
+      "addHelp": "1行に1人、封筒に表示したい形で名前を入力してください（例：「田中様ご家族」）。",
+      "addPlaceholder": "田中様ご家族\n佐藤 健\n鈴木 花子",
+      "side": "家",
+      "sideNone": "両家",
+      "sideGroom": "新郎側",
+      "sideBride": "新婦側",
+      "add": "リストに追加",
+      "added": "{n} 名のゲストを追加しました | {n} 名のゲストを追加しました",
+      "statGuests": "ゲスト",
+      "statOpened": "開封済み",
+      "statNotOpened": "未開封",
+      "statReplied": "返信済み",
+      "emptyTitle": "まだゲストはいません",
+      "emptyText": "上で名前を追加してください。名前付きのリンク（?to=Name）を開いた人もここに表示されます。",
+      "copy": "リンクをコピー",
+      "copied": "リンクをコピーしました",
+      "copyAll": "すべてのリンクをコピー",
+      "copiedAll": "{n} 件のリンクを1行ずつコピーしました",
+      "search": "ゲストを検索",
+      "filterAll": "すべて",
+      "filterOpened": "開封済み",
+      "filterNotOpened": "未開封",
+      "openedAt": "{date} に開封",
+      "opens": "{n} 回訪問 | {n} 回訪問",
+      "letterOpened": "手紙を開封",
+      "notOpened": "未開封",
+      "viaLink": "リンクから訪問",
+      "rsvpYes": "出席",
+      "rsvpNo": "欠席",
+      "rsvpGuests": "{n} 名",
+      "remove": "削除",
+      "removeConfirm": "{name} をリストから削除しますか？",
+      "lockedTitle": "招待状を開いた人を確認",
+      "lockedText": "{total} 名中 {opened} 名が開封しました。ウェディングパス（または有料プラン）なら、誰がいつ開いたかを確認でき、ゲストが開いた瞬間に通知が届きます。",
+      "lockedButton": "ウェディングパスを見る",
+      "telegramHint": "ゲストが招待状を開いたときに Telegram で通知を受け取れます。",
+      "failed": "ゲストリストを更新できませんでした"
+    }
+  }
+}

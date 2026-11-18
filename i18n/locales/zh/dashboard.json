@@ -1,0 +1,1261 @@
+{
+  "dashboard": {
+    "toast": {
+      "error": "错误",
+      "copied": "已复制！",
+      "copyFailed": "复制失败",
+      "published": "已发布！",
+      "unpublished": "已取消发布",
+      "saved": "已保存！",
+      "urlCopied": "URL 已复制到剪贴板"
+    },
+    "home": {
+      "title": "创建",
+      "mySites": "我的网站",
+      "heading": "创建你的网站",
+      "intro": "先占用一个地址，或点击下方模板立即开始。地址可以稍后再选，所有内容都能随时修改。",
+      "newSiteLine": "为新网站选择一个地址，或从下方模板开始。",
+      "templatesHeading": "从模板开始",
+      "templatesIntro": "{n} 个模板，每个都含示例内容、主题和配套的 3D 房间。",
+      "all": "全部",
+      "useTemplate": "使用模板",
+      "previewTemplate": "预览",
+      "previewTitle": "模板预览",
+      "previewUse": "使用此模板",
+      "claimHeading": "占用你的网站地址",
+      "features": {
+        "sampleContent": "可编辑的示例内容",
+        "theme": "配套的主题和字体",
+        "room": "附带装饰好的 3D 房间",
+        "changeAnytime": "随时更换模板"
+      },
+      "creating": "正在创建你的网站…",
+      "yourSites": "你的网站",
+      "seeAllSites": "查看全部（{n}）"
+    },
+    "sites": {
+      "title": "我的网站",
+      "createSite": "创建网站",
+      "heading": "你的网站",
+      "count": "{n} 个网站 | {n} 个网站",
+      "liveCount": "{n} 个在线",
+      "search": "搜索网站",
+      "live": "在线",
+      "draft": "草稿",
+      "views": "{n} 次浏览",
+      "updated": "更新于 {date}",
+      "noMatch": "没有匹配“{query}”的网站。",
+      "all": "全部",
+      "noneLive": "还没有在线的网站。",
+      "noneDraft": "没有草稿。",
+      "emptyTitle": "还没有网站",
+      "emptyText": "占用你的 perlink.to 地址，从模板开始。大约只需一分钟。",
+      "loadFailed": "网站加载失败",
+      "publishedText": "你的网站已上线",
+      "publishFailed": "网站发布失败",
+      "unpublishedText": "你的网站已隐藏",
+      "unpublishFailed": "取消发布失败",
+      "edit": "编辑",
+      "newSite": "新建网站",
+      "newSiteHint": "网站、菜单、商店或 3D 房间",
+      "greeting": {
+        "morning": "早上好，{name}",
+        "afternoon": "下午好，{name}",
+        "evening": "晚上好，{name}",
+        "morningPlain": "早上好",
+        "afternoonPlain": "下午好",
+        "eveningPlain": "晚上好",
+        "line": {
+          "morning": "新的一天，今天想做点什么？☕",
+          "afternoon": "继续加油：你的网站一点即达。",
+          "evening": "晚饭前快速更新一下吧。",
+          "night": "还在熬夜？你的网站就在这里。🌙"
+        }
+      },
+      "week": {
+        "heading": "最近 7 天",
+        "visits": "访问量",
+        "change": "较前一周 {n}%",
+        "details": "查看数据分析",
+        "requestsTitle": "你有 {n} 条新请求 | 你有 {n} 条新请求",
+        "requestsText": "访客通过你的网站发送了预订或联系请求。",
+        "nudgeTitle": "你把链接加到社交主页简介了吗？",
+        "nudgeText": "把它粘贴到 Instagram、TikTok 或 Facebook 简介中，或打印二维码，让大家找到你。",
+        "goodTitle": "有人在访问你的网站",
+        "goodText": "再分享一次，触达更多人。"
+      },
+      "filterLabel": "显示"
+    },
+    "editor": {
+      "titleCreate": "创建网站",
+      "titleEdit": "编辑网站",
+      "selectSite": "选择网站",
+      "copyUrl": "复制 URL",
+      "share": "分享",
+      "continueToEditor": "进入编辑器",
+      "templateHeading": "从模板开始",
+      "templateIntro": "选择一个起点。每个模板都含示例内容、主题和配套的 3D 房间。",
+      "closePreview": "关闭预览",
+      "tabs": {
+        "site": "网站",
+        "room": "3D 房间",
+        "content": "内容",
+        "design": "设计",
+        "settings": "设置",
+        "header": "页眉",
+        "blog": "博客"
+      },
+      "room": {
+        "heading": "你的 3D 房间",
+        "objects": "{n} 件物品。布置房间，并选择周围的场景。",
+        "openEditor": "装饰你的房间",
+        "showFirst": "优先显示 3D 房间",
+        "modeOn": "访客会先进入你的 3D 房间，一键即可切换到网站。",
+        "modeOff": "访客会先看到你的页面。",
+        "shareVideo": "分享你的房间",
+        "fab": "3D 房间",
+        "button": "页面上的“3D 房间”按钮",
+        "buttonText": "角落里的按钮，带访客进入你的 3D 房间。"
+      },
+      "settings": {
+        "addressHeading": "网站地址",
+        "addressText": "你的公开网站地址",
+        "languageHeading": "网站语言",
+        "languageText": "访客看到的按钮和标签所用的语言，例如营业时间和“立即预订”。你自己写的文字保持不变。",
+        "templateHeading": "更换模板",
+        "templateText": "用另一个模板替换当前所有内容、主题和 3D 房间。",
+        "shareHeading": "分享按钮",
+        "shareText": "在网站上显示悬浮分享按钮",
+        "visibilityHeading": "可见性",
+        "visibilityText": "控制谁能看到你的网站",
+        "published": "已发布",
+        "draft": "草稿",
+        "live": "在线",
+        "publicText": "你的页面对所有人可见",
+        "privateText": "只有你能看到此页面",
+        "deleteHeading": "删除此网站",
+        "deleteText": "永久删除网站及其中所有内容。该地址将释放给其他人使用。",
+        "deleteButton": "删除网站",
+        "deleteTitle": "删除此网站？",
+        "deleteWarning": "此操作无法撤销。你将失去：",
+        "deleteLossPage": "{address} 上的页面和 3D 房间",
+        "deleteLossInbox": "它的收件箱：请求、订单、回复和订阅者",
+        "deleteLossPosts": "它的博客文章、留言簿和已上传的照片",
+        "deleteLossStats": "它的数据分析，以及已连接的自有域名",
+        "deleteConfirmLabel": "输入 {address} 以确认",
+        "deleteConfirm": "永久删除",
+        "deleted": "{address} 已删除",
+        "deleteFailed": "无法删除网站，请重试。"
+      },
+      "shareFallbackTitle": "你的名字",
+      "usernameTooShort": "用户名至少需要 3 个字符",
+      "usernameInvalid": "只能使用字母、数字、下划线和连字符",
+      "created": "网站已创建！",
+      "createdText": "现在来定制你的页面吧",
+      "createFailed": "网站创建失败",
+      "noSiteToSave": "没有可保存的网站",
+      "savedText": "你的更改已保存",
+      "saveFailed": "保存失败",
+      "noSiteToPublish": "没有可发布的网站",
+      "publishedText": "你的页面已上线：perlink.to/{username}",
+      "publishFailed": "发布失败",
+      "templateApplied": "已应用 {name}",
+      "templateAppliedText": "把示例内容改成你自己的。编辑时页面会自动保存。",
+      "applyTitle": "应用“{name}”？",
+      "applyText": "当前所有区块、主题和 3D 房间都将被替换，你写的文字将会丢失。",
+      "applyConfirm": "应用模板",
+      "unsaved": {
+        "leaveTitle": "不保存就离开？",
+        "leaveText": "你对此网站的更改尚未保存。",
+        "leaveAction": "离开",
+        "restoredTitle": "已恢复未保存的编辑",
+        "restoredText": "你在 {time} 对 {site} 所做的编辑在离开时尚未保存。现已恢复并正在保存。",
+        "undo": "撤销"
+      },
+      "draft": {
+        "banner": "你有已保存但访客尚看不到的更改。发布后即可上线。",
+        "savedText": "已保存为草稿。在你发布前，访客看到的仍是已发布的版本。",
+        "discard": "放弃更改",
+        "discardTitle": "放弃未发布的更改？",
+        "discardText": "编辑器将恢复到访客当前看到的版本。"
+      },
+      "status": {
+        "saving": "保存中…",
+        "saved": "已保存",
+        "savedAt": "已于 {time} 保存",
+        "unsaved": "未保存",
+        "draftPending": "草稿已保存",
+        "error": "保存失败，正在重试"
+      },
+      "update": "更新网站",
+      "upToDate": "访客看到的是最新版本",
+      "previewHint": "点击手机上的某个部分即可编辑",
+      "templateReopen": "从模板开始",
+      "sections": "编辑器分区",
+      "yourSites": "你的网站",
+      "notLiveYet": "尚未发布，访客还看不到"
+    },
+    "username": {
+      "heading": "选择你的用户名",
+      "placeholder": "yourname",
+      "available": "用户名可用"
+    },
+    "previewPanel": {
+      "mobile": "手机"
+    },
+    "analyticsPage": {
+      "editSite": "编辑网站",
+      "notFound": "找不到该网站。",
+      "seoTitle": "数据分析 · {username} — Perlink"
+    },
+    "settings": {
+      "placeholder": "设置"
+    },
+    "upgrade": {
+      "title": "套餐",
+      "heading": "选择你的套餐",
+      "intro": "每个套餐都包含模板、编辑器，以及为你的页面打造的 3D 世界。",
+      "seoTitle": "套餐 — Perlink"
+    },
+    "feedback": {
+      "title": "反馈",
+      "formHeading": "发送反馈",
+      "formIntro": "帮助我们改进 Perlink",
+      "type": "反馈类型",
+      "typePlaceholder": "选择反馈类型",
+      "subject": "主题",
+      "subjectPlaceholder": "简要概括你的反馈",
+      "message": "你的反馈",
+      "messagePlaceholder": "说说你的想法、报告问题或建议新功能...",
+      "rating": "评分（可选）",
+      "ratingValue": "{rating} / 5",
+      "clear": "清除",
+      "submit": "提交反馈",
+      "historyHeading": "我的反馈记录",
+      "historyIntro": "查看你之前提交的反馈",
+      "submittedCount": "已提交 {n} 条",
+      "types": {
+        "general": "一般反馈",
+        "bug": "问题报告",
+        "feature": "功能请求",
+        "improvement": "改进建议",
+        "other": "其他"
+      },
+      "typeBadges": {
+        "general": "一般",
+        "bug": "问题报告",
+        "feature": "功能请求",
+        "improvement": "改进",
+        "other": "其他"
+      },
+      "statuses": {
+        "pending": "待处理",
+        "reviewing": "审核中",
+        "resolved": "已解决",
+        "closed": "已关闭"
+      },
+      "submitted": "反馈已提交",
+      "submittedText": "感谢你帮助我们改进！",
+      "submitFailed": "提交失败",
+      "tryAgain": "请重试",
+      "submitError": "反馈提交失败"
+    },
+    "claim": {
+      "placeholder": "your-site",
+      "ariaLabel": "网站地址",
+      "submit": "创建你的网站",
+      "submitShort": "创建",
+      "hint": "可使用字母、数字、连字符和下划线。内容可随时修改。",
+      "available": "perlink.to/{slug} 可用",
+      "taken": "此名称已被占用",
+      "checkFailed": "无法检查此名称，请重试。",
+      "tooShort": "至少 3 个字符",
+      "checking": "正在检查是否可用...",
+      "ready": "你的网站已就绪",
+      "createFailed": "无法创建你的网站",
+      "enterAddress": "请先选择地址",
+      "cantUse": "此地址无法使用"
+    },
+    "help": {
+      "ariaLabel": "帮助",
+      "heading": "需要什么帮助？",
+      "intro": "快速解答，或直接联系我们。",
+      "close": "关闭帮助",
+      "contact": "联系我们",
+      "feedback": "反馈",
+      "answers": {
+        "create": {
+          "q": "如何创建我的网站？",
+          "a": "前往控制台 → 创建，占用你的 perlink.to 名称并选择模板。之后所有内容都可以修改。"
+        },
+        "room": {
+          "q": "如何开启 3D 世界？",
+          "a": "在编辑器中打开你的网站，开启“3D 房间”。然后点击“装饰你的房间”来布置房间并选择场景。"
+        },
+        "publish": {
+          "q": "如何发布？",
+          "a": "在编辑器中点击“发布”。你的网站会立即在 perlink.to/yourname 上线。"
+        },
+        "photos": {
+          "q": "可以添加自己的照片吗？",
+          "a": "可以。在网站中添加图片相册区块，或在 3D 房间中放置相框并上传照片。"
+        },
+        "phones": {
+          "q": "手机上能用吗？",
+          "a": "能。网站以移动端优先设计，3D 世界在浏览器中运行，并会根据设备自动调整画质。"
+        },
+        "visitors": {
+          "q": "访客还能看到普通页面吗？",
+          "a": "始终可以。访客一键即可从 3D 世界切换到你的 2D 页面。"
+        }
+      }
+    },
+    "templates": {
+      "personal": {
+        "name": "个人作品集",
+        "description": "介绍你自己、你的作品，以及在哪里能找到你。"
+      },
+      "restaurant": {
+        "name": "餐厅菜单",
+        "description": "带价格的菜单、营业时间和订座。"
+      },
+      "hotel": {
+        "name": "酒店与民宿",
+        "description": "房型及每晚价格、联系方式和预订。"
+      },
+      "cafe": {
+        "name": "咖啡馆与小店",
+        "description": "饮品或商品、营业时间和店铺位置。"
+      },
+      "creator": {
+        "name": "创作者与艺术家",
+        "description": "以作品集展示你的作品，附购买或约稿链接。"
+      },
+      "link-in-bio": {
+        "name": "Link in Bio",
+        "description": "简洁的深色页面，放上你的社交账号和常用链接。"
+      },
+      "services": {
+        "name": "自由职业与服务",
+        "description": "带价格的服务、预订和营业时间。"
+      },
+      "event": {
+        "name": "婚礼与活动",
+        "description": "为你的重要日子准备日程、场地、出席回复和相册。"
+      },
+      "spa": {
+        "name": "水疗与按摩",
+        "description": "护理项目及价格、营业时间和在线预约。"
+      },
+      "nail": {
+        "name": "美甲店",
+        "description": "价目表、美甲作品集和预约。"
+      },
+      "barber": {
+        "name": "美发与理发店",
+        "description": "服务项目、发型师作品、营业时间和预约。"
+      },
+      "gym": {
+        "name": "健身房与私教",
+        "description": "会员方案、训练成果和免费体验报名。"
+      },
+      "dental": {
+        "name": "牙科与诊所",
+        "description": "诊疗项目、价格、营业时间和预约。"
+      },
+      "tutor": {
+        "name": "家教与培训中心",
+        "description": "课程、费用、家长评价和报名。"
+      },
+      "bakery": {
+        "name": "面包与蛋糕店",
+        "description": "今日出炉，附照片、价格和预订。"
+      },
+      "street-food": {
+        "name": "街头小吃摊",
+        "description": "简短菜单、夜间营业时间和银行二维码付款。"
+      },
+      "bar": {
+        "name": "酒吧与酒廊",
+        "description": "鸡尾酒单、夜间营业时间和订座。"
+      },
+      "florist": {
+        "name": "花店",
+        "description": "花束及价格、作品图集和按日期预订。"
+      },
+      "online-shop": {
+        "name": "网店",
+        "description": "你的店铺链接、热销商品和穿搭图册。"
+      },
+      "real-estate": {
+        "name": "房产经纪人",
+        "description": "精选房源、照片和看房申请表。"
+      },
+      "wedding-photo": {
+        "name": "婚礼摄影师",
+        "description": "作品集、套餐和档期咨询。"
+      },
+      "musician": {
+        "name": "音乐人与 DJ",
+        "description": "最新作品、近期演出和预约演出。"
+      },
+      "birthday": {
+        "name": "生日派对",
+        "description": "倒计时、当天安排、地点和出席回复。"
+      },
+      "charity": {
+        "name": "募捐与公益",
+        "description": "你的公益事业、用于捐款的银行二维码和最新动态。"
+      },
+      "gift-birthday": {
+        "name": "生日惊喜房间",
+        "description": "满载朋友祝福和礼物的 3D 房间。在生日当天分享链接。"
+      },
+      "gift-love": {
+        "name": "爱的房间",
+        "description": "给另一半一个惊喜：情书、在一起的天数、你们的故事和照片，都在一个 3D 房间里。"
+      },
+      "wedding-invite": {
+        "name": "婚礼请柬",
+        "description": "在线婚礼请柬：写给宾客的信、倒计时、当天安排、场地、出席回复和礼金二维码。"
+      },
+      "blog": {
+        "name": "个人博客",
+        "description": "文字为主：自我介绍、最新文章，以及 3D 房间里的博客展板。"
+      },
+      "blog-travel": {
+        "name": "旅行博客",
+        "description": "壮阔风景、旅行照片墙和你最新的旅途故事。"
+      },
+      "blog-food": {
+        "name": "美食博客",
+        "description": "食谱和美食故事，顶部配上令人垂涎的照片。"
+      },
+      "blog-tech": {
+        "name": "技术与编程博客",
+        "description": "深色、极客、利落：教程、笔记和业余项目。"
+      },
+      "blog-fashion": {
+        "name": "时尚美妆博客",
+        "description": "杂志感与梦幻感：穿搭图册、美妆笔记和穿搭日记。"
+      },
+      "blog-wellness": {
+        "name": "身心健康博客",
+        "description": "平静清新：瑜伽、正念生活和健康习惯。"
+      },
+      "blog-family": {
+        "name": "家庭育儿博客",
+        "description": "温暖活泼：家庭生活、成长里程碑和真诚的育儿心得。"
+      },
+      "blog-growth": {
+        "name": "理财与成长博客",
+        "description": "简洁可信：个人理财、效率提升和读书分享。"
+      },
+      "blog-diary": {
+        "name": "摄影日记",
+        "description": "氛围感与电影感：街头摄影和城市故事。"
+      },
+      "love-valentine": {
+        "name": "做我的情人好吗？",
+        "description": "勇敢提问：“不”按钮会逃跑，“好”会让页面布满爱心。附情书和你们的照片。"
+      },
+      "love-anniversary": {
+        "name": "结婚纪念日",
+        "description": "献给你的丈夫或妻子：结婚的年数、相伴的岁月、一封信和你们的婚纱照。"
+      },
+      "love-open-when": {
+        "name": "“在…时打开”信件",
+        "description": "为你不在身边的时刻准备的密封信件：想我时、睡不着时、生日那天。"
+      },
+      "love-long-distance": {
+        "name": "异地恋",
+        "description": "距离再次相见的天数、每一次见面、一封信和上次旅行的照片。"
+      },
+      "love-sorry": {
+        "name": "吵架后求和",
+        "description": "一封道歉信、你的承诺、美好的回忆，以及带有会逃跑的“不”按钮的“原谅我好吗？”。"
+      },
+      "invite-wedding-red": {
+        "name": "传统婚礼请柬",
+        "description": "红金配色：双方家庭、订婚与婚宴、出席回复和礼金二维码。"
+      },
+      "invite-wedding-garden": {
+        "name": "花园婚礼请柬",
+        "description": "鼠尾草绿的清新现代风：仪式与婚宴、你们的故事、着装要求、出席回复和照片。"
+      },
+      "wedding-song-hy": {
+        "name": "双喜婚礼请柬",
+        "description": "传统红金配双喜字：双方家庭、农历日期、仪式、婚宴、出席回复和礼金二维码。"
+      },
+      "wedding-dragon-phoenix": {
+        "name": "龙凤婚礼请柬",
+        "description": "庄重的深红与金色，由双方父母发出：送亲、仪式和婚宴，各在自家的标签页中。"
+      },
+      "wedding-minimal": {
+        "name": "极简婚礼请柬",
+        "description": "留白与黑色文字：日期、地点、当晚安排和出席回复。"
+      },
+      "wedding-korean": {
+        "name": "韩式婚礼请柬",
+        "description": "柔和米色、胶片照片和温柔字体：你们的故事、当天安排和出席回复。"
+      },
+      "wedding-vintage": {
+        "name": "复古婚礼请柬",
+        "description": "棕褐色信纸和火漆封印的信：请柬、日期、场地和回复卡。"
+      },
+      "wedding-ao-dai": {
+        "name": "奥黛婚礼请柬",
+        "description": "象牙白与玫瑰色的现代越南风：奥黛照片、家庭仪式、婚宴、农历日期和出席回复。"
+      },
+      "wedding-lotus": {
+        "name": "莲花婚礼请柬",
+        "description": "叶绿底上的莲花粉：一封信、仪式、湖畔婚宴、照片、出席回复和礼金二维码。"
+      },
+      "wedding-beach": {
+        "name": "海滩婚礼请柬",
+        "description": "海边的目的地婚礼：交通、住宿、日落仪式和出席回复。"
+      },
+      "wedding-night-gold": {
+        "name": "黑金晚宴婚礼",
+        "description": "黑金配色的晚宴：流程、着装要求、照片、出席回复和礼金二维码。"
+      },
+      "wedding-bilingual": {
+        "name": "双语婚礼请柬",
+        "description": "越南语与英语并排：信件、奉茶仪式、婚宴、出席回复和礼金。"
+      },
+      "wedding-two-families": {
+        "name": "双方家庭婚礼请柬",
+        "description": "一个链接，每个家庭一个标签页：各自的仪式、婚宴、时间和地址，以及共享的照片、出席回复和礼金。"
+      },
+      "invite-kids-birthday": {
+        "name": "儿童生日邀请函",
+        "description": "周岁宴或儿童派对：倒计时、派对安排、地点、出席回复和照片。"
+      },
+      "invite-grand-opening": {
+        "name": "开业邀请函",
+        "description": "邀请顾客参加开业：活动流程、开业优惠、地图、路线和出席回复。"
+      },
+      "invite-year-end-party": {
+        "name": "年会邀请函",
+        "description": "公司年会或晚会：倒计时、流程、着装要求、出席回复和照片。"
+      },
+      "personal-neon": {
+        "name": "霓虹开发者",
+        "description": "为开发者和技术创作者打造的深色发光页面：项目、时间线和极光天空。"
+      },
+      "personal-editorial": {
+        "name": "杂志风作品集",
+        "description": "为模特、造型师和创意总监打造的杂志风格：满版肖像、合作项目和预约。"
+      },
+      "personal-resume": {
+        "name": "在线简历",
+        "description": "求职时附上的简洁简历：工作经历、技能、推荐语和简历下载。"
+      },
+      "personal-nomad": {
+        "name": "数字游民",
+        "description": "为远程工作者和旅行者打造：旅途天数、工作过的地方、旅途笔记和装备。"
+      },
+      "personal-aesthetic": {
+        "name": "粉彩美学",
+        "description": "为 Z 世代创作者打造的柔和贴纸风：粉彩渐变、胶囊链接、可售卖的预设和 lo-fi 音乐。"
+      },
+      "photographer": {
+        "name": "摄影师",
+        "description": "以作品为先的深色画框：你的作品、带价格的拍摄套餐和预约表单。"
+      },
+      "tattoo-studio": {
+        "name": "纹身工作室",
+        "description": "为纹身师打造的大胆深色风：新作与愈合效果、价格、护理须知和咨询。"
+      },
+      "hair-salon": {
+        "name": "美发沙龙",
+        "description": "为美发沙龙打造的温暖多彩风：服务及价格、最新造型、评价和在线预约。"
+      },
+      "makeup-artist": {
+        "name": "化妆师",
+        "description": "为化妆师打造的优雅风：新娘与活动套餐、作品图册、评价和档期查询。"
+      },
+      "homestay": {
+        "name": "松林民宿",
+        "description": "山间的温馨民宿：房型及每晚价格、民宿的一天、住客评价和按日期预订。"
+      },
+      "villa-resort": {
+        "name": "豪华泳池别墅",
+        "description": "为泳池别墅和度假村打造的深色优雅风：别墅及价格、入住体验、图集和预订。"
+      },
+      "hostel": {
+        "name": "背包客青旅",
+        "description": "热闹友好：床位及价格、免费项目、本周酒吧之旅和旅行者评价。"
+      },
+      "tour-guide": {
+        "name": "旅游与导游",
+        "description": "为导游和小型旅行社打造：线路及价格、一日行程、照片、评价和预订。"
+      },
+      "language-center": {
+        "name": "英语培训中心",
+        "description": "课程及费用、雅思备考路线、学员成绩、开放日和免费分级测试。"
+      },
+      "online-course": {
+        "name": "在线课程",
+        "description": "为课程创作者打造的深色现代风：在售课程、每周课时安排、学习成果和早鸟倒计时。"
+      },
+      "kindergarten": {
+        "name": "幼儿园",
+        "description": "柔和活泼：在园的一天、月费、家长寄语、开放日和参观预约。"
+      },
+      "music-school": {
+        "name": "音乐学校",
+        "description": "五线谱上的象牙白与钢琴红：课程及价格、冬季音乐会、照片和免费试听。"
+      },
+      "pet-rescue": {
+        "name": "宠物救助与领养",
+        "description": "等待领养的宠物、领养流程、领养申请表和二维码捐款。"
+      },
+      "running-club": {
+        "name": "跑步俱乐部",
+        "description": "黑底霓虹：下一次团跑、比赛倒计时、每周安排和报名。"
+      },
+      "class-reunion": {
+        "name": "同学聚会",
+        "description": "笔记本纸风格：邀请信、倒计时、聚餐安排、今昔回忆、出席回复和班费。"
+      },
+      "volunteer-group": {
+        "name": "志愿者团体",
+        "description": "清新海洋色：用数字展示你的影响力、下一次活动、报名和捐款。"
+      },
+      "creative-agency": {
+        "name": "创意机构",
+        "description": "为设计或营销工作室打造的大胆海报风页面：服务、案例、工作方式和项目需求表。"
+      },
+      "interior-design": {
+        "name": "室内设计工作室",
+        "description": "为室内设计工作室打造的安静杂志风页面：项目、按平方米计价的服务和咨询预约。"
+      },
+      "consulting": {
+        "name": "咨询与律师事务所",
+        "description": "为顾问、律师和会计师打造的沉稳藏青金色页面：业务领域及收费和咨询预约。"
+      },
+      "yoga-studio": {
+        "name": "瑜伽馆",
+        "description": "为瑜伽馆打造的柔和舒缓页面：课程卡、每周课表、照片、免费体验课和舒缓音乐。"
+      },
+      "clinic": {
+        "name": "家庭诊所",
+        "description": "为诊所或家庭医生打造的干净安心页面：服务及价格、营业时间、预约和一键拨号。"
+      },
+      "nutritionist": {
+        "name": "营养师与膳食计划",
+        "description": "为营养师打造的清新多彩页面：可订购的膳食计划、服务流程、客户成果和免费咨询通话。"
+      },
+      "fashion-boutique": {
+        "name": "时装精品店",
+        "description": "为本地服装品牌打造的黑白杂志风页面：新品上架及折扣价、穿搭图册和你的门店。"
+      },
+      "handmade-shop": {
+        "name": "手作与陶艺店",
+        "description": "为手作店打造的温暖质朴页面：可订购的作品、可预约的陶艺课和工作室故事。"
+      },
+      "skincare-shop": {
+        "name": "护肤品牌",
+        "description": "为护肤品牌打造的柔光粉彩页面：产品与套装、早间护肤流程、评价和免费肌肤咨询。"
+      }
+    },
+    "categories": {
+      "personal": "个人",
+      "food": "餐饮",
+      "hospitality": "酒店与旅行",
+      "business": "商业",
+      "creative": "创意",
+      "events": "活动",
+      "beauty": "美容",
+      "health": "健康与健身",
+      "shop": "商店",
+      "education": "教育",
+      "community": "社区",
+      "gifts": "礼物",
+      "blog": "博客"
+    },
+    "seo": {
+      "heading": "搜索与分享",
+      "text": "你的网站在 Google 上的显示效果，以及链接在 Zalo、Messenger 或 Facebook 上分享时的样子。",
+      "titleLabel": "标题",
+      "descriptionLabel": "描述",
+      "imageLabel": "分享图片",
+      "imageHelp": "从你的照片中选一张。自动模式会优先使用横幅，其次是头像。",
+      "auto": "自动",
+      "previewLabel": "分享链接预览"
+    },
+    "inbox": {
+      "title": "收件箱",
+      "editSite": "编辑网站",
+      "unreadCount": "没有未读请求 | {n} 条未读请求 | {n} 条未读请求",
+      "all": "全部",
+      "unread": "未读",
+      "emptyTitle": "还没有请求",
+      "emptyText": "在网站中添加预订或联系表单，访客的请求会显示在这里。",
+      "addForm": "添加表单",
+      "noUnread": "全部处理完了。",
+      "guests": "{n} 位客人 | {n} 位客人",
+      "markRead": "标为已读",
+      "markUnread": "标为未读",
+      "deleteTitle": "删除此请求？",
+      "deleteText": "它将从你的收件箱中移除。",
+      "loadFailed": "无法加载收件箱",
+      "open": "收件箱",
+      "order": "订单 {code}",
+      "payCod": "货到付款",
+      "payTransfer": "银行转账（请查看你的银行账户）",
+      "requestsTab": "请求与订单",
+      "subscribersTab": "订阅者",
+      "subscribersCount": "没有订阅者 | {n} 位订阅者 | {n} 位订阅者",
+      "subscribersEmptyTitle": "还没有订阅者",
+      "subscribersEmptyText": "在页面中添加类型为“订阅”的表单。所有留下邮箱的人都会显示在这里。",
+      "copyEmails": "复制所有邮箱",
+      "copied": "已复制",
+      "exportCsv": "下载 CSV",
+      "rsvpYes": "出席",
+      "rsvpNo": "不出席",
+      "rsvpComing": "位宾客出席 | 位宾客出席",
+      "rsvpPeople": "人（合计） | 人（合计）",
+      "rsvpNotComing": "位无法出席 | 位无法出席",
+      "answerYes": "已答应",
+      "nights": "{n} 晚 | {n} 晚",
+      "kindBooking": "预订",
+      "kindStay": "客房",
+      "kindContact": "留言",
+      "openOrders": "待处理订单",
+      "noOpenOrders": "没有待处理的订单，干得漂亮！",
+      "status": {
+        "new": "🆕 新订单",
+        "confirmed": "✅ 已确认",
+        "shipped": "🚚 已发货",
+        "done": "🎉 已完成",
+        "cancelled": "✖ 已取消"
+      }
+    },
+    "qr": {
+      "open": "二维码",
+      "title": "二维码",
+      "ctaLabel": "卡片上的文字",
+      "styleLabel": "卡片颜色",
+      "styles": {
+        "light": "浅色",
+        "dark": "深色",
+        "brand": "你的颜色"
+      },
+      "trackingNote": "扫码次数会在数据分析中单独计为“QR”。",
+      "print": "打印",
+      "downloadPng": "PNG 图片",
+      "downloadSvg": "SVG 文件",
+      "custom": "自定义文字",
+      "customPlaceholder": "例如：扫码订座",
+      "download": "下载",
+      "pngHint": "适合社交帖子和聊天",
+      "svgHint": "适合印刷店和大幅印刷"
+    },
+    "account": {
+      "title": "账户",
+      "profile": "个人资料",
+      "namePlaceholder": "你的名字",
+      "nameSaved": "名字已保存",
+      "memberSince": "{date} 加入",
+      "language": "控制台语言",
+      "languageText": "用于控制台以及 Perlink 发给你的所有消息（Telegram、邮件）。你的网站在各自的设置中保留自己的语言。",
+      "plan": "套餐",
+      "sites": "{n} 个网站 | {n} 个网站 | {n} 个网站",
+      "seePlans": "查看套餐",
+      "signOutAll": "退出所有设备",
+      "signOutAllText": "在所有手机和电脑上退出登录，包括当前设备。",
+      "signOutAllAction": "退出所有设备",
+      "signOutAllTitle": "在所有设备上退出登录？",
+      "signOutAllConfirm": "你需要在每台设备上重新登录。",
+      "export": "下载你的数据",
+      "exportText": "以 JSON 文件导出你的个人资料、网站、表单请求和短链接。",
+      "exportAction": "下载",
+      "delete": "删除账户",
+      "deleteText": "永久删除你的账户、所有网站、表单请求、短链接和已上传的图片。此操作无法撤销。",
+      "deleteAction": "删除账户",
+      "deleteTitle": "删除你的账户？",
+      "deleteConfirmText": "所有内容将被永久删除，你的网站地址将释放给其他人使用。",
+      "deleteTypeEmail": "输入 {email} 以确认。",
+      "deleteForever": "永久删除"
+    },
+    "onboarding": {
+      "title": "准备好你的网站",
+      "progress": "已完成 {done}/{total}",
+      "expand": "显示步骤",
+      "collapse": "隐藏步骤",
+      "dismiss": "隐藏清单",
+      "steps": {
+        "photo": {
+          "title": "添加照片或 logo",
+          "text": "有头像或 logo 的页面更让人信任。"
+        },
+        "bio": {
+          "title": "写一段简短介绍",
+          "text": "用一两句话说明你是谁或提供什么。"
+        },
+        "contact": {
+          "title": "添加联系方式",
+          "text": "链接、社交图标、联系信息或预订表单。"
+        },
+        "publish": {
+          "title": "发布你的网站",
+          "text": "在你的 perlink.to 地址上线。"
+        },
+        "share": {
+          "title": "分享你的链接",
+          "text": "放到个人简介、Zalo 上，或为桌台打印二维码。"
+        }
+      },
+      "cardTitle": "完成设置",
+      "cardAction": "继续设置"
+    },
+    "domain": {
+      "heading": "自定义域名",
+      "text": "在你自己的域名上展示此网站，例如 www.myshop.com。你的 perlink.to 地址依然可用。",
+      "unavailable": "自定义域名即将推出。",
+      "connect": "连接",
+      "connectFailed": "无法连接域名",
+      "status": {
+        "pending": "等待 DNS 生效",
+        "active": "已生效",
+        "error": "请检查 DNS"
+      },
+      "open": "打开",
+      "instructions": "在管理域名 DNS 的地方添加以下记录：",
+      "type": "类型",
+      "name": "名称",
+      "value": "值",
+      "wait": "通常需要几分钟，有时最长一天。在此期间你的 perlink.to 地址照常可用。",
+      "check": "重新检查",
+      "nowActive": "你的域名已生效",
+      "remove": "移除域名",
+      "removeTitle": "移除此域名？",
+      "removeText": "网站仍保留其 perlink.to 地址。",
+      "detected": "你的域名 DNS 由 {provider} 管理。请在那里添加记录。",
+      "pickProvider": "你在哪里管理域名的 DNS？",
+      "openProvider": "打开 {provider}",
+      "otherProvider": "其他服务商",
+      "found": "已找到",
+      "check_ok": "已找到，一切正常",
+      "check_missing": "尚未找到",
+      "check_doubled": "域名被重复添加了两次",
+      "check_other": "此名称已被其他记录占用",
+      "doubledHelp": "你的 DNS 面板会自动加上“.{zone}”，所以记录中重复出现了两次。请将名称改为上方显示的简短部分。",
+      "otherHelp": "此名称已被另一条记录使用，或已开启代理。请删除它原有的 A/AAAA/CNAME 记录；如使用 Cloudflare，请将代理状态设为“仅 DNS”（灰色云朵）。",
+      "tips": {
+        "cloudflare": "如使用 Cloudflare，请将该 CNAME 的代理状态设为“仅 DNS”（灰色云朵）。",
+        "short": "在“名称/主机”字段中填写简短名称：大多数 DNS 面板会自动加上你的域名。"
+      }
+    },
+    "address": {
+      "title": "网站地址",
+      "text": "这是别人访问你网站时使用的地址。",
+      "textTemp": "你的网站目前使用的是临时地址。分享前请选一个好记的地址。",
+      "placeholder": "your-name",
+      "save": "保存地址",
+      "saveAndPublish": "保存并发布",
+      "later": "稍后",
+      "change": "更改地址",
+      "choose": "选择地址",
+      "bannerTitle": "你的网站目前使用的是临时地址",
+      "bannerText": "发布前请选择你自己的地址。",
+      "liveWarning": "此网站正在线上：更改后，{old} 将无法访问。",
+      "saved": "地址已更改",
+      "failed": "无法更改地址"
+    },
+    "billing": {
+      "plans": {
+        "free": {
+          "name": "免费版",
+          "description": "入门之选"
+        },
+        "starter": {
+          "name": "Starter",
+          "description": "适合个人和创作者"
+        },
+        "plus": {
+          "name": "Plus",
+          "description": "适合店铺和小型企业"
+        },
+        "max": {
+          "name": "Max",
+          "description": "适合代理机构和成长型企业"
+        }
+      },
+      "features": {
+        "sites": "{n} 个在线网站，草稿不限 | {n} 个在线网站，草稿不限",
+        "basics": "全部模板和 50 个主题",
+        "room": "为你的页面打造的 3D 世界",
+        "proThemes": "20 个 Pro 主题（玻璃、奢华、醒目）",
+        "removeBranding": "去除“Made with Perlink”",
+        "analytics": "{n} 天数据分析",
+        "analyticsYear": "1 年数据分析",
+        "support": "优先在线支持",
+        "customDomains": "{n} 个自定义域名 | {n} 个自定义域名",
+        "customDomainsSoon": "自定义域名（即将推出）",
+        "analyticsYears": "{n} 年数据分析",
+        "posts": "{n} 篇博客文章",
+        "postsUnlimited": "博客文章不限",
+        "tracking": "Facebook 和 TikTok 像素、Google Analytics",
+        "protect": "密码保护和定时开放页面",
+        "orders": "订单跟踪（新订单、已确认、已发货）",
+        "cleanVideo": "无水印 3D 房间视频",
+        "everythingPlus": "包含 Plus 的全部功能",
+        "allPacks": "包含全部 3D 房间包"
+      },
+      "monthly": "按月",
+      "annual": "按年",
+      "annualSave": "免费 2 个月",
+      "perMonth": "/月",
+      "billedYearly": "按年付费 {amount}",
+      "recommended": "热门",
+      "current": "当前套餐",
+      "choose": "选择 {plan}",
+      "renew": "续费",
+      "startFree": "免费开始",
+      "contact": "联系我们升级",
+      "contactNote": "在线支付即将推出。在此之前，请联系我们为你升级账户。",
+      "payNote": "按月或按年订阅，可随时取消。付款成功后套餐立即生效。每个账户还可以免费试用一次 Plus 7 天，无需绑卡。",
+      "status": {
+        "free": "你正在使用免费套餐",
+        "paid": "你正在使用 {plan}",
+        "until": "有效期至 {date}",
+        "sites": "{used}/{max} 个在线网站",
+        "overLimit": "你有 {used} 个网站在线，而你的套餐包含 {max} 个。它们都会保持在线，你也可以随意创建和编辑草稿；如需再上线一个网站，请升级或下线一个网站。"
+      },
+      "trial": {
+        "title": "免费试用 Plus 7 天",
+        "text": "Pro 主题、10 个网站和一年数据分析。无需绑卡，到期后自动回到免费版。",
+        "start": "开始免费试用",
+        "started": "Plus 已开启，有效期至 {date}",
+        "failed": "无法开始试用"
+      },
+      "checkout": {
+        "title": "支付 {plan}",
+        "periodMonthly": "1 个月",
+        "periodAnnual": "1 年",
+        "scan": "使用任意银行 App 扫码",
+        "manual": "或手动转账",
+        "bank": "银行",
+        "account": "账号",
+        "accountName": "账户名",
+        "amount": "金额",
+        "note": "转账备注",
+        "noteHint": "请完全使用此备注，以便我们核对你的付款。",
+        "waiting": "已转账？请点击“完成”",
+        "waitingHint": "我们核实后会为你开通套餐，通常只需几分钟。你可以关闭此窗口，套餐仍会开通。",
+        "paidTitle": "已收到付款",
+        "paidText": "{plan} 已开通，有效期至 {date}。谢谢！",
+        "done": "完成",
+        "failed": "无法发起付款",
+        "copied": "已复制",
+        "methodBank": "银行转账",
+        "methodCrypto": "加密货币",
+        "submit": "完成",
+        "refresh": "刷新",
+        "submittedTitle": "等待审核",
+        "submittedText": "我们已收到你的通知，确认后会立即为你开通套餐。你可以关闭此窗口。",
+        "cryptoAmount": "发送金额",
+        "network": "网络",
+        "token": "代币",
+        "address": "发送至",
+        "cryptoWarning": "仅可在 {network} 上发送 {token}。发送其他代币或使用其他网络可能导致资金丢失。",
+        "txHash": "交易哈希",
+        "txHashPlaceholder": "0x…",
+        "txHashHint": "发送后，请将钱包中的交易哈希粘贴到这里，然后点击“完成”。",
+        "submitFailed": "无法发送",
+        "check": {
+          "ok": "已在链上找到有效交易",
+          "short": "交易金额不足",
+          "none": "交易未发送到我们的钱包",
+          "failed": "交易在链上失败",
+          "pending": "尚未找到，可能仍在确认中",
+          "error": "暂时无法检查该交易"
+        },
+        "copy": "复制",
+        "rejectedTitle": "我们无法确认这笔付款",
+        "rejectedText": "我们找不到这笔付款。如果你确实已付款，请凭下方代码联系客服，或核对信息后重新提交。",
+        "contactSupport": "联系客服",
+        "tryAgain": "重新提交",
+        "methodCard": "银行卡",
+        "cardTitle": "使用银行卡安全付款",
+        "cardText": "支持 Visa、Mastercard、Apple Pay 和 Google Pay。你将在我们的经销商 Creem 的安全结账页面完成付款，然后返回这里。",
+        "cardRenews": "自动续费，可随时取消。",
+        "cardButton": "前往结账",
+        "cardPortal": "你已有订阅，请在订阅页面更改套餐。",
+        "returned": "已收到付款",
+        "returnedText": "你的套餐将在几秒钟后开通。"
+      },
+      "prompt": {
+        "sites": {
+          "title": "你的在线网站名额已用完",
+          "text": "此网站已保存为草稿。{plan} 最多可同时上线 {n} 个网站，还有 Pro 主题等更多功能。你也可以下线另一个网站来发布这个。"
+        },
+        "customDomain": {
+          "title": "{plan} 包含自定义域名",
+          "text": "把你的页面放到 www.yourname.com，看起来更专业，也更好记。"
+        },
+        "proThemes": {
+          "title": "{plan} 包含 Pro 主题",
+          "text": "可以在编辑器中随意试用。升级后即可使用此主题发布页面。"
+        },
+        "removeBranding": {
+          "title": "使用 {plan} 去除 Perlink 标识",
+          "text": "你的页面底部将不再显示“Made with Perlink”。"
+        },
+        "seePlans": "查看套餐",
+        "later": "暂不",
+        "trial": "免费试用 Plus 7 天",
+        "posts": {
+          "title": "你的文章额度已用完",
+          "text": "{plan} 套餐可发布更多文章，还有 Pro 主题等更多功能。"
+        },
+        "tracking": {
+          "title": "{plan} 包含广告像素和 Google Analytics",
+          "text": "使用 Facebook Pixel、TikTok Pixel、Google Analytics 和 Search Console 衡量广告效果和访客数据。"
+        },
+        "protect": {
+          "title": "{plan} 包含私密页面",
+          "text": "用密码锁定页面，或让它在你选定的时间自动开放。"
+        },
+        "orders": {
+          "title": "{plan} 包含订单跟踪",
+          "text": "将每个订单标记为已确认、已发货、已完成或已取消；取消的订单会退回库存。"
+        },
+        "cleanVideo": {
+          "title": "{plan} 包含无水印视频",
+          "text": "你的房间视频将不再显示“Made with Perlink”。"
+        }
+      },
+      "history": "付款记录",
+      "paymentStatus": {
+        "pending": "等待付款",
+        "paid": "已付款",
+        "expired": "已过期",
+        "submitted": "等待审核",
+        "rejected": "未确认",
+        "refunded": "已退款"
+      },
+      "comingSoon": "即将推出",
+      "usdNote": "价格以美元计；结账时可能会产生税费。",
+      "celebrate": {
+        "title": "恭喜！🎉",
+        "text": "你现在使用的是 {plan} 套餐。",
+        "until": "你的套餐有效期至 {date}。",
+        "unlocked": "你已解锁",
+        "start": "开始吧"
+      },
+      "subscription": {
+        "renews": "将于 {date} 续费",
+        "ends": "已取消 · 将于 {date} 到期",
+        "pastDue": "付款失败 · 请更新你的银行卡",
+        "manage": "管理订阅"
+      },
+      "usdNoteBank": "价格以美元计；结账时可能会产生税费。在越南也可以通过银行转账（VietQR）以越南盾付款。",
+      "switch": {
+        "title": "切换到 {plan}？",
+        "text": "你的订阅将立即从 {from} 变更为 {to}。本周期剩余时间的差价将立即扣除。",
+        "confirm": "切换套餐",
+        "done": "你现在使用的是 {plan}"
+      },
+      "weddingPass": {
+        "name": "婚礼通行证",
+        "badge": "一次性付款",
+        "title": "婚礼通行证",
+        "text": "婚礼请柬所需的一切，一次付清。无需订阅，不会续费。",
+        "price": "一次性 {price}",
+        "perks": [
+          "一年 Starter：Pro 主题、密码或定时开放、无水印房间视频",
+          "查看哪些宾客打开了请柬，并在他们打开时收到消息",
+          "婚礼 3D 房间包（拱门、蛋糕、香槟塔…），永久拥有",
+          "一年后你的网站会以免费套餐继续在线"
+        ],
+        "buy": "获取婚礼通行证",
+        "included": "你的套餐已包含婚礼通行证的全部内容。",
+        "once": "一次性",
+        "noRenew": "一次付款，不会续费。",
+        "history": "婚礼通行证"
+      }
+    },
+    "telegram": {
+      "title": "Telegram 通知",
+      "text": "在 Telegram 上接收所有网站的新订单和请求，并附带前往收件箱的按钮。",
+      "connected": "已连接",
+      "connectedText": "新订单和请求将发送到你的 Telegram。",
+      "waiting": "打开 Telegram，在与 Perlink 机器人的对话中点击 Start。",
+      "connect": "连接 Telegram",
+      "reopen": "重新打开 Telegram",
+      "test": "发送测试消息",
+      "testSent": "测试消息已发送",
+      "disconnect": "断开连接",
+      "done": "Telegram 已连接",
+      "failed": "出了点问题",
+      "section": "通知"
+    },
+    "guestbook": {
+      "tab": "留言簿",
+      "intro": "访客在你的 3D 房间里留下的消息。隐藏的消息不会在房间中显示。",
+      "emptyTitle": "还没有留言",
+      "emptyText": "访客可以在你的 3D 房间中点击“留言簿”，在房间前留言并送上礼物。",
+      "openRoom": "打开 3D 房间",
+      "hiddenBadge": "已隐藏",
+      "show": "显示",
+      "hide": "隐藏",
+      "deleteTitle": "删除这条留言？",
+      "loadFailed": "无法加载留言簿",
+      "saveFailed": "无法保存"
+    },
+    "blog": {
+      "heading": "博客",
+      "intro": "为你的网站撰写文章。读者可以在这里找到它们：",
+      "usage": "你的套餐已发布 {n}/{max} 篇文章",
+      "write": "写文章",
+      "emptyTitle": "还没有文章",
+      "emptyText": "分享新闻、故事或指南。每篇文章都有独立页面，便于 Google 收录和分享。",
+      "untitled": "无标题",
+      "status": {
+        "draft": "草稿",
+        "published": "已发布"
+      },
+      "minutes": "阅读约 {n} 分钟",
+      "more": "更多",
+      "edit": "编辑",
+      "view": "查看",
+      "delete": "删除",
+      "deleteTitle": "删除这篇文章？",
+      "deleteText": "“{title}”将被永久删除。",
+      "failed": "出了点问题",
+      "back": "返回网站",
+      "saving": "保存中…",
+      "saveFailed": "保存失败，稍后将重试",
+      "savedDraft": "草稿已保存",
+      "settings": "文章设置",
+      "slug": "地址",
+      "excerpt": "摘要",
+      "excerptHint": "显示在列表、Google 和链接预览中",
+      "unpublish": "取消发布",
+      "publish": "发布",
+      "published": "文章已发布",
+      "unpublished": "文章已取消发布",
+      "changeCover": "更换",
+      "removeCover": "移除封面",
+      "addCover": "添加封面图片",
+      "titlePlaceholder": "文章标题",
+      "bodyPlaceholder": "开始写作…",
+      "linkTitle": "链接",
+      "addLink": "添加链接",
+      "removeLink": "移除",
+      "addImage": "添加图片",
+      "uploadFailed": "图片上传失败",
+      "notFound": "找不到文章"
+    },
+    "tracking": {
+      "heading": "广告像素与 Google",
+      "text": "使用你自己的 Facebook、TikTok 和 Google 账户衡量广告效果和访客数据。",
+      "locked": "Starter 和 Plus 套餐包含像素代码和 Google Analytics。",
+      "upgrade": "升级",
+      "invalid": "格式似乎不对，应类似于 {example}",
+      "note": "粘贴 ID 或完整代码片段，我们只保留 ID。标签在你的线上网站运行，而非此编辑器中，发布后生效。",
+      "help": {
+        "metaPixel": "事件管理工具 → 数据源 → 你的像素 → 15–16 位 ID。",
+        "tiktokPixel": "TikTok Ads Manager → 工具 → 事件 → 网站事件 → 像素 ID。",
+        "ga4": "Google Analytics → 管理 → 数据流 → 衡量 ID（G-…）。",
+        "gsc": "Search Console → 添加资源（网址前缀）→ HTML 标记 → content=\"…\" 的值。"
+      }
+    },
+    "privacy": {
+      "heading": "私密页面",
+      "text": "只有知道密码的人才能打开，或在你选定的时间自动开放。适合婚礼、惊喜和发布活动。",
+      "locked": "Starter 和 Plus 套餐包含密码和定时开放功能。",
+      "passwordLabel": "密码",
+      "on": "已开启",
+      "setPassword": "设置密码（至少 4 个字符）",
+      "newPassword": "新密码",
+      "lock": "锁定页面",
+      "change": "更改",
+      "remove": "移除密码",
+      "passwordHelp": "立即生效。访客在每个浏览器中只需输入一次；更改密码后所有人需重新输入。",
+      "saved": "页面已设置密码保护",
+      "removed": "密码已移除",
+      "opensLabel": "开放时间",
+      "clear": "清除",
+      "opensHelp": "在此之前访客会看到倒计时。发布后生效。",
+      "opensSet": "访客将看到倒计时，直到 {date}。发布后生效。"
+    },
+    "earn": {
+      "title": "通过 Perlink 赚取收益",
+      "eyebrow": "推广联盟计划",
+      "headline": "终身赚取每笔付款的 {percent}%",
+      "intro": "把 Perlink 分享给你的粉丝、客户或朋友。你推荐的人在 {days} 天内购买付费套餐后，只要他们持续使用，你就能从他们的每笔付款（包括续费）中获得分成。我们的支付合作伙伴 Creem 负责追踪销售并向你付款。",
+      "statCommission": "佣金",
+      "statMonths": "每次续费都有",
+      "statSignups": "你带来的注册",
+      "step": "第 {n} 步",
+      "joinTitle": "加入我们的推广联盟计划",
+      "joinText": "我们的推广联盟计划由 Creem 运营：它会统计你的销售、显示你的收益，并通过银行转账或 USDC 向你付款。用邮箱注册即可，完全免费。",
+      "join": "成为推广者",
+      "codeTitle": "添加你的推广码",
+      "codeText": "审核通过后，Creem 的推广者后台会显示你的推荐链接（…?code=…）。把链接或推广码粘贴到这里。",
+      "codePlaceholder": "例如 abc123 或完整链接",
+      "saved": "推广码已保存",
+      "cleared": "推广码已移除",
+      "shareTitle": "分享你的链接",
+      "shareText": "放到你的简介、帖子、视频或邮件中。任何页面都可以。",
+      "shareLocked": "请先添加推广码以获取链接。",
+      "linkHome": "首页",
+      "linkPricing": "价格",
+      "linkTemplates": "模板",
+      "badge": "你网站上的“Made with Perlink”标识现在也带有你的推广码：从你的页面注册的任何人都算你的推荐。",
+      "dashboard": "查看你的销售和收益",
+      "rules": "禁止垃圾信息、虚假评价、使用 Perlink 名称投放广告，以及通过自己的链接购买。",
+      "rulesLink": "计划规则",
+      "forever": "终身有效",
+      "example": "10 位朋友按年订阅 Plus = 你每年获得 {amount}"
+    },
+    "guests": {
+      "title": "宾客",
+      "nav": "宾客",
+      "intro": "添加宾客并给每人发送专属链接：信封会以名字问候他们，你也能看到谁已经打开。",
+      "addTitle": "添加宾客",
+      "addHelp": "每行一个名字，按信封上显示的写法填写（例如“王叔叔一家”）。",
+      "addPlaceholder": "王叔叔一家\n张伟\n李娜",
+      "side": "家庭",
+      "sideNone": "双方",
+      "sideGroom": "男方",
+      "sideBride": "女方",
+      "add": "添加到名单",
+      "added": "已添加 {n} 位宾客 | 已添加 {n} 位宾客",
+      "statGuests": "宾客",
+      "statOpened": "已打开",
+      "statNotOpened": "尚未打开",
+      "statReplied": "已回复",
+      "emptyTitle": "还没有宾客",
+      "emptyText": "在上方添加名字。任何打开带有自己名字的链接（?to=Name）的人也会显示在这里。",
+      "copy": "复制链接",
+      "copied": "链接已复制",
+      "copyAll": "复制所有链接",
+      "copiedAll": "已复制 {n} 个链接，每行一个",
+      "search": "搜索宾客",
+      "filterAll": "全部",
+      "filterOpened": "已打开",
+      "filterNotOpened": "未打开",
+      "openedAt": "{date} 打开",
+      "opens": "{n} 次访问 | {n} 次访问",
+      "letterOpened": "已打开信件",
+      "notOpened": "尚未打开",
+      "viaLink": "通过链接访问",
+      "rsvpYes": "出席",
+      "rsvpNo": "无法出席",
+      "rsvpGuests": "{n} 人",
+      "remove": "移除",
+      "removeConfirm": "将 {name} 从名单中移除？",
+      "lockedTitle": "查看谁打开了请柬",
+      "lockedText": "{total} 位宾客中已有 {opened} 位打开。婚礼通行证（或任意付费套餐）可显示是谁、何时打开，并在宾客打开时立即给你发消息。",
+      "lockedButton": "查看婚礼通行证",
+      "telegramHint": "宾客打开请柬时，在 Telegram 上收到消息。",
+      "failed": "无法更新宾客名单"
+    }
+  }
+}

@@ -24,6 +24,7 @@ import { stableBlockIds } from '~/data/templateKit'
 import type { BioData } from '~/types/bio'
 import { localizeTemplateContent } from '~/data/templateCopyVi'
 import type { PageTemplate } from '~/data/pageTemplates'
+import { toAppLanguage, type AppLanguage } from '#shared/language'
 
 // Blocks inside show sample content instead of asking the server
 provide(TEMPLATE_PREVIEW_KEY, true)
@@ -66,7 +67,8 @@ const route = useRoute()
 const { locale } = useI18n()
 const { lang: marketingLang } = useMarketingLang()
 const lang = computed(() => (route.path.startsWith('/dashboard') ? locale.value : marketingLang.value))
-const sampleLabel = computed(() => (lang.value === 'vi' ? 'Nội dung mẫu' : 'Sample content'))
+const SAMPLE_LABEL: Record<AppLanguage, string> = { en: 'Sample content', vi: 'Nội dung mẫu', zh: '示例内容', ja: 'サンプル', ko: '샘플 콘텐츠' }
+const sampleLabel = computed(() => SAMPLE_LABEL[toAppLanguage(lang.value)])
 
 /** Template photos swapped for their small versions (480 px), anywhere in a value */
 function smallPhotos<T>(value: T): T {

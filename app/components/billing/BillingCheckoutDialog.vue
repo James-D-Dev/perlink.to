@@ -185,6 +185,7 @@ import qrcode from 'qrcode-generator'
 import { CRYPTO_NETWORK_BY_ID, CRYPTO_TOKEN_ICONS, type CryptoToken } from '#shared/crypto'
 import { PLAN_PRICES_USD, WEDDING_PASS, type BillingPeriod, type PaidPlanId, type Product } from '#shared/plans'
 import { SUPPORT_EMAIL } from '~/utils/legal'
+import { LANGUAGE_INFO, toAppLanguage } from '#shared/language'
 
 // Pay for a plan by bank transfer (VietQR, VND) or in USDT / USDC to the
 // crypto wallet. "Done" sends it for review; the plan turns on once the
@@ -199,6 +200,8 @@ const emit = defineEmits<{ paid: [] }>()
 const open = defineModel<boolean>('open', { default: false })
 
 const { t, locale } = useI18n()
+// Dates in the dashboard language (English as day-month, like the rest of the app)
+const intlLocale = computed(() => { const lang = toAppLanguage(locale.value); return lang === 'en' ? 'en-GB' : LANGUAGE_INFO[lang].intl })
 const toast = useToast()
 const { info, refresh } = useBilling()
 
@@ -252,7 +255,7 @@ function qrSvg(text: string) {
   return qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true })
 }
 
-const formatDate = (iso: string) => new Date(iso).toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-GB')
+const formatDate = (iso: string) => new Date(iso).toLocaleDateString(intlLocale.value)
 
 function copy(text: string) {
   navigator.clipboard.writeText(text)
