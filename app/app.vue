@@ -55,5 +55,6 @@ onMounted(() => {
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <ClientOnly><AnalyticsConsent /></ClientOnly>
   </UApp>
 </template>

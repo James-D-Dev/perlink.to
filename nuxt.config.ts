@@ -92,6 +92,8 @@ export default defineNuxtConfig({
       // Where people sign up as affiliates: the Creem affiliate program's
       // join link (Creem → Growth → Affiliate Hub)
       affiliateSignupUrl: "https://affiliates.creem.io/join/perlink",
+      // Perlink's own Google Analytics 4 (G-…); empty: no analytics
+      gaMeasurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || "G-PGV42X8SEB",
     },
   },
 

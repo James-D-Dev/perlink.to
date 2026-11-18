@@ -41,6 +41,7 @@ export function useSiteActions(sites: Ref<any[]>) {
     try {
       await $fetch(`/api/admin/bio/${username}/publish`, { method: 'POST' as const })
       setPublished(username, true)
+      useAnalytics().track('publish_site', { from: 'sites_list' })
       toast.add({ title: t('dashboard.toast.published'), description: t('dashboard.sites.publishedText') })
     } catch (error) {
       if (useUpgradePrompt().fromError(error)) return

@@ -86,6 +86,7 @@ export default defineEventHandler(async (event) => {
       
       console.log('[One Tap] Created profile:', { id: profile.id })
       sendWelcomeEmail(event, profile)
+      markSignup(event, 'google')
     } else {
       // Update avatar/name if changed
       if (!profile.avatar && googlePayload.picture) {

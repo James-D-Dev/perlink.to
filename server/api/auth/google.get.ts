@@ -62,6 +62,7 @@ export default defineOAuthGoogleEventHandler({
         
         console.log('[OAuth] Created new profile:', { id: profile.id, email: profile.email })
         sendWelcomeEmail(event, profile)
+        markSignup(event, 'google')
       } else {
         console.log('[OAuth] Existing profile found:', { id: profile.id, email: profile.email })
         // Update avatar if not set

@@ -268,6 +268,7 @@ async function payByCard() {
   openingPass.value = true
   try {
     const res = await $fetch<{ url: string }>('/api/billing/wedding-checkout', { method: 'POST' })
+    useAnalytics().track('begin_checkout', { item_category: 'wedding_pass' })
     window.location.href = res.url
   } catch (error: any) {
     toast.add({ title: t('dashboard.billing.checkout.failed'), description: error?.data?.statusMessage, color: 'error' })

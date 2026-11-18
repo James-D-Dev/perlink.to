@@ -31,7 +31,10 @@ export function useRoomPacks() {
         method: 'POST',
         body: { pack, back: back ?? (useRoute().fullPath.split('?')[0]) },
       })
-      if (res.url) window.location.href = res.url
+      if (res.url) {
+        useAnalytics().track('begin_checkout', { item_category: 'room_pack', item_name: pack })
+        window.location.href = res.url
+      }
       else if (res.owned) await refresh()
     } catch (error: any) {
       if (error?.statusCode === 401 || error?.status === 401) {

@@ -63,6 +63,7 @@ export async function signInWithSocial(event: H3Event, account: SocialAccount) {
     })
     console.log(`[OAuth] ${account.provider}: new profile`, { id: profile.id })
     sendWelcomeEmail(event, profile)
+    markSignup(event, account.provider)
   }
   if (!linked || linked.user_id !== profile.id) {
     await db

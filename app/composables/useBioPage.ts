@@ -208,6 +208,7 @@ export function useBioPage() {
       await $fetch("/api/bio/publish", {
         method: "POST",
       });
+      useAnalytics().track("publish_site", { from: "bio_editor" });
 
       if (existingBio.value) {
         existingBio.value.isPublished = true;

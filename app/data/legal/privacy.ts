@@ -45,6 +45,7 @@ export const PRIVACY: LegalDocs = {
             ['Provider', 'What for'],
             ['Cloudflare', 'Hosting, database, file storage, security, sending emails (e.g. form submissions to site owners)'],
             ['Google, Meta (Facebook), TikTok', 'Sign-in'],
+            ['Google Analytics', 'How visitors find and use Perlink’s own pages (not people’s sites); see the Cookie Notice'],
             ['Creem', 'Selling plans as our reseller and Merchant of Record: checkout, payments, tax, invoices and refunds'],
             ['SePay', 'Notifications of bank transfers for plan payments in Vietnam'],
           ] },
@@ -82,7 +83,7 @@ export const PRIVACY: LegalDocs = {
       {
         id: 'cookies',
         title: 'Cookies',
-        blocks: ['We only use cookies that Perlink needs to work, such as keeping you signed in. See the [Cookie Notice](/cookie-notice).'],
+        blocks: ['We use cookies that Perlink needs to work, such as keeping you signed in, and Google Analytics cookies on Perlink’s own pages, which you can turn off. See the [Cookie Notice](/cookie-notice).'],
       },
       {
         id: 'children',
@@ -150,6 +151,7 @@ export const PRIVACY: LegalDocs = {
             ['Nhà cung cấp', 'Mục đích'],
             ['Cloudflare', 'Máy chủ, cơ sở dữ liệu, lưu trữ tệp, bảo mật, gửi email (ví dụ: gửi biểu mẫu khách điền cho chủ trang)'],
             ['Google, Meta (Facebook), TikTok', 'Đăng nhập'],
+            ['Google Analytics', 'Khách tìm thấy và dùng các trang của chính Perlink thế nào (không phải trang của người dùng); xem Thông báo về cookie'],
             ['Creem', 'Bán gói với vai trò đại lý bán lại và đơn vị bán hàng chính thức: thanh toán, thuế, hoá đơn, hoàn tiền'],
             ['SePay', 'Thông báo giao dịch chuyển khoản khi thanh toán gói tại Việt Nam'],
           ] },
@@ -187,7 +189,7 @@ export const PRIVACY: LegalDocs = {
       {
         id: 'cookies',
         title: 'Cookie',
-        blocks: ['Chúng tôi chỉ dùng cookie cần thiết để Perlink hoạt động, như giữ trạng thái đăng nhập. Xem [Thông báo về cookie](/cookie-notice).'],
+        blocks: ['Chúng tôi dùng cookie cần thiết để Perlink hoạt động, như giữ trạng thái đăng nhập, và cookie Google Analytics trên các trang của chính Perlink mà bạn có thể tắt. Xem [Thông báo về cookie](/cookie-notice).'],
       },
       {
         id: 'children',

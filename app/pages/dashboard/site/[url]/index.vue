@@ -1166,6 +1166,7 @@ async function onRenamed(username: string) {
     publishing.value = true;
     try {
       await $fetch(`/api/admin/bio/${username}/publish`, { method: "POST" as const });
+      useAnalytics().track("publish_site", { from: "site_editor" });
       toast.add({ title: t("dashboard.toast.published"), description: t("dashboard.editor.publishedText", { username }), color: "success" });
     } catch (error: any) {
       // The address change went through either way, so carry on to it
@@ -1211,6 +1212,7 @@ const publishBio = async () => {
     );
 
     existingBio.value = response.bioPage;
+    useAnalytics().track("publish_site", { from: "site_editor" });
     // The card should show what just went live
     if (snapshotTimer) clearTimeout(snapshotTimer);
     nextTick(takeSnapshot);

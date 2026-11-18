@@ -2,7 +2,7 @@ import type { LegalLang } from '~/data/legal/types'
 
 // Shown on the legal pages (terms, privacy, refunds, report)
 export const SUPPORT_EMAIL = 'support@perlink.to'
-export const LEGAL_UPDATED_ISO = '2026-11-04'
+export const LEGAL_UPDATED_ISO = '2026-11-18'
 
 /** Legal pages follow the visitor's language (Vietnamese or English) */
 export function useLegalLang() {

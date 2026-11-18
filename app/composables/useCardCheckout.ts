@@ -45,6 +45,7 @@ export function useCardCheckout() {
         window.open(res.portalUrl, '_blank', 'noopener')
         opening.value = false
       } else if (res.url) {
+        useAnalytics().track('begin_checkout', { item_category: 'plan', item_name: `${plan}_${period}` })
         // Stays "opening" while the browser leaves for the checkout
         window.location.href = res.url
       } else {

@@ -127,6 +127,7 @@ async function publish(): Promise<boolean> {
     if (!(await save({ silent: true }))) return false
     await $fetch(`/api/admin/bio/${username.value}/publish`, { method: 'POST' as const })
     if (bioPage.value) bioPage.value = { ...bioPage.value, isPublished: true, hasDraft: false }
+    useAnalytics().track('publish_site', { from: 'room' })
     toast.add({
       title: t('room.toast.published'),
       description: t('room.toast.publishedText', { name: username.value }),
