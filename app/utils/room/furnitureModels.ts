@@ -10,7 +10,9 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // colour itself) and "TintDark" (a shade darker, for trims and folds), so a
 // room saved with the old box-built furniture keeps its colours. Parts named
 // with "Glow" (a lamp's shade or bulb, a screen) light up as night falls;
-// "TintGlow" is both.
+// "TintGlow" is both. A part named "Sky" (a window's glass) shows the sky
+// outside: blue by day, dark at night (RoomScene keeps it in step).
+// Wall-mounted models are centred vertically with their back on z = 0.
 
 const BASE = '/models/furniture/'
 
@@ -53,6 +55,7 @@ function loadFurniture(name: string): Promise<THREE.Object3D> {
 const isTint = (material: THREE.Material) => /^tint/i.test(material.name)
 const isDark = (material: THREE.Material) => /dark/i.test(material.name)
 const isGlow = (material: THREE.Material) => /glow/i.test(material.name)
+const isSky = (material: THREE.Material) => /^sky/i.test(material.name)
 
 /**
  * Put a copy of the furniture model in `group`, its tint parts painted
@@ -68,7 +71,7 @@ export async function attachFurnitureModel(group: THREE.Group, name: string, col
     const mesh = child as THREE.Mesh
     if (!mesh.isMesh) return
     const swap = (material: THREE.Material) => {
-      if (!isTint(material) && !isGlow(material)) return material
+      if (!isTint(material) && !isGlow(material) && !isSky(material)) return material
       let own = tints.get(material)
       if (!own) {
         const copy = material.clone() as THREE.MeshStandardMaterial
@@ -83,6 +86,12 @@ export async function attachFurnitureModel(group: THREE.Group, name: string, col
           copy.userData.glow = true
           copy.userData.baseGlow = screen ? 0.35 : 0.15
           copy.userData.nightGlow = screen ? 0.5 : 2.2
+        }
+        if (isSky(material)) {
+          copy.emissive.set('#9fd3ff')
+          copy.emissiveIntensity = 0.6
+          copy.roughness = 0.1
+          copy.userData.sky = true
         }
         own = copy
         tints.set(material, own)

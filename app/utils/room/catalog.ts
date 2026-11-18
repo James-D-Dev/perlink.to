@@ -352,18 +352,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     icon: 'i-lucide-sprout',
     category: 'decor',
     defaultColor: '#4f8a4b',
-    build: (color) => {
-      const leaves = mat(color, { roughness: 0.9, flatShading: true })
-      const leaf = (r: number, x: number, y: number, z: number) =>
-        mesh(new THREE.IcosahedronGeometry(r, 0), leaves, x, y, z)
-      return group(
-        cyl(0.2, 0.15, 0.36, mat('#c96f4a')),
-        leaf(0.3, 0, 0.7, 0),
-        leaf(0.22, 0.16, 0.92, 0.06),
-        leaf(0.2, -0.14, 0.88, -0.08),
-        leaf(0.17, 0.02, 1.1, 0),
-      )
-    },
+    build: color => furnitureModel('plant', color),
   },
   {
     type: 'rug',
@@ -393,23 +382,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'wall',
     defaultColor: WHITE,
     wallMounted: true,
-    build: (color) => {
-      const frame = mat(color)
-      const glass = new THREE.MeshStandardMaterial({ color: '#9fd3ff', emissive: '#9fd3ff', emissiveIntensity: 0.6, roughness: 0.1 })
-      glass.userData.sky = true
-      const pane = mesh(new THREE.PlaneGeometry(1.3, 1.1), glass, 0, 0, 0.02)
-      pane.castShadow = false
-      return group(
-        pane,
-        box(1.44, 0.07, 0.08, frame, 0, 0.55),
-        box(1.44, 0.07, 0.08, frame, 0, -0.62),
-        box(0.07, 1.17, 0.08, frame, -0.685, -0.585),
-        box(0.07, 1.17, 0.08, frame, 0.685, -0.585),
-        box(0.04, 1.1, 0.05, frame, 0, -0.55),
-        box(1.3, 0.04, 0.05, frame, 0, -0.02),
-        box(1.6, 0.05, 0.2, frame, 0, -0.68, 0.06),
-      )
-    },
+    build: color => furnitureModel('window', color),
   },
   {
     type: 'picture-frame',
@@ -489,14 +462,73 @@ export const ROOM_CATALOG: CatalogItem[] = [
     defaultColor: '#1d3557',
     wallMounted: true,
     build: (color) => {
-      const face = mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.04, 32), mat(color), 0, 0, 0.02)
-      face.rotation.x = Math.PI / 2
-      const dial = mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.01, 32), mat(WHITE), 0, 0, 0.045)
-      dial.rotation.x = Math.PI / 2
-      const hour = box(0.015, 0.1, 0.01, mat(DARK), 0, 0, 0.055)
-      const minute = box(0.01, 0.15, 0.01, mat(DARK), 0, 0, 0.06)
-      minute.rotation.z = -1.2
-      return group(face, dial, hour, minute)
+      const g = new THREE.Group()
+      // Rim in the chosen colour, with a rounded lip
+      const rim = mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.05, 48), mat(color, { roughness: 0.45 }), 0, 0, 0.025)
+      rim.rotation.x = Math.PI / 2
+      const lip = mesh(new THREE.TorusGeometry(0.235, 0.014, 10, 48), mat(color, { roughness: 0.4 }), 0, 0, 0.05)
+      g.add(rim, lip)
+      // Dial: numbers 1-12 and minute marks, drawn once (sharp at any zoom)
+      const canvas = document.createElement('canvas')
+      canvas.width = canvas.height = 512
+      const ctx = canvas.getContext('2d')!
+      ctx.fillStyle = '#fbf8f1'
+      ctx.beginPath(); ctx.arc(256, 256, 256, 0, Math.PI * 2); ctx.fill()
+      ctx.translate(256, 256)
+      for (let i = 0; i < 60; i++) {
+        const hour = i % 5 === 0
+        ctx.save()
+        ctx.rotate((i / 60) * Math.PI * 2)
+        ctx.fillStyle = hour ? '#1f2430' : '#8a8f99'
+        ctx.fillRect(hour ? -4 : -1.5, -238, hour ? 8 : 3, hour ? 26 : 13)
+        ctx.restore()
+      }
+      ctx.fillStyle = '#1f2430'
+      ctx.font = '600 58px Georgia, "Times New Roman", serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      for (let h = 1; h <= 12; h++) {
+        const a = (h / 12) * Math.PI * 2
+        ctx.fillText(String(h), Math.sin(a) * 172, -Math.cos(a) * 172 + 3)
+      }
+      const texture = new THREE.CanvasTexture(canvas)
+      texture.colorSpace = THREE.SRGBColorSpace
+      texture.anisotropy = 4
+      const dial = new THREE.Mesh(new THREE.CircleGeometry(0.215, 48), new THREE.MeshStandardMaterial({ map: texture, roughness: 0.7 }))
+      dial.position.z = 0.051
+      dial.receiveShadow = true
+      g.add(dial)
+      // Hands that show the visitor's own time
+      const handMat = mat(DARK, { roughness: 0.5 })
+      const hand = (w: number, len: number, material: THREE.Material, z: number) => {
+        const pivot = new THREE.Group()
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(w, len, 0.006), material)
+        bar.position.y = len / 2 - len * 0.12
+        pivot.add(bar)
+        pivot.position.z = z
+        return pivot
+      }
+      const hourHand = hand(0.016, 0.12, handMat, 0.056)
+      const minuteHand = hand(0.01, 0.175, handMat, 0.062)
+      const secondHand = hand(0.004, 0.19, mat('#d64545', { roughness: 0.5 }), 0.068)
+      const cap = mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.012, 16), mat('#d64545'), 0, 0, 0.07)
+      cap.rotation.x = Math.PI / 2
+      g.add(hourHand, minuteHand, secondHand, cap)
+      g.traverse((o) => { if ((o as THREE.Mesh).isMesh && o !== rim && o !== lip) o.castShadow = false })
+      let shown = -1
+      g.userData.tick = () => {
+        const now = new Date()
+        const second = now.getSeconds()
+        if (second === shown) return
+        shown = second
+        const minutes = now.getMinutes() + second / 60
+        const hours = (now.getHours() % 12) + minutes / 60
+        secondHand.rotation.z = -(second / 60) * Math.PI * 2
+        minuteHand.rotation.z = -(minutes / 60) * Math.PI * 2
+        hourHand.rotation.z = -(hours / 12) * Math.PI * 2
+      }
+      g.userData.tick()
+      return g
     },
   },
   {
