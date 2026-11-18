@@ -10,6 +10,7 @@ import { flameFlicker, flameTime } from './flame'
 import { compileOffscreen, createRoomRenderer, gpuKit, maxAnisotropy } from './gpu'
 import { clearSceneryPreparer, setSceneryPreparer } from './natureModels'
 import type { Cinematic } from './cinematic'
+import type { LiveLook } from './liveLook'
 import { animateGuestGift, buildGuestGift, guestGiftSpot } from './guestGifts'
 import { drawProductCard, drawProductSlide, productSignature, type ShopProduct } from './productCard'
 import type { GuestGiftType } from '#shared/guestbook'
@@ -90,6 +91,8 @@ const QUALITY_LEVELS = [
   // Weakest phones, last resort: a coarser shadow map
   { pixelRatio: 1, shadowSize: 512, shadows: true },
 ]
+/** The everyday look (ambient occlusion, glow) runs at this quality level and better */
+const LIVE_LOOK_MAX_QUALITY = 2
 /** Where small previews start */
 const PREVIEW_QUALITY = 4
 /** Widest zoom (camera distance from the room) */
@@ -129,6 +132,8 @@ export class RoomScene {
   private cinematic: Cinematic | null = null
   /** Settles once the recorder's film look is set up (or failed to) */
   private filmReady: Promise<void> = Promise.resolve()
+  /** Everyday look (./liveLook): ambient occlusion, glow, grading; capable devices only */
+  private liveLook: LiveLook | null = null
   /** The lens for the current frame shape (narrow frames get a wider one) */
   private baseFov = 32
   /** Pace of recent video frames (renderTour), to drop the film look if it can't keep up */
@@ -367,6 +372,7 @@ export class RoomScene {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
     this.quality = options.capture ? 0 : options.preview ? PREVIEW_QUALITY : memory < 4 ? 2 : coarse ? 1 : 0
     this.startQuality = this.quality
+    this.loadLiveLook()
     if (options.capture) this.controls.enabled = false
     this.applyQuality()
 
@@ -827,6 +833,7 @@ export class RoomScene {
     this.envTarget?.dispose()
     this.pmrem.dispose()
     this.cinematic?.dispose()
+    this.liveLook?.dispose()
     this.renderer.dispose()
     el.remove()
   }
@@ -1509,6 +1516,27 @@ export class RoomScene {
     this.shadowSun.copy(this.sun.position)
   }
 
+  /**
+   * The everyday look, where it can run: WebGL (not WebGPU), not a preview or
+   * the recorder (it has its own), at a high enough quality level; ?look=0
+   * turns it off to compare
+   */
+  private loadLiveLook() {
+    if (this.options.capture || this.options.preview || gpuKit() || this.quality > LIVE_LOOK_MAX_QUALITY) return
+    if (new URLSearchParams(window.location.search).get('look') === '0') return
+    this.rendererReady
+      .then(() => import('./liveLook'))
+      .then(m => m.createLiveLook(this.renderer, this.scene, this.camera))
+      .then((look) => {
+        if (this.disposed) look.dispose()
+        else {
+          this.liveLook = look
+          this.markActive()
+        }
+      })
+      .catch(error => console.warn('[room] live look unavailable', error))
+  }
+
   private applyQuality() {
     const level = QUALITY_LEVELS[this.quality]!
     // A recording is always full resolution (1080x1920 from a 540x960 box)
@@ -1606,6 +1634,7 @@ export class RoomScene {
     this.keepSkyAroundCamera()
     this.updateShadows(now)
     if (this.cinematic) this.cinematic.render(dt)
+    else if (this.liveLook && this.quality <= LIVE_LOOK_MAX_QUALITY) this.liveLook.render(dt)
     else this.renderer.render(this.scene, this.camera)
     this.reportStats(now)
   }
