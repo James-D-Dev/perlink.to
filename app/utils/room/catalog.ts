@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { attachDungeonModel, loadDungeonModel } from './dungeonModels'
 import { attachNaturePieces, greenLeaves, type NaturePiece } from './natureModels'
 import { PREMIUM_ITEMS } from './premiumModels'
@@ -227,6 +228,52 @@ function sphere(r: number, material: THREE.Material, x = 0, y = 0, z = 0) {
   return mesh(new THREE.SphereGeometry(r, 20, 14), material, x, y, z)
 }
 
+/** Box with rounded edges, positioned by its bottom-center */
+function rbox(w: number, h: number, d: number, radius: number, material: THREE.Material, x = 0, y = 0, z = 0) {
+  return mesh(new RoundedBoxGeometry(w, h, d, 3, radius), material, x, y + h / 2, z)
+}
+
+/** Woven rug: fine weave, a darker band inset from the edge; greyscale, tinted by the material */
+let rugWeave: THREE.Texture | null = null
+function rugTexture() {
+  if (rugWeave) return rugWeave
+  const canvas = document.createElement('canvas')
+  canvas.width = 1024
+  canvas.height = 716
+  const g = canvas.getContext('2d')!
+  g.fillStyle = 'rgb(236,236,236)'
+  g.fillRect(0, 0, canvas.width, canvas.height)
+  let seed = 7
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+  // Soft clouding, as wool takes dye a little unevenly
+  for (let i = 0; i < 140; i++) {
+    const v = 226 + rand() * 24
+    g.fillStyle = `rgba(${v},${v},${v},0.18)`
+    g.beginPath()
+    g.ellipse(rand() * 1024, rand() * 716, 30 + rand() * 90, 20 + rand() * 50, rand() * 3, 0, Math.PI * 2)
+    g.fill()
+  }
+  // Weave: short warp and weft ticks
+  for (let i = 0; i < 26000; i++) {
+    const v = 200 + rand() * 55
+    g.fillStyle = `rgba(${v},${v},${v},0.55)`
+    if (rand() < 0.5) g.fillRect(rand() * 1024, rand() * 716, 3, 1)
+    else g.fillRect(rand() * 1024, rand() * 716, 1, 3)
+  }
+  // Border band and a thin line inside it
+  g.strokeStyle = 'rgba(150,150,150,0.55)'
+  g.lineWidth = 26
+  g.strokeRect(52, 52, 1024 - 104, 716 - 104)
+  g.strokeStyle = 'rgba(165,165,165,0.5)'
+  g.lineWidth = 5
+  g.strokeRect(88, 88, 1024 - 176, 716 - 176)
+  rugWeave = new THREE.CanvasTexture(canvas)
+  rugWeave.colorSpace = THREE.SRGBColorSpace
+  rugWeave.anisotropy = 4
+  rugWeave.userData = { shared: true }
+  return rugWeave
+}
+
 /** Furniture drawn from a model file (./furnitureModels), painted `color` where it can be */
 function furnitureModel(name: FurnitureModelName, color: string) {
   const g = new THREE.Group()
@@ -326,17 +373,41 @@ export const ROOM_CATALOG: CatalogItem[] = [
     defaultColor: '#f4f1ec',
     productCard: { width: 0.44, height: 0.605, center: [0, 1.135, 0.026] },
     build: (color) => {
-      const g = new THREE.Group()
-      g.add(box(0.5, 0.06, 0.42, mat('#2f2f36'), 0, 0))
-      g.add(box(0.46, 0.7, 0.38, mat(color), 0, 0.06))
-      g.add(box(0.5, 0.04, 0.42, mat('#2f2f36'), 0, 0.76))
-      // Card holder: a thin board with a frame
-      g.add(box(0.5, 0.66, 0.04, mat('#2f2f36'), 0, 0.8))
-      const card = box(0.44, 0.6, 0.012, mat(WHITE), 0, 0.832, 0.02)
+      // A gallery plinth: recessed dark kick, a body in the picked colour with
+      // softened edges, an oak top; on it a slim walnut frame round the card,
+      // held by a brass easel behind, with a brass ledge under the card
+      const ink = mat('#26262b', { roughness: 0.6 })
+      const oak = mat('#b8875a', { roughness: 0.55 })
+      const walnut = mat('#4a3324', { roughness: 0.45 })
+      const brass = mat('#c9a45c', { metalness: 0.85, roughness: 0.3 })
+      const parts: THREE.Object3D[] = [
+        rbox(0.42, 0.05, 0.34, 0.01, ink, 0, 0),
+        rbox(0.48, 0.66, 0.4, 0.025, mat(color, { roughness: 0.6 }), 0, 0.045),
+        rbox(0.5, 0.035, 0.42, 0.012, oak, 0, 0.7),
+        // a fine groove under the top
+        box(0.482, 0.006, 0.402, ink, 0, 0.69),
+      ]
+      // Frame rails round the 0.44 x 0.605 card (centre y 1.135)
+      const fw = 0.03
+      const cy = 1.135
+      const inner = [0.44, 0.605]
+      parts.push(
+        box(inner[0] + fw * 2, fw, 0.03, walnut, 0, cy + inner[1] / 2, 0.005),
+        box(inner[0] + fw * 2, fw, 0.03, walnut, 0, cy - inner[1] / 2 - fw, 0.005),
+        box(fw, inner[1], 0.03, walnut, -(inner[0] + fw) / 2, cy - inner[1] / 2, 0.005),
+        box(fw, inner[1], 0.03, walnut, (inner[0] + fw) / 2, cy - inner[1] / 2, 0.005),
+        box(inner[0], inner[1], 0.008, ink, 0, cy - inner[1] / 2, -0.006),
+      )
+      const card = box(0.44, 0.6, 0.006, mat(WHITE), 0, cy - 0.3, 0.017)
       card.userData.placeholder = true
-      g.add(card)
-      g.add(box(0.12, 0.02, 0.1, mat('#2f2f36'), 0, 0.78, 0.05))
-      return g
+      parts.push(card)
+      // Brass ledge the frame rests on, and an easel leg behind
+      parts.push(rbox(0.36, 0.012, 0.06, 0.004, brass, 0, 0.735, 0.03))
+      const leg = cyl(0.007, 0.007, 0.6, brass)
+      leg.position.set(0, 1.04, -0.09)
+      leg.rotation.x = 0.3
+      parts.push(leg, cyl(0.007, 0.007, 0.06, brass, -0.12, 0.735, -0.005), cyl(0.007, 0.007, 0.06, brass, 0.12, 0.735, -0.005))
+      return group(...parts)
     },
   },
   // Furniture
@@ -471,13 +542,35 @@ export const ROOM_CATALOG: CatalogItem[] = [
     wallMounted: true,
     light: { color: '#ffcf7a', intensity: 1.5, distance: 4, offset: [0, -0.15, 0.6] },
     build: (color) => {
-      const parts: THREE.Object3D[] = []
-      const count = 13
+      // A dark cord sagging between two brass hooks, with festoon bulbs
+      // hanging from small sockets: clear glass in the picked colour
+      const cord = mat('#1f2421', { roughness: 0.7 })
+      const brass = mat('#b8954f', { metalness: 0.8, roughness: 0.35 })
+      const glass = glow(color, 0.15)
+      const sag = (t: number) => -0.2 * Math.sin(t * Math.PI)
+      const points: THREE.Vector3[] = []
+      for (let i = 0; i <= 40; i++) {
+        const t = i / 40
+        points.push(new THREE.Vector3(-1 + t * 2, sag(t) + 0.02, 0.05))
+      }
+      const parts: THREE.Object3D[] = [mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 80, 0.0045, 6), cord)]
+      for (const x of [-1, 1]) {
+        const hook = mesh(new THREE.TorusGeometry(0.014, 0.003, 6, 14, Math.PI * 1.4), brass, x, 0.03, 0.04)
+        hook.rotation.y = Math.PI / 2
+        parts.push(cyl(0.012, 0.012, 0.005, brass, x, 0.02, 0.003).rotateX(Math.PI / 2), hook)
+      }
+      const bulb = new THREE.SphereGeometry(0.026, 16, 12)
+      bulb.scale(1, 1.25, 1)
+      const count = 11
       for (let i = 0; i < count; i++) {
-        const t = i / (count - 1)
+        const t = (i + 0.5) / count
         const x = -1 + t * 2
-        const y = -0.18 * Math.sin(t * Math.PI)
-        parts.push(sphere(0.03, glow(color, 0.15), x, y, 0.04))
+        const y = sag(t) + 0.02
+        parts.push(cyl(0.011, 0.009, 0.03, cord, x, y - 0.03, 0.05))
+        parts.push(cyl(0.012, 0.012, 0.006, brass, x, y - 0.036, 0.05))
+        const b = mesh(bulb, glass, x, y - 0.066, 0.05)
+        b.castShadow = false
+        parts.push(b)
       }
       return group(...parts)
     },
@@ -499,6 +592,31 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'decor',
     defaultColor: '#d9b382',
     build: color => furnitureModel('rug', color),
+  },
+  {
+    type: 'rug-plain',
+    name: 'Plain rug',
+    icon: 'i-lucide-rectangle-horizontal',
+    category: 'decor',
+    defaultColor: '#dcc29b',
+    build: (color) => {
+      // Flat-woven wool, 2 x 1.4 m, with a bound edge and a fringe on the short ends
+      const wool = new THREE.MeshStandardMaterial({ color, map: rugTexture(), bumpMap: rugTexture(), bumpScale: 0.6, roughness: 0.95 })
+      const top = rbox(2, 0.014, 1.4, 0.006, wool, 0, 0)
+      top.castShadow = false
+      const fringe = mat(new THREE.Color(color).lerp(new THREE.Color('#f3eee4'), 0.55).getStyle(), { roughness: 1 })
+      const parts: THREE.Object3D[] = [top]
+      const strand = new THREE.BoxGeometry(0.055, 0.004, 0.006)
+      for (const side of [-1, 1]) {
+        for (let z = -0.66; z <= 0.661; z += 0.03) {
+          const s = mesh(strand, fringe, side * (1.025 + Math.abs(Math.sin(z * 91)) * 0.008), 0.002, z)
+          s.castShadow = false
+          s.rotation.y = Math.sin(z * 53) * 0.12
+          parts.push(s)
+        }
+      }
+      return group(...parts)
+    },
   },
   {
     type: 'mug',
