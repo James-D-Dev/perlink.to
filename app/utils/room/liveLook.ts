@@ -37,15 +37,16 @@ export async function createLiveLook(renderer: THREE.WebGLRenderer, scene: THREE
     // In world units. Distance: how far from the camera occlusion still
     // shows (the camera sits ~8-30 m away). Proximity: how big a gap in depth
     // still counts as touching (a chair leg on the floor, not the floor seen
-    // past the room's edge)
+    // past the room's edge). Kept small: a wall lamp 20 cm off the wall must
+    // not count, or it cuts a dark hard-edged disc into the wall around it
     worldDistanceThreshold: 60,
     worldDistanceFalloff: 10,
-    worldProximityThreshold: 0.6,
-    worldProximityFalloff: 0.3,
-    radius: 0.12,
+    worldProximityThreshold: 0.12,
+    worldProximityFalloff: 0.08,
+    radius: 0.08,
     intensity: 2,
-    // Keep it on white walls too, a little lighter than on dark floors
-    luminanceInfluence: 0.2,
+    // Keep it on white walls too, but lighter where a lamp lights them
+    luminanceInfluence: 0.5,
     bias: 0.025,
     fade: 0.02,
     resolutionScale: 0.5,
@@ -56,7 +57,7 @@ export async function createLiveLook(renderer: THREE.WebGLRenderer, scene: THREE
     camera,
     ao,
     // Only what is brighter than daylit walls glows: lamps, neon, flames
-    new pp.BloomEffect({ mipmapBlur: true, luminanceThreshold: 1.5, luminanceSmoothing: 0.25, intensity: 0.65, radius: 0.6 }),
+    new pp.BloomEffect({ mipmapBlur: true, luminanceThreshold: 1.6, luminanceSmoothing: 0.3, intensity: 0.45, radius: 0.4 }),
     new pp.ToneMappingEffect({ mode: pp.ToneMappingMode.NEUTRAL }),
     new pp.BrightnessContrastEffect({ contrast: 0.06 }),
     new pp.HueSaturationEffect({ saturation: 0.06 }),

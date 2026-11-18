@@ -319,7 +319,8 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'lighting',
     defaultColor: '#f2e2c4',
     wallMounted: true,
-    light: { color: WARM_LIGHT, intensity: 3.5, distance: 4.5, offset: [0, 0, 0.25] },
+    // Light well off the wall: closer, it burns a hot round spot onto the wall
+    light: { color: WARM_LIGHT, intensity: 2, distance: 4.5, offset: [0, -0.05, 0.55] },
     build: (color) => group(
       box(0.1, 0.18, 0.03, mat(DARK), 0, -0.09, 0.015),
       cyl(0.008, 0.008, 0.16, mat(DARK), 0, -0.02, 0.1),
@@ -333,7 +334,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'lighting',
     defaultColor: '#ffd27f',
     wallMounted: true,
-    light: { color: '#ffcf7a', intensity: 2.5, distance: 4, offset: [0, -0.1, 0.3] },
+    light: { color: '#ffcf7a', intensity: 1.5, distance: 4, offset: [0, -0.15, 0.6] },
     build: (color) => {
       const parts: THREE.Object3D[] = []
       const count = 13
@@ -540,7 +541,7 @@ export const ROOM_CATALOG: CatalogItem[] = [
     category: 'wall',
     defaultColor: '#ff4fd8',
     wallMounted: true,
-    light: { color: '#ff7be5', intensity: 1.5, distance: 3, offset: [0, 0, 0.3] },
+    light: { color: '#ff7be5', intensity: 1.5, distance: 3, offset: [0, 0, 0.5] },
     build: (color) => {
       const ring = mesh(new THREE.TorusGeometry(0.3, 0.025, 10, 40), glow(color, 0.8), 0, 0, 0.05)
       const bolt = box(0.05, 0.36, 0.03, glow(color, 0.8), 0, -0.18, 0.05)
