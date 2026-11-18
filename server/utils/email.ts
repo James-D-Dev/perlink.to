@@ -15,8 +15,8 @@ export interface EmailMessage {
   replyTo?: string
   /** Sender, e.g. "Perlink Support <support@perlink.to>" (default NUXT_EMAIL_FROM) */
   from?: string
-  /** For Superadmin → Emails → Sent: 'admin' (written there) or 'system' (default) */
-  kind?: 'admin' | 'system'
+  /** For Superadmin → Emails → Sent: 'admin' (written there), 'system' (default), or 'nudge:<id>' (a one-time reminder, see utils/nudges) */
+  kind?: 'admin' | 'system' | `nudge:${string}`
   /** The Sent row's id, when the caller wants to know it */
   id?: string
   /** Threading, when answering a received mail (its Message-ID / References) */

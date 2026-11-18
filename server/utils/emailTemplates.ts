@@ -67,6 +67,31 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
     },
   },
   {
+    id: 'nudge_no_site',
+    name: 'No site yet',
+    description: 'Sent once, 1 to 7 days after signing up, to people who haven’t made a site.',
+    audience: 'user',
+    variables: { name: 'Linh' },
+    sampleUrl: 'https://perlink.to/dashboard/new',
+    hero: { src: 'https://perlink.to/images/email/welcome-hero.jpg', alt: 'A Perlink 3D room under a cherry tree', width: 1120, height: 588 },
+    defaults: {
+      en: {
+        subject: 'Your Perlink site is 2 minutes away',
+        heading: 'Ready when you are, {{name}}',
+        body: 'You signed up for Perlink but haven’t made your site yet. It’s quicker than it looks: pick a theme, add your links, and it’s live.\n\nA few ideas to start from:\n\n- **Link in bio** for Instagram or TikTok\n- **Personal page** with your photos and contact buttons\n- **3D room** that visitors can walk around\n- **Birthday, wedding or Valentine** page for someone special\n\n{{button}}\n\nSee you inside,\n**The Perlink team**',
+        button: 'Make my site',
+        note: 'This is the only reminder we’ll send. Stuck on something? Reply and tell us.',
+      },
+      vi: {
+        subject: 'Trang Perlink của bạn chỉ cách 2 phút',
+        heading: 'Sẵn sàng khi bạn sẵn sàng, {{name}}',
+        body: 'Bạn đã đăng ký Perlink nhưng chưa tạo trang. Nhanh hơn bạn nghĩ: chọn một theme, thêm link, vậy là trang đã lên sóng.\n\nVài ý tưởng để bắt đầu:\n\n- **Link in bio** cho Instagram hoặc TikTok\n- **Trang cá nhân** với ảnh và nút liên hệ\n- **Phòng 3D** để khách dạo quanh\n- **Trang sinh nhật, cưới hoặc Valentine** tặng người đặc biệt\n\n{{button}}\n\nHẹn gặp bạn bên trong,\n**Đội ngũ Perlink**',
+        button: 'Tạo trang của tôi',
+        note: 'Đây là lời nhắc duy nhất chúng tôi gửi. Đang vướng chỗ nào? Trả lời email này để kể cho chúng tôi.',
+      },
+    },
+  },
+  {
     id: 'form_request',
     name: 'New request',
     description: 'To a site owner when a visitor sends their contact or booking form.',
