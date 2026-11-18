@@ -36,10 +36,13 @@ export interface PaymentRow {
   submitted_at: string | null
   reviewed_at: string | null
   paid_at: string | null
+  user_name?: string | null
+  user_avatar?: string | null
 }
 
 export const PAYMENT_SELECT = `SELECT p.id, p.user_id, pr.email, p.plan, p.period, p.amount, p.amount_usd, p.code, p.status, p.method,
-  p.network, p.token, p.tx_hash, p.check_result, p.created_at, p.submitted_at, p.reviewed_at, p.paid_at
+  p.network, p.token, p.tx_hash, p.check_result, p.created_at, p.submitted_at, p.reviewed_at, p.paid_at,
+  pr.name AS user_name, pr.avatar AS user_avatar
   FROM payments p LEFT JOIN profiles pr ON pr.id = p.user_id`
 
 export async function loadPayment(event: H3Event, id: string) {

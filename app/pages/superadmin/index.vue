@@ -355,7 +355,7 @@ const charts = computed(() => [
 const todo = computed(() => {
   const a = attention.value;
   return [
-    { count: a.payments, label: a.payments === 1 ? 'payment to review' : 'payments to review', icon: 'i-lucide-wallet', to: '/superadmin/payments', tone: 'primary' },
+    { count: a.payments, label: a.payments === 1 ? 'payment to review' : 'payments to review', icon: 'i-lucide-wallet', to: '/superadmin/payments?status=submitted', tone: 'primary' },
     { count: a.reports, label: a.reports === 1 ? 'open report' : 'open reports', icon: 'i-lucide-flag', to: '/superadmin/reports', tone: 'error' },
     { count: a.mail, label: 'unread mail', icon: 'i-lucide-mail', to: '/superadmin/emails', tone: 'primary' },
     { count: a.mailFailed, label: a.mailFailed === 1 ? 'email failed (7d)' : 'emails failed (7d)', icon: 'i-lucide-mail-x', to: '/superadmin/emails?box=out', tone: 'error' },

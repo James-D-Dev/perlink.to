@@ -34,7 +34,7 @@
           :class="collapsed ? 'mx-auto' : 'w-full'"
         />
 
-        <div v-for="group in navigationGroups" :key="group.label" class="mt-4 first-of-type:mt-3">
+        <div v-for="group in navigationGroups" :key="group.label" class="mt-3 first-of-type:mt-2">
           <p v-if="!collapsed" class="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">{{ group.label }}</p>
           <UNavigationMenu
             :collapsed="collapsed"
@@ -47,7 +47,7 @@
 
         <!-- Theme, the user dashboard and the site: one row of icons, so they
              always fit under the menu -->
-        <div class="mt-auto flex gap-1 pt-4" :class="collapsed ? 'flex-col items-center' : 'items-center'">
+        <div class="mt-auto flex gap-1 pt-2" :class="collapsed ? 'flex-col items-center' : 'items-center'">
           <UTooltip v-for="item in [themeLink, ...supportLinks]" :key="item.label" :text="item.label">
             <UButton
               :to="item.to"
