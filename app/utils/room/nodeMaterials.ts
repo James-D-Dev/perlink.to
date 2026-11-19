@@ -83,6 +83,8 @@ export function createFlameMaterial(time: Getter) {
 
 // ---------- Sky dome (RoomScene.createSkyDome) ----------
 
+const NIGHT_HORIZON = new THREE.Color('#1c2350')
+
 export function createSkyDome() {
   const zenith = uniform(new THREE.Color())
   const horizon = uniform(new THREE.Color())
@@ -101,7 +103,9 @@ export function createSkyDome() {
     mesh: mesh as unknown as import('three').Mesh,
     setColor(base: import('three').Color) {
       zenith.value.copy(base).offsetHSL(0, 0.08, -0.14)
-      horizon.value.copy(base).lerp(white, 0.35)
+      // Deep blue at night, not grey (as RoomScene's sky dome)
+      const bright = THREE.MathUtils.smoothstep(base.r * 0.2126 + base.g * 0.7152 + base.b * 0.0722, 0.01, 0.2)
+      horizon.value.copy(base).lerp(white, 0.35 * bright).lerp(NIGHT_HORIZON, 0.55 * (1 - bright))
       below.value.copy(base).offsetHSL(0, 0.12, -0.04)
     },
   }

@@ -1867,11 +1867,15 @@ function createSkyDome() {
   const mesh = new THREE.Mesh(new THREE.SphereGeometry(95, 32, 16), material)
   mesh.renderOrder = -1
   const white = new THREE.Color('#ffffff')
+  // A night horizon glows deep blue, not grey: white haze mixed into a near
+  // black sky turned the whole night background flat grey
+  const nightHorizon = new THREE.Color('#1c2350')
   return {
     mesh,
     setColor(base: THREE.Color) {
       uniforms.zenith.value.copy(base).offsetHSL(0, 0.08, -0.14)
-      uniforms.horizon.value.copy(base).lerp(white, 0.35)
+      const bright = THREE.MathUtils.smoothstep(base.r * 0.2126 + base.g * 0.7152 + base.b * 0.0722, 0.01, 0.2)
+      uniforms.horizon.value.copy(base).lerp(white, 0.35 * bright).lerp(nightHorizon, 0.55 * (1 - bright))
       uniforms.below.value.copy(base).offsetHSL(0, 0.12, -0.04)
     },
   }

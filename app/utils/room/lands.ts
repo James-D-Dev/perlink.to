@@ -206,15 +206,180 @@ function jitter(geometry: THREE.BufferGeometry, rand: () => number, amount: numb
   return geometry
 }
 
-/** Grass/snow top, soil band and a rocky point underneath, so every land floats */
-function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, _soil?: string, _rock?: string, _seed?: number) {
-  // Just the top layer: the land floats without a soil band or rock underneath
+interface GroundLook {
+  /** Earth just under the grass, and the rock below it */
+  soil: string
+  rock: string
+  seed: number
+  /** Sea of clouds under the land (off where the land has its own) */
+  clouds?: boolean
+  /** Cloud colour by day and by night */
+  cloudDay?: string
+  cloudNight?: string
+}
+
+const DEFAULT_GROUND: GroundLook = { soil: '#5b3d25', rock: '#7a6d60', seed: 1 }
+
+/**
+ * The land's top (grass, snow...) and what makes it float: a band of earth with
+ * hanging roots, then a jagged, layered rock tapering to a point, a few rocks
+ * drifting round it and a sea of clouds far below. The underside is one
+ * vertex-coloured mesh and the clouds a handful of merged puffs, so it costs a
+ * few draw calls. update() fades the clouds to night.
+ */
+function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, look: GroundLook = DEFAULT_GROUND) {
   const group = new THREE.Group()
   const topMesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.98, 0.4, 56), top)
   topMesh.position.y = ctx.groundY - 0.2
   topMesh.receiveShadow = true
   group.add(topMesh)
-  return { group, top: topMesh }
+
+  const rand = seeded(look.seed * 97 + 13)
+  const soil = new THREE.Color(look.soil)
+  const rock = new THREE.Color(look.rock)
+  const dark = rock.clone().multiplyScalar(0.62)
+  const light = rock.clone().lerp(new THREE.Color('#ffffff'), 0.14)
+
+  // Underside: rings from the lip down to the tip, pushed in and out by noise
+  const segments = 72
+  const rings = 16
+  const depth = radius * 1.25
+  const lipY = ctx.groundY - 0.4
+  const positions: number[] = []
+  const colors: number[] = []
+  const vertex = (ring: number, seg: number) => {
+    const t = ring / rings
+    const angle = (seg % segments) / segments * Math.PI * 2
+    const ca = Math.cos(angle)
+    const sa = Math.sin(angle)
+    // Earth band hugs the lip, then the rock bulges and tapers to a point
+    const profile = t < 0.08 ? 0.985 - t * 0.6 : Math.max(0, (1 - Math.pow((t - 0.08) / 0.92, 1.35)) * 0.95)
+    const n = fbm(ca * 2.2 + 5, sa * 2.2 + t * 3.1, look.seed)
+    const crag = 0.82 + n * 0.36 + (t > 0.1 ? (hash2(seg, ring, look.seed) - 0.5) * 0.08 : 0)
+    const r = radius * profile * (t < 0.04 ? 1 : crag)
+    // Ledges: the rock steps rather than sloping evenly
+    const y = lipY - depth * Math.pow(t, 0.9) + (t > 0.06 && t < 1 ? (noise2(angle * 3, t * 9, look.seed + 4) - 0.5) * 0.5 : 0)
+    return [ca * r, y, sa * r, t, n] as const
+  }
+  const colorAt = (t: number, n: number, y: number) => {
+    if (t < 0.09) return soil.clone().multiplyScalar(0.75 + n * 0.3)
+    // Strata: lighter and darker bands across the rock
+    const band = noise2(y * 1.6, n * 4, look.seed + 9)
+    const c = rock.clone().lerp(band > 0.55 ? light : dark, Math.abs(band - 0.5) * 1.4)
+    // Earth bleeds into the top of the rock; the tip darkens into shadow
+    if (t < 0.2) c.lerp(soil, (0.2 - t) * 5 * 0.6)
+    return c.multiplyScalar(1 - Math.max(0, t - 0.6) * 0.5)
+  }
+  for (let ring = 0; ring < rings; ring++) {
+    for (let seg = 0; seg < segments; seg++) {
+      const q = [vertex(ring, seg), vertex(ring, seg + 1), vertex(ring + 1, seg + 1), vertex(ring + 1, seg)]
+      // One colour per face, so the rock reads as cut facets
+      const mid = q.reduce((sum, v) => sum + v[1], 0) / 4
+      const c = colorAt(q[0][3], q[0][4], mid)
+      for (const i of [0, 2, 1, 0, 3, 2]) {
+        positions.push(q[i]![0], q[i]![1], q[i]![2])
+        colors.push(c.r, c.g, c.b)
+      }
+    }
+  }
+  const underGeometry = new THREE.BufferGeometry()
+  underGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  underGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
+  underGeometry.computeVertexNormals()
+  const underside = new THREE.Mesh(underGeometry, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }))
+  group.add(underside)
+
+  // Roots hanging out of the earth band, swaying a little in the wind
+  const rootParts: THREE.BufferGeometry[] = []
+  for (let i = 0; i < 16; i++) {
+    const a = rand() * Math.PI * 2
+    const r = radius * (0.9 + rand() * 0.05)
+    const length = 0.6 + rand() * 1.6
+    const start = new THREE.Vector3(Math.cos(a) * r, lipY - 0.05 - rand() * 0.25, Math.sin(a) * r)
+    const out = new THREE.Vector3(Math.cos(a), 0, Math.sin(a))
+    const points = [0, 0.33, 0.66, 1].map((k) => start.clone().addScaledVector(out, Math.sin(k * 2.2) * 0.25).add(new THREE.Vector3((rand() - 0.5) * 0.15, -length * k, (rand() - 0.5) * 0.15)))
+    const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 8, 0.025 + rand() * 0.02, 4)
+    // Thinner towards the tip
+    const p = tube.attributes.position!
+    for (let v = 0; v < p.count; v++) {
+      const k = Math.min(1, Math.max(0, (start.y - p.getY(v)) / length))
+      const centre = start.clone().addScaledVector(out, Math.sin(k * 2.2) * 0.25)
+      p.setX(v, centre.x + (p.getX(v) - centre.x) * (1 - k * 0.75))
+      p.setZ(v, centre.z + (p.getZ(v) - centre.z) * (1 - k * 0.75))
+    }
+    rootParts.push(tube)
+  }
+  const roots = new THREE.Mesh(mergeGeometries(rootParts), std(soil.clone().multiplyScalar(0.7).getStyle(), { flatShading: true }))
+  rootParts.forEach(r => r.dispose())
+  group.add(roots)
+
+  // Rocks drifting round the land, each with a tuft of earth on top
+  const rockMaterial = std(look.rock, { flatShading: true })
+  const drifting = Array.from({ length: 5 }, (_, i) => {
+    const size = 0.35 + rand() * 0.55
+    const geometry = jitter(new THREE.DodecahedronGeometry(size, 0), rand, size * 0.3)
+    geometry.scale(1, 0.7, 1)
+    const piece = new THREE.Mesh(geometry, rockMaterial)
+    const a = (i / 5) * Math.PI * 2 + rand() * 0.8
+    const d = radius + 1.5 + rand() * 3
+    piece.position.set(Math.cos(a) * d, ctx.groundY - 1.5 - rand() * 4, Math.sin(a) * d)
+    group.add(piece)
+    return { piece, baseY: piece.position.y, phase: rand() * 10 }
+  })
+
+  // Sea of clouds far below, with a soft haze joining it to the sky
+  const cloudDay = new THREE.Color(look.cloudDay ?? '#ffffff')
+  const cloudNight = new THREE.Color(look.cloudNight ?? '#3e4766')
+  let cloudMaterial: THREE.MeshStandardMaterial | null = null
+  let haze: THREE.MeshBasicMaterial | null = null
+  if (look.clouds !== false) {
+    cloudMaterial = new THREE.MeshStandardMaterial({ color: cloudDay, roughness: 1, emissive: '#ffffff', emissiveIntensity: 0.18 })
+    const sea = new THREE.Group()
+    const count = Math.round(30 * Math.max(0.6, ctx.detail ?? 1))
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2 + rand() * 0.4
+      const r = radius * (0.9 + rand() * 2.2)
+      const puff = cloudPuff(rand, cloudMaterial)
+      // Further out sits lower, so the sea falls away from the land
+      puff.position.set(Math.cos(a) * r, ctx.groundY - depth * (0.9 + rand() * 0.25) - (r - radius) * 0.25, Math.sin(a) * r)
+      puff.scale.multiplyScalar(1.6 + rand() * 1.8)
+      puff.rotation.y = rand() * Math.PI
+      sea.add(puff)
+    }
+    // All puffs as one mesh: one draw call for the whole sea
+    sea.updateMatrixWorld(true)
+    const parts: THREE.BufferGeometry[] = []
+    sea.traverse((o) => {
+      const m = o as THREE.Mesh
+      if (m.isMesh) parts.push(m.geometry.clone().applyMatrix4(m.matrixWorld))
+    })
+    const merged = mergeGeometries(parts)
+    parts.forEach(p => p.dispose())
+    sea.traverse(o => (o as THREE.Mesh).geometry?.dispose())
+    group.add(new THREE.Mesh(merged, cloudMaterial))
+    haze = new THREE.MeshBasicMaterial({ map: softDotTexture(), color: cloudDay, transparent: true, opacity: 0.85, depthWrite: false, fog: false })
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(radius * 9, radius * 9), haze)
+    sheet.rotation.x = -Math.PI / 2
+    sheet.position.y = ctx.groundY - depth * 1.1
+    sheet.renderOrder = -1
+    group.add(sheet)
+  }
+
+  const update = (time: number, daylight: number) => {
+    for (const d of drifting) {
+      d.piece.position.y = d.baseY + Math.sin(time * 0.5 + d.phase) * 0.3
+      d.piece.rotation.y = time * 0.08 + d.phase
+    }
+    if (cloudMaterial) {
+      cloudMaterial.color.copy(cloudNight).lerp(cloudDay, daylight)
+      cloudMaterial.emissiveIntensity = 0.04 + daylight * 0.16
+    }
+    if (haze) {
+      haze.color.copy(cloudNight).lerp(cloudDay, daylight)
+      haze.opacity = 0.35 + daylight * 0.5
+    }
+  }
+  return { group, top: topMesh, update }
 }
 
 /** Layered pine with optional snow caps */
@@ -1372,7 +1537,7 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(11)
   const { width, depth } = ctx.style
   // Ground the dark green of the grass roots, so the lawn reads as one field
-  const { group } = floatingGround(ctx, radius, std('#2f5d1e'))
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#2f5d1e'), { soil: '#5b3d25', rock: '#7d7064', seed: 11, clouds: false })
   const terrain = createTerrain(ctx, radius, 4, { grass: ['#2c581b', '#31601e', '#376822', '#2f5c1d'], dry: '#466d24', path: '#9a8a5c' })
   group.add(terrain.mesh)
 
@@ -1463,6 +1628,7 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
     atmosphere: { turbidity: 2.5, rayleigh: 2.2, mie: 0.003 },
     focus: { position: hero.origin.clone(), height: heroHeight },
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
@@ -1692,7 +1858,7 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(37)
   const { width, depth } = ctx.style
   // Ground the dark green of the grass roots, so the lawn reads as one field
-  const { group } = floatingGround(ctx, radius, std('#33601f'))
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#33601f'), { soil: '#5b3d25', rock: '#857a70', seed: 17, cloudDay: '#fff6fa' })
   const terrain = createTerrain(ctx, radius, 21, { grass: ['#305c1d', '#356421', '#3b6b25', '#33601f'], dry: '#4c7228', path: '#a8946a' })
   group.add(terrain.mesh)
 
@@ -1770,6 +1936,7 @@ function buildSakura(ctx: LandContext, radius: number): LandInstance {
     light: { sun: 0.9, sky: 0.45 },
     focus: { position: hero.origin.clone(), height: heroHeight },
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
@@ -2354,7 +2521,7 @@ function buildCrimson(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(53)
   const detail = ctx.detail ?? 1
   const { width, depth } = ctx.style
-  const { group } = floatingGround(ctx, radius, std('#3a0812'))
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#3a0812'), { soil: '#3b1c1a', rock: '#6a5458', seed: 53, cloudDay: '#fff2f5', cloudNight: '#3d3558' })
   // Ground the same red as the grass roots, the path barely showing through it
   const terrain = createTerrain(ctx, radius, 29, { grass: ['#3a0812', '#4a0b18', '#560e1e', '#420915'], dry: '#30060f', path: '#5a1424' })
   group.add(terrain.mesh)
@@ -2400,6 +2567,7 @@ function buildCrimson(ctx: LandContext, radius: number): LandInstance {
     focus: { position: origin.clone(), height: heroHeight },
     heightAt: terrain.heightAt,
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
@@ -2467,7 +2635,7 @@ function buildCity(ctx: LandContext, radius: number): LandInstance {
   // Lawns between the streets; roads and sidewalks are laid on top
   const lawnColor = new THREE.Color('#7ba65a')
   const lawn = std('#7ba65a', { roughness: 1 })
-  const { group } = floatingGround(ctx, radius, lawn)
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, lawn, { soil: '#4a4440', rock: '#6f6b67', seed: 23 })
   // Ground the buildings, houses, park and trees must not overlap
   const blocked: { x0: number; z0: number; x1: number; z1: number }[] = []
   const block = (x: number, z: number, w: number, d: number, pad = 0) =>
@@ -2884,6 +3052,7 @@ function buildCity(ctx: LandContext, radius: number): LandInstance {
     sky: { night: new THREE.Color('#0b1026'), dusk: new THREE.Color('#f09a6b'), day: new THREE.Color('#9fcdf0') },
     atmosphere: { turbidity: 4, rayleigh: 1.6, mie: 0.005 },
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       lawn.color.copy(nightTint).lerp(white, daylight).multiply(lawnColor)
       if (pondWater) {
@@ -3071,7 +3240,7 @@ function buildWinter(ctx: LandContext, radius: number): LandInstance {
   const detail = ctx.detail ?? 1
   const { width, depth } = ctx.style
   const snowTop = std('#dbe5f1', { roughness: 1 })
-  const { group } = floatingGround(ctx, radius, snowTop)
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, snowTop, { soil: '#5e6270', rock: '#93a2b4', seed: 31, cloudNight: '#36405e' })
   // Snow in soft drifts, blue in their hollows, a trodden path through it
   const terrain = createTerrain(ctx, radius, 33, { grass: ['#e9f0f9', '#f5f8fc', '#dde7f3', '#eef3fa'], dry: '#c6d4e6', path: '#b5c3d4' })
   group.add(terrain.mesh)
@@ -3180,6 +3349,7 @@ function buildWinter(ctx: LandContext, radius: number): LandInstance {
     heightAt: terrain.heightAt,
     ground: terrain.mesh,
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       snowTop.color.copy(snowNight).lerp(snowDay, daylight)
@@ -3305,7 +3475,7 @@ function buildAutumn(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(67)
   const detail = ctx.detail ?? 1
   const { width, depth } = ctx.style
-  const { group } = floatingGround(ctx, radius, std('#4a3d16'))
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#4a3d16'), { soil: '#5a3a1e', rock: '#806a54', seed: 37, cloudDay: '#fff4e6' })
   // Ground the colour of the grass roots, so the lawn reads as one field
   const terrain = createTerrain(ctx, radius, 41, { grass: ['#463a14', '#4f4318', '#584a1b', '#4a3e16'], dry: '#5c4418', path: '#9a7a4e' })
   group.add(terrain.mesh)
@@ -3373,6 +3543,7 @@ function buildAutumn(ctx: LandContext, radius: number): LandInstance {
     heightAt: terrain.heightAt,
     ground: terrain.mesh,
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
@@ -3891,7 +4062,7 @@ function buildFairy(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(79)
   const detail = ctx.detail ?? 1
   const { width, depth } = ctx.style
-  const { group } = floatingGround(ctx, radius, std('#163a30'))
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#163a30'), { soil: '#2b2a22', rock: '#4f5866', seed: 41, cloudDay: '#e6e2ff', cloudNight: '#2c2a4e' })
   const terrain = createTerrain(ctx, radius, 53, { grass: ['#15362c', '#183c31', '#1c4436', '#16382e'], dry: '#22402a', path: '#7a6a8a' })
   group.add(terrain.mesh)
 
@@ -3957,6 +4128,7 @@ function buildFairy(ctx: LandContext, radius: number): LandInstance {
     heightAt: terrain.heightAt,
     ground: terrain.mesh,
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       mist.color.copy(mistNight).lerp(white, daylight)
@@ -4146,7 +4318,7 @@ function buildVolcano(ctx: LandContext, radius: number): LandInstance {
   const detail = ctx.detail ?? 1
   const { width, depth } = ctx.style
   // The land's top the same as the ground (it shows through where the ground dips)
-  const { group } = floatingGround(ctx, radius, std('#352b26', { roughness: 1 }))
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#352b26', { roughness: 1 }), { soil: '#2a2220', rock: '#403634', seed: 43, cloudDay: '#cdbdb2', cloudNight: '#3a2a2a' })
   const terrain = createTerrain(ctx, radius, 59, { grass: ['#2e2622', '#342a25', '#3a2f29', '#302723'], dry: '#3e2c22', path: '#4e4036' })
   group.add(terrain.mesh)
 
@@ -4257,6 +4429,7 @@ function buildVolcano(ctx: LandContext, radius: number): LandInstance {
     heightAt: terrain.heightAt,
     ground: terrain.mesh,
     update(time, dt, daylight) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       lava.uniforms.time.value = time
@@ -4495,7 +4668,7 @@ function buildZen(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(97)
   const detail = ctx.detail ?? 1
   const { width, depth } = ctx.style
-  const { group } = floatingGround(ctx, radius, std('#2a4a1e'))
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#2a4a1e'), { soil: '#4a3a28', rock: '#7c766c', seed: 47 })
   const terrain = createTerrain(ctx, radius, 61, { grass: ['#2a481e', '#2f5022', '#355824', '#2c4c20'], dry: '#3a5a26', path: '#7f7a6e' })
   group.add(terrain.mesh)
 
@@ -4613,6 +4786,7 @@ function buildZen(ctx: LandContext, radius: number): LandInstance {
     heightAt: terrain.heightAt,
     ground: terrain.mesh,
     update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
       natureWind.value = time
       terrain.material.color.copy(nightTint).lerp(white, daylight)
       cloudMaterial.color.copy(cloudNight).lerp(white, daylight)
