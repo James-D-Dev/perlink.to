@@ -435,7 +435,7 @@ let butterflyAsset: Promise<{ scene: THREE.Object3D; clips: THREE.AnimationClip[
 function loadButterfly() {
   butterflyAsset ??= Promise.all([
     new GLTFLoader().loadAsync(`${BUTTERFLY_DIR}butterfly.glb`),
-    new THREE.ImageLoader().loadAsync(`${BUTTERFLY_DIR}butterfly-skin.png`),
+    new THREE.ImageLoader().loadAsync(`${BUTTERFLY_DIR}butterfly-skin.webp`),
   ]).then(([gltf, skin]) => ({ scene: gltf.scene, clips: gltf.animations, skin }))
   return butterflyAsset
 }

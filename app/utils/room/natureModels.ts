@@ -208,7 +208,7 @@ export function cherryLeaves(material: THREE.Material): THREE.Material {
   let pink = cherryMaterials.get(material)
   if (!pink) {
     const m = (material as THREE.MeshStandardMaterial).clone()
-    m.map = natureTexture('Leaves_Cherry.png')
+    m.map = natureTexture('Leaves_Cherry.webp')
     m.emissive = new THREE.Color('#ffc2dc')
     m.emissiveMap = m.map
     m.emissiveIntensity = 0.07
@@ -228,7 +228,7 @@ export function greenLeaves(material: THREE.Material): THREE.Material {
   let green = greenMaterials.get(material)
   if (!green) {
     const m = (material as THREE.MeshStandardMaterial).clone()
-    m.map = natureTexture('Leaves_NormalTree_C.png')
+    m.map = natureTexture('Leaves_NormalTree_C.webp')
     m.userData.shared = true
     m.userData.wind = false
     addWindSway(m)

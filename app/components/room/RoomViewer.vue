@@ -429,10 +429,24 @@ onMounted(() => {
   // Straight away when the owner chose autoplay, or when the visitor has
   // already tapped on the site (e.g. the "3D room" button), where the
   // browser allows it; otherwise with the first interaction in the room
-  if (props.room.music?.autoplay || navigator.userActivation?.hasBeenActive) toggleMusic()
+  // The track (1-3 MB) waits until the room has loaded, so on a phone's first
+  // visit it doesn't share the connection with the room's models
+  if (props.room.music?.autoplay || navigator.userActivation?.hasBeenActive) afterRoomLoads(toggleMusic)
 })
 
+function afterRoomLoads(then: () => void) {
+  const until = performance.now() + 8000
+  const check = () => {
+    if (unmountedViewer || musicOn.value || starting || mutedByVisitor) return
+    if (canvasRef.value?.isLoading() !== false && performance.now() < until) return void setTimeout(check, 200)
+    then()
+  }
+  check()
+}
+let unmountedViewer = false
+
 onBeforeUnmount(() => {
+  unmountedViewer = true
   removeUnlock()
   audio?.pause()
 })
@@ -547,7 +561,7 @@ const GIFT_LABEL: Record<GuestGiftType, SiteMessageKey> = {
   star: 'giftStar',
 }
 
-const canvasRef = ref<{ focusGuest: (id: string) => void } | null>(null)
+const canvasRef = ref<{ focusGuest: (id: string) => void; isLoading: () => boolean } | null>(null)
 const guestbookOn = computed(() => !!props.username && props.room.guestbook !== false)
 const guestEntries = ref<GuestbookEntry[]>([])
 const guestTotal = ref(0)

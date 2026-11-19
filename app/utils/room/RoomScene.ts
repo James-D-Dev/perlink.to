@@ -111,6 +111,16 @@ const GIFT_SCALE = 1.3
 const SUN_COLOR = new THREE.Color('#ffe6bf')
 const MOON_COLOR = new THREE.Color('#9fb4ff')
 
+// Load timings in the console with ?perf=1 (where the first visit's seconds go)
+const perfOn = typeof location !== 'undefined' && /[?&]perf=1/.test(location.search)
+let perfStart = 0
+function perf(label: string) {
+  if (!perfOn) return
+  const now = performance.now()
+  if (!perfStart) perfStart = now
+  console.info(`[room perf] ${label}: +${Math.round(now - perfStart)} ms (page ${Math.round(now)} ms)`)
+}
+
 export class RoomScene {
   private container: HTMLElement
   private options: RoomSceneOptions
@@ -253,6 +263,7 @@ export class RoomScene {
   } | null = null
 
   constructor(container: HTMLElement, options: RoomSceneOptions) {
+    perf('scene start')
     this.container = container
     this.options = options
 
@@ -265,6 +276,7 @@ export class RoomScene {
     // Scenery that loads later is compiled before it's added (./natureModels)
     setSceneryPreparer(this.prepareScenery)
     this.rendererReady = created.ready.then(() => {
+      perf('renderer ready')
       this.canRender = true
       if (gpuKit()) console.info(`[room] renderer: ${created.backend()}`)
       this.markActive()
@@ -401,6 +413,7 @@ export class RoomScene {
       this.styleSignature = signature
       this.style = room.style
       this.buildShell(room.style)
+      perf('shell built')
       // Wall objects depend on room size
       for (const entry of this.entries.values()) this.applyTransform(entry)
     }
@@ -409,8 +422,10 @@ export class RoomScene {
     if (landKey !== this.landKey) {
       this.landKey = landKey
       this.buildOutdoor(landId, room.style)
+      perf('land built')
     }
     this.syncObjects(room.objects)
+    perf('objects queued')
   }
 
   /**
@@ -861,6 +876,7 @@ export class RoomScene {
       .then(() => compileOffscreen(this.renderer, land.group, this.camera, this.scene))
       .catch(() => {})
       .then(() => {
+        perf('land compiled, shown')
         land.group.visible = true
         this.markActive()
         this.markShadows()
@@ -1001,6 +1017,7 @@ export class RoomScene {
   private removeLoadingMarker(id: string, marker: THREE.Mesh) {
     this.scene.remove(marker)
     if (this.loadingMarkers.get(id) === marker) this.loadingMarkers.delete(id)
+    if (!this.loadingMarkers.size) perf('all objects loaded')
   }
 
   /** Give a lamp a light from the pool, if one is free */
@@ -1608,6 +1625,7 @@ export class RoomScene {
   private renderFrame(now: number) {
     if (!this.canRender) return
     if (!this.firstFrameLogged) {
+      perf('first frame')
       this.firstFrameLogged = true
       console.info(`[room] first frame (${this.backend()}) at ${Math.round(performance.now())} ms`)
     }
