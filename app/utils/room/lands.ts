@@ -243,7 +243,7 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
   // Underside: rings from the lip down to the tip, pushed in and out by noise
   const segments = 72
   const rings = 16
-  const depth = radius * 1.25
+  const depth = radius * 0.95
   const lipY = ctx.groundY - 0.4
   const positions: number[] = []
   const colors: number[] = []
@@ -256,7 +256,8 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
     const profile = t < 0.08 ? 0.985 - t * 0.6 : Math.max(0, (1 - Math.pow((t - 0.08) / 0.92, 1.35)) * 0.95)
     const n = fbm(ca * 2.2 + 5, sa * 2.2 + t * 3.1, look.seed)
     const crag = 0.82 + n * 0.36 + (t > 0.1 ? (hash2(seg, ring, look.seed) - 0.5) * 0.08 : 0)
-    const r = radius * profile * (t < 0.04 ? 1 : crag)
+    // Never wider than the land above it (seen from above it showed as a ring)
+    const r = radius * (t < 0.04 ? profile : Math.min(profile * crag, 0.93 - t * 0.1))
     // Ledges: the rock steps rather than sloping evenly
     const y = lipY - depth * Math.pow(t, 0.9) + (t > 0.06 && t < 1 ? (noise2(angle * 3, t * 9, look.seed + 4) - 0.5) * 0.5 : 0)
     return [ca * r, y, sa * r, t, n] as const
@@ -276,7 +277,9 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
       // One colour per face, so the rock reads as cut facets
       const mid = q.reduce((sum, v) => sum + v[1], 0) / 4
       const c = colorAt(q[0][3], q[0][4], mid)
-      for (const i of [0, 2, 1, 0, 3, 2]) {
+      // Wound to face outwards (the other way round, the near side was culled
+      // and the far side's inside showed, like a hollow ring)
+      for (const i of [0, 1, 2, 0, 2, 3]) {
         positions.push(q[i]![0], q[i]![1], q[i]![2])
         colors.push(c.r, c.g, c.b)
       }
@@ -334,6 +337,7 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
   const cloudNight = new THREE.Color(look.cloudNight ?? '#3e4766')
   let cloudMaterial: THREE.MeshStandardMaterial | null = null
   let haze: THREE.MeshBasicMaterial | null = null
+  const seaDepth = radius * 1.25
   if (look.clouds !== false) {
     cloudMaterial = new THREE.MeshStandardMaterial({ color: cloudDay, roughness: 1, emissive: '#ffffff', emissiveIntensity: 0.18 })
     const sea = new THREE.Group()
@@ -343,7 +347,7 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
       const r = radius * (0.9 + rand() * 2.2)
       const puff = cloudPuff(rand, cloudMaterial)
       // Further out sits lower, so the sea falls away from the land
-      puff.position.set(Math.cos(a) * r, ctx.groundY - depth * (0.9 + rand() * 0.25) - (r - radius) * 0.25, Math.sin(a) * r)
+      puff.position.set(Math.cos(a) * r, ctx.groundY - seaDepth * (0.9 + rand() * 0.25) - (r - radius) * 0.25, Math.sin(a) * r)
       puff.scale.multiplyScalar(1.6 + rand() * 1.8)
       puff.rotation.y = rand() * Math.PI
       sea.add(puff)
@@ -362,7 +366,7 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
     haze = new THREE.MeshBasicMaterial({ map: softDotTexture(), color: cloudDay, transparent: true, opacity: 0.85, depthWrite: false, fog: false })
     const sheet = new THREE.Mesh(new THREE.PlaneGeometry(radius * 9, radius * 9), haze)
     sheet.rotation.x = -Math.PI / 2
-    sheet.position.y = ctx.groundY - depth * 1.1
+    sheet.position.y = ctx.groundY - seaDepth * 1.1
     sheet.renderOrder = -1
     group.add(sheet)
   }
