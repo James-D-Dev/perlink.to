@@ -137,7 +137,7 @@ const steamMaterial = new THREE.ShaderMaterial({
       float x = vUv.x - 0.5 - sway;
       float wisp = exp(-pow(x * 9.0, 2.0)) + 0.6 * exp(-pow((x + 0.12 * sin(t + y * 4.0)) * 12.0, 2.0));
       float breaks = smoothstep(0.35, 0.75, noise(vec2(x * 6.0, y * 4.0 - t * 1.6)));
-      float alpha = wisp * breaks * smoothstep(0.0, 0.15, y) * (1.0 - smoothstep(0.45, 1.0, y)) * 0.6;
+      float alpha = clamp(wisp * breaks * smoothstep(0.0, 0.15, y) * (1.0 - smoothstep(0.45, 1.0, y)) * 0.6, 0.0, 1.0);
       gl_FragColor = vec4(vec3(1.0), alpha);
       #include <colorspace_fragment>
     }
