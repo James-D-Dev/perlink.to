@@ -286,7 +286,9 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
   underGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
   underGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
   underGeometry.computeVertexNormals()
-  const underside = new THREE.Mesh(underGeometry, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }))
+  // At night the rock catches a little moonlight, or it vanishes into the sky
+  const underMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1, emissive: '#7d86c8', emissiveIntensity: 0 })
+  const underside = new THREE.Mesh(underGeometry, underMaterial)
   group.add(underside)
 
   // Roots hanging out of the earth band, swaying a little in the wind
@@ -366,6 +368,7 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
   }
 
   const update = (time: number, daylight: number) => {
+    underMaterial.emissiveIntensity = (1 - daylight) * 0.1
     for (const d of drifting) {
       d.piece.position.y = d.baseY + Math.sin(time * 0.5 + d.phase) * 0.3
       d.piece.rotation.y = time * 0.08 + d.phase
@@ -923,6 +926,9 @@ function createPetals(count: number, ctx: LandContext, sources: THREE.Vector3[],
   bounds.min.y = ctx.groundY
   mesh.boundingBox = bounds
   mesh.boundingSphere = bounds.getBoundingSphere(new THREE.Sphere())
+  // The land's edge (buildLand's radius), a little beyond so some drift off it
+  const edge = Math.max(ctx.style.width, ctx.style.depth) * 1.1 + 2.5 + 0.8
+  const edge2 = edge * edge
   // And they're only moved while they're drawn: off screen they wait in the air
   let drawn = true
   mesh.onBeforeRender = () => {
@@ -938,8 +944,9 @@ function createPetals(count: number, ctx: LandContext, sources: THREE.Vector3[],
       p.pos.y -= p.speed * dt * (1 - gust * 0.5)
       p.pos.x += Math.sin(time * 1.3 + p.phase) * 0.3 * dt + 0.08 * dt + windField.dir.x * push * dt
       p.pos.z += Math.cos(time * 1.1 + p.phase) * 0.2 * dt + windField.dir.y * push * dt
-      // Back to the crown once on the ground, or if it ever strays out of bounds
-      if (p.pos.y < ctx.groundY + 0.02 || !bounds.containsPoint(p.pos)) {
+      // Back to the crown once on the ground, past the land's edge (or they
+      // pile up downwind off the edge in a dense stream), or out of bounds
+      if (p.pos.y < ctx.groundY + 0.02 || p.pos.x * p.pos.x + p.pos.z * p.pos.z > edge2 || !bounds.containsPoint(p.pos)) {
         p.pos.set(p.origin.x + (rand() - 0.5) * 1.6, p.origin.y, p.origin.z + (rand() - 0.5) * 1.6)
       }
       dummy.position.copy(p.pos)
