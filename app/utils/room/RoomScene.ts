@@ -727,7 +727,7 @@ export class RoomScene {
   focusObject(id: string) {
     const entry = this.entries.get(id)
     if (!entry) return
-    const center = new THREE.Box3().setFromObject(entry.root).getCenter(new THREE.Vector3())
+    const center = boundsOf(entry.root, new THREE.Box3()).getCenter(new THREE.Vector3())
     const offset = this.camera.position.clone().sub(this.controls.target)
     offset.setLength(Math.min(offset.length(), 8))
     // Aim a bit below the object so it sits above the editor's bottom panels
@@ -890,7 +890,7 @@ export class RoomScene {
     const spots: THREE.Vector3[] = []
     for (const entry of this.entries.values()) {
       if (!entry.item.attractsButterflies || entry.revealedAt === null) continue
-      box.setFromObject(entry.root)
+      boundsOf(entry.root, box)
       const center = box.getCenter(new THREE.Vector3())
       spots.push(new THREE.Vector3(center.x, box.max.y - 0.04, center.z))
     }
@@ -1257,7 +1257,7 @@ export class RoomScene {
     const box = new THREE.Box3()
     while (queue.length) {
       const base = queue.shift()!
-      box.setFromObject(base.root)
+      boundsOf(base.root, box)
       for (const other of this.entries.values()) {
         if (other === entry || other.item.wallMounted || riders.includes(other)) continue
         const [x, y, z] = other.data.position
@@ -1621,7 +1621,7 @@ export class RoomScene {
     flameTime.value = time
     this.land?.update(time, dt, this.shownDaylight ?? 1, this.lamps)
     const entry = this.selectedId ? this.entries.get(this.selectedId) : undefined
-    if (entry) this.selectionBox.box.setFromObject(entry.root)
+    if (entry) boundsOf(entry.root, this.selectionBox.box)
     if (this.cameraGlide) {
       this.controls.target.lerp(this.cameraGlide.target, 0.12)
       this.camera.position.lerp(this.cameraGlide.position, 0.12)
@@ -1830,6 +1830,18 @@ export class RoomScene {
 
 
 /** Gradient sky dome: deeper blue overhead, light at the horizon, rich below it */
+/** An object's world bounds, without its loose parts (steam, particles: userData.ignoreBounds) */
+function boundsOf(root: THREE.Object3D, box: THREE.Box3) {
+  box.makeEmpty()
+  root.updateWorldMatrix(true, true)
+  root.traverse((obj) => {
+    for (let o: THREE.Object3D | null = obj; o && o !== root.parent; o = o.parent) if (o.userData.ignoreBounds) return
+    if ((obj as THREE.Mesh).isMesh || (obj as THREE.Points).isPoints) box.expandByObject(obj, false)
+  })
+  if (box.isEmpty()) box.setFromObject(root)
+  return box
+}
+
 function createSkyDome() {
   const uniforms = {
     zenith: { value: new THREE.Color() },

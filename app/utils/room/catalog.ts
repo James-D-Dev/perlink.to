@@ -5,6 +5,7 @@ import { attachNaturePieces, greenLeaves, type NaturePiece } from './natureModel
 import { PREMIUM_ITEMS } from './premiumModels'
 import { attachFurnitureModel } from './furnitureModels'
 import type { FlowerName, FurnitureModelName } from './modelManifest'
+import { createSteam, flameTime } from './flame'
 import { attachFlowers, type FlowerStem } from './flowerModels'
 
 // Procedural model catalog for the 3D mini room.
@@ -97,6 +98,16 @@ function glow(color: string, base = 0) {
 let curtainGeometry: THREE.BufferGeometry | null = null
 const linen = new THREE.MeshStandardMaterial({ color: '#ece3d3', roughness: 0.95, side: THREE.DoubleSide })
 linen.userData.shared = true
+// A slow breeze through the window: the hem sways, the top stays put (on the
+// GPU, nothing per frame on the CPU; WebGPU's node materials skip this)
+linen.onBeforeCompile = (shader) => {
+  shader.uniforms.uTime = flameTime
+  shader.vertexShader = 'uniform float uTime;\n' + shader.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+    float down = clamp(-position.y / 1.6, 0.0, 1.0);
+    float breeze = sin(uTime * 0.9 + position.x * 3.0) * 0.6 + sin(uTime * 1.7 + position.x * 7.0) * 0.4;
+    transformed.z += breeze * 0.03 * down * down;
+    transformed.x += sin(uTime * 0.7) * 0.012 * down * down;`)
+}
 function curtainPanel(x: number, top: number, z: number) {
   if (!curtainGeometry) {
     const width = 0.36
@@ -631,7 +642,8 @@ export const ROOM_CATALOG: CatalogItem[] = [
       const handle = mesh(new THREE.TorusGeometry(0.026, 0.0075, 10, 24, Math.PI), glaze(color), 0.039, 0.054, 0)
       handle.rotation.z = -Math.PI / 2
       handle.scale.set(1, 1.15, 1)
-      return group(body, coffee, handle)
+      const steam = createSteam(new THREE.Vector3(0, 0.084, 0), 0.26)
+      return steam ? group(body, coffee, handle, steam) : group(body, coffee, handle)
     },
   },
 

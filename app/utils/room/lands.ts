@@ -2440,7 +2440,41 @@ function plantHeroTree(group: THREE.Group, ctx: LandContext, terrain: Terrain, r
   hero.tree.position.copy(origin)
   group.add(hero.tree)
   hero.tree.updateMatrixWorld(true)
-  return { origin, blossoms: hero.blossoms.map(p => p.clone().applyMatrix4(hero.tree.matrixWorld)) }
+  const blossoms = hero.blossoms.map(p => p.clone().applyMatrix4(hero.tree.matrixWorld))
+  group.add(...crownLights(blossoms, rand, Math.round(140 * (ctx.detail ?? 1))))
+  return { origin, blossoms }
+}
+
+/** Night lights for every land, set each frame by buildLand's update (0 by day, 1 at night) */
+const landLamps = { value: 0, time: 0 }
+
+/**
+ * Fairy lights strung through a giant tree's crown, lit at night: warm points
+ * among the blossoms, in two sets that twinkle out of step. Positions never
+ * change (nothing re-uploaded per frame) and by day they're hidden, so they
+ * cost two draw calls at night and nothing in the day.
+ */
+function crownLights(blossoms: THREE.Vector3[], rand: () => number, count: number): THREE.Object3D[] {
+  if (!blossoms.length || count <= 0) return []
+  return [0, 1].map((set) => {
+    const n = Math.ceil(count / 2)
+    const positions = new Float32Array(n * 3)
+    for (let i = 0; i < n; i++) {
+      const b = blossoms[Math.floor(rand() * blossoms.length)]!
+      // Hung under the leaves, where they show from below
+      positions.set([b.x + (rand() - 0.5) * 1.2, b.y - 0.5 - rand() * 0.9, b.z + (rand() - 0.5) * 1.2], i * 3)
+    }
+    const { object, material } = sizedPoints(positions, { color: set ? '#ffc861' : '#ffe9b0', size: 0.6, map: softDotTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })
+    object.visible = false
+    object.frustumCulled = false
+    const sync = () => {
+      const lamps = landLamps.value
+      object.visible = lamps > 0.02
+      material.opacity = lamps * (0.75 + 0.25 * Math.sin(landLamps.time * (set ? 1.9 : 2.6) + set * 2))
+    }
+    object.userData.syncNight = sync
+    return object
+  })
 }
 
 /**
@@ -4814,6 +4848,23 @@ function buildZen(ctx: LandContext, radius: number): LandInstance {
 }
 
 export function buildLand(id: LandId, ctx: LandContext): LandInstance {
+  const land = buildLandOf(id, ctx)
+  const update = land.update
+  const nightLights: (() => void)[] = []
+  land.group.traverse((o) => {
+    if (o.userData.syncNight) nightLights.push(o.userData.syncNight)
+  })
+  land.update = (time, dt, daylight, lamps) => {
+    landLamps.value = lamps
+    landLamps.time = time
+    // A hidden object isn't drawn, so its onBeforeRender can't show it again
+    for (const sync of nightLights) sync()
+    update(time, dt, daylight, lamps)
+  }
+  return land
+}
+
+function buildLandOf(id: LandId, ctx: LandContext): LandInstance {
   const radius = Math.max(ctx.style.width, ctx.style.depth) * 1.1 + 2.5
   // Gusting wind is a land's own (crimson, winter, autumn); the others just sway
   windField.gust.value = id === 'crimson' || id === 'winter' || id === 'autumn' ? 1 : 0

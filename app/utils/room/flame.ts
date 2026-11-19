@@ -94,3 +94,68 @@ export function createFlame(position: THREE.Vector3, height: number, width = hei
 export function flameFlicker(time: number, seed: number) {
   return 0.9 + 0.1 * Math.sin(time * 13 + seed) * Math.sin(time * 7.3 + seed * 2.1) + 0.05 * Math.sin(time * 23 + seed * 0.7)
 }
+
+// ---------- Steam (hot drinks) ----------
+
+// Faint wisps rising from a cup: a camera-facing card whose noise scrolls up
+// and sways, fading at the top. One shared material, one small card per cup.
+// WebGL only: on WebGPU (experimental) the cup simply doesn't steam.
+const steamMaterial = new THREE.ShaderMaterial({
+  uniforms: { uTime: flameTime },
+  transparent: true,
+  depthWrite: false,
+  side: THREE.DoubleSide,
+  fog: false,
+  vertexShader: /* glsl */ `
+    varying vec2 vUv;
+    varying float vSeed;
+    void main() {
+      vUv = uv;
+      vSeed = fract(sin(dot(modelMatrix[3].xz, vec2(12.9898, 78.233))) * 43758.5453) * 100.0;
+      vec4 center = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+      vec2 size = vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz));
+      center.xy += position.xy * size;
+      gl_Position = projectionMatrix * center;
+    }
+  `,
+  fragmentShader: /* glsl */ `
+    uniform float uTime;
+    varying vec2 vUv;
+    varying float vSeed;
+    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float noise(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+    }
+    void main() {
+      float t = uTime * 0.6 + vSeed;
+      float y = vUv.y;
+      // Two thin wisps that sway more the higher they rise
+      float sway = sin(y * 5.0 - t * 2.0) * 0.12 * y + (noise(vec2(y * 3.0 - t, vSeed)) - 0.5) * 0.25 * y;
+      float x = vUv.x - 0.5 - sway;
+      float wisp = exp(-pow(x * 9.0, 2.0)) + 0.6 * exp(-pow((x + 0.12 * sin(t + y * 4.0)) * 12.0, 2.0));
+      float breaks = smoothstep(0.35, 0.75, noise(vec2(x * 6.0, y * 4.0 - t * 1.6)));
+      float alpha = wisp * breaks * smoothstep(0.0, 0.15, y) * (1.0 - smoothstep(0.45, 1.0, y)) * 0.6;
+      gl_FragColor = vec4(vec3(1.0), alpha);
+      #include <colorspace_fragment>
+    }
+  `,
+})
+steamMaterial.userData.shared = true
+
+/** Steam rising from `position` (the drink's surface), null on WebGPU */
+export function createSteam(position: THREE.Vector3, height: number) {
+  if (gpuKit()) return null
+  const steam = new THREE.Mesh(geometry, steamMaterial)
+  steam.position.copy(position)
+  steam.scale.set(height * 0.45, height, 1)
+  steam.renderOrder = 2
+  steam.castShadow = false
+  steam.userData.shared = true
+  // Not part of the cup: left out of its bounds (selection box, stacking) and clicks
+  steam.userData.ignoreBounds = true
+  steam.raycast = () => {}
+  return steam
+}
