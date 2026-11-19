@@ -243,7 +243,7 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
   // Underside: rings from the lip down to the tip, pushed in and out by noise
   const segments = 72
   const rings = 16
-  const depth = radius * 0.95
+  const depth = radius * 0.6
   const lipY = ctx.groundY - 0.4
   const positions: number[] = []
   const colors: number[] = []
@@ -253,11 +253,11 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
     const ca = Math.cos(angle)
     const sa = Math.sin(angle)
     // Earth band hugs the lip, then the rock bulges and tapers to a point
-    const profile = t < 0.08 ? 0.985 - t * 0.6 : Math.max(0, (1 - Math.pow((t - 0.08) / 0.92, 1.35)) * 0.95)
+    const profile = t < 0.08 ? 0.985 - t * 0.6 : Math.max(0, (1 - Math.pow((t - 0.08) / 0.92, 0.75)) * 0.85)
     const n = fbm(ca * 2.2 + 5, sa * 2.2 + t * 3.1, look.seed)
     const crag = 0.82 + n * 0.36 + (t > 0.1 ? (hash2(seg, ring, look.seed) - 0.5) * 0.08 : 0)
     // Never wider than the land above it (seen from above it showed as a ring)
-    const r = radius * (t < 0.04 ? profile : Math.min(profile * crag, 0.93 - t * 0.1))
+    const r = radius * (t < 0.04 ? profile : Math.min(profile * crag, 0.9 - t * 0.2))
     // Ledges: the rock steps rather than sloping evenly
     const y = lipY - depth * Math.pow(t, 0.9) + (t > 0.06 && t < 1 ? (noise2(angle * 3, t * 9, look.seed + 4) - 0.5) * 0.5 : 0)
     return [ca * r, y, sa * r, t, n] as const
