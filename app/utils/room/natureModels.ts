@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { gpuKit } from './gpu'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 // Low-poly nature models from Quaternius' Stylized Nature MegaKit (CC0),
 // served from /public/models/nature. Each model type is drawn as instanced
@@ -148,7 +149,8 @@ export function clearSceneryPreparer(prepare: SceneryPreparer) {
   if (index >= 0) preparers.splice(index, 1)
 }
 
-const loader = new GLTFLoader()
+// Geometry is Draco-compressed (*.draco.bin, about a seventh of the bytes)
+const loader = new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath('/draco/'))
 const cache = new Map<string, Promise<LoadedModel>>()
 const textureCache = new Map<string, THREE.Texture>()
 
