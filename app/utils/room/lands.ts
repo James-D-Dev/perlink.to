@@ -3997,7 +3997,21 @@ interface MushroomGlow {
  * pale on top and deeper towards the edge; spots and gills glow at night,
  * with a halo round the cap and a pool of its light on the ground.
  */
-function giantMushroom(rand: () => number, height: number, cap: { color: string; glow: string; spots?: boolean; wide?: number }) {
+interface CapLook {
+  color: string
+  glow: string
+  spots?: boolean
+  wide?: number
+  /** Glowing threads hanging from the rim, swaying (the hero) */
+  strands?: number
+  /** Shelf fungi climbing the stalk */
+  shelves?: number
+}
+
+/** Shared clock for the fairy forest's swaying threads */
+const fairyTime = { value: 0 }
+
+function giantMushroom(rand: () => number, height: number, cap: CapLook) {
   const g = new THREE.Group()
   const capR = height * (cap.wide ?? 0.42)
   const lean = (rand() - 0.5) * 0.25
@@ -4014,7 +4028,8 @@ function giantMushroom(rand: () => number, height: number, cap: { color: string;
     pos.setX(i, pos.getX(i) + Math.sin((y / height) * Math.PI * 0.8) * lean * height * 0.4)
   }
   stem.computeVertexNormals()
-  const stalk = new THREE.Mesh(stem, std('#efe4cc', { roughness: 0.9 }))
+  // The stalk catches a little of its cap's glow, so at night it isn't a black post
+  const stalk = new THREE.Mesh(stem, std('#efe4cc', { roughness: 0.9, emissive: cap.glow, emissiveIntensity: 0.12 }))
   stalk.castShadow = true
   const top = new THREE.Vector3(Math.sin(Math.PI * 0.74) * lean * height * 0.4, height * 0.9, 0)
 
@@ -4075,7 +4090,105 @@ function giantMushroom(rand: () => number, height: number, cap: { color: string;
   pool.userData.noShadow = true
   g.add(halo, pool)
   glow.halos.push(haloMaterial, poolMaterial)
+
+  // Glowing threads hanging from under the rim, each with a bead of light at
+  // its tip, swaying in the vertex shader (one mesh)
+  if (cap.strands) {
+    const parts: THREE.BufferGeometry[] = []
+    const topY = top.y - capR * 0.18
+    for (let i = 0; i < cap.strands; i++) {
+      const a = (i / cap.strands) * Math.PI * 2 + rand() * 0.2
+      const r = capR * (0.55 + rand() * 0.32)
+      const length = capR * (0.15 + rand() * 0.5) * (r / capR)
+      const x = top.x + Math.cos(a) * r
+      const z = top.z + Math.sin(a) * r
+      const thread = new THREE.CylinderGeometry(0.008, 0.014, length, 3, 1, true)
+      thread.translate(x, topY - length / 2, z)
+      const bead = new THREE.IcosahedronGeometry(0.035 + rand() * 0.035, 0)
+      bead.translate(x, topY - length, z)
+      parts.push(thread.toNonIndexed(), bead.toNonIndexed())
+      thread.dispose()
+      bead.dispose()
+    }
+    const strandMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: cap.glow, emissiveIntensity: 0.3, roughness: 0.4 })
+    strandMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = fairyTime
+      shader.uniforms.uTop = { value: topY }
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nuniform float uTime;\nuniform float uTop;')
+        .replace('#include <begin_vertex>', `#include <begin_vertex>
+          float hang = max(0.0, uTop - position.y);
+          float phase = position.x * 1.7 + position.z * 2.3;
+          transformed.x += sin(uTime * 0.9 + phase) * 0.06 * hang;
+          transformed.z += cos(uTime * 0.7 + phase) * 0.06 * hang;`)
+    }
+    const strands = new THREE.Mesh(mergeGeometries(parts), strandMaterial)
+    parts.forEach(p => p.dispose())
+    strands.castShadow = false
+    strands.raycast = () => {}
+    g.add(strands)
+    glow.emissive.push(strandMaterial)
+  }
+
+  // Shelf fungi stepping up the stalk, glowing at their rims
+  if (cap.shelves) {
+    const parts: THREE.BufferGeometry[] = []
+    for (let i = 0; i < cap.shelves; i++) {
+      const y = height * (0.18 + (i / cap.shelves) * 0.55 + rand() * 0.05)
+      const t = y / height
+      const stemR = height * (0.085 + 0.06 * Math.pow(1 - t, 3) + 0.02 * t * t)
+      const a = rand() * Math.PI * 2
+      const size = height * (0.05 + rand() * 0.04)
+      const shelf = new THREE.SphereGeometry(size, 12, 4, -Math.PI / 2, Math.PI, 0, Math.PI / 2)
+      shelf.scale(1, 0.32, 1.25)
+      shelf.rotateY(-a)
+      const leanX = Math.sin(t * Math.PI * 0.8) * lean * height * 0.4
+      shelf.translate(leanX + Math.cos(a) * stemR * 0.92, y, Math.sin(a) * stemR * 0.92)
+      parts.push(shelf.toNonIndexed())
+      shelf.dispose()
+    }
+    const shelfMaterial = new THREE.MeshStandardMaterial({ color: '#f3d9a8', emissive: cap.glow, emissiveIntensity: 0.05, roughness: 0.7, flatShading: true })
+    const shelves = new THREE.Mesh(mergeGeometries(parts), shelfMaterial)
+    parts.forEach(p => p.dispose())
+    shelves.castShadow = true
+    g.add(shelves)
+    glow.emissive.push(shelfMaterial)
+  }
   return { group: g, glow }
+}
+
+/**
+ * A cluster of glowing crystals (one mesh): hexagonal prisms with pointed
+ * tips, leaning out from a common root, and a halo at night
+ */
+function crystalCluster(rand: () => number, size: number, color: string) {
+  const parts: THREE.BufferGeometry[] = []
+  const count = 4 + Math.floor(rand() * 4)
+  for (let i = 0; i < count; i++) {
+    const h = size * (0.45 + rand() * 0.75) * (i === 0 ? 1.4 : 1)
+    const r = size * (0.08 + rand() * 0.07)
+    const body = new THREE.CylinderGeometry(r, r * 0.9, h, 6)
+    const tip = new THREE.ConeGeometry(r, r * 2.2, 6)
+    tip.translate(0, h / 2 + r * 1.1, 0)
+    const crystal = mergeGeometries([body.toNonIndexed(), tip.toNonIndexed()])
+    body.dispose()
+    tip.dispose()
+    crystal.translate(0, h / 2, 0)
+    crystal.rotateZ(i === 0 ? (rand() - 0.5) * 0.2 : 0.25 + rand() * 0.45)
+    crystal.rotateY(rand() * Math.PI * 2)
+    parts.push(crystal)
+  }
+  const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.25, roughness: 0.15, metalness: 0.1, flatShading: true, transparent: true, opacity: 0.88 })
+  const mesh = new THREE.Mesh(mergeGeometries(parts), material)
+  parts.forEach(p => p.dispose())
+  mesh.castShadow = true
+  const g = new THREE.Group()
+  const haloMaterial = new THREE.SpriteMaterial({ map: softDotTexture(), color, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })
+  const halo = new THREE.Sprite(haloMaterial)
+  halo.position.y = size * 0.6
+  halo.scale.setScalar(size * 3)
+  g.add(mesh, halo)
+  return { group: g, material, halo: haloMaterial }
 }
 
 /** Glowing spores drifting slowly upwards */
@@ -4119,7 +4232,7 @@ function buildFairy(ctx: LandContext, radius: number): LandInstance {
   const heroHeight = Math.max(5.2, ctx.style.height * 1.75)
   const heroAt = new THREE.Vector3(-width / 2 - 2, 0, -depth / 2 - 2)
   heroAt.y = terrain.heightAt(heroAt.x, heroAt.z)
-  const add = (x: number, z: number, height: number, cap: { color: string; glow: string; spots?: boolean; wide?: number }) => {
+  const add = (x: number, z: number, height: number, cap: CapLook) => {
     if (Math.hypot(x, z) > radius - 0.8) return
     const m = giantMushroom(rand, height, cap)
     m.group.rotation.y = rand() * Math.PI * 2
@@ -4129,7 +4242,7 @@ function buildFairy(ctx: LandContext, radius: number): LandInstance {
     glows.push(...m.glow.emissive)
     halos.push(...m.glow.halos)
   }
-  add(heroAt.x, heroAt.z, heroHeight, { color: '#7a4ff0', glow: '#7cc8ff', spots: true, wide: 0.6 })
+  add(heroAt.x, heroAt.z, heroHeight, { color: '#7a4ff0', glow: '#7cc8ff', spots: true, wide: 0.6, strands: Math.round(70 * Math.max(0.6, detail)), shelves: 6 })
   // Red toadstools and glowing blue caps round the walls
   add(width / 2 + 1.5, -depth / 2 - 1.3, 3.4, { color: '#d93a3a', glow: '#ffb38a', spots: true })
   add(width / 2 + 2.6, -depth / 2 - 2.4, 2.2, { color: '#d93a3a', glow: '#ffb38a', spots: true })
@@ -4142,6 +4255,24 @@ function buildFairy(ctx: LandContext, radius: number): LandInstance {
       const a = (i / 6) * Math.PI * 2 + rand() * 0.4
       add(cx + Math.cos(a) * 0.7, cz + Math.sin(a) * 0.7, 0.35 + rand() * 0.35, { color: i % 2 ? '#3aa0c8' : '#b04ad8', glow: i % 2 ? '#7cf2ff' : '#e7a8ff' })
     }
+  }
+
+  // Glowing crystal clusters breaking through the moss
+  const crystals: { material: THREE.MeshStandardMaterial; halo: THREE.SpriteMaterial }[] = []
+  const crystalSpots: [number, number, number, string][] = [
+    // Round the sides and back, never between the camera and the room
+    [-width / 2 - 3.2, -depth / 2 + 0.6, 1.2, '#c79bff'],
+    [width / 2 + 3.4, -depth / 2 + 0.4, 0.9, '#ff9be0'],
+    [radius * 0.78, radius * 0.08, 0.8, '#8fe8ff'],
+    [-radius * 0.8, radius * 0.12, 0.7, '#8fe8ff'],
+    [width / 2 + 0.6, -depth / 2 - 3.4, 0.7, '#c79bff'],
+  ]
+  for (const [x, z, size, color] of crystalSpots) {
+    if (Math.hypot(x, z) > radius - 0.8) continue
+    const c = crystalCluster(rand, size, color)
+    c.group.rotation.y = rand() * Math.PI * 2
+    group.add(place(c.group, x, terrain.heightAt(x, z) - 0.05, z))
+    crystals.push(c)
   }
 
   // Deep green moss, ferns round the mushrooms, small mushrooms in the moss
@@ -4183,6 +4314,13 @@ function buildFairy(ctx: LandContext, radius: number): LandInstance {
       glows.forEach((m, i) => (m.emissiveIntensity = 0.04 + lamps * (0.9 + Math.sin(time * 0.8 + i) * 0.25)))
       // Halos round the caps soft, their light on the ground stronger (it lands on dark moss)
       halos.forEach((m, i) => (m.opacity = lamps * ((m instanceof THREE.SpriteMaterial ? 0.3 : 0.75) + Math.sin(time * 0.8 + i) * 0.06)))
+      fairyTime.value = time
+      // Crystals shimmer: a little glow by day, bright at night, each on its own beat
+      crystals.forEach((c, i) => {
+        const beat = 0.5 + 0.5 * Math.sin(time * 1.3 + i * 1.7)
+        c.material.emissiveIntensity = 0.25 + daylight * 0.1 + lamps * (0.9 + beat * 0.6)
+        c.halo.opacity = lamps * (0.25 + beat * 0.2)
+      })
       spores.update(time, dt, lamps)
       fireflies.update(time, lamps)
       butterflies.group.visible = daylight > 0.25
