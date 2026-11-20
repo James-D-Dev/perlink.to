@@ -253,13 +253,15 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
     const ca = Math.cos(angle)
     const sa = Math.sin(angle)
     // Earth band hugs the lip, then the rock bulges and tapers to a point
-    const profile = t < 0.08 ? 0.985 - t * 0.6 : Math.max(0, (1 - Math.pow((t - 0.08) / 0.92, 0.75)) * 0.85)
+    // The top ring starts inside the land's top slab, so no sliver of sky
+    // shows between the two
+    const profile = t === 0 ? 0.95 : t < 0.08 ? 0.985 - t * 0.6 : Math.max(0, (1 - Math.pow((t - 0.08) / 0.92, 0.75)) * 0.85)
     const n = fbm(ca * 2.2 + 5, sa * 2.2 + t * 3.1, look.seed)
     const crag = 0.82 + n * 0.36 + (t > 0.1 ? (hash2(seg, ring, look.seed) - 0.5) * 0.08 : 0)
     // Never wider than the land above it (seen from above it showed as a ring)
     const r = radius * (t < 0.04 ? profile : Math.min(profile * crag, 0.9 - t * 0.2))
     // Ledges: the rock steps rather than sloping evenly
-    const y = lipY - depth * Math.pow(t, 0.9) + (t > 0.06 && t < 1 ? (noise2(angle * 3, t * 9, look.seed + 4) - 0.5) * 0.5 : 0)
+    const y = lipY + (t === 0 ? 0.2 : 0) - depth * Math.pow(t, 0.9) + (t > 0.06 && t < 1 ? (noise2(angle * 3, t * 9, look.seed + 4) - 0.5) * 0.5 : 0)
     return [ca * r, y, sa * r, t, n] as const
   }
   const colorAt = (t: number, n: number, y: number) => {
@@ -290,7 +292,7 @@ function floatingGround(ctx: LandContext, radius: number, top: THREE.Material, l
   underGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
   underGeometry.computeVertexNormals()
   // At night the rock catches a little moonlight, or it vanishes into the sky
-  const underMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1, emissive: '#7d86c8', emissiveIntensity: 0 })
+  const underMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1, emissive: '#7d86c8', emissiveIntensity: 0, side: THREE.DoubleSide })
   const underside = new THREE.Mesh(underGeometry, underMaterial)
   group.add(underside)
 
