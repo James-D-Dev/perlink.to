@@ -3821,6 +3821,159 @@ function tikiTorch(flame: THREE.MeshBasicMaterial, glow: THREE.SpriteMaterial) {
   return { group: g, fire }
 }
 
+/** A geometry in one flat vertex colour (for merged, vertex-coloured creatures) */
+function painted(geometry: THREE.BufferGeometry, color: string) {
+  const g = geometry.index ? geometry.toNonIndexed() : geometry
+  if (g !== geometry) geometry.dispose()
+  const col = new THREE.Color(color)
+  const colors = new Float32Array(g.attributes.position!.count * 3)
+  for (let i = 0; i < colors.length; i += 3) colors.set([col.r, col.g, col.b], i)
+  g.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+  if (g.attributes.uv) g.deleteAttribute('uv')
+  return g
+}
+
+function mergedPainted(parts: THREE.BufferGeometry[]) {
+  const geometry = mergeGeometries(parts)
+  parts.forEach(p => p.dispose())
+  return geometry
+}
+
+/**
+ * Little crabs on the beach (one instanced mesh): each scuttles sideways along
+ * the shore, stops, raises its claws, and goes on again
+ */
+function createCrabs(count: number, ctx: LandContext, radius: number, terrain: Terrain, seaY: number, rand: () => number) {
+  const shell = '#e0502e'
+  const claw = '#f2703f'
+  const parts: THREE.BufferGeometry[] = [
+    painted(new THREE.SphereGeometry(0.08, 12, 6).scale(1.35, 0.5, 1).translate(0, 0.045, 0), shell),
+  ]
+  for (const s of [-1, 1]) {
+    // Eyes on stalks
+    parts.push(painted(new THREE.CylinderGeometry(0.005, 0.006, 0.04, 4).translate(s * 0.028, 0.08, 0.055), shell))
+    parts.push(painted(new THREE.SphereGeometry(0.012, 6, 4).translate(s * 0.028, 0.102, 0.055), '#1a1a1a'))
+    // Claws held up in front
+    parts.push(painted(new THREE.CylinderGeometry(0.008, 0.01, 0.07, 4).rotateZ(s * 0.9).rotateX(-0.5).translate(s * 0.09, 0.06, 0.07), claw))
+    parts.push(painted(new THREE.SphereGeometry(0.032, 8, 5).scale(1.1, 0.75, 1.3).translate(s * 0.115, 0.085, 0.105), claw))
+    parts.push(painted(new THREE.ConeGeometry(0.012, 0.05, 4).rotateX(Math.PI / 2).translate(s * 0.105, 0.1, 0.14), claw))
+    // Three legs a side, bent down to the sand
+    for (const z of [-0.035, 0, 0.035]) {
+      parts.push(painted(new THREE.BoxGeometry(0.08, 0.011, 0.011).rotateZ(s * -0.55).translate(s * 0.13, 0.02, z), shell))
+    }
+  }
+  const geometry = mergedPainted(parts)
+  const mesh = new THREE.InstancedMesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.5 }), count)
+  mesh.castShadow = true
+  mesh.receiveShadow = false
+  mesh.raycast = () => {}
+  mesh.frustumCulled = false
+
+  // Where the sand is still dry, just above the waterline
+  const shoreR = (angle: number) => {
+    for (let r = radius - 1.2; r > radius - 4; r -= 0.1) {
+      if (terrain.heightAt(Math.cos(angle) * r, Math.sin(angle) * r) > seaY + 0.05) return r - 0.15
+    }
+    return radius - 4
+  }
+  const { width, depth } = ctx.style
+  const crabs = Array.from({ length: count }, (_, i) => {
+    // Spread round the front half of the beach, where the camera sees them
+    let angle = Math.PI * (-0.15 + (i / count) * 1.0) + rand() * 0.2
+    const r = shoreR(angle) - rand() * 0.5
+    if (Math.abs(Math.cos(angle) * r) < width / 2 + 0.6 && Math.abs(Math.sin(angle) * r) < depth / 2 + 0.6) angle += 0.5
+    return { angle, r, home: angle, dir: rand() < 0.5 ? -1 : 1, until: rand() * 3, walking: false, phase: rand() * 10, scale: 0.8 + rand() * 0.6 }
+  })
+  const dummy = new THREE.Object3D()
+  function update(time: number, dt: number) {
+    for (let i = 0; i < count; i++) {
+      const c = crabs[i]!
+      c.until -= dt
+      if (c.until <= 0) {
+        c.walking = !c.walking
+        c.until = c.walking ? 0.8 + rand() * 1.8 : 1 + rand() * 3
+        // Turn back towards home if it has wandered off
+        if (c.walking) c.dir = Math.abs(c.angle - c.home) > 0.25 ? Math.sign(c.home - c.angle) : rand() < 0.5 ? -1 : 1
+      }
+      if (c.walking) c.angle += (c.dir * 0.45 * dt) / c.r
+      const x = Math.cos(c.angle) * c.r
+      const z = Math.sin(c.angle) * c.r
+      const scuttle = c.walking ? Math.abs(Math.sin(time * 22 + c.phase)) * 0.012 : 0
+      dummy.position.set(x, Math.max(terrain.heightAt(x, z), seaY + 0.02) + scuttle, z)
+      // Faces the sea, walks sideways; a little wiggle while it goes
+      dummy.rotation.set(0, Math.PI / 2 - c.angle + (c.walking ? Math.sin(time * 18 + c.phase) * 0.12 : Math.sin(time * 1.5 + c.phase) * 0.05), 0)
+      dummy.scale.setScalar(c.scale)
+      dummy.updateMatrix()
+      mesh.setMatrixAt(i, dummy.matrix)
+    }
+    mesh.instanceMatrix.needsUpdate = true
+  }
+  update(0, 0)
+  return { mesh, update }
+}
+
+/** Seagulls circling high over the island, flapping and gliding (three instanced meshes) */
+function createGulls(count: number, ctx: LandContext, radius: number, rand: () => number) {
+  const white = '#f8fafc'
+  const grey = '#9aa4b2'
+  const body = mergedPainted([
+    painted(new THREE.SphereGeometry(0.1, 10, 6).scale(0.7, 0.65, 1.7), white),
+    painted(new THREE.SphereGeometry(0.065, 8, 6).translate(0, 0.04, 0.17), white),
+    painted(new THREE.ConeGeometry(0.018, 0.07, 5).rotateX(Math.PI / 2).translate(0, 0.035, 0.25), '#f5b301'),
+    painted(new THREE.ConeGeometry(0.06, 0.12, 4).rotateX(-Math.PI / 2).scale(1, 0.3, 1).translate(0, 0, -0.2), grey),
+  ])
+  const wing = (s: number) => mergedPainted([
+    painted(new THREE.BoxGeometry(0.34, 0.012, 0.13).translate(s * 0.17, 0, 0), white),
+    painted(new THREE.BoxGeometry(0.16, 0.012, 0.09).translate(s * 0.41, 0, -0.015), grey),
+  ])
+  const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6 })
+  const meshes = [body, wing(-1), wing(1)].map((g) => {
+    const m = new THREE.InstancedMesh(g, material, count)
+    m.castShadow = false
+    m.raycast = () => {}
+    m.frustumCulled = false
+    return m
+  })
+  const group = new THREE.Group()
+  group.add(...meshes)
+  const gulls = Array.from({ length: count }, () => ({
+    height: ctx.groundY + 6 + rand() * 3,
+    r: radius * (0.45 + rand() * 0.45),
+    speed: (0.18 + rand() * 0.1) * (rand() < 0.5 ? -1 : 1),
+    phase: rand() * Math.PI * 2,
+    flap: rand() * 10,
+  }))
+  const m = new THREE.Matrix4()
+  const local = new THREE.Matrix4()
+  const q = new THREE.Quaternion()
+  const e = new THREE.Euler()
+  const p = new THREE.Vector3()
+  const one = new THREE.Vector3(1, 1, 1)
+  function update(time: number) {
+    for (let i = 0; i < count; i++) {
+      const g = gulls[i]!
+      const a = g.phase + time * g.speed
+      p.set(Math.cos(a) * g.r, g.height + Math.sin(time * 0.6 + g.phase) * 0.4, Math.sin(a) * g.r)
+      // Heading along the circle, banked into the turn
+      const heading = Math.atan2(-Math.sin(a) * Math.sign(g.speed), Math.cos(a) * Math.sign(g.speed))
+      e.set(0, heading, -Math.sign(g.speed) * 0.35, 'YXZ')
+      q.setFromEuler(e)
+      m.compose(p, q, one)
+      meshes[0]!.setMatrixAt(i, m)
+      // Flaps for a while, then glides with wings held a little up
+      const flapping = Math.sin(time * 0.5 + g.flap) > -0.2
+      const angle = flapping ? Math.sin(time * 9 + g.flap) * 0.55 : 0.12
+      for (const [k, s] of [[1, -1], [2, 1]] as const) {
+        local.makeRotationZ(s * angle).setPosition(s * 0.05, 0.03, 0.02)
+        meshes[k]!.setMatrixAt(i, local.premultiply(m))
+      }
+    }
+    meshes.forEach(mesh => (mesh.instanceMatrix.needsUpdate = true))
+  }
+  update(0)
+  return { group, update }
+}
+
 function buildTropical(ctx: LandContext, radius: number): LandInstance {
   const rand = seeded(73)
   const detail = ctx.detail ?? 1
@@ -3909,6 +4062,10 @@ function buildTropical(ctx: LandContext, radius: number): LandInstance {
   const butterflies = createButterflies(3, flutterSpots, rand, ['#38bdf8', '#facc15'])
   const fireflies = createFireflies(16, ctx, radius - 2, rand)
   group.add(butterflies.group, fireflies.points)
+  // Crabs scuttling along the waterline, gulls circling overhead
+  const crabs = createCrabs(Math.round(7 * Math.max(0.6, detail)), ctx, radius, terrain, ctx.groundY - 0.16, rand)
+  const gulls = createGulls(4, ctx, radius, rand)
+  group.add(crabs.mesh, gulls.group)
 
   // Moonlit sand stays pale
   const nightTint = new THREE.Color('#8a93c0')
@@ -3933,6 +4090,10 @@ function buildTropical(ctx: LandContext, radius: number): LandInstance {
       flame.opacity = lamps
       glow.opacity = lamps * (0.8 + Math.sin(time * 9) * 0.1)
       fires.forEach((f, i) => f.scale.set(1, 0.85 + Math.sin(time * 11 + i * 2) * 0.15, 1))
+      crabs.update(time, dt)
+      // Gulls roost at night
+      gulls.group.visible = daylight > 0.2
+      if (gulls.group.visible) gulls.update(time)
       butterflies.group.visible = daylight > 0.25
       if (butterflies.group.visible) butterflies.update(time, dt)
       fireflies.update(time, lamps)
