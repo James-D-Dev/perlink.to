@@ -253,6 +253,10 @@
         "name": "Fairy forest",
         "description": "Giant glowing mushrooms, drifting spores and fireflies in deep moss"
       },
+      "mushroom": {
+        "name": "Mushroom village",
+        "description": "Toadstool houses with lit windows, red caps everywhere and a stone path in golden light"
+      },
       "volcano": {
         "name": "Volcano",
         "description": "A smoking volcano, a river of lava pouring off the edge, rising embers"

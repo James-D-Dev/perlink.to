@@ -32,6 +32,7 @@ export const LANDS: LandMeta[] = [
   { id: 'autumn', name: 'Autumn', description: 'A giant maple in red and gold, leaves blowing in the wind, pumpkins', icon: 'i-lucide-leaf', preview: 'linear-gradient(180deg,#86b9e6 0%,#f6c27a 55%,#b8862a 56%,#7a5a1e 100%)', thumbnail: '/images/lands/autumn.webp' },
   { id: 'tropical', name: 'Tropical beach', description: 'Palms on white sand, turquoise sea and waves, tiki torches at night', icon: 'i-lucide-tree-palm', preview: 'linear-gradient(180deg,#6ec3f2 0%,#bfe8ff 55%,#f0dcaa 56%,#2fb8c8 100%)', thumbnail: '/images/lands/tropical.webp' },
   { id: 'fairy', name: 'Fairy forest', description: 'Giant glowing mushrooms, drifting spores and fireflies in deep moss', icon: 'i-lucide-sparkles', preview: 'linear-gradient(180deg,#a9b8ee 0%,#d6c4f2 55%,#2c6b52 56%,#15362c 100%)', thumbnail: '/images/lands/fairy.webp' },
+  { id: 'mushroom', name: 'Mushroom village', description: 'Toadstool houses with lit windows, red caps everywhere and a stone path in golden light', icon: 'i-lucide-house', preview: 'linear-gradient(180deg,#f3cf9a 0%,#ffe2b8 55%,#73782e 56%,#4a4a1c 100%)', thumbnail: '/images/lands/mushroom.webp' },
   { id: 'volcano', name: 'Volcano', description: 'A smoking volcano, a river of lava pouring off the edge, rising embers', icon: 'i-lucide-flame', preview: 'linear-gradient(180deg,#d9a582 0%,#f08a4a 55%,#3b322d 56%,#1a1412 100%)', thumbnail: '/images/lands/volcano.webp' },
   { id: 'zen', name: 'Zen garden', description: 'Bamboo grove, raked gravel, a koi pond and stone lanterns', icon: 'i-lucide-sprout', preview: 'linear-gradient(180deg,#a8cfe8 0%,#dfeee0 55%,#4d7a2c 56%,#2a481e 100%)', thumbnail: '/images/lands/zen.webp' },
 ]
@@ -4628,6 +4629,398 @@ function buildVolcano(ctx: LandContext, radius: number): LandInstance {
   }
 }
 
+// ---------- Mushroom village ----------
+
+/** Fine ridges for the gills under a cap (wraps round a cone) */
+let ridgeCanvas: THREE.CanvasTexture | null = null
+function gillRidgeTexture() {
+  if (ridgeCanvas) return ridgeCanvas
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 8
+  const g = canvas.getContext('2d')!
+  const grad = g.createLinearGradient(0, 0, 64, 0)
+  grad.addColorStop(0, '#8a6448')
+  grad.addColorStop(0.35, '#f2dcc0')
+  grad.addColorStop(0.65, '#e8cfae')
+  grad.addColorStop(1, '#8a6448')
+  g.fillStyle = grad
+  g.fillRect(0, 0, 64, 8)
+  ridgeCanvas = new THREE.CanvasTexture(canvas)
+  ridgeCanvas.colorSpace = THREE.SRGBColorSpace
+  ridgeCanvas.wrapS = THREE.RepeatWrapping
+  ridgeCanvas.repeat.set(70, 1)
+  return ridgeCanvas
+}
+
+/** Arched window/door outline, bottom centre at the origin */
+function archShape(width: number, height: number) {
+  const s = new THREE.Shape()
+  const r = width / 2
+  s.moveTo(-r, 0)
+  s.lineTo(r, 0)
+  s.lineTo(r, height - r)
+  s.absarc(0, height - r, r, 0, Math.PI, false)
+  s.lineTo(-r, 0)
+  return s
+}
+
+interface VillageLights {
+  glass: THREE.MeshStandardMaterial
+  halo: THREE.SpriteMaterial
+}
+
+/**
+ * A toadstool: a thick, flared cream stalk, a wide red cap with white spots
+ * and ridged gills underneath. With `windows`, it's a house: an arched door
+ * at its foot facing `facing` (radians, world), little arched windows up the
+ * stalk that light up at night.
+ */
+function toadstool(rand: () => number, height: number, opts: { cap: string; windows?: number; facing?: number; lights?: VillageLights; wide?: number }) {
+  const g = new THREE.Group()
+  const stalkTop = height * 0.8
+  const stalkR = (y: number) => {
+    const t = y / stalkTop
+    return height * (0.12 + 0.1 * Math.pow(1 - t, 3) + 0.025 * t * t)
+  }
+  const profile: THREE.Vector2[] = []
+  for (let i = 0; i <= 14; i++) {
+    const y = (i / 14) * stalkTop
+    profile.push(new THREE.Vector2(stalkR(y), y))
+  }
+  const stem = new THREE.LatheGeometry(profile, 20)
+  // Knobbly, not turned on a lathe
+  const sp = stem.attributes.position as THREE.BufferAttribute
+  for (let i = 0; i < sp.count; i++) {
+    const x = sp.getX(i), y = sp.getY(i), z = sp.getZ(i)
+    const k = 1 + (noise2(Math.atan2(z, x) * 2, y * 1.5, 7) - 0.5) * 0.08
+    sp.setXYZ(i, x * k, y, z * k)
+  }
+  stem.computeVertexNormals()
+  const stalk = new THREE.Mesh(stem, std('#d9b98a', { roughness: 0.85 }))
+  g.add(stalk)
+
+  // Cap: a wide, low dome, deeper red towards the rim
+  const capR = height * (opts.wide ?? 0.62)
+  const capH = capR * 0.45
+  const capY = stalkTop - height * 0.03
+  const dome = new THREE.SphereGeometry(capR, 48, 14, 0, Math.PI * 2, 0, Math.PI / 2)
+  const dp = dome.attributes.position as THREE.BufferAttribute
+  const shades = new Float32Array(dp.count * 3)
+  const base = new THREE.Color(opts.cap)
+  const pale = base.clone().lerp(new THREE.Color('#ffd9a0'), 0.3)
+  const deep = base.clone().multiplyScalar(0.62)
+  const c = new THREE.Color()
+  for (let i = 0; i < dp.count; i++) {
+    const x = dp.getX(i), y = dp.getY(i), z = dp.getZ(i)
+    const down = 1 - y / capR
+    const wobble = 1 + Math.sin(Math.atan2(z, x) * 4 + 1.3) * 0.03
+    // The rim curls down a little
+    const curl = Math.max(0, down - 0.82) * 2
+    dp.setXYZ(i, x * wobble, (y / capR) * capH - curl * capR * 0.06, z * wobble)
+    c.copy(pale).lerp(base, THREE.MathUtils.smoothstep(down, 0.0, 0.4)).lerp(deep, THREE.MathUtils.smoothstep(down, 0.7, 1))
+    shades.set([c.r, c.g, c.b], i * 3)
+  }
+  dome.setAttribute('color', new THREE.BufferAttribute(shades, 3))
+  dome.computeVertexNormals()
+  const capMesh = new THREE.Mesh(dome, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55 }))
+  capMesh.position.y = capY
+  g.add(capMesh)
+
+  // White spots sitting on the cap's surface (one mesh)
+  const spots: THREE.BufferGeometry[] = []
+  const up = new THREE.Vector3(0, 1, 0)
+  for (let i = 0; i < 26; i++) {
+    const a = rand() * Math.PI * 2
+    const polar = Math.acos(1 - rand() * 0.85)
+    const x = Math.sin(polar) * Math.cos(a) * capR
+    const y = Math.cos(polar) * capH
+    const z = Math.sin(polar) * Math.sin(a) * capR
+    const normal = new THREE.Vector3(x / (capR * capR), y / (capH * capH), z / (capR * capR)).normalize()
+    const size = capR * (0.04 + rand() * 0.05)
+    const spot = new THREE.SphereGeometry(size, 8, 4).scale(1, 0.3, 1)
+    spot.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(up, normal))
+    spot.translate(x, capY + y, z)
+    spots.push(spot)
+  }
+  const spotMesh = new THREE.Mesh(mergeGeometries(spots), std('#fff8ec', { roughness: 0.7 }))
+  spots.forEach(s => s.dispose())
+  g.add(spotMesh)
+
+  // Gills: an open cone from the rim in to the stalk, ridged
+  const gillHeight = capR * 0.16
+  const gills = new THREE.CylinderGeometry(capR * 0.97, stalkR(stalkTop) * 1.05, gillHeight, 72, 1, true)
+  const gillMaterial = new THREE.MeshStandardMaterial({ map: gillRidgeTexture(), bumpMap: gillRidgeTexture(), bumpScale: 2, roughness: 0.9, side: THREE.DoubleSide })
+  const gillMesh = new THREE.Mesh(gills, gillMaterial)
+  gillMesh.position.y = capY - gillHeight / 2 + capR * 0.005
+  g.add(gillMesh)
+
+  // A house: an arched door at the foot, windows up the stalk
+  if (opts.windows && opts.lights) {
+    const s = height / 5
+    const facing = opts.facing ?? 0
+    const glassParts: THREE.BufferGeometry[] = []
+    const frameParts: THREE.BufferGeometry[] = []
+    const doorParts: THREE.BufferGeometry[] = []
+    const onStalk = (geometry: THREE.BufferGeometry, angle: number, y: number, out: number) => {
+      // Faces outwards along `angle` (a shape faces +z before it's turned)
+      geometry.rotateY(Math.PI / 2 - angle)
+      const r = stalkR(Math.max(y, 0.01)) + out
+      geometry.translate(Math.cos(angle) * r, y, Math.sin(angle) * r)
+      return geometry
+    }
+    // The door, its frame and a step
+    const doorW = 0.42 * s
+    const doorH = 0.75 * s
+    doorParts.push(onStalk(new THREE.ShapeGeometry(archShape(doorW, doorH), 6), facing, 0.02, 0.03))
+    frameParts.push(onStalk(new THREE.ShapeGeometry(archShape(doorW * 1.3, doorH * 1.12), 6), facing, 0.0, 0.02))
+    const step = new THREE.CylinderGeometry(doorW * 0.9, doorW, 0.06, 7)
+    step.translate(Math.cos(facing) * (stalkR(0) + doorW * 0.5), 0.03, Math.sin(facing) * (stalkR(0) + doorW * 0.5))
+    frameParts.push(step)
+    const glowAt: THREE.Vector3[] = []
+    for (let i = 0; i < opts.windows; i++) {
+      const y = stalkTop * (0.3 + (i / Math.max(1, opts.windows)) * 0.5) + rand() * 0.1 * s
+      const angle = facing + (i % 2 ? 0.7 : -0.6) + (rand() - 0.5) * 0.3
+      const w = 0.36 * s
+      const h = 0.54 * s
+      glassParts.push(onStalk(new THREE.ShapeGeometry(archShape(w, h), 6), angle, y, 0.035))
+      frameParts.push(onStalk(new THREE.ShapeGeometry(archShape(w * 1.35, h * 1.2), 6), angle, y - h * 0.08, 0.025))
+      // Cross bars
+      const bar = new THREE.BoxGeometry(w, 0.02 * s, 0.015)
+      bar.translate(0, h * 0.45, 0)
+      const post = new THREE.BoxGeometry(0.02 * s, h, 0.015)
+      post.translate(0, h / 2, 0)
+      frameParts.push(onStalk(bar, angle, y, 0.04), onStalk(post, angle, y, 0.04))
+      const r = stalkR(y) + 0.25
+      glowAt.push(new THREE.Vector3(Math.cos(angle) * r, y + h * 0.5, Math.sin(angle) * r))
+    }
+    const merge = (parts: THREE.BufferGeometry[]) => {
+      const geometry = mergeGeometries(parts.map(p => p.index ? p.toNonIndexed() : p))
+      parts.forEach(p => p.dispose())
+      return geometry
+    }
+    g.add(new THREE.Mesh(merge(glassParts), opts.lights.glass))
+    g.add(new THREE.Mesh(merge(frameParts), std('#6b4428', { roughness: 0.8 })))
+    g.add(new THREE.Mesh(merge(doorParts), std('#8a5530', { roughness: 0.7 })))
+    for (const p of glowAt) {
+      const halo = new THREE.Sprite(opts.lights.halo)
+      halo.position.copy(p)
+      halo.scale.setScalar(1.1 * s)
+      g.add(halo)
+    }
+  }
+  return { group: g, capY, capR }
+}
+
+/** Little red toadstools, all one instanced mesh (one draw call for hundreds) */
+function toadstoolCarpet(items: ScatterItem[], rand: () => number) {
+  const parts: THREE.BufferGeometry[] = []
+  const paint = (geometry: THREE.BufferGeometry, color: string) => {
+    const g = geometry.index ? geometry.toNonIndexed() : geometry
+    const col = new THREE.Color(color)
+    const colors = new Float32Array(g.attributes.position!.count * 3)
+    for (let i = 0; i < colors.length; i += 3) colors.set([col.r, col.g, col.b], i)
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+    g.deleteAttribute('uv')
+    return g
+  }
+  parts.push(paint(new THREE.CylinderGeometry(0.045, 0.07, 0.5, 6).translate(0, 0.25, 0), '#f1e4cc'))
+  parts.push(paint(new THREE.SphereGeometry(0.22, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 0.55, 1).translate(0, 0.47, 0), '#d8401f'))
+  parts.push(paint(new THREE.CircleGeometry(0.2, 10).rotateX(Math.PI / 2).translate(0, 0.47, 0), '#e9d2b0'))
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2 + 0.3
+    const r = i === 0 ? 0 : 0.13
+    parts.push(paint(new THREE.SphereGeometry(0.03, 5, 3).scale(1, 0.4, 1).translate(Math.cos(a) * r, 0.47 + (i === 0 ? 0.12 : 0.08), Math.sin(a) * r), '#fff8ec'))
+  }
+  const geometry = mergeGeometries(parts)
+  parts.forEach(p => p.dispose())
+  const mesh = new THREE.InstancedMesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6 }), items.length)
+  const dummy = new THREE.Object3D()
+  const tints = ['#ffffff', '#ffd2b0', '#ffe7a8', '#ffc0b0'].map(t => new THREE.Color(t))
+  items.forEach((item, i) => {
+    dummy.position.set(item.x, item.y - 0.02, item.z)
+    dummy.rotation.set((rand() - 0.5) * 0.25, item.rotation ?? 0, (rand() - 0.5) * 0.25)
+    dummy.scale.setScalar(item.height / 0.6)
+    dummy.updateMatrix()
+    mesh.setMatrixAt(i, dummy.matrix)
+    mesh.setColorAt(i, tints[Math.floor(rand() * tints.length)]!)
+  })
+  mesh.castShadow = false
+  mesh.receiveShadow = true
+  return mesh
+}
+
+function buildMushroomVillage(ctx: LandContext, radius: number): LandInstance {
+  const rand = seeded(83)
+  const detail = ctx.detail ?? 1
+  const { width, depth } = ctx.style
+  const { group, update: groundUpdate } = floatingGround(ctx, radius, std('#4a4a1c'), { soil: '#4a3220', rock: '#8a7462', seed: 59, cloudDay: '#fff1dc', cloudNight: '#3d3550' })
+  const terrain = createTerrain(ctx, radius, 67, { grass: ['#5a6224', '#66702a', '#73782e', '#5e6626'], dry: '#9a8a3e', path: '#a8946e' })
+  group.add(terrain.mesh)
+
+  // Village lights: windows glow warm at night
+  const lights: VillageLights = {
+    glass: new THREE.MeshStandardMaterial({ color: '#ffe2a8', emissive: '#ffb04a', emissiveIntensity: 0.15, roughness: 0.3 }),
+    halo: new THREE.SpriteMaterial({ map: softDotTexture(), color: '#ffb766', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }),
+  }
+  // Doors face the camera's side of the land
+  const facingFrom = (x: number, z: number) => Math.atan2(radius - z, radius - x)
+
+  const heroHeight = Math.max(5.6, ctx.style.height * 1.9)
+  const heroAt = new THREE.Vector3(-width / 2 - 2.3, 0, -depth / 2 - 2.3)
+  heroAt.y = terrain.heightAt(heroAt.x, heroAt.z)
+  const capSpots: THREE.Vector3[] = []
+  const stools: [number, number, number, string, number][] = [
+    // x, z, height, cap colour, windows
+    [heroAt.x, heroAt.z, heroHeight, '#d9471f', 3],
+    [width / 2 + 2.3, -depth / 2 - 1.5, 4.2, '#e0582a', 2],
+    [-width / 2 - 2.2, depth / 2 - 0.6, 3.4, '#c93a1c', 1],
+    [width / 2 + 3.4, -depth / 2 + 1.4, 1.9, '#e06a2e', 0],
+    [-width / 2 - 3.6, -depth / 2 + 1.0, 1.5, '#d9471f', 0],
+    [width / 2 + 0.6, -depth / 2 - 3.8, 2.2, '#cf4422', 0],
+    [-width / 2 - 0.4, -depth / 2 - 4.0, 1.4, '#e0582a', 0],
+  ]
+  for (const [x, z, height, cap, windows] of stools) {
+    if (Math.hypot(x, z) > radius - 1) continue
+    const y = terrain.heightAt(x, z)
+    const t = toadstool(rand, height, { cap, windows, facing: facingFrom(x, z), lights, wide: windows ? 0.62 : 0.55 })
+    group.add(place(t.group, x, y - 0.05, z))
+    capSpots.push(new THREE.Vector3(x, y + t.capY, z))
+  }
+
+  // Stone slabs along the path
+  const pathFrom = new THREE.Vector2(width / 2 + 0.9, depth / 2 + 0.8)
+  const pathMid = new THREE.Vector2(width / 2 + 1.8, depth / 2 + 1.2)
+  const pathTo = new THREE.Vector2(radius * 0.5, radius * 0.62)
+  const pathEnd = new THREE.Vector2(radius * 0.62, radius * 0.95)
+  const slabParts: THREE.BufferGeometry[] = []
+  for (const [a, b] of [[pathFrom, pathMid], [pathMid, pathTo], [pathTo, pathEnd]] as const) {
+    const n = Math.max(1, Math.round(a.distanceTo(b) / 0.45))
+    for (let i = 0; i < n; i++) {
+      const p = a.clone().lerp(b, i / n)
+      if (p.length() > radius - 0.5) continue
+      const slab = jitter(new THREE.CylinderGeometry(0.2 + rand() * 0.08, 0.22, 0.07, 6), rand, 0.03)
+      slab.rotateY(rand() * Math.PI)
+      const side = (rand() - 0.5) * 0.3
+      slab.translate(p.x + side, terrain.heightAt(p.x, p.y) + 0.02, p.y - side)
+      slabParts.push(slab.index ? slab.toNonIndexed() : slab)
+    }
+  }
+  const slabs = new THREE.Mesh(mergeGeometries(slabParts), std('#b4a088', { roughness: 1, flatShading: true }))
+  slabParts.forEach(p => p.dispose())
+  slabs.receiveShadow = true
+  group.add(slabs)
+
+  // Little lanterns on posts along the path, lit at night
+  const postParts: THREE.BufferGeometry[] = []
+  const lampParts: THREE.BufferGeometry[] = []
+  const lanternAt = [pathFrom.clone().lerp(pathMid, 0.5), pathMid.clone().lerp(pathTo, 0.45), pathTo.clone().lerp(pathEnd, 0.2)]
+  lanternAt.forEach((p, i) => {
+    const side = i % 2 ? 0.55 : -0.55
+    const x = p.x + side
+    const z = p.y - side
+    if (Math.hypot(x, z) > radius - 0.5) return
+    const y = terrain.heightAt(x, z)
+    const post = new THREE.CylinderGeometry(0.025, 0.035, 0.75, 5).translate(x, y + 0.375, z)
+    const arm = new THREE.BoxGeometry(0.2, 0.025, 0.025).translate(x + 0.08, y + 0.74, z)
+    const cap = new THREE.ConeGeometry(0.09, 0.08, 6).translate(x + 0.16, y + 0.66, z)
+    postParts.push(post.toNonIndexed(), arm.toNonIndexed(), cap.toNonIndexed())
+    lampParts.push(new THREE.SphereGeometry(0.07, 8, 6).scale(1, 1.25, 1).translate(x + 0.16, y + 0.55, z).toNonIndexed())
+    const halo = new THREE.Sprite(lights.halo)
+    halo.position.set(x + 0.16, y + 0.55, z)
+    halo.scale.setScalar(0.55)
+    group.add(halo)
+  })
+  if (postParts.length) {
+    group.add(place(new THREE.Mesh(mergeGeometries(postParts), std('#3a2a1e', { roughness: 0.7 })), 0, 0, 0))
+    group.add(place(new THREE.Mesh(mergeGeometries(lampParts), lights.glass), 0, 0, 0, false))
+  }
+
+  // Golden meadow grass
+  group.add(bladeGrass(ctx, radius, terrain, rand, Math.round(13000 * detail), {
+    colors: ['#3c3c16', '#7a7a2a', '#e0c068'],
+    tints: ['#ffffff', '#fff2d0', '#ffe8b8', '#f0f5d0'],
+    height: [0.2, 0.5],
+    pathClear: 0.95,
+  }))
+
+  // Little red toadstools in clumps round the big ones, along the path and in the meadow
+  const clumpAt: [number, number][] = [
+    ...stools.map(([x, z]) => [x + 1.1, z + 1.1] as [number, number]),
+    [width / 2 + 2.6, depth / 2 + 0.6], [width / 2 + 0.8, depth / 2 + 2.4], [radius * 0.62, radius * 0.38], [radius * 0.32, radius * 0.78],
+    ...landSpots(rand, ctx, radius, 8, 1),
+  ]
+  const small = clumps(rand, terrain, clumpAt.filter(([x, z]) => Math.hypot(x, z) < radius - 0.6), Math.round(22 * Math.max(0.5, detail)), 0.9, [0.14, 0.45])
+  group.add(toadstoolCarpet(small, rand))
+  scatterModel(group, 'Fern_1', clumps(rand, terrain, [[width / 2 + 1.4, -depth / 2 - 0.4], [-width / 2 - 0.8, depth / 2 + 0.6]], 3, 0.8, [0.5, 0.8]), { castShadow: false })
+
+  // Bushes round the back edge
+  scatterModel(group, 'Bush_Common', clumps(rand, terrain, [[-radius * 0.8, -radius * 0.2], [-radius * 0.15, -radius * 0.82], [radius * 0.55, -radius * 0.6]].filter(([x, z]) => Math.hypot(x!, z!) < radius - 0.8) as [number, number][], 3, 0.8, [0.7, 1.1]), { castShadow: false })
+
+  // Giant mushrooms far off in the haze behind the land (flat, fogged silhouettes)
+  const hazeMaterial = new THREE.MeshBasicMaterial({ color: '#f2c99a', transparent: true, opacity: 0.55, depthWrite: false, fog: false })
+  const giants: THREE.BufferGeometry[] = []
+  for (const [angle, distance, height] of [[-0.82, 2.4, 16], [-0.62, 2.9, 22], [-0.42, 2.5, 13], [-0.95, 3.1, 19]] as const) {
+    const a = angle * Math.PI
+    const x = Math.cos(a) * radius * distance
+    const z = Math.sin(a) * radius * distance
+    const stalkGeo = new THREE.CylinderGeometry(height * 0.07, height * 0.12, height, 10).translate(x, ctx.groundY - height * 0.35 + height / 2, z)
+    const capGeo = new THREE.SphereGeometry(height * 0.45, 20, 8, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 0.4, 1).translate(x, ctx.groundY - height * 0.35 + height * 0.97, z)
+    giants.push(stalkGeo.toNonIndexed(), capGeo.toNonIndexed())
+    stalkGeo.dispose()
+    capGeo.dispose()
+  }
+  const farGiants = new THREE.Mesh(mergeGeometries(giants), hazeMaterial)
+  giants.forEach(p => p.dispose())
+  farGiants.renderOrder = -1
+  farGiants.raycast = () => {}
+  group.add(farGiants)
+
+  const cloudMaterial = new THREE.MeshStandardMaterial({ color: '#fff3e0', roughness: 1, emissive: '#ffd9a8', emissiveIntensity: 0.2 })
+  skyClouds(group, rand, cloudMaterial)
+  // Spores drifting from under the caps, gold in the sun
+  const motes = createPetals(Math.round(110 * detail), ctx, capSpots, rand, { colors: ['#ffb36b', '#ffd59a', '#ff8a4a'], size: 0.55 })
+  const fireflies = createFireflies(40, ctx, radius, rand)
+  const flutterSpots = landSpots(rand, ctx, radius, 10, 1).map(([x, z]) => new THREE.Vector3(x, terrain.heightAt(x, z) + 0.5, z))
+  const butterflies = createButterflies(4, flutterSpots, rand, ['#ffb347', '#fff1c4'])
+  group.add(motes.mesh, fireflies.points, butterflies.group)
+
+  const nightTint = new THREE.Color('#4a4a6a')
+  const white = new THREE.Color('#ffffff')
+  const hazeDay = new THREE.Color('#f2c99a')
+  const hazeNight = new THREE.Color('#2a2848')
+  const cloudNight = new THREE.Color('#4a4468')
+  const cloudDay = new THREE.Color('#fff3e0')
+  return {
+    group,
+    starsAlways: false,
+    sky: { night: new THREE.Color('#100c24'), dusk: new THREE.Color('#f0905a'), day: new THREE.Color('#f3cf9a') },
+    atmosphere: { turbidity: 7, rayleigh: 1.4, mie: 0.012 },
+    light: { sun: 1.05, sky: 0.55 },
+    focus: { position: heroAt, height: heroHeight },
+    heightAt: terrain.heightAt,
+    ground: terrain.mesh,
+    update(time, dt, daylight, lamps) {
+      groundUpdate(time, daylight)
+      natureWind.value = time
+      terrain.material.color.copy(nightTint).lerp(white, daylight)
+      cloudMaterial.color.copy(cloudNight).lerp(cloudDay, daylight)
+      // The clouds' warm glow is sunlight: none at night
+      cloudMaterial.emissiveIntensity = 0.02 + daylight * 0.18
+      hazeMaterial.color.copy(hazeNight).lerp(hazeDay, daylight)
+      // Windows: a warm glow at night, flickering a touch like candlelight
+      lights.glass.emissiveIntensity = 0.15 + lamps * (2.2 + Math.sin(time * 7) * 0.1 + Math.sin(time * 11.3) * 0.08)
+      lights.halo.opacity = lamps * 0.75
+      motes.update(time, dt)
+      fireflies.update(time, lamps)
+      butterflies.group.visible = daylight > 0.25
+      if (butterflies.group.visible) butterflies.update(time, dt)
+    },
+    setAttractor: butterflies.setAttractor,
+    setRoomFlowers: butterflies.setRoomFlowers,
+  }
+}
+
 // ---------- Zen garden ----------
 
 /** Raked gravel: concentric lines round the stones, straight rows elsewhere */
@@ -5029,6 +5422,8 @@ function buildLandOf(id: LandId, ctx: LandContext): LandInstance {
       return buildTropical(ctx, radius)
     case 'fairy':
       return buildFairy(ctx, radius)
+    case 'mushroom':
+      return buildMushroomVillage(ctx, radius)
     case 'volcano':
       return buildVolcano(ctx, radius)
     case 'zen':
