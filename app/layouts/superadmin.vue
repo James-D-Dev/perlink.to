@@ -106,7 +106,9 @@ const navUi = {
 
 // Unread mail to support@perlink.to, on the Emails item (checked on each page change)
 const { data: mailbox, refresh: refreshUnread } = useFetch<{ unread: number }>('/api/superadmin/email/unread', { key: 'mail-unread', server: false });
-watch(() => route.fullPath, () => refreshUnread());
+// Conversations waiting for an answer, on the Support chat item
+const { data: support, refresh: refreshSupport } = useFetch<{ unread: number }>('/api/superadmin/support/unread', { key: 'support-unread', server: false });
+watch(() => route.fullPath, () => { refreshUnread(); refreshSupport(); });
 
 const navigationGroups = computed<{ label: string; items: NavigationMenuItem[] }[]>(() => [
   {
@@ -125,6 +127,7 @@ const navigationGroups = computed<{ label: string; items: NavigationMenuItem[] }
       { label: "Reports", icon: "i-lucide-flag", to: "/superadmin/reports" },
       { label: "Payments", icon: "i-lucide-wallet", to: "/superadmin/payments" },
       { label: "Emails", icon: "i-lucide-mail", to: "/superadmin/emails", badge: mailbox.value?.unread ? String(mailbox.value.unread) : undefined },
+      { label: "Support chat", icon: "i-lucide-message-circle", to: "/superadmin/support", badge: support.value?.unread ? String(support.value.unread) : undefined },
     ],
   },
   {

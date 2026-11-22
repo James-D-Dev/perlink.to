@@ -88,7 +88,7 @@ export async function rejectPayment(event: H3Event, id: string) {
 }
 
 /** The superadmin's Telegram chat, if they connected the bot (Settings → Notifications) */
-async function adminChatId(event: H3Event) {
+export async function adminChatId(event: H3Event) {
   const row = await getDB(event)
     .prepare('SELECT telegram_chat_id FROM profiles WHERE email = ? AND telegram_chat_id IS NOT NULL')
     .bind(SUPERADMIN_EMAIL)

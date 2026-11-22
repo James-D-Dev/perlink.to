@@ -276,6 +276,20 @@
       "enterAddress": "먼저 주소를 정하세요",
       "cantUse": "이 주소는 사용할 수 없어요"
     },
+    "support": {
+      "title": "Perlink 지원팀",
+      "subtitle": "보통 몇 시간 안에 답장합니다",
+      "greeting": "안녕하세요! 👋 사이트, 3D 룸, 요금제, 결제 등 Perlink에 대해 무엇이든 물어보세요. 여기에서 답장드릴게요.",
+      "placeholder": "메시지를 입력하세요…",
+      "send": "보내기",
+      "close": "채팅 닫기",
+      "open": "지원팀과 채팅",
+      "launcher": "상담 채팅",
+      "sending": "보내는 중",
+      "willReply": "메시지를 받았습니다. 곧 여기에서 답장드릴게요.",
+      "tooMany": "메시지가 너무 많습니다. 잠시 기다려 주세요.",
+      "failed": "보내지 못했습니다. 다시 시도해 주세요."
+    },
     "help": {
       "ariaLabel": "도움말",
       "heading": "무엇을 도와드릴까요?",

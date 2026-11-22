@@ -93,6 +93,7 @@
     <BillingPackDialog />
     <BillingCelebration />
     <HelpCenter :launcher="false" />
+    <SupportChat />
   </UDashboardGroup>
 </template>
 
@@ -132,6 +133,7 @@ watch(isEditor, (editing, wasEditing) => {
 onMounted(() => nextTick(() => (isEditor.value ? fold() : unfold())));
 
 const helpOpen = useHelpCenter();
+const supportOpen = useSupportChat();
 const { current: setup } = useSiteSetup();
 
 // The upgrade card is for free accounts
@@ -169,6 +171,7 @@ const supportLinks = computed<NavigationMenuItem[]>(() => [
     onSelect: (event: Event) => { event.preventDefault(); toggleTheme(); },
   },
   { label: t("nav.help"), icon: "i-lucide-circle-help", onSelect: () => (helpOpen.value = true) },
+  { label: t("nav.support"), icon: "i-lucide-message-circle", onSelect: () => (supportOpen.value = true) },
   { label: t("nav.feedback"), icon: "i-lucide-message-square-heart", to: "/dashboard/feedback" },
 ]);
 

@@ -276,6 +276,20 @@
       "enterAddress": "Choose an address first",
       "cantUse": "This address can’t be used"
     },
+    "support": {
+      "title": "Perlink support",
+      "subtitle": "We usually reply within a few hours",
+      "greeting": "Hi! 👋 Ask us anything about Perlink: your site, 3D rooms, plans or payments. We'll reply here.",
+      "placeholder": "Type a message…",
+      "send": "Send",
+      "close": "Close chat",
+      "open": "Chat with support",
+      "launcher": "Chat with us",
+      "sending": "sending",
+      "willReply": "We've got your message and will reply here soon.",
+      "tooMany": "Too many messages. Please wait a little.",
+      "failed": "Couldn't send. Please try again."
+    },
     "help": {
       "ariaLabel": "Help",
       "heading": "How can we help?",

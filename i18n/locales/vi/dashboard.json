@@ -276,6 +276,20 @@
       "enterAddress": "Hãy nhập địa chỉ trước",
       "cantUse": "Chưa dùng được địa chỉ này"
     },
+    "support": {
+      "title": "Tư vấn viên Perlink",
+      "subtitle": "Thường trả lời trong vài giờ",
+      "greeting": "Xin chào! 👋 Bạn cần hỗ trợ gì về Perlink: trang của bạn, phòng 3D, gói dịch vụ hay thanh toán? Hãy nhắn ở đây, chúng tôi sẽ trả lời ngay trong khung chat này.",
+      "placeholder": "Nhập tin nhắn…",
+      "send": "Gửi",
+      "close": "Đóng chat",
+      "open": "Chat với tư vấn viên",
+      "launcher": "Chat với tư vấn viên",
+      "sending": "đang gửi",
+      "willReply": "Đã nhận tin nhắn, tư vấn viên sẽ sớm trả lời bạn ở đây.",
+      "tooMany": "Bạn gửi quá nhiều tin. Vui lòng đợi một chút.",
+      "failed": "Gửi không được. Vui lòng thử lại."
+    },
     "help": {
       "ariaLabel": "Trợ giúp",
       "heading": "Chúng tôi có thể giúp gì?",

@@ -33,7 +33,9 @@
         </div>
 
         <footer class="grid grid-cols-2 gap-2 border-t border-line p-3">
-          <UButton :href="mailto" icon="i-lucide-mail" :label="t('dashboard.help.contact')" block />
+          <!-- Signed in: chat with us; otherwise email -->
+          <UButton v-if="loggedIn" icon="i-lucide-message-circle" :label="t('dashboard.support.launcher')" block @click="openChat" />
+          <UButton v-else :href="mailto" icon="i-lucide-mail" :label="t('dashboard.help.contact')" block />
           <UButton
             :to="loggedIn ? '/dashboard/feedback' : '/login'"
             color="neutral"
@@ -86,4 +88,10 @@ const answers = computed(() =>
 )
 
 watch(() => route.fullPath, () => (open.value = false))
+
+const supportOpen = useSupportChat()
+function openChat() {
+  open.value = false
+  supportOpen.value = true
+}
 </script>

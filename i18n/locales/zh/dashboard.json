@@ -276,6 +276,20 @@
       "enterAddress": "请先选择地址",
       "cantUse": "此地址无法使用"
     },
+    "support": {
+      "title": "Perlink 客服",
+      "subtitle": "通常在几小时内回复",
+      "greeting": "你好！👋 关于 Perlink 的任何问题（网站、3D 房间、套餐或付款）都可以问我们，我们会在这里回复。",
+      "placeholder": "输入消息…",
+      "send": "发送",
+      "close": "关闭聊天",
+      "open": "联系客服",
+      "launcher": "在线咨询",
+      "sending": "发送中",
+      "willReply": "已收到你的消息，我们会尽快在这里回复。",
+      "tooMany": "消息太多，请稍等片刻。",
+      "failed": "发送失败，请重试。"
+    },
     "help": {
       "ariaLabel": "帮助",
       "heading": "需要什么帮助？",

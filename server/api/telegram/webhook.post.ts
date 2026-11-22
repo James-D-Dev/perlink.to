@@ -3,12 +3,15 @@ import { sendTelegram, telegramApi, telegramConfig } from '../../utils/telegram'
 import { BOT_COPY } from '../../utils/botCopy'
 import { chatLanguage } from '../../utils/userLanguage'
 import { toAppLanguage } from '#shared/language'
+import { answerFromTelegram } from '../../utils/support'
 import { REVIEW_COPY, adminLanguage, approvePayment, isAdminChat, loadPayment, markTelegramDecision, notifyPayer, paymentSummary, rejectPayment } from '../../utils/paymentReview'
 
 interface TelegramUpdate {
   message?: {
     text?: string
     chat: { id: number; type: string }
+    /** The message this one replies to (a reply to a support notification answers the user) */
+    reply_to_message?: { message_id: number }
   }
   /** A button under a payment review message was pressed */
   callback_query?: {
@@ -53,6 +56,16 @@ export default defineEventHandler(async (event) => {
       .run()
     await sendTelegram(event, chatId, BOT_COPY[toAppLanguage(profile.language)].connected)
     return { ok: true }
+  }
+
+  // The admin replying to a support notification: that's the answer to the user
+  if (message.reply_to_message && (await isAdminChat(event, chatId))) {
+    const answered = await answerFromTelegram(event, message.reply_to_message.message_id, text)
+    if (answered) {
+      const lang = await adminLanguage(event)
+      await sendTelegram(event, chatId, lang === 'vi' ? '✅ Đã gửi trả lời cho khách.' : '✅ Reply sent to the user.')
+      return { ok: true }
+    }
   }
 
   // In the linked account's language, English otherwise
