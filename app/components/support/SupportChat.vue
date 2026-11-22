@@ -153,10 +153,10 @@ async function send() {
   scrollDown()
   try {
     await $fetch('/api/support', { method: 'POST', body: { body } })
-    messages.value = messages.value.filter(m => m !== temp)
+    messages.value = messages.value.filter(m => m.id !== temp.id)
     await load()
   } catch (e: any) {
-    messages.value = messages.value.filter(m => m !== temp)
+    messages.value = messages.value.filter(m => m.id !== temp.id)
     draft.value = body
     error.value = e?.statusCode === 429 ? t('dashboard.support.tooMany') : t('dashboard.support.failed')
   } finally {
