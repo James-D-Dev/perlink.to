@@ -123,9 +123,40 @@ function grow() {
   el.style.height = `${Math.min(el.scrollHeight, 128)}px`
 }
 
+// A soft two-note chime for a new answer, made with Web Audio (no file to load).
+// Browsers only play sound after the visitor has interacted with the page.
+let audio: AudioContext | null = null
+function chime() {
+  try {
+    audio ??= new AudioContext()
+    if (audio.state === 'suspended') audio.resume()
+    const now = audio.currentTime
+    for (const [freq, at] of [[880, 0], [1318.5, 0.14]] as const) {
+      const osc = audio.createOscillator()
+      const gain = audio.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      gain.gain.setValueAtTime(0.0001, now + at)
+      gain.gain.exponentialRampToValueAtTime(0.18, now + at + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + at + 0.45)
+      osc.connect(gain).connect(audio.destination)
+      osc.start(now + at)
+      osc.stop(now + at + 0.5)
+    }
+  } catch {}
+}
+
+// Answers from support already seen (null until the first check, which never chimes)
+let knownAnswers: number | null = null
+function noticeAnswers(count: number) {
+  if (knownAnswers !== null && count > knownAnswers) chime()
+  knownAnswers = count
+}
+
 async function load() {
   try {
     const data = await $fetch<{ messages: SupportMessage[]; unread: number }>('/api/support', { query: { read: open.value ? '1' : undefined } })
+    noticeAnswers(data.messages.filter(m => m.sender === 'admin').length)
     const grew = data.messages.length !== messages.value.filter(m => !m.pending).length
     messages.value = [...data.messages, ...messages.value.filter(m => m.pending)]
     unread.value = open.value ? 0 : data.unread
@@ -136,7 +167,9 @@ async function load() {
 
 async function checkUnread() {
   try {
-    unread.value = (await $fetch<{ unread: number }>('/api/support/unread')).unread
+    const data = await $fetch<{ unread: number; answers?: number }>('/api/support/unread')
+    unread.value = data.unread
+    if (typeof data.answers === 'number') noticeAnswers(data.answers)
     available.value = true
   } catch {}
 }
@@ -164,7 +197,7 @@ async function send() {
   }
 }
 
-// Open: refresh every 8 s; closed: check for answers every minute (only while the tab is visible)
+// Open: refresh every 8 s; closed: check for answers every 30 s (only while the tab is visible)
 let timer: ReturnType<typeof setInterval> | null = null
 function schedule() {
   if (timer) clearInterval(timer)
@@ -172,7 +205,7 @@ function schedule() {
   timer = setInterval(() => {
     if (document.visibilityState !== 'visible') return
     open.value ? load() : checkUnread()
-  }, open.value ? 8000 : 60000)
+  }, open.value ? 8000 : 30000)
 }
 
 watch(open, (isOpen) => {
