@@ -4,6 +4,7 @@
       ref="canvasRef"
       :room="room"
       intro
+      @ready="onCanvasReady"
       :force-mode="forceMode"
       :guests="guestGifts"
       :products="shopProducts"
@@ -354,8 +355,16 @@ const props = defineProps<{
 
 const emit = defineEmits<{ switch2d: []; ready: [] }>()
 
-// The page's loader waits for this: the viewer (and its 3D code) is here
-onMounted(() => emit('ready'))
+// The page's loader waits for this: the land built and on screen (or, if
+// that takes too long, 12 s after the viewer arrived, so the loader never
+// stays forever)
+let readySent = false
+function onCanvasReady() {
+  if (readySent) return
+  readySent = true
+  emit('ready')
+}
+onMounted(() => setTimeout(onCanvasReady, 12000))
 
 const t = (key: SiteMessageKey, params?: Record<string, string | number>) => siteT(props.lang ?? 'en', key, params)
 

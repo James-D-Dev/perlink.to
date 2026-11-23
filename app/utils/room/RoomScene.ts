@@ -37,6 +37,8 @@ export interface RoomSceneOptions {
   onGuestActivate?: (id: string) => void
   /** The pointer is over a guestbook gift (null when it leaves) */
   onGuestHover?: (id: string | null, x: number, y: number) => void
+  /** Once, when the land is built, compiled and on screen (a page's loader waits for it) */
+  onReady?: () => void
   /**
    * Video recording: best quality at a fixed 2x pixel ratio, no input, and
    * no frames of its own; the recorder draws each frame with renderTour()
@@ -878,6 +880,10 @@ export class RoomScene {
       .then(() => {
         perf('land compiled, shown')
         land.group.visible = true
+        if (this.land === land && !this.landShown) {
+          this.landShown = true
+          this.options.onReady?.()
+        }
         this.markActive()
         this.markShadows()
       })
@@ -1489,8 +1495,16 @@ export class RoomScene {
     this.camera.lookAt(this.controls.target)
   }
 
+  /** The first land is on screen (the intro waits for it) */
+  private landShown = false
+
   private updateIntro(now: number) {
     if (!this.intro) return
+    // Wait on the distant view until the land is there to fly into
+    if (!this.landShown) {
+      this.placeIntroCamera(0)
+      return
+    }
     // Hold on the distant view for a moment so the land's models can load
     this.intro.start ??= now + INTRO_HOLD
     const progress = THREE.MathUtils.clamp((now - this.intro.start) / INTRO_DURATION, 0, 1)

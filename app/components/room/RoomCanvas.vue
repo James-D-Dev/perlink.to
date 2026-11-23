@@ -46,6 +46,8 @@ const emit = defineEmits<{
   stats: [stats: RoomSceneStats]
   guestActivate: [id: string]
   guestHover: [id: string | null, x: number, y: number]
+  /** The land is built and on screen */
+  ready: []
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -55,6 +57,9 @@ let unmounted = false
 onMounted(async () => {
   // WebGPU (with ?gpu=1) or WebGL: the renderer kit loads first (./gpu.ts)
   await loadGpuKit()
+  // Let the page paint first (its loader): building the scene holds the main
+  // thread for a while, on phones for a second or more
+  await new Promise<void>(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)))
   if (!containerRef.value || unmounted) return
   scene = new RoomScene(containerRef.value, {
     editable: props.editable,
@@ -67,6 +72,7 @@ onMounted(async () => {
     onStats: stats => emit('stats', stats),
     onGuestActivate: id => emit('guestActivate', id),
     onGuestHover: (id, x, y) => emit('guestHover', id, x, y),
+    onReady: () => emit('ready'),
   })
   if (props.products) scene.setProducts(props.products, props.shopAccent, props.soldOutLabel, props.buyLabel)
   scene.setRoom(props.room)
