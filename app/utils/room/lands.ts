@@ -1640,6 +1640,9 @@ function buildIsland(ctx: LandContext, radius: number): LandInstance {
     starsAlways: false,
     sky: { night: new THREE.Color('#070b1f'), dusk: new THREE.Color('#f2a65a'), day: new THREE.Color('#8fd0f5') },
     atmosphere: { turbidity: 2.5, rayleigh: 2.2, mie: 0.003 },
+    // The open sky's full light burnt the room's white walls and pale floors
+    // out (and made them glow), like on the other lands before they were tamed
+    light: { sun: 0.9, sky: 0.5 },
     focus: { position: hero.origin.clone(), height: heroHeight },
     update(time, dt, daylight, lamps) {
       groundUpdate(time, daylight)

@@ -15,6 +15,8 @@ import * as THREE from 'three'
 
 export interface LiveLook {
   render: (dt: number) => void
+  /** Daylight 0 (night) .. 1 (noon): sunlit white walls must not glow */
+  setDaylight: (d: number) => void
   dispose: () => void
 }
 
@@ -53,11 +55,16 @@ export async function createLiveLook(renderer: THREE.WebGLRenderer, scene: THREE
     color: new THREE.Color('#2a2118'),
   })
 
+  // Only what is brighter than lit walls glows: lamps, neon, flames. By day
+  // the bar is higher: on the brightest lands (Sky island's open sky) a white
+  // wall facing the sun goes past 1.6 and the whole room glowed
+  const NIGHT_GLOW = 1.6
+  const DAY_GLOW = 3.2
+  const bloom = new pp.BloomEffect({ mipmapBlur: true, luminanceThreshold: NIGHT_GLOW, luminanceSmoothing: 0.3, intensity: 0.45, radius: 0.4 })
   composer.addPass(new pp.EffectPass(
     camera,
     ao,
-    // Only what is brighter than daylit walls glows: lamps, neon, flames
-    new pp.BloomEffect({ mipmapBlur: true, luminanceThreshold: 1.6, luminanceSmoothing: 0.3, intensity: 0.45, radius: 0.4 }),
+    bloom,
     new pp.ToneMappingEffect({ mode: pp.ToneMappingMode.NEUTRAL }),
     new pp.BrightnessContrastEffect({ contrast: 0.06 }),
     new pp.HueSaturationEffect({ saturation: 0.06 }),
@@ -77,6 +84,9 @@ export async function createLiveLook(renderer: THREE.WebGLRenderer, scene: THREE
         composer.setSize(css.x, css.y, false)
       }
       composer.render(dt)
+    },
+    setDaylight(d) {
+      bloom.luminanceMaterial.threshold = NIGHT_GLOW + (DAY_GLOW - NIGHT_GLOW) * Math.min(1, Math.max(0, d))
     },
     dispose: () => composer.dispose(),
   }

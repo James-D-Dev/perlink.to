@@ -1562,6 +1562,7 @@ export class RoomScene {
         if (this.disposed) look.dispose()
         else {
           this.liveLook = look
+          look.setDaylight(this.shownDaylight ?? 1)
           this.markActive()
         }
       })
@@ -1769,6 +1770,7 @@ export class RoomScene {
     }
     this.hemi.color.copy(this.skyColor).lerp(new THREE.Color('#ffffff'), 0.5)
     this.renderer.toneMappingExposure = (atmosphere ? 0.75 + 0.1 * d : 1 + 0.1 * d) * (this.land?.light?.exposure ?? 1)
+    this.liveLook?.setDaylight(d)
     this.moonDisc.visible = !isDay
     ;(isDay ? this.sunDisc : this.moonDisc).position.copy(arcPos)
 
