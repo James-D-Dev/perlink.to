@@ -29,3 +29,10 @@
   ! CDN-Cache-Control
   ! Cloudflare-CDN-Cache-Control
   Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+# The Draco decoder (for the compressed 3D models): a month
+/draco/*
+  ! Cache-Control
+  ! CDN-Cache-Control
+  ! Cloudflare-CDN-Cache-Control
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
