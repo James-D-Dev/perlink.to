@@ -119,12 +119,12 @@
         size="xl"
         icon="i-lucide-box"
         :label="siteT(siteLang, 'room3d')"
-        @click="show2d = false"
+        @click="open3d"
       />
       <!-- The 3D room's loader (outside the branches above, so it can fade
            out over the room) -->
       <Transition leave-active-class="transition-opacity duration-300" leave-to-class="opacity-0">
-        <RoomLoadingShell v-if="!pending && !error && bioPage && room && !show2d && roomLoading" />
+        <RoomLoadingShell v-if="!pending && !error && bioPage && room && !show2d && roomLoading" progress />
       </Transition>
     </div>
   </div>
@@ -135,6 +135,7 @@ import type { BioBlock, BioData, ThemeConfig } from "~/types/bio";
 import { cleanTracking } from "#shared/tracking";
 import { DEFAULT_THEME } from "~/types/bio";
 import { normalizeRoom, type RoomConfig } from "~/types/room";
+import { resetRoomLoadStep } from "~/utils/room/loadProgress";
 const props = defineProps<{
   username: string;
   /** Set when the site is shown on its own domain (canonical links point there) */
@@ -245,6 +246,12 @@ const show2d = ref(bioPage.value?.themeConfig?.pageMode !== "3d");
 // The 3D room's loader stays until the viewer is mounted and the loader has
 // finished its intro (the pearl on the floor)
 const roomLoading = ref(true);
+// Back from the 2D page: the room is built again, so the loader shows again
+function open3d() {
+  resetRoomLoadStep();
+  roomLoading.value = true;
+  show2d.value = false;
+}
 function onViewerMounted() {
   setTimeout(() => (roomLoading.value = false), loaderWaitMs());
 }

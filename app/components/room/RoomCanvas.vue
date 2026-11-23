@@ -6,6 +6,7 @@
 import type { RoomConfig, WallSide } from '~/types/room'
 import { RoomScene, type ObjectPatch, type RoomSceneStats } from '~/utils/room/RoomScene'
 import { loadGpuKit } from '~/utils/room/gpu'
+import { setRoomLoadStep } from '~/utils/room/loadProgress'
 import { daylightAtHour, getDaylight, type DaylightState } from '~/utils/room/daylight'
 import type { GuestGiftType } from '#shared/guestbook'
 import type { ShopProduct } from '~/utils/room/productCard'
@@ -57,6 +58,7 @@ let unmounted = false
 onMounted(async () => {
   // WebGPU (with ?gpu=1) or WebGL: the renderer kit loads first (./gpu.ts)
   await loadGpuKit()
+  if (props.intro) setRoomLoadStep(45, 55)
   // Let the page paint first (its loader): building the scene holds the main
   // thread for a while, on phones for a second or more
   await new Promise<void>(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)))
@@ -72,13 +74,18 @@ onMounted(async () => {
     onStats: stats => emit('stats', stats),
     onGuestActivate: id => emit('guestActivate', id),
     onGuestHover: (id, x, y) => emit('guestHover', id, x, y),
-    onReady: () => emit('ready'),
+    onReady: () => {
+      if (props.intro) setRoomLoadStep(100)
+      emit('ready')
+    },
   })
   if (props.products) scene.setProducts(props.products, props.shopAccent, props.soldOutLabel, props.buyLabel)
   scene.setRoom(props.room)
   if (props.guests) scene.setGuests(props.guests)
   scene.select(props.selectedId)
   applyPreview()
+  // Built; the land's shaders compile next
+  if (props.intro) setRoomLoadStep(70, 96)
 })
 
 onBeforeUnmount(() => {

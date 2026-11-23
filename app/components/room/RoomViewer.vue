@@ -328,11 +328,15 @@ import type { SiteLanguage, SiteMessageKey } from '~/utils/siteI18n'
 import type { RoomConfig, RoomObject } from '~/types/room'
 import { CATALOG_BY_TYPE } from '~/utils/room/catalog'
 import { getDaylight } from '~/utils/room/daylight'
+import { setRoomLoadStep } from '~/utils/room/loadProgress'
 import { MUSIC_BY_ID, ROOM_MUSIC_ENABLED } from '~/data/roomMusic'
 import { GUEST_GIFTS, GUEST_GIFT_EMOJI, GUESTBOOK_LIMITS, type GuestbookEntry, type GuestGiftType } from '#shared/guestbook'
 import type { BioBlock, ProductItem, ProductsBlock } from '~/types/bio'
 import { formatVnd } from '#shared/plans'
 import { createReusableTemplate, useMediaQuery } from '@vueuse/core'
+
+// The viewer's code has arrived (the loader's percentage)
+setRoomLoadStep(35, 45)
 
 // Pinch zooms the camera, never the page
 usePreventPageZoom()
