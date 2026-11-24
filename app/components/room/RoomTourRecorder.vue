@@ -41,8 +41,15 @@
             <video v-if="phase === 'done' && videoUrl" :src="videoUrl" class="size-full object-cover" controls autoplay loop playsinline />
             <div v-show="phase === 'recording'" ref="liveBox" class="size-full [&>canvas]:size-full" />
             <canvas v-show="phase === 'setup'" ref="frameCanvas" :width="WIDTH" :height="HEIGHT" class="size-full" />
-            <div v-if="(phase === 'setup' && !stillReady) || stage === 'loading' && preparing" class="absolute inset-0 flex items-center justify-center bg-black/40">
+            <div v-if="phase === 'setup' && !stillReady" class="absolute inset-0 flex items-center justify-center bg-black/40">
               <UIcon name="i-lucide-loader-circle" class="size-8 animate-spin text-white" />
+            </div>
+            <!-- While the video is made its frames come one by one, stuttering:
+                 frosted over, with how far it has got -->
+            <div v-if="phase === 'recording'" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/45 px-8 text-center backdrop-blur-2xl">
+              <UIcon name="i-lucide-loader-circle" class="size-9 animate-spin text-white/90" />
+              <p v-if="stage !== 'loading'" class="text-3xl font-semibold tabular-nums">{{ Math.round(progress * 100) }}%</p>
+              <p class="text-sm text-white/65">{{ t('room.tour.makingHint') }}</p>
             </div>
           </div>
 
