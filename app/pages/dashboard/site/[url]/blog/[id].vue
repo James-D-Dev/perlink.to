@@ -80,7 +80,7 @@
         :mention="false"
         :placeholder="t('dashboard.blog.bodyPlaceholder')"
         class="mt-4"
-        :ui="{ base: 'blog-editor min-h-[50vh] text-[17px] leading-relaxed' }"
+        :ui="{ base: 'blog-editor min-h-[50vh] px-0 sm:px-0 text-[17px] leading-relaxed' }"
         @update:model-value="queueSave"
       >
         <div class="sticky top-14 z-20 -mx-2 mb-3 overflow-x-auto bg-paper/90 px-2 py-1.5 backdrop-blur [scrollbar-width:none]">
@@ -117,6 +117,10 @@ interface Editor {
 // Writing a blog post: cover, title and body, saved as you type; Publish puts
 // it on perlink.to/<site>/blog
 definePageMeta({ layout: 'blank', middleware: 'auth', ssr: false })
+// The dashboard's surfaces (paper, ink) and their dark version: without it
+// the page stayed light in dark mode while its buttons and toolbar took the
+// dark mode's pale text, and all but vanished
+useHead({ htmlAttrs: { class: 'admin-theme' } })
 
 const route = useRoute()
 const { t } = useI18n()
