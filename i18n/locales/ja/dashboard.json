@@ -1169,7 +1169,15 @@
       "removeLink": "削除",
       "addImage": "画像を追加",
       "uploadFailed": "画像をアップロードできませんでした",
-      "notFound": "記事が見つかりません"
+      "notFound": "記事が見つかりません",
+      "sidebar": {
+        "title": "記事",
+        "search": "記事を検索",
+        "all": "すべて",
+        "none": "一致する記事はありません",
+        "list": "記事一覧",
+        "words": "{n} 語"
+      }
     },
     "tracking": {
       "heading": "広告ピクセルと Google",

@@ -1169,7 +1169,15 @@
       "removeLink": "삭제",
       "addImage": "이미지 추가",
       "uploadFailed": "이미지를 업로드하지 못했어요",
-      "notFound": "게시물을 찾을 수 없어요"
+      "notFound": "게시물을 찾을 수 없어요",
+      "sidebar": {
+        "title": "글",
+        "search": "글 검색",
+        "all": "전체",
+        "none": "일치하는 글이 없어요",
+        "list": "글 목록",
+        "words": "{n}단어"
+      }
     },
     "tracking": {
       "heading": "광고 픽셀 & Google",

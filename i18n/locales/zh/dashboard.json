@@ -1169,7 +1169,15 @@
       "removeLink": "移除",
       "addImage": "添加图片",
       "uploadFailed": "图片上传失败",
-      "notFound": "找不到文章"
+      "notFound": "找不到文章",
+      "sidebar": {
+        "title": "文章",
+        "search": "搜索文章",
+        "all": "全部",
+        "none": "没有匹配的文章",
+        "list": "全部文章",
+        "words": "{n} 字"
+      }
     },
     "tracking": {
       "heading": "广告像素与 Google",

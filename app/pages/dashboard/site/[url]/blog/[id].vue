@@ -1,13 +1,26 @@
 <template>
-  <div class="min-h-screen bg-paper text-ink">
-    <!-- Top bar: back, save status, post settings, publish -->
+  <div class="min-h-screen bg-paper text-ink lg:flex">
+    <!-- The site's posts, to switch between (wide screens: a column; phones:
+         a panel from the list button) -->
+    <aside class="sticky top-0 hidden h-screen w-72 shrink-0 border-r border-line bg-sand/40 lg:block">
+      <SiteBlogSidebar :username="username" :current-id="postId" :current="current" />
+    </aside>
+    <USlideover v-model:open="listOpen" side="left" :title="t('dashboard.blog.sidebar.list')" :ui="{ content: 'max-w-[20rem]', header: 'sr-only', body: 'p-0 sm:p-0' }">
+      <template #body>
+        <SiteBlogSidebar :username="username" :current-id="postId" :current="current" @navigate="listOpen = false" />
+      </template>
+    </USlideover>
+
+    <div class="min-w-0 flex-1">
+    <!-- Top bar: the list (phones), save status, post settings, publish -->
     <header class="sticky top-0 z-30 border-b border-line bg-paper/85 backdrop-blur-xl">
       <div class="mx-auto flex h-14 max-w-3xl items-center gap-2 px-3">
-        <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" :to="backTo" :aria-label="t('dashboard.blog.back')" />
+        <UButton class="lg:hidden" icon="i-lucide-panel-left" color="neutral" variant="ghost" :aria-label="t('dashboard.blog.sidebar.list')" @click="listOpen = true" />
         <span class="min-w-0 flex-1 truncate text-xs text-muted">
           <template v-if="saving">{{ t('dashboard.blog.saving') }}</template>
           <template v-else-if="saveError">{{ t('dashboard.blog.saveFailed') }}</template>
           <template v-else-if="post">{{ post.status === 'published' ? t('dashboard.blog.status.published') : t('dashboard.blog.savedDraft') }}</template>
+          <template v-if="post && words"> · {{ t('dashboard.blog.sidebar.words', { n: words }) }} · {{ t('dashboard.blog.minutes', { n: Math.max(1, Math.round(words / 200)) }) }}</template>
         </span>
         <UPopover :content="{ align: 'end' }">
           <UButton icon="i-lucide-settings-2" color="neutral" variant="ghost" :aria-label="t('dashboard.blog.settings')" />
@@ -89,6 +102,8 @@
       </UEditor>
     </main>
 
+    </div>
+
     <input ref="fileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" @change="onFile">
 
     <!-- Add a link to the selected words -->
@@ -116,7 +131,7 @@ interface Editor {
 
 // Writing a blog post: cover, title and body, saved as you type; Publish puts
 // it on perlink.to/<site>/blog
-definePageMeta({ layout: 'blank', middleware: 'auth', ssr: false })
+definePageMeta({ layout: 'blank', middleware: 'auth', ssr: false, key: route => route.fullPath })
 // The dashboard's surfaces (paper, ink) and their dark version: without it
 // the page stayed light in dark mode while its buttons and toolbar took the
 // dark mode's pale text, and all but vanished
@@ -141,6 +156,31 @@ const autoExcerptText = ref('')
 const titleEl = ref<HTMLTextAreaElement | null>(null)
 
 useHead({ title: () => `${title.value || t('dashboard.blog.untitled')} — Perlink` })
+
+// ---------- The list beside it ----------
+
+const listOpen = ref(false)
+const current = computed(() => post.value ? { title: title.value, status: post.value.status, coverUrl: coverUrl.value } : undefined)
+// The open post's row in the list follows each save (title, state, time)
+const sidebarPosts = useState<Record<string, { id: string; title: string; status: 'draft' | 'published'; coverUrl: string | null; updatedAt: string }[]>>('blog-sidebar-posts', () => ({}))
+function syncRow(p: Post) {
+  const list = sidebarPosts.value[username]
+  if (!list) return
+  const row = { id: p.id, title: p.title, status: p.status, coverUrl: p.coverUrl, updatedAt: new Date().toISOString() }
+  sidebarPosts.value = { ...sidebarPosts.value, [username]: [row, ...list.filter(item => item.id !== p.id)] }
+}
+
+// Words in the body, for the bar's "320 words · 2 min read"
+const words = computed(() => {
+  let n = 0
+  const walk = (node: any) => {
+    if (!node) return
+    if (typeof node.text === 'string') n += node.text.split(/\s+/).filter(Boolean).length
+    if (Array.isArray(node.content)) node.content.forEach(walk)
+  }
+  walk(content.value)
+  return n
+})
 
 onMounted(async () => {
   try {
@@ -190,6 +230,7 @@ async function save(extra: Record<string, unknown> = {}) {
       body: { title: title.value, content: content.value, excerpt: excerpt.value || null, coverUrl: coverUrl.value, ...extra },
     })
     post.value = { ...post.value, ...res.post }
+    syncRow(post.value)
     autoExcerptText.value = res.post.autoExcerpt ?? ''
     if (!slug.value && !res.post.slug.startsWith('draft-') && res.post.status === 'published') slug.value = res.post.slug
     return res.post

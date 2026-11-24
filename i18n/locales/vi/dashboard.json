@@ -1169,7 +1169,15 @@
       "removeLink": "Bỏ",
       "addImage": "Chèn ảnh",
       "uploadFailed": "Không tải được ảnh lên",
-      "notFound": "Không tìm thấy bài viết"
+      "notFound": "Không tìm thấy bài viết",
+      "sidebar": {
+        "title": "Bài viết",
+        "search": "Tìm bài viết",
+        "all": "Tất cả",
+        "none": "Không có bài nào khớp",
+        "list": "Danh sách bài viết",
+        "words": "{n} chữ"
+      }
     },
     "tracking": {
       "heading": "Pixel quảng cáo & Google",

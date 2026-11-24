@@ -1169,7 +1169,15 @@
       "removeLink": "Remove",
       "addImage": "Add an image",
       "uploadFailed": "Couldn’t upload the image",
-      "notFound": "Post not found"
+      "notFound": "Post not found",
+      "sidebar": {
+        "title": "Posts",
+        "search": "Search posts",
+        "all": "All",
+        "none": "No posts match",
+        "list": "All posts",
+        "words": "{n} words"
+      }
     },
     "tracking": {
       "heading": "Ad pixels & Google",
