@@ -324,7 +324,7 @@
       </div>
 
       <!-- Selected object: tap to open its details -->
-      <UTooltip v-if="selectedObject && selectedItem" :text="showingDetail ? t('room.camera.hideDetails') : t('room.camera.editObject', { name: objectName(selectedItem) })" :content="{ side: 'left' }">
+      <UTooltip v-if="selectedObject && selectedItem" class="max-lg:hidden" :text="showingDetail ? t('room.camera.hideDetails') : t('room.camera.editObject', { name: objectName(selectedItem) })" :content="{ side: 'left' }">
         <button
           type="button"
           class="relative flex size-12 items-center justify-center rounded-2xl bg-default/70 shadow-lg ring-1 backdrop-blur-xl transition"
@@ -361,6 +361,33 @@
           <span v-if="stats.cap < 60" class="text-white/50">{{ t('room.stats.idle') }}</span>
         </div>
       </div>
+
+      <!-- Phones and tablets: the picked object, plainly, with a button to
+           its details (a chip at the side went unnoticed) -->
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="translate-y-3 opacity-0"
+        leave-active-class="transition duration-150 ease-in"
+        leave-to-class="translate-y-3 opacity-0"
+      >
+        <div
+          v-if="selectedObject && selectedItem && !showingDetail"
+          class="pointer-events-auto flex w-full max-w-md items-center gap-2.5 rounded-2xl bg-default/85 p-2 shadow-xl ring-1 ring-perlink-blue/40 backdrop-blur-xl lg:hidden"
+        >
+          <button type="button" class="flex min-w-0 flex-1 items-center gap-2.5 text-left" @click="openPanel('detail')">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-elevated">
+              <img v-if="thumbnails[selectedItem.type]" :src="thumbnails[selectedItem.type]" :alt="objectName(selectedItem)" class="size-10 object-contain">
+              <UIcon v-else name="i-lucide-box" class="size-5" />
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-sm font-semibold text-highlighted">{{ objectName(selectedItem) }}</span>
+              <span class="block truncate text-xs text-muted">{{ selectedItem.wallMounted ? t('room.detail.dragWall') : t('room.detail.dragFloor') }}</span>
+            </span>
+          </button>
+          <UButton icon="i-lucide-sliders-horizontal" :label="t('room.selection.edit')" class="shrink-0" @click="openPanel('detail')" />
+          <UButton icon="i-lucide-x" color="neutral" variant="ghost" class="shrink-0" :aria-label="t('room.selection.deselect')" @click="selectedId = null" />
+        </div>
+      </Transition>
 
       <!-- Inventory bar -->
       <div data-tour="tray" class="pointer-events-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-default/75 ring-1 ring-white/10 shadow-xl backdrop-blur-xl">

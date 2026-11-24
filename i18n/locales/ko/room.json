@@ -80,6 +80,10 @@
       "hideDetails": "세부 정보 숨기기",
       "editObject": "{name} 편집"
     },
+    "selection": {
+      "edit": "편집",
+      "deselect": "선택 해제"
+    },
     "coach": {
       "label": "룸 편집기 둘러보기",
       "replay": "사용 방법",

@@ -80,6 +80,10 @@
       "hideDetails": "Hide details",
       "editObject": "Edit {name}"
     },
+    "selection": {
+      "edit": "Edit",
+      "deselect": "Deselect"
+    },
     "coach": {
       "label": "Room editor tour",
       "replay": "How it works",

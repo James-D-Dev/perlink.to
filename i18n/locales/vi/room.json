@@ -80,6 +80,10 @@
       "hideDetails": "Ẩn chi tiết",
       "editObject": "Sửa {name}"
     },
+    "selection": {
+      "edit": "Chỉnh sửa",
+      "deselect": "Bỏ chọn"
+    },
     "coach": {
       "label": "Hướng dẫn trình chỉnh phòng",
       "replay": "Hướng dẫn",

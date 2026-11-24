@@ -80,6 +80,10 @@
       "hideDetails": "詳細を隠す",
       "editObject": "{name}を編集"
     },
+    "selection": {
+      "edit": "編集",
+      "deselect": "選択解除"
+    },
     "coach": {
       "label": "ルームエディターのツアー",
       "replay": "使い方",

@@ -80,6 +80,10 @@
       "hideDetails": "隐藏详情",
       "editObject": "编辑 {name}"
     },
+    "selection": {
+      "edit": "编辑",
+      "deselect": "取消选择"
+    },
     "coach": {
       "label": "房间编辑器导览",
       "replay": "使用说明",
