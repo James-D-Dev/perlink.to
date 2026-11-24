@@ -1,13 +1,14 @@
 import * as THREE from 'three'
 
-// The room video's film look (pmndrs postprocessing): depth of field, a soft
-// glow from the bright parts, the scene's own Neutral tone mapping, a light
-// vignette and a touch of contrast. Only the video recorder's scene uses it
-// (loaded on demand), so visitors' phones never pay for it.
+// The room video's film look (pmndrs postprocessing): depth of field, the
+// scene's own Neutral tone mapping, a light vignette and a touch of contrast.
+// No glow: it caught every sunlit wall and washed the video out on phones.
+// Only the video recorder's scene uses it (loaded on demand), so visitors'
+// phones never pay for it.
 //
 // The scene renders into a half-float buffer (render targets skip the
-// renderer's tone mapping), so tone mapping happens here, after the glow,
-// with the renderer's exposure as before.
+// renderer's tone mapping), so tone mapping happens here, with the
+// renderer's exposure as before.
 
 export interface Cinematic {
   render: (dt: number) => void
@@ -33,7 +34,6 @@ export async function createCinematic(renderer: THREE.WebGLRenderer, scene: THRE
 
   composer.addPass(new pp.EffectPass(
     camera,
-    new pp.BloomEffect({ mipmapBlur: true, luminanceThreshold: 0.75, luminanceSmoothing: 0.2, intensity: 0.65, radius: 0.7 }),
     new pp.ToneMappingEffect({ mode: pp.ToneMappingMode.NEUTRAL }),
     new pp.BrightnessContrastEffect({ contrast: 0.08 }),
     new pp.VignetteEffect({ offset: 0.32, darkness: 0.5 }),
