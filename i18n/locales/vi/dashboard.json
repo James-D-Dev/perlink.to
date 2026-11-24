@@ -193,7 +193,13 @@
       "templateReopen": "Bắt đầu từ một mẫu có sẵn",
       "sections": "Các phần của trang",
       "yourSites": "Trang của bạn",
-      "notLiveYet": "Chưa xuất bản, khách chưa xem được"
+      "notLiveYet": "Chưa xuất bản, khách chưa xem được",
+      "phoneView": {
+        "page": "Trang",
+        "list": "Các phần",
+        "hint": "Chạm vào phần nào trên trang để sửa phần đó",
+        "add": "Thêm phần mới"
+      }
     },
     "username": {
       "heading": "Chọn tên người dùng",

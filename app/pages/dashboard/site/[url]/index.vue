@@ -218,6 +218,52 @@
             <div class="rounded-3xl bg-paper p-4 ring-1 ring-line sm:p-6 lg:col-span-7">
               <h2 class="mb-5 hidden text-xl font-semibold text-ink lg:block">{{ editorTabs.find((tab) => tab.value === pane)?.label }}</h2>
               <template v-if="pane === 'content'">
+                <!-- Phones: the page itself (tap a part to change it) or the
+                     list of sections (to reorder, hide, add) -->
+                <div v-if="swipeable && !isEmptyPage" class="mb-4 grid grid-cols-2 gap-1 rounded-full bg-sand p-1 ring-1 ring-line lg:hidden" role="tablist">
+                  <button
+                    v-for="view in (['page', 'list'] as const)"
+                    :key="view"
+                    type="button"
+                    role="tab"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-medium transition-colors"
+                    :class="phoneView === view ? 'bg-ink text-paper shadow-sm' : 'text-ink-soft'"
+                    :aria-selected="phoneView === view"
+                    @click="phoneView = view"
+                  >
+                    <UIcon :name="view === 'page' ? 'i-lucide-smartphone' : 'i-lucide-list'" class="size-4" />
+                    {{ t(`dashboard.editor.phoneView.${view}`) }}
+                  </button>
+                </div>
+
+                <template v-if="phonePageView">
+                  <p class="mb-3 flex items-center justify-center gap-1.5 text-center text-xs font-medium text-ink-muted">
+                    <UIcon name="i-lucide-pointer" class="size-3.5 shrink-0" />
+                    {{ t('dashboard.editor.phoneView.hint') }}
+                  </p>
+                  <!-- The page as visitors see it, full width. translateZ makes
+                       the page's fixed layers (video, effects, share button)
+                       stay inside this box -->
+                  <div ref="phonePage" class="-mx-2 overflow-hidden rounded-2xl ring-1 ring-line [transform:translateZ(0)] sm:mx-0">
+                    <BioPageView
+                      :bio-data="bioData"
+                      :username="existingBio?.username || username"
+                      :active-block-id="sheetBlock"
+                      mode="preview"
+                      @select-block="openBlock"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-accented py-3 text-sm font-medium text-muted"
+                    @click="addFromPage"
+                  >
+                    <UIcon name="i-lucide-plus" class="size-4" />
+                    {{ t('dashboard.editor.phoneView.add') }}
+                  </button>
+                </template>
+
+                <template v-else>
                 <!-- Template picker for empty pages -->
                 <div v-if="showTemplatePicker" class="mb-4 rounded-xl border border-perlink-blue/30 bg-perlink-blue/5 p-4">
                   <div class="mb-3 flex items-start justify-between gap-3">
@@ -253,6 +299,7 @@
                   @update-blocks="bioData.blocks = $event"
                   @focus-block="openBlock"
                 />
+                </template>
               </template>
 
               <!-- Photo, name, intro and the header layout -->
@@ -305,6 +352,7 @@
                 :published="!!existingBio?.isPublished"
                 :can-discard="!!existingBio?.isPublished && !!existingBio?.hasDraft"
                 :discarding="discarding"
+                :hide-preview="pane === 'content' && phonePageView"
                 @preview="previewOpen = true"
                 @switch-tab="activeTab = $event"
                 @publish="publishBio"
@@ -612,6 +660,41 @@
           :blocks="bioData.blocks"
         />
 
+        <!-- Phones, page view: the part tapped on the page, edited in a sheet
+             over it (the page above changes as you type) -->
+        <AppSheet
+          v-model:open="sheetOpen"
+          :title="t('common.edit')"
+          no-autofocus
+          :ui="{ header: 'sr-only', body: 'pb-[calc(1rem+env(safe-area-inset-bottom))]' }"
+        >
+          <template #body>
+            <BioBlockHeader
+              v-if="sheetBlock === 'header'"
+              :is-active="true"
+              :title="bioData.title"
+              :bio="bioData.bio"
+              :avatar-url="bioData.avatarUrl"
+              :bio-page-id="existingBio?.id ?? ''"
+              @update:title="updateBioData('title', $event)"
+              @update:bio="updateBioData('bio', $event)"
+              @update:avatar-url="updateBioData('avatarUrl', $event)"
+            />
+            <BioEditor
+              v-else-if="sheetBlock"
+              :only="sheetBlock"
+              :active-block="sheetBlock"
+              :bio-data="bioData"
+              :bio-page-id="existingBio?.id ?? ''"
+              @add-block="onAddBlock"
+              @toggle-block="sheetBlock = null"
+              @update-data="updateBioData"
+              @update-blocks="bioData.blocks = $event"
+              @focus-block="openBlock"
+            />
+          </template>
+        </AppSheet>
+
         <!-- Phone preview (mobile and tablet; desktop shows it beside the editor) -->
         <!-- The phone frame is the card: centred on a plain dim screen (no
              blur), close button in the top-right corner, tap around to close -->
@@ -759,6 +842,31 @@ const onBioPageChange = (username: string) => {
 // Editor tabs
 const previewOpen = ref(false);
 
+// Phones: the content tab opens on the page itself (tap a part to edit it in
+// a sheet); the list of sections is one tap away. The choice is remembered
+const PHONE_VIEW_KEY = "perlink.editorPhoneView";
+const phoneView = ref<"page" | "list">("page");
+onMounted(() => {
+  try { if (localStorage.getItem(PHONE_VIEW_KEY) === "list") phoneView.value = "list"; } catch {}
+});
+watch(phoneView, (view) => {
+  try { localStorage.setItem(PHONE_VIEW_KEY, view); } catch {}
+});
+const phonePage = ref<HTMLElement | null>(null);
+const sheetBlock = ref<string | null>(null);
+const sheetOpen = computed({
+  get: () => !!sheetBlock.value,
+  set: (open: boolean) => { if (!open) sheetBlock.value = null; },
+});
+// A block deleted from the sheet closes it
+watch(() => bioData.blocks, (blocks) => {
+  if (sheetBlock.value && sheetBlock.value !== "header" && !blocks.some((b) => b.id === sheetBlock.value)) sheetBlock.value = null;
+});
+function addFromPage() {
+  phoneView.value = "list";
+  nextTick(() => editorRef.value?.openBlockModal());
+}
+
 const qrOpen = ref(false);
 
 type EditorTab = "content" | "header" | "design" | "room" | "blog" | "settings";
@@ -791,6 +899,7 @@ watch(activeTab, (tab) => {
 // just off screen (outside the page's padding) so they show while swiping
 const swipeArea = ref<HTMLElement | null>(null);
 const swipeable = useMediaQuery("(max-width: 1023px)");
+const phonePageView = computed(() => swipeable.value && phoneView.value === "page" && !isEmptyPage.value);
 const PANE_GAP = 32;
 const swipe = useTabSwipe(swipeArea, computed(() => EDITOR_TABS), activeTab, swipeable, PANE_GAP);
 
@@ -948,6 +1057,16 @@ const toggleBlock = (blockId: string) => {
 };
 
 const openBlock = (blockId: string) => {
+  // Phones, page view: edit it in the sheet, over the page
+  if (phonePageView.value && activeTab.value === "content") {
+    activeBlock.value = blockId;
+    sheetBlock.value = blockId;
+    nextTick(() => {
+      const el = phonePage.value?.querySelector<HTMLElement>(`#${CSS.escape(blockId === "header" ? "header-block" : `block-${blockId}`)}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return;
+  }
   // The page's top has its own section
   if (blockId === "header") {
     activeTab.value = "header";
@@ -1017,6 +1136,7 @@ const onOnboardingAction = (step: string) => {
     openBlock("header");
   } else if (step === "contact") {
     activeTab.value = "content";
+    phoneView.value = "list";
     nextTick(() => editorRef.value?.openBlockModal());
   } else if (step === "publish") {
     publishBio();

@@ -12,6 +12,7 @@
         icon="i-lucide-eye"
         color="neutral"
         variant="outline"
+        v-if="!hidePreview"
         class="shrink-0 lg:hidden"
         :label="t('common.preview')"
         @click="$emit('preview')"
@@ -65,6 +66,8 @@ defineProps<{
   published: boolean
   canDiscard: boolean
   discarding: boolean
+  /** The page is already on screen (phones' page view) */
+  hidePreview?: boolean
 }>()
 
 defineEmits<{

@@ -193,7 +193,13 @@
       "templateReopen": "Start from a template",
       "sections": "Editor sections",
       "yourSites": "Your sites",
-      "notLiveYet": "Not published yet, visitors can’t see it"
+      "notLiveYet": "Not published yet, visitors can’t see it",
+      "phoneView": {
+        "page": "Page",
+        "list": "Sections",
+        "hint": "Tap any part of your page to change it",
+        "add": "Add a section"
+      }
     },
     "username": {
       "heading": "Choose your username",

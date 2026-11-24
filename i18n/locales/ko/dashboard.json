@@ -193,7 +193,13 @@
       "templateReopen": "템플릿으로 시작하기",
       "sections": "편집기 섹션",
       "yourSites": "내 사이트",
-      "notLiveYet": "아직 게시되지 않아 방문자가 볼 수 없어요"
+      "notLiveYet": "아직 게시되지 않아 방문자가 볼 수 없어요",
+      "phoneView": {
+        "page": "페이지",
+        "list": "섹션",
+        "hint": "바꾸고 싶은 부분을 탭하세요",
+        "add": "섹션 추가"
+      }
     },
     "username": {
       "heading": "사용자 이름 선택",

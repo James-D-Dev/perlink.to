@@ -12,6 +12,7 @@
     <div class="space-y-2">
       <!-- Who the page is about; edited in the Header section -->
       <button
+        v-if="!only"
         id="edit-header"
         type="button"
         class="flex w-full scroll-mt-24 items-center gap-3 rounded-2xl p-2 text-left transition-colors hover:bg-sand/60"
@@ -39,6 +40,7 @@
       >
         <template #item="{ element: block, index }">
           <BioBlockItem
+            v-show="!only || block.id === only"
             :block="block"
             :index="index"
             :count="localBlocks.length"
@@ -228,6 +230,7 @@
 
       <!-- Add Block Button -->
       <button
+        v-if="!only"
         type="button"
         class="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-accented py-3 text-sm font-medium text-muted transition hover:border-inverted hover:bg-elevated hover:text-highlighted dark:border-white/15 dark:text-neutral-400 dark:hover:border-white/40 dark:hover:text-white"
         @click="openBlockModal()"
@@ -258,6 +261,8 @@ const props = defineProps<{
   activeBlock: string | null;
   bioData: BioData;
   bioPageId: string;
+  /** Just this block's editor (the phone editor's sheet): no header row, no add button */
+  only?: string | null;
 }>();
 
 const { t } = useI18n();

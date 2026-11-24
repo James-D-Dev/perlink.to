@@ -193,7 +193,13 @@
       "templateReopen": "テンプレートから始める",
       "sections": "エディターのセクション",
       "yourSites": "あなたのサイト",
-      "notLiveYet": "未公開のため、訪問者には表示されません"
+      "notLiveYet": "未公開のため、訪問者には表示されません",
+      "phoneView": {
+        "page": "ページ",
+        "list": "セクション",
+        "hint": "ページの変えたい部分をタップ",
+        "add": "セクションを追加"
+      }
     },
     "username": {
       "heading": "ユーザー名を選択",

@@ -193,7 +193,13 @@
       "templateReopen": "从模板开始",
       "sections": "编辑器分区",
       "yourSites": "你的网站",
-      "notLiveYet": "尚未发布，访客还看不到"
+      "notLiveYet": "尚未发布，访客还看不到",
+      "phoneView": {
+        "page": "页面",
+        "list": "板块",
+        "hint": "点击页面上的任意部分即可修改",
+        "add": "添加板块"
+      }
     },
     "username": {
       "heading": "选择你的用户名",
