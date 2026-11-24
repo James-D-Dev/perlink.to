@@ -5,13 +5,15 @@
   <Teleport to="body">
   <div class="fixed inset-x-0 bottom-0 z-20 border-t border-default bg-default/90 px-3 py-2.5 backdrop-blur sm:px-4 lg:hidden dark:border-white/10">
     <div class="flex items-center gap-2">
-      <!-- Phone preview and the design switch, on screens without the side column -->
+      <!-- The phone preview, said in words: a bare phone icon here went
+           unnoticed, and without the preview the block list is all there is
+           to see of the site on a phone -->
       <UButton
-        icon="i-lucide-smartphone"
+        icon="i-lucide-eye"
         color="neutral"
         variant="outline"
-        class="lg:hidden"
-        :aria-label="t('common.preview')"
+        class="shrink-0 lg:hidden"
+        :label="t('common.preview')"
         @click="$emit('preview')"
       />
 

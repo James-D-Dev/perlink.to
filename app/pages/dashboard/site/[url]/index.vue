@@ -623,7 +623,12 @@
           :ui="{ content: 'rounded-none bg-black/70 ring-0 shadow-none backdrop-blur-none backdrop-saturate-100 dark:bg-black/70 dark:shadow-none' }"
         >
           <template #content>
-            <div class="flex size-full items-center justify-center overflow-y-auto p-4" @click.self="previewOpen = false">
+            <div class="flex size-full flex-col items-center justify-center gap-3 overflow-y-auto p-4" @click.self="previewOpen = false">
+              <!-- What the preview is for, besides looking: tapping a part opens it -->
+              <p class="pointer-events-none flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white">
+                <UIcon name="i-lucide-pointer" class="size-3.5 shrink-0" />
+                {{ t('dashboard.editor.previewHint') }}
+              </p>
               <BioPreviewFrame>
                 <BioPreview
                   :bio-data="bioData"
