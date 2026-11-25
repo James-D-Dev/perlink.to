@@ -302,6 +302,15 @@ export class RoomScene {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.domElement.style.display = 'block'
     this.renderer.domElement.style.touchAction = 'none'
+    // Claim every touch on the scene outright (the controls use pointer
+    // events, which don't), so the app around an in-app browser (TikTok,
+    // Instagram, iOS's swipe from the edge) doesn't take a sideways drag that
+    // orbits the room as its swipe back. Nothing here listens for clicks
+    const claim = (e: TouchEvent) => {
+      if (e.cancelable) e.preventDefault()
+    }
+    this.renderer.domElement.addEventListener('touchstart', claim, { passive: false })
+    this.renderer.domElement.addEventListener('touchmove', claim, { passive: false })
     container.appendChild(this.renderer.domElement)
 
     this.camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200)
