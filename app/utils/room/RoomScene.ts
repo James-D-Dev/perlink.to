@@ -103,8 +103,13 @@ const QUALITY_LEVELS = [
  * frame instead of once (208 draws a frame instead of 72)
  */
 const LIVE_LOOK_MAX_QUALITY = 0
-/** Phones' Lambert materials: how much of the sky's image-based light the hemisphere light makes up */
-const LAMBERT_SKY_FILL = 1.6
+/** Phones' Lambert materials: how much of the sky's image-based light the hemisphere light makes up (?fill= to tune) */
+const LAMBERT_SKY_FILL = 16
+let fillCache: number | null = null
+function skyFill() {
+  if (fillCache === null) fillCache = Number(new URLSearchParams(window.location.search).get('fill')) || LAMBERT_SKY_FILL
+  return fillCache
+}
 /** Where small previews start */
 const PREVIEW_QUALITY = 4
 /** Widest zoom (camera distance from the room) */
@@ -1796,7 +1801,8 @@ export class RoomScene {
       this.scene.environmentIntensity = THREE.MathUtils.lerp(0.18, 0.4 * (light?.sky ?? 1), d)
       // Image-based light does the fill; keep flat ambient low so colours stay rich
       this.hemi.intensity = THREE.MathUtils.lerp(0.24, 0.42 * (light?.sky ?? 1), d)
-        + (lightMaterialsOn() ? this.scene.environmentIntensity * LAMBERT_SKY_FILL : 0)
+        // (the sky's light is the daylight's: a night sky lights next to nothing)
+        + (lightMaterialsOn() ? this.scene.environmentIntensity * skyFill() * d : 0)
       this.ambient.intensity = 0.07 + 0.01 * d
       // Midday sun a little softer than physical: white walls kept their detail
       this.sun.intensity = isDay ? (0.6 + 2.7 * d) * (light?.sun ?? 1) : 0.55 * (1 - d) + 0.1
