@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { dracoLoader } from './draco'
 import { flowerModelUrl, type FlowerName } from './modelManifest'
 
 // Cut flowers for vases and pots: tulip, rose, daisy, lavender, made in
@@ -25,7 +25,7 @@ export interface FlowerStem {
 
 let loader: GLTFLoader | null = null
 function gltfLoader() {
-  if (!loader) loader = new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath('/draco/'))
+  if (!loader) loader = new GLTFLoader().setDRACOLoader(dracoLoader())
   return loader
 }
 

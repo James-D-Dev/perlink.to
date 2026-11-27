@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { dracoLoader } from './draco'
 import { furnitureModelUrl, type FurnitureModelName } from './modelManifest'
 
 // Furniture from Quaternius' low-poly packs (CC0, via poly.pizza), prepared in
@@ -18,8 +18,7 @@ import { furnitureModelUrl, type FurnitureModelName } from './modelManifest'
 let loader: GLTFLoader | null = null
 function gltfLoader() {
   if (!loader) {
-    const draco = new DRACOLoader().setDecoderPath('/draco/')
-    loader = new GLTFLoader().setDRACOLoader(draco)
+    loader = new GLTFLoader().setDRACOLoader(dracoLoader())
   }
   return loader
 }
