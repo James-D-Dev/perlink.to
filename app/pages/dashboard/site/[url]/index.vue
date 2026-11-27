@@ -236,6 +236,14 @@
                   </button>
                 </div>
 
+                <!-- Parts still the template's sample: how many, and a way
+                     to each in turn (sites went live full of them) -->
+                <div v-if="samples.length" class="mb-4 flex items-center gap-2 rounded-2xl bg-amber-50 py-2 pl-3 pr-2 ring-1 ring-amber-200 dark:bg-amber-400/10 dark:ring-amber-300/25">
+                  <UIcon name="i-lucide-sparkles" class="size-4 shrink-0 text-amber-600 dark:text-amber-300" />
+                  <p class="min-w-0 flex-1 text-sm text-amber-900 dark:text-amber-100">{{ t('dashboard.editor.sample.left', { n: samples.length }, samples.length) }}</p>
+                  <UButton size="xs" color="warning" variant="soft" trailing-icon="i-lucide-arrow-right" :label="t('dashboard.editor.sample.next')" @click="nextSample" />
+                </div>
+
                 <template v-if="phonePageView">
                   <p class="mb-3 flex items-center justify-center gap-1.5 text-center text-xs font-medium text-ink-muted">
                     <UIcon name="i-lucide-pointer" class="size-3.5 shrink-0" />
@@ -244,6 +252,7 @@
                   <!-- The page as visitors see it, full width. translateZ makes
                        the page's fixed layers (video, effects, share button)
                        stay inside this box -->
+                  <component :is="'style'" v-if="sampleCss">{{ sampleCss }}</component>
                   <div ref="phonePage" class="-mx-2 overflow-hidden rounded-2xl ring-1 ring-line [transform:translateZ(0)] sm:mx-0">
                     <BioPageView
                       :bio-data="bioData"
@@ -651,6 +660,31 @@
           @renamed="onRenamed"
         />
 
+        <!-- Publishing with parts still the template's sample: show them,
+             hide them in one tap (the default), or fix them first -->
+        <AppSheet v-model:open="sampleCheckOpen" :title="t('dashboard.editor.sample.checkTitle', { n: sampleCheck.length }, sampleCheck.length)" :description="t('dashboard.editor.sample.checkText')">
+          <template #body>
+            <ul class="space-y-1.5">
+              <li v-for="block in sampleCheck" :key="block.id">
+                <button type="button" class="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-sand" @click="fixSample(block.id)">
+                  <span class="flex size-8 shrink-0 items-center justify-center rounded-lg" :class="blockLook(block.name)?.tint ?? 'bg-sand'">
+                    <UIcon :name="blockLook(block.name)?.icon ?? 'i-lucide-square'" class="size-4" />
+                  </span>
+                  <span class="min-w-0 flex-1 truncate text-sm font-medium text-ink">{{ blockLabel(block) }}</span>
+                  <span class="shrink-0 text-xs text-ink-muted">{{ t('dashboard.editor.sample.edit') }}</span>
+                  <UIcon name="i-lucide-chevron-right" class="size-4 shrink-0 text-ink-faint" />
+                </button>
+              </li>
+            </ul>
+          </template>
+          <template #footer>
+            <div class="flex w-full flex-col gap-2 sm:flex-row-reverse">
+              <UButton icon="i-lucide-eye-off" class="justify-center sm:flex-1" :label="t('dashboard.editor.sample.hideAndPublish')" @click="publishWithSamples('hide')" />
+              <UButton color="neutral" variant="ghost" class="justify-center" :label="t('dashboard.editor.sample.publishAnyway')" @click="publishWithSamples('keep')" />
+            </div>
+          </template>
+        </AppSheet>
+
         <SiteQrModal
           v-if="existingBio?.username"
           v-model:open="qrOpen"
@@ -768,6 +802,8 @@ import { PAGE_TEMPLATES } from "~/data/pageTemplates";
 import { localizeTemplateContent } from "~/data/templateCopyVi";
 import { createDefaultRoom, normalizeRoom, type PageMode, type RoomConfig } from "~/types/room";
 import { useBioBlock } from "~/composables/useBioBlock";
+import { isSampleBlock, sampleBlocks } from "~/utils/sampleContent";
+import { BLOCK_CATALOG, blockLook } from "~/utils/blockCatalog";
 import type { BlockSeed } from "~/components/modals/BlockSelectionModal.vue";
 
 definePageMeta({
@@ -1132,6 +1168,7 @@ const onboardingRef = ref<{ markShared: () => void } | null>(null);
 const markShared = () => onboardingRef.value?.markShared();
 const editorRef = ref<{ openBlockModal: () => void } | null>(null);
 const onOnboardingAction = (step: string) => {
+  useAnalytics().track("onboarding_action", { step });
   if (step === "photo" || step === "bio") {
     openBlock("header");
   } else if (step === "contact") {
@@ -1147,6 +1184,7 @@ const onOnboardingAction = (step: string) => {
 
 const sharePage = async () => {
   markShared();
+  useAnalytics().track("share_site", { from: "site_editor", method: "share" in navigator ? "native" : "copy" });
   const url = `https://perlink.to/${username.value}`;
   try {
     await navigator.share({
@@ -1292,7 +1330,7 @@ async function onRenamed(username: string) {
     publishing.value = true;
     try {
       await $fetch(`/api/admin/bio/${username}/publish`, { method: "POST" as const });
-      useAnalytics().track("publish_site", { from: "site_editor" });
+      useAnalytics().track("publish_site", publishParams());
       toast.add({ title: t("dashboard.toast.published"), description: t("dashboard.editor.publishedText", { username }), color: "success" });
     } catch (error: any) {
       // The address change went through either way, so carry on to it
@@ -1309,7 +1347,57 @@ async function onRenamed(username: string) {
   await navigateTo({ path: `/dashboard/site/${username}`, hash: activeTab.value === "content" ? "" : `#${activeTab.value}` }, { replace: true });
 }
 
-const publishBio = async () => {
+// ---- Sample content (the template's, untouched) ----
+const samples = computed(() => sampleBlocks(bioData.blocks));
+const blockLabel = (block: { name: string }) => {
+  const key = BLOCK_CATALOG.find((option) => option.id === block.name)?.key;
+  return key ? t(`blocks.picker.items.${key}.label`) : block.name;
+};
+/** The next sample part after the open one, round and round */
+function nextSample() {
+  const list = samples.value;
+  if (!list.length) return;
+  const at = list.findIndex((b) => b.id === activeBlock.value);
+  const block = list[(at + 1) % list.length]!;
+  useAnalytics().track("sample_next", { block: block.name, left: list.length });
+  openBlock(block.id);
+}
+// Phones, page view: sample parts outlined on the page itself, with a label
+const sampleCss = computed(() => {
+  if (!samples.value.length) return "";
+  const label = JSON.stringify(t("blocks.editor.sampleBadge"));
+  const ids = samples.value.map((b) => `#block-${CSS.escape(b.id)}`).join(",");
+  return `${ids}{position:relative;outline:2px dashed rgb(245 158 11 / .85);outline-offset:-2px;border-radius:12px}`
+    + `${samples.value.map((b) => `#block-${CSS.escape(b.id)}::after`).join(",")}{content:${label};position:absolute;top:6px;right:6px;z-index:5;padding:2px 8px;border-radius:999px;background:#fef3c7;color:#92400e;font:600 11px/1.5 system-ui,sans-serif;pointer-events:none}`;
+});
+
+const sampleCheckOpen = ref(false);
+const sampleCheck = ref<BioBlock[]>([]);
+/** Publish, unless parts are still sample: then ask (once per tap) */
+const publishBio = () => {
+  const list = samples.value;
+  if (list.length) {
+    sampleCheck.value = list;
+    sampleCheckOpen.value = true;
+    useAnalytics().track("publish_sample_check", { samples: list.length, blocks: bioData.blocks.length, kinds: [...new Set(list.map((b) => b.name))].join(",") });
+    return;
+  }
+  return publishNow();
+};
+function publishWithSamples(choice: "hide" | "keep") {
+  const ids = new Set(sampleCheck.value.map((b) => b.id));
+  useAnalytics().track("publish_sample_choice", { choice, samples: ids.size });
+  if (choice === "hide") bioData.blocks = bioData.blocks.map((b) => (ids.has(b.id) ? ({ ...b, hidden: true } as BioBlock) : b));
+  sampleCheckOpen.value = false;
+  publishNow();
+}
+function fixSample(id: string) {
+  useAnalytics().track("publish_sample_choice", { choice: "edit", samples: sampleCheck.value.length });
+  sampleCheckOpen.value = false;
+  openBlock(id);
+}
+
+const publishNow = async () => {
   // A real address first
   if (tempAddress.value) {
     openAddress(true);
@@ -1338,7 +1426,7 @@ const publishBio = async () => {
     );
 
     existingBio.value = response.bioPage;
-    useAnalytics().track("publish_site", { from: "site_editor" });
+    useAnalytics().track("publish_site", publishParams());
     // The card should show what just went live
     if (snapshotTimer) clearTimeout(snapshotTimer);
     nextTick(takeSnapshot);
@@ -1349,6 +1437,7 @@ const publishBio = async () => {
       color: "success",
     });
   } catch (error: any) {
+    useAnalytics().track("publish_failed", { status: error?.statusCode ?? 0, reason: String(error?.data?.statusMessage || error?.message || "").slice(0, 90) });
     if (upgradePrompt.fromError(error)) return;
     toast.add({
       title: t("dashboard.toast.error"),
@@ -1408,6 +1497,9 @@ const showTemplatePicker = computed(() => !templatePickerDismissed.value && isEm
 const applyTemplate = async (templateId: string) => {
   const template = PAGE_TEMPLATES.find((t) => t.id === templateId);
   if (!template) return;
+  useAnalytics().track("template_applied", { template: templateId });
+  blockBase = null;
+  nextTick(() => setTimeout(() => (blockBase = snapshotBlocks()), 1600));
   // Vietnamese users get Vietnamese sample content and site language
   const content = localizeTemplateContent(template.build(), locale.value);
   bioData.title = bioData.title || content.title;
@@ -1546,6 +1638,14 @@ const loadBio = async () => {
       step.value = "edit";
       await nextTick();
       markSavedSnapshotOnly();
+      openedAt = Date.now();
+      blockBase = snapshotBlocks();
+      useAnalytics().track("editor_open", {
+        published: !!response.bioPage.isPublished,
+        blocks: bioData.blocks.length,
+        samples: samples.value.length,
+        device: swipeable.value ? "phone" : "desktop",
+      });
       // Sites from before thumbnails get their first picture once the preview has drawn
       // None yet, or one from before the share button was left out of them
       if (!String(response.bioPage.thumbnailUrl || "").includes("/thumb_page_v2")) scheduleSnapshot(3000);
@@ -1726,5 +1826,68 @@ onBeforeRouteLeave(async () => {
 onMounted(() => {
   loadBio();
   loadUserBioPages();
+});
+
+// ---- Analytics (GA4): how owners work on their site ----
+// What they change, hide, add and remove (the first change of each part,
+// and whether it was still the template's sample), the tabs and views they
+// use, and how long until they publish. Read with the create flow's events
+// (dashboard/new) to see where sites are left half done.
+let openedAt = 0;
+let blockBase: Map<string, { json: string; hidden: boolean; name: string; sample: boolean }> | null = null;
+const editedBlocks = new Set<string>();
+function snapshotBlocks() {
+  return new Map(bioData.blocks.map((b) => [b.id, { json: JSON.stringify(b.data ?? {}), hidden: !!b.hidden, name: b.name, sample: isSampleBlock(b) }]));
+}
+function publishParams() {
+  return {
+    from: "site_editor",
+    blocks: bioData.blocks.filter((b) => !b.hidden).length,
+    samples_left: samples.value.length,
+    edited_parts: editedBlocks.size,
+    minutes_in_editor: openedAt ? Math.round((Date.now() - openedAt) / 60000) : undefined,
+    first: !existingBio.value?.isPublished,
+  };
+}
+const diffBlocks = useDebounceFn(() => {
+  const before = blockBase;
+  if (!before) return;
+  const now = snapshotBlocks();
+  const ga = useAnalytics();
+  const added = [...now.keys()].filter((id) => !before.has(id));
+  // (more at once is a template or a reload, not someone adding parts)
+  if (added.length <= 2) for (const id of added) ga.track("block_added", { block: now.get(id)!.name, view: phonePageView.value ? "page" : "list" });
+  for (const [id, old] of before) {
+    const current = now.get(id);
+    if (!current) {
+      ga.track("block_removed", { block: old.name, was_sample: old.sample });
+      continue;
+    }
+    if (current.hidden !== old.hidden) ga.track(current.hidden ? "block_hidden" : "block_shown", { block: current.name, was_sample: old.sample });
+    if (current.json !== old.json && !editedBlocks.has(id)) {
+      editedBlocks.add(id);
+      ga.track("block_edited", { block: current.name, was_sample: old.sample, still_sample: current.sample, view: phonePageView.value ? "page" : "list" });
+    }
+  }
+  blockBase = now;
+}, 1500);
+watch(() => bioData.blocks, () => diffBlocks(), { deep: true });
+
+const editedHeader = new Set<string>();
+watch(() => [bioData.title, bioData.bio, bioData.avatarUrl] as const, (now, before) => {
+  if (!blockBase) return;
+  (["title", "bio", "photo"] as const).forEach((field, i) => {
+    if (now[i] !== before[i] && !editedHeader.has(field)) {
+      editedHeader.add(field);
+      useAnalytics().track("header_edited", { field });
+    }
+  });
+});
+watch(activeTab, (tab) => blockBase && useAnalytics().track("editor_tab", { tab }));
+watch(phoneView, (view) => useAnalytics().track("editor_phone_view", { view }));
+watch(previewOpen, (open) => open && useAnalytics().track("preview_open", { from: "site_editor" }));
+watch(sheetBlock, (id) => {
+  const block = id && id !== "header" ? bioData.blocks.find((b) => b.id === id) : null;
+  if (id) useAnalytics().track("block_open", { block: block?.name ?? "header", from: "page", sample: block ? isSampleBlock(block) : false });
 });
 </script>

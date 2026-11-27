@@ -127,6 +127,7 @@ async function create() {
   creating.value = true
   try {
     const { id } = await $fetch<{ id: string }>(`/api/admin/bio/${props.username}/posts`, { method: 'POST' })
+    useAnalytics().track('blog_post_created', { from: 'post_sidebar' })
     await navigateTo(`/dashboard/site/${props.username}/blog/${id}`)
   } catch (error: any) {
     if (useUpgradePrompt().fromError(error)) return

@@ -868,6 +868,7 @@ const objectRows = computed(() => {
 })
 
 function openPanel(view: 'list' | 'detail') {
+  useAnalytics().track('room_panel_open', { view, object: view === 'detail' ? selectedObject.value?.type : undefined, phone: window.innerWidth < 1024 })
   panelView.value = view
   panelOpen.value = true
 }
@@ -1057,6 +1058,7 @@ function addObject(type: string, position: [number, number, number], wall?: Wall
   }
   setObjects([...room.value.objects, object])
   selectedId.value = object.id
+  useAnalytics().track('room_object_added', { type, category: item.category, premium: !!item.pack, count: room.value.objects.length })
 }
 
 function addAtDefault(type: string) {
@@ -1174,6 +1176,7 @@ function moveToWall(wall: WallSide) {
 }
 
 function duplicateSelected() {
+  useAnalytics().track('room_object_duplicated', { type: selectedObject.value?.type })
   const obj = selectedObject.value
   if (!obj) return
   const [x, y, z] = obj.position
@@ -1186,6 +1189,7 @@ function duplicateSelected() {
 }
 
 function removeSelected() {
+  useAnalytics().track('room_object_removed', { type: selectedObject.value?.type })
   if (selectedId.value) removeObject(selectedId.value)
 }
 

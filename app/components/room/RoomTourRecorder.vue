@@ -591,6 +591,7 @@ function jpeg(canvas: HTMLCanvasElement) {
  *    nothing stutters. The next few frames are decoded ahead of time.
  */
 async function record() {
+  useAnalytics().track('room_video_start', { seconds: duration.value, music: withMusic.value, style: tourStyle.value })
   if (phase.value !== 'setup') return
   // Created inside the click, so the browser lets it play
   const audioContext = withMusic.value && track.value ? new AudioContext() : null
@@ -762,6 +763,7 @@ function finish(audioContext: AudioContext | null, blob: Blob | null) {
   }
   videoBlob.value = blob
   videoUrl.value = URL.createObjectURL(blob)
+  useAnalytics().track('room_video_done', { seconds: duration.value, mb: Math.round(blob.size / 1e5) / 10, type: blob.type.split(';')[0] })
   canShare.value = !!navigator.canShare?.({ files: [videoFile()] })
   phase.value = 'done'
 }
@@ -771,6 +773,7 @@ function videoFile() {
 }
 
 function download() {
+  useAnalytics().track('room_video_save', { how: 'download' })
   const a = document.createElement('a')
   a.href = videoUrl.value
   a.download = `perlink-${props.username}.${extension()}`
@@ -796,6 +799,7 @@ async function putLive() {
 }
 
 async function share() {
+  useAnalytics().track('room_video_save', { how: 'share' })
   // Copied first (not awaited, so the share sheet still opens from the tap):
   // TikTok and Reels drop the text that comes with a shared video
   copyCaption()

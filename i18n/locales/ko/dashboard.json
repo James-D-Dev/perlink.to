@@ -190,6 +190,15 @@
       "update": "사이트 업데이트",
       "upToDate": "방문자에게 최신 버전이 보이고 있어요",
       "previewHint": "휴대폰 화면의 한 부분을 눌러 편집하세요",
+      "sample": {
+        "left": "샘플 내용인 부분이 {n}개 남았어요",
+        "next": "다음",
+        "checkTitle": "{n}개 부분이 아직 샘플이에요",
+        "checkText": "방문자에게 샘플 사진, 글, 링크가 보여요. 숨기거나, 눌러서 먼저 수정하세요.",
+        "edit": "수정",
+        "hideAndPublish": "샘플 숨기고 게시",
+        "publishAnyway": "그대로 게시"
+      },
       "templateReopen": "템플릿으로 시작하기",
       "sections": "편집기 섹션",
       "yourSites": "내 사이트",

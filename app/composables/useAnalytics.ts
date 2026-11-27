@@ -13,15 +13,37 @@ declare global {
  * Perlink's GA4 (see plugins/analytics.client.ts). `track` sends an event when
  * the page is one Perlink measures; nothing happens otherwise or without an ID.
  */
+const pending: [string, Record<string, unknown>][] = []
+
 export function useAnalytics() {
   // 'ask': show the banner; null: not decided yet (still loading)
   const consent = useState<Consent | 'ask' | null>('analytics-consent', () => null)
   // Is this page one of Perlink's own (not a user's site, not Superadmin)?
   const measured = useState<boolean>('analytics-measured', () => false)
 
+  // Between a navigation and its page being on screen it isn't known yet
+  // whether the new page is measured: events from its setup wait for that
+  const settled = useState<boolean>('analytics-settled', () => false)
+
   function track(name: string, params: Record<string, unknown> = {}) {
-    if (!import.meta.client || !measured.value || !window.gtag) return
+    if (!import.meta.client) return
+    if (!settled.value) {
+      if (pending.length < 50) pending.push([name, params])
+      return
+    }
+    if (!measured.value || !window.gtag) return
     window.gtag('event', name, params)
+  }
+
+  /** The page is on screen (plugins/analytics): send what waited, or drop it */
+  function settle(isMeasured: boolean) {
+    measured.value = isMeasured
+    settled.value = true
+    const waiting = pending.splice(0)
+    if (isMeasured && window.gtag) for (const [name, params] of waiting) window.gtag('event', name, params)
+  }
+  function unsettle() {
+    settled.value = false
   }
 
   function setConsent(value: Consent) {
@@ -44,5 +66,5 @@ export function useAnalytics() {
     consent.value = 'ask'
   }
 
-  return { consent, measured, track, setConsent, reopen }
+  return { consent, measured, track, settle, unsettle, setConsent, reopen }
 }

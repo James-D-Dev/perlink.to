@@ -190,6 +190,15 @@
       "update": "更新网站",
       "upToDate": "访客看到的是最新版本",
       "previewHint": "点击手机上的某个部分即可编辑",
+      "sample": {
+        "left": "还有 {n} 个部分是示例内容",
+        "next": "下一个",
+        "checkTitle": "{n} 个部分仍是示例内容",
+        "checkText": "访客会看到示例照片、文字和链接。隐藏它们，或点一个先改成你自己的。",
+        "edit": "编辑",
+        "hideAndPublish": "隐藏示例并发布",
+        "publishAnyway": "仍然发布"
+      },
       "templateReopen": "从模板开始",
       "sections": "编辑器分区",
       "yourSites": "你的网站",

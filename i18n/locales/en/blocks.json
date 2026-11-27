@@ -5,6 +5,8 @@
       "unsavedChanges": "Unsaved changes",
       "allSaved": "All changes saved",
       "hiddenBadge": "Hidden",
+      "sampleBadge": "Sample",
+      "sampleHint": "Still the template's sample content: replace it with yours, or hide it",
       "menu": {
         "more": "More actions",
         "show": "Show block",

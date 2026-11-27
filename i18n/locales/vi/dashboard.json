@@ -190,6 +190,15 @@
       "update": "Cập nhật trang",
       "upToDate": "Khách đang thấy bản mới nhất",
       "previewHint": "Bấm vào một phần trong điện thoại để sửa phần đó",
+      "sample": {
+        "left": "Còn {n} phần là nội dung mẫu",
+        "next": "Sửa tiếp",
+        "checkTitle": "{n} phần vẫn là nội dung mẫu",
+        "checkText": "Khách sẽ thấy ảnh, chữ và link mẫu. Ẩn chúng đi, hoặc chạm vào một phần để sửa trước.",
+        "edit": "Sửa",
+        "hideAndPublish": "Ẩn phần mẫu và đăng",
+        "publishAnyway": "Vẫn đăng"
+      },
       "templateReopen": "Bắt đầu từ một mẫu có sẵn",
       "sections": "Các phần của trang",
       "yourSites": "Trang của bạn",

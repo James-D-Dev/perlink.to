@@ -260,6 +260,7 @@ async function setStatus(status: 'draft' | 'published') {
   publishing.value = true
   try {
     const saved = await save({ status })
+    if (saved) useAnalytics().track(status === 'published' ? 'blog_post_published' : 'blog_post_unpublished', { words: words.value })
     if (saved) toast.add({ title: status === 'published' ? t('dashboard.blog.published') : t('dashboard.blog.unpublished'), color: 'success' })
   } catch (error: any) {
     if (useUpgradePrompt().fromError(error)) return

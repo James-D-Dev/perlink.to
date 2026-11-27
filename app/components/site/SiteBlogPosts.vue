@@ -82,6 +82,7 @@ async function create() {
   creating.value = true
   try {
     const { id } = await $fetch<{ id: string }>(`/api/admin/bio/${props.username}/posts`, { method: 'POST' })
+    useAnalytics().track('blog_post_created', { from: 'blog_tab' })
     await navigateTo(editLink(id))
   } catch (error: any) {
     toast.add({ title: t('dashboard.blog.failed'), description: error?.data?.statusMessage, color: 'error' })

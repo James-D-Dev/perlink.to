@@ -5,6 +5,8 @@
       "unsavedChanges": "Chưa lưu thay đổi",
       "allSaved": "Đã lưu",
       "hiddenBadge": "Ẩn",
+      "sampleBadge": "Mẫu",
+      "sampleHint": "Vẫn là nội dung mẫu của giao diện: thay bằng của bạn, hoặc ẩn đi",
       "menu": {
         "more": "Thêm thao tác",
         "show": "Hiện khối",

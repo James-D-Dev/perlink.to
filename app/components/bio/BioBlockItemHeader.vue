@@ -47,6 +47,13 @@
       {{ t('blocks.editor.hiddenBadge') }}
     </span>
 
+    <!-- Still the template's sample: say so, so it gets replaced or hidden -->
+    <UTooltip v-if="isSample" :text="t('blocks.editor.sampleHint')">
+      <span class="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800 dark:bg-amber-400/15 dark:text-amber-300">
+        {{ t('blocks.editor.sampleBadge') }}
+      </span>
+    </UTooltip>
+
     <!-- Shown on one family's tab only (two-family wedding pages) -->
     <span v-if="side" class="shrink-0 rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
       {{ side === 'groom' ? t('blocks.editor.menu.sideBadgeGroom') : t('blocks.editor.menu.sideBadgeBride') }}
@@ -91,6 +98,7 @@
 
 <script setup lang="ts">
 import { BLOCK_ITEM_KEY } from '~/utils/blockItem'
+import { isSampleBlock } from '~/utils/sampleContent'
 import { isRepeatableBlock } from '~/utils/blocks'
 
 const props = defineProps<{
@@ -116,6 +124,7 @@ const look = computed(() => (props.block ? blockLook(props.block) : null))
 const item = inject(BLOCK_ITEM_KEY, null)
 
 const isHidden = computed(() => item ? !!item.block.value.hidden : !!props.hidden)
+const isSample = computed(() => !!item && !isHidden.value && isSampleBlock(item.block.value))
 const side = computed(() => item?.block.value.side)
 
 function onToggleHidden() {

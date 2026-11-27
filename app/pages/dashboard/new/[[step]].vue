@@ -542,6 +542,7 @@ function missingBefore(current: Step): Step | null {
 
 function chooseGoal(id: SiteGoalId) {
   state.goal = id
+  useAnalytics().track('create_goal', { goal: id })
   // Templates follow the goal
   const suggested = templatesFor(id)
   if (!state.templateId || !suggested.some(item => item.id === state.templateId)) state.templateId = suggested[0]?.id ?? null
@@ -664,11 +665,20 @@ async function create() {
       avatarFile: avatarFile.value,
     })
     doneSite.value = username
+    useAnalytics().track('site_created', {
+      from: 'create_flow',
+      goal: state.goal,
+      template: state.templateId,
+      photo: !!avatarFile.value,
+      bio: !!state.bio.trim(),
+      address_suggested: suggestions.value.includes(state.address),
+    })
     doneTemplate.value = PAGE_TEMPLATES.find(item => item.id === state.templateId) ?? null
     donePersonal.value = { ...personal.value }
     try { sessionStorage.removeItem(STORE) } catch {}
     await router.replace({ path: '/dashboard/new/done' })
   } catch (error: any) {
+    useAnalytics().track('site_create_failed', { status: error?.statusCode ?? 0, reason: String(error?.data?.statusMessage || error?.message || '').slice(0, 90) })
     if (useUpgradePrompt().fromError(error)) return
     toast.add({ title: text.value.failed, description: error?.data?.statusMessage || error?.message, color: 'error' })
     addressStatus.value = 'checking'
@@ -685,4 +695,27 @@ watch(step, (current) => {
 
 const PAGE_TITLE: Record<AppLanguage, string> = { en: 'New site', vi: 'Tạo trang mới', zh: '新建网站', ja: '新しいサイト', ko: '새 사이트' }
 useSeoMeta({ title: () => `${PAGE_TITLE[lang.value]} — Perlink`, robots: 'noindex, nofollow' })
+
+// ---- Analytics (GA4) ----
+// The steps are one page to the router, so GA's page views miss them: each
+// step is its own event, with how long the one before took. Leaving with the
+// X or the logo says at which step.
+let stepStarted = Date.now()
+watch(step, (current, before) => {
+  if (!import.meta.client) return
+  useAnalytics().track('create_step', {
+    step: current,
+    index: stepIndex.value + 1,
+    from_step: before ?? null,
+    seconds_on_previous: before ? Math.round((Date.now() - stepStarted) / 1000) : undefined,
+    at_site_limit: atSiteLimit.value,
+  })
+  stepStarted = Date.now()
+}, { immediate: true })
+onBeforeRouteLeave((to) => {
+  if (step.value !== 'done' && !to.path.startsWith('/dashboard/new')) {
+    useAnalytics().track('create_abandon', { step: step.value, seconds_on_step: Math.round((Date.now() - stepStarted) / 1000), to: to.path.split('/').slice(0, 3).join('/') })
+  }
+})
+watch(showAll, (all) => all && useAnalytics().track('create_more_templates', { goal: state.goal }))
 </script>

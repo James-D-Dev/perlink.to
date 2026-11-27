@@ -190,6 +190,15 @@
       "update": "Update site",
       "upToDate": "Visitors see the latest version",
       "previewHint": "Tap a part of the phone to edit it",
+      "sample": {
+        "left": "1 part is still sample content | {n} parts are still sample content",
+        "next": "Next",
+        "checkTitle": "1 part is still sample content | {n} parts are still sample content",
+        "checkText": "Visitors would see sample photos, words and links. Hide them, or tap one to make it yours first.",
+        "edit": "Edit",
+        "hideAndPublish": "Hide samples and publish",
+        "publishAnyway": "Publish anyway"
+      },
       "templateReopen": "Start from a template",
       "sections": "Editor sections",
       "yourSites": "Your sites",

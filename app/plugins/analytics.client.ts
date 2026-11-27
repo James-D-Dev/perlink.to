@@ -17,7 +17,7 @@ const EXCLUDED = /^(username|s-|qr-|superadmin|pack-cover|plan-cover|design-syst
 
 export default defineNuxtPlugin((nuxtApp) => {
   const id = String(useRuntimeConfig().public.gaMeasurementId || '')
-  const { consent, measured, track } = useAnalytics()
+  const { consent, track, settle, unsettle } = useAnalytics()
   const customDomain = useState<{ hostname: string } | null>('custom-domain')
   if (!id) return
 
@@ -65,10 +65,12 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   function onPage(route: RouteLocationNormalized) {
-    measured.value = isMeasured(route)
-    if (!measured.value) return
+    const yes = isMeasured(route)
+    if (!yes) return settle(false)
     load()
     window.gtag!('event', 'page_view', { page_location: location.href, page_path: route.fullPath, page_title: document.title })
+    // The page's own events (sent while it was being set up) after its view
+    settle(true)
 
     // A new account (cookie set by the server when it was created)
     const signup = useCookie<string | null>(SIGNUP_COOKIE)
@@ -82,6 +84,21 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   const router = useRouter()
+  // A new page: its events wait until it's on screen (and known measured)
+  router.beforeEach((to, from) => {
+    if (to.path !== from.path) unsettle()
+  })
+  // A page that stays on screen for a new address (the create flow's steps)
+  // never "finishes": settle it anyway
+  const settled = useState<boolean>('analytics-settled', () => false)
+  router.afterEach((to) => {
+    setTimeout(() => {
+      if (settled.value) return
+      const yes = isMeasured(to)
+      if (yes) load()
+      settle(yes)
+    }, 1500)
+  })
   // After the page is on screen, so the title is the new page's
   nuxtApp.hook('page:finish', () => onPage(router.currentRoute.value))
 })

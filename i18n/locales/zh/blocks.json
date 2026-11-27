@@ -5,6 +5,8 @@
       "unsavedChanges": "有未保存的更改",
       "allSaved": "所有更改已保存",
       "hiddenBadge": "已隐藏",
+      "sampleBadge": "示例",
+      "sampleHint": "仍是模板的示例内容：换成你自己的，或隐藏它",
       "menu": {
         "more": "更多操作",
         "show": "显示区块",

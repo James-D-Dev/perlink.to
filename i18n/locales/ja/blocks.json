@@ -5,6 +5,8 @@
       "unsavedChanges": "未保存の変更があります",
       "allSaved": "すべての変更を保存しました",
       "hiddenBadge": "非表示",
+      "sampleBadge": "サンプル",
+      "sampleHint": "テンプレートのサンプルのままです。自分の内容に変えるか、非表示にしてください",
       "menu": {
         "more": "その他の操作",
         "show": "ブロックを表示",

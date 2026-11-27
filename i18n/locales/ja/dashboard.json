@@ -190,6 +190,15 @@
       "update": "サイトを更新",
       "upToDate": "訪問者には最新版が表示されています",
       "previewHint": "スマホ画面の部分をタップして編集",
+      "sample": {
+        "left": "サンプルのままの部分が{n}つあります",
+        "next": "次へ",
+        "checkTitle": "{n}つの部分がサンプルのままです",
+        "checkText": "訪問者にサンプルの写真・文章・リンクが表示されます。非表示にするか、タップして先に編集してください。",
+        "edit": "編集",
+        "hideAndPublish": "サンプルを隠して公開",
+        "publishAnyway": "このまま公開"
+      },
       "templateReopen": "テンプレートから始める",
       "sections": "エディターのセクション",
       "yourSites": "あなたのサイト",
