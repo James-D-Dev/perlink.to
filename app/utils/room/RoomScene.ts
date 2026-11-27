@@ -93,8 +93,14 @@ const QUALITY_LEVELS = [
   // Weakest phones, last resort: a coarser shadow map
   { pixelRatio: 1, shadowSize: 512, shadows: true },
 ]
-/** The everyday look (ambient occlusion, glow) runs at this quality level and better */
-const LIVE_LOOK_MAX_QUALITY = 2
+/**
+ * The everyday look (ambient occlusion, glow) runs at this quality level and
+ * better: desktops only. On phones it cost a first visit seconds of frozen
+ * screen compiling its shaders (5.8 s on an M-series Mac with a cold shader
+ * cache, several times that on a phone) and drew the scene three times a
+ * frame instead of once (208 draws a frame instead of 72)
+ */
+const LIVE_LOOK_MAX_QUALITY = 0
 /** Where small previews start */
 const PREVIEW_QUALITY = 4
 /** Widest zoom (camera distance from the room) */
@@ -146,6 +152,7 @@ export class RoomScene {
   private filmReady: Promise<void> = Promise.resolve()
   /** Everyday look (./liveLook): ambient occlusion, glow, grading; capable devices only */
   private liveLook: LiveLook | null = null
+  private liveLookStarted = false
   /** The lens for the current frame shape (narrow frames get a wider one) */
   private baseFov = 32
   /** Pace of recent video frames (renderTour), to drop the film look if it can't keep up */
@@ -395,7 +402,6 @@ export class RoomScene {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
     this.quality = options.capture ? 0 : options.preview ? PREVIEW_QUALITY : memory < 4 ? 2 : coarse ? 1 : 0
     this.startQuality = this.quality
-    this.loadLiveLook()
     if (options.capture) this.controls.enabled = false
     this.applyQuality()
 
@@ -892,6 +898,7 @@ export class RoomScene {
         if (this.land === land && !this.landShown) {
           this.landShown = true
           this.options.onReady?.()
+          this.loadLiveLook()
         }
         this.markActive()
         this.markShadows()
@@ -1562,10 +1569,16 @@ export class RoomScene {
    * turns it off to compare
    */
   private loadLiveLook() {
-    if (this.options.capture || this.options.preview || gpuKit() || this.quality > LIVE_LOOK_MAX_QUALITY) return
+    if (this.liveLookStarted || this.options.capture || this.options.preview || gpuKit() || this.quality > LIVE_LOOK_MAX_QUALITY) return
     if (new URLSearchParams(window.location.search).get('look') === '0') return
+    this.liveLookStarted = true
+    // After the room is on screen and its furniture has had a moment to
+    // load: its shaders compile on the main thread, which would hold up both
+    const idle = () => new Promise<void>(resolve => ('requestIdleCallback' in window ? requestIdleCallback(() => resolve(), { timeout: 3000 }) : setTimeout(resolve, 1500)))
     this.rendererReady
-      .then(() => import('./liveLook'))
+      .then(() => new Promise(resolve => setTimeout(resolve, 1200)))
+      .then(idle)
+      .then(() => (this.disposed ? Promise.reject(new Error('disposed')) : import('./liveLook')))
       .then(m => m.createLiveLook(this.renderer, this.scene, this.camera))
       .then((look) => {
         if (this.disposed) look.dispose()
@@ -1575,7 +1588,7 @@ export class RoomScene {
           this.markActive()
         }
       })
-      .catch(error => console.warn('[room] live look unavailable', error))
+      .catch(error => !this.disposed && console.warn('[room] live look unavailable', error))
   }
 
   private applyQuality() {
