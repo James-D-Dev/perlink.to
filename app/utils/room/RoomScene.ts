@@ -8,6 +8,8 @@ import { buildLand, createStarSphere, type LandInstance } from './lands'
 import { buildRoomShell, FLOOR_THICKNESS } from './shell'
 import { flameFlicker, flameTime } from './flame'
 import { compileOffscreen, createRoomRenderer, gpuKit, maxAnisotropy } from './gpu'
+import { lighten, lightMaterialsOn, setLightMaterials } from './lightMaterials'
+import { warmDraco } from './draco'
 import { clearSceneryPreparer, setSceneryPreparer } from './natureModels'
 import type { Cinematic } from './cinematic'
 import type { LiveLook } from './liveLook'
@@ -101,6 +103,8 @@ const QUALITY_LEVELS = [
  * frame instead of once (208 draws a frame instead of 72)
  */
 const LIVE_LOOK_MAX_QUALITY = 0
+/** Phones' Lambert materials: how much of the sky's image-based light the hemisphere light makes up */
+const LAMBERT_SKY_FILL = 1.6
 /** Where small previews start */
 const PREVIEW_QUALITY = 4
 /** Widest zoom (camera distance from the room) */
@@ -153,6 +157,7 @@ export class RoomScene {
   /** Everyday look (./liveLook): ambient occlusion, glow, grading; capable devices only */
   private liveLook: LiveLook | null = null
   private liveLookStarted = false
+  private lightenedAt = -Infinity
   /** The lens for the current frame shape (narrow frames get a wider one) */
   private baseFov = 32
   /** Pace of recent video frames (renderTour), to drop the film look if it can't keep up */
@@ -273,6 +278,8 @@ export class RoomScene {
 
   constructor(container: HTMLElement, options: RoomSceneOptions) {
     perf('scene start')
+    // The models' decoder gets ready while the land is built
+    if (!options.preview) warmDraco()
     this.container = container
     this.options = options
 
@@ -402,6 +409,11 @@ export class RoomScene {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
     this.quality = options.capture ? 0 : options.preview ? PREVIEW_QUALITY : memory < 4 ? 2 : coarse ? 1 : 0
     this.startQuality = this.quality
+    // Phones and low-memory devices (and ?light=1 to compare on a desktop):
+    // lighter materials (one setting for the page, previews included)
+    const lightParam = new URLSearchParams(window.location.search).get('light')
+    // (the video recorder's scene follows the page's setting, it doesn't set it)
+    if (!options.capture) setLightMaterials(!gpuKit() && lightParam !== '0' && (coarse || memory < 4 || lightParam === '1'))
     if (options.capture) this.controls.enabled = false
     this.applyQuality()
 
@@ -1661,6 +1673,12 @@ export class RoomScene {
 
   private renderFrame(now: number) {
     if (!this.canRender) return
+    // Anything added without going through compileOffscreen (guests, the
+    // room's shell) is made light too, once a second (a quick no-op walk)
+    if (lightMaterialsOn() && now - this.lightenedAt > 1000) {
+      this.lightenedAt = now
+      lighten(this.scene)
+    }
     if (!this.firstFrameLogged) {
       perf('first frame')
       this.firstFrameLogged = true
@@ -1767,7 +1785,9 @@ export class RoomScene {
         u.mieDirectionalG!.value = 0.8
         u.sunPosition!.value.copy(skyDir)
       }
-      this.updateEnvironment(`${Math.round(skyDir.y * 40)}|${Math.round(skyDir.x * 8)}|${atmosphere.turbidity}`)
+      // Lambert materials (phones) take no image-based light: no sky
+      // environment to render, its share goes to the hemisphere light below
+      if (!lightMaterialsOn()) this.updateEnvironment(`${Math.round(skyDir.y * 40)}|${Math.round(skyDir.x * 8)}|${atmosphere.turbidity}`)
       // The physical sky is very bright (HDR), so its light is scaled down
       // A land's light scaling touches the daylight only, so nights stay as
       // bright on every land
@@ -1776,6 +1796,7 @@ export class RoomScene {
       this.scene.environmentIntensity = THREE.MathUtils.lerp(0.18, 0.4 * (light?.sky ?? 1), d)
       // Image-based light does the fill; keep flat ambient low so colours stay rich
       this.hemi.intensity = THREE.MathUtils.lerp(0.24, 0.42 * (light?.sky ?? 1), d)
+        + (lightMaterialsOn() ? this.scene.environmentIntensity * LAMBERT_SKY_FILL : 0)
       this.ambient.intensity = 0.07 + 0.01 * d
       // Midday sun a little softer than physical: white walls kept their detail
       this.sun.intensity = isDay ? (0.6 + 2.7 * d) * (light?.sun ?? 1) : 0.55 * (1 - d) + 0.1

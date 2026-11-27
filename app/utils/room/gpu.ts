@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { lighten } from './lightMaterials'
 
 // WebGPU for the 3D rooms: experimental, only with ?gpu=1. Everyone else
 // gets the classic WebGLRenderer (WebGPU lagged on phones and wasn't worth it
@@ -104,6 +105,8 @@ export function maxAnisotropy(renderer: RoomRenderer) {
  * after; WebGL's compiles everything anyway. `scene` gives the lights.
  */
 export function compileOffscreen(renderer: RoomRenderer, object: THREE.Object3D, camera: THREE.Camera, scene: THREE.Scene): Promise<unknown> {
+  // Phones: light materials first, so only their shaders are compiled
+  lighten(object)
   const saved: [THREE.Object3D, boolean, boolean][] = []
   object.traverse((obj) => {
     saved.push([obj, obj.visible, obj.frustumCulled])
