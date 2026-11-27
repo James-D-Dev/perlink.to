@@ -2,11 +2,17 @@
   <!-- While a 3D room loads (the room editor, and sites' 3D views): the
        animated Perlink mark on the room's dark screen, with how far it has
        got on live pages -->
-  <div class="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-5 bg-[#0a0a0a]" aria-busy="true">
-    <AppLoader :size="76" />
+  <div class="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-5 overflow-hidden bg-[#0a0a0a]" aria-busy="true">
+    <!-- The room as it was last pictured, at once (it's in the page's HTML),
+         softened and dimmed, so visitors see their way in while it builds -->
+    <template v-if="poster">
+      <img :src="poster" alt="" fetchpriority="high" decoding="async" class="absolute inset-0 size-full scale-110 object-cover blur-[6px]">
+      <div class="absolute inset-0 bg-black/45" />
+    </template>
+    <AppLoader :size="76" class="relative" />
     <div
       v-if="progress"
-      class="flex w-28 flex-col items-center gap-2 transition-opacity duration-300"
+      class="relative flex w-28 flex-col items-center gap-2 transition-opacity duration-300"
       :class="shown === null ? 'opacity-0' : 'opacity-100'"
       role="progressbar"
       aria-valuemin="0"
@@ -27,6 +33,8 @@ import { roomLoadStep } from '~/utils/room/loadProgress'
 const props = defineProps<{
   /** Show the percentage (live pages, where the room's steps report in) */
   progress?: boolean
+  /** A picture of the room, shown behind while it loads */
+  poster?: string | null
 }>()
 
 // Not rendered on the server (the number is the browser's): it fades in

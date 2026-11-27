@@ -119,8 +119,10 @@ function parseDraft(value: unknown): BioDraft | null {
 /** What visitors may see: never the unpublished draft */
 export function publicBioPage(page: BioPage) {
   // Snapshots can show unpublished edits, so they stay with the owner too
-  const { draft: _draft, draftUpdatedAt: _draftUpdatedAt, thumbnailUrl: _thumb, roomThumbnailUrl: _roomThumb, ...live } = page
-  return live
+  const { draft, draftUpdatedAt: _draftUpdatedAt, thumbnailUrl: _thumb, roomThumbnailUrl, ...live } = page
+  // Except the room's, shown while the 3D view loads, when there's no draft:
+  // then the room as last saved is the room that's live
+  return { ...live, roomPosterUrl: draft ? null : roomThumbnailUrl }
 }
 
 /** What the editor works on: the live content with any draft on top */

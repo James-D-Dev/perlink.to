@@ -124,7 +124,7 @@
       <!-- The 3D room's loader (outside the branches above, so it can fade
            out over the room) -->
       <Transition leave-active-class="transition-opacity duration-300" leave-to-class="opacity-0">
-        <RoomLoadingShell v-if="!pending && !error && bioPage && room && !show2d && roomLoading" progress />
+        <RoomLoadingShell v-if="!pending && !error && bioPage && room && !show2d && roomLoading" progress :poster="bioPage.roomPosterUrl" />
       </Transition>
     </div>
   </div>
